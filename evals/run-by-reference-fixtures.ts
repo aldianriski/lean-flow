@@ -1281,17 +1281,20 @@ const CASES: Case[] = [
     expect: [],
   },
   {
-    // j: a backtick-protected `<!--` with a REACHABLE, unprotected `-->` later in the same
-    // paragraph -- P5/P6 (round 2) never discriminate code-span masking, because their `<!--` has
-    // no `-->` to reach at all (literal by the unclosed-comment rule instead). Here the id sits
-    // between the two, so losing backtick protection swallows it into a false comment span.
-    name: "j-backtick-protects-a-reachable-arrow (must-PASS: the id is not really commented out)",
+    // j (A5 DELIBERATE FLIP, revise round 3): this case was must-PASS under round-3's code-span
+    // model (the backtick-wrapped `<!--` was protected, since its "-->" was unreachable-through-
+    // backticks). A5 removes the code-span exception entirely -- the checker stops modelling inline
+    // Markdown -- so this `<!--` is now a real, reachable comment opener regardless of the
+    // surrounding backticks, and correctly blanks "TASK-901" out of the excuse text. The entry no
+    // longer excuses, so the edit is now (correctly, under A5) loud: FREEZE-EDIT. Kept as a control
+    // that A5's owner-ruled direction (err loud) is what actually fires here, not a bug.
+    name: "j-backtick-no-longer-protects-under-a5 (must-FAIL under A5: no code-span exception at all)",
     mutate: (d) => {
       EDIT_901(d, W("todo", T901));
       appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\nalpha explains `<!--` markers.\nTASK-901 gains a --> benchmark.\n");
-      commit(d, "edit + backtick-protected marker with a later arrow");
+      commit(d, "edit + backtick-wrapped marker with a later arrow");
     },
-    expect: [],
+    expect: ["FREEZE-EDIT TASK-901"],
   },
   // --- SPRINT-108 T1 revise round 3 (A5: err loud, stop parsing) --------------------------------
   {
@@ -1417,10 +1420,16 @@ const CASES: Case[] = [
     expect: [],
   },
   {
-    // Finding 4a: the inline Execution Log heading is unclosed at promote, closed later; a
-    // pre-promote scope-change entry must not retroactively count as new once it becomes
-    // recognisable, and must be flagged, never silently trusted.
-    name: "a5-4a-log-heading-unclosed-then-closed (must-FAIL: LOG-HEADING-CHANGED, never a silent excuse)",
+    // Finding 4a: the inline Execution Log heading is unclosed at promote, closed later. Under A5,
+    // headingName() strips an unclosed `<!--` to end of LINE, so this heading is ALREADY recognized
+    // at the baseline too (unlike round-3's paragraph model, where an unclosed comment stayed
+    // literal and broke the exact-match) -- there is no unrecognizable-then-recognizable transition
+    // to flag here, and LOG-HEADING-CHANGED correctly does not fire. The pre-promote entry is still
+    // correctly excluded (it is part of the unchanged prefix, not a new suffix), so the edit is
+    // still (correctly) loud: FREEZE-EDIT alone. Retained as the sibling that shows finding 4's fix
+    // is not needed for every unrecognizable-heading shape -- only for one genuinely unrecognizable
+    // at baseline (4b).
+    name: "a5-4a-log-heading-unclosed-then-closed (must-FAIL: FREEZE-EDIT; resolved by headingName alone, not LOG-HEADING-CHANGED)",
     opts: {
       pre: (d) => {
         edit(d, SPRINT, "## Execution Log", "## Execution Log <!-- inline");
@@ -1432,7 +1441,7 @@ const CASES: Case[] = [
       EDIT_901(d, W("todo", T901));
       commit(d, "close the inline log heading + edit");
     },
-    expect: ["LOG-HEADING-CHANGED", "FREEZE-EDIT TASK-901"],
+    expect: ["FREEZE-EDIT TASK-901"],
   },
   {
     // Finding 4b: a plain rename, "## Execution Log (draft)" -> "## Execution Log".

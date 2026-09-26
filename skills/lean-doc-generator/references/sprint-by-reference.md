@@ -75,22 +75,24 @@ baseline is the first commit that stamps or lists it, so its later edits need a 
 2. Find each member **by id** in its baseline tree so that folder moves do not matter:
    `git ls-tree -r -z --name-only <baseline> docs/work/` gives the one path whose filename starts
    with `TASK-NNN-`. The trailing hyphen keeps `TASK-36` from matching `TASK-360`.
-3. Read it at the baseline (`git show <baseline>:<path>`) and from disk now. **The rule throughout:
-   anything that ends or names a section, or excuses an edit, reads the text with comments blanked
-   (rendered); anything that selects members or compares the Done-when body reads the raw text — so
-   a wrong answer over-includes (a loud false positive) rather than silently missing.** So headings
-   are matched on the rendered text: take **every** `## Done when` section, ignoring `## ` lines
+3. Read it at the baseline (`git show <baseline>:<path>`) and from disk now. **A5 (owner ruling): the
+   checker stops modelling inline Markdown — it does not track code spans, so a comment is a comment
+   whatever backticks surround it. Wherever the reading is uncertain it takes whichever one produces
+   a finding: over-matching a heading only widens a compared section, over-stripping a comment can
+   only remove an excuse, and over-including a Members id can only add a member to check — all loud,
+   never a silent miss.** So a level-2 heading name is normalized before matching (0–3 spaces indent,
+   exactly `## `; every `<!-- … -->` on the line removed, an unclosed `<!--` to end of line; one
+   optional closing `#+` run stripped; internal whitespace collapsed to one space; trimmed;
+   case-insensitive) — take **every** `## Done when` section this way, still ignoring `## ` lines
    inside code fences (CommonMark: a fence opens or closes only at 0–3 spaces indent; it closes on a
    line of the same character, a run at least as long as the opener's, and nothing but whitespace
-   after — so a nested ` ``` ` inside a ` ```` ` fence never closes it, and a 4+-space-indented
-   closer never closes it either; a backtick fence whose info string itself contains a backtick
-   isn't a fence, so a bare inline span like `` ```x``` `` in running prose never flips it) and
-   `## ` lines inside an HTML comment, **block** (0–3 spaces indent, `<!--` to the first `-->`) or
-   **inline** (a same-line `<!-- … -->`, which may reach into the next body line before a blank
-   line, heading or fence ends the paragraph; a `<!--` inside a backtick span, or left unclosed at
-   the paragraph's end, is literal). **The comment or fence only hides the boundary, never the
-   Done-when text** — the raw line, comment and all, still goes into the body, so an edit made
-   *inside* the comment still counts as an edit (D1). If there is none on either side, that is a
+   after). **Only the heading boundary is ever normalized — the Done-when and Members BODY stays raw**
+   (an edit inside a comment still counts, D1; a commented-out Members id still selects the member).
+   A scope-change entry's event field and every id/`Tn` match likewise read the entry (heading and
+   body) with every comment span removed, entry-wide, no exception for backticks; an unclosed `<!--`
+   removes the rest of the entry. If the sprint's own `## Execution Log` heading is unrecognizable at
+   the baseline but recognizable now, that is its own finding (`LOG-HEADING-CHANGED`) — never license
+   to treat every earlier entry as new. If there is no `## Done when` on either side, that is a
    finding, never a pass.
 4. Compare line by line, ignoring blank lines, trailing space, line endings, the tick state of
    `[ ]`/`[x]` boxes (`-`, `*`, `+` or numbered), and the ` ✓ …` tail that a tick appends after the

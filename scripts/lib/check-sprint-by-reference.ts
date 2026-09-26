@@ -104,38 +104,48 @@ function sprintNumber(v: string | null): number | null {
 interface ScanLine {
   line: string; // always the RAW line
   hidden: boolean; // not a candidate section/heading boundary (inside a fence or a BLOCK HTML comment)
-  rendered: string; // `line` with INLINE `<!-- ... -->` spans blanked (paragraph-scoped) -- read by
-  // anything that ENDS/NAMES a section or EXCUSES an edit; anything that SELECTS members or
-  // COMPARES Done-when text reads `line` (raw) instead, so it over-includes rather than misses
-  // (round 2 review, D1's scope corrected: raw is for the Done-when BODY only, not everywhere).
 }
 
-const HEADING_SHAPE = /^#{1,6} /; // generic ATX heading, used only to bound a paragraph
-
 /**
- * A `<!-- ... -->` span (possibly spanning several lines) blanked to same-length whitespace
- * (newlines kept); a same-line backtick span (`` `...` ``) is left untouched first, so a `<!--`
- * inside one is literal and never opens a comment (F4/P5). An unclosed `<!--` -- no `-->` before
- * `text` (one paragraph) ends -- is left untouched too: the regex only matches a CLOSED span.
+ * A5 (owner ruling): the checker stops modelling inline Markdown. No code-span exception anywhere.
+ * Every `<!-- ... -->` span in `text` is blanked to same-length whitespace (newlines kept), across
+ * lines, and an unclosed `<!--` blanks everything to the end of `text`. Over-stripping can only
+ * remove an excuse or shrink a body, which is the loud direction -- never the reverse.
  */
-function renderParagraph(text: string): string {
-  return text.replace(/`[^`\n]*`|<!--[\s\S]*?-->/g, (m) => (m[0] === "`" ? m : m.replace(/[^\n]/g, " ")));
+function stripComments(text: string): string {
+  let s = text.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, " "));
+  const i = s.indexOf("<!--");
+  if (i !== -1) s = s.slice(0, i) + s.slice(i).replace(/[^\n]/g, " ");
+  return s;
 }
 
 /**
- * ONE block-structure scan, used by section(), scopeChangeEntries() and the Plan Cites: reader, so
- * fence and HTML-comment handling can never disagree between callers (that disagreement was F2).
- * States: normal / fence(char, len) / comment. `hidden` lines are never a heading/entry boundary;
- * `rendered` additionally blanks an INLINE comment span within the same paragraph -- a paragraph
- * ends at a blank line, a hidden (fenced/block-comment) line, or a heading-shaped line, so an inline
- * comment can span body lines but never reach past one of those (may span lines: R3d).
+ * Normalizes a level-2 ATX heading line to its comparable name, or null if `rawLine` isn't one.
+ * A5: 0-3 spaces indent then exactly `## ` (a third `#` disqualifies it, matching CommonMark);
+ * strip comments on the line (stripComments, unclosed-to-end-of-LINE here since a heading is one
+ * line); strip one optional closing `#+` run preceded by a space; collapse internal whitespace to
+ * one space; trim. Over-matching (a heading recognized that a stricter reading would miss) only
+ * widens a compared section, which is loud -- never a silent gap (finding 2, 3).
+ */
+function headingName(rawLine: string): string | null {
+  const m = rawLine.match(/^ {0,3}## (.*)$/);
+  if (!m) return null;
+  let rest = stripComments(m[1]!);
+  rest = rest.replace(/ #+\s*$/, "");
+  return rest.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * ONE block-structure scan, used by section() to find fenced/block-comment lines. `hidden` lines
+ * are never a heading/entry boundary; the RAW line is always returned unmodified.
  *
  * - normal: 0-3 spaces indent then a run of >= 3 of the SAME `` ` `` or `~` OPENS a fence -- except
  *   a backtick run whose trailing info string itself contains a backtick (CommonMark; this is also
  *   what stops a bare inline code span like "```x``` spans are inline code" from flipping parity --
  *   F5). 0-3 spaces indent then `<!--` opens an HTML BLOCK comment, closing on the first line that
  *   contains `-->` (maybe the same line); unclosed runs to EOF. A `<!--` that does not start the
- *   line is inline, handled by `rendered` instead -- never block-hidden (F4).
+ *   line is inline -- never block-hidden (F4); the excuse path handles inline comments separately
+ *   via stripComments(), entry-wide (A5).
  * - fence: closes only on a line with 0-3 spaces indent, the SAME char, a run >= the opener's, and
  *   nothing but whitespace after (F1, F3). Everything inside, including a `<!--` line, is just
  *   fenced content: neither a fence nor a comment can open inside an open fence.
@@ -172,43 +182,29 @@ function scanBlocks(content: string): ScanLine[] {
       }
     }
   }
-
-  const rendered: string[] = new Array(lines.length);
-  for (let i = 0; i < lines.length; ) {
-    if (hidden[i]) {
-      rendered[i] = lines[i]!.replace(/[^\n]/g, " "); // fence/block-comment content: fully blanked
-      i++;
-      continue;
-    }
-    if (lines[i]!.trim() === "" || HEADING_SHAPE.test(lines[i]!)) {
-      rendered[i] = renderParagraph(lines[i]!);
-      i++;
-      continue;
-    }
-    const start = i;
-    while (i < lines.length && !hidden[i] && lines[i]!.trim() !== "" && !HEADING_SHAPE.test(lines[i]!)) i++;
-    const renderedLines = renderParagraph(lines.slice(start, i).join("\n")).split("\n");
-    for (let k = 0; k < renderedLines.length; k++) rendered[start + k] = renderedLines[k]!;
-  }
-
-  return lines.map((line, idx) => ({ line, hidden: hidden[idx]!, rendered: rendered[idx]! }));
+  return lines.map((line, idx) => ({ line, hidden: hidden[idx]! }));
 }
 
 /**
  * Every level-2 section with this heading, concatenated; null when none exists. Boundaries are
- * found on `rendered` (D1's scope corrected: a heading naming this section is recognized even with
- * a trailing inline comment -- R1/R2/R4), but the RAW line is what is pushed into the BODY, so an
- * edit inside a comment still shows as a change (D1 unchanged for Done-when text itself).
+ * found via headingName() (A5: comments blanked, a closing `#+` stripped, whitespace collapsed --
+ * so a decorated or malformed heading is still recognized -- R1/R2/R4, findings 2-3), but the RAW
+ * line is what is pushed into the BODY, so an edit inside a comment still shows as a change (D1
+ * unchanged for Done-when text itself; Members selection also stays raw -- R5).
  */
 function section(content: string, heading: string): string | null {
   const out: string[] = [];
   let inside = false;
   let found = false;
-  for (const { line, hidden, rendered } of scanBlocks(content)) {
-    if (!hidden && /^## /.test(rendered)) {
-      inside = rendered.trim().toLowerCase() === `## ${heading}`.toLowerCase();
-      found ||= inside;
-      continue;
+  const target = heading.toLowerCase();
+  for (const { line, hidden } of scanBlocks(content)) {
+    if (!hidden) {
+      const name = headingName(line);
+      if (name !== null) {
+        inside = name.toLowerCase() === target;
+        found ||= inside;
+        continue;
+      }
     }
     if (inside) out.push(line);
   }
@@ -268,23 +264,26 @@ function resolveId(paths: string[], id: string): string[] {
  */
 function scopeChangeEntries(log: string, from = 0): string[] {
   const entries: string[] = [];
-  let cur: string[] | null = null;
+  let cur: string[] | null = null; // RAW lines of the current entry (heading first)
   let at = 0;
-  for (const { line, hidden, rendered } of scanBlocks(log)) {
+  const flush = () => {
+    if (cur) entries.push(stripComments(cur.join("\n")).trim()); // A5: excuseText, entry-wide, no code-span exception
+  };
+  for (const { line, hidden } of scanBlocks(log)) {
     const start = at;
-    at += line.length + 1; // raw line length (== rendered length, comments blank in place), so `from` still works
-    if (!hidden && /^#{1,3} /.test(rendered)) {
-      if (cur) entries.push(cur.join("\n").trim());
+    at += line.length + 1; // raw line length, so `from` (a byte offset into the raw log) still works
+    if (!hidden && /^#{1,3} /.test(line)) {
+      flush();
       cur = null;
-      // the event field and every id/Tn match read `rendered`: a commented `| scope-change |` is not
-      // an event, and an id only inside a comment (heading or body) excuses nothing (R3a-d).
-      const f = rendered.split("|");
-      if (start >= from && /^### /.test(rendered) && f.length >= 2 && f[1]!.trim().toLowerCase() === "scope-change") cur = [rendered];
+      // the event field reads the line's own stripped text: a commented `| scope-change |` is not
+      // an event (finding 1's sibling on the heading side).
+      const f = stripComments(line).split("|");
+      if (start >= from && /^### /.test(line) && f.length >= 2 && f[1]!.trim().toLowerCase() === "scope-change") cur = [line];
       continue;
     }
-    cur?.push(rendered);
+    cur?.push(line);
   }
-  if (cur) entries.push(cur.join("\n").trim());
+  flush();
   return entries;
 }
 
@@ -457,17 +456,30 @@ function main(argv: string[]) {
   // appended after the baseline's text -- never an old entry reworded, nor a paragraph tucked under one
   // (round 2, minor 1). A source whose baseline text is no longer a prefix was rewritten: LOG-REWRITTEN,
   // and none of its entries count.
+  const nowInlineSection = section(sprintText, "Execution Log"); // null: heading unrecognisable now too
   const liveSources: [string, string][] = [
     ["logs/ file", existsSync(join(root, logRel)) ? readFileSync(join(root, logRel), "utf8") : ""],
-    ["inline ## Execution Log", section(sprintText, "Execution Log") ?? ""],
+    ["inline ## Execution Log", nowInlineSection ?? ""],
   ];
   const rewritten = new Set<string>();
+  const logHeadingChanged = new Set<string>();
   const newSince = new Map<string, string[]>();
   const scopedSince = (base: string): string[] => {
     if (!newSince.has(base)) {
-      const baseSources = [showAt(base, "log"), section(showAt(base, "sprint"), "Execution Log") ?? ""];
+      const baseInlineSection = section(showAt(base, "sprint"), "Execution Log");
+      const baseSources = [showAt(base, "log"), baseInlineSection ?? ""];
       const fresh: string[] = [];
       liveSources.forEach(([label, live], i) => {
+        // The inline heading is expected to always exist somehow; unrecognisable at the baseline
+        // but recognisable now (closed later, renamed, ...) must never silently make every
+        // pre-promote entry new -- flag it instead, and count none of that source's entries.
+        if (i === 1 && baseInlineSection === null && nowInlineSection !== null) {
+          if (!logHeadingChanged.has(base)) {
+            logHeadingChanged.add(base);
+            bad("LOG-HEADING-CHANGED", `the inline ## Execution Log heading is unrecognisable at ${base.slice(0, 7)} but recognisable now -- its entries are not counted`);
+          }
+          return;
+        }
         // frontmatter is metadata (`last_updated` is bumped on every append), not a past entry
         const before = body(baseSources[i]!).trimEnd();
         const now = body(live);
@@ -486,13 +498,32 @@ function main(argv: string[]) {
   const frozenSprint = showAt(pc, "sprint");
   const tCites = new Map<string, Set<string>>();
   let curT: string | null = null;
-  for (const { hidden, rendered } of scanBlocks(section(frozenSprint, "Plan") ?? "")) {
+  let curTLines: string[] = [];
+  const flushT = () => {
+    if (curT) {
+      const citesLine = stripComments(curTLines.join("\n"))
+        .split("\n")
+        .find((l) => /^Cites:/.test(l));
+      if (citesLine) tCites.set(curT, taskIds(citesLine));
+    }
+    curTLines = [];
+  };
+  for (const { line, hidden } of scanBlocks(section(frozenSprint, "Plan") ?? "")) {
     if (hidden) continue;
-    const h = rendered.match(/^### (T\d+)\b/);
-    if (h) curT = h[1]!;
-    else if (/^#{1,3} /.test(rendered)) curT = null;
-    else if (curT && /^Cites:/.test(rendered)) tCites.set(curT, taskIds(rendered));
+    const h = line.match(/^### (T\d+)\b/);
+    if (h) {
+      flushT();
+      curT = h[1]!;
+      continue;
+    }
+    if (/^#{1,3} /.test(line)) {
+      flushT();
+      curT = null;
+      continue;
+    }
+    if (curT) curTLines.push(line);
   }
+  flushT();
   const names = (entries: string[], id: string): boolean =>
     entries.some(
       // a `Tn` counts only in the heading: in a body it is as often sequencing prose as a subject
