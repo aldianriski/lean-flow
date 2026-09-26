@@ -103,22 +103,39 @@ function sprintNumber(v: string | null): number | null {
 
 interface ScanLine {
   line: string; // always the RAW line
-  hidden: boolean; // not a candidate section/heading boundary (inside a fence or an HTML comment)
+  hidden: boolean; // not a candidate section/heading boundary (inside a fence or a BLOCK HTML comment)
+  rendered: string; // `line` with INLINE `<!-- ... -->` spans blanked (paragraph-scoped) -- read by
+  // anything that ENDS/NAMES a section or EXCUSES an edit; anything that SELECTS members or
+  // COMPARES Done-when text reads `line` (raw) instead, so it over-includes rather than misses
+  // (round 2 review, D1's scope corrected: raw is for the Done-when BODY only, not everywhere).
+}
+
+const HEADING_SHAPE = /^#{1,6} /; // generic ATX heading, used only to bound a paragraph
+
+/**
+ * A `<!-- ... -->` span (possibly spanning several lines) blanked to same-length whitespace
+ * (newlines kept); a same-line backtick span (`` `...` ``) is left untouched first, so a `<!--`
+ * inside one is literal and never opens a comment (F4/P5). An unclosed `<!--` -- no `-->` before
+ * `text` (one paragraph) ends -- is left untouched too: the regex only matches a CLOSED span.
+ */
+function renderParagraph(text: string): string {
+  return text.replace(/`[^`\n]*`|<!--[\s\S]*?-->/g, (m) => (m[0] === "`" ? m : m.replace(/[^\n]/g, " ")));
 }
 
 /**
  * ONE block-structure scan, used by section(), scopeChangeEntries() and the Plan Cites: reader, so
  * fence and HTML-comment handling can never disagree between callers (that disagreement was F2).
- * States: normal / fence(char, len) / comment. `hidden` lines are never a heading/entry boundary,
- * but the RAW line is always returned, so a caller can still read or compare the real text (D1: an
- * edit inside a comment still counts).
+ * States: normal / fence(char, len) / comment. `hidden` lines are never a heading/entry boundary;
+ * `rendered` additionally blanks an INLINE comment span within the same paragraph -- a paragraph
+ * ends at a blank line, a hidden (fenced/block-comment) line, or a heading-shaped line, so an inline
+ * comment can span body lines but never reach past one of those (may span lines: R3d).
  *
  * - normal: 0-3 spaces indent then a run of >= 3 of the SAME `` ` `` or `~` OPENS a fence -- except
  *   a backtick run whose trailing info string itself contains a backtick (CommonMark; this is also
  *   what stops a bare inline code span like "```x``` spans are inline code" from flipping parity --
- *   F5). 0-3 spaces indent then `<!--` opens an HTML block comment, closing on the first line that
+ *   F5). 0-3 spaces indent then `<!--` opens an HTML BLOCK comment, closing on the first line that
  *   contains `-->` (maybe the same line); unclosed runs to EOF. A `<!--` that does not start the
- *   line is inline -- headings are block-level, so an inline comment can never hide one (F4).
+ *   line is inline, handled by `rendered` instead -- never block-hidden (F4).
  * - fence: closes only on a line with 0-3 spaces indent, the SAME char, a run >= the opener's, and
  *   nothing but whitespace after (F1, F3). Everything inside, including a `<!--` line, is just
  *   fenced content: neither a fence nor a comment can open inside an open fence.
@@ -126,54 +143,65 @@ interface ScanLine {
  *   (F2) -- a fence can't open inside a comment either.
  */
 function scanBlocks(content: string): ScanLine[] {
-  const out: ScanLine[] = [];
+  const lines = lf(content).split("\n");
+  const hidden: boolean[] = new Array(lines.length).fill(false);
   let fenceChar: string | null = null;
   let fenceLen = 0;
   let inComment = false;
-  for (const line of lf(content).split("\n")) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
     if (fenceChar !== null) {
       const close = line.match(/^ {0,3}(`{3,}|~{3,})[ \t]*$/);
       if (close && close[1]![0] === fenceChar && close[1]!.length >= fenceLen) {
         fenceChar = null;
         fenceLen = 0;
       }
-      out.push({ line, hidden: true });
-      continue;
-    }
-    if (inComment) {
+      hidden[i] = true;
+    } else if (inComment) {
       if (line.includes("-->")) inComment = false;
-      out.push({ line, hidden: true });
-      continue;
+      hidden[i] = true;
+    } else {
+      const open = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+      if (open && !(open[1]![0] === "`" && open[2]!.includes("`"))) {
+        fenceChar = open[1]![0]!;
+        fenceLen = open[1]!.length;
+        hidden[i] = true;
+      } else if (/^ {0,3}<!--/.test(line)) {
+        if (!line.includes("-->")) inComment = true;
+        hidden[i] = true;
+      }
     }
-    const open = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
-    if (open && !(open[1]![0] === "`" && open[2]!.includes("`"))) {
-      fenceChar = open[1]![0]!;
-      fenceLen = open[1]!.length;
-      out.push({ line, hidden: true });
-      continue;
-    }
-    if (/^ {0,3}<!--/.test(line)) {
-      if (!line.includes("-->")) inComment = true;
-      out.push({ line, hidden: true });
-      continue;
-    }
-    out.push({ line, hidden: false });
   }
-  return out;
+
+  const rendered: string[] = new Array(lines.length);
+  for (let i = 0; i < lines.length; ) {
+    if (hidden[i] || lines[i]!.trim() === "" || HEADING_SHAPE.test(lines[i]!)) {
+      rendered[i] = renderParagraph(lines[i]!);
+      i++;
+      continue;
+    }
+    const start = i;
+    while (i < lines.length && !hidden[i] && lines[i]!.trim() !== "" && !HEADING_SHAPE.test(lines[i]!)) i++;
+    const renderedLines = renderParagraph(lines.slice(start, i).join("\n")).split("\n");
+    for (let k = 0; k < renderedLines.length; k++) rendered[start + k] = renderedLines[k]!;
+  }
+
+  return lines.map((line, idx) => ({ line, hidden: hidden[idx]!, rendered: rendered[idx]! }));
 }
 
 /**
  * Every level-2 section with this heading, concatenated; null when none exists. Boundaries are
- * found on non-hidden lines (D1: a comment or fence only hides the boundary, never the text -- the
- * RAW line is what is pushed into the body, so an edit inside a comment still shows as a change).
+ * found on `rendered` (D1's scope corrected: a heading naming this section is recognized even with
+ * a trailing inline comment -- R1/R2/R4), but the RAW line is what is pushed into the BODY, so an
+ * edit inside a comment still shows as a change (D1 unchanged for Done-when text itself).
  */
 function section(content: string, heading: string): string | null {
   const out: string[] = [];
   let inside = false;
   let found = false;
-  for (const { line, hidden } of scanBlocks(content)) {
-    if (!hidden && /^## /.test(line)) {
-      inside = line.trim().toLowerCase() === `## ${heading}`.toLowerCase();
+  for (const { line, hidden, rendered } of scanBlocks(content)) {
+    if (!hidden && /^## /.test(rendered)) {
+      inside = rendered.trim().toLowerCase() === `## ${heading}`.toLowerCase();
       found ||= inside;
       continue;
     }
@@ -237,17 +265,19 @@ function scopeChangeEntries(log: string, from = 0): string[] {
   const entries: string[] = [];
   let cur: string[] | null = null;
   let at = 0;
-  for (const { line, hidden } of scanBlocks(log)) {
+  for (const { line, hidden, rendered } of scanBlocks(log)) {
     const start = at;
-    at += line.length + 1; // raw line length, so `from` (a byte offset into the raw log) still works
-    if (!hidden && /^#{1,3} /.test(line)) {
+    at += line.length + 1; // raw line length (== rendered length, comments blank in place), so `from` still works
+    if (!hidden && /^#{1,3} /.test(rendered)) {
       if (cur) entries.push(cur.join("\n").trim());
       cur = null;
-      const f = line.split("|");
-      if (start >= from && /^### /.test(line) && f.length >= 2 && f[1]!.trim().toLowerCase() === "scope-change") cur = [line];
+      // the event field and every id/Tn match read `rendered`: a commented `| scope-change |` is not
+      // an event, and an id only inside a comment (heading or body) excuses nothing (R3a-d).
+      const f = rendered.split("|");
+      if (start >= from && /^### /.test(rendered) && f.length >= 2 && f[1]!.trim().toLowerCase() === "scope-change") cur = [rendered];
       continue;
     }
-    cur?.push(line);
+    cur?.push(rendered);
   }
   if (cur) entries.push(cur.join("\n").trim());
   return entries;
@@ -451,12 +481,12 @@ function main(argv: string[]) {
   const frozenSprint = showAt(pc, "sprint");
   const tCites = new Map<string, Set<string>>();
   let curT: string | null = null;
-  for (const { line, hidden } of scanBlocks(section(frozenSprint, "Plan") ?? "")) {
+  for (const { hidden, rendered } of scanBlocks(section(frozenSprint, "Plan") ?? "")) {
     if (hidden) continue;
-    const h = line.match(/^### (T\d+)\b/);
+    const h = rendered.match(/^### (T\d+)\b/);
     if (h) curT = h[1]!;
-    else if (/^#{1,3} /.test(line)) curT = null;
-    else if (curT && /^Cites:/.test(line)) tCites.set(curT, taskIds(line));
+    else if (/^#{1,3} /.test(rendered)) curT = null;
+    else if (curT && /^Cites:/.test(rendered)) tCites.set(curT, taskIds(rendered));
   }
   const names = (entries: string[], id: string): boolean =>
     entries.some(
