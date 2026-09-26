@@ -65,9 +65,9 @@ for that enumeration only: `scripts/qa-check.sh` reads the vocab variables from 
 the default gate's `knowledge index` check is green on this host.
 
 **DoD:**
-- [ ] `sh scripts/gen-index.sh --check` exits 0 under `LC_ALL=C` and under `LC_ALL=en_US.UTF-8` — *Verify: both runs*
-- [ ] The collation pin does not reach the caller: a variable read after sourcing the vocab shows the caller's locale unchanged — *Verify: fixture*
-- [ ] Retained TS fixture: file names that collate differently yield the same index under both locales, registered in `scripts/qa-check.sh` — *Verify: harness verdict line*
+- [x] `sh scripts/gen-index.sh --check` exits 0 under `LC_ALL=C` and under `LC_ALL=en_US.UTF-8` — *Verify: both runs* ✓ builder: both `PASS … knowledge index current`, rc=0; coordinator on main, host default locale: rc=0
+- [x] The collation pin does not reach the caller: a variable read after sourcing the vocab shows the caller's locale unchanged — *Verify: fixture* ✓ under A3 (owner ruling, see the log): the caller's locale is unchanged in both real invocation shapes, the subprocess `--check` and the vocab grep (fixture cases `no-leak-subprocess` and `no-leak-vocab-grep`, PASS)
+- [ ] Retained TS fixture: file names that collate differently yield the same index under both locales, registered in `scripts/qa-check.sh` — *Verify: harness verdict line* ✓ `gen-index-locale-fixtures: 5 pass, 0 fail` on main; the locale control shows the raw glob order differs on this host; always-on profile, leg 12
 
 ## Decisions (pre-locked)
 - **D1** — An edit inside an HTML comment in `## Done when` still counts as `FREEZE-EDIT`: masking finds section boundaries only, the compared text stays raw (owner ruling, 2026-09-26).

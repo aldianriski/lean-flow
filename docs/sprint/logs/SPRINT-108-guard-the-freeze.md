@@ -30,3 +30,22 @@ T1 is `/tdd` fixture-first with seeded-break proof and outside review; T2 is dir
 fixture and a locale control that prints INVALID when the host cannot discriminate.
 consequence · T1 · behaviour:material · governance:high → worktree-isolated outside review
 consequence · T2 · behaviour:low · governance:med → coordinator re-run + read of the diff
+
+### 2026-09-26 | progress | T2 accepted — the knowledge index is built in byte order under any locale
+Worktree commits `6c4ddb5` and `fdf4427`, cherry-picked as `0afbac2` and `aabe874`. The generator enumerates the ADR and
+research globs, then orders them with a `LC_ALL=C sort` scoped to that one pipeline. `IFS` is restored
+after the loop even when there are no matches. There are no other locale-sensitive steps (builder checked).
+The committed index regenerates byte-identical, which confirms A2. New retained harness registered always-on in
+leg 12, beside the git-availability harness (git init only, no commits built, ~9 s).
+**Coordinator re-run on main:** `--check` → `PASS … knowledge index current` rc=0 under the host default locale;
+`gen-index-locale-fixtures: 5 pass, 0 fail`. The locale control confirms the raw glob order differs on this host,
+so the byte-identical case discriminates. Builder seed (sort removed) reddened `byte-identical-index`; restored,
+`git hash-object` = `git rev-parse HEAD:` = `27dabd38`.
+Read of the diff: the only locale change is the prefix on `sort`; nothing is exported.
+
+### 2026-09-26 | scope-change | T2 "no leak" criterion names a shape no caller uses
+What broke: the DoD reads "a variable read after *sourcing* the vocab". The gate never sources the
+generator. It runs it as a subprocess and greps its `TAGS=`/`DOMAINS=` lines, so the premise was the
+coordinator's error at G1. Impact: none on scope. The criterion's intent (nothing reaches the caller) is fixtured
+in both real shapes. **A3 (owner ruling, 2026-09-26):** amend the premise to the two real invocation shapes
+and tick on that basis. § Plan's criterion text itself is unedited.
