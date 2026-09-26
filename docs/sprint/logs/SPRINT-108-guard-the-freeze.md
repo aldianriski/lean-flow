@@ -169,3 +169,13 @@ are all CLOSED on the reviewer's own spellings, and the L-186 selection probes (
 Reviewer seeds A–C each reddened exactly one case; restored to `a8d51c2b` (`git hash-object` = HEAD blob).
 Pattern: three rounds of a hand-rolled CommonMark subset, and each round closes its set and opens the next set at a new
 boundary. Owner ruling required on direction.
+
+### 2026-09-26 | gate | owner authorizes T1 revise round 3 — A5: err loud, stop parsing
+Owner ruling (popup, 2026-09-26), chosen over adopting a real parser and over stopping with TDs. **A5:** the checker stops
+modelling inline Markdown; wherever the rendered meaning is uncertain, it takes the reading that produces a finding.
+- Excuses match against the entry text with every comment span removed (no code-span exception; an unclosed `<!--` strips
+  to the end of the entry).
+- Heading names allow a 0–3-space indent and closing `#`s, with whitespace collapsed.
+- A log heading that is unrecognised at the baseline yields `LOG-HEADING-CHANGED`, never "all entries new".
+- One deliberate flip is allowed: `j-backtick-protects-a-reachable-arrow` may turn loud.
+- List-item containers and `<pre>` blocks go to TD at close.
