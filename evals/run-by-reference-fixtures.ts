@@ -1253,18 +1253,30 @@ const CASES: Case[] = [
   },
   {
     // R5: a Members bullet wrapped in an HTML comment -- selection reads RAW, so it still selects
-    // (over-inclusion is the loud/safe direction).
+    // (over-inclusion is the loud/safe direction). T902 is ALSO unstamped so this is the only path
+    // to it (with the stamp left in place the id is found either way, and the fixture proves
+    // nothing -- L-186).
     name: "r5-members-line-commented-out-edited (must-FAIL: raw selection over-includes)",
-    opts: { pre: (d) => edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "<!-- - docs/work/todo/TASK-902-beta.md -->\n") },
+    opts: {
+      pre: (d) => {
+        edit(d, W("todo", T902), "sprint: SPRINT-901\n", "");
+        edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "<!-- - docs/work/todo/TASK-902-beta.md -->\n");
+      },
+    },
     mutate: (d) => {
       edit(d, W("todo", T902), "beta consumes alpha's output unchanged", "beta consumes alpha's output unchanged, verified");
-      commit(d, "edit commented-out member");
+      commit(d, "edit commented-out, unstamped member");
     },
     expect: ["FREEZE-EDIT TASK-902"],
   },
   {
     name: "r5-members-line-commented-out-clean (sibling control)",
-    opts: { pre: (d) => edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "<!-- - docs/work/todo/TASK-902-beta.md -->\n") },
+    opts: {
+      pre: (d) => {
+        edit(d, W("todo", T902), "sprint: SPRINT-901\n", "");
+        edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "<!-- - docs/work/todo/TASK-902-beta.md -->\n");
+      },
+    },
     mutate: () => {},
     expect: [],
   },
