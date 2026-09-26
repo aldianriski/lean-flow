@@ -272,7 +272,11 @@ function returnToBacklog(root: string, id: string, withLog = true) {
 function hostCheck(root: string, close: boolean): string[] | null {
   if (!existsSync(CHECKER)) return null; // a consumer without the host gate: the plain-git fallback is the check
   const r = spawnSync("bun", [CHECKER, join(root, SPRINT), ...(close ? ["--close"] : [])], { encoding: "utf8" });
-  return (r.stdout ?? "").split(/\r?\n/).filter((l) => l.startsWith("FAIL  ")).map((l) => l.slice(6).split(" -- ")[0]!.trim()).sort();
+  const lines = (r.stdout ?? "").split(/\r?\n/);
+  // A missing verdict line is never a vacuous pass -- it is its own finding, so no expectation can
+  // pass by accident when the checker silently produced nothing to read.
+  if (!lines.some((l) => /^check-sprint-by-reference: \d+ pass, \d+ fail$/.test(l))) return ["NO-VERDICT"];
+  return lines.filter((l) => l.startsWith("FAIL  ")).map((l) => l.slice(6).split(" -- ")[0]!.trim()).sort();
 }
 
 // ---------- fixture repo ----------

@@ -20,9 +20,9 @@
 // CRLF (core.autocrlf) working tree, where a member reached only by its stamp must still be read.
 
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, appendFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmdirSync, rmSync, symlinkSync, writeFileSync, appendFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const FIX = fileURLToPath(new URL("fixtures/by-reference/", import.meta.url));
@@ -775,6 +775,125 @@ const CASES: Case[] = [
     },
     expect: ["FREEZE-EDIT TASK-905"],
   },
+  // --- SPRINT-108 T1: fences (CommonMark closing rule) and comments must not hide an edit --------
+  {
+    name: "nested-fence-hides-heading-then-edited (must-FAIL: a 4-backtick fence is not closed by an inner 3-backtick run)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "````markdown\n```typescript\n## Example, not heading\n```\n````\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit after nested fence");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "nested-fence-hides-heading-clean (sibling control: same shape, unedited)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "````markdown\n```typescript\n## Example, not heading\n```\n````\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "log-fenced-example-scope-change-hidden (must-FAIL: a fenced example does not excuse a real edit)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(
+        join(d, LOG),
+        "\n### 2026-09-25 | note | example scope-change syntax\n" +
+          "````markdown\n```md\n### 2026-09-25 | scope-change | example\nTASK-901 gains a benchmark.\n```\n````\n",
+      );
+      commit(d, "edit + fenced example entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "log-plain-fenced-example-scope-change-hidden (sibling control: a plain ``` fence already excludes it today)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(
+        join(d, LOG),
+        "\n### 2026-09-25 | note | example scope-change syntax\n" +
+          "```md\n### 2026-09-25 | scope-change | example\nTASK-901 gains a benchmark.\n```\n",
+      );
+      commit(d, "edit + plain-fenced example entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "comment-guidance-edit-below (must-FAIL: a `## ` inside an HTML comment does not end Done when)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] a retained fixture covers the empty input",
+          "<!--\n## guidance: one box per outcome\n-->\n- [ ] a retained fixture covers the empty input",
+        ),
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit below comment");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "comment-guidance-edit-inside (must-FAIL: D1 -- an edit inside the comment still counts)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] a retained fixture covers the empty input",
+          "<!--\n## guidance: one box per outcome\n-->\n- [ ] a retained fixture covers the empty input",
+        ),
+    },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "one box per outcome", "two boxes per outcome");
+      commit(d, "edit inside comment");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "comment-guidance-clean (sibling control: comment present, unedited)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] a retained fixture covers the empty input",
+          "<!--\n## guidance: one box per outcome\n-->\n- [ ] a retained fixture covers the empty input",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "unticked-box-with-check-tail (must-FAIL: guards the !l.ticked clause in sameDoneWhen)",
+    mutate: (d) => {
+      edit(
+        d,
+        W("todo", T901),
+        "- [ ] a retained fixture covers the empty input",
+        "- [ ] a retained fixture covers the empty input ✓ -- dropped: null input out of scope",
+      );
+      commit(d, "unticked box gains a check tail");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
   { name: "no-members (must-FAIL guard)", opts: { noMembers: true }, mutate: () => {}, expect: ["NO-MEMBERS"] },
@@ -841,6 +960,38 @@ for (const c of CASES) {
     fail++;
   } finally {
     if (dir) rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+// --- item 4(e): the sprint path spelled through an alias/junction must not CHECK-ERROR -----------
+{
+  const dir = build();
+  let alias: string | null = null;
+  try {
+    const candidate = join(dirname(dir), `${basename(dir)}-alias`);
+    try {
+      symlinkSync(dir, candidate, process.platform === "win32" ? "junction" : "dir");
+      alias = candidate;
+    } catch (e) {
+      console.log(`SKIP  alias-path: ${(e as Error).message.split("\n")[0]}`);
+    }
+    if (alias) {
+      const r = run(alias, false, SPRINT);
+      const good = r.exit === 0 && r.findings.length === 0;
+      console.log(
+        `${good ? "PASS" : "FAIL"}  by-reference-fixture: alias-path (sprint spelled through a junction resolves without CHECK-ERROR) -- findings [${r.findings.join(", ")}]; checker said "${r.verdict}" (exit ${r.exit})`,
+      );
+      good ? pass++ : fail++;
+    }
+  } catch (e) {
+    console.log(`FAIL  by-reference-fixture: alias-path -- harness error: ${(e as Error).message.split("\n")[0]}`);
+    fail++;
+  } finally {
+    if (alias) {
+      if (process.platform === "win32") rmdirSync(alias); // removes the junction point, never its target
+      else rmSync(alias, { force: true });
+    }
+    if (existsSync(dir)) rmSync(dir, { recursive: true, force: true });
   }
 }
 

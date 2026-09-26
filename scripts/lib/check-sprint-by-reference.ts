@@ -40,7 +40,7 @@
 // Exits 1 if M > 0.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 
 const WORK = "docs/work";
@@ -101,34 +101,61 @@ function sprintNumber(v: string | null): number | null {
   return m ? Number(m[1]) : null;
 }
 
-/** Lines outside fenced code blocks, so a fenced `## ` or `### ` is never read as a heading. */
+/**
+ * Lines outside fenced code blocks, so a fenced `## ` or `### ` is never read as a heading.
+ * CommonMark closing rule: a fence closes only on a line of the SAME char, a run length >= the
+ * opener's, and nothing but whitespace after the run -- so an inner "```typescript" inside a
+ * "````" fence is just more fenced content, never a close.
+ */
 function unfenced(content: string): { line: string; fenced: boolean }[] {
-  let fence: string | null = null;
+  let openChar: string | null = null;
+  let openLen = 0;
   return lf(content)
     .split("\n")
     .map((line) => {
-      const f = line.match(/^\s*(`{3,}|~{3,})/);
+      const f = line.match(/^\s*(`{3,}|~{3,})(.*)$/);
       if (f) {
-        if (fence === null) fence = f[1]![0]!;
-        else if (f[1]![0] === fence) fence = null;
-        return { line, fenced: true }; // a fence line is never a heading
+        const runChar = f[1]![0]!;
+        const runLen = f[1]!.length;
+        if (openChar === null) {
+          openChar = runChar;
+          openLen = runLen;
+        } else if (runChar === openChar && runLen >= openLen && /^\s*$/.test(f[2]!)) {
+          openChar = null;
+          openLen = 0;
+        }
+        return { line, fenced: true }; // a fence line (open, inner or close) is never a heading
       }
-      return { line, fenced: fence !== null };
+      return { line, fenced: openChar !== null };
     });
 }
 
-/** Every level-2 section with this heading, concatenated; null when none exists. */
+/** HTML comments blanked to same-length whitespace (newlines kept), so line numbers survive. */
+function blankComments(text: string): string {
+  return text.replace(/<!--[\s\S]*?(-->|$)/g, (c) => c.replace(/[^\n]/g, " "));
+}
+
+/**
+ * Every level-2 section with this heading, concatenated; null when none exists. Boundaries are
+ * found on comment-blanked text, so a `## ` inside an HTML comment never opens or closes a section
+ * (D1) -- but the RAW line is what is pushed into the body, so an edit inside the comment still
+ * shows as a text change.
+ */
 function section(content: string, heading: string): string | null {
+  const rawLines = lf(content).split("\n");
+  const blankLines = blankComments(lf(content)).split("\n");
+  const fenced = unfenced(content).map((x) => x.fenced);
   const out: string[] = [];
   let inside = false;
   let found = false;
-  for (const { line, fenced } of unfenced(content)) {
-    if (!fenced && /^## /.test(line)) {
-      inside = line.trim().toLowerCase() === `## ${heading}`.toLowerCase();
+  for (let i = 0; i < rawLines.length; i++) {
+    const blankLine = blankLines[i]!;
+    if (!fenced[i] && /^## /.test(blankLine)) {
+      inside = blankLine.trim().toLowerCase() === `## ${heading}`.toLowerCase();
       found ||= inside;
       continue;
     }
-    if (inside) out.push(line);
+    if (inside) out.push(rawLines[i]!);
   }
   return found ? out.join("\n") : null;
 }
@@ -188,7 +215,7 @@ function scopeChangeEntries(log: string, from = 0): string[] {
   const entries: string[] = [];
   let cur: string[] | null = null;
   let at = 0;
-  const blanked = log.replace(/<!--[\s\S]*?(-->|$)/g, (c) => c.replace(/[^\n]/g, " ")); // same offsets
+  const blanked = blankComments(log); // same offsets
   for (const { line, fenced } of unfenced(blanked)) {
     const start = at;
     at += line.length + 1;
@@ -254,8 +281,10 @@ function main(argv: string[]) {
   }
   const sprintPath = resolve(args[0]!);
   const sprintText = readFileSync(sprintPath, "utf8");
-  const root = git(dirname(sprintPath), ["rev-parse", "--show-toplevel"]).trim();
-  const sprintRel = relative(root, sprintPath).split("\\").join("/");
+  // Real spelling on both sides: an 8.3 short name or a junction/alias makes relative() climb
+  // `../../..` (and `git log --follow` throw) unless both are resolved the same way first.
+  const root = realpathSync.native(git(dirname(sprintPath), ["rev-parse", "--show-toplevel"]).trim());
+  const sprintRel = relative(root, realpathSync.native(sprintPath)).split("\\").join("/");
   // The log sits beside the sprint in logs/ -- unless only one of the pair was archived; then any
   // tracked docs/sprint/**/logs/<same basename> is it.
   let logRel = `${dirname(sprintRel)}/logs/${basename(sprintRel)}`;
