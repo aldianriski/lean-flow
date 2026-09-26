@@ -4,7 +4,8 @@ slug: guard-the-freeze
 owner: Maintainer
 last_updated: 2026-09-26
 status: active
-plan_commit: [sha — set at promote]
+gates_signed: G1,G2 @ 96865d2
+plan_commit: 96865d2
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
