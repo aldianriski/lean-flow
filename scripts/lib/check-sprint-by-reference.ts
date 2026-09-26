@@ -101,61 +101,83 @@ function sprintNumber(v: string | null): number | null {
   return m ? Number(m[1]) : null;
 }
 
-/**
- * Lines outside fenced code blocks, so a fenced `## ` or `### ` is never read as a heading.
- * CommonMark closing rule: a fence closes only on a line of the SAME char, a run length >= the
- * opener's, and nothing but whitespace after the run -- so an inner "```typescript" inside a
- * "````" fence is just more fenced content, never a close.
- */
-function unfenced(content: string): { line: string; fenced: boolean }[] {
-  let openChar: string | null = null;
-  let openLen = 0;
-  return lf(content)
-    .split("\n")
-    .map((line) => {
-      const f = line.match(/^\s*(`{3,}|~{3,})(.*)$/);
-      if (f) {
-        const runChar = f[1]![0]!;
-        const runLen = f[1]!.length;
-        if (openChar === null) {
-          openChar = runChar;
-          openLen = runLen;
-        } else if (runChar === openChar && runLen >= openLen && /^\s*$/.test(f[2]!)) {
-          openChar = null;
-          openLen = 0;
-        }
-        return { line, fenced: true }; // a fence line (open, inner or close) is never a heading
-      }
-      return { line, fenced: openChar !== null };
-    });
+interface ScanLine {
+  line: string; // always the RAW line
+  hidden: boolean; // not a candidate section/heading boundary (inside a fence or an HTML comment)
 }
 
-/** HTML comments blanked to same-length whitespace (newlines kept), so line numbers survive. */
-function blankComments(text: string): string {
-  return text.replace(/<!--[\s\S]*?(-->|$)/g, (c) => c.replace(/[^\n]/g, " "));
+/**
+ * ONE block-structure scan, used by section(), scopeChangeEntries() and the Plan Cites: reader, so
+ * fence and HTML-comment handling can never disagree between callers (that disagreement was F2).
+ * States: normal / fence(char, len) / comment. `hidden` lines are never a heading/entry boundary,
+ * but the RAW line is always returned, so a caller can still read or compare the real text (D1: an
+ * edit inside a comment still counts).
+ *
+ * - normal: 0-3 spaces indent then a run of >= 3 of the SAME `` ` `` or `~` OPENS a fence -- except
+ *   a backtick run whose trailing info string itself contains a backtick (CommonMark; this is also
+ *   what stops a bare inline code span like "```x``` spans are inline code" from flipping parity --
+ *   F5). 0-3 spaces indent then `<!--` opens an HTML block comment, closing on the first line that
+ *   contains `-->` (maybe the same line); unclosed runs to EOF. A `<!--` that does not start the
+ *   line is inline -- headings are block-level, so an inline comment can never hide one (F4).
+ * - fence: closes only on a line with 0-3 spaces indent, the SAME char, a run >= the opener's, and
+ *   nothing but whitespace after (F1, F3). Everything inside, including a `<!--` line, is just
+ *   fenced content: neither a fence nor a comment can open inside an open fence.
+ * - comment: runs until a line containing `-->`. A ``` inside it is comment content, never a fence
+ *   (F2) -- a fence can't open inside a comment either.
+ */
+function scanBlocks(content: string): ScanLine[] {
+  const out: ScanLine[] = [];
+  let fenceChar: string | null = null;
+  let fenceLen = 0;
+  let inComment = false;
+  for (const line of lf(content).split("\n")) {
+    if (fenceChar !== null) {
+      const close = line.match(/^ {0,3}(`{3,}|~{3,})[ \t]*$/);
+      if (close && close[1]![0] === fenceChar && close[1]!.length >= fenceLen) {
+        fenceChar = null;
+        fenceLen = 0;
+      }
+      out.push({ line, hidden: true });
+      continue;
+    }
+    if (inComment) {
+      if (line.includes("-->")) inComment = false;
+      out.push({ line, hidden: true });
+      continue;
+    }
+    const open = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (open && !(open[1]![0] === "`" && open[2]!.includes("`"))) {
+      fenceChar = open[1]![0]!;
+      fenceLen = open[1]!.length;
+      out.push({ line, hidden: true });
+      continue;
+    }
+    if (/^ {0,3}<!--/.test(line)) {
+      if (!line.includes("-->")) inComment = true;
+      out.push({ line, hidden: true });
+      continue;
+    }
+    out.push({ line, hidden: false });
+  }
+  return out;
 }
 
 /**
  * Every level-2 section with this heading, concatenated; null when none exists. Boundaries are
- * found on comment-blanked text, so a `## ` inside an HTML comment never opens or closes a section
- * (D1) -- but the RAW line is what is pushed into the body, so an edit inside the comment still
- * shows as a text change.
+ * found on non-hidden lines (D1: a comment or fence only hides the boundary, never the text -- the
+ * RAW line is what is pushed into the body, so an edit inside a comment still shows as a change).
  */
 function section(content: string, heading: string): string | null {
-  const rawLines = lf(content).split("\n");
-  const blankLines = blankComments(lf(content)).split("\n");
-  const fenced = unfenced(content).map((x) => x.fenced);
   const out: string[] = [];
   let inside = false;
   let found = false;
-  for (let i = 0; i < rawLines.length; i++) {
-    const blankLine = blankLines[i]!;
-    if (!fenced[i] && /^## /.test(blankLine)) {
-      inside = blankLine.trim().toLowerCase() === `## ${heading}`.toLowerCase();
+  for (const { line, hidden } of scanBlocks(content)) {
+    if (!hidden && /^## /.test(line)) {
+      inside = line.trim().toLowerCase() === `## ${heading}`.toLowerCase();
       found ||= inside;
       continue;
     }
-    if (inside) out.push(rawLines[i]!);
+    if (inside) out.push(line);
   }
   return found ? out.join("\n") : null;
 }
@@ -215,11 +237,10 @@ function scopeChangeEntries(log: string, from = 0): string[] {
   const entries: string[] = [];
   let cur: string[] | null = null;
   let at = 0;
-  const blanked = blankComments(log); // same offsets
-  for (const { line, fenced } of unfenced(blanked)) {
+  for (const { line, hidden } of scanBlocks(log)) {
     const start = at;
-    at += line.length + 1;
-    if (!fenced && /^#{1,3} /.test(line)) {
+    at += line.length + 1; // raw line length, so `from` (a byte offset into the raw log) still works
+    if (!hidden && /^#{1,3} /.test(line)) {
       if (cur) entries.push(cur.join("\n").trim());
       cur = null;
       const f = line.split("|");
@@ -430,8 +451,8 @@ function main(argv: string[]) {
   const frozenSprint = showAt(pc, "sprint");
   const tCites = new Map<string, Set<string>>();
   let curT: string | null = null;
-  for (const { line, fenced } of unfenced(section(frozenSprint, "Plan") ?? "")) {
-    if (fenced) continue;
+  for (const { line, hidden } of scanBlocks(section(frozenSprint, "Plan") ?? "")) {
+    if (hidden) continue;
     const h = line.match(/^### (T\d+)\b/);
     if (h) curT = h[1]!;
     else if (/^#{1,3} /.test(line)) curT = null;

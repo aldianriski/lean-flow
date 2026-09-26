@@ -76,12 +76,16 @@ baseline is the first commit that stamps or lists it, so its later edits need a 
    `git ls-tree -r -z --name-only <baseline> docs/work/` gives the one path whose filename starts
    with `TASK-NNN-`. The trailing hyphen keeps `TASK-36` from matching `TASK-360`.
 3. Read it at the baseline (`git show <baseline>:<path>`) and from disk now. In each copy, take
-   **every** `## Done when` section, ignoring `## ` lines inside code fences (CommonMark closing: a
-   fence closes only on a line of the same character, a run at least as long as the opener's, and
-   nothing but whitespace after — so a nested ` ``` ` inside a ` ```` ` fence never closes it) and
-   `## ` lines inside an HTML comment. **The comment only hides the boundary, not the text** — the
-   raw line, comment and all, still goes into the body, so an edit made *inside* the comment still
-   counts as an edit (D1). If there is none on either side, that is a finding, never a pass.
+   **every** `## Done when` section, ignoring `## ` lines inside code fences (CommonMark: a fence
+   opens or closes only at 0–3 spaces indent; it closes on a line of the same character, a run at
+   least as long as the opener's, and nothing but whitespace after — so a nested ` ``` ` inside a
+   ` ```` ` fence never closes it, and a 4+-space-indented closer never closes it either; a backtick
+   fence whose info string itself contains a backtick isn't a fence, so a bare inline span like
+   `` ```x``` `` in running prose never flips it) and `## ` lines inside an HTML **block** comment
+   (0–3 spaces indent, `<!--` to the first `-->`; a `<!--` elsewhere in the line is inline and never
+   hides a heading). **The comment or fence only hides the boundary, not the text** — the raw line,
+   comment and all, still goes into the body, so an edit made *inside* the comment still counts as an
+   edit (D1). If there is none on either side, that is a finding, never a pass.
 4. Compare line by line, ignoring blank lines, trailing space, line endings, the tick state of
    `[ ]`/`[x]` boxes (`-`, `*`, `+` or numbered), and the ` ✓ …` tail that a tick appends after the
    frozen text.

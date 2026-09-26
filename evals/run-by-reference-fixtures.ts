@@ -894,6 +894,237 @@ const CASES: Case[] = [
     },
     expect: ["FREEZE-EDIT TASK-901"],
   },
+  // --- SPRINT-108 T1 revise round 1: one scanner, discriminating probes (outside review 2026-09-26) --
+  {
+    name: "scanner-p1-run-length (must-FAIL: bare fences isolate the run-length clause alone)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "````\n```\n## Example\n````\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit after p1 fence");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scanner-p1-run-length-clean (sibling control)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "````\n```\n## Example\n````\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "scanner-p2-whitespace-info (must-FAIL: equal-length info-carrying closer isolates the trailing-whitespace clause, TASK-902)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T902),
+          "- [ ] beta consumes alpha's output unchanged",
+          "```\n```text\n## Example\n```\n- [ ] beta consumes alpha's output unchanged",
+        ),
+    },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "beta consumes alpha's output unchanged", "beta consumes alpha's output unchanged, verified");
+      commit(d, "edit after p2 fence");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "scanner-p2-whitespace-info-clean (sibling control)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T902),
+          "- [ ] beta consumes alpha's output unchanged",
+          "```\n```text\n## Example\n```\n- [ ] beta consumes alpha's output unchanged",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "scanner-p9-log-whitespace-info (must-FAIL: a plain fence around an equal-length info line does not excuse a real edit)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(
+        join(d, LOG),
+        "\n### 2026-09-25 | note | example\n```\n```text\n### 2026-09-25 | scope-change | example\nTASK-901 gains a benchmark.\n```\n",
+      );
+      commit(d, "edit + p9 log fence");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scanner-p9-log-whitespace-info-clean (sibling control: the log alone, unedited, is not a finding)",
+    mutate: (d) => {
+      appendFileSync(
+        join(d, LOG),
+        "\n### 2026-09-25 | note | example\n```\n```text\n### 2026-09-25 | scope-change | example\nTASK-901 gains a benchmark.\n```\n",
+      );
+      commit(d, "p9 log fence only");
+    },
+    expect: [],
+  },
+  {
+    name: "scanner-f2-comment-then-fence (must-FAIL: one scanner keeps a comment and a following fence in agreement)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "<!--\n```\n-->\n```\n## Example, not heading\n```\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit after comment-then-fence");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scanner-f2-comment-then-fence-clean (sibling control)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "<!--\n```\n-->\n```\n## Example, not heading\n```\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "scanner-p4a-closer-indent (must-FAIL: a 4+-space-indented closer must not close, CommonMark <=3)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "```\n    ```\n## Example\n```\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit after p4a fence");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scanner-p4a-closer-indent-clean (sibling control)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "```\n    ```\n## Example\n```\n- [ ] alpha returns the documented value for every input in the table",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "scanner-p8-log-closer-indent (must-FAIL: same indent rule inside the log)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(
+        join(d, LOG),
+        "\n### 2026-09-25 | note | example\n```md\n    ```\n### 2026-09-25 | scope-change | example\nTASK-901 gains a benchmark.\n```\n",
+      );
+      commit(d, "edit + p8 log fence");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scanner-p8-log-closer-indent-clean (sibling control)",
+    mutate: (d) => {
+      appendFileSync(
+        join(d, LOG),
+        "\n### 2026-09-25 | note | example\n```md\n    ```\n### 2026-09-25 | scope-change | example\nTASK-901 gains a benchmark.\n```\n",
+      );
+      commit(d, "p8 log fence only");
+    },
+    expect: [],
+  },
+  {
+    name: "scanner-p5-inline-lt-bang-dash-second-done-when (must-FAIL: an inline `<!--` under Assumes must not swallow a later heading, TASK-902)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T902),
+          "## Assumes\n\nnone",
+          "## Assumes\n\nnone, except that `<!--` opens a comment\n\n## Done when\n\n- [ ] gamma holds",
+        ),
+    },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "gamma holds", "gamma holds and persists");
+      commit(d, "edit second Done when");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "scanner-p5-inline-lt-bang-dash-second-done-when-clean (sibling control)",
+    opts: {
+      pre: (d) =>
+        edit(
+          d,
+          W("todo", T902),
+          "## Assumes\n\nnone",
+          "## Assumes\n\nnone, except that `<!--` opens a comment\n\n## Done when\n\n- [ ] gamma holds",
+        ),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "scanner-p6-inline-lt-bang-dash-above-done-when (must-PASS: an inline `<!--` before ## Done when must not hide it -- never a false NO-DONE-WHEN)",
+    opts: {
+      pre: (d) => edit(d, W("todo", T901), "# TASK-901 — Deliver alpha", "# TASK-901 — Deliver alpha\n\nHandles the `<!--` token."),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    name: "scanner-p4d-inline-code-span-false-fence (must-FAIL: a ```x``` inline span must not flip fence parity, F5)",
+    opts: {
+      pre: (d) =>
+        edit(d, W("todo", T901), "- [ ] a retained fixture covers the empty input", "```x``` spans are inline code\n- [ ] a retained fixture covers the empty input"),
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit after inline-span line");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scanner-p4d-inline-code-span-false-fence-clean (sibling control)",
+    opts: {
+      pre: (d) =>
+        edit(d, W("todo", T901), "- [ ] a retained fixture covers the empty input", "```x``` spans are inline code\n- [ ] a retained fixture covers the empty input"),
+    },
+    mutate: () => {},
+    expect: [],
+  },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
   { name: "no-members (must-FAIL guard)", opts: { noMembers: true }, mutate: () => {}, expect: ["NO-MEMBERS"] },
