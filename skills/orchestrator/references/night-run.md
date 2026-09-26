@@ -200,9 +200,9 @@ process, where there is no ask channel to halt into.
 
 | # | If… | Then run | Gate |
 |---|---|---|---|
-| 1 | `<X>` is raw intent / a PRD / a ticket / **a slice of an open epic** | `/task-decomposer` (`--prd <path>` · `--epic <id\|name>` — decompose only the slice named, never the whole epic) → `TASK-NNN` in the Backlog | human `approve` |
-| 2 | the Backlog is ungroomed, or nothing is `state: ready` | `/triage` | human sign-off |
-| 3 | no active sprint holds the work | `/lean-doc-generator promote` | governance checklist sign-off |
+| 1 | `<X>` is raw intent / a PRD / a ticket / **a slice of an open epic** | `/task-decomposer` (`--prd <path>` · `--epic <id\|name>` — decompose only the slice named, never the whole epic) → a `TASK-NNN` file in `docs/work/backlog/` | human `approve` |
+| 2 | the files in `docs/work/backlog/` are ungroomed, or none is `state: ready` | `/triage` | human sign-off |
+| 3 | no active sprint holds the work — no top-level `docs/sprint/SPRINT-*.md` with `status: active` has the task as a member (`## Members` ∪ `sprint:` stamp, `dispatch.md` § Members by reference) | `/lean-doc-generator promote` | governance checklist sign-off |
 | 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |
 | 4b | G1/G2 are signed but no **approval envelope** is recorded | write `approval_envelope:` into the sprint frontmatter | human approval of all ten dimensions |
 | 4c | the gate (`scripts/qa-check.sh`) is red and **this Plan's purpose is repairing it** | write `gate_exceptions:` into the sprint frontmatter, naming only the check(s) the Plan repairs | owner ruling naming those specific checks — never a blanket grant |
@@ -291,7 +291,9 @@ All items must pass or the night-run does not fire:
       `promote`-, `close`-retention-, or `triage`-class approval is parked by design (Part 0), not
       attempted — if the sprint isn't promoted yet, promote it *now*, interactively, or don't fire.
 - [ ] Trigger carries the explicit `unattended` signal (Part 0).
-- [ ] Active sprint exists; § Plan is frozen (true since `promote`); **every task in the run is
+- [ ] Active sprint exists and at least one of its **members** still has an open `## Done when`
+      box — the members are the store's (`dispatch.md` § Members by reference), never Plan boxes,
+      which a by-reference Plan does not carry; § Plan is frozen (true since `promote`); **every task in the run is
       declared `J0` or `J1` — a declared `J2` task FAILS this item** (TD-109, ruled STRICT). Parking
       is what the run does with a J2-shaped step it *meets mid-run and could not have declared in
       advance* (Part 0's park protocol, above); it is not a way to *launch* while already holding a
@@ -307,7 +309,8 @@ All items must pass or the night-run does not fire:
       parks every task having done zero work. A sign-off the run cannot read is a sign-off that did not
       happen (L-099). **An absent field means NOT signed**, never "assume it was fine": the safe
       default is the one that costs a parked run, not the one that executes an ungated Plan.
-- [ ] Zero open `assumes:` / `needs-info` tasks in the run — G2 already blocks on this; pre-flight
+- [ ] Zero open `assumes:` / `needs-info` tasks in the run (read from each member file's
+      `## Assumes`) — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
 - [ ] **The gate is green, or every failing check is a named, pre-approved exception.**
       `night-run.sh` refuses to fire on ANY non-zero exit from `scripts/qa-check.sh` — otherwise a
@@ -326,7 +329,8 @@ All items must pass or the night-run does not fire:
          every `Bash` rule it needed and no `PowerShell` rule at all.
       2. **The landing path** — how the run's output becomes committed history. If the run fans work
          out, that is the coordinator's merge-back: integration-worktree creation, the merge itself,
-         and the worktree removal/prune after it. Read the steps off `dispatch.md` § Merge-back queue
+         and the worktree removal/prune after it — plus the task-file `git mv` transitions and the
+         duplicate-id check that run there. Read the steps off `dispatch.md` § Merge-back queue
          rather than recalling them.
       3. **The gate's own subprocesses** — any always-on check that shells out and *writes*. A
          harness that creates throwaway repos or temp dirs is doing git writes like any other, and
@@ -500,12 +504,17 @@ it is a hope. **The guarantee lives in the launcher instead** — see the reaper
 
 `scripts/night-run.sh` fires the run inside a wrapper that captures its exit code. That wrapper
 outlives the model, so it is where the rollup belongs: after the fired command exits — cleanly, early,
-or badly — the launcher re-enters itself, counts the DoD boxes in the active sprint file, lifts the
+or badly — the launcher re-enters itself, counts the `## Done when` boxes across the active sprint's
+**member files** (`## Members` ∪ `sprint:` stamps — the Plan carries none), lifts the
 cost figures off the log's last `result` event, and appends the Part 4 block to the Execution Log.
 Nobody has to remember. `--no-reap` opts out; otherwise it fires for every run that reaches the
 launcher's fire step at all, because getting there already proves a recognised mode signal was
 present (Part 0's mode-signal gate refuses anything else before launch). Decision and its trade →
 **ADR-016**.
+
+**This prose contract leads the script.** The shipped `scripts/night-run.sh` still counts boxes in
+the sprint file itself and is retargeted onto member files under TASK-383; until then it finds no
+Plan boxes to count on a by-reference sprint.
 
 **Pre-existing defect, fixed at SPRINT-093 T3's retry.** This used to fire only when the raw
 command text contained the literal substring `sprint-bulk` — stale from before SPRINT-088 T3
@@ -538,7 +547,7 @@ Two properties worth knowing, because they bound what the rollup can tell you:
 
 **If you do not use the launcher, none of this fires.** The format above is still the contract and a
 run can still write it — you simply have no guarantee that it did, which is the situation this section
-exists to describe rather than to hide. Counting DoD boxes remains the fallback.
+exists to describe rather than to hide. Counting the members' `## Done when` boxes remains the fallback.
 
 **`stream-json` is not optional here, and it is the one flag the rest of this document depends on.**
 Part 3's watchdog defines its stall signal in terms of new stream lines, and Part 4 reads the run's
@@ -602,7 +611,7 @@ at spawn, re-checked at every later wave boundary — a mismatch halts that wave
 This binds unattended runs the same as interactive ones, for the same reason the rest of Part 0
 exists: nobody is watching to catch a silent divergence before it reaches a commit.
 
-**Morning.** Read the sprint file's Execution Log + DoD state — that's the report; no new artifact.
+**Morning.** Read the sprint file's Execution Log + its members' DoD state — that's the report; no new artifact.
 Stall/kill/resume path: Part 3. Rollup line format: Part 4.
 
 ## Part 3 — Watchdog (OS-level pattern, ships outside lean-flow's own surface)
@@ -653,6 +662,14 @@ warnings · <comma/semicolon-joined list, or "none">
 Tn · state (done | blocked | parked-hitl | denied-tool | stalled | unattempted) · unblock condition / next action
 ```
 
+**What the counts read (by reference, ADR-047).** `N of M` counts the `## Done when` boxes across the
+sprint's **member files** — the `## Members` paths ∪ every `docs/work/*/TASK-*.md` stamped
+`sprint: SPRINT-NNN`, each resolved by id (`dispatch.md` § Members by reference). `M` is every box,
+`N` the ticked ones; the Plan carries none, so it contributes nothing to either. **Units** are the
+Plan's `### Tn` blocks, and a unit is **delivered** when every member its `Cites:` names has no open
+`## Done when` box; a `Tn` whose `Cites:` names no current member (all scoped out) leaves both unit
+counts. `Tn ·` lines and `tasks ·` count units, never boxes.
+
 **The typed outcome and its evidence (SPRINT-098 T3 — EPIC-015 § Closed-when 6).** `outcome` is a
 three-way, EPIC-015-LOCAL vocabulary — `DELIVERED | PARTIAL | FAILED` — a pure function of `terminal`
 alone (PLAN_EXHAUSTED → DELIVERED; AUTHORITY_BOUNDARY/BUDGET_STOP/USER_STOP → PARTIAL; HARD_FAILURE →
@@ -665,7 +682,7 @@ subsume or map this shape.
 **Every evidence field is tagged by how it was produced, because they are not equally trustworthy**
 (TD-152, one level up). Three tags, emitted inline beside each field in the rollup itself — never only
 in this doc:
-- **`mechanical`** — counted directly from the Plan/log text (DoD boxes, task headers, presence/absence
+- **`mechanical`** — counted directly from the member files and the Plan/log text (member `## Done when` boxes, task headers, presence/absence
   of a task's own line). `run ·`, `tasks ·`, `warnings ·`.
 - **`model-reported`** — written by the run during the turn, trusted the way every other Part 4 state
   line already is, with no independent verification. `parks ·`, `repair-cycles ·`, `verification ·`.
@@ -826,7 +843,7 @@ is what leaves the next person estimating from nothing.
 **Under the launcher this row is written for you** (Part 2's reaper), which is the point: the two runs
 that produced this whole section both finished without writing theirs, and both rows below were
 reconstructed by a human afterwards from the harness payload. **`units` means Plan tasks, not DoD
-boxes** — the series is read as "4 of 7 units", and a row counting checkboxes in that field would
+boxes** (a unit is delivered when every member its `Cites:` names has no open box — Part 4) — the series is read as "4 of 7 units", and a row counting checkboxes in that field would
 silently rescale every row above it.
 
 **Rows so far** — this is a series being started, not a budget. One row is an anecdote; do not size a

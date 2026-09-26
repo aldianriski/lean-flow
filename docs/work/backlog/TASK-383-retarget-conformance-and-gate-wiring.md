@@ -30,6 +30,10 @@ scripts/lib/conformance-engine.sh · scripts/qa-check.sh · scripts/night-run.sh
 
 none
 
+## Amended 2026-09-26
+
+- Carried from SPRINT-107 T4: `scripts/night-run.sh` `reap()` still counts `- [x]`/`- [ ]` in the sprint FILE and `### Tn` blocks there. The prose contract (`skills/orchestrator/references/night-run.md` Part 4) now counts `## Done when` boxes across member files (Members ∪ `sprint:` stamps), and a unit is delivered when every member its `Cites:` names has no open box. On a by-reference sprint the script reports `0 of 0`. The contract leads, so retarget the script to it.
+
 ## Tracker
 
 EPIC-017 scope 6 · moved from TASK-365

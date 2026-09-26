@@ -16,11 +16,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-107 — Retarget the Loop** → docs/sprint/SPRINT-107-retarget-the-loop.md
->
-> `EPIC-017`'s second member: `TASK-362` (+ `TASK-360`'s open half) · `TASK-361` · `TASK-376` · `TASK-375`.
-> Predecessor: **SPRINT-106 — The Store, and the Way In** closed 2026-09-24: 26 of 27 Plan DoD + 1 n/a by
-> ruling; TASK-360 and TASK-370 carried open in `docs/work/todo/`. See `CHANGELOG.md` and the sprint pair.
+> _None active._ Last closed: **SPRINT-107 — Retarget the Loop**, closed 2026-09-26 with 18 of 18 Plan DoD
+> and all five members in `docs/work/done/`. The loop now runs on the store (ADR-047). See `CHANGELOG.md`
+> and the sprint pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
@@ -71,7 +69,7 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
 ### P1 — Next Phase Required
 
 > **EPIC-017 (the 2.0 plan) lives in the work-item store, not here** — 26 task files under
-> [`docs/work/`](docs/work/) carrying `epic: EPIC-017` (status is the folder: 23 in `backlog/`, 3 in `done/` after SPRINT-106).
+> [`docs/work/`](docs/work/) carrying `epic: EPIC-017` (status is the folder: 18 in `backlog/`, 8 in `done/` after SPRINT-107).
 > Moved 2026-09-23 on owner direction: `TASK-359`…`365` · `369` · `370` left this file; `371`…`387` were
 > filed there directly after three Codex review rounds. Map → [`EPIC-017`](docs/epic/EPIC-017-work-items-that-fit.md).
 

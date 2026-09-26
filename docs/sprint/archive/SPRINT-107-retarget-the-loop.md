@@ -3,11 +3,11 @@ sprint: 107
 slug: retarget-the-loop
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-09-24
-status: active
+last_updated: 2026-09-26
+status: closed
 plan_commit: 3e0e710
 gates_signed: G1,G2 @ 3b23f79
-close_commit: [sha — set at close]
+close_commit: cef7344
 update_trigger: sprint execute/close events
 ---
 
@@ -41,7 +41,8 @@ incl. dispatch merge-back (`TASK-375`).
 ## Plan
 
 ### T1 — Make `promote` and `close` operate by reference `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `evals/fixtures/by-reference/` · `evals/run-by-reference-fixtures.ts` · `TECH-DEBT.md`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `evals/fixtures/by-reference/` · `evals/run-by-reference-fixtures.ts` · `TECH-DEBT.md` ·
+  `scripts/lib/check-sprint-by-reference.ts` · `docs/adr/ADR-047-a-sprint-references-its-members-and-plan-commit-is-the-freeze.md` · `docs/DECISIONS.md` · `evals/run-layout-fixtures.ts`
 Depends-on: none
 Cites: `TASK-362` · `TASK-360` · `TD-179` · `EPIC-017` D2 · `ADR-045` · `docs/work/README.md`
 
@@ -54,14 +55,14 @@ TD-179, since one DoD per task leaves nothing to mirror.
 place, and a member edited after promote is detectable against the frozen snapshot.
 
 **DoD:**
-- [ ] `promote` stamps `sprint:` + `git mv` backlog → todo (own commit, D6); the sprint file lists members by reference, no DoD copy
-- [ ] `close` verifies every member is in `done/`/`cancel/`, never counting Plan boxes
-- [ ] The freeze survives: what `plan locked` pins, and how a post-promote member edit is detected — written down and fixtured (must-FAIL: an unlogged edit to a member after promote)
-- [ ] `skills/lean-doc-generator/SKILL.md` ≤ 140 lines — *Verify: `wc -l`*
-- [ ] TD-179 resolved on evidence; TASK-360's open half ticked
+- [x] `promote` stamps `sprint:` + `git mv` backlog → todo (own commit, D6); the sprint file lists members by reference, no DoD copy ✓ by-reference procedure + sprint template; by-reference-fixtures 73/0 (`68c2a0b`)
+- [x] `close` verifies every member is in `done/`/`cancel/`, never counting Plan boxes ✓ `--close` CLOSE-OPEN fixtures incl. close-ignores-plan-boxes, nested folder, archived (`68c2a0b`)
+- [x] The freeze survives: what `plan locked` pins, and how a post-promote member edit is detected — written down and fixtured (must-FAIL: an unlogged edit to a member after promote) ✓ ADR-047 + reference; 73/0, 33 seeds, 3 outside review rounds → CLEAR (`68c2a0b`)
+- [x] `skills/lean-doc-generator/SKILL.md` ≤ 140 lines — *Verify: `wc -l`* ✓ 138
+- [x] TD-179 resolved on evidence; TASK-360's open half ticked ✓ TD-179 resolved → TASK-362; TASK-360 derived 7 open / 5 ticked = hand count
 
 ### T2 — Retarget `/triage` and `/task-decomposer` onto the store `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/fog-map.md` · `skills/task-decomposer/references/prd-and-slices.md` · `evals/fixtures/store-writers/` · `evals/run-store-writers-fixtures.ts`
+Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` · `skills/task-decomposer/references/fog-map.md` · `skills/task-decomposer/references/prd-and-slices.md` · `evals/fixtures/store-writers/` · `evals/run-store-writers-fixtures.ts`
 Depends-on: T1
 Cites: `TASK-361` · `EPIC-017` Closed-when 1
 
@@ -91,7 +92,7 @@ from the store, with no `TODO.md` read.
 - [x] Exercised once each on a v2 fixture ✓ store-readers-fixtures 21/0 (`4b79bcc`)
 
 ### T4 — Retarget `/orchestrator` onto the store `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/review-scoping.md` · `evals/fixtures/orchestrator-store/` · `evals/run-orchestrator-store-fixtures.ts`
+Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/review-scoping.md` · `evals/fixtures/orchestrator-store/` · `evals/run-orchestrator-store-fixtures.ts` · `scripts/qa-check.sh`
 Depends-on: T1
 Cites: `TASK-375` · `TASK-362` · `EPIC-017` D6
 
@@ -99,11 +100,11 @@ Cites: `TASK-375` · `TASK-362` · `EPIC-017` D6
 review comparand) with no Plan-copy dependency.
 
 **DoD:**
-- [ ] sprint-bulk reads members by reference
-- [ ] dispatch: return-to-backlog is a `git mv`; merge-back transitions are coordinator-owned with a duplicate-id check (moved from TASK-362, D6)
-- [ ] night-run entry routing, rollup and reaper read the store
-- [ ] review-scoping's `Cites:` resolves from the task file
-- [ ] Exercised once end-to-end on a v2 fixture sprint
+- [x] sprint-bulk reads members by reference ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
+- [x] dispatch: return-to-backlog is a `git mv`; merge-back transitions are coordinator-owned with a duplicate-id check (moved from TASK-362, D6) ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
+- [x] night-run entry routing, rollup and reaper read the store ✓ night-run.md contract; orchestrator-store-fixtures 42/0 (`af78aaf`); the executable reaper script is carried to TASK-383
+- [x] review-scoping's `Cites:` resolves from the task file ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
+- [x] Exercised once end-to-end on a v2 fixture sprint ✓ e2e-1..20 in orchestrator-store-fixtures 42/0, incl. T1's host --close gate (`af78aaf`)
 
 ## Decisions (pre-locked)
 
@@ -137,6 +138,10 @@ review comparand) with no Plan-copy dependency.
 | `evals/run-layout-fixtures.ts` | T1 | close-row anchor retargeted | Low | 33/0 |
 | `docs/knowledge-index.md` | T1 | regenerated | Low | gen-index --check |
 | `scripts/qa-check.sh` | T1 (coord.) | harness registered opt-in (D3) | Low | — |
+| `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `references/sprint-by-reference.md` · ADR-047 | T1 revise | population at plan_commit + now, time-bounded scope-change, freeze-point bounds, parsing minors (review round 1) | High | 55/0 + 21 seeds |
+| same four | T1 revise 2–3 | per-commit paths, start-anchored bound, append-only log, log frontmatter/context; harness signing off + build in try (review rounds 2–3) | High | 73/0 + 33 seeds; round 3 CLEAR |
+| `skills/orchestrator/SKILL.md` · `references/dispatch.md` · `night-run.md` · `review-scoping.md` | T4 | sprint-bulk runs from member files; coordinator-owned moves + duplicate-id check; return-to-backlog as scope-out; rollup/units/reaper contract and `Cites:` comparand from task files | Med | orchestrator-store 42/0 |
+| `evals/run-orchestrator-store-fixtures.ts` · `evals/fixtures/orchestrator-store/` · `scripts/qa-check.sh` | T4 | retained Tier X e2e harness (v2 sprint, v1 refusal, L-186 selection), registered opt-in | Low | self 42/0 |
 | `skills/handoff/SKILL.md` | T3 | active sprint from sprint frontmatter + members, not TODO § Active Sprint | Med | store-readers 21/0 |
 | `skills/flow/SKILL.md` | T3 | assess/feed/plan/build/close preconditions query the store | Med | store-readers 21/0 |
 | `skills/lean-doc-generator/references/handoff-reconciliation.md` | T3 | follow-up TASK → backlog task file, `origin: close-retro`, derived id | Low | store-readers 21/0 |
@@ -149,3 +154,37 @@ review comparand) with no Plan-copy dependency.
 | `evals/run-store-writers-fixtures.ts` · `evals/fixtures/store-writers/` | T2 | retained Tier X fixtures + the 37-task EPIC-017 breakdown, always-on | Low | self 29/0 |
 
 ## Retro
+
+**Retrieval check.** No prior L or ADR was contradicted. L-186 (a guard's member *set*) was re-hit twice, each
+time by the outside reviewer, not the author. Round 1: a population blind to `plan_commit`. Round 2: every
+fixture shared "the sprint never moves" and "`plan_commit` is recorded in the next commit". Bar (ii) of the
+Tier-G rule worked as written, because the independent pass found what no fixture could. L-165 held as well:
+every guard defect this sprint was found by a reviewer or a disagreeing second number. TD-178 was re-hit by
+the coordinator's own tick-evidence text.
+
+**Cost.** Coordinator inline, plus this session's subagents: one T4 builder (~0.22M tokens) and one reviewer
+across rounds 2–3 (~0.25M). The earlier session's T1–T3 builders and round-1 reviewer are not summed here, since
+their reports are not in this session. Four full-gate runs. Four tasks delivered; 18 of 18 Plan boxes and all
+five members in `done/`.
+
+**Worked**
+- Three outside rounds on the T1 checker, NOT CLEAR → NOT CLEAR → CLEAR. Each round's new fixtures reddened
+  against the previous round's checker (24, then 10), and 33 targeted seeds each reddened exactly their cases.
+- The by-reference model proved itself on its own sprint: the live freeze held at 6/0 across 18 ticks and
+  five moves, and the first real close-by-reference read `11 pass, 0 fail`.
+- The coordinator re-read found a real gap in the builder's T4 (the step-0 guard sent an all-ticked sprint
+  with a member in `review/` back to `promote`), and it was fixed with a fixture before acceptance.
+
+**Friction**
+- The round-1 revise was dispatched in the earlier session but never reached history, so this session
+  rebuilt it. A dispatch that ends with no commit is invisible until someone checks `git log`.
+- Two seed batches produced unusable signal: one overlapped a `git stash` (L-216), and one ran without a
+  harness at all, because the host signer failed at volume (L-215).
+- System-verify tripped on this sprint's own bookkeeping: files already covered by logged scope-changes
+  had never been added to `Layers:`, and tick evidence carried bare file tokens.
+
+**Pattern candidate:** L-215 · L-216 (count 1 each).
+
+**Carried:** night-run.sh `reap()` → TASK-383 · undocumented `## Assumes` conventions → TASK-377 · stale
+TODO § Active Sprint readers → TASK-379 (all as `## Amended` notes) · `65bbb13` unattributable → TD-181
+(owner-ruled exception) · locale-dependent `s13` fixture → TD-180.

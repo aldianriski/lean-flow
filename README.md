@@ -233,7 +233,7 @@ Plan already carries, so there is nothing extra to maintain. A failure halts tha
 finding. Not a human gate (nothing to approve); it just refuses to fan out work whose ordering is unsafe.
 
 **Modes** (`/orchestrator <mode>`) — three: `quick` (single small low-risk task, G1 only) · `mvp`
-(feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the Active Sprint task list, G1+G2 once) —
+(feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the active sprint's member tasks, G1+G2 once) —
 full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
 
 **Unattended runs (`overnight`)** — a promoted sprint can be executed headless while you sleep:
@@ -405,8 +405,10 @@ graceful window — every `2.x` queue skill carries exactly one read path.
    overwriting an existing file it doesn't recognize. Once every task has moved, it removes
    `TODO.md`; any non-task prose in it is listed for you to relocate or drop, never dropped
    silently. Interrupted mid-run? Just run it again — already-migrated tasks are left alone.
-3. **Resume normal use.** `/prime`, `/triage`, `/task-decomposer`, promote/close all read the
-   store from here on.
+3. **Resume normal use.** `/prime`, `/triage`, `/task-decomposer`, `/handoff`, `/flow`,
+   `/orchestrator` and promote/close all read the store from here on. A sprint now **references**
+   its member task files instead of copying their DoD into its Plan. Each task's DoD lives only in
+   its own `## Done when`, and `plan_commit` is the freeze (ADR-047).
 
 **Why the refusal instead of dual support?** A `2.x` queue skill that finds `TODO.md` still present
 (alone, or alongside `docs/work/`) names the layout it found and does nothing else — it never

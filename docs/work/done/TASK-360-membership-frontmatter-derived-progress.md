@@ -19,7 +19,7 @@ depends-on: [TASK-359]
 
 ## Done when
 
-- [ ] A task file carries `sprint:` / `epic:`; the sprint file **references** its members instead of containing them; `/prime` derives open-DoD by counting `## Done when` boxes across member files and **matches a hand count**. Nesting membership under status is explicitly rejected — "what is in review across all sprints?" must stay answerable with one glob.
+- [x] A task file carries `sprint:` / `epic:`; the sprint file **references** its members instead of containing them; `/prime` derives open-DoD by counting `## Done when` boxes across member files and **matches a hand count**. Nesting membership under status is explicitly rejected — "what is in review across all sprints?" must stay answerable with one glob. ✓ SPRINT-107: /prime's v2 rule (stamp-selected `## Done when` boxes) gives 7 open / 5 ticked, equal to a hand count over the Members ids; sprint references members by ADR-047 (`68c2a0b`)
 
 ## Touches
 

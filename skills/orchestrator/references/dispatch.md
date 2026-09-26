@@ -42,8 +42,44 @@ Pick the routed skill from the **work type**, then hand that skill to the sub-ag
 **Declining `/tdd` needs a stated reason** — the owner opts out, or the repo has no harness. Either way,
 note a manual verification step in its place; a silent skip is how spec-only debt enters (L-007).
 
-**Drive with `/goal`.** Set a `/goal` equal to the task's done-when / acceptance so execution keeps working
+**Drive with `/goal`.** Set a `/goal` equal to the task's done-when (its member file's `## Done when`) / acceptance so execution keeps working
 across turns until it is verifiably met (Goal-Driven Execution, native), then clear it at task end.
+
+## Members by reference (what sprint-bulk reads, ticks and moves)
+
+A v2 sprint **references** its member task files in `docs/work/` and never copies them (ADR-047), so
+`sprint-bulk` reads each task from its file, never from the sprint Plan. `TODO.md` is never read — on
+a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In the order the loop meets them:
+
+1. **Active sprint** — candidates are the top-level `docs/sprint/SPRINT-*.md` files only (never
+   `logs/` or `archive/`, whatever their frontmatter says) whose frontmatter reads `status: active`.
+   On a multi-stream repo keep the one whose `stream:` matches the work in hand; still more than one → ask.
+2. **Members** — the `## Members` paths ∪ every `docs/work/*/TASK-*.md` stamped `sprint: SPRINT-NNN`,
+   whatever folder it sits in. A `## Members` path is resolved **by its TASK id** — the filename that
+   starts `TASK-NNN-` in any of the six status folders (the trailing hyphen keeps `TASK-81` from
+   matching `TASK-810`) — so a path left stale by a later move still finds its file.
+3. **Guard (step 0)** — the sprint is runnable while at least one member is still open: its
+   `## Done when` has an open `[ ]` box, **or** it sits outside `done/`/`cancel/` (all ticked but still
+   in `review/` is unfinished, not over). Plan `Tn` blocks carry no boxes, so they are never counted.
+   Every member closed → the sprint is over: go to close (step 6), never back to `promote`.
+4. **Plan block vs. member file** — a `### Tn` block carries only sprint-scoped meta (header meta ·
+   `Layers:` · `Depends-on:` · `Cites:` · `**Acceptance:**`). The task's own content — `## Done when`,
+   `## Assumes`, `## Touches` — is read from the member file(s) its `Cites:` names. A unit (`### Tn`)
+   is **delivered** when every member its `Cites:` names has no open `## Done when` box; a `Tn` whose
+   `Cites:` names no current member (all scoped out) is not counted as a unit at all.
+5. **Tick** — the coordinator ticks the member file's box, `- [ ]` → `- [x]`, appending
+   ` ✓ <evidence>` after the frozen text. Nothing else in `## Done when` changes: any other edit
+   first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze).
+6. **Transitions** — `todo/` → `in_progress/` when the task starts · → `review/` when its work is
+   committed and awaits review or merge-back · → `done/` once every box is ticked and review accepted.
+   Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/` in **its own commit**, never
+   sharing one with a content edit (ADR-045 D6). **Coordinator-owned** — § Merge-back queue.
+7. **Close precondition (step 6)** — every member sits in `docs/work/done/` or `docs/work/cancel/`;
+   Plan boxes are never counted. Where the host keeps the gate, run
+   `bun scripts/lib/check-sprint-by-reference.ts <sprint-file> --close` (it also re-runs the freeze
+   check). Plain-git fallback for any consumer: resolve each member by rule 2 and confirm its folder
+   is `done/` or `cancel/`. Any member in `todo/`, `in_progress/` or `review/` blocks close, and the
+   freeze check is `/lean-doc-generator`'s sprint-by-reference procedure.
 
 ## Pre-dispatch preflight (cycle · ownership · base-ref · waves)
 
@@ -51,7 +87,9 @@ Runs before any wave-shape decision below — the Parallel-vs-sequential call is
 tokens it's read from, so read them mechanically first. Derives four things from the three markup
 tokens every active-sprint Plan task already carries mandatorily (`### Tn` · `Layers:` ·
 `Depends-on:`) — no new file format, no second source of truth (ADR-013: a no-JSON preflight over
-this markup proved sufficient; a compiled DAG was rejected as a needless second SSOT):
+this markup proved sufficient; a compiled DAG was rejected as a needless second SSOT). These are the
+Plan block's **sprint-scoped meta**, read from the sprint file; the task's own content is read from
+the member file its `Cites:` names (§ Members by reference, rule 4), and the preflight needs none of it:
 
 1. **Cycle check** — the `Depends-on` graph must be acyclic; a cycle means no valid dispatch order exists.
 2. **Shared-file single-owner check** — a file named in more than one task's `Layers:` needs an
@@ -230,11 +268,13 @@ while IFS= read -r line || [ -n "$line" ]; do
       # an item with one, wherever it sits.
       ;;
     "Cites:"*)
+      # Cites: names the member TASK file(s) that hold this unit's own content (## Done when,
+      # ## Assumes) -- read from those files, never from this Plan block (ADR-047). Not collected.
       cur=C
       ;;
     [[:blank:]]*)
       # An INDENTED line CONTINUES the declaration above it (TD-040), matching how the full
-      # checker and TODO.md entries already wrap. Previously only column-0 `Layers:` lines were
+      # checker already wraps a declaration. Previously only column-0 `Layers:` lines were
       # read, so a wrapped declaration kept its first line and every path on the continuation was
       # invisible -- a silent false PASS on a real overlap, observed live at the SPRINT-053 and
       # SPRINT-054 promotes. A `Cites:` continuation is deliberately NOT collected: those tokens
@@ -420,14 +460,16 @@ dispatch brief). It never touches a **coordinator-owned** file — and two kinds
 which the map can see:
 
 - **(a) Files the overlap map marks shared.** Derived from `Layers:`, so the map sees them by design.
-- **(b) Sprint infrastructure** — the sprint **Plan file** (its DoD ticks and § Files Changed) and its
-  **Execution Log** sibling. Every task writes these; **no task declares them**, so they are in no
+- **(b) Sprint infrastructure** — the sprint **Plan file** (its § Files Changed), its **Execution
+  Log** sibling, and the **member task files** under `docs/work/` (their `## Done when` ticks and
+  `git mv` transitions). Every task writes these; **no task declares them**, so they are in no
   `Layers:` and the map cannot mark them *by construction*. `check-layers-observed.sh` already excludes
   `docs/sprint/*` on exactly this reasoning and already calls it coordinator-owned — the protection
   exists in the checker and was missing from the brief.
 
 **A dispatched agent returns its Execution Log entry inside its report; the coordinator appends it at
-merge-back.** The agent does not create or edit the Log, tick a DoD box, or touch § Plan.
+merge-back.** The agent does not create or edit the Log, tick a DoD box, `git mv` a task file, or
+touch § Plan — it reports its evidence, and the coordinator ticks and moves (§ Merge-back queue).
 
 Proven live and this is why the clause is split: SPRINT-063 dispatched one agent whose brief correctly
 banned editing § Plan and ticking DoD **and said nothing about the Log** — so the coordinator and the
@@ -567,8 +609,33 @@ stated goal and note the trade-off in the merge commit. **Never invent new behav
 and **always resolve rather than `--abort`** — abandoning the merge strands the wave that was the whole
 point of the fan-out. SPRINT-041's corrupted merge is why this is written down.
 
+**Task-file transitions are coordinator-owned, with a duplicate-id check at every merge-back.** A
+dispatched agent never `git mv`s a task file or ticks a box; it reports, and the coordinator applies
+the tick and the move on the integration tree (§ Members by reference, rules 5–6). After **each**
+task's merge, before the next, the coordinator confirms that no TASK id resolves to more than one file
+across `docs/work/*/` — this must print nothing:
+
+    find docs/work -name 'TASK-*.md' | sed -E 's#.*/(TASK-[0-9]+)-.*#\1#' | sort | uniq -d
+
+It starts at `docs/work`, never at the repo root, so the full repo copies under `.claude/worktrees/`
+are excluded by construction. Any id printed is a `DUPLICATE-ID` finding and halts the queue. Two
+isolated worktrees can each claim the same ticket from their own snapshot: one moves it to `review/`,
+the other to `done/`, or each files a new task under the same derived id. A reused id never
+conflicts, and a rename/rename conflict resolved by keeping both sides leaves two files, so the
+store then says two things about one task (ADR-045 D6). Resolve it on the coordinator
+side. Keep the folder the coordinator's own transition record names, and give a colliding new file a
+freshly derived id.
+
 A broken or incomplete worktree never merges — return the task to backlog with an unblock
-condition, salvage any doc/research artifacts, drop the code.
+condition, salvage any doc/research artifacts, drop the code. **Returning it is a file move by the
+coordinator**, so the sprint's freeze and close checks stay green (ADR-047 § scoped out):
+1. append an Execution Log entry headed `### <date> | scope-change | …` that names the TASK id and
+   its unblock condition (a prose mention under another event does not count);
+2. `git mv docs/work/<status>/TASK-NNN-<slug>.md docs/work/backlog/` in **its own commit**;
+3. clear the file's `sprint:` stamp and remove its line from the sprint's `## Members` (one content
+   commit, after the move).
+A task still stamped or listed after the move is still a member, so it blocks close from `backlog/`.
+Clearing the stamp and the line without the Log entry is an unlogged `MEMBER-DROPPED`.
 
 Cleanup (coordinator-only): leave the worktree directory **before** removing it — Windows holds a
 handle-lock on any worktree a shell has `cd`'d into, so removal from inside it fails

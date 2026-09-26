@@ -2,7 +2,7 @@
 epic: 017
 slug: work-items-that-fit
 owner: Maintainer
-last_updated: 2026-09-24
+last_updated: 2026-09-26
 status: active
 member_sprints: [SPRINT-106, SPRINT-107]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -194,7 +194,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-106](../sprint/archive/SPRINT-106-the-store-and-the-way-in.md) | The store, and the way in | closed `fc6c003` | The store exists and is the queue's home (schema, ADR-045, first `git mv` transitions as pure renames); 2.x queue skills refuse a v1/mixed tree by existence alone (ADR-046); `migrate` carries a v1 repo across with owner-resolved conflicts; before-baseline frozen (9/26 · 11/12 · 22). No § Closed-when fully met: derived progress (5) is proven on a fixture but this repo's own sprint drifted (TD-179). |
-| [SPRINT-107](../sprint/SPRINT-107-retarget-the-loop.md) | Retarget the loop | active | — (at close) |
+| [SPRINT-107](../sprint/archive/SPRINT-107-retarget-the-loop.md) | Retarget the loop | closed `cef7344` | The loop runs on the store: sprints reference members, `plan_commit` is the freeze (ADR-047); five skills read and write task files. Met Closed-when **1** and **5**. |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
@@ -204,15 +204,18 @@ rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 
 
 ## Closed when
 
-- [ ] An epic breakdown of ≥ 30 tasks writes ≥ 30 files and **no cap check fires** — exercised on
-      real input, not asserted.
+- [x] An epic breakdown of ≥ 30 tasks writes ≥ 30 files and **no cap check fires** — exercised on
+      real input, not asserted. ✓ SPRINT-107 T2: EPIC-017 decomposed into 37 files in a scratch v2
+      store, `check-doc-caps` 0 FAIL; control: the same 37 in v1 shape push `TODO.md` to 828 > 320 (`3b49aef`)
 - [ ] `TODO.md` is deleted and **no executable reads it** — derived mechanically (zero non-test
       references across `scripts/`, `evals/`, `skills/`), never asked of the author.
 - [ ] The gate reports **zero OVER-CAP rows**, including the three standing today — each closed by a
       recorded disposition, not by a diet.
 - [ ] `.claude/CLAUDE.md` is inside a **token** budget with a long-line guard, and at least one rule
       has been demoted through the disposition route with its destination recorded.
-- [ ] A sprint's progress is **derived** from member files and matches a hand count.
+- [x] A sprint's progress is **derived** from member files and matches a hand count. ✓ SPRINT-107:
+      stamp-selected `## Done when` boxes gave 7 open / 5 ticked, equal to a hand count over the Members
+      ids (TASK-360, `f6b3cf4`); close by reference then read 11/0 on the live sprint
 - [ ] `workdoo` runs the same store, and the EPIC-016 Work & Queue view reads it without a second
       copy of status.
 - [ ] **Effectiveness is measured, not assumed** — a before/after comparison of decomposition

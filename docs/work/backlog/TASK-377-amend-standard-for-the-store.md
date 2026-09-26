@@ -30,6 +30,10 @@ spec/STANDARD.md · spec/CHANGELOG.md
 
 none
 
+## Amended 2026-09-26
+
+- Carried from SPRINT-107 T2: `/triage` writes two conventions under `## Assumes` that `docs/work/README.md` does not yet document: `- **open:** …` (an assumption still unconfirmed) and `- **blocked-by:** TASK-NNN` (read when ordering the backlog, where a blocker sorts at the highest priority of anything waiting on it). The schema doc is this task's.
+
 ## Tracker
 
 EPIC-017 D1 · D2 · hard-cut ruling 2026-09-23

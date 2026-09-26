@@ -295,6 +295,28 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-181** severity: low | status: open | created: Sprint-107
+  - Summary: **`layers observed` accepts a qualifier after the task id in one subject shape and rejects
+    it in another.** Rule 2 admits `sprint(NN) Tn <qualifier>: …` (SPRINT-093 T7), but rule 4 admits
+    only the exact trailing `(SPRINT-NNN Tn)`, so `65bbb13`, a real T3 alignment fix with subject
+    `… (SPRINT-107 T3 align)`, is `attributable to no task`. It is pushed history, so the only
+    remedy was an owner ruling at SPRINT-107's close (recorded as an exception).
+  - Mitigation (hypothesis): give rule 4 the same letter-led, no-embedded-`T<digit>` qualifier that
+    rule 2 already carries. Tier **G**, so it needs the retained must-FAIL fixture, and `(SPRINT-NNN
+    T1 T2)` must still fall through as ambiguous.
+  - **Re-file fresh if** subjects move wholly onto the `Task:` trailer.
+
+- **TD-180** severity: low | status: open | created: Sprint-107
+  - Summary: **`run-spec-reader-fixtures.sh` case `s13-rows-intact` is locale-dependent.** It matches the
+    em dash in `S13.NOINFER — implementation-directed` with a single `.`, and an em dash is three bytes
+    in UTF-8. Under a POSIX/C locale (`LANG` unset, the cloud container SPRINT-107 closed in) the case
+    FAILs on correct output, while under `LC_ALL=C.UTF-8` (the maintainer's shell) it passes. It was
+    already red at `3e0e710`. The gate therefore reads differently by host with no code change, which
+    is L-067's environment-boundary shape.
+  - Mitigation: match with `.*` (or the literal dash) instead of `.`. It is one line, and Tier G
+    discipline applies to the fixture itself.
+  - **Re-file fresh if** the gate starts pinning a UTF-8 locale for every harness.
+
 - **TD-179** severity: medium | status: resolved → TASK-362 (SPRINT-107 T1, ADR-047) | created: Sprint-106
   - **Resolved on evidence (SPRINT-107 T1):** `promote` now works by reference — the Plan's `Tn` blocks
     carry no DoD, so each task has one DoD, its member file's `## Done when`, and there is nothing to
@@ -326,6 +348,9 @@ status: current
     changes what the guard admits, so the retained must-FAIL bar applies (a bare name matching
     **no** declared path must still redden).
   - **Re-file fresh if** prose convention changes to always cite full paths.
+  - **Sighting (SPRINT-107 close):** re-hit by the coordinator's own tick-evidence text (a bare template
+    name, a bare reference path and a bare script name). Cleared by rewording the evidence into prose,
+    which is the third workaround shape: say it without the token.
 
 - **TD-177** severity: medium | status: open | created: Sprint-104
   - Summary: **A `Layers:` token that matches no file is indistinguishable from a correct one.** `covers()`

@@ -72,6 +72,7 @@ function crlf(dir: string, rel: string) {
 }
 
 interface Opts {
+  pre?: (dir: string) => void; // shapes the tree BEFORE the promote commit (what plan_commit freezes)
   noPlanCommit?: boolean;
   extraStampedUnlisted?: boolean; // TASK-903 stamped sprint: SPRINT-901 at promote, absent from Members
   noMembers?: boolean;
@@ -83,6 +84,9 @@ function build(o: Opts = {}): string {
   git(dir, ["config", "user.email", "fixture@example.com"]);
   git(dir, ["config", "user.name", "Fixture Bot"]);
   git(dir, ["config", "core.autocrlf", "false"]); // stored bytes = fixture bytes; CRLF is a case, not ambient
+  git(dir, ["config", "commit.gpgsign", "false"]); // a host's signing setup is not the fixture's (and fails at volume)
+  put(dir, "README.md", "fixture repo\n");
+  commit(dir, "base -- before the sprint exists"); // a commit without the Plan: PLAN-COMMIT-NO-PLAN's target
   let sprint = fix("SPRINT-901-fixture.md");
   if (o.noMembers) sprint = sprint.replace(/- docs\/work\/todo\/TASK-90[12]-[a-z]+\.md\n/g, "");
   put(dir, SPRINT, sprint);
@@ -94,6 +98,7 @@ function build(o: Opts = {}): string {
     put(dir, W("todo", "TASK-903-gamma.md"), fix(T901).replace(/TASK-901/g, "TASK-903").replace(/alpha/g, "gamma"));
   }
   put(dir, W("backlog", "TASK-9010-other.md"), fix(T902).replace(/TASK-902/g, "TASK-9010").replace("sprint: SPRINT-901\n", ""));
+  o.pre?.(dir);
   commit(dir, "sprint(901): stamp sprint: on members");
   if (!o.noPlanCommit) {
     const pc = git(dir, ["rev-parse", "--short", "HEAD"]).trim();
@@ -103,8 +108,8 @@ function build(o: Opts = {}): string {
   return dir;
 }
 
-function run(dir: string, close: boolean): { findings: string[]; verdict: string; exit: number } {
-  const args = [CHECKER, join(dir, SPRINT)];
+function run(dir: string, close: boolean, sprint = SPRINT): { findings: string[]; verdict: string; exit: number } {
+  const args = [CHECKER, join(dir, sprint)];
   if (close) args.push("--close");
   const r = spawnSync("bun", args, { encoding: "utf8" });
   const lines = (r.stdout ?? "").split(/\r?\n/);
@@ -117,6 +122,7 @@ interface Case {
   name: string;
   opts?: Opts;
   close?: boolean;
+  sprint?: string; // where the sprint file is at check time, when a case moves it
   mutate: (dir: string) => void;
   expect: string[];
 }
@@ -126,6 +132,13 @@ const TICK_901 = (dir: string, rel: string) => {
   edit(dir, rel, "for every input in the table", "for every input in the table ✓ `abc1234` — 12/0");
   edit(dir, rel, "- [ ] a retained fixture", "- [X] a retained fixture");
 };
+const ARCH = "docs/sprint/archive/SPRINT-901-fixture.md";
+const ARCH_LOG = "docs/sprint/archive/logs/SPRINT-901-fixture.md";
+const archive = (d: string, withLog = true) => {
+  mv(d, SPRINT, ARCH); // the §11 archival pass: git mv, own commit
+  if (withLog) mv(d, LOG, ARCH_LOG);
+};
+const INLINE = (d: string, body: string) => edit(d, SPRINT, "## Files Changed", `${body}\n\n## Files Changed`);
 const EDIT_901 = (dir: string, rel: string) =>
   edit(dir, rel, "- [ ] a retained fixture covers the empty input", "- [ ] a retained fixture covers the empty input\n- [ ] a benchmark stays under 5ms");
 
@@ -282,13 +295,485 @@ const CASES: Case[] = [
     expect: ["MEMBER-MISSING TASK-902"],
   },
   {
-    name: "member-absent-at-plan-commit (must-FAIL: MEMBER-MISSING)",
+    name: "listed-at-promote-without-a-file (must-FAIL: MEMBER-MISSING at plan_commit)",
+    opts: { pre: (d) => edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "- docs/work/todo/TASK-902-beta.md\n- docs/work/todo/TASK-906-ghost.md\n") },
+    mutate: () => {},
+    expect: ["MEMBER-MISSING TASK-906"],
+  },
+  // --- population across time: dropped and added members (review round 1, major 1 + G2 ruling) -
+  {
+    name: "dropped-from-both-indices-then-edited (must-FAIL: MEMBER-DROPPED)",
+    close: true,
+    mutate: (d) => {
+      edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "");
+      edit(d, W("todo", T902), "sprint: SPRINT-901\n", "");
+      edit(d, W("todo", T902), "unchanged", "unchanged, and faster");
+      mv(d, W("todo", T901), W("done", T901));
+      commit(d, "drop 902 silently");
+    },
+    expect: ["MEMBER-DROPPED TASK-902"],
+  },
+  {
+    name: "scoped-out-with-scope-change (sibling control)",
+    close: true,
+    mutate: (d) => {
+      edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "");
+      edit(d, W("todo", T902), "sprint: SPRINT-901\n", "");
+      logEntry(d, "scope-change", "beta leaves the sprint", "What broke: TASK-902 is blocked upstream. Impact: T2 out.");
+      mv(d, W("todo", T901), W("done", T901));
+      commit(d, "scope 902 out");
+    },
+    expect: [],
+  },
+  {
+    name: "added-after-promote-unlogged (must-FAIL: MEMBER-UNPLANNED)",
     mutate: (d) => {
       put(d, W("todo", "TASK-904-delta.md"), fix(T902).replace(/TASK-902/g, "TASK-904"));
       edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "- docs/work/todo/TASK-902-beta.md\n- docs/work/todo/TASK-904-delta.md\n");
       commit(d, "add 904 after promote");
     },
-    expect: ["MEMBER-MISSING TASK-904"],
+    expect: ["MEMBER-UNPLANNED TASK-904"],
+  },
+  {
+    name: "added-after-promote-admitted (sibling control: baseline = the stamping commit)",
+    mutate: (d) => {
+      put(d, W("todo", "TASK-904-delta.md"), fix(T902).replace(/TASK-902/g, "TASK-904"));
+      logEntry(d, "scope-change", "delta joins", "What broke: TASK-904 is needed by T2. G2 re-confirmed.");
+      commit(d, "admit 904");
+      edit(d, W("todo", "TASK-904-delta.md"), "- [ ] beta", "- [x] beta");
+      commit(d, "tick 904");
+    },
+    expect: [],
+  },
+  {
+    name: "added-admitted-then-edited-unlogged (must-FAIL: the admitting entry predates the edit's baseline)",
+    mutate: (d) => {
+      put(d, W("todo", "TASK-904-delta.md"), fix(T902).replace(/TASK-902/g, "TASK-904"));
+      logEntry(d, "scope-change", "delta joins", "What broke: TASK-904 is needed by T2. G2 re-confirmed.");
+      commit(d, "admit 904");
+      edit(d, W("todo", "TASK-904-delta.md"), "unchanged", "unchanged, and faster");
+      commit(d, "edit 904");
+    },
+    expect: ["FREEZE-EDIT TASK-904"],
+  },
+  // --- the freeze point (review round 1, major 2) ----------------------------------------------
+  {
+    name: "scope-change-predates-promote (must-FAIL: only entries new since plan_commit count)",
+    opts: { pre: (d) => logEntry(d, "scope-change", "early widening", "TASK-901 may gain a benchmark later.") },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "plan-commit-re-pointed-to-head (must-FAIL: PLAN-COMMIT-LATE)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit");
+      const head = git(d, ["rev-parse", "--short", "HEAD"]).trim();
+      const pc = (readFileSync(join(d, SPRINT), "utf8").match(/^plan_commit: (\S+)$/m) ?? [])[1]!;
+      edit(d, SPRINT, `plan_commit: ${pc}`, `plan_commit: ${head}`);
+      commit(d, "re-point plan_commit");
+    },
+    expect: ["PLAN-COMMIT-LATE"],
+  },
+  {
+    name: "plan-commit-repaired-to-earlier (sibling control: SPRINT-107's own slip)",
+    mutate: (d) => {
+      const pc = (readFileSync(join(d, SPRINT), "utf8").match(/^plan_commit: (\S+)$/m) ?? [])[1]!;
+      // history rewritten in place: the first recording pointed at the base commit, a repair points back at pc
+      const base = git(d, ["rev-list", "--max-parents=0", "HEAD"]).trim().slice(0, 7);
+      edit(d, SPRINT, `plan_commit: ${pc}`, `plan_commit: ${base}`);
+      commit(d, "slip");
+      edit(d, SPRINT, `plan_commit: ${base}`, `plan_commit: ${pc}`);
+      commit(d, "repair");
+    },
+    expect: [],
+  },
+  {
+    name: "plan-commit-before-the-plan (must-FAIL: PLAN-COMMIT-NO-PLAN)",
+    mutate: (d) => {
+      const pc = (readFileSync(join(d, SPRINT), "utf8").match(/^plan_commit: (\S+)$/m) ?? [])[1]!;
+      const base = git(d, ["rev-list", "--max-parents=0", "HEAD"]).trim().slice(0, 7);
+      edit(d, SPRINT, `plan_commit: ${pc}`, `plan_commit: ${base}`);
+      commit(d, "point before the plan");
+    },
+    expect: ["PLAN-COMMIT-NO-PLAN"],
+  },
+  {
+    name: "plan-commit-not-an-ancestor (must-FAIL: PLAN-COMMIT-NOT-ANCESTOR)",
+    mutate: (d) => {
+      const pc = (readFileSync(join(d, SPRINT), "utf8").match(/^plan_commit: (\S+)$/m) ?? [])[1]!;
+      const main = git(d, ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
+      git(d, ["checkout", "-q", "-b", "side"]);
+      put(d, "side.txt", "x\n");
+      commit(d, "side");
+      const side = git(d, ["rev-parse", "--short", "HEAD"]).trim();
+      git(d, ["checkout", "-q", main]);
+      edit(d, SPRINT, `plan_commit: ${pc}`, `plan_commit: ${side}`);
+      commit(d, "point at a side branch");
+    },
+    expect: ["PLAN-COMMIT-NOT-ANCESTOR"],
+  },
+  {
+    name: "plan-commit-never-committed (must-FAIL: PLAN-COMMIT-UNRECORDED)",
+    opts: { noPlanCommit: true },
+    mutate: (d) => {
+      const head = git(d, ["rev-parse", "--short", "HEAD"]).trim();
+      edit(d, SPRINT, "plan_commit: PLAN_COMMIT", `plan_commit: ${head}`); // on disk only
+    },
+    expect: ["PLAN-COMMIT-UNRECORDED"],
+  },
+  // --- section and log parsing (review round 1, minors) ----------------------------------------
+  {
+    name: "no-done-when-on-either-side (must-FAIL: NO-DONE-WHEN, never a vacuous pass)",
+    opts: { pre: (d) => edit(d, W("todo", T902), "## Done when", "## Outcome") },
+    mutate: () => {},
+    expect: ["NO-DONE-WHEN TASK-902"],
+  },
+  {
+    name: "empty-done-when-on-either-side (must-FAIL: NO-DONE-WHEN, a heading with no body is not a DoD)",
+    opts: { pre: (d) => edit(d, W("todo", T902), "- [ ] beta consumes alpha's output unchanged\n", "") },
+    mutate: () => {},
+    expect: ["NO-DONE-WHEN TASK-902"],
+  },
+  {
+    name: "done-when-heading-removed-now (must-FAIL: NO-DONE-WHEN)",
+    mutate: (d) => {
+      edit(d, W("todo", T902), "## Done when", "## Done");
+      commit(d, "rename heading");
+    },
+    expect: ["NO-DONE-WHEN TASK-902"],
+  },
+  {
+    name: "second-done-when-section-edited (must-FAIL: every ## Done when is read)",
+    opts: { pre: (d) => edit(d, W("todo", T902), "## Tracker", "## Done when\n\n- [ ] beta is documented\n\n## Tracker") },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "beta is documented", "beta is documented and benchmarked");
+      commit(d, "edit second section");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "edit-below-a-fenced-heading (must-FAIL: a fenced ## does not end the section)",
+    opts: {
+      pre: (d) =>
+        edit(d, W("todo", T902), "- [ ] beta consumes", "```md\n## sample output\n```\n- [ ] beta prints the sample\n- [ ] beta consumes"),
+    },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "unchanged", "unchanged, and faster");
+      commit(d, "edit below fence");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "last-scope-change-does-not-swallow-the-tail (must-FAIL)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "beta widened", "TASK-902 widened.");
+      appendFileSync(join(d, LOG), "\n## Notes\n\nTASK-901 may need a benchmark.\n");
+      commit(d, "edit + tail");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-heading-without-summary (must-PASS)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change\nTASK-901 gains a benchmark.\n");
+      commit(d, "edit + bare heading");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-in-inline-log (must-PASS: a sprint file's own ## Execution Log is read)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      edit(d, SPRINT, "## Files Changed", "### 2026-09-25 | scope-change | alpha gains a bar\nTASK-901 gains a benchmark.\n\n## Files Changed");
+      commit(d, "edit + inline entry");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-names-Tn (must-PASS: T1 Cites TASK-901 in the frozen Plan)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: alpha needs a benchmark. G2 re-confirmed.");
+      commit(d, "edit + Tn entry");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-names-other-Tn (must-FAIL: T2 Cites only TASK-902)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T2 gains a perf bar", "What broke: beta needs a benchmark.");
+      commit(d, "edit + other Tn");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "in-text-check-mark-ticked-bare (must-PASS: a ✓ already in the frozen text is text, not evidence)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "- [ ] alpha returns", "- [ ] alpha shows the ✓ icon\n- [ ] alpha returns") },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "- [ ] alpha shows the ✓ icon", "- [x] alpha shows the ✓ icon");
+      commit(d, "tick bare");
+    },
+    expect: [],
+  },
+  {
+    name: "plus-bullets-ticked (must-PASS: + is a list marker)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "- [ ] alpha returns", "+ [ ] alpha returns") },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "+ [ ] alpha returns", "+ [x] alpha returns");
+      commit(d, "tick +");
+    },
+    expect: [],
+  },
+  {
+    name: "blank-line-between-boxes (must-PASS: blank lines are layout)",
+    mutate: (d) => {
+      edit(d, W("todo", T901), "for every input in the table\n", "for every input in the table\n\n");
+      commit(d, "blank line");
+    },
+    expect: [],
+  },
+  // --- round 2: where the sprint lives, when it was recorded, what the log may count ----------
+  {
+    name: "archived-pre-promote-entry-then-edited (must-FAIL: the log is read at its path AT the baseline)",
+    sprint: ARCH,
+    opts: { pre: (d) => logEntry(d, "scope-change", "early widening", "TASK-901 may gain a benchmark later.") },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit");
+      archive(d);
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "archived-added-unstamped-member-edited (must-FAIL: Members read at its path AT each commit)",
+    sprint: ARCH,
+    mutate: (d) => {
+      put(d, W("todo", "TASK-903-gamma.md"), fix(T902).replace(/TASK-902/g, "TASK-903").replace("sprint: SPRINT-901\n", ""));
+      edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "- docs/work/todo/TASK-902-beta.md\n- docs/work/todo/TASK-903-gamma.md\n");
+      INLINE(d, "### 2026-09-25 | scope-change | admit TASK-903\nNeeded by T2.");
+      commit(d, "admit 903");
+      edit(d, W("todo", "TASK-903-gamma.md"), "unchanged", "changed");
+      commit(d, "edit 903");
+      archive(d, false);
+    },
+    expect: ["FREEZE-EDIT TASK-903"],
+  },
+  {
+    name: "archived-clean-close (sibling control: archiving is not an edit)",
+    sprint: ARCH,
+    close: true,
+    mutate: (d) => {
+      mv(d, W("todo", T901), W("done", T901));
+      mv(d, W("todo", T902), W("done", T902));
+      archive(d);
+    },
+    expect: [],
+  },
+  {
+    name: "renamed-sprint-file (must-PASS: history is followed across a rename)",
+    sprint: "docs/sprint/SPRINT-901-renamed.md",
+    mutate: (d) => {
+      mv(d, SPRINT, "docs/sprint/SPRINT-901-renamed.md");
+      mv(d, LOG, "docs/sprint/logs/SPRINT-901-renamed.md");
+    },
+    expect: [],
+  },
+  {
+    name: "plan-commit-recorded-late (must-FAIL: PLAN-COMMIT-LATE -- the promote had already stamped and activated)",
+    opts: { noPlanCommit: true },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit before recording");
+      const head = git(d, ["rev-parse", "--short", "HEAD"]).trim();
+      edit(d, SPRINT, "plan_commit: PLAN_COMMIT", `plan_commit: ${head}`);
+      commit(d, "record late");
+    },
+    expect: ["PLAN-COMMIT-LATE"],
+  },
+  {
+    name: "old-entry-reworded (must-FAIL: LOG-REWRITTEN, and the rewrite excuses nothing)",
+    opts: { pre: (d) => logEntry(d, "scope-change", "beta widened", "TASK-902 widened.") },
+    mutate: (d) => {
+      edit(d, LOG, "TASK-902 widened.", "TASK-902 widened; TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "reword + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901", "LOG-REWRITTEN"],
+  },
+  {
+    name: "paragraph-appended-under-old-entry (must-FAIL: only NEW entries count)",
+    opts: { pre: (d) => logEntry(d, "scope-change", "beta widened", "TASK-902 widened.") },
+    mutate: (d) => {
+      appendFileSync(join(d, LOG), "TASK-901 gains a benchmark too.\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "append under old + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-inside-html-comment (must-FAIL: a commented-out entry is not an entry)",
+    mutate: (d) => {
+      appendFileSync(join(d, LOG), "\n<!--\n### 2026-09-25 | scope-change | draft\nTASK-901 gains a benchmark.\n-->\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "commented entry + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "Tn-only-in-body (must-FAIL: a Tn counts only in the heading)",
+    mutate: (d) => {
+      logEntry(d, "scope-change", "perf bar added", "Carried from the T1 review.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "body Tn + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "nested-member-folder-edited (must-FAIL: the working tree is walked as deep as the commit trees)",
+    mutate: (d) => {
+      mv(d, W("todo", T901), W("done/2026", T901));
+      EDIT_901(d, W("done/2026", T901));
+      commit(d, "edit nested");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "nested-member-folder-clean-close (sibling control)",
+    close: true,
+    mutate: (d) => {
+      mv(d, W("todo", T901), W("done/2026", T901));
+      mv(d, W("todo", T902), W("done", T902));
+    },
+    expect: [],
+  },
+  {
+    name: "edit-merged-from-side-branch (must-FAIL: non-linear history)",
+    mutate: (d) => {
+      const main = git(d, ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
+      git(d, ["checkout", "-q", "-b", "side"]);
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit on side");
+      git(d, ["checkout", "-q", main]);
+      git(d, ["merge", "-q", "--no-ff", "-m", "merge side", "side"]);
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  // --- round 3: the legitimate direction after the log moves, and log metadata -----------------
+  {
+    name: "archived-pair-logged-edit (must-PASS: a scope-change is still found after archiving)",
+    sprint: ARCH,
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      commit(d, "edit + entry");
+      archive(d);
+    },
+    expect: [],
+  },
+  {
+    name: "renamed-sprint-log-not-renamed-logged-edit (must-PASS: the log is found by its frontmatter)",
+    sprint: "docs/sprint/SPRINT-901-renamed.md",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      commit(d, "edit + entry");
+      mv(d, SPRINT, "docs/sprint/SPRINT-901-renamed.md");
+    },
+    expect: [],
+  },
+  {
+    name: "log-created-after-promote-logged-edit (must-PASS)",
+    opts: { pre: (d) => rmSync(join(d, LOG)) },
+    mutate: (d) => {
+      put(d, LOG, fix("log-SPRINT-901-fixture.md"));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "log + entry + edit");
+    },
+    expect: [],
+  },
+  {
+    name: "log-created-after-promote-unlogged-edit (must-FAIL sibling)",
+    opts: { pre: (d) => rmSync(join(d, LOG)) },
+    mutate: (d) => {
+      put(d, LOG, fix("log-SPRINT-901-fixture.md"));
+      EDIT_901(d, W("todo", T901));
+      commit(d, "log + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "log-frontmatter-bumped-logged-edit (must-PASS: last_updated is metadata, not a past entry)",
+    mutate: (d) => {
+      edit(d, LOG, "last_updated: 2026-09-24", "last_updated: 2026-09-25");
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "bump + entry + edit");
+    },
+    expect: [],
+  },
+  {
+    name: "comment-opened-before-promote-hides-later-entry (must-FAIL)",
+    opts: { pre: (d) => appendFileSync(join(d, LOG), "\n<!-- draft note\n") },
+    mutate: (d) => {
+      appendFileSync(join(d, LOG), "### 2026-09-25 | scope-change | TASK-901 gains a bar\n-->\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "entry inside an old comment + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  // --- selection: stamp and Members shapes (review round 1, minors) -----------------------------
+  ...[
+    ["quoted", 'sprint: "SPRINT-901"'],
+    ["comment", "sprint: SPRINT-901 # promoted 2026-09-24"],
+    ["bare-number", "sprint: 901"],
+    ["bom", "sprint: SPRINT-901", true],
+  ].map(([shape, stamp, bom]) => ({
+    name: `stamp-shape-${shape}-not-listed-edited (must-FAIL: the stamp still selects TASK-903)`,
+    opts: {
+      pre: (d: string) => {
+        const t = fix(T901).replace(/TASK-901/g, "TASK-903").replace(/alpha/g, "gamma").replace("sprint: SPRINT-901", stamp as string);
+        put(d, W("todo", "TASK-903-gamma.md"), (bom ? "\uFEFF" : "") + t);
+      },
+    },
+    mutate: (d: string) => {
+      edit(d, W("todo", "TASK-903-gamma.md"), "the empty input", "the empty and null input");
+      commit(d, "edit 903");
+    },
+    expect: ["FREEZE-EDIT TASK-903"],
+  })),
+  {
+    name: "members-table-and-multi-id-lines-unstamped-edited (must-FAIL: every id in ## Members selects)",
+    opts: {
+      pre: (d) => {
+        for (const id of ["TASK-903", "TASK-907"]) {
+          put(d, W("todo", `${id}-x.md`), fix(T902).replace(/TASK-902/g, id).replace("sprint: SPRINT-901\n", ""));
+        }
+        edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "- docs/work/todo/TASK-902-beta.md\n\n| id | file |\n|---|---|\n| TASK-903 | x |\n\n- also: TASK-901 · TASK-907\n");
+      },
+    },
+    mutate: (d) => {
+      edit(d, W("todo", "TASK-903-x.md"), "unchanged", "changed");
+      edit(d, W("todo", "TASK-907-x.md"), "unchanged", "changed");
+      commit(d, "edit 903 + 907");
+    },
+    expect: ["FREEZE-EDIT TASK-903", "FREEZE-EDIT TASK-907"],
+  },
+  {
+    name: "non-ascii-filename-stamped-edited (must-FAIL: a quoted path still resolves)",
+    opts: { pre: (d) => put(d, W("todo", "TASK-905-café.md"), fix(T902).replace(/TASK-902/g, "TASK-905")) },
+    mutate: (d) => {
+      edit(d, W("todo", "TASK-905-café.md"), "unchanged", "changed");
+      commit(d, "edit 905");
+    },
+    expect: ["FREEZE-EDIT TASK-905"],
   },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
@@ -337,10 +822,11 @@ const CASES: Case[] = [
 ];
 
 for (const c of CASES) {
-  const dir = build(c.opts);
+  let dir = "";
   try {
+    dir = build(c.opts); // inside the try: a build error fails its case, never the whole run's verdict line
     c.mutate(dir);
-    const r = run(dir, c.close ?? false);
+    const r = run(dir, c.close ?? false, c.sprint);
     const expect = [...c.expect].sort();
     const setOk = JSON.stringify(r.findings) === JSON.stringify(expect);
     const m = r.verdict.match(/: (\d+) pass, (\d+) fail$/);
@@ -354,7 +840,7 @@ for (const c of CASES) {
     console.log(`FAIL  by-reference-fixture: ${c.name} -- harness error: ${(e as Error).message.split("\n")[0]}`);
     fail++;
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    if (dir) rmSync(dir, { recursive: true, force: true });
   }
 }
 
