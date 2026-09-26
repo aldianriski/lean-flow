@@ -175,7 +175,12 @@ function scanBlocks(content: string): ScanLine[] {
 
   const rendered: string[] = new Array(lines.length);
   for (let i = 0; i < lines.length; ) {
-    if (hidden[i] || lines[i]!.trim() === "" || HEADING_SHAPE.test(lines[i]!)) {
+    if (hidden[i]) {
+      rendered[i] = lines[i]!.replace(/[^\n]/g, " "); // fence/block-comment content: fully blanked
+      i++;
+      continue;
+    }
+    if (lines[i]!.trim() === "" || HEADING_SHAPE.test(lines[i]!)) {
       rendered[i] = renderParagraph(lines[i]!);
       i++;
       continue;
