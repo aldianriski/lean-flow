@@ -131,3 +131,25 @@ Owner ruling (popup, 2026-09-26): one more builder round with the corrected rule
 whatever SELECTS members or COMPARES Done-when text reads raw text, so an error always lands on the loud side. D1 is unchanged.
 The pre-existing `<pre>` block and 1–3-space indented heading misses go to TD at close, not into this round.
 consequence · T1 · behaviour:material · governance:high → fresh worktree-isolated re-review after round 2
+
+### 2026-09-26 | progress | T1 revise round 2 landed — rendered text for boundaries and excuses, raw for selection and body; re-review dispatched
+Worktree commits `3383845` · `1a2f697` · `c2a3ba0` · `02c6543` · `585246f`, cherry-picked as `f84f5fc` · `28b51d2` · `9e3481c` · `5fcd241` · `b615868`.
+`scanBlocks()` now also returns `rendered`: block comments hidden, and inline comment spans blanked within a paragraph,
+skipping code spans and unclosed comments. Heading match, scope-change event/id/Tn reads and the Plan `Cites:` reader
+use it; the Done-when and Members bodies stay raw (A4).
+Test-first: the R1–R5 fixtures were committed alone, then run on `f515a1e` → 103 pass, 8 fail, exactly the claimed misses.
+Three fixture or definition corrections were made after seeds failed to discriminate:
+- R5 was masked by the stamp arm, so TASK-902 is now unstamped
+- P5/P6 never reach the code-span branch, so a new reachable-`-->` case was added
+- a hidden line's `rendered` is now fully blank
+
+**Seeds** (restored to `a8d51c2b` = HEAD blob, `git hash-object`):
+- (g) headings read raw → R1, R2, R4a, R4b
+- (h) scope-change reads raw → R3a–d
+- (i) Members ids read rendered → R5
+- (j) no code-span mask → the new j case
+- (k) Done-when body read rendered → `comment-guidance-edit-inside` + R5 (they share one path)
+
+**Coordinator re-run on main, default TMP:** `by-reference-fixtures: 112 pass, 0 fail` · `orchestrator-store-fixtures:
+42 pass, 0 fail` · live SPRINT-107 `--close` → `11 pass, 0 fail`. The stash stack is empty.
+A fresh worktree-isolated re-review is dispatched on `b615868`.
