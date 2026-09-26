@@ -1140,6 +1140,134 @@ const CASES: Case[] = [
     mutate: () => {},
     expect: [],
   },
+  // --- SPRINT-108 T1 revise round 2: rendered for boundaries/excuses, raw for selection/body -----
+  {
+    // R1: a second "## Done when" whose heading carries a trailing inline comment must still be
+    // recognized as Done-when (rendered), not silently invisible (TASK-902; not adjacent to T901's
+    // first box -- L-186).
+    name: "r1-second-done-when-inline-comment (must-FAIL: TASK-902)",
+    opts: {
+      pre: (d) => edit(d, W("todo", T902), "## Touches", "## Done when <!-- stretch -->\n\n- [ ] gamma holds\n\n## Touches"),
+    },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "gamma holds", "gamma holds and persists");
+      commit(d, "edit second Done when");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "r1-second-done-when-inline-comment-clean (sibling control)",
+    opts: {
+      pre: (d) => edit(d, W("todo", T902), "## Touches", "## Done when <!-- stretch -->\n\n- [ ] gamma holds\n\n## Touches"),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // R2: "## Members" carrying a trailing inline comment must still be recognized as Members
+    // (rendered); TASK-901 is unstamped so it is reachable ONLY by being listed.
+    name: "r2-members-heading-inline-comment-unstamped (must-FAIL: TASK-901 reachable only by listing)",
+    opts: {
+      pre: (d) => {
+        edit(d, W("todo", T901), "sprint: SPRINT-901\n", "");
+        edit(d, SPRINT, "## Members", "## Members <!-- frozen at promote -->");
+      },
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit unstamped, listed-only member");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "r2-members-heading-inline-comment-unstamped-clean (sibling control)",
+    opts: {
+      pre: (d) => {
+        edit(d, W("todo", T901), "sprint: SPRINT-901\n", "");
+        edit(d, SPRINT, "## Members", "## Members <!-- frozen at promote -->");
+      },
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // R3a: an id named ONLY inside an inline comment in the entry BODY must not excuse.
+    name: "r3a-scope-change-id-in-comment-body (must-FAIL: a commented-out id excuses nothing)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\n<!-- TASK-901 --> gains a benchmark.\n");
+      commit(d, "edit + id only in comment body");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    // R3b: an id named ONLY inside an inline comment in the entry HEADING's summary field.
+    name: "r3b-scope-change-id-in-comment-heading (must-FAIL)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "tidy <!-- TASK-901 -->", "General cleanup.");
+      commit(d, "edit + id only in comment heading");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    // R3c: a fake "| scope-change |" field hidden in an inline comment inside the heading must not
+    // be read as the event -- the rendered heading's real event here is "note".
+    name: "r3c-scope-change-event-in-comment (must-FAIL: the real (rendered) event is note, not scope-change)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 <!-- | scope-change | --> | note | TASK-901 tidy\nGeneral cleanup.\n");
+      commit(d, "edit + fake event field in comment");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    // R3d: an inline comment spanning two body lines hides the only occurrence of the id.
+    name: "r3d-scope-change-id-in-multiline-comment (must-FAIL)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\nalpha needs <!-- a note about\nTASK-901 --> gains a benchmark.\n");
+      commit(d, "edit + multi-line comment hides the id");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    // R4a: "## Done when <!-- frozen -->" as the ONLY Done-when heading, unedited -- must not be a
+    // loud false NO-DONE-WHEN.
+    name: "r4-done-when-heading-inline-comment-clean (must-PASS: never a false NO-DONE-WHEN)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "## Done when", "## Done when <!-- frozen -->") },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // R4b: the sprint's inline "## Execution Log <!-- inline -->" must still be read, so a valid
+    // entry there excuses -- never a loud false FREEZE-EDIT.
+    name: "r4-execution-log-heading-inline-comment-excuses (must-PASS: the inline log is still read)",
+    opts: { pre: (d) => edit(d, SPRINT, "## Execution Log", "## Execution Log <!-- inline -->") },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      edit(d, SPRINT, "## Files Changed", "### 2026-09-25 | scope-change | alpha gains a bar\nTASK-901 gains a benchmark.\n\n## Files Changed");
+      commit(d, "edit + inline entry under a decorated heading");
+    },
+    expect: [],
+  },
+  {
+    // R5: a Members bullet wrapped in an HTML comment -- selection reads RAW, so it still selects
+    // (over-inclusion is the loud/safe direction).
+    name: "r5-members-line-commented-out-edited (must-FAIL: raw selection over-includes)",
+    opts: { pre: (d) => edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "<!-- - docs/work/todo/TASK-902-beta.md -->\n") },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "beta consumes alpha's output unchanged", "beta consumes alpha's output unchanged, verified");
+      commit(d, "edit commented-out member");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "r5-members-line-commented-out-clean (sibling control)",
+    opts: { pre: (d) => edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "<!-- - docs/work/todo/TASK-902-beta.md -->\n") },
+    mutate: () => {},
+    expect: [],
+  },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
   { name: "no-members (must-FAIL guard)", opts: { noMembers: true }, mutate: () => {}, expect: ["NO-MEMBERS"] },
