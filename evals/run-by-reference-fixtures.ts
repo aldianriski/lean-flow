@@ -1280,6 +1280,19 @@ const CASES: Case[] = [
     mutate: () => {},
     expect: [],
   },
+  {
+    // j: a backtick-protected `<!--` with a REACHABLE, unprotected `-->` later in the same
+    // paragraph -- P5/P6 (round 2) never discriminate code-span masking, because their `<!--` has
+    // no `-->` to reach at all (literal by the unclosed-comment rule instead). Here the id sits
+    // between the two, so losing backtick protection swallows it into a false comment span.
+    name: "j-backtick-protects-a-reachable-arrow (must-PASS: the id is not really commented out)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\nalpha explains `<!--` markers.\nTASK-901 gains a --> benchmark.\n");
+      commit(d, "edit + backtick-protected marker with a later arrow");
+    },
+    expect: [],
+  },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
   { name: "no-members (must-FAIL guard)", opts: { noMembers: true }, mutate: () => {}, expect: ["NO-MEMBERS"] },
