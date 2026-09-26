@@ -1105,14 +1105,24 @@ const CASES: Case[] = [
     expect: [],
   },
   {
+    // If "```x``` spans are inline code" wrongly opened a 3-run fence (F5), the following bare
+    // "````" would wrongly CLOSE it (same char, run 4>=3) instead of opening the real 4-run fence
+    // around "## Example, not heading" -- so that heading would wrongly re-surface as a boundary,
+    // ending "## Done when" right there and silently dropping both boxes below it (and any edit to
+    // them) from the comparison. Disqualifying the inline span keeps the real fence intact.
     name: "scanner-p4d-inline-code-span-false-fence (must-FAIL: a ```x``` inline span must not flip fence parity, F5)",
     opts: {
       pre: (d) =>
-        edit(d, W("todo", T901), "- [ ] a retained fixture covers the empty input", "```x``` spans are inline code\n- [ ] a retained fixture covers the empty input"),
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "```x``` spans are inline code\n````\n## Example, not heading\n````\n- [ ] alpha returns the documented value for every input in the table",
+        ),
     },
     mutate: (d) => {
       EDIT_901(d, W("todo", T901));
-      commit(d, "edit after inline-span line");
+      commit(d, "edit after inline-span-then-fence");
     },
     expect: ["FREEZE-EDIT TASK-901"],
   },
@@ -1120,7 +1130,12 @@ const CASES: Case[] = [
     name: "scanner-p4d-inline-code-span-false-fence-clean (sibling control)",
     opts: {
       pre: (d) =>
-        edit(d, W("todo", T901), "- [ ] a retained fixture covers the empty input", "```x``` spans are inline code\n- [ ] a retained fixture covers the empty input"),
+        edit(
+          d,
+          W("todo", T901),
+          "- [ ] alpha returns the documented value for every input in the table",
+          "```x``` spans are inline code\n````\n## Example, not heading\n````\n- [ ] alpha returns the documented value for every input in the table",
+        ),
     },
     mutate: () => {},
     expect: [],
