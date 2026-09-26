@@ -31,7 +31,7 @@ fixtures (same at `9d8658a`).
 
 ### T1 — Stop fences and comments from hiding edits from the by-reference freeze checker `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/` ·
-`evals/run-orchestrator-store-fixtures.ts` · `skills/lean-doc-generator/references/sprint-by-reference.md`
+  `evals/run-orchestrator-store-fixtures.ts` · `skills/lean-doc-generator/references/sprint-by-reference.md`
 Depends-on: none
 Cites: `TASK-388` · `ADR-047` · SPRINT-107 outside review (2026-09-26) findings 1–5
 
@@ -53,12 +53,12 @@ harnesses are green under this host's default TMP.
 
 ### T2 — Make the knowledge index byte-identical under any locale `[size: S · risk: low · class: execution · AFK · J1]`
 Layers: `scripts/gen-index.sh` · `docs/knowledge-index.md` · `evals/run-gen-index-locale-fixtures.ts` ·
-`evals/fixtures/gen-index-locale/` · `scripts/qa-check.sh`
+  `evals/fixtures/gen-index-locale/` · `scripts/qa-check.sh`
 Depends-on: none
 Cites: `TASK-389` · SPRINT-107 outside review finding 4 · `3ae370d` · `b952f44`
 
 Tier X. The file order comes from a shell glob, which sorts by the caller's locale. Pin the collation
-for that enumeration only: `qa-check.sh` reads the vocab variables from this script, so nothing may leak.
+for that enumeration only: `scripts/qa-check.sh` reads the vocab variables from this script, so nothing may leak.
 
 **Acceptance:** the committed index passes `--check` under `LC_ALL=C` and under `en_US.UTF-8`, and
 the default gate's `knowledge index` check is green on this host.
@@ -66,7 +66,7 @@ the default gate's `knowledge index` check is green on this host.
 **DoD:**
 - [ ] `sh scripts/gen-index.sh --check` exits 0 under `LC_ALL=C` and under `LC_ALL=en_US.UTF-8` — *Verify: both runs*
 - [ ] The collation pin does not reach the caller: a variable read after sourcing the vocab shows the caller's locale unchanged — *Verify: fixture*
-- [ ] Retained TS fixture: file names that collate differently yield the same index under both locales, registered in `qa-check.sh` — *Verify: harness verdict line*
+- [ ] Retained TS fixture: file names that collate differently yield the same index under both locales, registered in `scripts/qa-check.sh` — *Verify: harness verdict line*
 
 ## Decisions (pre-locked)
 - **D1** — An edit inside an HTML comment in `## Done when` still counts as `FREEZE-EDIT`: masking finds section boundaries only, the compared text stays raw (owner ruling, 2026-09-26).
