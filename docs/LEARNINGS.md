@@ -30,6 +30,14 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
+## L-217 [tags: process] [status: active]: **A Tier G review loop needs a threat model and a stop rule; "hunt for new silent misses" in a hand-rolled parser never converges.** SPRINT-108 T1 ran three builder rounds and four worktree-isolated reviews, about 2.4M sub-agent tokens, on the freeze checker's Markdown handling. Each review closed its set and found a new one at the next boundary: fences, then comments, then code spans, then heading variants. The shapes were hand-built adversarial inputs, and 0 of 26 live task files contained any of them, while about 80% of the value (a path-spelling fix that had both harnesses red on the owner's host, one unguarded clause, the verdict-line read) landed in the first pass. Round 2 was also the coordinator's own error: the brief said "raw lines everywhere" where the ruling only covered the Done-when body. What ended it was a rule, not a fix: **err loud, stop parsing (A5)**. The owner asked outright whether the spend was worth it. Before authorizing another round, run a census of the finding's shape against the real corpus and show the cumulative spend. A census-zero shape goes to TD. Brief reviewers against a threat model and the listed findings, not "find anything".
+- seen: 2026-09-26 (SPRINT-108 T1, revise rounds 1–3, owner ruling A6)
+- count: 1
+- promoted: no
+- related: L-165 (every Tier G change gets an outside reviewer — this bounds how many) · L-186 (vary the selection) · L-088 (re-agree a criterion execution invalidated)
+
+---
+
 ## L-216 [tags: edit-safety] [status: active]: **A background job that rewrites files in the working tree owns that tree until it exits — no `git stash`, `checkout` or other tree-wide git command in the same checkout meanwhile.** At SPRINT-107 a seeded-break batch ran in the background, swapping a Tier G checker's content per seed, and the coordinator ran `git stash` / `stash pop` in the same checkout to test an unrelated index. The stash captured a *seeded* checker and put it back, and for a few seconds one seed's harness ran against HEAD's checker, so that seed's result was void. Nothing reported it. It was caught only by a `cmp` against the saved pristine copy that showed an unexpected diff, and the seed was re-run. The seed runner's own restore-under-hash check could not help, because it checks only after its own write. Fix: give a mutating background job its own worktree, or leave the tree alone until it exits. Read-only commands against other paths are fine.
 - seen: 2026-09-25 (SPRINT-107 T1 revise round 1 — seed S7 re-run clean afterwards)
 - count: 1

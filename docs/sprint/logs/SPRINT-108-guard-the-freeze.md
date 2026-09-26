@@ -200,3 +200,19 @@ remainder to TD, and close. On that basis the last T1 DoD box is ticked.
 `f133efe` ("T2 accepted -- tick DoD") appended evidence to the harness-registration box but left it `[ ]`. The Edit's
 anchor covered only the tail of the line, so the report said 3 of 3 while the file said 2 of 3. Found by counting open boxes
 before close, not by any check. Flipped now; the evidence is unchanged. Plan DoD: 10 of 10.
+
+### 2026-09-26 | close | SPRINT-108 closed — 10 of 10 Plan DoD
+**System-verify** (`QA_FULL=1 bun scripts/qa-verdict.ts sh scripts/qa-check.sh`, run as its own call, verdict line read):
+`QA-CHECK: 276 pass, 2 fail`.
+- The prose-density FAIL was this file's own line 53, fixed in `165a569`; a re-check gives 0 FAIL.
+- The `run-qa-budget-fixtures` FAIL is TD-167's known timing flake (empty `got:` under load, PASS when run alone), third sighting.
+
+Handoff reconciliation: no `handoff` entries this sprint.
+Retro written and routed:
+- **Shipped** → `CHANGELOG.md` § SPRINT-108
+- **Debt** → `TD-186` + the TD-167 sighting (`TD-182`…`185` were filed at G1)
+- **Follow-ups** → none
+- **Learnings** → `L-217`
+
+TODO pointer cleared and the shipped Backlog entries removed; knowledge index regenerated and `--check` PASS. No release (D2).
+§11 retention (archiving the sprint pair) is proposed to the owner.

@@ -295,6 +295,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-186** severity: low | status: open | created: Sprint-108
+  - Summary: **the freeze checker does not model list-item containers or `<pre>` blocks.** A heading at
+    column 0 after `- none` / `  <!--` (or a fence) under Assumes is real in CommonMark, because the list
+    item ends there, but the checker keeps it hidden. A `<pre>` block wrapping `## Example` still ends Done
+    when. Both are silent on an edit, both predate SPRINT-108, and 0 of 26 live task files have either shape.
+  - Mitigation (hypothesis): under A5 (err loud), treat an open block comment or fence as ending at a
+    column-0 `## ` line, and a `## ` inside `<pre>…</pre>` as hidden. **Census the real corpus before
+    building (L-217)**: a zero census stays TD.
+
 - **TD-185** severity: low | status: open | created: Sprint-107 (outside review)
   - Summary: **an uncommitted new member in `done/` is frozen against its own current content.** With
     no stamping commit, `check-sprint-by-reference.ts` falls back to `baseline now` and prints a
@@ -667,6 +676,8 @@ status: current
     reported `FAIL … got:` with an **empty** capture during a gate run at 0.41 GB free, then passed
     standalone. An empty capture on a must-FAIL case would read green, so the risk is wider than the
     timing race itself. Cause not verified.
+  - **Seen again at SPRINT-108 close (2026-09-26):** the same empty `got:` inside the `QA_FULL=1` system-verify
+    run (`276 pass, 2 fail`), then PASS standalone on the Windows host. Third sighting.
 - **TD-165** severity: medium | status: open | created: Sprint-102
   - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
     discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that

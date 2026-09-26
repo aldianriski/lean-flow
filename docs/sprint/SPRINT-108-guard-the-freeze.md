@@ -3,7 +3,7 @@ sprint: 108
 slug: guard-the-freeze
 owner: Maintainer
 last_updated: 2026-09-26
-status: active
+status: closed
 gates_signed: G1,G2 @ 96865d2
 plan_commit: 96865d2
 close_commit: [sha — set at close]
@@ -87,5 +87,42 @@ the default gate's `knowledge index` check is green on this host.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-sprint-by-reference.ts` | T1 | CommonMark fence closing, block-comment scanner, real-path spelling, A5 (comment-stripped excuses, tolerant heading names, `LOG-HEADING-CHANGED`) | High | 127/0 retained; seeds (a)–(q) |
+| `evals/run-by-reference-fixtures.ts` | T1 | 73 → 127 cases: fence, comment, code-span, heading, log-baseline and alias-path shapes, each with a sibling | Med | same |
+| `evals/run-orchestrator-store-fixtures.ts` | T1 | host check requires the verdict line (`NO-VERDICT`) | Low | 42/0; no-verdict stub seed |
+| `skills/lean-doc-generator/references/sprint-by-reference.md` | T1 | step 3 states the fence/comment rules and A5 | Low | read-through |
+| `scripts/gen-index.sh` | T2 | byte-order enumeration via a scoped `LC_ALL=C sort` | Low | `--check` rc=0 under both locales |
+| `evals/run-gen-index-locale-fixtures.ts` · `evals/fixtures/gen-index-locale/` | T2 | retained locale proof + leak checks | Low | 5/0; locale control |
+| `scripts/qa-check.sh` | T2 | registers the locale harness always-on | Low | full gate 276/2 (both explained) |
 
 ## Retro
+
+**Shipped** → `CHANGELOG.md` § SPRINT-108. Both tasks are done; Plan DoD 10 of 10. T1 was accepted under A6 (owner), and T2's
+no-leak box under A3.
+**System-verify:** `QA_FULL=1` gate `276 pass, 2 fail`, up from `259 pass, 6 fail` on `1777e0a` on this host. The two failures:
+- prose density on this file's own line 53: fixed in `165a569`, and the check is now 0 FAIL
+- the known TD-167 timing flake, PASS when run alone (third sighting logged)
+
+**Tech debt** → `TD-182`…`185` (filed at G1) · `TD-186` (list-item containers and `<pre>` blocks, census zero) ·
+TD-167 sighting. **Follow-ups** → none. **Learnings** → `L-217` (Tier G review needs a threat model and a stop rule).
+
+**Retrieval check:** yes. L-165 (outside review for every Tier G change) was followed, but nothing bounded how many rounds it
+takes, and L-186's selection rule caught the round-1 fixture conflation only once a reviewer applied it. L-217 is the gap.
+
+**Cost:** coordinator plus 9 dispatched agents: 2 builders (T1: 3 revise rounds, about 1.58M tokens; T2: about 190k) and 4 reviews
+(about 590k), for about 2.4M sub-agent tokens in all. Roughly 80% of the delivered value came from about 20% of that: the first T1 pass and T2.
+The fence, comment and code-span rounds closed shapes that no live file carries. That cost is the case for L-217.
+
+**Worked**
+- Test-first with a sibling control per case, plus one-clause seeds. Each round's fixtures were red before the fix,
+  and seeds exposed three fixtures that did not discriminate before they could ship.
+- Parallel worktree dispatch for disjoint tasks (T1 ∥ T2) with coordinator-owned ticks and the log.
+- Asking the owner at each exhausted retry instead of pressing on.
+
+**Friction**
+- An open-ended review brief ("hunt for new silent misses") with no stop rule, which drove three rounds.
+- The coordinator's round-1 brief said raw lines for the whole scanner, which designed round 2's regressions in.
+- The coordinator wrote a DoD premise from memory ("sourcing the vocab"). It needed A3.
+- An Edit anchored on a line's tail appended evidence without flipping the box. It was caught only by counting.
+
+**Pattern candidate** → `L-217` (count 1).

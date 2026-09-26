@@ -30,6 +30,26 @@ listed for the owner to relocate or drop, never dropped silently). Mapping + ver
 migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md § Upgrading to 2.x.
 
 ---
+## SPRINT-108 — Guard the Freeze (2026-09-26)
+
+A hardening sprint after SPRINT-107's outside review. **Unreleased**: no version bump (D2).
+
+- **The by-reference freeze checker no longer lets Markdown hide an edit.**
+  - Fences close by the CommonMark rule (same character, a run at least as long as the opener's, nothing after it, at most 3 spaces of indent).
+  - HTML comments end a section only when they start a line.
+  - Under the new err-loud rule (A5), the checker does not model inline Markdown at all:
+    - scope-change excuses are matched with every comment removed
+    - heading names tolerate indent, closing `#`s and extra spaces
+    - a renamed log heading gives `LOG-HEADING-CHANGED`
+
+  An edit *inside* a Done-when comment still counts (D1). Paths are resolved to their real spelling, so a
+  Windows 8.3 short name no longer turns the whole suite into `CHECK-ERROR`. There are 127 retained cases
+  (up from 73), and the orchestrator-store harness now requires the checker's verdict line.
+- **The knowledge index is byte-identical under any locale.** The generator orders its files with a scoped
+  `LC_ALL=C sort`, so the same repo no longer reads STALE on a host whose collation differs. A new
+  always-on harness proves the order and checks that the setting does not leak to the caller.
+
+---
 ## SPRINT-107 — Retarget the Loop (2026-09-26)
 
 EPIC-017's second member sprint. **Unreleased**: the whole epic gates `2.0.0`.
