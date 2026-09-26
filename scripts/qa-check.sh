@@ -1161,6 +1161,21 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # git-free rule: it is a `bun test` wrapper over in-memory fixtures (see evals/dod-delta.test.ts), no
 # git, no mktemp, no repos built -- measured well under 1s on this host, the same shape
 # run-s4-ts-evaluators.sh already takes for a TS-evaluator leg.
+# run-gen-index-locale-fixtures.ts (SPRINT-108 T2, TASK-389) joins the always-on set by the SAME
+# deliberate exception run-git-availability-fixtures.sh takes above, not the plain cheap-and-git-free
+# rule: it guards gen-index.sh's ADR/research enumeration order against locale-dependent bash glob
+# collation (a Linux-container-generated index reads STALE on a host whose default locale collates
+# the same file set differently -- verified live on this Windows host before the fix). Each of its
+# throwaway repos is `git init` ONLY, no commit -- gen-index.sh's own
+# `ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)` needs a repo to exist, never history --
+# so it does not BUILD repos in the TD-016 sense either. Costed rather than assumed: ~9s on this
+# host for all 5 cases (6 throwaway inits, several `sh` subprocess spawns, and one seeded-break
+# sub-case) -- more than run-git-availability-fixtures.sh's ~2.1s because it shells out to run the
+# real generator multiple times rather than probing one engine flag, but still well under several
+# harnesses already always-on here (e.g. run-dispatch-preflight-fixtures.sh at 51.6s). Placed
+# immediately after run-git-availability-fixtures.sh in the list below as its nearest cost/shape
+# neighbor; the list's full cheapest-first order has not been re-measured for this addition
+# (SPRINT-104 T4 owns the next total re-measure per the note above).
 # ── ORDERED CHEAPEST-FIRST, AND THAT IS LOAD-BEARING (SPRINT-105 T3) ───────────────────────────
 # The list was previously in order-of-addition, which meant truncation dropped whichever harnesses
 # happened to be newest. Measured 2026-09-21 that was actively perverse: the gate spent **162.2s**
@@ -1181,7 +1196,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts"
 eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
