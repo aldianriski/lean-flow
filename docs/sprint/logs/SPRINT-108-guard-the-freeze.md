@@ -124,3 +124,10 @@ Reviewer seeds S1–S3 each reddened exactly their cases; restored to `62f31929`
 **Surprise, the coordinator's own:** the revise brief specified "raw lines" for the whole scanner, when D1 covered only
 the Done-when *body*. The regression was designed in, not built in. The builder implemented the brief exactly.
 The one bounded retry is spent → **owner ruling required** before T1 can move.
+
+### 2026-09-26 | gate | owner authorizes T1 revise round 2 (beyond the one-retry bound)
+Owner ruling (popup, 2026-09-26): one more builder round with the corrected rule, then a fresh isolated re-review.
+**A4 (the rule):** whatever ENDS or NAMES a section, or EXCUSES an edit, reads rendered text (comments blanked);
+whatever SELECTS members or COMPARES Done-when text reads raw text, so an error always lands on the loud side. D1 is unchanged.
+The pre-existing `<pre>` block and 1–3-space indented heading misses go to TD at close, not into this round.
+consequence · T1 · behaviour:material · governance:high → fresh worktree-isolated re-review after round 2
