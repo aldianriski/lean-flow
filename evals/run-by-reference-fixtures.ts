@@ -1350,10 +1350,14 @@ const CASES: Case[] = [
   },
   {
     // Finding 3b: 1-3 spaces indent, on a STAMP-ONLY member (TASK-903, L-186 population variance).
+    // Inserted AFTER "## Touches" (not before): "## Touches" already closes the first Done-when
+    // section, so if the indented heading is not recognized as a new one, the box that follows it
+    // stays genuinely outside any tracked section (a real gap) instead of being swallowed into the
+    // still-open first section, which would detect the edit for the wrong reason either way.
     name: "a5-3b-heading-indent (must-FAIL: TASK-903, stamp-only member)",
     opts: {
       extraStampedUnlisted: true,
-      pre: (d) => edit(d, W("todo", "TASK-903-gamma.md"), "## Touches", "  ## Done when\n\n- [ ] epsilon holds\n\n## Touches"),
+      pre: (d) => edit(d, W("todo", "TASK-903-gamma.md"), "## Assumes", "  ## Done when\n\n- [ ] epsilon holds\n\n## Assumes"),
     },
     mutate: (d) => {
       edit(d, W("todo", "TASK-903-gamma.md"), "epsilon holds", "epsilon holds now");
@@ -1365,7 +1369,7 @@ const CASES: Case[] = [
     name: "a5-3b-heading-indent-clean (sibling control)",
     opts: {
       extraStampedUnlisted: true,
-      pre: (d) => edit(d, W("todo", "TASK-903-gamma.md"), "## Touches", "  ## Done when\n\n- [ ] epsilon holds\n\n## Touches"),
+      pre: (d) => edit(d, W("todo", "TASK-903-gamma.md"), "## Assumes", "  ## Done when\n\n- [ ] epsilon holds\n\n## Assumes"),
     },
     mutate: () => {},
     expect: [],
