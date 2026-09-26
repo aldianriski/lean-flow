@@ -80,7 +80,7 @@ the default gate's `knowledge index` check is green on this host.
 
 ## Execution Log
 
-> **Lives in its own file** — `docs/sprint/logs/SPRINT-108-guard-the-freeze.md`, created lazily at the
+> **Lives in its own file** — `docs/sprint/archive/logs/SPRINT-108-guard-the-freeze.md`, created lazily at the
 > first entry (STANDARD §9 · ADR-014). Append there, never here.
 
 ## Files Changed
