@@ -179,3 +179,19 @@ modelling inline Markdown; wherever the rendered meaning is uncertain, it takes 
 - A log heading that is unrecognised at the baseline yields `LOG-HEADING-CHANGED`, never "all entries new".
 - One deliberate flip is allowed: `j-backtick-protects-a-reachable-arrow` may turn loud.
 - List-item containers and `<pre>` blocks go to TD at close.
+
+### 2026-09-26 | progress | T1 revise round 3 landed (A5) — T1 accepted under A6
+Worktree commits `6da5e30` · `a6e72ff` · `ba3f1b4` · `64da183`, cherry-picked as `52494d4` · `941172b` · `eda5553` · `7555b73`.
+`stripComments()` (applied to the whole entry, no code-span exception, an unclosed `<!--` strips to the end) and
+`headingName()` (0–3-space indent, closing `#` strip, whitespace collapse) replace round 2's paragraph renderer.
+A genuine log-heading rename now yields `LOG-HEADING-CHANGED`. Nine fixtures were seen red on `585246f` (117/9) before the fix;
+`a5-3b` was relocated once so it actually tests its gap. The deliberate A5 flip is `j-backtick-no-longer-protects-under-a5`,
+which is now FREEZE-EDIT. Seeds (l)–(q) each redden their target; (l) and (q) also redden shared-helper neighbours, as documented.
+Restored to `3908a657` (`git hash-object` = HEAD blob).
+**Coordinator re-run on main, default TMP:** `by-reference-fixtures: 127 pass, 0 fail` · `orchestrator-store-fixtures:
+42 pass, 0 fail` · live SPRINT-107 `--close` → `11 pass, 0 fail`. Each listed round-2 finding has a PASSing must-FAIL
+fixture and a clean sibling. I read `stripComments`/`headingName`: they match A5.
+**A6 (owner ruling, 2026-09-26):** after about 2.4M sub-agent tokens across three builder rounds and four reviews, the
+owner asked whether the spend was worth it. The coordinator's answer: the open-ended "hunt for new edges" review had no stop rule, and 0 of 26
+live task files carry the shapes involved. Ruling: finish round 3, check only the listed findings (no new reviewer), send the
+remainder to TD, and close. On that basis the last T1 DoD box is ticked.

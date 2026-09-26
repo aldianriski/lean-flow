@@ -44,13 +44,13 @@ anything is made relative, so an 8.3 short name and git's toplevel agree.
 harnesses are green under this host's default TMP.
 
 **DoD:**
-- [ ] Nested fence in Done when (four-backtick fence around a three-backtick one holding a `## ` line) + a post-promote box edit → `FREEZE-EDIT`; same shape unedited → clean — *Verify: retained must-FAIL fixture + sibling*
-- [ ] A fenced example `scope-change` entry in the log does not excuse a real edit → `FREEZE-EDIT` — *Verify: retained must-FAIL fixture + sibling*
-- [ ] A `## ` line inside an HTML comment does not end Done when; an edit below it **and** an edit inside it → `FREEZE-EDIT` — *Verify: retained must-FAIL fixtures + sibling*
-- [ ] An unticked box with a ` ✓` tail → `FREEZE-EDIT`; removing the unticked-box check reddens exactly this case — *Verify: fixture + seeded break*
-- [ ] A sprint path spelled differently from git's toplevel runs without `CHECK-ERROR`: `run-by-reference-fixtures` and `run-orchestrator-store-fixtures` print `0 fail` under the default TMP on this host — *Verify: both verdict lines*
-- [ ] The orchestrator-store host check reads the checker's verdict line; a checker that prints none makes the case FAIL — *Verify: seeded no-verdict checker*
-- [ ] Seeded-break proof per new check, under one stated hash convention; worktree-isolated outside review CLEAR — *Verify: review entry in the Execution Log*
+- [x] Nested fence in Done when (four-backtick fence around a three-backtick one holding a `## ` line) + a post-promote box edit → `FREEZE-EDIT`; same shape unedited → clean — *Verify: retained must-FAIL fixture + sibling* ✓ `nested-fence-hides-heading-then-edited` + `-clean`, and one-clause seeds for run-length (P1) and trailing whitespace (P2, P9), each reddening only its case
+- [x] A fenced example `scope-change` entry in the log does not excuse a real edit → `FREEZE-EDIT` — *Verify: retained must-FAIL fixture + sibling* ✓ `log-fenced-example-scope-change-hidden` + plain-fence sibling; P9 and P8 cover the info-string and indented-closer shapes
+- [x] A `## ` line inside an HTML comment does not end Done when; an edit below it **and** an edit inside it → `FREEZE-EDIT` — *Verify: retained must-FAIL fixtures + sibling* ✓ `comment-guidance-edit-below` · `-edit-inside` (D1 raw) · `-clean`; seeds C and D and round-2 seed (k) each redden exactly these
+- [x] An unticked box with a ` ✓` tail → `FREEZE-EDIT`; removing the unticked-box check reddens exactly this case — *Verify: fixture + seeded break* ✓ `unticked-box-with-check-tail`; seed dropping the clause reddens only it (builder, reviewer 1)
+- [x] A sprint path spelled differently from git's toplevel runs without `CHECK-ERROR`: `run-by-reference-fixtures` and `run-orchestrator-store-fixtures` print `0 fail` under the default TMP on this host — *Verify: both verdict lines* ✓ coordinator on main, default 8.3 TMP: `127 pass, 0 fail` · `42 pass, 0 fail`; `alias-path` junction case clean; live SPRINT-107 close `11 pass, 0 fail`
+- [x] The orchestrator-store host check reads the checker's verdict line; a checker that prints none makes the case FAIL — *Verify: seeded no-verdict checker* ✓ no-verdict stub reddens e2e-14, e2e-20 and the return-to-backlog case (NO-VERDICT)
+- [x] Seeded-break proof per new check, under one stated hash convention; worktree-isolated outside review CLEAR — *Verify: review entry in the Execution Log* ✓ under A6 (owner ruling, see the log): seeds (a)–(q) under `git hash-object`, each restored to the HEAD blob; reviews 1–3 NOT CLEAR, each finding closed by a retained fixture; the round-3 outside review was replaced by a coordinator check of the listed findings (127/0)
 
 ### T2 — Make the knowledge index byte-identical under any locale `[size: S · risk: low · class: execution · AFK · J1]`
 Layers: `scripts/gen-index.sh` · `docs/knowledge-index.md` · `evals/run-gen-index-locale-fixtures.ts` ·
