@@ -295,6 +295,35 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-185** severity: low | status: open | created: Sprint-107 (outside review)
+  - Summary: **an uncommitted new member in `done/` is frozen against its own current content.** With
+    no stamping commit, `check-sprint-by-reference.ts` falls back to `baseline now` and prints a
+    `freeze … unchanged since now` PASS that asserts nothing. `sprint-by-reference.md` defines the
+    baseline as "the first commit that stamps or lists it", and no such commit exists, so its close
+    rule reads either way.
+  - Mitigation (hypothesis): rule it in the reference first. Either no stamping commit → `MEMBER-MISSING`,
+    or keep `now` but print it as unverified, not as PASS.
+
+- **TD-184** severity: low | status: open | created: Sprint-107 (outside review)
+  - Summary: **re-indenting a Done-when box is not a freeze edit.** `- [ ]` → `  - [ ]` changes the
+    list structure but compares equal, and the reference's list of ignored differences does not name
+    leading indentation.
+  - Mitigation (hypothesis): either list indentation as ignored in the reference or compare it. Tier **G**
+    either way: needs a retained fixture.
+
+- **TD-183** severity: low | status: open | created: Sprint-107 (outside review)
+  - Summary: **a slugless `TASK-NNN.md` member is never selected, and nothing says so.** The reference puts
+    that filename outside the contract, but an edit to one yields a clean `3 pass, 0 fail` with no signal
+    that a stamped file was skipped (L-186's shape: the set, not the branch).
+  - Mitigation (hypothesis): report a stamped file whose name the resolver rejects as a named finding.
+
+- **TD-182** severity: low | status: open | created: Sprint-107 (outside review)
+  - Summary: **one `scope-change` entry excuses every later edit to a planned member.** An edit plus
+    a logged entry, then a second *unlogged* edit, passes. Planned members need only an entry "new
+    since plan_commit", while added members need "a newer entry", so the two cases are treated differently.
+  - Mitigation (hypothesis): a spec ruling first. Should an entry excuse only edits committed before it?
+    Then a Tier **G** change with a must-FAIL fixture.
+
 - **TD-181** severity: low | status: open | created: Sprint-107
   - Summary: **`layers observed` accepts a qualifier after the task id in one subject shape and rejects
     it in another.** Rule 2 admits `sprint(NN) Tn <qualifier>: …` (SPRINT-093 T7), but rule 4 admits

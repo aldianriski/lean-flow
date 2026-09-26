@@ -73,6 +73,47 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
 > Moved 2026-09-23 on owner direction: `TASK-359`…`365` · `369` · `370` left this file; `371`…`387` were
 > filed there directly after three Codex review rounds. Map → [`EPIC-017`](docs/epic/EPIC-017-work-items-that-fit.md).
 
+- [ ] TASK-388 — Stop fences and comments from hiding edits from the by-reference freeze checker  [size: M] [risk: high] [HITL]
+      class:      execution
+      tier:       G
+      authority:  J2
+      done-when:  each case below has a retained must-FAIL fixture plus a clean sibling control:
+                  (a) a nested fence in Done when (a four-backtick fence wrapping a three-backtick one
+                  that holds a `## ` line) plus a post-promote box edit → FREEZE-EDIT; (b) a fenced example
+                  scope-change entry in the log does not excuse a real edit → FREEZE-EDIT; (c) a `## `
+                  line inside an HTML comment does not end Done when, and an edit below it or inside
+                  it → FREEZE-EDIT (raw compare, owner ruling 2026-09-26); (d) an unticked box with a ✓
+                  tail → FREEZE-EDIT (removing the unticked-box check reddens exactly this case); (e) a
+                  sprint path spelled differently from git's toplevel (an 8.3 short name) runs without
+                  CHECK-ERROR, so both harnesses are green under the default TMP on the owner's Windows host;
+                  (f) the orchestrator-store host check reads the checker's verdict line, and no verdict
+                  → the case FAILs. Seeded-break proof per check, under one stated hash convention;
+                  worktree-isolated outside review CLEAR.
+      touches:    scripts/lib/check-sprint-by-reference.ts · evals/run-by-reference-fixtures.ts ·
+                  evals/run-orchestrator-store-fixtures.ts · sprint-by-reference.md (only if the rule text needs a line)
+      depends-on: none
+      assumes:    closing fence per CommonMark = same char, length ≥ opener, no info string ·
+                  `realpathSync.native` expands 8.3 names (verified at build)
+      origin:     decomposer
+      state:      ready
+      tracker:    SPRINT-107 outside review (2026-09-26), findings 1–5
+
+- [ ] TASK-389 — Make the knowledge index byte-identical under any locale  [size: S] [risk: low] [AFK]
+      class:      execution
+      tier:       X
+      authority:  J1
+      done-when:  the index generator's `--check` passes on the committed index under both `LC_ALL=C` and
+                  `en_US.UTF-8`, and qa-check's `knowledge index` check is green on the owner's
+                  Windows host. The collation pin does not leak into anything that sources the generator's
+                  vocab. A retained TypeScript fixture shows file names that collate differently
+                  produce the same index under both locales.
+      touches:    the index generator's file enumeration · the committed knowledge index (regenerated) · one TS fixture
+      depends-on: none
+      assumes:    the shell glob's collation is the only locale-dependent step (the ordering is the only diff seen)
+      origin:     decomposer
+      state:      ready
+      tracker:    SPRINT-107 outside review, finding 4 (commits `3ae370d` / `b952f44` regenerated under a C locale)
+
 - [ ] TASK-348 — Re-file TD-143's cost half against the HOST envelope, not the gate  [size: M] [risk: med] [HITL]
       class:      decision
       authority:  J2
