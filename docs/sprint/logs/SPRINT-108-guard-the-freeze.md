@@ -68,3 +68,24 @@ verdict line (`NO-VERDICT` otherwise). The reference gains one sentence in step 
 **Open:** a one-clause seed dropping only the run-length condition left the suite at 82/0, so that clause may be
 unguarded. `section()` also unfences raw text while the log parser unfences blanked text. Both have gone to the
 worktree-isolated outside review (Tier G bar), which is dispatched on `90081d8`.
+
+### 2026-09-26 | review | T1 outside review (worktree-isolated) — NOT CLEAR, revise round 1 dispatched
+Reviewer on `90081d8`, verdict lines first: `82 pass, 0 fail` · `42 pass, 0 fail` · live SPRINT-107 `11 pass, 0 fail`.
+Six probe inputs pass SILENTLY on a real Done-when edit:
+- **F1:** neither closing clause is guarded. One-clause seeds (drop run-length / drop the trailing-whitespace test) both
+  leave the suite at 82/0, because every fence fixture's inner opener is both shorter *and* carries an info string
+  (L-186's shared incidental property).
+- **F2:** `section()` unfences raw text while the log parser blanks comments first, so a ``` inside a comment
+  flips fence parity.
+- **F3:** a closer indented 4 or more spaces still closes a fence, in Done when and in the log.
+- **F4, a regression this commit introduced:** an inline `<!--` (in a code span) blanks to EOF, so a later Done when is
+  skipped silently, or `NO-DONE-WHEN` fires falsely. This repo is not affected today (0 of 26 task files contain `<!--`);
+  consumer repos can be.
+- **F5 (low):** a line starting with an inline ```x``` span opens a fence.
+
+Not defects: tilde nesting · a 4-space opener (loud only) · realpath shapes (ENOENT/EISDIR stay named findings; `subst`
+drive 11/0) · a member-varying probe. D1 is guarded (both reviewer seeds C and D reddened exactly their cases).
+Restored `2484da9f` (`git hash-object` = HEAD blob).
+**Revise round 1** (the one bounded retry): one CommonMark block scanner shared by both parsers. It has three states
+(normal · fence · comment); fences take ≤3 spaces of indent; a backtick info string may not contain a backtick; only a
+line-start `<!--` opens a comment. Each clause gets a discriminating fixture and a one-clause seed.
