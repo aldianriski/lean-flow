@@ -16,9 +16,11 @@ status: current
 
 ## Active Sprint
 
-> _None active._ Last closed: **SPRINT-107 — Retarget the Loop**, closed 2026-09-26 with 18 of 18 Plan DoD
-> and all five members in `docs/work/done/`. The loop now runs on the store (ADR-047). See `CHANGELOG.md`
-> and the sprint pair.
+> **SPRINT-108 — Guard the Freeze** → docs/sprint/SPRINT-108-guard-the-freeze.md
+>
+> `TASK-388` (freeze checker: fences, comments, path spelling) · `TASK-389` (locale-independent knowledge index).
+> From the SPRINT-107 outside review. Predecessor: **SPRINT-107 — Retarget the Loop** closed 2026-09-26
+> with 18 of 18 Plan DoD. See `CHANGELOG.md` and the sprint pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
