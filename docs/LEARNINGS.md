@@ -34,7 +34,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 - seen: 2026-09-25 (SPRINT-107 T1 revise round 1 — seed S7 re-run clean afterwards)
 - count: 1
 - promoted: no
-- related: L-168 (an adversarial reviewer writes, so isolate it) · L-137 (verify the seed landed; restore under a checked hash) · L-042 (shared-file staging)
+- related: L-168 (an adversarial reviewer writes, so isolate it) · L-137 (verify the seed landed; restore under a checked hash) · CLAUDE.md edit-safety (a) (shared-file staging)
 
 ## L-215 [tags: tooling] [status: active]: **A throwaway fixture repo inherits the host's global git config, so the host's environment becomes part of the fixture — pin what the fixture depends on.** SPRINT-107's by-reference harness makes ~70 temp repos and hundreds of commits per run, and each commit went through this host's configured commit signer. At seed-battery volume the signer failed with "too many open files". The fixture-build error then escaped the per-case `try` (the build ran outside it), so the harness died with **no verdict line**, and 28 of 33 seeds scored `BAD` on `red=[]`, a unanimous result from an instrument that had not run. Two fixes, both needed: fixture repos set `commit.gpgsign false` (with `core.autocrlf`, `user.*`, anything else the fixture assumes), and a harness case builds inside its own `try` so one broken build fails one case, never the verdict. The seed runner now treats a missing verdict line as INVALID, not as a result (L-120's shape: read the verdict the gate prints, never the absence of one).
 - seen: 2026-09-25 (SPRINT-107 T1 round-3 seed battery; harness fixed in `68c2a0b`)
