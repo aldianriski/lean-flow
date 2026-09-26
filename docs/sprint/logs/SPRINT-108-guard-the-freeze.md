@@ -153,3 +153,19 @@ Three fixture or definition corrections were made after seeds failed to discrimi
 **Coordinator re-run on main, default TMP:** `by-reference-fixtures: 112 pass, 0 fail` · `orchestrator-store-fixtures:
 42 pass, 0 fail` · live SPRINT-107 `--close` → `11 pass, 0 fail`. The stash stack is empty.
 A fresh worktree-isolated re-review is dispatched on `b615868`.
+
+### 2026-09-26 | review | T1 round-2 re-review (worktree-isolated) — NOT CLEAR: R1–R5 and round 1 closed; 2 regressions, 1 in-claim miss
+Reviewer on `b615868`: `112 pass, 0 fail` · `42 pass, 0 fail` · live SPRINT-107 `11 pass, 0 fail`. R1–R5 and P1–P9/F2/P4a/P8/P5/P6/P4d
+are all CLOSED on the reviewer's own spellings, and the L-186 selection probes (stamp-only, cancel/, in_progress/) hold.
+**Silent misses found:**
+- (1) REGRESSION: the code-span model assumes single backticks on one line. ``` ``a`b`` ``` and an escaped `` \` `` make a
+  `<!-- TASK-901 -->` read as code, so a hidden id excuses an edit. `1bd9c71` caught this.
+- (2) IN-CLAIM: `## Done <!-- x --> when` renders "Done when", but the rendered name is only trimmed, so interior spaces are not collapsed.
+- (3) PRE-EXISTING: `## Done when ##`, a 1–3-space indent, `##  Done when`, `## Members ##`.
+- (4) inline-log heading unrecognised at promote and recognised later → every pre-promote entry counts as new. The unclosed-comment
+  variant is a REGRESSION, since `1bd9c71` was loud; the plain rename is pre-existing.
+- (5) low, pre-existing: list-item containers are not modelled.
+
+Reviewer seeds A–C each reddened exactly one case; restored to `a8d51c2b` (`git hash-object` = HEAD blob).
+Pattern: three rounds of a hand-rolled CommonMark subset, and each round closes its set and opens the next set at a new
+boundary. Owner ruling required on direction.
