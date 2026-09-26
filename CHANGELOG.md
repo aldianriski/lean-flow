@@ -30,6 +30,26 @@ listed for the owner to relocate or drop, never dropped silently). Mapping + ver
 migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md § Upgrading to 2.x.
 
 ---
+## SPRINT-107 — Retarget the Loop (2026-09-26)
+
+EPIC-017's second member sprint. **Unreleased**: the whole epic gates `2.0.0`.
+
+- **Sprints by reference (`ADR-047`).** `promote` moves member task files `backlog/ → todo/` with `git mv`
+  and stamps `sprint:`. The sprint's § Plan carries meta only, with no DoD copy, because each task's DoD
+  is its own `## Done when`. `plan_commit` is the freeze. `close` requires every member in
+  `done/`/`cancel/`. The freeze check covers membership at `plan_commit` and now, a `scope-change` that
+  is new since the baseline, a bounded freeze point, and an append-only log. It is a Tier G checker
+  with 73 retained cases, and it cleared three worktree-isolated outside reviews.
+- **`/triage` + `/task-decomposer`** write one task file per task. A 37-task breakdown of EPIC-017
+  produced 37 files and no cap check fired.
+- **`/handoff` + `/flow`** find the active sprint and route from the store. They never read `TODO.md`.
+- **`/orchestrator`** runs a sprint from its member files. It ticks and moves them as the coordinator,
+  runs a duplicate-id check at every merge-back, and treats return-to-backlog as a logged scope-out.
+  The rollup and units count member boxes, and review's `Cites:` comparand resolves to the task file.
+- **Gate:** four new harnesses (store-readers and store-writers always-on; by-reference and
+  orchestrator-store opt-in). The close gate read `259 pass, 1 fail`, the one being a pushed commit
+  whose subject the attribution rule cannot parse, recorded as an owner-ruled exception (`TD-181`).
+
 ## SPRINT-106 — The Store, and the Way In (2026-09-24)
 
 EPIC-017's first member sprint. **Unreleased** — the whole epic gates `2.0.0` (owner ruling).

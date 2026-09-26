@@ -204,3 +204,18 @@ and is pushed history — rewriting it is off the table; it stays a named `layer
 **Environment, not this sprint:** `typecheck` + `typecheck-population` → no `node_modules` (fixed: `bun install`);
 `spec-reader s13` → the fixture matches an em dash with one `.`, so it fails under a POSIX locale (this container:
 `LANG` unset) and passes under `LC_ALL=C.UTF-8`; red already at `3e0e710` → TD at close.
+
+### 2026-09-26 | close | SPRINT-107 closed — 18 of 18 Plan DoD, five of five members in `done/`
+**System-verify** (`LC_ALL=C.UTF-8 bash scripts/qa-check.sh`, run as its own call, verdict line read):
+`QA-CHECK: 259 pass, 1 fail`. The FAIL is `layers observed` on `65bbb13`, a pushed commit from the prior session
+whose subject qualifier `T3 align` the attribution rule cannot parse. **Owner ruling (2026-09-26): recorded as an
+exception, history untouched** (SPRINT-094 precedent) → TD-181. Close gate: `check-sprint-by-reference … --close`
+→ `11 pass, 0 fail`. Handoff reconciliation: no `handoff` entries this sprint.
+Retro written and routed. **Shipped** → `CHANGELOG.md` (SPRINT-107 section). **Debt** → `TD-180` (locale-dependent
+`s13` fixture) · `TD-181` (rule-4 qualifier) · TD-178 sighting. **Follow-ups** → none new: carried as `## Amended`
+notes on TASK-377 · TASK-379 · TASK-383. **Learnings** → `L-215` (fixture repos inherit host git config) ·
+`L-216` (a background tree mutator owns the tree). **Doc freshness** (owner-approved): README (sprint-bulk
+line, upgrade step 3) and `.claude/CONTEXT.md` (sprint-bulk row, the sprint-file line) now describe members by
+reference. EPIC-017 rolled up: § Closed-when **1** and **5** met; not closed (8 conditions open). TODO pointer
+cleared. **§11 retention** (owner-approved): archive the sprint pair and add the INDEX line, in the next commits.
+No release: D4, the epic gates `2.0.0`.

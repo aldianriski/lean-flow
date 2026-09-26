@@ -3,8 +3,8 @@ sprint: 107
 slug: retarget-the-loop
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-09-24
-status: active
+last_updated: 2026-09-26
+status: closed
 plan_commit: 3e0e710
 gates_signed: G1,G2 @ 3b23f79
 close_commit: [sha — set at close]
@@ -154,3 +154,37 @@ review comparand) with no Plan-copy dependency.
 | `evals/run-store-writers-fixtures.ts` · `evals/fixtures/store-writers/` | T2 | retained Tier X fixtures + the 37-task EPIC-017 breakdown, always-on | Low | self 29/0 |
 
 ## Retro
+
+**Retrieval check.** No prior L or ADR was contradicted. L-186 (a guard's member *set*) was re-hit twice, each
+time by the outside reviewer, not the author. Round 1: a population blind to `plan_commit`. Round 2: every
+fixture shared "the sprint never moves" and "`plan_commit` is recorded in the next commit". Bar (ii) of the
+Tier-G rule worked as written, because the independent pass found what no fixture could. L-165 held as well:
+every guard defect this sprint was found by a reviewer or a disagreeing second number. TD-178 was re-hit by
+the coordinator's own tick-evidence text.
+
+**Cost.** Coordinator inline, plus this session's subagents: one T4 builder (~0.22M tokens) and one reviewer
+across rounds 2–3 (~0.25M). The earlier session's T1–T3 builders and round-1 reviewer are not summed here, since
+their reports are not in this session. Four full-gate runs. Four tasks delivered; 18 of 18 Plan boxes and all
+five members in `done/`.
+
+**Worked**
+- Three outside rounds on the T1 checker, NOT CLEAR → NOT CLEAR → CLEAR. Each round's new fixtures reddened
+  against the previous round's checker (24, then 10), and 33 targeted seeds each reddened exactly their cases.
+- The by-reference model proved itself on its own sprint: the live freeze held at 6/0 across 18 ticks and
+  five moves, and the first real close-by-reference read `11 pass, 0 fail`.
+- The coordinator re-read found a real gap in the builder's T4 (the step-0 guard sent an all-ticked sprint
+  with a member in `review/` back to `promote`), and it was fixed with a fixture before acceptance.
+
+**Friction**
+- The round-1 revise was dispatched in the earlier session but never reached history, so this session
+  rebuilt it. A dispatch that ends with no commit is invisible until someone checks `git log`.
+- Two seed batches produced unusable signal: one overlapped a `git stash` (L-216), and one ran without a
+  harness at all, because the host signer failed at volume (L-215).
+- System-verify tripped on this sprint's own bookkeeping: files already covered by logged scope-changes
+  had never been added to `Layers:`, and tick evidence carried bare file tokens.
+
+**Pattern candidate:** L-215 · L-216 (count 1 each).
+
+**Carried:** night-run.sh `reap()` → TASK-383 · undocumented `## Assumes` conventions → TASK-377 · stale
+TODO § Active Sprint readers → TASK-379 (all as `## Amended` notes) · `65bbb13` unattributable → TD-181
+(owner-ruled exception) · locale-dependent `s13` fixture → TD-180.

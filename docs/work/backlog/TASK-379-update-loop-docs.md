@@ -30,6 +30,10 @@ depends-on: [TASK-375, TASK-376, TASK-377]
 
 none
 
+## Amended 2026-09-26
+
+- Carried from SPRINT-107 T3: these still describe `TODO.md` § Active Sprint as the pointer to the running sprint: `skills/prime/SKILL.md` (~l.41, the v1 resolution sentence), `skills/lean-doc-generator/SKILL.md` (~l.101/107, the promote/close rows), `.claude/CONTEXT.md` (~l.103) and `README.md` (the loop description). On a v2 store the active sprint is found from top-level `docs/sprint/SPRINT-*.md` `status: active` plus members (as in `/handoff`). The sprint-bulk and Plan-DoD wording was already refreshed at SPRINT-107's close.
+
 ## Tracker
 
 EPIC-017 · Codex r2 R2-2b

@@ -22,11 +22,25 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-214**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-216**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-216 [tags: edit-safety] [status: active]: **A background job that rewrites files in the working tree owns that tree until it exits — no `git stash`, `checkout` or other tree-wide git command in the same checkout meanwhile.** At SPRINT-107 a seeded-break batch ran in the background, swapping a Tier G checker's content per seed, and the coordinator ran `git stash` / `stash pop` in the same checkout to test an unrelated index. The stash captured a *seeded* checker and put it back, and for a few seconds one seed's harness ran against HEAD's checker, so that seed's result was void. Nothing reported it. It was caught only by a `cmp` against the saved pristine copy that showed an unexpected diff, and the seed was re-run. The seed runner's own restore-under-hash check could not help, because it checks only after its own write. Fix: give a mutating background job its own worktree, or leave the tree alone until it exits. Read-only commands against other paths are fine.
+- seen: 2026-09-25 (SPRINT-107 T1 revise round 1 — seed S7 re-run clean afterwards)
+- count: 1
+- promoted: no
+- related: L-168 (an adversarial reviewer writes, so isolate it) · L-137 (verify the seed landed; restore under a checked hash) · L-042 (shared-file staging)
+
+## L-215 [tags: tooling] [status: active]: **A throwaway fixture repo inherits the host's global git config, so the host's environment becomes part of the fixture — pin what the fixture depends on.** SPRINT-107's by-reference harness makes ~70 temp repos and hundreds of commits per run, and each commit went through this host's configured commit signer. At seed-battery volume the signer failed with "too many open files". The fixture-build error then escaped the per-case `try` (the build ran outside it), so the harness died with **no verdict line**, and 28 of 33 seeds scored `BAD` on `red=[]`, a unanimous result from an instrument that had not run. Two fixes, both needed: fixture repos set `commit.gpgsign false` (with `core.autocrlf`, `user.*`, anything else the fixture assumes), and a harness case builds inside its own `try` so one broken build fails one case, never the verdict. The seed runner now treats a missing verdict line as INVALID, not as a result (L-120's shape: read the verdict the gate prints, never the absence of one).
+- seen: 2026-09-25 (SPRINT-107 T1 round-3 seed battery; harness fixed in `68c2a0b`)
+- count: 1
+- promoted: no
+- related: L-067 / L-081 (an environment is inherited by children it was never meant to reach) · L-120 (the verdict line is the signal) · L-142 (the seeded pass needs guarding)
 
 ---
 

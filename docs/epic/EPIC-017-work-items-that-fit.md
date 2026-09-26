@@ -2,7 +2,7 @@
 epic: 017
 slug: work-items-that-fit
 owner: Maintainer
-last_updated: 2026-09-24
+last_updated: 2026-09-26
 status: active
 member_sprints: [SPRINT-106, SPRINT-107]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -204,15 +204,18 @@ rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 
 
 ## Closed when
 
-- [ ] An epic breakdown of ≥ 30 tasks writes ≥ 30 files and **no cap check fires** — exercised on
-      real input, not asserted.
+- [x] An epic breakdown of ≥ 30 tasks writes ≥ 30 files and **no cap check fires** — exercised on
+      real input, not asserted. ✓ SPRINT-107 T2: EPIC-017 decomposed into 37 files in a scratch v2
+      store, `check-doc-caps` 0 FAIL; control: the same 37 in v1 shape push `TODO.md` to 828 > 320 (`3b49aef`)
 - [ ] `TODO.md` is deleted and **no executable reads it** — derived mechanically (zero non-test
       references across `scripts/`, `evals/`, `skills/`), never asked of the author.
 - [ ] The gate reports **zero OVER-CAP rows**, including the three standing today — each closed by a
       recorded disposition, not by a diet.
 - [ ] `.claude/CLAUDE.md` is inside a **token** budget with a long-line guard, and at least one rule
       has been demoted through the disposition route with its destination recorded.
-- [ ] A sprint's progress is **derived** from member files and matches a hand count.
+- [x] A sprint's progress is **derived** from member files and matches a hand count. ✓ SPRINT-107:
+      stamp-selected `## Done when` boxes gave 7 open / 5 ticked, equal to a hand count over the Members
+      ids (TASK-360, `f6b3cf4`); close by reference then read 11/0 on the live sprint
 - [ ] `workdoo` runs the same store, and the EPIC-016 Work & Queue view reads it without a second
       copy of status.
 - [ ] **Effectiveness is measured, not assumed** — a before/after comparison of decomposition
