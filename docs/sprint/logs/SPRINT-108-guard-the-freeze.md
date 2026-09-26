@@ -195,3 +195,8 @@ fixture and a clean sibling. I read `stripComments`/`headingName`: they match A5
 owner asked whether the spend was worth it. The coordinator's answer: the open-ended "hunt for new edges" review had no stop rule, and 0 of 26
 live task files carry the shapes involved. Ruling: finish round 3, check only the listed findings (no new reviewer), send the
 remainder to TD, and close. On that basis the last T1 DoD box is ticked.
+
+### 2026-09-26 | surprise | T2's third box was reported ticked but never flipped
+`f133efe` ("T2 accepted -- tick DoD") appended evidence to the harness-registration box but left it `[ ]`. The Edit's
+anchor covered only the tail of the line, so the report said 3 of 3 while the file said 2 of 3. Found by counting open boxes
+before close, not by any check. Flipped now; the evidence is unchanged. Plan DoD: 10 of 10.
