@@ -194,7 +194,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-106](../sprint/archive/SPRINT-106-the-store-and-the-way-in.md) | The store, and the way in | closed `fc6c003` | The store exists and is the queue's home (schema, ADR-045, first `git mv` transitions as pure renames); 2.x queue skills refuse a v1/mixed tree by existence alone (ADR-046); `migrate` carries a v1 repo across with owner-resolved conflicts; before-baseline frozen (9/26 · 11/12 · 22). No § Closed-when fully met: derived progress (5) is proven on a fixture but this repo's own sprint drifted (TD-179). |
-| [SPRINT-107](../sprint/SPRINT-107-retarget-the-loop.md) | Retarget the loop | active | — (at close) |
+| [SPRINT-107](../sprint/SPRINT-107-retarget-the-loop.md) | Retarget the loop | closed `cef7344` | The loop runs on the store. Sprints reference their members and `plan_commit` is the freeze (ADR-047, a Tier G checker that cleared three outside rounds). `/triage`, `/task-decomposer`, `/handoff`, `/flow` and `/orchestrator` read and write task files; merge-back is coordinator-owned with a duplicate-id check. Closed-when **1** (37-task breakdown → 37 files, no cap) and **5** (derived progress = hand count) met. |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
