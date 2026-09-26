@@ -1293,6 +1293,159 @@ const CASES: Case[] = [
     },
     expect: [],
   },
+  // --- SPRINT-108 T1 revise round 3 (A5: err loud, stop parsing) --------------------------------
+  {
+    // Finding 1a: a double-backtick span around the id's comment must not protect it -- A5 has no
+    // code-span exception in the excuse path at all.
+    name: "a5-1a-double-backtick-body (must-FAIL: no code-span exception in excuseText)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\nsee ``a`b`` <!-- TASK-901 --> and `c`.\n");
+      commit(d, "edit + double-backtick body");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    // Finding 1b: a backslash-escaped backtick likewise must not protect it.
+    name: "a5-1b-escaped-backtick-body (must-FAIL: no code-span exception in excuseText)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\nthe \\` key <!-- TASK-901 --> and ` key.\n");
+      commit(d, "edit + escaped-backtick body");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    // Finding 2: a second Done-when heading with an inline comment IN THE MIDDLE of the name;
+    // trimming alone leaves internal double-spacing that never equals "Done when".
+    name: "a5-2-heading-comment-mid-name-no-collapse (must-FAIL: TASK-901)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "## Touches", "## Done <!-- x --> when\n\n- [ ] gamma holds\n\n## Touches") },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "gamma holds", "gamma holds now");
+      commit(d, "edit second Done when (mid-name comment)");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "a5-2-heading-comment-mid-name-no-collapse-clean (sibling control)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "## Touches", "## Done <!-- x --> when\n\n- [ ] gamma holds\n\n## Touches") },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // Finding 3a: a closing "##" sequence, TASK-902 (L-186 population variance).
+    name: "a5-3a-heading-closing-hash (must-FAIL: TASK-902)",
+    opts: { pre: (d) => edit(d, W("todo", T902), "## Touches", "## Done when ##\n\n- [ ] delta holds\n\n## Touches") },
+    mutate: (d) => {
+      edit(d, W("todo", T902), "delta holds", "delta holds now");
+      commit(d, "edit second Done when (closing hash)");
+    },
+    expect: ["FREEZE-EDIT TASK-902"],
+  },
+  {
+    name: "a5-3a-heading-closing-hash-clean (sibling control)",
+    opts: { pre: (d) => edit(d, W("todo", T902), "## Touches", "## Done when ##\n\n- [ ] delta holds\n\n## Touches") },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // Finding 3b: 1-3 spaces indent, on a STAMP-ONLY member (TASK-903, L-186 population variance).
+    name: "a5-3b-heading-indent (must-FAIL: TASK-903, stamp-only member)",
+    opts: {
+      extraStampedUnlisted: true,
+      pre: (d) => edit(d, W("todo", "TASK-903-gamma.md"), "## Touches", "  ## Done when\n\n- [ ] epsilon holds\n\n## Touches"),
+    },
+    mutate: (d) => {
+      edit(d, W("todo", "TASK-903-gamma.md"), "epsilon holds", "epsilon holds now");
+      commit(d, "edit second Done when (indented, stamp-only member)");
+    },
+    expect: ["FREEZE-EDIT TASK-903"],
+  },
+  {
+    name: "a5-3b-heading-indent-clean (sibling control)",
+    opts: {
+      extraStampedUnlisted: true,
+      pre: (d) => edit(d, W("todo", "TASK-903-gamma.md"), "## Touches", "  ## Done when\n\n- [ ] epsilon holds\n\n## Touches"),
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // Finding 3c: two spaces after "##", never collapsed to one.
+    name: "a5-3c-heading-double-space (must-FAIL: TASK-901)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "## Touches", "##  Done when\n\n- [ ] zeta holds\n\n## Touches") },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "zeta holds", "zeta holds now");
+      commit(d, "edit second Done when (double space)");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "a5-3c-heading-double-space-clean (sibling control)",
+    opts: { pre: (d) => edit(d, W("todo", T901), "## Touches", "##  Done when\n\n- [ ] zeta holds\n\n## Touches") },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // Finding 3d: "## Members ##" (closing hash) with TASK-901 unstamped and listed only.
+    name: "a5-3d-members-closing-hash (must-FAIL: TASK-901 reachable only by listing)",
+    opts: {
+      pre: (d) => {
+        edit(d, W("todo", T901), "sprint: SPRINT-901\n", "");
+        edit(d, SPRINT, "## Members", "## Members ##");
+      },
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit unstamped, listed-only member (Members ##)");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "a5-3d-members-closing-hash-clean (sibling control)",
+    opts: {
+      pre: (d) => {
+        edit(d, W("todo", T901), "sprint: SPRINT-901\n", "");
+        edit(d, SPRINT, "## Members", "## Members ##");
+      },
+    },
+    mutate: () => {},
+    expect: [],
+  },
+  {
+    // Finding 4a: the inline Execution Log heading is unclosed at promote, closed later; a
+    // pre-promote scope-change entry must not retroactively count as new once it becomes
+    // recognisable, and must be flagged, never silently trusted.
+    name: "a5-4a-log-heading-unclosed-then-closed (must-FAIL: LOG-HEADING-CHANGED, never a silent excuse)",
+    opts: {
+      pre: (d) => {
+        edit(d, SPRINT, "## Execution Log", "## Execution Log <!-- inline");
+        edit(d, SPRINT, "## Files Changed", "### 2026-09-25 | scope-change | early note\nTASK-901 gains a benchmark.\n\n## Files Changed");
+      },
+    },
+    mutate: (d) => {
+      edit(d, SPRINT, "## Execution Log <!-- inline", "## Execution Log <!-- inline -->");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "close the inline log heading + edit");
+    },
+    expect: ["LOG-HEADING-CHANGED", "FREEZE-EDIT TASK-901"],
+  },
+  {
+    // Finding 4b: a plain rename, "## Execution Log (draft)" -> "## Execution Log".
+    name: "a5-4b-log-heading-renamed (must-FAIL: LOG-HEADING-CHANGED, never a silent excuse)",
+    opts: {
+      pre: (d) => {
+        edit(d, SPRINT, "## Execution Log", "## Execution Log (draft)");
+        edit(d, SPRINT, "## Files Changed", "### 2026-09-25 | scope-change | early note\nTASK-901 gains a benchmark.\n\n## Files Changed");
+      },
+    },
+    mutate: (d) => {
+      edit(d, SPRINT, "## Execution Log (draft)", "## Execution Log");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "rename the inline log heading + edit");
+    },
+    expect: ["LOG-HEADING-CHANGED", "FREEZE-EDIT TASK-901"],
+  },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
   { name: "no-members (must-FAIL guard)", opts: { noMembers: true }, mutate: () => {}, expect: ["NO-MEMBERS"] },
