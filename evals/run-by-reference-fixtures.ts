@@ -1459,6 +1459,17 @@ const CASES: Case[] = [
     },
     expect: ["LOG-HEADING-CHANGED", "FREEZE-EDIT TASK-901"],
   },
+  {
+    // (q): an unclosed `<!--` in an entry BODY must strip to the end of the ENTRY, not just to the
+    // end of its own line -- the id sits on the line right after the unclosed comment opens.
+    name: "a5-q-unclosed-comment-to-end-of-entry (must-FAIL: the id never reappears after an unclosed comment)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      appendFileSync(join(d, LOG), "\n### 2026-09-25 | scope-change | tidy\nnotes <!-- draft\nTASK-901 gains a benchmark.\n");
+      commit(d, "edit + unclosed comment hiding the rest of the entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
   // --- guards: a check with nothing to check is not a pass -------------------------------------
   { name: "no-plan-commit (must-FAIL guard)", opts: { noPlanCommit: true }, mutate: () => {}, expect: ["NO-PLAN-COMMIT"] },
   { name: "no-members (must-FAIL guard)", opts: { noMembers: true }, mutate: () => {}, expect: ["NO-MEMBERS"] },
