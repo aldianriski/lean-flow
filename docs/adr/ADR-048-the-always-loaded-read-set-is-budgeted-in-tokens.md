@@ -1,6 +1,6 @@
 ---
 id: ADR-048
-tags: [docs, tooling, governance]
+tags: [docs, tooling]
 domain: doc-standard
 status: accepted
 related: [ADR-015, ADR-017, ADR-019, ADR-006, ADR-032, ADR-033]
