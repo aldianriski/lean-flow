@@ -40,10 +40,29 @@
 // Exits 1 if M > 0.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
+import {
+  WORK,
+  frontmatterField,
+  lf,
+  nowTree,
+  resolveId,
+  scanBlocks,
+  section,
+  sprintNumber,
+  stampedIn,
+  stripComments,
+  taskIds,
+  type Tree,
+} from "./sprint-members.ts";
 
-const WORK = "docs/work";
+// TASK-382 owner ruling A: `resolveId`, the six-folder walk (`nowTree`), the `sprint:` stamp scan
+// (`stampedIn`) and the pure markdown helpers (`frontmatterField`, `section`, `taskIds`,
+// `scanBlocks`, `sprintNumber`, `lf`, `stripComments`) moved to scripts/lib/sprint-members.ts --
+// this file now imports them rather than holding its own copies. No behaviour change: verified by
+// `bun evals/run-by-reference-fixtures.ts` reporting the same verdict line before and after.
+
 const CLOSED = new Set(["done", "cancel"]);
 const SHA = /^[0-9a-f]{7,40}$/;
 
@@ -70,150 +89,11 @@ function gitOk(cwd: string, args: string[]): boolean {
   }
 }
 
-function lf(s: string): string {
-  return s.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
-}
-
-/** A frontmatter value: `# comment` tail and surrounding quotes stripped. */
-function frontmatterField(content: string, key: string): string | null {
-  const lines = lf(content).split("\n");
-  if (lines[0]!.trimEnd() !== "---") return null;
-  for (let i = 1; i < lines.length && lines[i]!.trimEnd() !== "---"; i++) {
-    const m = lines[i]!.match(new RegExp(`^${key}:[ \\t]*(.*)$`));
-    if (!m) continue;
-    let v = m[1]!.replace(/\s+#.*$/, "").trim();
-    if (/^(["']).*\1$/.test(v)) v = v.slice(1, -1).trim();
-    return v;
-  }
-  return null;
-}
-
 /** The text after a leading `---` frontmatter block, LF-normalised. */
 function body(content: string): string {
   const t = lf(content);
   const m = t.match(/^---[ \t]*\n[\s\S]*?\n---[ \t]*(\n|$)/);
   return m ? t.slice(m[0].length) : t;
-}
-
-/** `SPRINT-107`, `107`, `"SPRINT-0107"` -> 107; anything else -> null. */
-function sprintNumber(v: string | null): number | null {
-  const m = (v ?? "").match(/^(?:SPRINT-)?0*(\d+)$/i);
-  return m ? Number(m[1]) : null;
-}
-
-interface ScanLine {
-  line: string; // always the RAW line
-  hidden: boolean; // not a candidate section/heading boundary (inside a fence or a BLOCK HTML comment)
-}
-
-/**
- * A5 (owner ruling): the checker stops modelling inline Markdown. No code-span exception anywhere.
- * Every `<!-- ... -->` span in `text` is blanked to same-length whitespace (newlines kept), across
- * lines, and an unclosed `<!--` blanks everything to the end of `text`. Over-stripping can only
- * remove an excuse or shrink a body, which is the loud direction -- never the reverse.
- */
-function stripComments(text: string): string {
-  let s = text.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, " "));
-  const i = s.indexOf("<!--");
-  if (i !== -1) s = s.slice(0, i) + s.slice(i).replace(/[^\n]/g, " ");
-  return s;
-}
-
-/**
- * Normalizes a level-2 ATX heading line to its comparable name, or null if `rawLine` isn't one.
- * A5: 0-3 spaces indent then exactly `## ` (a third `#` disqualifies it, matching CommonMark);
- * strip comments on the line (stripComments, unclosed-to-end-of-LINE here since a heading is one
- * line); strip one optional closing `#+` run preceded by a space; collapse internal whitespace to
- * one space; trim. Over-matching (a heading recognized that a stricter reading would miss) only
- * widens a compared section, which is loud -- never a silent gap (finding 2, 3).
- */
-function headingName(rawLine: string): string | null {
-  const m = rawLine.match(/^ {0,3}## (.*)$/);
-  if (!m) return null;
-  let rest = stripComments(m[1]!);
-  rest = rest.replace(/ #+\s*$/, "");
-  return rest.replace(/\s+/g, " ").trim();
-}
-
-/**
- * ONE block-structure scan, used by section() to find fenced/block-comment lines. `hidden` lines
- * are never a heading/entry boundary; the RAW line is always returned unmodified.
- *
- * - normal: 0-3 spaces indent then a run of >= 3 of the SAME `` ` `` or `~` OPENS a fence -- except
- *   a backtick run whose trailing info string itself contains a backtick (CommonMark; this is also
- *   what stops a bare inline code span like "```x``` spans are inline code" from flipping parity --
- *   F5). 0-3 spaces indent then `<!--` opens an HTML BLOCK comment, closing on the first line that
- *   contains `-->` (maybe the same line); unclosed runs to EOF. A `<!--` that does not start the
- *   line is inline -- never block-hidden (F4); the excuse path handles inline comments separately
- *   via stripComments(), entry-wide (A5).
- * - fence: closes only on a line with 0-3 spaces indent, the SAME char, a run >= the opener's, and
- *   nothing but whitespace after (F1, F3). Everything inside, including a `<!--` line, is just
- *   fenced content: neither a fence nor a comment can open inside an open fence.
- * - comment: runs until a line containing `-->`. A ``` inside it is comment content, never a fence
- *   (F2) -- a fence can't open inside a comment either.
- */
-function scanBlocks(content: string): ScanLine[] {
-  const lines = lf(content).split("\n");
-  const hidden: boolean[] = new Array(lines.length).fill(false);
-  let fenceChar: string | null = null;
-  let fenceLen = 0;
-  let inComment = false;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!;
-    if (fenceChar !== null) {
-      const close = line.match(/^ {0,3}(`{3,}|~{3,})[ \t]*$/);
-      if (close && close[1]![0] === fenceChar && close[1]!.length >= fenceLen) {
-        fenceChar = null;
-        fenceLen = 0;
-      }
-      hidden[i] = true;
-    } else if (inComment) {
-      if (line.includes("-->")) inComment = false;
-      hidden[i] = true;
-    } else {
-      const open = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
-      if (open && !(open[1]![0] === "`" && open[2]!.includes("`"))) {
-        fenceChar = open[1]![0]!;
-        fenceLen = open[1]!.length;
-        hidden[i] = true;
-      } else if (/^ {0,3}<!--/.test(line)) {
-        if (!line.includes("-->")) inComment = true;
-        hidden[i] = true;
-      }
-    }
-  }
-  return lines.map((line, idx) => ({ line, hidden: hidden[idx]! }));
-}
-
-/**
- * Every level-2 section with this heading, concatenated; null when none exists. Boundaries are
- * found via headingName() (A5: comments blanked, a closing `#+` stripped, whitespace collapsed --
- * so a decorated or malformed heading is still recognized -- R1/R2/R4, findings 2-3), but the RAW
- * line is what is pushed into the BODY, so an edit inside a comment still shows as a change (D1
- * unchanged for Done-when text itself; Members selection also stays raw -- R5).
- */
-function section(content: string, heading: string): string | null {
-  const out: string[] = [];
-  let inside = false;
-  let found = false;
-  const target = heading.toLowerCase();
-  for (const { line, hidden } of scanBlocks(content)) {
-    if (!hidden) {
-      const name = headingName(line);
-      if (name !== null) {
-        inside = name.toLowerCase() === target;
-        found ||= inside;
-        continue;
-      }
-    }
-    if (inside) out.push(line);
-  }
-  return found ? out.join("\n") : null;
-}
-
-/** Every `TASK-NNN` token in a text -- any line shape: bullets, tables, several per line. */
-function taskIds(text: string | null): Set<string> {
-  return new Set([...(text ?? "").matchAll(/\bTASK-\d+(?![0-9])/g)].map((m) => m[0]));
 }
 
 const BOX = /^\s*(?:[-*+]|\d+[.)])\s+\[([ xX])\]\s?(.*)$/;
@@ -250,11 +130,6 @@ function idRe(id: string): RegExp {
   return new RegExp(`\\b${id}(?![0-9])`);
 }
 
-/** Paths among `paths` whose basename is this task id's file (`TASK-NNN-<slug>.md`). */
-function resolveId(paths: string[], id: string): string[] {
-  return paths.filter((p) => p.startsWith(`${WORK}/`) && basename(p).startsWith(`${id}-`) && p.endsWith(".md"));
-}
-
 /**
  * Execution Log entries whose event is `scope-change`. An entry is its `### ` heading plus body, up
  * to the next heading of level 1-3 (never the rest of the file). The heading's second `|` field is
@@ -285,28 +160,6 @@ function scopeChangeEntries(log: string, from = 0): string[] {
   }
   flush();
   return entries;
-}
-
-interface Tree {
-  label: string; // short commit, or "now"
-  commit: string | null; // full sha; null for the working tree
-  paths: string[];
-  read: (p: string) => string | null;
-}
-
-function nowTree(root: string): Tree {
-  const paths: string[] = [];
-  const workDir = join(root, WORK);
-  if (existsSync(workDir)) {
-    const walk = (rel: string) => {
-      for (const e of readdirSync(join(root, rel), { withFileTypes: true })) {
-        if (e.isDirectory()) walk(`${rel}/${e.name}`);
-        else if (/^TASK-\d+-.*\.md$/.test(e.name)) paths.push(`${rel}/${e.name}`);
-      }
-    };
-    walk(WORK); // recursive, like the commit trees' ls-tree -r: a nested folder is not a different population
-  }
-  return { label: "now", commit: null, paths, read: (p) => (existsSync(join(root, p)) ? readFileSync(join(root, p), "utf8") : null) };
 }
 
 function commitTree(root: string, commit: string): Tree {
@@ -531,20 +384,14 @@ function main(argv: string[]) {
     );
 
   // --- population: Members ids ∪ sprint: stamps, at plan_commit and now --------------------------
-  const stampedIn = (t: Tree): Set<string> => {
-    const s = new Set<string>();
-    for (const p of t.paths) {
-      const c = t.read(p);
-      if (c !== null && sprintNo !== null && sprintNumber(frontmatterField(c, "sprint")) === sprintNo) {
-        s.add(basename(p).match(/^(TASK-\d+)-/)![1]!);
-      }
-    }
-    return s;
-  };
+  // stampedIn/nowTree moved to sprint-members.ts (TASK-382 owner ruling A); sprintNo may be null
+  // (an unparseable `sprint:` field), which the shared stampedIn() cannot itself represent -- the
+  // null check that guards the call is what stayed here, preserving the original behaviour of
+  // contributing an empty set in that case.
   const pcTree = commitTree(root, pc);
   const now = nowTree(root);
-  const planned = new Set([...taskIds(section(frozenSprint, "Members")), ...stampedIn(pcTree)]);
-  const current = new Set([...taskIds(section(sprintText, "Members")), ...stampedIn(now)]);
+  const planned = new Set([...taskIds(section(frozenSprint, "Members")), ...(sprintNo !== null ? stampedIn(pcTree, sprintNo) : new Set<string>())]);
+  const current = new Set([...taskIds(section(sprintText, "Members")), ...(sprintNo !== null ? stampedIn(now, sprintNo) : new Set<string>())]);
   const all = [...new Set([...planned, ...current])].sort();
   if (all.length === 0) {
     bad("NO-MEMBERS", `no member listed under ## Members or stamped sprint: ${sprintId}, at plan_commit or now`);
