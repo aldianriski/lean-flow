@@ -146,3 +146,14 @@ finding. Filed: TD-191 (`.ts` Verify method = silent judgment tick, medium, and 
 doc is never correlated; its skip prints PASS) · TD-193 (a wrapped `*Verify:*` vanishes) · TD-188 addendum (second consumer).
 Post-merge on main: dod-delta 84/0 · verify-reaches all green · emitter 9/0.
 review · T4 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-09-28 | progress | T2 phase 1 built and reviewed; waiting on the owner's calibration run
+Builder (sonnet + /tdd, worktree `6601136`): `3e725ef` (a token-budget row over `ALWAYS_LOADED`, imported; `--calibrate` via the count_tokens
+`fetch`, no dependency; `scripts/lib/token-budget.txt` PENDING, reported and never a PASS; ADR-048 supersedes ADR-015/017/019 in their
+status field only; STANDARD §2 and the unreleased 0.12.0 CHANGELOG entry amended) · `22bb0c4` (the coordinator fixed the calibration model to `claude-opus-5-5`,
+which is the model that reads the set, where the builder had written `claude-opus-5`). Isolated review (sonnet, 9 probes): **NOT CLEAR**, one census-positive blocker.
+The byte count came from the checkout (`statSync`), so a CRLF checkout (`core.autocrlf=true`) read 48335 bytes against the committed LF 48115, and a
+calibration taken on one platform drifts on another. Revise `899be0c`: one normalising helper for inventory and calibration; a CRLF/LF parity
+fixture, seeded back to `statSync` so that exactly it reddens; and the differential's exit code taken from the stripped output (B2). Coordinator re-check:
+PENDING on 48115 bytes, 28/0. Gate reach proven by the reviewer (a scratch low budget → `pass=77 fail=1` through qa-check's exact leg).
+review · T2 · scoped-reviewer · behaviour:material · governance:high
