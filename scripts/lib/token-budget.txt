@@ -1,0 +1,19 @@
+# scripts/lib/token-budget.txt -- the token budget for the always-loaded read set (TASK-364, ADR-048).
+#
+# Format (one data row, comments/blanks ignored):
+#   <budget-tokens> <ratio-bytes-per-token> <adopted-at> <reason...>
+#
+# WHY: check-doc-caps.ts estimates the always-loaded read set's (.claude/CLAUDE.md +
+# .claude/CONTEXT.md, ALWAYS_LOADED in check-prose-density.ts) token cost as bytes / ratio, never by
+# calling the API on every gate run (this repo ships zero dependencies and stays offline -- ADR-032 /
+# ADR-033). `ratio` is measured ONCE by calibration -- `bun scripts/lib/check-doc-caps.ts --calibrate`
+# -- against Claude's own count_tokens endpoint, never guessed or borrowed from another tokenizer
+# (tiktoken undercounts Claude text). The owner pastes the calibration output's pooled ratio here to
+# ADOPT it; the ratio and budget then move only by a new adoption, mirroring the
+# doc-caps-grandfathered.txt ratchet pattern (ADR-015).
+#
+# PENDING sentinel: all three of budget-tokens / ratio / adopted-at read PENDING until the owner runs
+# --calibrate and adopts real numbers (TASK-364 phase 2). check-doc-caps.ts reports this as a named
+# not-yet-calibrated finding -- never as a silent PASS and never as a FAIL either, since there is
+# nothing to enforce yet.
+PENDING PENDING PENDING phase-1-ships-the-mechanism-uncalibrated-see-TASK-364-amended-2026-09-23

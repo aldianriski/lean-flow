@@ -69,9 +69,17 @@ function runShell(c: Case): { code: number; out: string } {
 }
 
 function runTs(c: Case): { code: number; out: string } {
+  // No 4th (token-budget) argument here -- runCheckDocCaps() leaves the row OFF when it's omitted, so
+  // these in-process comparisons never need the stripping below at all. See the named exclusion note
+  // printed once, further down: TASK-364 gave the TS checker a row the shell oracle has no concept of.
   const r = runCheckDocCaps(c.guide, c.root, c.gf);
   return { code: r.exitCode, out: r.lines.join("\n") + (r.lines.length ? "\n" : "") };
 }
+
+console.log(
+  "NOTE  doc-caps differential: token-budget row EXCLUDED from parity -- TASK-364/ADR-048, the shell " +
+    "oracle (check-doc-caps.sh) has no token-budget concept and stays authoritative for LINE-cap rows only",
+);
 
 let compared = 0;
 let identical = 0;
@@ -119,12 +127,23 @@ function runShellCli(args: string[]): { code: number; out: string } {
     return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
   }
 }
+// TASK-364/ADR-048: the CLI (unlike the in-process runTs() above) always resolves a token-budget
+// path by default, so its stdout carries one extra line the shell oracle has no concept of at all --
+// there is no oracle to diverge from, so it is EXCLUDED from parity, named here rather than silently
+// filtered (the sibling `runTs()` needs no such filter, since it never passes the 4th argument).
+function stripTokenBudgetLine(out: string): string {
+  return out
+    .split("\n")
+    .filter((l) => !l.includes("doc-caps: token-budget"))
+    .join("\n");
+}
+
 function runTsCli(args: string[]): { code: number; out: string } {
   try {
     const out = execFileSync("bun", [TS_CHECKER, ...args], { encoding: "utf8" });
-    return { code: 0, out };
+    return { code: 0, out: stripTokenBudgetLine(out) };
   } catch (e: any) {
-    return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
+    return { code: e.status ?? 1, out: stripTokenBudgetLine((e.stdout ?? "") + (e.stderr ?? "")) };
   }
 }
 

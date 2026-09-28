@@ -12,13 +12,20 @@
 // same named findings -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
 import { fileURLToPath } from "node:url";
-import { resolveArgs, runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
+import { parseTokenBudget, resolveArgs, runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
 
 const FX = fileURLToPath(new URL("fixtures/doc-caps/", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 function run(fixture: string, gfFile: string) {
   return runCheckDocCaps(`${FX}${fixture}/DOCS_Guide.md`, `${FX}${fixture}`, `${FX}${fixture}/${gfFile}`);
+}
+
+/** Same fixture shape as `run()`, but wires the 4th (token-budget) argument -- OFF by default
+ *  in `run()` so every pre-existing line-cap fixture above is unaffected by TASK-364. */
+function runTB(fixture: string, tokenBudgetFile: string) {
+  const none = `${FX}${fixture}/none.txt`; // no §2 grandfather list needed for any token-budget fixture
+  return runCheckDocCaps(`${FX}${fixture}/DOCS_Guide.md`, `${FX}${fixture}`, none, `${FX}${fixture}/${tokenBudgetFile}`);
 }
 
 describe("check-doc-caps.ts -- retained fixtures", () => {
@@ -133,7 +140,94 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
   });
 
   test("a real (non-empty) CLI argument is used as-is, not overridden by the default", () => {
-    const resolved = resolveArgs(["/g.md", "/r", "/gf.txt"], "/some/script/dir");
-    expect(resolved).toEqual({ guide: "/g.md", root: "/r", gfFile: "/gf.txt" });
+    const resolved = resolveArgs(["/g.md", "/r", "/gf.txt", "/tb.txt"], "/some/script/dir");
+    expect(resolved).toEqual({ guide: "/g.md", root: "/r", gfFile: "/gf.txt", tokenBudgetFile: "/tb.txt" });
+  });
+
+  // --- token budget over the always-loaded read set (TASK-364, ADR-048) -------------------------
+  // Population: ALWAYS_LOADED = [.claude/CLAUDE.md, .claude/CONTEXT.md] (imported from
+  // check-prose-density.ts, never redefined). Every fixture below fixes ratio=1 byte/token so the
+  // arithmetic is exact and legible; the ratio itself is never hardcoded in the checker (it is read
+  // from token-budget.txt), so a fixture-chosen ratio exercises the real code path, not a shortcut.
+
+  test("token-budget case A (must-FAIL): token-budget.txt absent is a named token-budget-missing FAIL", () => {
+    const r = runTB("token-budget-missing", "token-budget.txt"); // deliberately does not exist on disk
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("FAIL  doc-caps: token-budget-missing:");
+  });
+
+  test("token-budget case A sibling control: the same shape with a real file present does not FAIL missing", () => {
+    const r = runTB("token-budget-under", "token-budget.txt");
+    expect(r.lines.join("\n")).not.toContain("token-budget-missing");
+  });
+
+  test("token-budget case B (must-FAIL): a malformed token-budget.txt is a named token-budget-malformed FAIL", () => {
+    const r = runTB("token-budget-malformed", "token-budget.txt");
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("token-budget-malformed: budget-tokens is not a positive number");
+  });
+
+  test("token-budget case B sibling control: a well-formed file beside it does not report malformed", () => {
+    const r = runTB("token-budget-under", "token-budget.txt");
+    expect(r.lines.join("\n")).not.toContain("token-budget-malformed");
+  });
+
+  test("token-budget case C: the PENDING sentinel is reported, never as PASS and never as FAIL", () => {
+    const r = runTB("token-budget-pending", "token-budget.txt");
+    expect(r.exitCode).toBe(0);
+    const text = r.lines.join("\n");
+    expect(text).toContain("PENDING doc-caps: token-budget not yet calibrated");
+    expect(text).not.toContain("PASS  doc-caps: token-budget");
+    expect(text).not.toContain("FAIL  doc-caps: token-budget");
+  });
+
+  test("token-budget case C sibling control (proves PENDING does not blanket-suppress a real breach): over-budget still FAILs", () => {
+    const r = runTB("token-budget-over", "token-budget.txt");
+    expect(r.exitCode).toBe(1);
+  });
+
+  test("token-budget case D (must-FAIL): the read set over its adopted budget FAILs, named token-budget-exceeded", () => {
+    const r = runTB("token-budget-over", "token-budget.txt");
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("FAIL  doc-caps: token-budget-exceeded: always-loaded read set ~100 tokens > budget 50");
+  });
+
+  test("token-budget case D sibling control: the same shape comfortably under budget PASSes, tokenizer + ratio named", () => {
+    const r = runTB("token-budget-under", "token-budget.txt");
+    expect(r.exitCode).toBe(0);
+    expect(r.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~100 tokens <= budget 200 (ratio 1 bytes/token, claude-opus-5 count_tokens");
+  });
+
+  // --- selection-varying (L-186): the population, not just the verdict arithmetic ------------------
+  test("token-budget selection A: one always-loaded file absent is named, not silently absorbed as 0", () => {
+    const r = runTB("token-budget-selection-missing-file", "token-budget.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1); // 40 bytes (CLAUDE.md only) > budget 30
+    expect(text).toContain("MISSING from the always-loaded read set: .claude/CONTEXT.md");
+    expect(text).toContain("~40 tokens > budget 30");
+  });
+
+  test("token-budget selection B: the SECOND file's bytes are not dropped from the sum (would silently PASS if they were)", () => {
+    const r = runTB("token-budget-selection-second-file-dominates", "token-budget.txt");
+    // Correct sum: 5 (CLAUDE.md) + 500 (CONTEXT.md) = 505 > budget 50 -> FAIL.
+    // A checker that summed only ALWAYS_LOADED[0] would see 5 <= 50 and wrongly PASS.
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("~505 tokens > budget 50");
+  });
+
+  // --- parseTokenBudget unit coverage (fast, no filesystem) ----------------------------------------
+  test("parseTokenBudget: a partial PENDING sentinel is malformed, not treated as pending or as real values", () => {
+    const r = parseTokenBudget("50 PENDING 2026-09-28 reason");
+    expect(r.kind).toBe("malformed");
+  });
+
+  test("parseTokenBudget: more than one data row is malformed (never silently takes the first/last)", () => {
+    const r = parseTokenBudget("50 1 2026-09-28 a\n60 1 2026-09-28 b\n");
+    expect(r.kind).toBe("malformed");
+  });
+
+  test("parseTokenBudget: comments and blank lines around a single valid row are ignored", () => {
+    const r = parseTokenBudget("# comment\n\n50 1 2026-09-28 a real reason\n\n");
+    expect(r).toEqual({ kind: "set", budgetTokens: 50, ratio: 1, adoptedAt: "2026-09-28", reason: "a real reason" });
   });
 });

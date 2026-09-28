@@ -22,6 +22,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { ALWAYS_LOADED } from "./check-prose-density.ts";
 
 // --- §2 row derivation (pure) ----------------------------------------------------------------------
 
@@ -329,6 +330,279 @@ export function evaluateSkillCaps(root: string): { lines: string[]; anyFail: boo
   return { lines: out, anyFail };
 }
 
+// --- token budget over the always-loaded read set (TASK-364, ADR-048) -------------------------------
+//
+// check-doc-caps counted NEWLINES. check-prose-density.ts (SPRINT-105) proved that is gameable: a file
+// can satisfy its line cap while its actual reading cost (tokens) keeps climbing via longer lines. This
+// section adds the resource ADR-017's line cap was always a stand-in for -- tokens -- as the PRIMARY
+// signal over the always-loaded pair, keeping the line caps above as a secondary one (ADR-048,
+// superseding ADR-015 / ADR-017 / ADR-019's line-count-is-exact precision rule for this pair).
+//
+// POPULATION: `ALWAYS_LOADED` is check-prose-density.ts's existing, exported definition -- imported
+// here, never redefined (owner ruling, G2). Both files import from each other (this one now also
+// pulls `ALWAYS_LOADED`; check-prose-density.ts already pulls `deriveRows`/`shGlobExpand` from here) --
+// a real ES-module cycle, verified safe because neither module touches the other's binding at its own
+// top level: every use is inside a function body, called only after the whole module graph has loaded.
+//
+// TOKENIZER: Claude's own, sampled via the Messages `count_tokens` API -- never tiktoken or another
+// model's tokenizer (it undercounts Claude text). The GATE stays offline and zero-dependency
+// (ADR-032/033): it estimates tokens as bytes ÷ ratio, where `ratio` (bytes/token) is measured ONCE by
+// `--calibrate` against the real API and adopted by the owner pasting it into token-budget.txt --
+// mirroring the doc-caps-grandfathered.txt ratchet already in this file (ADR-015).
+export const DEFAULT_TOKEN_BUDGET_FILE = "token-budget.txt";
+export const TOKEN_BUDGET_PENDING = "PENDING";
+export const CALIBRATION_MODEL = "claude-opus-5"; // current flagship per the claude-api skill's defaults
+
+export interface TokenBudgetSet {
+  readonly kind: "set";
+  readonly budgetTokens: number;
+  readonly ratio: number;
+  readonly adoptedAt: string;
+  readonly reason: string;
+}
+export interface TokenBudgetPending {
+  readonly kind: "pending";
+}
+export interface TokenBudgetMalformed {
+  readonly kind: "malformed";
+  readonly reason: string;
+}
+export interface TokenBudgetMissing {
+  readonly kind: "missing";
+}
+export type TokenBudgetResult = TokenBudgetSet | TokenBudgetPending | TokenBudgetMalformed | TokenBudgetMissing;
+
+/**
+ * Parses token-budget.txt's single data row: `<budget-tokens> <ratio> <adopted-at> <reason...>`.
+ * `#`-prefixed and blank lines are comments, the same convention as doc-caps-grandfathered.txt.
+ *
+ * All three of budget-tokens / ratio / adopted-at reading the literal PENDING sentinel is the phase-1
+ * not-yet-calibrated state -- reported by the caller, never silently treated as either a pass or a
+ * fail. Anything else that fails to parse cleanly is a named `malformed` finding, never a silent skip
+ * (L-058): zero data rows, more than one, a PARTIAL sentinel (some fields PENDING, some not -- an
+ * inconsistent file, not a valid state), a non-numeric or non-positive budget/ratio, or a blank
+ * adopted-at/reason field.
+ */
+export function parseTokenBudget(content: string): TokenBudgetResult {
+  const rows = content
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0 && !l.startsWith("#"));
+
+  if (rows.length === 0) return { kind: "malformed", reason: "no data row" };
+  if (rows.length > 1) return { kind: "malformed", reason: `${rows.length} data rows (expected exactly 1)` };
+
+  const parts = rows[0]!.split(/\s+/);
+  if (parts.length < 4) {
+    return {
+      kind: "malformed",
+      reason: `expected 4 fields (budget-tokens ratio adopted-at reason), got ${parts.length}`,
+    };
+  }
+  const [budgetRaw, ratioRaw, adoptedAt, ...reasonParts] = parts as [string, string, string, ...string[]];
+  const reason = reasonParts.join(" ");
+
+  const sentinelCount = [budgetRaw, ratioRaw, adoptedAt].filter((f) => f === TOKEN_BUDGET_PENDING).length;
+  if (sentinelCount === 3) return { kind: "pending" };
+  if (sentinelCount > 0) {
+    return {
+      kind: "malformed",
+      reason: "partial PENDING sentinel -- budget-tokens/ratio/adopted-at must be all PENDING or all real values",
+    };
+  }
+
+  const budgetTokens = Number(budgetRaw);
+  if (!Number.isFinite(budgetTokens) || budgetTokens <= 0) {
+    return { kind: "malformed", reason: `budget-tokens is not a positive number: "${budgetRaw}"` };
+  }
+  const ratio = Number(ratioRaw);
+  if (!Number.isFinite(ratio) || ratio <= 0) {
+    return { kind: "malformed", reason: `ratio is not a positive number: "${ratioRaw}"` };
+  }
+  if (adoptedAt.length === 0) return { kind: "malformed", reason: "adopted-at is empty" };
+  if (reason.length === 0) return { kind: "malformed", reason: "reason is empty" };
+
+  return { kind: "set", budgetTokens, ratio, adoptedAt, reason };
+}
+
+/** `missing` when the file is absent or unreadable -- a named FAIL upstream, never a silent skip. */
+export function loadTokenBudget(path: string): TokenBudgetResult {
+  if (!existsSync(path)) return { kind: "missing" };
+  let content: string;
+  try {
+    content = readFileSync(path, "utf8");
+  } catch {
+    return { kind: "missing" };
+  }
+  return parseTokenBudget(content);
+}
+
+export interface AlwaysLoadedEntry {
+  readonly rel: string;
+  readonly bytes: number;
+  readonly present: boolean;
+}
+
+/**
+ * Every file in `ALWAYS_LOADED`, present or not, under `root` -- the POPULATION this budget covers.
+ * A missing file contributes 0 bytes and is reported BY NAME by the caller, never silently absorbed
+ * into the sum as if the pair were smaller by design (L-186: the population is a property nothing
+ * else here checks).
+ */
+export function alwaysLoadedInventory(root: string): AlwaysLoadedEntry[] {
+  return ALWAYS_LOADED.map((rel) => {
+    const abs = join(root, rel);
+    if (!existsSync(abs)) return { rel, bytes: 0, present: false };
+    try {
+      return { rel, bytes: statSync(abs).size, present: true };
+    } catch {
+      return { rel, bytes: 0, present: false };
+    }
+  });
+}
+
+export interface TokenBudgetLineResult {
+  readonly line: string;
+  readonly isFail: boolean;
+}
+
+/** One PASS/FAIL/note line for the always-loaded read set's token budget -- the shape every other
+ *  row in this file already prints in, so it composes with the rest of the output unremarkably. */
+export function evaluateTokenBudget(root: string, tokenBudgetPath: string): TokenBudgetLineResult {
+  const inventory = alwaysLoadedInventory(root);
+  const totalBytes = inventory.reduce((sum, f) => sum + f.bytes, 0);
+  const missing = inventory.filter((f) => !f.present).map((f) => f.rel);
+  const missingNote = missing.length > 0 ? ` -- MISSING from the always-loaded read set: ${missing.join(", ")}` : "";
+
+  const budget = loadTokenBudget(tokenBudgetPath);
+
+  if (budget.kind === "missing") {
+    return {
+      line: `FAIL  doc-caps: token-budget-missing: ${tokenBudgetPath} not found -- the always-loaded read set (${ALWAYS_LOADED.join(", ")}) has no recorded budget${missingNote}`,
+      isFail: true,
+    };
+  }
+  if (budget.kind === "malformed") {
+    return {
+      line: `FAIL  doc-caps: token-budget-malformed: ${budget.reason} [${tokenBudgetPath}]${missingNote}`,
+      isFail: true,
+    };
+  }
+  if (budget.kind === "pending") {
+    return {
+      line: `      PENDING doc-caps: token-budget not yet calibrated [${tokenBudgetPath} carries the PENDING sentinel] -- always-loaded read set is ${totalBytes} bytes; run "bun scripts/lib/check-doc-caps.ts --calibrate" and paste its output into ${DEFAULT_TOKEN_BUDGET_FILE} (TASK-364 phase 2)${missingNote}`,
+      isFail: false,
+    };
+  }
+
+  const estimatedTokens = Math.ceil(totalBytes / budget.ratio);
+  if (estimatedTokens > budget.budgetTokens) {
+    return {
+      line: `FAIL  doc-caps: token-budget-exceeded: always-loaded read set ~${estimatedTokens} tokens > budget ${budget.budgetTokens} (ratio ${budget.ratio} bytes/token, ${CALIBRATION_MODEL} count_tokens) -- adopted ${budget.adoptedAt}, ${budget.reason}; no disposition mechanism exists yet (TASK-384), so this is a FAIL, not a report${missingNote}`,
+      isFail: true,
+    };
+  }
+  return {
+    line: `PASS  doc-caps: token-budget ~${estimatedTokens} tokens <= budget ${budget.budgetTokens} (ratio ${budget.ratio} bytes/token, ${CALIBRATION_MODEL} count_tokens; adopted ${budget.adoptedAt})${missingNote}`,
+    isFail: false,
+  };
+}
+
+// --- calibration (`--calibrate`, owner-run, never wired into the default gate) ----------------------
+//
+// Reads ANTHROPIC_API_KEY from the environment (absent -> a clear error, exit 2), sends each
+// always-loaded file's text to Claude's count_tokens endpoint via the built-in `fetch` (no SDK, no
+// dependency -- ADR-032/033), and prints per file: bytes, API tokens, bytes/token, plus the pooled
+// ratio and the per-file spread as the error band. WRITES NOTHING TO DISK: the owner pastes the
+// printed ratio into token-budget.txt themselves (an adoption is a deliberate act, not a side effect).
+// NEVER logs, prints, or otherwise surfaces the API key itself.
+export interface CalibrationResult {
+  readonly lines: string[];
+  readonly exitCode: 0 | 2;
+}
+
+async function countTokensViaApi(text: string, apiKey: string): Promise<number> {
+  const res = await fetch("https://api.anthropic.com/v1/messages/count_tokens", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: CALIBRATION_MODEL,
+      messages: [{ role: "user", content: text }],
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`count_tokens HTTP ${res.status}: ${body.slice(0, 500)}`);
+  }
+  const data = (await res.json()) as { input_tokens?: number };
+  if (typeof data.input_tokens !== "number") {
+    throw new Error(`count_tokens response had no numeric input_tokens field`);
+  }
+  return data.input_tokens;
+}
+
+export async function runCalibration(root: string): Promise<CalibrationResult> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return {
+      lines: [
+        "FAIL  doc-caps --calibrate: ANTHROPIC_API_KEY is not set in the environment -- calibration calls Claude's count_tokens endpoint and needs it; export it and re-run",
+      ],
+      exitCode: 2,
+    };
+  }
+
+  const lines: string[] = [];
+  let totalBytes = 0;
+  let totalTokens = 0;
+  const ratios: number[] = [];
+
+  for (const rel of ALWAYS_LOADED) {
+    const abs = join(root, rel);
+    if (!existsSync(abs)) {
+      lines.push(`      calibrate: ${rel} not found under ${root} -- skipped`);
+      continue;
+    }
+    const content = readFileSync(abs, "utf8");
+    const bytes = Buffer.byteLength(content, "utf8");
+    let tokens: number;
+    try {
+      tokens = await countTokensViaApi(content, apiKey);
+    } catch (e: any) {
+      lines.push(`FAIL  doc-caps --calibrate: count_tokens failed for ${rel}: ${e?.message ?? String(e)}`);
+      return { lines, exitCode: 2 };
+    }
+    const ratio = bytes / tokens;
+    ratios.push(ratio);
+    totalBytes += bytes;
+    totalTokens += tokens;
+    lines.push(`      calibrate: ${rel} -- ${bytes} bytes, ${tokens} tokens (${CALIBRATION_MODEL}), ${ratio.toFixed(3)} bytes/token`);
+  }
+
+  if (totalTokens === 0 || ratios.length === 0) {
+    lines.push("FAIL  doc-caps --calibrate: no always-loaded files were found under the given root -- nothing to calibrate");
+    return { lines, exitCode: 2 };
+  }
+
+  const pooledRatio = totalBytes / totalTokens;
+  const spread = Math.max(...ratios) - Math.min(...ratios);
+  lines.push(
+    `      calibrate: pooled ratio ${pooledRatio.toFixed(3)} bytes/token over ${totalBytes} bytes / ${totalTokens} tokens (${CALIBRATION_MODEL})`,
+  );
+  lines.push(
+    `      calibrate: per-file spread (error band) ${spread.toFixed(3)} bytes/token across ${ratios.length} file(s) [min ${Math.min(...ratios).toFixed(3)}, max ${Math.max(...ratios).toFixed(3)}]`,
+  );
+  lines.push(`      calibrate: writes NOTHING to disk -- the owner adopts by pasting a row like this into ${DEFAULT_TOKEN_BUDGET_FILE}:`);
+  lines.push(
+    `      calibrate:   <budget-tokens> ${pooledRatio.toFixed(3)} ${new Date().toISOString().slice(0, 10)} <reason>`,
+  );
+  return { lines, exitCode: 0 };
+}
+
 // --- CLI -------------------------------------------------------------------------------------------
 
 export interface DocCapsResult {
@@ -336,8 +610,20 @@ export interface DocCapsResult {
   readonly exitCode: 0 | 1;
 }
 
-/** The full checker, pure w.r.t. its three string/paths inputs plus the filesystem under `root`. */
-export function runCheckDocCaps(guidePath: string, root: string, gfFilePath: string): DocCapsResult {
+/**
+ * The full checker, pure w.r.t. its four string/paths inputs plus the filesystem under `root`.
+ * `tokenBudgetPath` is OPTIONAL and OFF by default: passing it is what turns the token-budget row on.
+ * The CLI (below) always passes it, so production runs always carry the row; a caller that omits it
+ * (every pre-existing line-cap fixture in evals/doc-caps.test.ts, and the differential harness's
+ * in-process comparisons against the shell oracle, which has no token-budget concept at all) gets the
+ * exact pre-TASK-364 output, unchanged.
+ */
+export function runCheckDocCaps(
+  guidePath: string,
+  root: string,
+  gfFilePath: string,
+  tokenBudgetPath?: string,
+): DocCapsResult {
   const lines: string[] = [];
 
   if (!existsSync(guidePath) || !statSync(guidePath).isFile()) {
@@ -365,7 +651,14 @@ export function runCheckDocCaps(guidePath: string, root: string, gfFilePath: str
   const skillResult = evaluateSkillCaps(root);
   lines.push(...skillResult.lines);
 
-  const anyFail = rowResult.anyFail || skillResult.anyFail;
+  let anyFail = rowResult.anyFail || skillResult.anyFail;
+
+  if (tokenBudgetPath !== undefined) {
+    const tb = evaluateTokenBudget(root, tokenBudgetPath);
+    lines.push(tb.line);
+    if (tb.isFail) anyFail = true;
+  }
+
   return { lines, exitCode: anyFail ? 1 : 0 };
 }
 
@@ -373,6 +666,7 @@ export interface ResolvedArgs {
   readonly guide: string;
   readonly root: string;
   readonly gfFile: string;
+  readonly tokenBudgetFile: string;
 }
 
 /**
@@ -380,20 +674,32 @@ export interface ResolvedArgs {
  * positional parameter is UNSET *or* NULL (empty string). `||` mirrors that; `??` only catches
  * null/undefined and would pass an empty string straight through, diverging from the oracle on
  * `sh check-doc-caps.sh "" . gf.txt` (repro: the oracle resolves the default guide path; a `??`-based
- * port prints an empty path instead).
+ * port prints an empty path instead). The 4th positional (`tokenBudgetFile`, TASK-364) has no shell
+ * oracle to diverge from -- it is new -- but resolves the same way for consistency.
  */
 export function resolveArgs(argv: readonly (string | undefined)[], here: string): ResolvedArgs {
-  const [guideArg, rootArg, gfArg] = argv;
+  const [guideArg, rootArg, gfArg, tokenBudgetArg] = argv;
   return {
     guide: guideArg || join(here, "..", "..", "spec", "STANDARD.md"),
     root: rootArg || join(here, "..", ".."),
     gfFile: gfArg || join(here, "doc-caps-grandfathered.txt"),
+    tokenBudgetFile: tokenBudgetArg || join(here, DEFAULT_TOKEN_BUDGET_FILE),
   };
 }
 
 if (import.meta.main) {
-  const { guide, root, gfFile } = resolveArgs(process.argv.slice(2), import.meta.dir);
-  const result = runCheckDocCaps(guide, root, gfFile);
-  for (const l of result.lines) console.log(l);
-  process.exit(result.exitCode);
+  const argv = process.argv.slice(2);
+  const calibrateIdx = argv.indexOf("--calibrate");
+  if (calibrateIdx !== -1) {
+    const positional = argv.filter((_, i) => i !== calibrateIdx);
+    const { root } = resolveArgs(positional, import.meta.dir);
+    const result = await runCalibration(root);
+    for (const l of result.lines) console.log(l);
+    process.exit(result.exitCode);
+  } else {
+    const { guide, root, gfFile, tokenBudgetFile } = resolveArgs(argv, import.meta.dir);
+    const result = runCheckDocCaps(guide, root, gfFile, tokenBudgetFile);
+    for (const l of result.lines) console.log(l);
+    process.exit(result.exitCode);
+  }
 }

@@ -92,6 +92,14 @@ around the rules, and the rule count is what shows it.
 | `CLAUDE.md` | AI assistant | 80 | init (lean loop — an AI assistant reads this repo) | project shape / workflow / anti-patterns change | — |
 | `CONTEXT.md` | AI assistant | 150 (ADR-017) | init (lean loop — an AI assistant reads this repo) | vocabulary / patterns / conventions change | — |
 
+**The always-loaded pair also carries a token budget (ADR-048).** `CLAUDE.md` + `CONTEXT.md` — loaded
+before any task-specific content, every invocation — are additionally budgeted on their **combined
+token cost**, checked by `check-doc-caps` against `scripts/lib/token-budget.txt` (tokenizer: Claude's
+own `count_tokens`, ratio calibrated and ratcheted at adoption). The line caps above stay in force as a
+**secondary signal**: a file can sit under its line cap and still push the pair's token cost up by
+writing longer lines, which a line count cannot catch and a token budget does. Supersedes ADR-015 ·
+ADR-017 · ADR-019's line-count-is-exact precision rule for this pair.
+
 **Loop rows vs repository-universal rows, stated here so the split is a ruling and not an oversight
 (the ADR-026 pattern).** Three rows above — `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/CONTEXT.md` —
 and the `docs/work/` store row below (with `TODO.md`, the v1 layout it replaced) are the **lean loop's
