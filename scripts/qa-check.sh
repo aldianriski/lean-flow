@@ -616,27 +616,33 @@ qb_checkpoint "leg 2c-bis: mechanical Verify"
 # --- 2c-bis. A mechanical Verify: must reach the criterion it claims (SPRINT-082 T3) -------------
 # S9.VERIFYCLAUSE asks whether a ticked criterion NAMES a method; it passes on a method that cannot
 # examine its own subject, and unreachable reads exactly like satisfied (L-136 x4). This screens the
-# two mechanical halves -- EXISTS and REACHES -- against LIVE Plans. RUNS and PROVES stay G2's.
+# two mechanical halves -- EXISTS and REACHES -- against LIVE Plans, AND against every current
+# member's own Done-when (SPRINT-109 T4, TASK-387 -- a v2 sprint's Plan carries no clause at all).
 # Covered by evals/run-verify-reaches-fixtures.sh, which also carries the positive path: this
 # repository's own Plan confirms 0 targets, so its green here is vacuous by itself (L-156).
-vr_script="scripts/lib/check-verify-reaches.sh"
-if [ ! -f "$vr_script" ]; then
-  bad "verify reaches: checker not found at $vr_script"
+# TypeScript run by Bun (retired the POSIX-sh version at T4, mirroring dod-delta's own leg below).
+if ! command -v bun >/dev/null 2>&1; then
+  bad "verify reaches: bun not found on PATH -- cannot run scripts/lib/check-verify-reaches.ts. This FAILS rather than skipping on purpose, same rule as the typecheck leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
 else
-  vr_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
-  if [ -z "$vr_files" ]; then
-    note "verify reaches: skip -- no active sprint Plan"
+  vr_script="scripts/lib/check-verify-reaches.ts"
+  if [ ! -f "$vr_script" ]; then
+    bad "verify reaches: checker not found at $vr_script"
   else
-    vr_out=$(sh "$vr_script" $vr_files 2>&1); vr_code=$?
-    printf '%s\n' "$vr_out"
-    vr_pass=$(printf '%s\n' "$vr_out" | grep -cE '^PASS')
-    vr_fails=$(printf '%s\n' "$vr_out" | grep -cE '^FAIL')
-    pass=$((pass + vr_pass))
-    if [ "$vr_code" -ne 0 ]; then
-      if [ "$vr_fails" -gt 0 ]; then
-        fail=$((fail + vr_fails))
-      else
-        bad "verify reaches: checker exited $vr_code without reporting a FAIL line"
+    vr_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+    if [ -z "$vr_files" ]; then
+      note "verify reaches: skip -- no active sprint Plan"
+    else
+      vr_out=$(bun "$vr_script" $vr_files 2>&1); vr_code=$?
+      printf '%s\n' "$vr_out"
+      vr_pass=$(printf '%s\n' "$vr_out" | grep -cE '^PASS')
+      vr_fails=$(printf '%s\n' "$vr_out" | grep -cE '^FAIL')
+      pass=$((pass + vr_pass))
+      if [ "$vr_code" -ne 0 ]; then
+        if [ "$vr_fails" -gt 0 ]; then
+          fail=$((fail + vr_fails))
+        else
+          bad "verify reaches: checker exited $vr_code without reporting a FAIL line"
+        fi
       fi
     fi
   fi

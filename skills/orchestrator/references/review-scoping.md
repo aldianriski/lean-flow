@@ -215,7 +215,7 @@ anyone reading the tick afterwards. So G2 asks four questions of every mechanica
 is recorded as **not-valid-proof**, never accepted; and where nothing mechanical reaches it, the
 criterion stays a judgment tick that says so — manufacturing a checker to make a criterion *look*
 mechanical is the failure this rule names, not its remedy. EXISTS and REACHES are pre-screened by
-`scripts/lib/check-verify-reaches.sh`; RUNS and PROVES stay human, and the checker says so rather than
+`scripts/lib/check-verify-reaches.ts`; RUNS and PROVES stay human, and the checker says so rather than
 implying it settled all four.
 
 When the diff **touches tests**, the test-quality standard (`skills/tdd/references/test-standard.md`) is

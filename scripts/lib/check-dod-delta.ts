@@ -25,6 +25,24 @@
 // text -- see checkDodDelta below).
 //
 // TypeScript run by Bun, per the owner ruling recorded in SPRINT-101 T3 -- not POSIX sh.
+//
+// SPRINT-109 T4 (TASK-387, owner ruling C): a v2 sprint carries no `**DoD:**` list under its `### Tn`
+// headings at all -- the boxes live in each member task file's `## Done when` (docs/work/, ADR-047).
+// A `### Tn` Plan block instead carries `Cites:` naming the TASK id(s) it delivers. So a commit's
+// claimed task (T1, T2, ...) is cross-checked against member-file ticks via THAT map, not against a
+// (now-empty) in-doc DoD section -- checkDodDeltaWithMembers below adds this without touching
+// checkDodDelta/parseDodSections/attributeClaim, which stay the sprint-file (v1) path, verbatim, so
+// v1 sprints keep working exactly as before (owner ruling C, last sentence).
+
+import { section, taskIds } from "./sprint-members.ts";
+//
+// A member tick differs from a v1 DoD tick in one load-bearing way: dispatch.md's own tick rule
+// ("Tick" step 5) appends ` <checkmark> <evidence>` to the SAME bullet line at tick time, so the
+// checked line's text is `<frozen text> <checkmark> <evidence>`, never byte-identical to its own
+// unchecked past self. findNewTicks' exact-text match (correct for v1, where a tick changes only the
+// box marker) would therefore never match a member tick to its pre-tick row -- findNewMemberTicks
+// below compares on a STABLE KEY that strips a trailing checkmark-and-evidence suffix from a CHECKED
+// item only, so an item's identity survives the very edit that ticks it.
 
 export interface DodItem {
   /** The bullet's own text (all wrapped/continuation lines joined), with the checkbox marker stripped. */
@@ -361,6 +379,160 @@ export function checkDodDelta(
   };
 }
 
+// --- member-file DoD (SPRINT-109 T4, TASK-387) ----------------------------------------------------
+
+/** `### Tn` -> the TASK ids in that block's OWN `Cites:` line (never guessed from prose elsewhere --
+ * a block with no `Cites:` line, or none of them TASK-shaped, maps to `[]`). */
+export function parsePlanCites(content: string): Map<string, string[]> {
+  const lines = content.split(/\r?\n/);
+  const out = new Map<string, string[]>();
+  let currentTask: string | null = null;
+  let buffer: string[] = [];
+  const flush = () => {
+    if (currentTask !== null) {
+      const citesLine = buffer.find((l) => /^Cites:/.test(l));
+      out.set(currentTask, citesLine ? [...taskIds(citesLine)] : []);
+    }
+  };
+  for (const line of lines) {
+    const h = HEADING_RE.exec(line);
+    if (h) {
+      flush();
+      currentTask = h[1]!;
+      buffer = [];
+      continue;
+    }
+    if (currentTask === null) continue;
+    buffer.push(line);
+  }
+  flush();
+  return out;
+}
+
+/** Every `- [ ]`/`- [x]` row (continuation lines folded, exactly like parseDodSections' own inner
+ * loop) inside a member task file's `## Done when` section. A file with no such section is `[]`. */
+export function parseDoneWhenItems(content: string): DodItem[] {
+  const text = section(content, "Done when");
+  if (text === null) return [];
+  const lines = text.split(/\r?\n/);
+  const items: DodItem[] = [];
+  let current: { checked: boolean; text: string[] } | null = null;
+  const closeItem = () => {
+    if (current) {
+      items.push({ text: current.text.join(" ").replace(/\s+/g, " ").trim(), checked: current.checked });
+      current = null;
+    }
+  };
+  for (const line of lines) {
+    const m = ITEM_RE.exec(line);
+    if (m) {
+      closeItem();
+      current = { checked: m[1]!.toLowerCase() === "x", text: [m[2]!.trim()] };
+      continue;
+    }
+    if (/^\s*$/.test(line)) {
+      closeItem();
+      continue;
+    }
+    if (/^\s+\S/.test(line) && current) {
+      current.text.push(line.trim());
+      continue;
+    }
+    closeItem();
+  }
+  closeItem();
+  return items;
+}
+
+/** A checked item's comparable identity: the frozen text, with a trailing `<checkmark> <evidence>`
+ * suffix (dispatch.md's own tick convention) stripped so a just-ticked row still matches its own
+ * pre-tick self. An unchecked item's text is never touched -- there is nothing to strip yet. */
+function memberItemKey(item: DodItem): string {
+  return item.checked ? item.text.replace(/\s*✓[\s\S]*$/, "").trim() : item.text.trim();
+}
+
+/** Every `## Done when` item that is checked in `newContent` and was NOT already checked (or did not
+ * yet exist) in `oldContent`, matched on `memberItemKey` -- never on raw text (a tick's own edit
+ * changes the text by appending evidence, so an exact-text match would never see its own tick). */
+export function findNewMemberTicks(oldContent: string, newContent: string): DodItem[] {
+  const oldCheckedKeys = new Set(parseDoneWhenItems(oldContent).filter((i) => i.checked).map(memberItemKey));
+  return parseDoneWhenItems(newContent).filter((i) => i.checked && !oldCheckedKeys.has(memberItemKey(i)));
+}
+
+export interface MemberChange {
+  readonly id: string; // TASK-NNN
+  readonly path: string; // repo-relative, forward slashes
+  readonly oldContent: string | null; // null: file did not exist at the commit's parent (new member)
+  readonly newContent: string;
+}
+
+/**
+ * The full DoD-delta result for a commit, member-aware (TASK-387). Runs the EXISTING sprint-file (v1)
+ * check unchanged first, then layers member-file ticks on top:
+ *
+ *  - No member file changed a `## Done when` box this commit -> the legacy result stands alone (a v1
+ *    sprint, or a v2 commit that touched no member box, is unaffected byte-for-byte).
+ *  - Some member box WAS newly ticked, but the commit does not attribute to exactly one Tn (COORD,
+ *    unscoped, or the unmatched-shape LOUD exemption) -> the legacy verdict stands (rule C: preserve
+ *    the COORD/unscoped exemption exactly -- ticking a member's box from a bare `sprint(NNN):` commit
+ *    is dispatch.md's own documented coordinator workflow, not a violation).
+ *  - The commit attributes to Tn, and the sprint doc's content needed to read Tn's `Cites:` could not
+ *    be resolved at all (no sprint doc found on either side) -> a legitimate skip, never a guessed
+ *    FAIL: this checker does not presume a member tick is foreign merely because it could not find
+ *    the citation list to check it against.
+ *  - Otherwise: every newly-ticked member item must belong to a TASK id Tn's `Cites:` names. A tick
+ *    under an uncited id is `unattributed-tick`, naming the member id, its file, and the item text --
+ *    the SAME finding kind the v1 path already uses, because the violation is the same shape (a
+ *    commit's claim and what it actually ticked disagree), just read from a different document.
+ */
+export function checkDodDeltaWithMembers(
+  subject: string,
+  taskTrailer: string | null,
+  sprintOldContent: string,
+  sprintNewContent: string | null,
+  memberChanges: readonly MemberChange[],
+): DodDeltaResult {
+  const legacy = checkDodDelta(subject, taskTrailer, sprintOldContent, sprintNewContent);
+
+  const memberTicks: { id: string; path: string; item: DodItem }[] = [];
+  for (const mc of memberChanges) {
+    for (const item of findNewMemberTicks(mc.oldContent ?? "", mc.newContent)) {
+      memberTicks.push({ id: mc.id, path: mc.path, item });
+    }
+  }
+  if (memberTicks.length === 0) return legacy;
+
+  const scope = attributeClaim(subject, taskTrailer);
+  if (scope.kind !== "task") return legacy; // COORD/unscoped/unmatched-shape: rule C, unchanged.
+
+  const citesSource = sprintNewContent ?? (sprintOldContent.length > 0 ? sprintOldContent : null);
+  if (citesSource === null) {
+    // No sprint doc resolved on EITHER side of this commit -- this checker cannot read Tn's Cites,
+    // so it reports what it can (the legacy verdict) and never guesses "foreign" from an absent map.
+    return {
+      ok: legacy.ok,
+      findings: legacy.findings,
+      note:
+        (legacy.note ? legacy.note + "; " : "") +
+        `dod-delta: ${memberTicks.length} member tick(s) present but no sprint doc resolved for ${scope.task} -- Cites not checked`,
+    };
+  }
+
+  const cites = parsePlanCites(citesSource).get(scope.task) ?? [];
+  const foreign = memberTicks.filter((t) => !cites.includes(t.id));
+  const foreignFindings: DodDeltaFinding[] = foreign.map((f) => ({
+    kind: "unattributed-tick" as const,
+    message: `dod-delta: commit claims ${scope.task} but ticked ${f.id}'s Done-when item it never named (${f.path}): "${f.item.text}"`,
+  }));
+
+  if (foreignFindings.length === 0) {
+    if (!legacy.ok) return legacy; // a v1-path finding still stands even when member ticks agree.
+    const ids = [...new Set(memberTicks.map((t) => t.id))].join(", ");
+    return { ok: true, findings: [], note: `dod-delta: ${scope.task} -- member tick(s) match Cites (${ids})` };
+  }
+  return { ok: false, findings: [...legacy.findings, ...foreignFindings] };
+}
+
 // --- CLI: reads real commits via git, never a hand-passed string (L-166) -------------------------
 
 import { execFileSync } from "node:child_process";
@@ -492,6 +664,34 @@ export function commitsInRange(repoRoot: string, planCommit: string, head: strin
     .filter((l) => l.length > 0);
 }
 
+const MEMBER_PATH_RE = /^docs\/work\/(?:backlog|todo|in_progress|review|done|cancel)\/(TASK-\d+)-[^/]+\.md$/;
+
+/** Every member task file this commit changed, old/new content at this ref (TASK-387). A file this
+ * commit's diff does not resolve AT THIS REF (deleted, or moved away in the same commit) is skipped --
+ * there is no "Done when" state to compare a tick against once the path is gone, mirroring loadCommit's
+ * own "skip a candidate that doesn't resolve" rule (finding 6 of the ca577e9 review). */
+export function loadMemberChanges(repoRoot: string, ref: string, changedFiles: readonly string[]): MemberChange[] {
+  const out: MemberChange[] = [];
+  for (const p of changedFiles) {
+    const m = MEMBER_PATH_RE.exec(p);
+    if (!m) continue;
+    let newContent: string;
+    try {
+      newContent = git(["show", `${ref}:${p}`], repoRoot);
+    } catch {
+      continue;
+    }
+    let oldContent: string | null;
+    try {
+      oldContent = git(["show", `${ref}^:${p}`], repoRoot);
+    } catch {
+      oldContent = null; // no parent, or the file did not exist there yet -- every box reads as new
+    }
+    out.push({ id: m[1]!, path: p, oldContent, newContent });
+  }
+  return out;
+}
+
 function checkOneCommit(repoRoot: string, ref: string): { line: string; ok: boolean } {
   let commit: LoadedCommit;
   try {
@@ -499,7 +699,11 @@ function checkOneCommit(repoRoot: string, ref: string): { line: string; ok: bool
   } catch (e) {
     return { line: `FAIL  dod-delta: could not read commit '${ref}' -- ${(e as Error).message}`, ok: false };
   }
-  const result = checkDodDelta(commit.subject, commit.taskTrailer, commit.oldContent, commit.newContent);
+  const changed = git(["show", "--name-only", "--format=", ref], repoRoot)
+    .split(/\r?\n/)
+    .filter((l) => l.length > 0);
+  const memberChanges = loadMemberChanges(repoRoot, ref, changed);
+  const result = checkDodDeltaWithMembers(commit.subject, commit.taskTrailer, commit.oldContent, commit.newContent, memberChanges);
   if (result.ok) {
     const msg = result.note ?? `dod-delta: ${commit.sprintDocPath} -- claim and ticks agree (${ref}: "${commit.subject}")`;
     return { line: `PASS  ${msg}`, ok: true };

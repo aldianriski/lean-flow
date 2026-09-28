@@ -94,9 +94,13 @@ const CASES: readonly Case[] = [
     name: "predicate-guard-second-file",
     arm: "1b (inline printf, predicate template)",
     cmd: "__isolated__",
-    args: ["scripts/lib/check-verify-reaches.sh"],
+    // SPRINT-109 T4 (TASK-387): check-verify-reaches.sh was retired (ported to .ts, which reads
+    // this repo's docs/work/ store directly rather than sourcing archive-path.sh -- there is no
+    // shell predicate-guard shape left to fire there). Re-pointed at another live carrier of the
+    // SAME template so this arm's case count and its live-execution proof are unaffected.
+    args: ["scripts/lib/check-review-depth.sh"],
     want: "two-space",
-    finding: "verify reaches: shared archive predicate not found",
+    finding: "review depth: shared archive predicate not found",
     why: "nine files carry this template and the suite reached none of them before SPRINT-104 T2 review",
   },
   {
