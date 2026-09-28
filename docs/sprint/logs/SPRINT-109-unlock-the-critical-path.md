@@ -58,3 +58,22 @@ The dispatch preflight read `scripts/lib/check-doc-caps.{sh,ts}` (T2) and `scrip
 as the bare directory `scripts/lib/`, which then "overlapped" every other `scripts/lib/` file: 7 `shared-file-unowned`
 FAILs across T2/T3/T4, none of them real. The paths are now written out (a live declaration, L-100; `## Done when`
 is untouched). Re-run: `PREFLIGHT: CLEAR`. Waves are T1 · T3 · T4 at rank 0 and T2 at rank 1 (after T1, on `spec/STANDARD.md`).
+
+### 2026-09-28 | scope-change | G2 rulings: T4 now depends on T3, and Layers widened for T1–T4
+**What broke:** A3 was false. No exported member lookup exists (the `## Members` ∪ `sprint:` union is private to
+`check-sprint-by-reference.ts`), and T3 and T4 both need it. `check-verify-reaches` is shell-only, and reading
+member files would mean rewriting most of it. Removing §2's `TODO.md` row would hard-FAIL `S11.TODOCAP`
+(`spec-table-unreadable`) until TASK-383.
+**Impact / owner rulings (2026-09-28, G2 popups):**
+- A1 → spec `1.0.0`. T1 keeps §2's `TODO.md` row, with its cap, labelled *v1 layout, retired at 1.0, read only by migrate*,
+  and adds a `docs/work/` row. TASK-383's hand-off list names every rule to retarget. `overview.md:22` states the version.
+- A2 → T2's named tokenizer is Claude's, sampled once via the `count_tokens` API (owner action: the key). The gate uses
+  bytes ÷ the measured ratio, with the ratio and error band recorded in `docs/research/logs/token-calibration.md`. The budget
+  **ratchets at adoption**: growth past it FAILs unless a disposition is recorded, and TASK-384 lowers it.
+- T3 extracts the member lookup into `scripts/lib/sprint-members.ts`, and `check-sprint-by-reference.ts` re-points at it
+  (its harness stays green). The authority guard reads the member's `authority:` and FAILs `authority-plan-member-mismatch`
+  when a Plan block's J-class differs from the member its `Cites:` names. task-origin covers every `docs/work/*/TASK-*.md`.
+- T4 **depends on T3** (rank 1). verify-reaches is ported to `check-verify-reaches.ts`, the `.sh` is deleted, and the runner and
+  the `qa-check.sh` leg are re-pointed. There's no differential oracle, since the `.sh` can't read members. Motivating artifact: SPRINT-109
+  itself, whose members carry 0 `*Verify:*` clauses. Silence on that is the vacuous pass to close (L-166 (i)).
+**Re-confirm G2:** preflight re-run below. Waves: rank 0 = T1 ∥ T3, rank 1 = T2 (after T1) ∥ T4 (after T3). No member `## Done when` edited.

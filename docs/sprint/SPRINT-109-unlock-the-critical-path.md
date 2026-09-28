@@ -39,7 +39,7 @@ filed at this promote) · any release (D2).
 ## Plan
 
 ### T1 — Amend STANDARD for the work-item store and bump the spec MAJOR `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/work/README.md`
+Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/work/README.md` · `docs/architecture/overview.md`
 Depends-on: none
 Cites: `TASK-377` · EPIC-017 D1 · D2 · ADR-045 · ADR-046 · ADR-047
 
@@ -53,7 +53,8 @@ CHANGELOG entry, and `TASK-383` has a named list of the rules it must retarget.
 ### T2 — Budget the tokens the always-loaded read set actually consumes `[size: M · risk: high · class: decision · HITL · J2]`
 Layers: `scripts/lib/check-doc-caps.sh` · `scripts/lib/check-doc-caps.ts` · `evals/run-doc-caps-fixtures.sh` · `evals/doc-caps.test.ts` ·
   `evals/run-doc-caps-differential.ts` · `evals/fixtures/doc-caps/` · `spec/STANDARD.md` (after T1, D1) ·
-  `docs/adr/` (new ADR) · `docs/DECISIONS.md`
+  `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `scripts/lib/check-prose-density.ts` ·
+  `docs/research/logs/token-calibration.md`
 Depends-on: T1 on `spec/STANDARD.md` only (D1)
 Cites: `TASK-364` · EPIC-017 D3 · ADR-015 · ADR-017 · ADR-019 · TD-174
 
@@ -68,7 +69,7 @@ tokenizer, a retained must-FAIL fixture reddens on an over-budget set, and the s
 Layers: `scripts/lib/check-authority.sh` · `scripts/lib/check-authority.ts` · `scripts/lib/check-task-origin.sh` ·
   `scripts/lib/prose-density-baseline.txt` · `evals/run-authority-fixtures.sh` · `evals/authority.test.ts` ·
   `evals/run-authority-differential.ts` · `evals/run-task-origin-fixtures.sh` · `evals/fixtures/authority/` ·
-  `evals/fixtures/task-origin/`
+  `evals/fixtures/task-origin/` · `scripts/lib/sprint-members.ts` (new, T3 owns) · `scripts/lib/check-sprint-by-reference.ts`
 Depends-on: none
 Cites: `TASK-382` · Codex r1 F1 · L-058 · L-166 · L-186
 
@@ -79,10 +80,10 @@ right now both pass without examining anything.
 reddens on a planted violation with its named finding, and an isolated outside review is CLEAR.
 
 ### T4 — Retarget the dod-delta and verify-reaches guards onto member files `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `scripts/lib/check-dod-delta.ts` · `scripts/lib/check-verify-reaches.sh` ·
+Layers: `scripts/lib/check-dod-delta.ts` · `scripts/lib/check-verify-reaches.ts` (new) · `scripts/lib/check-verify-reaches.sh` (deleted) ·
   `evals/run-dod-delta-fixtures.sh` · `evals/dod-delta.test.ts` · `evals/run-verify-reaches-fixtures.sh` ·
-  `evals/fixtures/dod-delta/` · `evals/fixtures/verify-reaches/`
-Depends-on: none
+  `evals/fixtures/dod-delta/` · `evals/fixtures/verify-reaches/` · `scripts/qa-check.sh`
+Depends-on: T3 (imports `scripts/lib/sprint-members.ts`, G2 ruling 2026-09-28)
 Cites: `TASK-387` · Codex r1 F1 · r2 R2-3c · L-166 · L-186
 
 Tier G. The DoD boxes and `Verify:` clauses these guards count now live in member files' `## Done when`,
