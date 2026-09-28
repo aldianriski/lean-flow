@@ -115,3 +115,13 @@ That goes past the frozen text of TASK-382 box 1 ("check-authority (sh + ts) rea
 brief's addition, not a G2 ruling. **Impact:** `qa-check.sh` runs only the `.ts`, so the gate reads members either way. The
 `.sh` feeds only the opt-in differential, which now names its member-finding exclusion. **Owner ruling (2026-09-28):** accept `.ts`-only.
 The box's `sh + ts` is met by the guard that gates, and no new shell logic is added (the owner's no-shell rule). The box text stays as frozen.
+
+### 2026-09-28 | progress | T3 TASK-382 merged at `d2cb16b`. Outside review CLEAR, 3 census-zero misses → TD
+Builder (sonnet + /tdd, worktree `b9d06a8`): `bca35aa` extracted `scripts/lib/sprint-members.ts` (`resolveMembers`) from
+check-sprint-by-reference.ts · `905391a` check-authority.ts reads member `authority:` + `authority-plan-member-mismatch` ·
+`c27ad57` check-task-origin.sh reads all six store folders + legacy TODO.md. Seeded breaks ×4, targeted, restored
+(`git hash-object` = `rev-parse HEAD:path`). Isolated review (sonnet, 12 probes, ~65k tokens): **CLEAR**. by-reference
+output byte-identical at `b9d06a8` and at `c27ad57` (127/0). Silent misses, each census 0, filed as TD-188 (ambiguous member dropped by
+the shared module, which T4 inherits) · TD-189 (`### T3a` invisible to the mismatch check) · TD-190 (origin glob is not recursive,
+and it reads the value verbatim). Post-merge on main: authority 26/0 · task-origin all green · 4 members examined · 0 origin FAILs.
+Box 1 per the owner's scope-change ruling above (`.ts` gates; `.sh` is the oracle).

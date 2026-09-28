@@ -124,5 +124,11 @@ clauses and redden on a planted violation with a named finding, and an isolated 
 | `spec/CHANGELOG.md` | T1 | 0.12.0 entry, breaking, 1.0.0 deferred to §15 | Low | read-through + review |
 | `docs/work/README.md` | T1 | `open:` / `blocked-by:` conventions under `## Assumes` | Low | matches the task-file.md / triage write sites |
 | `docs/architecture/overview.md` | T1 | spec version mention → v0.12.0 | Low | grep |
+| `scripts/lib/sprint-members.ts` | T3 | new shared member lookup (`## Members` ∪ `sprint:` stamps), extracted | High (Tier G, shared) | by-reference 127/0, output byte-identical before and after |
+| `scripts/lib/check-sprint-by-reference.ts` | T3 | re-pointed at sprint-members.ts, no behaviour change | Med | same |
+| `scripts/lib/check-authority.ts` | T3 | reads member `authority:`, new `authority-plan-member-mismatch` | High (Tier G) | authority 26/0 · seeded breaks · review CLEAR |
+| `scripts/lib/check-task-origin.sh` | T3 | population = all six docs/work/ folders + legacy TODO.md | High (Tier G) | task-origin 16 cases green · seeded break |
+| `evals/…authority…` · `evals/…task-origin…` | T3 | 3 + 6 fixture cases, runners' floors raised, differential names the member exclusion | Low | runner verdicts |
+| `TECH-DEBT.md` | T3 | TD-188/189/190 from the outside review (census-zero) | Low | — |
 
 ## Retro

@@ -309,6 +309,31 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-190** severity: low | status: open | created: Sprint-109 (T3 outside review)
+  - Summary: **`check-task-origin.sh` and `sprint-members.ts` disagree on what "the store" is.** The origin guard
+    globs `docs/work/<folder>/TASK-*.md` one level deep, while `nowTree()` walks `docs/work/` recursively ("a nested subfolder is not a
+    different population"). So `docs/work/todo/2026-09/TASK-980-x.md` with no `origin:` goes unnoticed: `skip (no task entries …)`, exit 0.
+    It also reads `origin:` verbatim, so a quoted value, a trailing space or an inline comment FAILs as invalid (loud, not
+    silent). Census 2026-09-28: 0 nested files, 0 decorated values.
+  - Mitigation (hypothesis): take the population from `nowTree()` (this means porting the guard to TS, per the no-shell rule) and
+    normalise the value the way the TS frontmatter readers do. Tier G: a nested-file fixture (L-186).
+
+- **TD-189** severity: low | status: open | created: Sprint-109 (T3 outside review)
+  - Summary: **`authority-plan-member-mismatch` never sees a letter-suffixed Plan block.** `parseCites` matches
+    `^### (T\d+)\b`, so on `### T3a …` the digit-then-letter has no word boundary, its `Cites:` is dropped, and a J1 Plan bracket against a
+    J2 member passes. Census 2026-09-28: 0 letter-suffixed `### T` headings in `docs/sprint/`.
+  - Mitigation (hypothesis): accept `T\d+[a-z]?` as the dispatch preflight and `check-dod-delta` already do. A fixture
+    in that shape (L-186).
+
+- **TD-188** severity: medium | status: open | created: Sprint-109 (T3 outside review)
+  - Summary: **`resolveMembers` drops an ambiguous member silently.** An id that resolves to two files (a
+    stray duplicate mid-`git mv`) is skipped (`matches.length !== 1 → continue`), so `check-authority` never sees the member,
+    and with no `### Tn` blocks it prints `skip`, exit 0. `check-sprint-by-reference` reports resolution failures itself, but
+    every newer consumer of the shared module (T4's guards next) inherits the silence. Census 2026-09-28: 0 duplicate ids;
+    merge-back's duplicate-id check is the only thing that catches the shape today, and only at merge.
+  - Mitigation (hypothesis): return ambiguous and unresolved ids alongside the members, so each consumer must
+    decide, and have the guards FAIL on them. Tier G: a duplicate-id fixture per consumer.
+
 - **TD-187** severity: medium | status: open | created: Sprint-109 (promote governance review)
   - Summary: **`S11.TDDELETE` prints PASS without judging any resolved row.** Its extractor
     (`conformance-engine.sh`, `assert_S11_TDDELETE`) wants `closed: Sprint-NNN` or `resolved … (Sprint-NNN`,
