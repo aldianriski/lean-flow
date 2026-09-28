@@ -130,3 +130,8 @@ Box 1 per the owner's scope-change ruling above (`.ts` gates; `.sh` is the oracl
 Deleting the `.sh` leaves every caller stale. A grep outside history found three beyond T4's Layers: `evals/run-emitter-column-fixtures.ts:97`
 · `skills/orchestrator/SKILL.md:50` · `skills/orchestrator/references/review-scoping.md:218`. All three join T4's Layers so the port ships wired.
 T4's base is `36f9bdd` (T3 merged). It imports `sprint-members.ts` read-only, and inherits TD-188 without fixing it (out of Layers).
+
+### 2026-09-28 | progress | review-depth records for the accepted tasks (night-run.md Part 4 shape)
+review · T1 · scoped-reviewer · behaviour:low · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:high
+T1: one scoped sonnet reviewer (Spec CLEAR, Standards NOT CLEAR → one revise → verified). T3: a worktree-isolated Tier G reviewer, CLEAR.
