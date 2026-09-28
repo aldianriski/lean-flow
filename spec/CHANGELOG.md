@@ -9,24 +9,26 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
-## 1.0.0 — 2026-09-28
+## 0.12.0 — 2026-09-28
 
-**MAJOR — breaking: the work-item store replaces `TODO.md`.** The queue moves from one capped file
-into `docs/work/<status>/TASK-NNN-<slug>.md` — one file per task, status in the folder, title in the
-filename, membership in frontmatter (ADR-045). A repository still keeping its queue in `TODO.md` is on
-a retired layout, so this is a break an adopter must act on, not new ground above them (§15). The
-upgrade path is `/lean-doc-generator migrate`, the one path that reads a v1 tree (ADR-046).
+**0.x MINOR carrying MAJOR meaning (§15) — breaking: the work-item store replaces `TODO.md`.** The
+queue moves from one capped file into `docs/work/<status>/TASK-NNN-<slug>.md` — one file per task,
+status in the folder, title in the filename, membership in frontmatter (ADR-045). A repository still
+keeping its queue in `TODO.md` is on a retired layout, so this is a break an adopter must act on, not
+new ground above them. The upgrade path is `/lean-doc-generator migrate`, the one path that reads a
+v1 tree (ADR-046). **`1.0.0` is deferred to §15's condition** — two or more repositories pinned to one
+version — expected when `workdoo` pins the spec with the plugin's `2.0.0` release (`TASK-373`).
 
 - **§2** adds the `docs/work/` store row. The `TODO.md` row stays, cap intact, labelled the v1 layout
-  retired at 1.0: `migrate` still reads it, and so does every checker that derives a cap from §2.
+  retired at 0.12.0: `migrate` still reads it, and so does every checker that derives a cap from §2.
 - **§9** describes a sprint by reference (ADR-047): `## Members` lists member task files, each
   member's DoD is its own `## Done when`, and `plan_commit` is the freeze. The Plan carries no DoD boxes.
 - **§10** routes the Follow-ups bucket to a task file in `docs/work/backlog/` stamped
   `origin: close-retro`.
 - **§11** prunes `docs/work/done/` and `cancel/` in place of `TODO.md`'s Backlog removal and
-  whole-file prune. The v1 whole-file row stays, retired: its only prune is `migrate`.
-- **§15** now records that `1.0.0` was taken here by owner ruling (SPRINT-109 G2). It does not
-  claim the two-pinned-repositories condition §15 stated for leaving `0.x`.
+  whole-file prune. A task file is pruned only once nothing live names it and it is not the store's
+  highest-numbered file. The v1 whole-file row stays, retired: its only prune is `migrate`.
+- Stale single-file-Backlog wording in §10 now names a task file in `docs/work/backlog/`.
 
 **What did not move: the rule surface.** No rule id, level or mark changed. `read-spec-rules.sh` over
 this version emits the same 100 rows, byte-identical to the frozen
