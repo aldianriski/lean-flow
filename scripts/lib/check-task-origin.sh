@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-# check-task-origin.sh -- every TODO.md Backlog task declares where it came from (SPRINT-055 T6,
-# TASK-172).
+# check-task-origin.sh -- every task declares where it came from (SPRINT-055 T6, TASK-172;
+# retargeted onto the docs/work/ store at TASK-382 / SPRINT-109 T3, owner ruling C).
 #
 # G1 fast-paths a "decomposer-approved task" to a one-line scope confirm. Until T6 no field recorded
 # whether a task had ever met the intake grill, so the clause was unverifiable prose: tasks filed by
@@ -16,54 +16,90 @@
 # the first is checkable, so that is what this guards. A MISSING origin is a FAIL rather than a
 # default, because "unstamped" is exactly the state the old prose could not distinguish.
 #
+# POPULATION (owner ruling C): TWO sources, both checked, kept separate ONLY in what each finding
+# names, never in vocabulary or shape:
+#   1. every docs/work/<folder>/TASK-NNN-*.md, across ALL SIX status folders (backlog todo
+#      in_progress review done cancel) -- the store is now the primary population.
+#   2. TODO.md's own § Backlog entries, while TODO.md still exists -- the legacy population, kept
+#      live for a mixed tree still mid-migration. TODO.md's ABSENCE is not a skip when the store has
+#      task files: this checker only ever skips-with-nothing-to-verify when BOTH populations are
+#      empty.
+#
 # Usage: sh check-task-origin.sh <repo-root>
-# Reads the § Backlog section of TODO.md only -- the Active Sprint pointer and closed history are not
-# task entries. Prints one PASS/FAIL line; exits 1 if any FAIL line was printed, 0 otherwise.
-# Dependency-free POSIX sh.
+# Prints one PASS/FAIL line per task, naming which population it came from (store: docs/work/<folder>/
+# or TODO.md: legacy backlog); exits 1 if any FAIL line was printed, 0 otherwise. Dependency-free
+# POSIX sh.
 set -u
 
 root=${1:?usage: check-task-origin.sh <repo-root>}
 todo="$root/TODO.md"
-[ -f "$todo" ] || { printf '      %s\n' "task-origin: skip (missing): TODO.md"; exit 0; }
 
 VALID='decomposer close-retro triage-bug manual'
 
-# Emit "<TASK-id>\t<origin-or-empty>" for every task entry inside § Backlog. A task block runs from
-# its "- [ ] TASK-NNN" line to the next one or the next "## " heading, so an origin: line is only
-# ever attributed to the task it sits under.
-records=$(awk '
-  /^## Backlog/     { inb=1; next }
-  /^## /            { if (inb) { if (tid != "") print tid "\t" org; tid=""; org=""; inb=0 } }
-  !inb              { next }
-  /^- \[[ x]\] TASK-/ {
-      if (tid != "") print tid "\t" org
-      tid=$0; sub(/^- \[[ x]\] /,"",tid); sub(/ .*/,"",tid); org=""; next
-  }
-  /^[ \t]*origin:/  { if (tid != "") { o=$0; sub(/^[ \t]*origin:[ \t]*/,"",o); sub(/[ \t].*$/,"",o); org=o } }
-  END               { if (tid != "") print tid "\t" org }
-' "$todo")
+out="${TMPDIR:-/tmp}/task-origin.$$"
+: > "$out"
+seen=0
 
-fail=0
-n=0
-if [ -z "$records" ]; then
-  printf '      %s\n' "task-origin: skip (no task entries in TODO.md § Backlog)"
-  exit 0
+# --- population 1: docs/work/<folder>/TASK-NNN-*.md, all six status folders ---------------------
+for folder in backlog todo in_progress review done cancel; do
+  dir="$root/docs/work/$folder"
+  [ -d "$dir" ] || continue
+  for f in "$dir"/TASK-*.md; do
+    [ -f "$f" ] || continue
+    seen=1
+    tid=$(basename "$f" | sed -n 's/^\(TASK-[0-9][0-9]*\)-.*/\1/p')
+    [ -n "$tid" ] || tid=$(basename "$f" .md)
+    org=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^origin:[ \t]*/{sub(/^origin:[ \t]*/,"");print;exit}' "$f")
+    if [ -z "$org" ]; then
+      printf 'FAIL  %s\n' "task-origin: $tid (store: docs/work/$folder/) declares no origin: -- G1 cannot tell whether it met the intake grill, and an unstamped task is exactly what the old 'decomposer-approved' prose could not distinguish. Stamp decomposer | close-retro | triage-bug | manual" >> "$out"
+    else
+      case " $VALID " in
+        *" $org "*) printf 'PASS  %s\n' "task-origin: $tid (store: docs/work/$folder/) origin: $org" >> "$out" ;;
+        *)          printf 'FAIL  %s\n' "task-origin: $tid (store: docs/work/$folder/) has origin: '$org', which is not one of: $VALID" >> "$out" ;;
+      esac
+    fi
+  done
+done
+
+# --- population 2: legacy TODO.md § Backlog entries, only while TODO.md exists -------------------
+if [ -f "$todo" ]; then
+  # Emit "<TASK-id>\t<origin-or-empty>" for every task entry inside § Backlog. A task block runs
+  # from its "- [ ] TASK-NNN" line to the next one or the next "## " heading, so an origin: line is
+  # only ever attributed to the task it sits under.
+  records=$(awk '
+    /^## Backlog/     { inb=1; next }
+    /^## /            { if (inb) { if (tid != "") print tid "\t" org; tid=""; org=""; inb=0 } }
+    !inb              { next }
+    /^- \[[ x]\] TASK-/ {
+        if (tid != "") print tid "\t" org
+        tid=$0; sub(/^- \[[ x]\] /,"",tid); sub(/ .*/,"",tid); org=""; next
+    }
+    /^[ \t]*origin:/  { if (tid != "") { o=$0; sub(/^[ \t]*origin:[ \t]*/,"",o); sub(/[ \t].*$/,"",o); org=o } }
+    END               { if (tid != "") print tid "\t" org }
+  ' "$todo")
+
+  if [ -n "$records" ]; then
+    seen=1
+    printf '%s\n' "$records" | while IFS="$(printf '\t')" read -r tid org; do
+      [ -n "$tid" ] || continue
+      if [ -z "$org" ]; then
+        printf 'FAIL  %s\n' "task-origin: $tid (TODO.md: legacy backlog) declares no origin: -- G1 cannot tell whether it met the intake grill, and an unstamped task is exactly what the old 'decomposer-approved' prose could not distinguish. Stamp decomposer | close-retro | triage-bug | manual"
+      else
+        case " $VALID " in
+          *" $org "*) printf 'PASS  %s\n' "task-origin: $tid (TODO.md: legacy backlog) origin: $org" ;;
+          *)          printf 'FAIL  %s\n' "task-origin: $tid (TODO.md: legacy backlog) has origin: '$org', which is not one of: $VALID" ;;
+        esac
+      fi
+    done >> "$out"
+  fi
 fi
 
-printf '%s\n' "$records" | while IFS="$(printf '\t')" read -r tid org; do
-  [ -n "$tid" ] || continue
-  if [ -z "$org" ]; then
-    printf 'FAIL  %s\n' "task-origin: $tid declares no origin: -- G1 cannot tell whether it met the intake grill, and an unstamped task is exactly what the old 'decomposer-approved' prose could not distinguish. Stamp decomposer | close-retro | triage-bug | manual"
-  else
-    case " $VALID " in
-      *" $org "*) printf 'PASS  %s\n' "task-origin: $tid origin: $org" ;;
-      *)          printf 'FAIL  %s\n' "task-origin: $tid has origin: '$org', which is not one of: $VALID" ;;
-    esac
-  fi
-done > "${TMPDIR:-/tmp}/task-origin.$$" 2>&1
+if [ "$seen" -eq 0 ]; then
+  printf '      %s\n' "task-origin: skip (no task entries in docs/work/ or TODO.md § Backlog)" >> "$out"
+fi
 
-cat "${TMPDIR:-/tmp}/task-origin.$$"
-grep -q '^FAIL' "${TMPDIR:-/tmp}/task-origin.$$" && fail=1
-rm -f "${TMPDIR:-/tmp}/task-origin.$$"
-n=$n
+cat "$out"
+fail=0
+grep -q '^FAIL' "$out" && fail=1
+rm -f "$out"
 exit $fail
