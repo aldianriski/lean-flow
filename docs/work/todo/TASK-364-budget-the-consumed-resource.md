@@ -2,6 +2,7 @@
 id: TASK-364
 title: "Budget the tokens actually consumed by the always-loaded read set"
 epic: EPIC-017
+sprint: SPRINT-109
 priority: P1
 size: M
 risk: high

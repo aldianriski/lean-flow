@@ -2,6 +2,7 @@
 id: TASK-377
 title: "Amend STANDARD for the work-item store and bump the spec MAJOR"
 epic: EPIC-017
+sprint: SPRINT-109
 priority: P1
 size: M
 risk: high

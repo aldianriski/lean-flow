@@ -16,7 +16,9 @@ status: current
 
 ## Active Sprint
 
-> _None active._ Last closed: **SPRINT-108 — Guard the Freeze**, closed 2026-09-26 with 10 of 10 Plan DoD
+> **SPRINT-109 — Unlock the Critical Path** → docs/sprint/SPRINT-109-unlock-the-critical-path.md
+>
+> Last closed: **SPRINT-108 — Guard the Freeze**, closed 2026-09-26 with 10 of 10 Plan DoD
 > (`TASK-388` freeze checker · `TASK-389` locale-independent index). See `CHANGELOG.md` and the sprint pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in

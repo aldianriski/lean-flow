@@ -2,6 +2,7 @@
 id: TASK-387
 title: "Retarget the dod-delta and verify-reaches guards onto member files"
 epic: EPIC-017
+sprint: SPRINT-109
 priority: P1
 size: M
 risk: high
