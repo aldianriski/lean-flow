@@ -40,9 +40,10 @@ inventing a real count.
 `.claude/CONTEXT.md`, the existing `ALWAYS_LOADED` population from `check-prose-density.ts`, imported
 rather than redefined — and reports PASS/FAIL against `scripts/lib/token-budget.txt`.
 
-- **Tokenizer: Claude's own**, sampled via the Messages `count_tokens` API (model `claude-opus-5`, the
-  current flagship per the `claude-api` skill's own defaults) — never a third-party tokenizer such as
-  `tiktoken`, which undercounts Claude text. The gate itself stays **offline and zero-dependency**
+- **Tokenizer: Claude's own**, sampled via the Messages `count_tokens` API (model `claude-opus-5-5` —
+  the tokenizer is sampled from the model that actually reads the always-loaded set in this repo's
+  sessions) — never a third-party tokenizer such as `tiktoken`, which undercounts Claude text. The gate
+  itself stays **offline and zero-dependency**
   (ADR-032/033): it *estimates* tokens as `bytes ÷ ratio`, where `ratio` (bytes/token) is measured
   **once** by an opt-in `bun scripts/lib/check-doc-caps.ts --calibrate` run against the real API,
   using the built-in `fetch` (no SDK). Calibration writes nothing to disk; the owner adopts a ratio by

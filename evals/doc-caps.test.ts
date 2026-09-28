@@ -195,7 +195,7 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
   test("token-budget case D sibling control: the same shape comfortably under budget PASSes, tokenizer + ratio named", () => {
     const r = runTB("token-budget-under", "token-budget.txt");
     expect(r.exitCode).toBe(0);
-    expect(r.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~100 tokens <= budget 200 (ratio 1 bytes/token, claude-opus-5 count_tokens");
+    expect(r.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~100 tokens <= budget 200 (ratio 1 bytes/token, claude-opus-5-5 count_tokens");
   });
 
   // --- selection-varying (L-186): the population, not just the verdict arithmetic ------------------

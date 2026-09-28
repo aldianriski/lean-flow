@@ -351,7 +351,7 @@ export function evaluateSkillCaps(root: string): { lines: string[]; anyFail: boo
 // mirroring the doc-caps-grandfathered.txt ratchet already in this file (ADR-015).
 export const DEFAULT_TOKEN_BUDGET_FILE = "token-budget.txt";
 export const TOKEN_BUDGET_PENDING = "PENDING";
-export const CALIBRATION_MODEL = "claude-opus-5"; // current flagship per the claude-api skill's defaults
+export const CALIBRATION_MODEL = "claude-opus-5-5"; // the tokenizer is sampled from the model that actually reads the always-loaded set in this repo's sessions
 
 export interface TokenBudgetSet {
   readonly kind: "set";
