@@ -33,3 +33,17 @@ never reached the checklist. SPRINT-107's promote had counted it (5). The dispos
 because deleting `TODO.md` is `TASK-380` (EPIC-017 Closed-when 2), so no new work follows. It was
 caught by re-running the check on the rendered file, a second route, and not by the rule. L-198's
 shape: the first query cut its own population short.
+
+### 2026-09-28 | promote | the governance record, restated with every checklist line named
+The first promote entry named four of the five checklist lines, but not doc-aging, so
+`S10.PROMOTEREVIEW` read it as `promote-checklist-absent`. The signed checklist, line by line:
+- **L-promotion:** none (47 unpromoted, all count 1).
+- **TD aging:** 99 of 107 open rows aged, 30 newly named in the SPRINT-109 sweep (`a0f37ee`). TD-090/117/128 → `TASK-357`.
+- **doc-aging:** §2 caps, 5 soft OVER-CAP files (the four signed + `TODO.md`, see the entry above), 0 hard.
+  §11 retention: TD-157/169/170/175 deleted, and `TD-187` filed. `S11.TODOCAP` (`todo-over-cap-at-promote`, 531 > 320)
+  fires on size alone. Its disposition is **open, pending an owner ruling**: it was never on the signed checklist.
+- **epic rollup currency:** EPIC-014/015/017 current. EPIC-016 can't be checked from here.
+- **handoff ledger:** none.
+Other conformance FAILs at this commit predate the promote: 32 `update-trigger-absent` / 28 `ownership-header-field-missing`
+on store task files (the engine doesn't yet know the store, `TASK-383`) · ADR-043/044 · the CHANGELOG rotation · 2 tracked fixture logs.
+Verdict, not exit code: `S10.TDAGING` PASS (99 named) · `S11.TDDELETE` PASS, which is TD-187's blind spot and not a real clearance.
