@@ -77,3 +77,13 @@ member files would mean rewriting most of it. Removing §2's `TODO.md` row would
   the `qa-check.sh` leg are re-pointed. There's no differential oracle, since the `.sh` can't read members. Motivating artifact: SPRINT-109
   itself, whose members carry 0 `*Verify:*` clauses. Silence on that is the vacuous pass to close (L-166 (i)).
 **Re-confirm G2:** preflight re-run below. Waves: rank 0 = T1 ∥ T3, rank 1 = T2 (after T1) ∥ T4 (after T3). No member `## Done when` edited.
+
+### 2026-09-28 | progress | G1 + G2 signed by the owner at `56dc057`; rank 0 dispatched (T1 ∥ T3, worktree-isolated)
+The owner signed the batch G1 table and the G2 design and rulings (entry above) in one popup: "Sign, dispatch T1 ∥ T3". Review depth,
+read from the skip table now:
+consequence · T1 · behaviour:low · governance:high
+consequence · T2 · behaviour:material · governance:high
+consequence · T3 · behaviour:material · governance:high
+consequence · T4 · behaviour:material · governance:high
+T1 → one scoped sonnet reviewer (spec semantics). T2–T4 → Tier G: a worktree-isolated outside reviewer each, with a
+threat model and a stop rule (L-165 · L-168 · L-217).
