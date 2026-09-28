@@ -69,9 +69,20 @@ function runShell(c: Case): { code: number; out: string } {
 }
 
 function runTs(c: Case): { code: number; out: string } {
+  // No 4th (token-budget) argument here -- runCheckDocCaps() leaves the row OFF when it's omitted, so
+  // these in-process comparisons never need the stripping below at all. See the named exclusion note
+  // printed once, further down: TASK-364 gave the TS checker a row the shell oracle has no concept of.
   const r = runCheckDocCaps(c.guide, c.root, c.gf);
   return { code: r.exitCode, out: r.lines.join("\n") + (r.lines.length ? "\n" : "") };
 }
+
+console.log(
+  "NOTE  doc-caps differential: token-budget row EXCLUDED from parity, stdout AND exit code -- " +
+    "TASK-364/ADR-048, the shell oracle (check-doc-caps.sh) has no token-budget concept and stays " +
+    "authoritative for LINE-cap rows only (B2, outside review round 1: once phase 2 adopts a real " +
+    "budget, an over-budget repo would otherwise flip the TS CLI's real exit code for reasons the " +
+    "shell-comparison cases have nothing to do with)",
+);
 
 let compared = 0;
 let identical = 0;
@@ -119,13 +130,38 @@ function runShellCli(args: string[]): { code: number; out: string } {
     return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
   }
 }
+// TASK-364/ADR-048: the CLI (unlike the in-process runTs() above) always resolves a token-budget
+// path by default, so its stdout carries one extra line the shell oracle has no concept of at all --
+// there is no oracle to diverge from, so it is EXCLUDED from parity, named here rather than silently
+// filtered (the sibling `runTs()` needs no such filter, since it never passes the 4th argument).
+function stripTokenBudgetLine(out: string): string {
+  return out
+    .split("\n")
+    .filter((l) => !l.includes("doc-caps: token-budget"))
+    .join("\n");
+}
+
+// B1 outside-review round 1: the raw process exit code bakes in the token row's own isFail, so once
+// phase 2 adopts a real (non-PENDING) budget, an over-budget repo would flip the TS CLI's real exit
+// code to 1 for a reason the LINE-cap comparison has nothing to do with -- while the shell oracle's
+// exit code, having no token concept, stays whatever the line-cap rows alone produce. Deriving the
+// exit code from the STRIPPED output (a FAIL-prefixed line is exactly and only what makes
+// check-doc-caps exit 1 -- see runCheckDocCaps's own `anyFail`) excludes the token row from the exit
+// code the same way `stripTokenBudgetLine` already excludes it from stdout, so the two can never
+// silently drift apart again.
+function deriveExitFromLines(strippedOut: string): 0 | 1 {
+  return strippedOut.split("\n").some((l) => l.startsWith("FAIL")) ? 1 : 0;
+}
+
 function runTsCli(args: string[]): { code: number; out: string } {
+  let rawOut: string;
   try {
-    const out = execFileSync("bun", [TS_CHECKER, ...args], { encoding: "utf8" });
-    return { code: 0, out };
+    rawOut = execFileSync("bun", [TS_CHECKER, ...args], { encoding: "utf8" });
   } catch (e: any) {
-    return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
+    rawOut = (e.stdout ?? "") + (e.stderr ?? "");
   }
+  const out = stripTokenBudgetLine(rawOut);
+  return { code: deriveExitFromLines(out), out };
 }
 
 const emptyArgCases: { name: string; args: string[] }[] = [

@@ -44,7 +44,15 @@ test_file="evals/doc-caps.test.ts"
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
 # (a renamed test, a dropped describe) while still reporting PASS. RAISE THIS when adding cases to
 # evals/doc-caps.test.ts, in the same commit.
-min_tests=14
+#
+# TASK-364/ADR-048 added the token-budget-over-the-always-loaded-read-set cases (14 -> 27): missing /
+# malformed / PENDING / exceeded, each with its sibling control, two population-selection cases
+# (a missing always-loaded file; the second file's bytes not dropped from the sum), and three
+# parseTokenBudget unit cases (partial-PENDING, multi-row, comment/blank handling).
+# Outside review round 1 (B1) added a CRLF/LF parity regression guard: 27 -> 28.
+# TASK-364 phase 2 added headless-calibration error-handling cases (baseline instability, a missing
+# usage field, each with a sibling control) plus parseHeadlessUsage units: 28 -> 34.
+min_tests=34
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
@@ -66,5 +74,5 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback)"
+echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback, token-budget missing/malformed/pending/exceeded+siblings, token-budget selection-missing-file, token-budget selection-second-file-dominates, token-budget crlf/lf parity (B1), parseTokenBudget units, headless-calibration baseline-instability/missing-usage-field+siblings, parseHeadlessUsage units)"
 exit 0

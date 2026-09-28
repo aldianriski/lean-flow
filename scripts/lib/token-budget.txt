@@ -1,0 +1,22 @@
+# scripts/lib/token-budget.txt -- the token budget for the always-loaded read set (TASK-364, ADR-048).
+#
+# Format (one data row, comments/blanks ignored):
+#   <budget-tokens> <ratio-bytes-per-token> <adopted-at> <reason...>
+#
+# WHY: check-doc-caps.ts estimates the always-loaded read set's (.claude/CLAUDE.md +
+# .claude/CONTEXT.md, ALWAYS_LOADED in check-prose-density.ts) token cost as bytes / ratio, never by
+# calling the API on every gate run (this repo ships zero dependencies and stays offline -- ADR-032 /
+# ADR-033). `ratio` is measured ONCE by calibration -- `bun scripts/lib/check-doc-caps.ts --calibrate`
+# -- against Claude's own count_tokens endpoint, never guessed or borrowed from another tokenizer
+# (tiktoken undercounts Claude text). The owner pastes the calibration output's pooled ratio here to
+# ADOPT it; the ratio and budget then move only by a new adoption, mirroring the
+# doc-caps-grandfathered.txt ratchet pattern (ADR-015).
+#
+# ADOPTED 2026-09-28 (TASK-364 phase 2). Owner ruling: no ANTHROPIC_API_KEY, subscription only --
+# calibrated via the HEADLESS DIFFERENTIAL method instead (`claude -p` + a baseline/delimiter diff,
+# see `runHeadlessCalibration` and docs/research/logs/token-calibration.md for the full method and
+# raw numbers). Ratio is the pooled figure over both always-loaded files: 48115 normalised bytes /
+# 16088 measured tokens = 2.991 (rounded to 3dp). Budget is the check's OWN estimate of today's
+# always-loaded set at that ratio (ceil(48115 / 2.991) = 16087) -- the adoption figure exactly, so
+# the gate is green today and any growth FAILs (owner G2 ruling: "ratchet at adoption").
+16087 2.991 2026-09-28+899be0c headless differential via claude-opus-5-5 (claude -p, no ANTHROPIC_API_KEY) -- see docs/research/logs/token-calibration.md

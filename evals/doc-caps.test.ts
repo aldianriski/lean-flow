@@ -11,14 +11,29 @@
 // Every case below is the SAME case evals/run-doc-caps-fixtures.sh asserted, same fixture files,
 // same named findings -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { resolveArgs, runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
+import {
+  type HeadlessUsage,
+  parseHeadlessUsage,
+  parseTokenBudget,
+  resolveArgs,
+  runCheckDocCaps,
+  runHeadlessCalibration,
+} from "../scripts/lib/check-doc-caps.ts";
 
 const FX = fileURLToPath(new URL("fixtures/doc-caps/", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 function run(fixture: string, gfFile: string) {
   return runCheckDocCaps(`${FX}${fixture}/DOCS_Guide.md`, `${FX}${fixture}`, `${FX}${fixture}/${gfFile}`);
+}
+
+/** Same fixture shape as `run()`, but wires the 4th (token-budget) argument -- OFF by default
+ *  in `run()` so every pre-existing line-cap fixture above is unaffected by TASK-364. */
+function runTB(fixture: string, tokenBudgetFile: string) {
+  const none = `${FX}${fixture}/none.txt`; // no §2 grandfather list needed for any token-budget fixture
+  return runCheckDocCaps(`${FX}${fixture}/DOCS_Guide.md`, `${FX}${fixture}`, none, `${FX}${fixture}/${tokenBudgetFile}`);
 }
 
 describe("check-doc-caps.ts -- retained fixtures", () => {
@@ -133,7 +148,196 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
   });
 
   test("a real (non-empty) CLI argument is used as-is, not overridden by the default", () => {
-    const resolved = resolveArgs(["/g.md", "/r", "/gf.txt"], "/some/script/dir");
-    expect(resolved).toEqual({ guide: "/g.md", root: "/r", gfFile: "/gf.txt" });
+    const resolved = resolveArgs(["/g.md", "/r", "/gf.txt", "/tb.txt"], "/some/script/dir");
+    expect(resolved).toEqual({ guide: "/g.md", root: "/r", gfFile: "/gf.txt", tokenBudgetFile: "/tb.txt" });
+  });
+
+  // --- token budget over the always-loaded read set (TASK-364, ADR-048) -------------------------
+  // Population: ALWAYS_LOADED = [.claude/CLAUDE.md, .claude/CONTEXT.md] (imported from
+  // check-prose-density.ts, never redefined). Every fixture below fixes ratio=1 byte/token so the
+  // arithmetic is exact and legible; the ratio itself is never hardcoded in the checker (it is read
+  // from token-budget.txt), so a fixture-chosen ratio exercises the real code path, not a shortcut.
+
+  test("token-budget case A (must-FAIL): token-budget.txt absent is a named token-budget-missing FAIL", () => {
+    const r = runTB("token-budget-missing", "token-budget.txt"); // deliberately does not exist on disk
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("FAIL  doc-caps: token-budget-missing:");
+  });
+
+  test("token-budget case A sibling control: the same shape with a real file present does not FAIL missing", () => {
+    const r = runTB("token-budget-under", "token-budget.txt");
+    expect(r.lines.join("\n")).not.toContain("token-budget-missing");
+  });
+
+  test("token-budget case B (must-FAIL): a malformed token-budget.txt is a named token-budget-malformed FAIL", () => {
+    const r = runTB("token-budget-malformed", "token-budget.txt");
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("token-budget-malformed: budget-tokens is not a positive number");
+  });
+
+  test("token-budget case B sibling control: a well-formed file beside it does not report malformed", () => {
+    const r = runTB("token-budget-under", "token-budget.txt");
+    expect(r.lines.join("\n")).not.toContain("token-budget-malformed");
+  });
+
+  test("token-budget case C: the PENDING sentinel is reported, never as PASS and never as FAIL", () => {
+    const r = runTB("token-budget-pending", "token-budget.txt");
+    expect(r.exitCode).toBe(0);
+    const text = r.lines.join("\n");
+    expect(text).toContain("PENDING doc-caps: token-budget not yet calibrated");
+    expect(text).not.toContain("PASS  doc-caps: token-budget");
+    expect(text).not.toContain("FAIL  doc-caps: token-budget");
+  });
+
+  test("token-budget case C sibling control (proves PENDING does not blanket-suppress a real breach): over-budget still FAILs", () => {
+    const r = runTB("token-budget-over", "token-budget.txt");
+    expect(r.exitCode).toBe(1);
+  });
+
+  test("token-budget case D (must-FAIL): the read set over its adopted budget FAILs, named token-budget-exceeded", () => {
+    const r = runTB("token-budget-over", "token-budget.txt");
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("FAIL  doc-caps: token-budget-exceeded: always-loaded read set ~100 tokens > budget 50");
+  });
+
+  test("token-budget case D sibling control: the same shape comfortably under budget PASSes, tokenizer + ratio named", () => {
+    const r = runTB("token-budget-under", "token-budget.txt");
+    expect(r.exitCode).toBe(0);
+    expect(r.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~100 tokens <= budget 200 (ratio 1 bytes/token, claude-opus-5-5 tokenizer");
+  });
+
+  // --- selection-varying (L-186): the population, not just the verdict arithmetic ------------------
+  test("token-budget selection A: one always-loaded file absent is named, not silently absorbed as 0", () => {
+    const r = runTB("token-budget-selection-missing-file", "token-budget.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1); // 40 bytes (CLAUDE.md only) > budget 30
+    expect(text).toContain("MISSING from the always-loaded read set: .claude/CONTEXT.md");
+    expect(text).toContain("~40 tokens > budget 30");
+  });
+
+  test("token-budget selection B: the SECOND file's bytes are not dropped from the sum (would silently PASS if they were)", () => {
+    const r = runTB("token-budget-selection-second-file-dominates", "token-budget.txt");
+    // Correct sum: 5 (CLAUDE.md) + 500 (CONTEXT.md) = 505 > budget 50 -> FAIL.
+    // A checker that summed only ALWAYS_LOADED[0] would see 5 <= 50 and wrongly PASS.
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("~505 tokens > budget 50");
+  });
+
+  // --- B1 (outside review round 1): the estimate is a property of CONTENT, not of the checkout's
+  // line-ending convention. token-budget-crlf/ and token-budget-lf/ hold the SAME logical text (5
+  // lines then 3 lines) -- one stored CRLF (raw bytes 15+9=24), one stored LF (raw bytes 10+6=16).
+  // Both normalise to 16 bytes, so both must report the identical ~16-token estimate against the
+  // same budget=16. Under the pre-fix `statSync(...).size` implementation this reddens: the CRLF
+  // fixture's raw 24 bytes > budget 16 FAILs while the LF sibling's raw 16 <= 16 PASSes -- a
+  // checkout-dependent divergence over identical content.
+  //
+  // The two `.claude/*.md` files are written HERE, at test time, rather than committed as raw CRLF
+  // bytes: this repo runs `core.autocrlf=true` with no per-path `.gitattributes` override for `.md`,
+  // so committing literal `\r\n` bytes would let git's own clean/smudge filters silently normalise
+  // them on the very next checkout -- destroying the CRLF/LF distinction this test exists to prove,
+  // on the same class of checkout-dependent surprise B1 itself is about. Writing them at run time
+  // guarantees the exact bytes on every host, unconditionally.
+  test("token-budget B1 (regression guard): CRLF and LF checkouts of the SAME content yield the SAME estimate", () => {
+    const crlfDir = `${FX}token-budget-crlf/.claude`;
+    const lfDir = `${FX}token-budget-lf/.claude`;
+    mkdirSync(crlfDir, { recursive: true });
+    mkdirSync(lfDir, { recursive: true });
+    writeFileSync(`${crlfDir}/CLAUDE.md`, "A\r\nB\r\nC\r\nD\r\nE\r\n");
+    writeFileSync(`${crlfDir}/CONTEXT.md`, "F\r\nG\r\nH\r\n");
+    writeFileSync(`${lfDir}/CLAUDE.md`, "A\nB\nC\nD\nE\n");
+    writeFileSync(`${lfDir}/CONTEXT.md`, "F\nG\nH\n");
+
+    const crlf = runTB("token-budget-crlf", "token-budget.txt");
+    const lf = runTB("token-budget-lf", "token-budget.txt");
+    expect(crlf.exitCode).toBe(0);
+    expect(lf.exitCode).toBe(0);
+    expect(crlf.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~16 tokens <= budget 16");
+    expect(lf.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~16 tokens <= budget 16");
+  });
+
+  // --- parseTokenBudget unit coverage (fast, no filesystem) ----------------------------------------
+  test("parseTokenBudget: a partial PENDING sentinel is malformed, not treated as pending or as real values", () => {
+    const r = parseTokenBudget("50 PENDING 2026-09-28 reason");
+    expect(r.kind).toBe("malformed");
+  });
+
+  test("parseTokenBudget: more than one data row is malformed (never silently takes the first/last)", () => {
+    const r = parseTokenBudget("50 1 2026-09-28 a\n60 1 2026-09-28 b\n");
+    expect(r.kind).toBe("malformed");
+  });
+
+  test("parseTokenBudget: comments and blank lines around a single valid row are ignored", () => {
+    const r = parseTokenBudget("# comment\n\n50 1 2026-09-28 a real reason\n\n");
+    expect(r).toEqual({ kind: "set", budgetTokens: 50, ratio: 1, adoptedAt: "2026-09-28", reason: "a real reason" });
+  });
+
+  // --- headless calibration (TASK-364 phase 2, outside review round 2): error handling, no real CLI --
+  // An injectable `HeadlessRunner` stands in for a real `claude -p` spawn, so every case below runs
+  // with zero process spawns and zero API/subscription cost. `token-budget-under`'s `.claude/` pair
+  // (CLAUDE.md 40 bytes, CONTEXT.md 60 bytes, both plain ASCII) is reused as the always-loaded root --
+  // known byte counts make the arithmetic in the sibling control checkable by hand.
+  const TB_FX = `${FX}token-budget-under`;
+  function usage(totalInput: number): HeadlessUsage {
+    return { input_tokens: totalInput, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
+  }
+
+  test("headless calibration (must-FAIL): baseline instability is named and never adopted", async () => {
+    let call = 0;
+    const runner = async (_p: string) => {
+      call++;
+      // Two identical baseline prompts measuring DIFFERENT totals -- exactly the drift this check
+      // exists to catch before it corrupts every file delta computed against the baseline.
+      return usage(call === 1 ? 100 : 105);
+    };
+    const result = await runHeadlessCalibration(TB_FX, runner);
+    expect(result.exitCode).toBe(2);
+    expect(result.lines.join("\n")).toContain("baseline-unstable");
+  });
+
+  test("headless calibration (must-FAIL): a missing usage field surfaces through the SAME parser a real spawn's stdout would hit", async () => {
+    let call = 0;
+    const runner = async (_p: string): Promise<HeadlessUsage> => {
+      call++;
+      if (call <= 2) return usage(100); // stable baseline
+      // The delimiter-cost call "returns" canned JSON missing cache_read_input_tokens, parsed
+      // through parseHeadlessUsage() itself -- the identical code path runClaudeHeadlessReal() would
+      // hit on a real spawn's malformed stdout, just without spawning a process to get there.
+      return parseHeadlessUsage(JSON.stringify({ usage: { input_tokens: 5, cache_creation_input_tokens: 10 } }));
+    };
+    const result = await runHeadlessCalibration(TB_FX, runner);
+    expect(result.exitCode).toBe(2);
+    expect(result.lines.join("\n")).toContain("usable usage fields");
+  });
+
+  test("headless calibration sibling control: a stable baseline + complete usage everywhere succeeds", async () => {
+    let call = 0;
+    const runner = async (_p: string) => {
+      call++;
+      if (call <= 2) return usage(100); // baseline x2, stable
+      if (call === 3) return usage(105); // delimiter cost = 5
+      if (call === 4) return usage(100 + 5 + 40); // .claude/CLAUDE.md: 40 tokens
+      return usage(100 + 5 + 60); // .claude/CONTEXT.md: 60 tokens
+    };
+    const result = await runHeadlessCalibration(TB_FX, runner);
+    const text = result.lines.join("\n");
+    expect(result.exitCode).toBe(0);
+    expect(text).not.toContain("FAIL");
+    expect(text).toContain("baseline stable at 100 total input tokens");
+    expect(text).toContain("pooled ratio 1.000 bytes/token over 100 bytes / 100 tokens");
+  });
+
+  test("parseHeadlessUsage (must-FAIL): a missing usage field throws a named error", () => {
+    expect(() =>
+      parseHeadlessUsage(JSON.stringify({ usage: { input_tokens: 5, cache_creation_input_tokens: 10 } })),
+    ).toThrow(/usable usage fields/);
+  });
+
+  test("parseHeadlessUsage (must-FAIL): invalid JSON throws a named error", () => {
+    expect(() => parseHeadlessUsage("not valid json")).toThrow(/not valid JSON/);
+  });
+
+  test("parseHeadlessUsage sibling control: a complete usage object parses cleanly", () => {
+    const u = parseHeadlessUsage(JSON.stringify({ usage: { input_tokens: 5, cache_creation_input_tokens: 10, cache_read_input_tokens: 20 } }));
+    expect(u).toEqual({ input_tokens: 5, cache_creation_input_tokens: 10, cache_read_input_tokens: 20 });
   });
 });

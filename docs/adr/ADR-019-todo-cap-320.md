@@ -2,7 +2,7 @@
 id: ADR-019
 tags: [docs, process]
 domain: doc-standard
-status: accepted
+status: superseded
 related: [ADR-015, ADR-017, ADR-007]
 ---
 

@@ -1,0 +1,5 @@
+# evals/doc-caps.test.ts writes .claude/CLAUDE.md + .claude/CONTEXT.md here at test time with
+# explicit \n bytes (B1, outside review round 1) -- never committed, because this host's
+# core.autocrlf=true would otherwise smudge a committed LF file back to CRLF on the next checkout,
+# destroying the exact distinction this fixture proves.
+.claude/
