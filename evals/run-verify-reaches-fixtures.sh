@@ -1,5 +1,7 @@
 #!/bin/sh
-# run-verify-reaches-fixtures.sh -- fixtures for scripts/lib/check-verify-reaches.sh (SPRINT-082 T3).
+# run-verify-reaches-fixtures.sh -- fixtures for scripts/lib/check-verify-reaches.ts (SPRINT-082 T3;
+# re-pointed from the retired .sh at SPRINT-109 T4, TASK-387 -- same finding names, same
+# EXISTS/REACHES semantics, invoked with `bun` instead of `sh`).
 #
 # The checker exists because §9's existing rule (S9.VERIFYCLAUSE) asks whether a ticked criterion NAMES
 # a verification method, and passes on a method that cannot examine its own subject. L-136's fourth
@@ -28,38 +30,53 @@
 # front. No prior case in this family covered that shape; this one is retained so it cannot regress
 # silently a second time.
 #
-# Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-verify-reaches-fixtures.sh
+# The runner is dependency-free POSIX sh, no git needed; the checker it drives is TypeScript run by
+# Bun (owner ruling, SPRINT-109 T4 -- the SAME shape run-dod-delta-fixtures.sh already uses). A
+# missing runtime FAILs rather than skips (TD-101/ADR-037): a skip reads exactly like a pass.
+# Run bare: sh evals/run-verify-reaches-fixtures.sh
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repo_root=$(CDPATH= cd -- "$here/.." && pwd)
-checker="$repo_root/scripts/lib/check-verify-reaches.sh"
+checker="$repo_root/scripts/lib/check-verify-reaches.ts"
 fx="$here/fixtures/verify-reaches"
 . "$here/lib/harness-common.sh"
+
+if ! command -v bun >/dev/null 2>&1; then
+  echo "FAIL harness: bun not found on PATH -- the verify-reaches checker cannot run, and skipping it"
+  echo "              silently would report this suite green with verify-reaches unexercised"
+  exit 2
+fi
+[ -f "$checker" ] || { echo "FAIL harness: checker not found at $checker"; exit 2; }
+
+# CWD = repo root, matching qa-check.sh's own invocation of this checker: bare-basename/relative
+# Verify: clause targets (this fixture family's own scripts/, evals/fixtures/... paths) resolve
+# against the process's working directory, exactly as the retired .sh version required.
+cd "$repo_root" || { echo "FAIL harness: cannot cd to repo root $repo_root"; exit 2; }
 
 fail=0
 
 # --- case 1: criterion claims docs/beta/, method examines only docs/alpha/ -> FAIL, named --------
 run_case_anywhere "unreachable-target-fails" 1 "verify-does-not-reach-target" -- \
-  sh "$checker" "$fx/unreachable-target/docs/sprint/SPRINT-960-unreachable.md"
+  bun "$checker" "$fx/unreachable-target/docs/sprint/SPRINT-960-unreachable.md"
 
 # --- case 2: criterion claims docs/alpha/, method examines docs/alpha/ -> PASS -------------------
 # Asserts the DENOMINATOR too: a control reporting 0 examined would be vacuously green (L-156).
 run_case_anywhere "reachable-target-passes" 0 "1 claimed target(s) confirmed reachable" -- \
-  sh "$checker" "$fx/reachable-target/docs/sprint/SPRINT-961-reachable.md"
+  bun "$checker" "$fx/reachable-target/docs/sprint/SPRINT-961-reachable.md"
 
 # --- case 3: the named method is not in the repo at all -> FAIL, named (the EXISTS half) ---------
 run_case_anywhere "method-absent-fails" 1 "verify-method-absent" -- \
-  sh "$checker" "$fx/method-absent/docs/sprint/SPRINT-962-absent.md"
+  bun "$checker" "$fx/method-absent/docs/sprint/SPRINT-962-absent.md"
 
 # --- case 4: a judgment method (no script named) -> PASS, counted, never pressured ---------------
 run_case_anywhere "judgment-only-passes" 0 "judgment-method clause(s) left to G2" -- \
-  sh "$checker" "$fx/judgment-only/docs/sprint/SPRINT-963-judgment.md"
+  bun "$checker" "$fx/judgment-only/docs/sprint/SPRINT-963-judgment.md"
 
 # --- case 5: one Plan, two clauses, one violation -> FAIL on that clause only --------------------
 # Guards per-clause reading: a reachable target elsewhere must not vouch for an unreachable one here.
 run_case_anywhere "mixed-one-bad-fails" 1 "verify-does-not-reach-target" -- \
-  sh "$checker" "$fx/mixed-one-bad/docs/sprint/SPRINT-964-mixed.md"
+  bun "$checker" "$fx/mixed-one-bad/docs/sprint/SPRINT-964-mixed.md"
 
 # --- case 6: the method's PROSE names the target, its code does not -> FAIL, named ---------------
 # The only case holding the comment-stripping line in place. Found by T3's own seeded-break proof:
@@ -68,13 +85,13 @@ run_case_anywhere "mixed-one-bad-fails" 1 "verify-does-not-reach-target" -- \
 # never examines -- the self-describing-corpus failure (L-108) that turned this family's must-FAIL
 # green on its first run.
 run_case_anywhere "prose-mentions-path-fails" 1 "verify-does-not-reach-target" -- \
-  sh "$checker" "$fx/prose-mentions-path/docs/sprint/SPRINT-966-prose.md"
+  bun "$checker" "$fx/prose-mentions-path/docs/sprint/SPRINT-966-prose.md"
 
 # --- case 7: an ARCHIVED sprint carrying the violation -> skipped, exit 0 ------------------------
 mkdir -p "$fx/archived/docs/sprint/archive"
 cp "$fx/unreachable-target/docs/sprint/SPRINT-960-unreachable.md" \
    "$fx/archived/docs/sprint/archive/SPRINT-965-archived.md" 2>/dev/null
-out=$(sh "$checker" "$fx/archived/docs/sprint/archive/SPRINT-965-archived.md" 2>&1); rc=$?
+out=$(bun "$checker" "$fx/archived/docs/sprint/archive/SPRINT-965-archived.md" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && [ -z "$out" ]; then
   echo "PASS fixture(archived-out-of-scope): exit 0 with no output -- archived sprint not re-checked"
 else
@@ -83,19 +100,19 @@ fi
 
 # --- case 8: no arguments -> the denominator note, never a silent pass ---------------------------
 run_case_anywhere "no-input-reports-nothing-verified" 0 "nothing verified" -- \
-  sh "$checker"
+  bun "$checker"
 
 # --- SPRINT-100 T1 (TD-097 -- EXISTS leg) -----------------------------------------------------
 # case 9: a bare basename naming the repo's dominant convention, pointed at its motivating
 # artifact -- TD-097's own Evidence (SPRINT-087 T4 DoD 1). Before the fix this read
 # verify-method-absent for a script that is, in fact, present.
 run_case_anywhere "basename-resolves-passes" 0 "0 claimed target(s) confirmed reachable" -- \
-  sh "$checker" "$fx/basename-resolves/docs/sprint/SPRINT-967-basename-resolves.md"
+  bun "$checker" "$fx/basename-resolves/docs/sprint/SPRINT-967-basename-resolves.md"
 
 # case 10: a bare basename resolving against NEITHER the current directory NOR the known roots ->
 # a DIFFERENT named finding from verify-method-absent (TD-097's fix must not collapse the two).
 run_case_anywhere "basename-unresolvable-fails" 1 "verify-method-unresolvable" -- \
-  sh "$checker" "$fx/basename-unresolvable/docs/sprint/SPRINT-968-unresolvable.md"
+  bun "$checker" "$fx/basename-unresolvable/docs/sprint/SPRINT-968-unresolvable.md"
 
 # case 11 (DoD3 + DoD4 "archive arm"): the SAME motivating artifact as case 9, reached through the
 # archive exemption instead of a fresh file -- proves the exemption is now a retained FIXTURE, not
@@ -106,7 +123,7 @@ run_case_anywhere "basename-unresolvable-fails" 1 "verify-method-unresolvable" -
 mkdir -p "$fx/archive-arm/docs/sprint/archive"
 cp "$fx/basename-resolves/docs/sprint/SPRINT-967-basename-resolves.md" \
    "$fx/archive-arm/docs/sprint/archive/SPRINT-967-basename-resolves.md" 2>/dev/null
-out=$(sh "$checker" "$fx/archive-arm/docs/sprint/archive/SPRINT-967-basename-resolves.md" 2>&1); rc=$?
+out=$(bun "$checker" "$fx/archive-arm/docs/sprint/archive/SPRINT-967-basename-resolves.md" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && [ -z "$out" ]; then
   echo "PASS fixture(archive-arm-basename-skipped): exit 0 with no output -- the basename-resolves motivating artifact, reached via the archive arm, is still skipped rather than re-litigated"
 else
@@ -118,30 +135,64 @@ fi
 # reference to the target PRUNES it (a `case … ) continue` arm, a `grep -v`) rather than examining
 # it; a plain substring test reads this as "confirmed reachable" today.
 run_case_anywhere "exclusion-idiom-fails" 1 "verify-does-not-reach-target" -- \
-  sh "$checker" "$fx/exclusion-idiom/docs/sprint/SPRINT-970-exclusion.md"
+  bun "$checker" "$fx/exclusion-idiom/docs/sprint/SPRINT-970-exclusion.md"
 run_case_anywhere "exclusion-idiom-control-passes" 0 "1 claimed target(s) confirmed reachable" -- \
-  sh "$checker" "$fx/exclusion-idiom-control/docs/sprint/SPRINT-971-exclusion-control.md"
+  bun "$checker" "$fx/exclusion-idiom-control/docs/sprint/SPRINT-971-exclusion-control.md"
 
 # case 14/15: the PREFIX-COLLISION shape (TD-087 (b): target `src/db` matches a script touching
 # only `src/dbtools/`) and its sibling control, differing in exactly one path component.
 run_case_anywhere "prefix-collision-fails" 1 "verify-does-not-reach-target" -- \
-  sh "$checker" "$fx/prefix-collision/docs/sprint/SPRINT-972-prefix.md"
+  bun "$checker" "$fx/prefix-collision/docs/sprint/SPRINT-972-prefix.md"
 run_case_anywhere "prefix-collision-control-passes" 0 "1 claimed target(s) confirmed reachable" -- \
-  sh "$checker" "$fx/prefix-collision-control/docs/sprint/SPRINT-973-prefix-control.md"
+  bun "$checker" "$fx/prefix-collision-control/docs/sprint/SPRINT-973-prefix-control.md"
 
 # case 16 (DoD4 "a clause naming two methods"): pointed at its motivating artifact -- TD-087's own
 # Evidence (SPRINT-084 T5 DoD, line 135). Two scripts named in one clause; before the fix the
 # checker paired them against each other as target/method, producing two FAILs against a
 # criterion that genuinely passed (recorded in that sprint's own Retro).
 run_case_anywhere "two-method-clause-passes" 0 "0 claimed target(s) confirmed reachable" -- \
-  sh "$checker" "$fx/two-method-clause/docs/sprint/SPRINT-969-two-method.md"
+  bun "$checker" "$fx/two-method-clause/docs/sprint/SPRINT-969-two-method.md"
 
 # case 17: REGRESSION GUARD, found by the outside reviewer (ADR-029), not by any case above. A
 # target reached only through a shell-variable-prefixed path (`$here/lib/...`) -- this repo's own
 # `conformance.sh` idiom, reproduced live against archived `SPRINT-079:64` -- must still read as
 # reached. An earlier lf_line_touches draft tokenised "$here/..." as one fused token and missed it.
 run_case_anywhere "variable-prefix-reach-passes" 0 "1 claimed target(s) confirmed reachable" -- \
-  sh "$checker" "$fx/variable-prefix-reach/docs/sprint/SPRINT-974-variable-prefix.md"
+  bun "$checker" "$fx/variable-prefix-reach/docs/sprint/SPRINT-974-variable-prefix.md"
+
+# =====================================================================================================
+# SPRINT-109 T4 (TASK-387): the member-file arm. A v2 sprint's own Plan text carries no mechanical
+# clause at all -- criteria live in each member task file's own Done-when list (docs/work/, ADR-047).
+# Each fixture below is its own self-contained root (its own docs/sprint/ + docs/work/), so member
+# resolution never touches this repo's REAL docs/work/ store (Hard rule: this task may not create or
+# edit docs/work/**/TASK-*.md at the repo root) -- see check-verify-reaches.ts's memberRootFor().
+# =====================================================================================================
+
+# case 18: retained must-FAIL -- a MEMBER's own Verify: clause is unreachable, named against the
+# MEMBER's path, not the sprint file's.
+run_case_anywhere "member-must-fail" 1 "verify-does-not-reach-target: docs/work/todo/TASK-980-member-must-fail.md" -- \
+  bun "$checker" "$fx/member-must-fail/docs/sprint/SPRINT-980-member-must-fail.md"
+
+# case 19: sibling control -- identical shape, the member's criterion claims the REACHABLE target.
+run_case_anywhere "member-sibling-passes" 0 "1 claimed target(s) confirmed reachable" -- \
+  bun "$checker" "$fx/member-sibling/docs/sprint/SPRINT-981-member-sibling.md"
+
+# case 20 (L-186, selection-varying): the member is reached ONLY through resolveMembers()' `sprint:`
+# STAMP arm (no `## Members` listing at all) and sits in review/, not the todo/ every other case uses.
+run_case_anywhere "member-selection-stamp-arm-passes" 0 "1 claimed target(s) confirmed reachable" -- \
+  bun "$checker" "$fx/member-selection-stamp-arm/docs/sprint/SPRINT-982-member-stamp-arm.md"
+
+# case 21 (owner ruling B): a v2 sprint with TWO members and ZERO mechanical Verify: clauses between
+# them must still say so, by name and by count -- never a silent, indistinguishable-from-unexamined
+# PASS. This is the exact vacuous-pass shape T4 exists to close (the .sh version had no member concept
+# at all and said nothing here).
+run_case_anywhere "member-v2-no-clauses-not-vacuous" 0 "2 member(s), 0 mechanical Verify: clause(s): every criterion is a judgment tick" -- \
+  bun "$checker" "$fx/member-v2-no-clauses/docs/sprint/SPRINT-983-no-clauses.md"
+
+# case 22: `## Members` names an id that resolves to ZERO files -- a real finding (the population
+# itself, not a branch inside it -- L-186's own point), never a silent empty result.
+run_case_anywhere "member-resolution-empty-fails" 1 "verify-member-resolution-empty" -- \
+  bun "$checker" "$fx/member-resolution-empty/docs/sprint/SPRINT-984-resolution-empty.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "VERIFY-REACHES FIXTURES: all green"; else echo "VERIFY-REACHES FIXTURES: at least one FAIL"; fi

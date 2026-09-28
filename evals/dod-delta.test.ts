@@ -7,13 +7,18 @@ import { fileURLToPath } from "node:url";
 import {
   attributeClaim,
   checkDodDelta,
+  checkDodDeltaWithMembers,
   commitsInRange,
+  findNewMemberTicks,
   findNewTicks,
   findSprintDocPath,
   frontmatterValue,
   loadCommit,
+  loadMemberChanges,
   orderedSprintDocCandidates,
   parseDodSections,
+  parseDoneWhenItems,
+  parsePlanCites,
 } from "../scripts/lib/check-dod-delta.ts";
 
 const FIXTURES = fileURLToPath(new URL("fixtures/dod-delta/", import.meta.url));
@@ -678,5 +683,372 @@ describe("checkDodDelta -- SPRINT-102 T4 must-FAIL: real unmatched-shape subject
     expect(result.ok).toBe(false);
     expect(result.findings.map((f) => f.kind)).toEqual(["unmatched-task-shape"]);
     expect(result.findings[0]!.message).toContain(fx.subject);
+  });
+});
+
+// =================================================================================================
+// SPRINT-109 T4 (TASK-387): member-file DoD. A v2 sprint's `### Tn` blocks carry no `**DoD:**` list
+// at all -- the boxes live in each member task file's `## Done when` (docs/work/, ADR-047), and a Tn
+// maps to its member(s) via its own `Cites:` line. checkDodDelta/parseDodSections/attributeClaim
+// above are untouched (verified: all 61 pre-existing tests still pass unmodified); everything below
+// enters through the NEW member-aware surface, checkDodDeltaWithMembers, never through the old one.
+// =================================================================================================
+
+describe("parsePlanCites -- Tn -> the TASK ids in ITS OWN Cites: line", () => {
+  test("reads one Cites: line per Tn block, ignoring non-TASK tokens", () => {
+    const plan = [
+      "### T1 -- Amend STANDARD `[size: M]`",
+      "Layers: `spec/STANDARD.md`",
+      "Depends-on: none",
+      "Cites: `TASK-377` · EPIC-017 D1 · D2 · ADR-045",
+      "",
+      "Tier P. prose here.",
+      "",
+      "### T2 -- other `[size: M]`",
+      "Cites: `TASK-364` · ADR-015",
+    ].join("\n");
+    expect([...parsePlanCites(plan)]).toEqual([
+      ["T1", ["TASK-377"]],
+      ["T2", ["TASK-364"]],
+    ]);
+  });
+
+  test("a Tn block with no Cites: line maps to an empty array, never undefined-guessed", () => {
+    const plan = ["### T1 -- x `[]`", "Layers: y", "", "### T2 -- z `[]`", "Cites: `TASK-1`"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual([]);
+  });
+
+  test("a Cites: line naming TWO TASK ids keeps both", () => {
+    const plan = ["### T1 -- x `[]`", "Cites: `TASK-1` and `TASK-2`"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1", "TASK-2"]);
+  });
+});
+
+describe("parseDoneWhenItems / findNewMemberTicks -- the evidence-append tick convention", () => {
+  test("parses a member's own ## Done when section, folding a wrapped continuation line", () => {
+    const doc = [
+      "## Done when",
+      "",
+      "- [ ] first item wraps",
+      "      onto a continuation line",
+      "- [x] second item ✓ abc123: some evidence",
+      "",
+      "## Touches",
+      "x",
+    ].join("\n");
+    expect(parseDoneWhenItems(doc)).toEqual([
+      { text: "first item wraps onto a continuation line", checked: false },
+      { text: "second item ✓ abc123: some evidence", checked: true },
+    ]);
+  });
+
+  test("a file with no ## Done when section returns []", () => {
+    expect(parseDoneWhenItems("## Touches\nx\n")).toEqual([]);
+  });
+
+  test("a tick that APPENDS evidence to the same line still matches its own pre-tick self", () => {
+    const oldC = ["## Done when", "", "- [ ] first thing", "- [ ] second thing"].join("\n");
+    const newC = [
+      "## Done when",
+      "",
+      "- [x] first thing ✓ abc123: evidence here",
+      "- [ ] second thing",
+    ].join("\n");
+    expect(findNewMemberTicks(oldC, newC)).toEqual([
+      { text: "first thing ✓ abc123: evidence here", checked: true },
+    ]);
+  });
+
+  test("an item already checked (with its own evidence) in OLD is never re-reported as new", () => {
+    const oldC = ["## Done when", "", "- [x] done already ✓ xyz: e1"].join("\n");
+    const newC = ["## Done when", "", "- [x] done already ✓ xyz: e1"].join("\n");
+    expect(findNewMemberTicks(oldC, newC)).toEqual([]);
+  });
+});
+
+describe("checkDodDeltaWithMembers -- must-FAIL: a member tick outside the claimed Tn's Cites", () => {
+  const sprint = [
+    "### T1 -- x `[]`",
+    "Cites: `TASK-900`",
+    "",
+    "### T2 -- y `[]`",
+    "Cites: `TASK-901`",
+  ].join("\n");
+
+  test("reddens with a named unattributed-tick, naming the foreign member id, its path and text", () => {
+    const result = checkDodDeltaWithMembers("sprint(900) T1: some work", null, sprint, sprint, [
+      {
+        id: "TASK-900",
+        path: "docs/work/todo/TASK-900-x.md",
+        oldContent: "## Done when\n\n- [ ] own box",
+        newContent: "## Done when\n\n- [x] own box ✓ sha1: ev",
+      },
+      {
+        id: "TASK-901",
+        path: "docs/work/todo/TASK-901-y.md",
+        oldContent: "## Done when\n\n- [ ] foreign box",
+        newContent: "## Done when\n\n- [x] foreign box ✓ sha1: ev",
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    expect(result.findings).toEqual([
+      {
+        kind: "unattributed-tick",
+        message:
+          'dod-delta: commit claims T1 but ticked TASK-901\'s Done-when item it never named (docs/work/todo/TASK-901-y.md): "foreign box ✓ sha1: ev"',
+      },
+    ]);
+  });
+
+  test("sibling control: the same shape, only the CITED member ticked, stays green", () => {
+    const result = checkDodDeltaWithMembers("sprint(900) T1: some work", null, sprint, sprint, [
+      {
+        id: "TASK-900",
+        path: "docs/work/todo/TASK-900-x.md",
+        oldContent: "## Done when\n\n- [ ] own box",
+        newContent: "## Done when\n\n- [x] own box ✓ sha1: ev",
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+    expect(result.note).toMatch(/member tick\(s\) match Cites \(TASK-900\)/);
+  });
+});
+
+describe("checkDodDeltaWithMembers -- v2 sprint, no inline Plan DoD: must NOT pass vacuously", () => {
+  // The legacy (v1) path alone finds ZERO `**DoD:**` items in a v2 Plan block and returns a bare
+  // `{ok:true, findings:[]}` with NO note -- indistinguishable from "nothing examined". Asserting a
+  // note naming the member correlation is what proves this run actually looked at something.
+  test("a v2 Plan block (Cites only, no **DoD:** list) still examines the member's own box", () => {
+    const sprint = ["### T1 -- x `[size: M]`", "Layers: y", "Cites: `TASK-910`", "", "**Acceptance:** prose only."].join(
+      "\n",
+    );
+    const legacyAlone = checkDodDelta("sprint(910) T1: work", null, sprint, sprint);
+    expect(legacyAlone).toEqual({ ok: true, findings: [] }); // the vacuous-pass shape T4 exists to fix
+
+    const result = checkDodDeltaWithMembers("sprint(910) T1: work", null, sprint, sprint, [
+      {
+        id: "TASK-910",
+        path: "docs/work/todo/TASK-910-x.md",
+        oldContent: "## Done when\n\n- [ ] the thing",
+        newContent: "## Done when\n\n- [x] the thing ✓ sha1: ev",
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    expect(result.note).toBeDefined();
+    expect(result.note).toMatch(/member tick\(s\) match Cites/);
+  });
+});
+
+describe("checkDodDeltaWithMembers -- COORD/unscoped exemption is PRESERVED, not loosened (rule C)", () => {
+  test("a bare sprint(NNN): commit ticking a member's box stays exempt (dispatch.md's own tick step)", () => {
+    const sprint = ["### T1 -- x `[]`", "Cites: `TASK-920`"].join("\n");
+    const result = checkDodDeltaWithMembers("sprint(920): tick TASK-920's box", null, sprint, sprint, [
+      {
+        id: "TASK-920",
+        path: "docs/work/todo/TASK-920-x.md",
+        oldContent: "## Done when\n\n- [ ] the thing",
+        newContent: "## Done when\n\n- [x] the thing ✓ sha1: ev",
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+    expect(result.note).toMatch(/coordinator-scoped/);
+  });
+
+  test("sibling: the SAME COORD commit ticking a NEVER-cited member id is still exempt (unchanged rule)", () => {
+    const sprint = ["### T1 -- x `[]`", "Cites: `TASK-920`"].join("\n");
+    const result = checkDodDeltaWithMembers("sprint(920): tick an unrelated box", null, sprint, sprint, [
+      {
+        id: "TASK-999",
+        path: "docs/work/todo/TASK-999-z.md",
+        oldContent: "## Done when\n\n- [ ] the thing",
+        newContent: "## Done when\n\n- [x] the thing ✓ sha1: ev",
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    expect(result.note).toMatch(/coordinator-scoped/);
+  });
+});
+
+describe("checkDodDeltaWithMembers -- no sprint doc resolvable: a skip, never a guessed foreign flag", () => {
+  test("member ticks present but neither old nor new sprint content resolved -- reported, not FAILed", () => {
+    const result = checkDodDeltaWithMembers("sprint(930) T1: work", null, "", null, [
+      {
+        id: "TASK-930",
+        path: "docs/work/todo/TASK-930-x.md",
+        oldContent: "## Done when\n\n- [ ] the thing",
+        newContent: "## Done when\n\n- [x] the thing ✓ sha1: ev",
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    expect(result.note).toMatch(/no sprint doc resolved for T1 -- Cites not checked/);
+  });
+});
+
+// --- selection-varying (L-186): the member-path regex must reach EVERY status folder, not just
+// todo/ or in_progress/ -- a member cited from review/ (mid-lifecycle) or done/ (already closed, a
+// late correction) is the OTHER arm of the six-folder population dispatch.md defines. ---------------
+
+describe("loadMemberChanges -- MEMBER_PATH_RE reaches every docs/work/ status folder (L-186)", () => {
+  function repoWithMemberIn(folder: string): { dir: string; head: string; path: string } {
+    const dir = initRepo();
+    const path = `docs/work/${folder}/TASK-940-x.md`;
+    commitFile(dir, path, "## Done when\n\n- [ ] the thing\n", "sprint(940): scaffold member");
+    writeFileSync(join(dir, path), "## Done when\n\n- [x] the thing ✓ sha1: ev\n", "utf8");
+    execFileSync("git", ["add", path], { cwd: dir });
+    execFileSync("git", ["commit", "-q", "-m", "sprint(940) T1: tick it"], { cwd: dir });
+    const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: dir, encoding: "utf8" }).trim();
+    return { dir, head, path };
+  }
+
+  for (const folder of ["backlog", "todo", "in_progress", "review", "done", "cancel"]) {
+    test(`a member under docs/work/${folder}/ is resolved and its tick examined`, () => {
+      const { dir, head, path } = repoWithMemberIn(folder);
+      try {
+        const changed = execFileSync("git", ["show", "--name-only", "--format=", head], { cwd: dir, encoding: "utf8" })
+          .split(/\r?\n/)
+          .filter(Boolean);
+        const changes = loadMemberChanges(dir, head, changed);
+        expect(changes).toHaveLength(1);
+        expect(changes[0]!.id).toBe("TASK-940");
+        expect(changes[0]!.path).toBe(path);
+        expect(findNewMemberTicks(changes[0]!.oldContent ?? "", changes[0]!.newContent)).toEqual([
+          { text: "the thing ✓ sha1: ev", checked: true },
+        ]);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+  }
+});
+
+// --- retained, git-history end-to-end fixtures (member-file shape: a real plan_commit..HEAD walk
+// over a sprint doc PLUS member task files, exactly as SPRINT-109's own real history is shaped). ----
+
+describe("end-to-end (real git history) -- must-FAIL: a foreign member tick through loadCommit + loadMemberChanges", () => {
+  test("a commit claiming T1 that also ticks T2's cited member's box reddens, naming that member", () => {
+    const dir = initRepo();
+    try {
+      const sprintPath = "docs/sprint/SPRINT-950-member-e2e.md";
+      const plan = [
+        "---",
+        "sprint: 950",
+        "plan_commit: [pending]",
+        "---",
+        "",
+        "## Plan",
+        "",
+        "### T1 -- x `[size: S]`",
+        "Cites: `TASK-950`",
+        "",
+        "### T2 -- y `[size: S]`",
+        "Cites: `TASK-951`",
+        "",
+      ].join("\n");
+      commitFile(dir, sprintPath, plan, "sprint(950): plan locked");
+      commitFile(dir, "docs/work/todo/TASK-950-x.md", "## Done when\n\n- [ ] own box\n", "sprint(950): scaffold TASK-950");
+      commitFile(dir, "docs/work/todo/TASK-951-y.md", "## Done when\n\n- [ ] foreign box\n", "sprint(950): scaffold TASK-951");
+
+      // The must-FAIL commit: claims T1, ticks its OWN cited member AND T2's cited member.
+      writeFileSync(
+        join(dir, "docs/work/todo/TASK-950-x.md"),
+        "## Done when\n\n- [x] own box ✓ aaa: ev\n",
+        "utf8",
+      );
+      writeFileSync(
+        join(dir, "docs/work/todo/TASK-951-y.md"),
+        "## Done when\n\n- [x] foreign box ✓ bbb: ev\n",
+        "utf8",
+      );
+      // Real accepted-tick commits also touch the sprint doc's own log/Files-Changed table in the
+      // SAME commit (ab03653/aceff73 both do) -- this is what lets checkDodDeltaWithMembers resolve
+      // Tn's Cites at all; a commit that ticks a member WITHOUT touching the sprint doc is the
+      // documented "Cites not checked" skip, covered separately above, not this fixture's claim.
+      writeFileSync(join(dir, sprintPath), plan + "\n<!-- Files Changed: TASK-950, TASK-951 -->\n", "utf8");
+      execFileSync(
+        "git",
+        ["add", "docs/work/todo/TASK-950-x.md", "docs/work/todo/TASK-951-y.md", sprintPath],
+        { cwd: dir },
+      );
+      execFileSync("git", ["commit", "-q", "-m", "sprint(950) T1: tick own box, accidentally tick a foreign one too"], {
+        cwd: dir,
+      });
+      const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: dir, encoding: "utf8" }).trim();
+
+      const commit = loadCommit(dir, head);
+      const changed = execFileSync("git", ["show", "--name-only", "--format=", head], { cwd: dir, encoding: "utf8" })
+        .split(/\r?\n/)
+        .filter(Boolean);
+      const memberChanges = loadMemberChanges(dir, head, changed);
+      const result = checkDodDeltaWithMembers(commit.subject, commit.taskTrailer, commit.oldContent, commit.newContent, memberChanges);
+      expect(result.ok).toBe(false);
+      expect(result.findings).toEqual([
+        {
+          kind: "unattributed-tick",
+          message:
+            'dod-delta: commit claims T1 but ticked TASK-951\'s Done-when item it never named (docs/work/todo/TASK-951-y.md): "foreign box ✓ bbb: ev"',
+        },
+      ]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("sibling control: the same real-history shape, only the cited member ticked, stays green", () => {
+    const dir = initRepo();
+    try {
+      const sprintPath = "docs/sprint/SPRINT-951-member-e2e-sibling.md";
+      const plan = ["---", "sprint: 951", "plan_commit: [pending]", "---", "", "## Plan", "", "### T1 -- x `[size: S]`", "Cites: `TASK-952`", ""].join(
+        "\n",
+      );
+      commitFile(dir, sprintPath, plan, "sprint(951): plan locked");
+      commitFile(dir, "docs/work/todo/TASK-952-x.md", "## Done when\n\n- [ ] own box\n", "sprint(951): scaffold TASK-952");
+
+      writeFileSync(join(dir, "docs/work/todo/TASK-952-x.md"), "## Done when\n\n- [x] own box ✓ ccc: ev\n", "utf8");
+      writeFileSync(join(dir, sprintPath), plan + "\n<!-- Files Changed: TASK-952 -->\n", "utf8");
+      execFileSync("git", ["add", "docs/work/todo/TASK-952-x.md", sprintPath], { cwd: dir });
+      execFileSync("git", ["commit", "-q", "-m", "sprint(951) T1: tick own box only"], { cwd: dir });
+      const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: dir, encoding: "utf8" }).trim();
+
+      const commit = loadCommit(dir, head);
+      const changed = execFileSync("git", ["show", "--name-only", "--format=", head], { cwd: dir, encoding: "utf8" })
+        .split(/\r?\n/)
+        .filter(Boolean);
+      const memberChanges = loadMemberChanges(dir, head, changed);
+      const result = checkDodDeltaWithMembers(commit.subject, commit.taskTrailer, commit.oldContent, commit.newContent, memberChanges);
+      expect(result.ok).toBe(true);
+      expect(result.findings).toEqual([]);
+      expect(result.note).toMatch(/member tick\(s\) match Cites \(TASK-952\)/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+// --- the real motivating artifact (L-166): SPRINT-109 itself, ab03653 and aceff73 ----------------
+
+describe("end-to-end (real repo history) -- SPRINT-109's own ab03653/aceff73 (owner ruling D)", () => {
+  const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
+
+  function realResult(ref: string) {
+    const commit = loadCommit(REPO_ROOT, ref);
+    const changed = execFileSync("git", ["show", "--name-only", "--format=", ref], { cwd: REPO_ROOT, encoding: "utf8" })
+      .split(/\r?\n/)
+      .filter(Boolean);
+    const memberChanges = loadMemberChanges(REPO_ROOT, ref, changed);
+    return checkDodDeltaWithMembers(commit.subject, commit.taskTrailer, commit.oldContent, commit.newContent, memberChanges);
+  }
+
+  test("ab03653 (T1 accepted -- tick TASK-377): cited by T1, agrees, stays green", () => {
+    const result = realResult("ab03653");
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+  });
+
+  test("aceff73 (T3 accepted -- tick TASK-382): cited by T3, agrees, stays green", () => {
+    const result = realResult("aceff73");
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
   });
 });
