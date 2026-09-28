@@ -101,3 +101,10 @@ had rewritten §15 as waived. Owner accepted the §11 trigger. Revise `f8027d8`:
 citations resolve through git (the TECH-DEBT precedent), Backlog wording → task files. Coordinator re-check: all four confirmed on the branch.
 Reconcile 100/100 · doc-caps output identical (TODO.md 531>320 soft, cap still derived) · prose-density 32/0 · engine 73 FAIL before and after.
 Hand-off list written into TASK-383. Skipped: the review's minor note that the CHANGELOG cites repo tooling (earlier entries do the same).
+
+### 2026-09-28 | progress | T2 dispatched (phase 1). Layers adds spec/CHANGELOG.md and scripts/lib/token-budget.txt
+T1 has landed, so T2's `spec/STANDARD.md` dependency is met. Its cap-semantics change folds into the unreleased 0.12.0 entry,
+so `spec/CHANGELOG.md` joins its Layers. The ratchet needs a recorded adoption value, so a new `scripts/lib/token-budget.txt` does too.
+Next ADR id derived two ways: `docs/adr/` max = ADR-047 = `DECISIONS.md` max, so the new one is ADR-048. `ANTHROPIC_API_KEY` is
+absent from the session environment. Calibration is therefore an **owner action**: phase 1 builds everything plus `--calibrate`
+and stops; the owner runs one command; phase 2 records the measured ratio and the adoption budget.
