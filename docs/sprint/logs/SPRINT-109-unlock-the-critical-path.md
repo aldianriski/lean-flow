@@ -47,3 +47,8 @@ The first promote entry named four of the five checklist lines, but not doc-agin
 Other conformance FAILs at this commit predate the promote: 32 `update-trigger-absent` / 28 `ownership-header-field-missing`
 on store task files (the engine doesn't yet know the store, `TASK-383`) · ADR-043/044 · the CHANGELOG rotation · 2 tracked fixture logs.
 Verdict, not exit code: `S10.TDAGING` PASS (99 named) · `S11.TDDELETE` PASS, which is TD-187's blind spot and not a real clearance.
+
+### 2026-09-28 | promote | owner ruling: TODO.md's cap breach is accepted until TASK-380
+`S11.TODOCAP` (`todo-over-cap-at-promote`, 531 > 320) is a **ruled standing breach** (owner, 2026-09-28).
+`TASK-380` deletes `TODO.md` (EPIC-017 Closed-when 2), and trimming a file that is about to be deleted would be
+the diet EPIC-017 exists to stop. The FAIL stays visible on every run until 380 lands. It is not a pass.
