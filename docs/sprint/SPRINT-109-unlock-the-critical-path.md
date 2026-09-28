@@ -83,7 +83,8 @@ reddens on a planted violation with its named finding, and an isolated outside r
 ### T4 — Retarget the dod-delta and verify-reaches guards onto member files `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `scripts/lib/check-dod-delta.ts` · `scripts/lib/check-verify-reaches.ts` (new) · `scripts/lib/check-verify-reaches.sh` (deleted) ·
   `evals/run-dod-delta-fixtures.sh` · `evals/dod-delta.test.ts` · `evals/run-verify-reaches-fixtures.sh` ·
-  `evals/fixtures/dod-delta/` · `evals/fixtures/verify-reaches/` · `scripts/qa-check.sh`
+  `evals/fixtures/dod-delta/` · `evals/fixtures/verify-reaches/` · `scripts/qa-check.sh` ·
+  `evals/run-emitter-column-fixtures.ts` · `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/review-scoping.md`
 Depends-on: T3 (imports `scripts/lib/sprint-members.ts`, G2 ruling 2026-09-28)
 Cites: `TASK-387` · Codex r1 F1 · r2 R2-3c · L-166 · L-186
 

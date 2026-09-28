@@ -125,3 +125,8 @@ output byte-identical at `b9d06a8` and at `c27ad57` (127/0). Silent misses, each
 the shared module, which T4 inherits) · TD-189 (`### T3a` invisible to the mismatch check) · TD-190 (origin glob is not recursive,
 and it reads the value verbatim). Post-merge on main: authority 26/0 · task-origin all green · 4 members examined · 0 origin FAILs.
 Box 1 per the owner's scope-change ruling above (`.ts` gates; `.sh` is the oracle).
+
+### 2026-09-28 | progress | T4 dispatched. Layers adds the three live callers of check-verify-reaches.sh (L-020)
+Deleting the `.sh` leaves every caller stale. A grep outside history found three beyond T4's Layers: `evals/run-emitter-column-fixtures.ts:97`
+· `skills/orchestrator/SKILL.md:50` · `skills/orchestrator/references/review-scoping.md:218`. All three join T4's Layers so the port ships wired.
+T4's base is `36f9bdd` (T3 merged). It imports `sprint-members.ts` read-only, and inherits TD-188 without fixing it (out of Layers).
