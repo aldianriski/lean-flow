@@ -157,3 +157,11 @@ calibration taken on one platform drifts on another. Revise `899be0c`: one norma
 fixture, seeded back to `statSync` so that exactly it reddens; and the differential's exit code taken from the stripped output (B2). Coordinator re-check:
 PENDING on 48115 bytes, 28/0. Gate reach proven by the reviewer (a scratch low budget → `pass=77 fail=1` through qa-check's exact leg).
 review · T2 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-09-28 | scope-change | T2 (TASK-364) calibration channel: headless Claude Code, not the count_tokens API
+**What broke:** G2 A2 ruled calibration via the Messages `count_tokens` API, which needs `ANTHROPIC_API_KEY`. The owner has no API key,
+only a Claude subscription (the `--calibrate` run printed `FAIL … ANTHROPIC_API_KEY is not set`). **Impact:** the tokenizer is unchanged
+(`claude-opus-5-5`); only the channel changes. The coordinator verified headless `claude -p --output-format json` reports `usage` on the
+subscription (baseline total 32805). **Owner ruling (2026-09-28):** "i give you authority you run by yourself", "we only use claude
+subscription". Phase 2 adds a headless-differential path to `--calibrate` (API path kept for consumers with a key), runs it, and adopts the
+budget at the measured figure (ratchet). TASK-364's `## Done when` text is untouched: it names a tokenizer, not a channel.
