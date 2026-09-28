@@ -194,7 +194,8 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
       assumes:    that the sprint's measured savings (T1 median 341.0 → 149.8 s · T2 leg 15
                   21.0 → 3.4 s) survive into the total. UNCONFIRMED — that is the question, and the
                   arithmetic must not be substituted for the run (D2).
-      tracker:    ADR-039 · ADR-043 · TD-168 · TD-171 · Round 19/20/21
+      tracker:    ADR-039 · ADR-043 · TD-168 · TD-171 · Round 19/20/21 · TD-090 · TD-117 · TD-128
+                  (severity: high, re-routed here at the SPRINT-109 promote -- their owners TASK-349/329 are gone)
       carried:    SPRINT-104 T4, parked twice, 0 of 6 DoD. 2026-09-23: `wsl --shutdown` freed 5.35 GB
                   and run 1 completed at **1863 s, `275 pass, 4 fail`** — but under paging (min 311 MB
                   free), so it is an observation, not a range member. Run 2 was reaped for memory at

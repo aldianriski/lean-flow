@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-24
+last_updated: 2026-09-28
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -34,6 +34,20 @@ status: current
 ---
 
 ## Tech Debt
+
+> **Aging sweep — SPRINT-109 promote (2026-09-28).** **99 of 107 open rows** are ≥3 sprints unaddressed,
+> counted against sprint 109. 69 of them are named in the SPRINT-098 sweep below. The **30** it could not name
+> (filed after it) are named here, as re-review prompts: TD-142 · TD-144 · TD-145 · TD-147 · TD-148 · TD-149 · TD-151 · TD-152 · TD-153 · TD-154 · TD-155 · TD-156 · TD-158 · TD-159 · TD-160 · TD-161 · TD-162 · TD-163 · TD-164 · TD-165 · TD-166 · TD-167 · TD-168 · TD-171 · TD-172 · TD-173 · TD-174 · TD-176 · TD-177 · TD-178.
+> 69 + 30 = 99, which matches a direct age filter over all open rows. That filter was run separately, as the second query.
+>
+> **Escalation.** Seven open rows are `severity: high`. Four have a live owner: TD-143 → `TASK-348` · TD-150 →
+> `TASK-345` · TD-168 → `TASK-357` · TD-174 → `TASK-364` + `TASK-384`. Three had none: TD-090 and TD-117
+> cited `TASK-349`, which was never filed, and TD-128 cited `TASK-329`, which has left the Backlog. All three
+> are re-routed to `TASK-357` (owner, this promote; see each row).
+>
+> **§11 deletion.** TD-157 · TD-169 · TD-170 · TD-175 were resolved ≥3 sprints ago and are deleted (their ids stay
+> retired; the substance is in `CHANGELOG.md`). The `S11.TDDELETE` leg had reported them as not due, and that
+> finding is **TD-187**.
 
 > **Aging sweep — SPRINT-098 promote (2026-09-11).** **72 of 84 open rows** are ≥3 sprints unaddressed
 > (72 aged + 12 unaged = 84, reconciled against the row-header count). Derived at this promote, never
@@ -295,6 +309,16 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-187** severity: medium | status: open | created: Sprint-109 (promote governance review)
+  - Summary: **`S11.TDDELETE` prints PASS without judging any resolved row.** Its extractor
+    (`conformance-engine.sh`, `assert_S11_TDDELETE`) wants `closed: Sprint-NNN` or `resolved … (Sprint-NNN`,
+    with a lowercase `print`. All 5 resolved rows on 2026-09-28 wrote `→ SPRINT-NNN …` or `→ <sha> (SPRINT-NNN …`,
+    so all 5 extracted empty and the leg reported "no row has reached the trigger" while 4 were due.
+    A control row in the expected shape extracts `100`. So the branch works, but no real row reaches it (L-166).
+  - Mitigation (hypothesis): match the sprint id case-insensitively in every resolved shape the ledger
+    uses, and print `not judged` for a resolved row with no extractable sprint instead of passing it.
+    Tier G: a retained must-FAIL fixture in each real shape (L-186).
+
 - **TD-186** severity: low | status: open | created: Sprint-108
   - Summary: **the freeze checker does not model list-item containers or `<pre>` blocks.** A heading at
     column 0 after `- none` / `  <!--` (or a fence) under Assumes is real in CommonMark, because the list
@@ -416,29 +440,6 @@ status: current
     `docs/knowledge-index.md` is generated, so it cannot fall behind again.
   - **Re-file fresh if** the gap grows after a close that was supposed to append.
 
-- **TD-175** severity: medium | status: resolved → 7f9a138 (cause re-attributed, fixed same day) | created: Sprint-105
-  - Summary as filed: **a truncating gate prints two `QA-CHECK:` verdict lines and `night-run.sh`
-    takes `tail -n1`**, so the launcher could read another run's verdict as its pre-flight. Filed
-    `high`, on an outside review's evidence of "two complete gate reports — two leg-1 headers, ~67
-    harness rows, a complete nested `QA-CHECK: 263 pass, 3 fail` ahead of the outer one".
-  - **THE CAUSE WAS MIS-ATTRIBUTED, and the correction matters more than the row.** It was filed as
-    PRE-EXISTING on a control that reverted SPRINT-105 T3's budget *raise* and reproduced the
-    doubling. That control was incomplete: the defect was in the truncation *message*, which was
-    present in **both** arms. The reviewer said plainly they had not isolated which harness spawned
-    the nested run — it was not a harness. Commit `307d665` had written a command in **backticks**
-    inside a double-quoted `bad "..."` string, and backticks inside double quotes are command
-    substitution, so **the gate recursively invoked itself** whenever it built that finding.
-  - **Measured before and after.** Broken: `QA_BUDGET_SECONDS=1 sh scripts/qa-check.sh` ran past
-    **90s** without reaching a checkpoint. Same scenario at `bdb2300` (before the message change):
-    **4s**, checkpoint fires. After `7f9a138`: **3s**, one leg-1 header, zero harness rows.
-  - **What survives, narrower and still true:** a truncated run legitimately prints **two**
-    `QA-CHECK:` lines — the `TRUNCATED` outcome plus the verdict — and `night-run.sh:597` selects
-    with `tail -n1`. It is correct today because the anchored pattern excludes the `TRUNCATED` line
-    **and** the verdict sorts last: two independent accidents rather than one stated rule. Not
-    re-filed as its own row; folded into `TASK-367`, which already rewrites that selection.
-  - **Re-file fresh if** a third `QA-CHECK:`-shaped line is ever added, or the verdict stops
-    sorting last.
-
 - **TD-174** severity: high | status: open | created: Sprint-104
   - Summary: **The soft-cap route reports and nothing acts on it.** `check-doc-caps` prints three
     `OVER-CAP (soft)` rows on every run — `TODO.md` 536 > 320, `docs/research/adlc-epic-sequencing.md`
@@ -523,104 +524,6 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-170** severity: medium | status: resolved → SPRINT-103 close (owner ruling, no task) | created: Sprint-103
-  - Summary: **A governance commit that also appends to the sprint's own Execution Log is reported
-    `UNATTRIBUTED` by leg 15** — and appending to that Log is mandatory for every task, so this
-    fires on routine sprint work. `is_governance_commit()` requires **every** file in the commit to
-    be a governance artifact, and its allow-list (`TODO.md` · `TECH-DEBT.md` · `CHANGELOG.md` ·
-    `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `docs/epic/*` · `docs/research/*`) **does not
-    include `docs/sprint/`** — even though the per-file reporting loop excludes `docs/sprint/`
-    immediately afterwards via `is_excluded_committed()`. So the sprint-log file cannot be
-    *reported*, but it can still *disqualify* the whole commit from being governance, which sends
-    it to `UNATTRIBUTED` and gets its governance sibling named instead.
-  - **Observed live on SPRINT-103**, 5 of 22 in-range commits, all correctly detected:
-    `d515f33:TODO.md` · `975663e`/`5cb7ee9`/`883a9c6`/`7dbb81a:docs/research/logs/qa-gate-timing.md`.
-    Each is `{a governance file} + {docs/sprint/logs/SPRINT-103-…md}` and nothing else.
-  - **Not a port defect.** `scripts/lib/check-layers-observed.sh` and the SPRINT-103 T2 port
-    `check-layers-observed.ts` produce byte-identical output here, same exit code, on three
-    alternating runs. The gap is in the shared rule, pre-existing, and the port faithfully
-    reproduces it — which is the oracle contract working as intended (D5).
-  - **Why it stayed hidden until now.** Leg 15 only walks `plan_commit..HEAD`. Research-log commits
-    made *before* a sprint's `plan_commit` are out of range, so the pattern is invisible unless a
-    sprint writes research or Backlog entries **during** its own execution — which SPRINT-103 is
-    the first to do at volume (four `research:` Rounds plus a `todo:` filing). L-105's temporal
-    sibling: the rule is fine, the window it runs over decides whether it ever fires.
-  - Fix direction (**not a ruling**), two clean options and they are not equivalent:
-    **(a)** add `docs/sprint/*` to `is_governance_commit()`'s allow-list, so a bookkeeping file that
-    is already unreportable also stops disqualifying — narrow, matches the existing
-    `is_excluded_committed()` intent, and is a **change to a Tier G guard's semantics**, so it takes
-    the full ADR-029 bar plus byte-identical differential parity against the oracle on both
-    implementations; or **(b)** rule that sprint work must use `sprint(NNN):` / `sprint(NNN) Tn:`
-    subjects and that `research:`/`todo:` prefixes are for *between*-sprint commits only — no code
-    change, but it makes the convention load-bearing and needs writing down where a committer reads
-    it, not only here (L-151).
-  - **Blocks close as it stands**: leg 15 exits 1, so `sprint-bulk`'s system-verify step will not
-    pass against the integrated tree until this is ruled. It is a ruling, not a defect to patch
-    quietly — both options change something a reader depends on.
-  - **RESOLVED at the SPRINT-103 close — option (a), owner-ruled.** `is_governance_commit()`'s
-    allow-list now admits `docs/sprint/`, in **both** implementations (`check-layers-observed.sh`:
-    `docs/sprint/*) ;;` · `check-layers-observed.ts`: `if (f.startsWith("docs/sprint/")) continue;`),
-    one non-comment line each, documented at the site. The argument that decided it: the path is
-    *already* unreportable via `is_excluded_committed()`, so the omission let a file that cannot be
-    named still **disqualify** the commit carrying it — the same argument the `docs/knowledge-index.md`
-    and `docs/epic/`|`docs/research/` arms already make in that function.
-  - **Tier G bar met, and the over-exemption control is the part that matters.** Retained pair:
-    `governance-plus-sprintlog` (the real motivating shape — must NOT be unattributed) and
-    `governance-plus-real-file` (`{TODO.md} + {scripts/real-code.sh}` — must STILL be reported,
-    naming the code file). Suite after: 29/29 differential, 43/43 assertions. Discrimination proved
-    by reverting the one line from the port only (seed verified landed, 527→526 lines, still
-    parses): 29/29 → 32/41 and 43/43 → 42/43, **exactly** `governance-plus-sprintlog` reddening with
-    both over-exemption control assertions green; restored under one convention, `sha256sum` on the
-    working file. Outside-reviewed worktree-isolated; the reviewer's boundary-parity attack (9 cases
-    incl. `docs/sprintfoo`, `docs/sprint-notes/`, nested `archive/`, double-slash, case difference,
-    `..`) found no shell/TS divergence, and its one SUSPECTED finding — the new arm carried no
-    ASSUMPTION caveat unlike its siblings — was acted on.
-  - **Option (b) was also taken, as the half code cannot carry**: `.claude/CONTEXT.md` § Sprint model
-    now states leg 15's attribution rules in prose, including that a commit's files must be covered
-    by **that task's** `Layers:`. Two SPRINT-103 commits (`ccd6c6c`, `e9c7e14`) remain unattributable
-    and are **exempted on the record, history not rewritten** — their shas are cited by name in
-    ADR-043, this row's evidence trail and the sprint Log, and amending them would falsify those
-    references.
-- **TD-169** severity: high | status: resolved → 50b7e80 (SPRINT-104 T1; population fixture retained, c7ba1e3) | created: Sprint-103
-  - Summary: **The gate's typecheck leg reports "clean (0 errors)" without ever looking at
-    `scripts/lib/` or `evals/`** — which is where every ported checker lives. `scripts/qa-check.sh`
-    (:1008) runs bare `node_modules/.bin/tsc --noEmit`, so it uses the root `tsconfig.json`, whose
-    `include` is `["apps/**/*.ts", "packages/**/*.ts", "test/**/*.ts"]`. None of the repo's
-    safety-critical TypeScript is in that program.
-  - **Measured, not inferred.** `tsc --noEmit --listFiles | grep -c run-sprint-family-spec-reduction`
-    returns **0** — the file is not in the program at all. Re-running under a config that includes
-    `scripts/**` and `evals/**` surfaces **3 real errors** that the gate has never reported:
-    `evals/run-sprint-family-spec-reduction-fixtures.ts(48,10) TS2532` (fixed at SPRINT-103 T1) and
-    `scripts/qa-verdict.ts(147,5)` + `(151,5)` TS18047, both pre-existing and **still open**.
-  - **Why this is high and not cosmetic.** SPRINT-102 ported five checkers to TypeScript and
-    SPRINT-103 T2 ports a sixth; ADR-037/TD-101 hardened this very leg so that a *skip* could never
-    read as a pass. It is blind anyway — not by skipping but by **population**. The leg's own
-    comment says "a skip is indistinguishable from a pass, which is the defect this leg exists to
-    remove", and it has been reporting `0 errors` over a program that excludes the files the repo
-    most depends on being type-correct. **This is L-136** (a `Verify:` whose scope excludes its
-    target passes while saying nothing) at the gate's own level, and **L-186**'s population blindness
-    — the detection logic is sound, the member set it runs over is not.
-  - **Second instance of the same shape found in the same sprint**, which is why this is filed rather
-    than patched in passing: leg 12's harness census globs `evals/run-*.sh` only, so a `.ts` harness
-    is neither run nor reported as unregistered
-    (`docs/research/logs/qa-check-ts-harness-dispatch-wiring.diff.md`). Two gate legs, both correct
-    in their logic, both looking at the wrong set. Worth asking of every leg, not just these two.
-  - Fix direction (**not a ruling**): the obvious move is a committed `tsconfig` covering
-    `scripts/**` and `evals/**` and pointing the leg at it — but doing that turns the gate **red on
-    two pre-existing `qa-verdict.ts` errors**, so the fix and those errors are one task, not two.
-    Decide also whether `apps/`/`packages/` and `scripts/`/`evals/` should share one program or be
-    two leg invocations; they have different runtimes (Bun vs the app build) and `bun` types are
-    already an `extends` concern. Do not widen the glob without running it first.
-  - **Found by accident**, in a subagent's aside about its own typecheck coverage — not by any check.
-    Nothing in the repo currently detects a leg whose scope has drifted from its subject.
-  - **Escalated to `TODO.md` Backlog P1 as `TASK-358`** at the 2026-09-21 SPRINT-104 promote, by the
-    ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible
-    to every promote that reads the Backlog (L-151, the same shape as TD-117 and TD-143 above).
-  - **The blast radius is now measured, not assumed:** a probe `tsconfig` over `scripts/**` +
-    `evals/**` returns **exactly 2 errors, both `TS18047` in `scripts/qa-verdict.ts` (147,5 and
-    151,5)**; the other 20 `.ts` files in those trees typecheck clean. So "widening the glob turns
-    the gate red" is true and small — which is what makes the widening and the fix one task rather
-    than a blocked one. Snapshot of 2026-09-21; re-derive before building on it (L-097 · L-130).
 - **TD-168** severity: high | status: open | created: Sprint-103
   - Summary: **`scripts/lib/conformance-engine.sh` is the QA gate's single largest cost centre and is
     kernel-bound, but it is consumer-facing, so the fix needs its own sprint.** Measured at
@@ -884,31 +787,6 @@ status: current
     with no signal that anything was skipped.
   - Family: **TD-139** is the same punctuation defect at a different site (`dep_ids` in the dispatch
     preflight). If either is fixed, fix both — one strip rule, two call sites.
-
-- **TD-157** severity: medium | status: resolved → a12085f (SPRINT-104 T2; 28 sites, 8 named and left alone with the reason at the code) | created: Sprint-100
-  - Summary: **27 `FAIL ` emissions across 15 files use a ONE-space prefix that no two-space selector
-    can reach.** Every `bad()`/`ok()`/`gap()` line emits at a two-space column; these 27 bypass their
-    file's own helper with a raw `echo` and emit at one. They are bootstrap failures — emitted before
-    or outside the helper — so they are exactly the lines that mean *the check never ran*.
-  - Evidence: derived by three differently-shaped queries that agree (L-198) at the SPRINT-100 T4
-    close — `echo`-prefixed one-space FAILs = **27**; *any* one-space FAIL literal regardless of
-    emitter = **27**; two-space `bad()`-convention literals = **55**. Spread over
-    `check-approval-envelope` · `check-count-claims` · `check-ephemeral-intake` · `check-epic-archive` ·
-    `check-handoff-state` · `check-layers-completeness` · `check-layers-observed` ·
-    `check-night-run-rollup` · `check-qa-budget-default` (×4) · `check-research-archive` (×2) ·
-    `check-review-depth` · `check-verify-reaches` · `conformance-engine` · `check-system-verify-block` ·
-    `harness-common` (×9).
-  - **Confirmed live at T5, which is why this is medium and not minor.** `conformance-engine.sh:54`'s
-    one-space line was invisible to the foreign-repo sweep's selector, and `sweep_gate` therefore
-    returned **rc=0 silently on a crashed engine** — reproduced as
-    `total=0 reached=0 engine_error=[] unreached=[]`. T5 made the sweep robust to the emission; the
-    emitter is untouched. So the class has now produced a real false-clean once, not merely threatened
-    to.
-  - Impact: harmless where a counter uses `grep -cE '^FAIL'` (tolerates either spacing), and silent
-    wherever a selector is keyed to the two-space column. Every new selector is a coin flip until the
-    emission is uniform.
-  - Tracker: **`TASK-350`** — route bootstrap failures through a shared emitter. A design task across
-    15 files, not a patch.
 
 - **TD-156** severity: minor | status: open | created: Sprint-100
   - Summary: **Eight `bad "<kebab-slug>: <English prose>"` sites in `conformance-engine.sh` put prose
@@ -1437,6 +1315,8 @@ status: current
     `INFO` naming the elapsed figure, the not-killed fact and the foreground caveat.
   - **The cost half stays OPEN.** The gate is no faster; what changed is that it no longer asserts
     something false about itself. Measurements → `docs/research/logs/qa-gate-timing.md` § Round 15.
+  - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
+    owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
 
 - **TD-126** severity: medium | status: open | created: Sprint-092
   - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in
@@ -1711,6 +1591,8 @@ status: current
     gate, which would make this an environment note rather than a guard defect.
   - **Escalated to `TODO.md` Backlog P2 as `TASK-329`** at the 2026-09-07 `/triage`, by the ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible to every promote that reads the Backlog (L-151) — and **decomposed the same day**, absorbing TD-117 (`TASK-330`, retired) as one mechanism. **Scope note the fix must respect:** `check-qa-budget-default.sh` is CORRECT within its declared scope (configured default < ceiling, which is all its header claims). This row is a **missing reader**, not a broken checker, and widening that script is the wrong fix.
   - **Re-reviewed at the SPRINT-106 promote (2026-09-23, owner-signed):** `TASK-329` is no longer in the Backlog, so this high row has **no live owner**. Its named gap looks closed: SPRINT-099 T2 added the ACTUAL-runtime reader (`CHANGELOG.md`, "the ACTUAL runtime is asserted against the 600 s command ceiling"), and SPRINT-102 (`ADR-042`) then re-ruled that assertion as an uncounted `INFO`. **Proposed: resolve** against those two commits once someone confirms the reader still fires. Not resolved here, because a re-review is not a verification.
+  - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
+    owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
 
 - **TD-125** severity: medium | status: open | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`
@@ -2436,6 +2318,8 @@ status: current
     An outside review of SPRINT-102 T2 independently spotted the same shape in
     `run-layers-completeness-fixtures.sh`, which invokes its checker **4× against the same fixture**
     for three findings and a sibling control.
+  - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
+    owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
 
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
