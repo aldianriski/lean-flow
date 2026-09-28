@@ -174,3 +174,13 @@ Adopted budget **16087** (today's estimate, the ratchet). Main: `PASS … ~16087
 The headless runner is **Tier X** (measurement plumbing, not a gate path): retained fixtures via an injectable runner (instability /
 missing usage / sibling), plus a seeded break for the instability check. The gate path was already reviewed (NOT CLEAR → revise → verified).
 Post-merge on main: doc-caps fixtures 34/0.
+
+### 2026-09-28 | surprise | system verify: the QA_FULL gate was killed by the host's memory reaper, and its partial run found 3 real FAILs
+The first close-time `QA_FULL=1` run was stopped by Claude Code's low-memory reaper, not by a gate failure (481 lines, 283 PASS).
+It is not restarted without the owner (reaper instruction). Its partial output held three FAILs this sprint introduced, which every
+per-task check had missed:
+- `typecheck` TS2345 at check-sprint-by-reference.ts:445. T3's extraction made `Tree.commit` optional (absent = null, as documented),
+  but the call site still tested `!== null`, so a working-tree baseline would call `scopedSince(undefined)`. The builder and reviewer worktrees have no
+  `node_modules/.bin/tsc`, so neither could run the leg. Fixed with `!= null`; tsc 0 errors, by-reference 127/0.
+- `corpus metadata`: ADR-048 was tagged `governance`, which is outside the TAGS vocabulary → `[docs, tooling]`.
+- `knowledge index STALE`: ADR-048 is new, so the index was regenerated. `docs/knowledge-index.md` joins T2's Layers (generated).

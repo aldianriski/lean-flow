@@ -55,7 +55,7 @@ CHANGELOG entry, and `TASK-383` has a named list of the rules it must retarget.
 Layers: `scripts/lib/check-doc-caps.sh` · `scripts/lib/check-doc-caps.ts` · `evals/run-doc-caps-fixtures.sh` · `evals/doc-caps.test.ts` ·
   `evals/run-doc-caps-differential.ts` · `evals/fixtures/doc-caps/` · `spec/STANDARD.md` (after T1, D1) ·
   `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `scripts/lib/check-prose-density.ts` ·
-  `docs/research/logs/token-calibration.md` · `spec/CHANGELOG.md` (after T1) · `scripts/lib/token-budget.txt` (new)
+  `docs/research/logs/token-calibration.md` · `spec/CHANGELOG.md` (after T1) · `scripts/lib/token-budget.txt` (new) · `docs/knowledge-index.md` (generated)
 Depends-on: T1 on `spec/STANDARD.md` only (D1)
 Cites: `TASK-364` · EPIC-017 D3 · ADR-015 · ADR-017 · ADR-019 · TD-174
 
