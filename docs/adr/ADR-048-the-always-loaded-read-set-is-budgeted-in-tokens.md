@@ -110,3 +110,39 @@ so nothing already enforced is weakened.
 | Call `count_tokens` live on every gate run | Turns an offline, zero-cost check into a paid, network-dependent, API-key-gated one running on every promote/close — unacceptable for this checker's role; calibrate-once-and-ratchet is used instead |
 | Fold the token budget into `check-prose-density.ts` instead of `check-doc-caps.ts` | TASK-364's Touches and Done-when name `check-doc-caps`; `check-prose-density.ts`'s population (every capped prose file) is broader than the always-loaded pair this budget targets, and it already exports `ALWAYS_LOADED` for `check-doc-caps` to import rather than duplicate |
 | Raise `CLAUDE.md`/`CONTEXT.md`'s line caps instead of adding a token budget | Doesn't address the actual failure mode (density gaming within a cap); §7 forbids raising a cap to fit content rather than diet-first |
+
+## Amended 2026-09-28 (TASK-364 phase 2 — calibration lands, both paths, first adoption)
+
+Phase 1 above described the API path only, because it was the only one built. Owner ruling
+2026-09-28: no `ANTHROPIC_API_KEY` in this environment, a Claude subscription only, calibration
+**authorised to run through Claude Code's own headless mode instead**. `--calibrate` now tries BOTH,
+in order, naming the method on every printed line: the API when `ANTHROPIC_API_KEY` is set (unchanged
+from Phase 1); otherwise a **headless differential** through `claude -p` when a `claude` CLI is on
+PATH (there is no `count_tokens` call in headless mode, so the count is inferred instead); neither
+available is a named FAIL naming both options, never a silent skip.
+
+**The headless method.** A fixed baseline prompt is run **twice** — if the two totals disagree,
+calibration FAILs outright rather than adopt a number a drifting system prompt or cache state could
+have corrupted. A delimiter's own cost (baseline + delimiter + an empty body) is isolated once and
+subtracted from every file, leaving each file's marginal cost alone. Every run executes from a temp
+directory **outside this repo** (`mkdtempSync(tmpdir())`), so no `.claude/CLAUDE.md`/memory of any
+repo is auto-loaded into a measurement of its own size, and every prompt goes over **stdin, never
+argv** (`.claude/CLAUDE.md` is ~23 KB, past what Windows/`cmd.exe`/MSYS argv quoting reliably
+carries). `totalInput = input_tokens + cache_creation_input_tokens + cache_read_input_tokens`, read
+from `claude -p --output-format json`'s own `usage` object — the full cost of the turn's input,
+cached or not (owner ruling). The tokenizer identity is unchanged either way: `claude-opus-5-5`'s own,
+sampled through whichever path is available, never a third-party approximation.
+
+**The adopted figure was produced by the headless path** (no key in this environment): 5 calls total
+against `claude-opus-5-5` (2 baseline + 1 delimiter-cost + 1 per file). Pooled ratio **2.991
+bytes/token** over 48,115 normalised bytes / 16,088 measured tokens; per-file spread (error band)
+0.304 bytes/token (`.claude/CLAUDE.md` 2.841, `.claude/CONTEXT.md` 3.145). Adopted into
+`scripts/lib/token-budget.txt`: budget **16,087 tokens**, `adopted-at 2026-09-28+899be0c` — the
+check's own estimate of the always-loaded set's size on adoption day, so the gate reads PASS at the
+moment of adoption and any growth beyond it is a FAIL (owner G2 ruling: "ratchet at adoption"). Full
+method, raw per-file numbers and the baseline-stability check: `docs/research/logs/token-calibration.md`.
+
+This amendment adds a second measurement path and records the first real adoption; it changes nothing
+already decided above — the gate stays offline and zero-dependency either way (`Bun.spawn`, no SDK,
+no new package), and Phase 1's "no disposition mechanism exists yet" and "line caps retained as a
+secondary signal" both stand unchanged.

@@ -23,10 +23,11 @@ version — expected when `workdoo` pins the spec with the plugin's `2.0.0` rele
   retired at 0.12.0: `migrate` still reads it, and so does every checker that derives a cap from §2.
 - **§2** also adds a **token budget** over the always-loaded read set (`.claude/CLAUDE.md` +
   `.claude/CONTEXT.md`, ADR-048, superseding ADR-015 · ADR-017 · ADR-019): `check-doc-caps` now checks
-  `scripts/lib/token-budget.txt` against the pair's combined size, tokenizer named (Claude's
-  `count_tokens`, ratio calibrated and ratcheted at adoption), with the existing line caps retained as a
-  secondary signal. No rule id, level or mark was added — this composes with `S2.F-FILE`'s existing cap
-  machinery rather than introducing a new §14 row.
+  `scripts/lib/token-budget.txt` against the pair's combined size, tokenizer named (Claude's own —
+  measured via the `count_tokens` API, or a headless `claude -p` differential with no API key — ratio
+  calibrated and ratcheted at adoption), with the existing line caps retained as a secondary signal. No
+  rule id, level or mark was added — this composes with `S2.F-FILE`'s existing cap machinery rather
+  than introducing a new §14 row.
 - **§9** describes a sprint by reference (ADR-047): `## Members` lists member task files, each
   member's DoD is its own `## Done when`, and `plan_commit` is the freeze. The Plan carries no DoD boxes.
 - **§10** routes the Follow-ups bucket to a task file in `docs/work/backlog/` stamped

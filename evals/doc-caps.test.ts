@@ -13,7 +13,14 @@
 import { describe, expect, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { parseTokenBudget, resolveArgs, runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
+import {
+  type HeadlessUsage,
+  parseHeadlessUsage,
+  parseTokenBudget,
+  resolveArgs,
+  runCheckDocCaps,
+  runHeadlessCalibration,
+} from "../scripts/lib/check-doc-caps.ts";
 
 const FX = fileURLToPath(new URL("fixtures/doc-caps/", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -196,7 +203,7 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
   test("token-budget case D sibling control: the same shape comfortably under budget PASSes, tokenizer + ratio named", () => {
     const r = runTB("token-budget-under", "token-budget.txt");
     expect(r.exitCode).toBe(0);
-    expect(r.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~100 tokens <= budget 200 (ratio 1 bytes/token, claude-opus-5-5 count_tokens");
+    expect(r.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~100 tokens <= budget 200 (ratio 1 bytes/token, claude-opus-5-5 tokenizer");
   });
 
   // --- selection-varying (L-186): the population, not just the verdict arithmetic ------------------
@@ -262,5 +269,75 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
   test("parseTokenBudget: comments and blank lines around a single valid row are ignored", () => {
     const r = parseTokenBudget("# comment\n\n50 1 2026-09-28 a real reason\n\n");
     expect(r).toEqual({ kind: "set", budgetTokens: 50, ratio: 1, adoptedAt: "2026-09-28", reason: "a real reason" });
+  });
+
+  // --- headless calibration (TASK-364 phase 2, outside review round 2): error handling, no real CLI --
+  // An injectable `HeadlessRunner` stands in for a real `claude -p` spawn, so every case below runs
+  // with zero process spawns and zero API/subscription cost. `token-budget-under`'s `.claude/` pair
+  // (CLAUDE.md 40 bytes, CONTEXT.md 60 bytes, both plain ASCII) is reused as the always-loaded root --
+  // known byte counts make the arithmetic in the sibling control checkable by hand.
+  const TB_FX = `${FX}token-budget-under`;
+  function usage(totalInput: number): HeadlessUsage {
+    return { input_tokens: totalInput, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
+  }
+
+  test("headless calibration (must-FAIL): baseline instability is named and never adopted", async () => {
+    let call = 0;
+    const runner = async (_p: string) => {
+      call++;
+      // Two identical baseline prompts measuring DIFFERENT totals -- exactly the drift this check
+      // exists to catch before it corrupts every file delta computed against the baseline.
+      return usage(call === 1 ? 100 : 105);
+    };
+    const result = await runHeadlessCalibration(TB_FX, runner);
+    expect(result.exitCode).toBe(2);
+    expect(result.lines.join("\n")).toContain("baseline-unstable");
+  });
+
+  test("headless calibration (must-FAIL): a missing usage field surfaces through the SAME parser a real spawn's stdout would hit", async () => {
+    let call = 0;
+    const runner = async (_p: string): Promise<HeadlessUsage> => {
+      call++;
+      if (call <= 2) return usage(100); // stable baseline
+      // The delimiter-cost call "returns" canned JSON missing cache_read_input_tokens, parsed
+      // through parseHeadlessUsage() itself -- the identical code path runClaudeHeadlessReal() would
+      // hit on a real spawn's malformed stdout, just without spawning a process to get there.
+      return parseHeadlessUsage(JSON.stringify({ usage: { input_tokens: 5, cache_creation_input_tokens: 10 } }));
+    };
+    const result = await runHeadlessCalibration(TB_FX, runner);
+    expect(result.exitCode).toBe(2);
+    expect(result.lines.join("\n")).toContain("usable usage fields");
+  });
+
+  test("headless calibration sibling control: a stable baseline + complete usage everywhere succeeds", async () => {
+    let call = 0;
+    const runner = async (_p: string) => {
+      call++;
+      if (call <= 2) return usage(100); // baseline x2, stable
+      if (call === 3) return usage(105); // delimiter cost = 5
+      if (call === 4) return usage(100 + 5 + 40); // .claude/CLAUDE.md: 40 tokens
+      return usage(100 + 5 + 60); // .claude/CONTEXT.md: 60 tokens
+    };
+    const result = await runHeadlessCalibration(TB_FX, runner);
+    const text = result.lines.join("\n");
+    expect(result.exitCode).toBe(0);
+    expect(text).not.toContain("FAIL");
+    expect(text).toContain("baseline stable at 100 total input tokens");
+    expect(text).toContain("pooled ratio 1.000 bytes/token over 100 bytes / 100 tokens");
+  });
+
+  test("parseHeadlessUsage (must-FAIL): a missing usage field throws a named error", () => {
+    expect(() =>
+      parseHeadlessUsage(JSON.stringify({ usage: { input_tokens: 5, cache_creation_input_tokens: 10 } })),
+    ).toThrow(/usable usage fields/);
+  });
+
+  test("parseHeadlessUsage (must-FAIL): invalid JSON throws a named error", () => {
+    expect(() => parseHeadlessUsage("not valid json")).toThrow(/not valid JSON/);
+  });
+
+  test("parseHeadlessUsage sibling control: a complete usage object parses cleanly", () => {
+    const u = parseHeadlessUsage(JSON.stringify({ usage: { input_tokens: 5, cache_creation_input_tokens: 10, cache_read_input_tokens: 20 } }));
+    expect(u).toEqual({ input_tokens: 5, cache_creation_input_tokens: 10, cache_read_input_tokens: 20 });
   });
 });

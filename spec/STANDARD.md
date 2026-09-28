@@ -95,7 +95,8 @@ around the rules, and the rule count is what shows it.
 **The always-loaded pair also carries a token budget (ADR-048).** `CLAUDE.md` + `CONTEXT.md` — loaded
 before any task-specific content, every invocation — are additionally budgeted on their **combined
 token cost**, checked by `check-doc-caps` against `scripts/lib/token-budget.txt` (tokenizer: Claude's
-own `count_tokens`, ratio calibrated and ratcheted at adoption). The line caps above stay in force as a
+own, ratio calibrated — via the `count_tokens` API, or a headless `claude -p` differential when no API
+key is available — and ratcheted at adoption). The line caps above stay in force as a
 **secondary signal**: a file can sit under its line cap and still push the pair's token cost up by
 writing longer lines, which a line count cannot catch and a token budget does. Supersedes ADR-015 ·
 ADR-017 · ADR-019's line-count-is-exact precision rule for this pair.
