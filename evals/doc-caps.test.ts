@@ -11,6 +11,7 @@
 // Every case below is the SAME case evals/run-doc-caps-fixtures.sh asserted, same fixture files,
 // same named findings -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseTokenBudget, resolveArgs, runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
 
@@ -213,6 +214,38 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
     // A checker that summed only ALWAYS_LOADED[0] would see 5 <= 50 and wrongly PASS.
     expect(r.exitCode).toBe(1);
     expect(r.lines.join("\n")).toContain("~505 tokens > budget 50");
+  });
+
+  // --- B1 (outside review round 1): the estimate is a property of CONTENT, not of the checkout's
+  // line-ending convention. token-budget-crlf/ and token-budget-lf/ hold the SAME logical text (5
+  // lines then 3 lines) -- one stored CRLF (raw bytes 15+9=24), one stored LF (raw bytes 10+6=16).
+  // Both normalise to 16 bytes, so both must report the identical ~16-token estimate against the
+  // same budget=16. Under the pre-fix `statSync(...).size` implementation this reddens: the CRLF
+  // fixture's raw 24 bytes > budget 16 FAILs while the LF sibling's raw 16 <= 16 PASSes -- a
+  // checkout-dependent divergence over identical content.
+  //
+  // The two `.claude/*.md` files are written HERE, at test time, rather than committed as raw CRLF
+  // bytes: this repo runs `core.autocrlf=true` with no per-path `.gitattributes` override for `.md`,
+  // so committing literal `\r\n` bytes would let git's own clean/smudge filters silently normalise
+  // them on the very next checkout -- destroying the CRLF/LF distinction this test exists to prove,
+  // on the same class of checkout-dependent surprise B1 itself is about. Writing them at run time
+  // guarantees the exact bytes on every host, unconditionally.
+  test("token-budget B1 (regression guard): CRLF and LF checkouts of the SAME content yield the SAME estimate", () => {
+    const crlfDir = `${FX}token-budget-crlf/.claude`;
+    const lfDir = `${FX}token-budget-lf/.claude`;
+    mkdirSync(crlfDir, { recursive: true });
+    mkdirSync(lfDir, { recursive: true });
+    writeFileSync(`${crlfDir}/CLAUDE.md`, "A\r\nB\r\nC\r\nD\r\nE\r\n");
+    writeFileSync(`${crlfDir}/CONTEXT.md`, "F\r\nG\r\nH\r\n");
+    writeFileSync(`${lfDir}/CLAUDE.md`, "A\nB\nC\nD\nE\n");
+    writeFileSync(`${lfDir}/CONTEXT.md`, "F\nG\nH\n");
+
+    const crlf = runTB("token-budget-crlf", "token-budget.txt");
+    const lf = runTB("token-budget-lf", "token-budget.txt");
+    expect(crlf.exitCode).toBe(0);
+    expect(lf.exitCode).toBe(0);
+    expect(crlf.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~16 tokens <= budget 16");
+    expect(lf.lines.join("\n")).toContain("PASS  doc-caps: token-budget ~16 tokens <= budget 16");
   });
 
   // --- parseTokenBudget unit coverage (fast, no filesystem) ----------------------------------------

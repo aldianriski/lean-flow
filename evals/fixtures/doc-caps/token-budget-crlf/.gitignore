@@ -1,0 +1,5 @@
+# evals/doc-caps.test.ts writes .claude/CLAUDE.md + .claude/CONTEXT.md here at test time with
+# explicit \r\n bytes (B1, outside review round 1) -- never committed, because this host's
+# core.autocrlf=true with no per-path .gitattributes override for *.md would silently normalise a
+# committed CRLF byte on the next checkout, destroying the exact distinction this fixture proves.
+.claude/

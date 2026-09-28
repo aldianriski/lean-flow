@@ -437,6 +437,24 @@ export function loadTokenBudget(path: string): TokenBudgetResult {
   return parseTokenBudget(content);
 }
 
+/**
+ * Normalises CRLF -> LF so the byte estimate is a property of the FILE'S CONTENT, never of the
+ * checkout's line-ending convention. Outside review round 1 (B1): with `core.autocrlf=true`, the
+ * always-loaded pair checks out CRLF and `statSync(...).size` measured the checkout, not the content
+ * -- 48335 bytes on a CRLF checkout against 48115 in the committed LF blobs, a ~0.5% drift a budget
+ * calibrated on one checkout would carry onto another. ONE helper, used by both `alwaysLoadedInventory`
+ * (the estimate) and `runCalibration` (the text actually sent to `count_tokens`), so the two paths
+ * can never disagree.
+ */
+export function normalizeReadSetText(text: string): string {
+  return text.replace(/\r\n/g, "\n");
+}
+
+/** UTF-8 byte length of `text` AFTER CRLF normalisation -- see `normalizeReadSetText`. */
+export function normalizedByteLength(text: string): number {
+  return Buffer.byteLength(normalizeReadSetText(text), "utf8");
+}
+
 export interface AlwaysLoadedEntry {
   readonly rel: string;
   readonly bytes: number;
@@ -447,14 +465,16 @@ export interface AlwaysLoadedEntry {
  * Every file in `ALWAYS_LOADED`, present or not, under `root` -- the POPULATION this budget covers.
  * A missing file contributes 0 bytes and is reported BY NAME by the caller, never silently absorbed
  * into the sum as if the pair were smaller by design (L-186: the population is a property nothing
- * else here checks).
+ * else here checks). Bytes are the CRLF-normalised content length (`normalizedByteLength`), never the
+ * raw on-disk file size -- a checkout's line-ending convention must not move the estimate (B1).
  */
 export function alwaysLoadedInventory(root: string): AlwaysLoadedEntry[] {
   return ALWAYS_LOADED.map((rel) => {
     const abs = join(root, rel);
     if (!existsSync(abs)) return { rel, bytes: 0, present: false };
     try {
-      return { rel, bytes: statSync(abs).size, present: true };
+      const content = readFileSync(abs, "utf8");
+      return { rel, bytes: normalizedByteLength(content), present: true };
     } catch {
       return { rel, bytes: 0, present: false };
     }
@@ -567,7 +587,8 @@ export async function runCalibration(root: string): Promise<CalibrationResult> {
       lines.push(`      calibrate: ${rel} not found under ${root} -- skipped`);
       continue;
     }
-    const content = readFileSync(abs, "utf8");
+    const raw = readFileSync(abs, "utf8");
+    const content = normalizeReadSetText(raw); // same helper the inventory path uses -- see B1
     const bytes = Buffer.byteLength(content, "utf8");
     let tokens: number;
     try {

@@ -49,7 +49,8 @@ test_file="evals/doc-caps.test.ts"
 # malformed / PENDING / exceeded, each with its sibling control, two population-selection cases
 # (a missing always-loaded file; the second file's bytes not dropped from the sum), and three
 # parseTokenBudget unit cases (partial-PENDING, multi-row, comment/blank handling).
-min_tests=27
+# Outside review round 1 (B1) added a CRLF/LF parity regression guard: 27 -> 28.
+min_tests=28
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
@@ -71,5 +72,5 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback, token-budget missing/malformed/pending/exceeded+siblings, token-budget selection-missing-file, token-budget selection-second-file-dominates, parseTokenBudget units)"
+echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback, token-budget missing/malformed/pending/exceeded+siblings, token-budget selection-missing-file, token-budget selection-second-file-dominates, token-budget crlf/lf parity (B1), parseTokenBudget units)"
 exit 0
