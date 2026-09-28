@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-04
+last_updated: 2026-09-28
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.11.0
+version: 0.12.0
 status: current
 ---
 
@@ -58,7 +58,7 @@ gating → §6.
 | `AGENTS.md` | AI tools | 12 (ADR-015) | init (lean loop — an AI assistant reads this repo) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
 | `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
-| `TODO.md` | Dev / AI | 320 soft (ADR-019) | init (lean loop — work is tracked in-repo, not in an external issue tracker) | backlog change · sprint promote/close | §11 prune |
+| `TODO.md` — **v1 layout, retired at 0.12.0** | Dev / AI | 320 soft (ADR-019) | none since 0.12.0 — the queue lives in the `docs/work/` store (below); a v1 repo's file is read only by `/lean-doc-generator migrate` | none — not edited under 0.12.0 | `migrate` converts it into `docs/work/`, then deletes it (§11) |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
 | `HANDOFF-LEDGER.md` | Dev / AI | append-only | **create-lazily** — the first handoff taken with **no active sprint to log into** (governance work · a `/triage` pass · a research session); never pre-created empty (§7) | a handoff is taken, resumed, or reconciled — its status moves `live` → `consumed` → `spent` | §11 prune (entries `spent` ≥ 3 sprints) |
 
@@ -93,12 +93,13 @@ around the rules, and the rule count is what shows it.
 | `CONTEXT.md` | AI assistant | 150 (ADR-017) | init (lean loop — an AI assistant reads this repo) | vocabulary / patterns / conventions change | — |
 
 **Loop rows vs repository-universal rows, stated here so the split is a ruling and not an oversight
-(the ADR-026 pattern).** Four rows above — `AGENTS.md`, `TODO.md`, `.claude/CLAUDE.md`,
-`.claude/CONTEXT.md` — are the **lean loop's own surface**, not obligations of every repository. Their
+(the ADR-026 pattern).** Three rows above — `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/CONTEXT.md` —
+and the `docs/work/` store row below (with `TODO.md`, the v1 layout it replaced) are the **lean loop's
+own surface**, not obligations of every repository. Their
 `Create ←` cells therefore name their substrate (*an AI assistant reads this repo* · *work is tracked
 in-repo*) instead of saying `always`, exactly as §6 gates its substrate-conditional rows: **skipped,
 not owed, when the substrate is absent**. A repository that tracks work in GitHub Issues already has a
-backlog and does not owe `TODO.md`; one with no AI assistant does not owe an assistant's context files.
+backlog and does not owe `docs/work/`; one with no AI assistant does not owe an assistant's context files.
 
 **The distinction is machine-readable by construction, not by annotation.** A checker's required set is
 derived from the `Create ←` cell itself — the word `always` is the discriminator — so a row moving
@@ -138,7 +139,8 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 | `deployment/rollback-guide.md` | base | Dev / ops | 80 | with deployment-guide | rollback process changes |
 | `flows/<slug>.md` (Mermaid) | medium+ | Dev | 100 each | a flow needs shared understanding | that flow changes |
 | `epic/EPIC-NNN-<slug>.md` + `epic/INDEX.md` (created lazily) | lean loop | Team / AI | 200 soft | a **multi-sprint** outcome is named — one sprint's worth of work is a sprint, and an unnameable destination is fog (`--fog`) until it isn't | a member sprint closes, or a decision changes the outcome |
-| `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | DoD ticks · Files Changed · Retro during sprint (Plan frozen at promote) → §11 archive |
+| `work/<status>/TASK-NNN-<slug>.md` — the **work-item store**, one file per task (schema: `work/README.md`) | lean loop | Dev / AI | no container cap — one file per task, so nothing accumulates | lean loop — work is tracked in-repo: the first task file is written (`/task-decomposer` · `/triage`), or `migrate` converts a v1 `TODO.md` | status = the folder (`backlog · todo · in_progress · review · done · cancel`), changed by a `git mv` in its own commit; title = the filename; membership = `sprint:` / `epic:` frontmatter (ADR-045) → §11 prune of `done/` · `cancel/` |
+| `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | Files Changed · Retro during sprint (Plan frozen at promote; DoD ticks land in the member task files, §9) → §11 archive |
 | `sprint/logs/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | append-only | lazily, at the first Execution Log entry | every Execution Log entry → §11 archive with its sprint. **Must live in the `logs/` subdirectory**: the sprint-file checks glob `docs/sprint/SPRINT-*.md`, which is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 400 and schema-checked as a Plan (ADR-014) |
 | `LEARNINGS.md` | lean loop | Team / AI | append-only | first confirmed learning | close confirms · promote collapses (§11) |
 | `research/<slug>.md` | as needed | Team / AI | 130 soft (ADR-020) | a decision-driving question | question revisited · verdict changes; a verdict a decision has been built on is marked `status: superseded` rather than edited → §11 archive once nothing live cites it. **`status: superseded` ⇒ FROZEN, and the cap does not apply** (ADR-020): the only content that can still legally grow on a spent verdict is the annotation recording *why* it is spent, so a cap here measures the supersession trail and asks you to delete it. It exits via §11 archive, never via a diet |
@@ -533,17 +535,26 @@ The active sprint is **two files** — a capped Plan and an uncapped log (ADR-01
 
 | File | Cap | Holds |
 |---|---|---|
-| `docs/sprint/SPRINT-NNN-<slug>.md` | **400 hard** | frontmatter (`status` · `plan_commit` · `close_commit`) · Theme · Scope (In/Out) · Plan (Tn + size·risk + Acceptance + **DoD checkboxes** — what `/orchestrator sprint-bulk` loops and `/prime` counts) · Owner-action checklist · Decisions→ADR · Assumptions · Files Changed · **Retro** (routed per §10) |
+| `docs/sprint/SPRINT-NNN-<slug>.md` | **400 hard** | frontmatter (`status` · `plan_commit` · `close_commit`) · Theme · Scope (In/Out) · **Members** (the member task files, by reference) · Plan (Tn + size·risk + Layers · Cites + Acceptance — **no DoD checkboxes**: each member's DoD is its own `## Done when`) · Owner-action checklist · Decisions→ADR · Assumptions · Files Changed · **Retro** (routed per §10) |
 | `docs/sprint/logs/SPRINT-NNN-<slug>.md` | **append-only, uncapped** | the **Execution Log** only — created lazily at the first entry |
 
-`TODO.md` holds the Backlog **pool**. **Why they are separate:** the Log grows with the work done, so
-sharing one 400-line budget means the more a run accomplishes the closer the file gets to breaching —
+The Backlog **pool** is `docs/work/backlog/` (§2). **Why they are separate:** the Log grows with the
+work done, so sharing one 400-line budget means the more a run accomplishes the closer the file gets to breaching —
 which caps how many tasks a Plan may hold, and therefore how much an unattended run can consume before
 it clean-halts. Measured before the split: six consecutive sprints ran 232–368 lines holding only 2–6
 tasks, one of them reaching 368 lines on **two** tasks. The Plan was never what filled the file.
 
-The Plan stays frozen at promote; a mid-sprint scope shift is logged as a `scope-change` entry in the
-log file (what broke · impact · re-confirm G2) **before** § Plan is edited.
+**A sprint references its members; it never copies them (ADR-047).** `## Members` lists the member
+task files, and each member's DoD is that file's own `## Done when` — one copy to tick, none to drift.
+Close requires every member in `docs/work/done/` or `docs/work/cancel/`; it counts no Plan boxes.
+
+**`plan_commit` is the freeze.** Each member's `## Done when` as it stood at `plan_commit` — found by
+TASK id, so a later folder move does not matter — is the approved text. Git already holds it, so no
+copy or hash is stored beside it. Ticking a box and the ` ✓ <evidence>` a tick appends are not edits.
+
+The Plan and every member's `## Done when` stay frozen at promote; a mid-sprint scope shift is logged
+as a `scope-change` entry in the log file (what broke · impact · re-confirm G2) **before** either is
+edited.
 
 **Gate sign-off is a frontmatter field, and its absence is a negative answer.**
 
@@ -604,7 +615,7 @@ into four buckets, each **routed to a durable home** (don't leave them in the sp
 |---|---|
 | Shipped | `CHANGELOG.md` (root) |
 | Tech debt | `TD-NNN` row in root `TECH-DEBT.md` (`severity` + `created: Sprint-NNN`) |
-| Follow-ups | `TASK-NNN` entry in `TODO.md` § Backlog (re-enters the loop) |
+| Follow-ups | a `TASK-NNN` task file in `docs/work/backlog/` stamped `origin: close-retro` (re-enters the loop) |
 | Learnings | `L-NNN` entry in `docs/LEARNINGS.md` |
 
 **Retrieval-miss check** (at close) — also ask: *did we fail to find, or contradict, a prior
@@ -649,18 +660,18 @@ symptom and wrong about the cause, and in one case the proposed cure would have 
 (L-091).
 
 **A number inside a criterion is remembered, not measured.** Its facts-level sibling. A figure written
-into a DoD, a `TD-NNN` Summary or a Backlog `assumes:` line looks like evidence and reads as settled,
-but it was measured once — at authoring — and nothing re-measures it, so the criterion rots while its
+into a DoD, a `TD-NNN` Summary or a backlog task file's `## Assumes` looks like evidence and reads as
+settled, but it was measured once — at authoring — and nothing re-measures it, so the criterion rots while its
 prose stays confident. A stated figure with no check behind it is a comment: that is how a research doc
 absorbed 39 lines over its cap across four sprints while an open row cited a count that had been wrong
 since the sprint it was filed in, and how a DoD shipped clauses that were unsatisfiable when written.
 **Re-derive a stated figure before acting on it** — at **promote** when a DoD is built on one, at the
 **TD re-review** when a row is held on one, and at **decompose/triage** when one is written into or
-groomed in a Backlog entry. One command is the whole cost (L-097).
+groomed in a task file in `docs/work/backlog/`. One command is the whole cost (L-097).
 
 **Tech-debt aging** — at **Sprint Promote**: any `TD-NNN` unaddressed ≥ 3 sprints triggers a
-re-review prompt; `severity: high` auto-escalates to Backlog P1. Rows are never deleted — resolved
-debt is marked `status: resolved → TASK-NNN` for the audit trail.
+re-review prompt; `severity: high` auto-escalates to a backlog task file with `priority: P1`. Rows are
+never deleted — resolved debt is marked `status: resolved → TASK-NNN` for the audit trail.
 
 **Promote review (the governance checkpoint)** — before planning a sprint, run the L-promotion scan, TD
 aging, and doc-aging triggers, then **emit the result as an explicit checklist** rather than silent
@@ -677,9 +688,9 @@ against §2's table. **Never restate a §2 cap inside this checklist**: a copied
 that drifts silently from the row it copied, and enumerating triggers by hand is what lets an entire
 category go unreported (a cap check printed three soft breaches on every run for sprints while this
 review reported doc-aging clean — the report had a matcher and no consumer; SPRINT-062 T2 · L-106).
-The `TODO.md` whole-file row in §11's table is a **cap wearing a retention row's clothes** — it is listed
-there for its prune action, and it is the reason exactly one of §2's caps used to reach this checklist
-while the rest did not.
+The `TODO.md` whole-file row in §11's table, before its retirement at 0.12.0, was a **cap wearing a
+retention row's clothes** — listed there for its prune action, and the reason exactly one of §2's caps
+used to reach this checklist while the rest did not.
 
 **Conformance. §10 is the hardest section in the standard to check** — 4 mechanical of 10. Not because
 it is unimplemented, but because *"was the placement test applied well?"* and *"was the checkpoint
@@ -712,9 +723,9 @@ them**. Append-only is preserved *inside* each archive file.
 
 | Ledger | Trigger | Action |
 |---|---|---|
-| `TODO.md` Backlog entries (shipped/promoted) | sprint close | **remove outright** (propose→approve) — no shipped-in-SPRINT breadcrumb comments left in TODO.md; history's durable homes are root `CHANGELOG.md` + `docs/sprint/archive/` |
+| `docs/work/done/` · `docs/work/cancel/` task files | closed ≥ 3 sprints ago — its `sprint:` closed then, or, never scheduled, it moved to `cancel/` then — **and** nothing live names it: no open task's `depends-on:`, no active sprint's `## Members` — **and** it is not the store's highest-numbered task file (the next id is derived from the store, so ids stay monotonic) | **delete the file** (propose→approve). History's durable homes are root `CHANGELOG.md`, `docs/sprint/archive/` and git. An ADR, CHANGELOG or archived sprint may still cite the id; the citation resolves through git history — the file was a breadcrumb, not the record |
 | `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | **delete the row.** The substance already lives in `CHANGELOG.md`, the sprint archive and git, so a permanent in-file pointer is a breadcrumb rather than a record — and a ledger that only ever grows stops being read. **Ids stay monotonic: deleting a row never frees its id for reuse.** The 3-sprint delay is deliberate — a just-resolved debt is still context at the next promote |
-| `TODO.md` whole file | over its §2 cap at promote | flag in the governance review; prune with the user |
+| `TODO.md` whole file — **v1 layout, retired at 0.12.0** | a v1 or mixed tree is found | `/lean-doc-generator migrate` converts it into `docs/work/`, then deletes it — the only prune a retired file gets. Until then its §2 cap still reads, and a breach is flagged in the governance review |
 | `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1. **The collapse consumes the trigger it fires on:** a promoted entry ends up as `[status: promoted]` + the pointer, so `promoted: yes` is *never* the stored form and grepping for it returns zero on a perfectly healthy corpus. Count promotion state by `[status: promoted]` (position-anchored, per L-108); a zero here is evidence about the query, not about the corpus (SPRINT-062 T3) **Deliberate non-collapse is recorded** — a promoted entry may keep its body when the durable rule has not yet taken hold, but only on the record: the entry carries a body bullet containing `§11 collapse deliberately NOT applied` and naming a `Re-collapse when` condition. Both markers present ⇒ conformant; neither ⇒ the entry is simply uncollapsed. This is the exception clause of the collapse action, not a further rule — §11 still states eleven. |
 | `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
@@ -722,10 +733,11 @@ them**. Append-only is preserved *inside* each archive file.
 | `docs/research/<slug>.md` | `status: superseded` **and** nothing live still cites it | move → `docs/research/archive/`; it stays in the generated `knowledge-index.md`, marked `(archived)`. **Supersession alone is not enough** — a spent verdict is usually the WHY-trail for whatever replaced it, so while any live surface still points at it the doc stays put (closed history — `docs/sprint/archive/`, `docs/changelog/` — and the generated index never count as citers). A doc that never reaches `superseded` is never archived: the state is set by the author when a decision is built on it, per the RESEARCH template |
 | `docs/sprint/logs/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/logs/` **with its Plan**, same commit — the pair is one record and splitting them across an archive boundary strands the evidence the Retro cites. No INDEX row of its own; the Plan's row covers both. Never compacted: the log is the append-only audit trail the Retro was written from |
 
-**When it runs** — close-time triggers (Backlog removal · sprint archive) execute during `close`;
-scan-based triggers (TD deletion · rotation · LEARNINGS collapse · the `TODO.md` prune) run at
-**Promote** as **doc-aging**, alongside tech-debt aging in the governance review. Always propose →
-approve → apply; never compress silently.
+**When it runs** — close-time triggers (sprint archive) execute during `close`; a member's move to
+`done/` or `cancel/` is a status change (§2), not retention. Scan-based triggers (TD deletion ·
+rotation · LEARNINGS collapse · the `done/` · `cancel/` prune) run at **Promote** as **doc-aging**,
+alongside tech-debt aging in the governance review. Always propose → approve → apply; never compress
+silently.
 
 **Doc-aging is not bounded by this table.** The rows above are retention triggers; the promote review's
 doc-aging line also carries **every §2 cap breach**, which this table does not enumerate and must not

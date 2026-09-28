@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-24
+last_updated: 2026-09-28
 update_trigger: A field, section, folder, or the filename rule changes under docs/work/
 status: current
 ---
@@ -60,6 +60,17 @@ sprint's subtree instead of staying one glob (ADR-045 D1).
 
 `## Why` (optional) · `## Done when` · `## Amended <date>` (optional) · `## Touches` ·
 `## Assumes` · `## Tracker`.
+
+## `## Assumes` conventions
+
+Beside plain assumption lines (or `none`), two prefixed line shapes carry what readiness depends on.
+`/task-decomposer` writes them at intake; `/triage` adds or removes them when it sets `state:`, and
+touches no other `## Assumes` line.
+
+- `- **open:** <question>` — an unanswered question, or an assumption not yet confirmed. A
+  `state: needs-info` task lists each one.
+- `- **blocked-by:** <condition>` — a blocker that is **not** a task. A `state: blocked` task names a
+  task blocker in `depends-on:` instead, which is what backlog ordering reads.
 
 ## Transitions
 
