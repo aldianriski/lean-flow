@@ -108,3 +108,10 @@ so `spec/CHANGELOG.md` joins its Layers. The ratchet needs a recorded adoption v
 Next ADR id derived two ways: `docs/adr/` max = ADR-047 = `DECISIONS.md` max, so the new one is ADR-048. `ANTHROPIC_API_KEY` is
 absent from the session environment. Calibration is therefore an **owner action**: phase 1 builds everything plus `--calibrate`
 and stops; the owner runs one command; phase 2 records the measured ratio and the adoption budget.
+
+### 2026-09-28 | scope-change | TASK-382 box 1 "(sh + ts)": satisfied by the gating .ts; .sh stays the Plan-path oracle
+**What broke:** the coordinator's T3 brief kept `check-authority.sh` as a Plan-header-only oracle and made member reading TS-only.
+That goes past the frozen text of TASK-382 box 1 ("check-authority (sh + ts) reads the authority class from task files"), and it was the
+brief's addition, not a G2 ruling. **Impact:** `qa-check.sh` runs only the `.ts`, so the gate reads members either way. The
+`.sh` feeds only the opt-in differential, which now names its member-finding exclusion. **Owner ruling (2026-09-28):** accept `.ts`-only.
+The box's `sh + ts` is met by the guard that gates, and no new shell logic is added (the owner's no-shell rule). The box text stays as frozen.
