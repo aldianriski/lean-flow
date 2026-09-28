@@ -19,7 +19,7 @@ depends-on: [TASK-374]
 
 ## Done when
 
-- [ ] check-doc-caps measures tokens over the always-loaded read set (tokenizer named), line counts kept as a secondary signal; retained must-FAIL fixture; an ADR supersedes ADR-015 · ADR-017 · ADR-019.
+- [x] check-doc-caps measures tokens over the always-loaded read set (tokenizer named), line counts kept as a secondary signal; retained must-FAIL fixture; an ADR supersedes ADR-015 · ADR-017 · ADR-019. ✓ merged 829c265 (3e725ef·22bb0c4·899be0c·13e32e8): token-budget row over ALWAYS_LOADED, tokenizer claude-opus-5-5 calibrated by headless differential (2.991 B/tok, spread 0.304, docs/research/logs/token-calibration.md), budget 16087 ratcheted at adoption, real repo PASS ~16087<=16087, +1 line FAILs; line caps kept as the secondary signal; 34/0 fixtures incl. over-budget, malformed, missing, PENDING, CRLF/LF parity, headless error paths, each with a sibling; ADR-048 supersedes ADR-015/017/019
 
 ## Amended 2026-09-23
 

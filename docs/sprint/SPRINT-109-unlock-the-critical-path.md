@@ -135,5 +135,9 @@ clauses and redden on a planted violation with a named finding, and an isolated 
 | `scripts/lib/check-verify-reaches.ts` (new) · `.sh` (deleted) | T4 | TS port, Plan ∪ member Done-when, named member-count NOTE | High (Tier G) | 22/22 · 17 legacy byte-identical |
 | `scripts/qa-check.sh` · `evals/run-emitter-column-fixtures.ts` · `skills/orchestrator/SKILL.md` · `…/review-scoping.md` | T4 | re-pointed at the TS checker (L-020 wiring) | Med | legs 2c-bis/16 proven to redden · emitter 9/0 |
 | `TECH-DEBT.md` | T4 | TD-191/192/193 + a TD-188 addendum from the outside review | Low | — |
+| `scripts/lib/check-doc-caps.ts` · `scripts/lib/token-budget.txt` (new) | T2 | token budget over the always-loaded set, content-normalised, ratchet 16087 @ 2.991 B/tok; `--calibrate` (API or headless) | High (Tier G) | 34/0 · differential 15/15 · review NOT CLEAR → revise → verified |
+| `docs/adr/ADR-048-*.md` (new) · ADR-015/017/019 (status) · `docs/DECISIONS.md` | T2 | tokens are the cap resource; the three line-cap ADRs superseded | Med | read-through |
+| `spec/STANDARD.md` §2 · `spec/CHANGELOG.md` 0.12.0 | T2 | always-loaded read set carries a token budget | Med | reconcile unchanged |
+| `docs/research/logs/token-calibration.md` (new) | T2 | calibration method, raw numbers, error band | Low | — |
 
 ## Retro

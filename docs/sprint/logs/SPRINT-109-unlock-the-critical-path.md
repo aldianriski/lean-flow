@@ -165,3 +165,12 @@ only a Claude subscription (the `--calibrate` run printed `FAIL … ANTHROPIC_AP
 subscription (baseline total 32805). **Owner ruling (2026-09-28):** "i give you authority you run by yourself", "we only use claude
 subscription". Phase 2 adds a headless-differential path to `--calibrate` (API path kept for consumers with a key), runs it, and adopts the
 budget at the measured figure (ratchet). TASK-364's `## Done when` text is untouched: it names a tokenizer, not a channel.
+
+### 2026-09-28 | progress | T2 TASK-364 merged at `829c265`: calibrated and adopted, 4 of 4 members delivered
+Phase 2 `13e32e8`: `--calibrate` gains a headless-differential path (`claude -p --output-format json`, a temp dir outside the repo,
+the prompt over stdin, the baseline run twice). Real run: 5 subscription calls; baseline stable at 36969 ×2; delimiter 36; CLAUDE.md 8182 tok
+(2.841 B/tok), CONTEXT.md 7906 tok (3.145), pooled **2.991 B/tok** over 48115 B / 16088 tok, spread 0.304. `bytes/4` was ~25% low.
+Adopted budget **16087** (today's estimate, the ratchet). Main: `PASS … ~16087 <= 16087`; a +1-line scratch copy FAILs at ~16130.
+The headless runner is **Tier X** (measurement plumbing, not a gate path): retained fixtures via an injectable runner (instability /
+missing usage / sibling), plus a seeded break for the instability check. The gate path was already reviewed (NOT CLEAR → revise → verified).
+Post-merge on main: doc-caps fixtures 34/0.
