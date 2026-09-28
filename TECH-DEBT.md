@@ -309,6 +309,28 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-193** severity: low | status: open | created: Sprint-109 (T4 outside review)
+  - Summary: **A `*Verify:*` clause that wraps onto a second line vanishes without a trace.** `extractClause` needs the
+    closing `*` on the same line, so the line passes the `*Verify:` filter, extracts `null`, and adds nothing to checked,
+    judgment or findings: no NOTE at all. Census 2026-09-28: 15+ wrapped clauses, all in `docs/sprint/archive/` (exempt); 0 reachable.
+  - Mitigation (hypothesis): join continuation lines up to the closing `*`, or FAIL `verify-clause-unterminated`. A fixture (L-186).
+
+- **TD-192** severity: low | status: open | created: Sprint-109 (T4 outside review)
+  - Summary: **dod-delta never correlates a member tick in a commit that does not touch the sprint doc.** With no
+    `Cites:` source in the same commit, the member correlation is skipped. A builder-branch commit prints
+    `PASS  dod-delta: no sprint doc found for Tn … nothing to compare`, which is a PASS line for work never compared.
+    Census 2026-09-28: 0 real tick commits without the sprint doc (all tick commits in `1834c83..` touch it; transitions are 0/0 renames).
+  - Mitigation (hypothesis): resolve `Cites:` from the sprint doc at that commit via `git show <sha>:<path>`, not from the diff,
+    and print a NOTE, not a PASS, when nothing is compared (the TD-042 rule).
+
+- **TD-191** severity: medium | status: open | created: Sprint-109 (T4 outside review)
+  - Summary: **verify-reaches treats a `.ts` method as a judgment tick.** `clauseScripts()` matches
+    `^[A-Za-z0-9_./-]+\.sh$` only, so `*Verify: bun scripts/lib/check-dod-delta.ts …*` yields no script, counts as
+    `judgment`, and reports nothing. Every guard SPRINT-109 touched is now `.ts`, so the next author who names one in a
+    `Verify:` gets a silent pass. Census 2026-09-28: 0 real clauses name a `.ts` method.
+  - Mitigation (hypothesis): recognise `.ts` (and `bun <path>`) methods with the same EXISTS/REACHES semantics. A must-FAIL fixture
+    naming an absent `.ts` (L-058).
+
 - **TD-190** severity: low | status: open | created: Sprint-109 (T3 outside review)
   - Summary: **`check-task-origin.sh` and `sprint-members.ts` disagree on what "the store" is.** The origin guard
     globs `docs/work/<folder>/TASK-*.md` one level deep, while `nowTree()` walks `docs/work/` recursively ("a nested subfolder is not a
@@ -333,6 +355,8 @@ status: current
     merge-back's duplicate-id check is the only thing that catches the shape today, and only at merge.
   - Mitigation (hypothesis): return ambiguous and unresolved ids alongside the members, so each consumer must
     decide, and have the guards FAIL on them. Tier G: a duplicate-id fixture per consumer.
+  - **Second consumer confirmed (SPRINT-109 T4 review):** `check-verify-reaches.ts` inherits it. Its `verify-member-resolution-empty`
+    fires only when ALL listed ids fail, never when one of several drops.
 
 - **TD-187** severity: medium | status: open | created: Sprint-109 (promote governance review)
   - Summary: **`S11.TDDELETE` prints PASS without judging any resolved row.** Its extractor

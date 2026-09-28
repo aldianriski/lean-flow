@@ -131,5 +131,9 @@ clauses and redden on a planted violation with a named finding, and an isolated 
 | `scripts/lib/check-task-origin.sh` | T3 | population = all six docs/work/ folders + legacy TODO.md | High (Tier G) | task-origin 16 cases green · seeded break |
 | `evals/…authority…` · `evals/…task-origin…` | T3 | 3 + 6 fixture cases, runners' floors raised, differential names the member exclusion | Low | runner verdicts |
 | `TECH-DEBT.md` | T3 | TD-188/189/190 from the outside review (census-zero) | Low | — |
+| `scripts/lib/check-dod-delta.ts` | T4 | member-tick correlation via Plan `Cites:`; v1 path unchanged | High (Tier G) | 84/0 · seeded breaks · review CLEAR |
+| `scripts/lib/check-verify-reaches.ts` (new) · `.sh` (deleted) | T4 | TS port, Plan ∪ member Done-when, named member-count NOTE | High (Tier G) | 22/22 · 17 legacy byte-identical |
+| `scripts/qa-check.sh` · `evals/run-emitter-column-fixtures.ts` · `skills/orchestrator/SKILL.md` · `…/review-scoping.md` | T4 | re-pointed at the TS checker (L-020 wiring) | Med | legs 2c-bis/16 proven to redden · emitter 9/0 |
+| `TECH-DEBT.md` | T4 | TD-191/192/193 + a TD-188 addendum from the outside review | Low | — |
 
 ## Retro

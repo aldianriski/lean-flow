@@ -135,3 +135,14 @@ T4's base is `36f9bdd` (T3 merged). It imports `sprint-members.ts` read-only, an
 review · T1 · scoped-reviewer · behaviour:low · governance:high
 review · T3 · scoped-reviewer · behaviour:material · governance:high
 T1: one scoped sonnet reviewer (Spec CLEAR, Standards NOT CLEAR → one revise → verified). T3: a worktree-isolated Tier G reviewer, CLEAR.
+
+### 2026-09-28 | progress | T4 TASK-387 merged at `5576ea0`. Outside review CLEAR, census-zero gaps → TD-191/192/193
+Builder (sonnet + /tdd, worktree `13d5ca0`): `ab99dd0`. dod-delta correlates member `## Done when` ticks through Plan `Cites:`
+(COORD exemption kept). verify-reaches is ported to TS and reads the Plan ∪ member Done-when. The `.sh` is deleted, and qa-check leg 2c-bis,
+the emitter-column case and two orchestrator skill docs are re-pointed (L-020). Motivating artifact, real SPRINT-109: dod-delta attributes
+`ab03653`/`aceff73` to T1/T3 (member ticks match Cites); verify-reaches reports `4 member(s), 0 mechanical Verify: clause(s)`.
+Isolated review (sonnet, ~11 probes, ~85k tokens): **CLEAR**. 17 legacy cases byte-identical .sh vs .ts; legs 2c-bis and 16 redden on a real
+finding. Filed: TD-191 (`.ts` Verify method = silent judgment tick, medium, and the next to bite) · TD-192 (a tick commit without the sprint
+doc is never correlated; its skip prints PASS) · TD-193 (a wrapped `*Verify:*` vanishes) · TD-188 addendum (second consumer).
+Post-merge on main: dod-delta 84/0 · verify-reaches all green · emitter 9/0.
+review · T4 · scoped-reviewer · behaviour:material · governance:high
