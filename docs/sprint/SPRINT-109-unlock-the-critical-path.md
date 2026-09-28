@@ -120,5 +120,9 @@ clauses and redden on a planted violation with a named finding, and an isolated 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `spec/STANDARD.md` | T1 | §2 store row + TODO.md retired row; §9 by reference; §10 follow-ups → task file; §11 done/·cancel/ prune; 0.12.0 | High (the SSOT) | reconcile 100/100 · doc-caps identical · engine 73 FAIL before and after |
+| `spec/CHANGELOG.md` | T1 | 0.12.0 entry, breaking, 1.0.0 deferred to §15 | Low | read-through + review |
+| `docs/work/README.md` | T1 | `open:` / `blocked-by:` conventions under `## Assumes` | Low | matches the task-file.md / triage write sites |
+| `docs/architecture/overview.md` | T1 | spec version mention → v0.12.0 | Low | grep |
 
 ## Retro

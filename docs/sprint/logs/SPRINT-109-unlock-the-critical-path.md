@@ -87,3 +87,17 @@ consequence · T3 · behaviour:material · governance:high
 consequence · T4 · behaviour:material · governance:high
 T1 → one scoped sonnet reviewer (spec semantics). T2–T4 → Tier G: a worktree-isolated outside reviewer each, with a
 threat model and a stop rule (L-165 · L-168 · L-217).
+
+### 2026-09-28 | progress | rank 0 dispatched; worktree-base guard PASS ×2
+Declared base `b9d06a8`, the TASK-377/382 todo → in_progress move. `worktree-base` PASS for T1 (`agent-a1b2aab…`) and for T3
+(`agent-a5773151…`), both branched from `b9d06a8`. Seven worktrees left over from SPRINT-106/107 are still present
+and were not removed: they are not this sprint's, and three hold commits or uncommitted files (reported to the owner).
+
+### 2026-09-28 | progress | T1 TASK-377 merged at `3c85e84`. Review NOT CLEAR → one revise → verified
+Builder (opus, worktree): `616a373` · `1f0843b`. Scoped sonnet review: Spec CLEAR, Standards NOT CLEAR. Findings: the highest-id guard
+was not in the prune condition; the fate of a deleted task's citations went unstated; §10 still spoke of a single-file Backlog.
+**Owner re-ruled A1 → 0.12.0.** §15 makes 1.0.0 wait for ≥2 pinned repositories. I missed that at recon, and the builder
+had rewritten §15 as waived. Owner accepted the §11 trigger. Revise `f8027d8`: 0.12.0, §15 byte-identical to `b9d06a8`, guard in the condition,
+citations resolve through git (the TECH-DEBT precedent), Backlog wording → task files. Coordinator re-check: all four confirmed on the branch.
+Reconcile 100/100 · doc-caps output identical (TODO.md 531>320 soft, cap still derived) · prose-density 32/0 · engine 73 FAIL before and after.
+Hand-off list written into TASK-383. Skipped: the review's minor note that the CHANGELOG cites repo tooling (earlier entries do the same).
