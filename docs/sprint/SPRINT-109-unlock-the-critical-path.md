@@ -51,7 +51,7 @@ that still point at `TODO.md` is what `TASK-383` starts from.
 CHANGELOG entry, and `TASK-383` has a named list of the rules it must retarget.
 
 ### T2 — Budget the tokens the always-loaded read set actually consumes `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `scripts/lib/check-doc-caps.{sh,ts}` · `evals/run-doc-caps-fixtures.sh` · `evals/doc-caps.test.ts` ·
+Layers: `scripts/lib/check-doc-caps.sh` · `scripts/lib/check-doc-caps.ts` · `evals/run-doc-caps-fixtures.sh` · `evals/doc-caps.test.ts` ·
   `evals/run-doc-caps-differential.ts` · `evals/fixtures/doc-caps/` · `spec/STANDARD.md` (after T1, D1) ·
   `docs/adr/` (new ADR) · `docs/DECISIONS.md`
 Depends-on: T1 on `spec/STANDARD.md` only (D1)
@@ -65,7 +65,7 @@ signal. The ADR records why the three cap ADRs are superseded.
 tokenizer, a retained must-FAIL fixture reddens on an over-budget set, and the superseding ADR is indexed.
 
 ### T3 — Retarget the task-metadata guards onto the store `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `scripts/lib/check-authority.{sh,ts}` · `scripts/lib/check-task-origin.sh` ·
+Layers: `scripts/lib/check-authority.sh` · `scripts/lib/check-authority.ts` · `scripts/lib/check-task-origin.sh` ·
   `scripts/lib/prose-density-baseline.txt` · `evals/run-authority-fixtures.sh` · `evals/authority.test.ts` ·
   `evals/run-authority-differential.ts` · `evals/run-task-origin-fixtures.sh` · `evals/fixtures/authority/` ·
   `evals/fixtures/task-origin/`

@@ -52,3 +52,9 @@ Verdict, not exit code: `S10.TDAGING` PASS (99 named) · `S11.TDDELETE` PASS, wh
 `S11.TODOCAP` (`todo-over-cap-at-promote`, 531 > 320) is a **ruled standing breach** (owner, 2026-09-28).
 `TASK-380` deletes `TODO.md` (EPIC-017 Closed-when 2), and trimming a file that is about to be deleted would be
 the diet EPIC-017 exists to stop. The FAIL stays visible on every run until 380 lands. It is not a pass.
+
+### 2026-09-28 | progress | preflight HALT on brace-shorthand Layers → paths written out, CLEAR
+The dispatch preflight read `scripts/lib/check-doc-caps.{sh,ts}` (T2) and `scripts/lib/check-authority.{sh,ts}` (T3)
+as the bare directory `scripts/lib/`, which then "overlapped" every other `scripts/lib/` file: 7 `shared-file-unowned`
+FAILs across T2/T3/T4, none of them real. The paths are now written out (a live declaration, L-100; `## Done when`
+is untouched). Re-run: `PREFLIGHT: CLEAR`. Waves are T1 · T3 · T4 at rank 0 and T2 at rank 1 (after T1, on `spec/STANDARD.md`).
