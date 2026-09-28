@@ -21,6 +21,12 @@
 # J1 sibling, all in ONE real active-sprint-shaped Plan/log pair -- see that file's own note on why
 # the ten single-purpose fixtures alone left the "real shape" population unexercised).
 #
+# TASK-382 owner ruling B added THREE more, nested docs/sprint/+docs/work/ shape: member-missing-
+# authority (a listed member with no authority:), member-plan-mismatch (a Tn's bracket class
+# disagreeing with its cited member's authority:), and member-only-no-plan (NO ### Tn blocks AND no
+# ## Members section -- proves the member checks are not skipped vacuously, and covers the
+# stamp-only + non-todo-folder selection arms, L-186).
+#
 # Differential parity against the shell oracle lives in evals/run-authority-differential.ts (opt-in,
 # spawns the real `sh` checker over every fixture PLUS every real archived/active sprint doc this
 # repo has) -- never here; this harness's whole point is that it does NOT spawn. STATED HONESTLY
@@ -51,7 +57,7 @@ test_file="evals/authority.test.ts"
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
 # (a renamed test, a dropped describe) while still reporting PASS. RAISE THIS when adding cases to
 # evals/authority.test.ts, in the same commit.
-min_tests=20
+min_tests=26
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
@@ -73,5 +79,5 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(authority): checker green -- $n_pass tests, 0 fail (retained: missing-class, control-classed, j2-executed, attended-j2-executed, envelope-backstop-unattended, attended-fenced-example, control-j2-parked, closed-out-of-scope, j2-bypassed, control-j2-ruled, active-sprint-mixed)"
+echo "PASS fixture(authority): checker green -- $n_pass tests, 0 fail (retained: missing-class, control-classed, j2-executed, attended-j2-executed, envelope-backstop-unattended, attended-fenced-example, control-j2-parked, closed-out-of-scope, j2-bypassed, control-j2-ruled, active-sprint-mixed, member-missing-authority, member-plan-mismatch, member-only-no-plan)"
 exit 0

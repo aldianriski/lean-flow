@@ -7,6 +7,15 @@
 // SHELL RETAINS AUTHORITY. check-authority.sh is the oracle; check-authority.ts is the migrated
 // implementation being checked AGAINST it. Any divergence is a defect in the TS port.
 //
+// MEMBER-FILE FINDINGS ARE EXCLUDED FROM THIS COMPARISON (TASK-382, owner ruling B). check-authority.ts
+// additionally reads each sprint's CURRENT docs/work/ members and emits `authority-undeclared:
+// ... member ...`, `authority-plan-member-mismatch:` and `authority-member-declared:` lines that
+// check-authority.sh -- the Plan-header-only oracle, deliberately left unchanged -- can never produce.
+// Comparing those lines against the shell would report a manufactured divergence on every sprint that
+// HAS members (this repo's own active SPRINT-109 among them), not a defect in the port. So TS output
+// is filtered to Plan-header-shaped lines only before the two sides are diffed -- named here and in
+// the run's own printed line, never silently.
+//
 // Compares every retained fixture (single-file invocations, as evals/run-authority-fixtures.sh
 // itself uses them) AND every real, live docs/sprint/SPRINT-*.md this repo currently has -- both
 // individually and as one combined multi-arg invocation, since the CLI takes N sprint files at once
@@ -40,9 +49,17 @@ function runShell(args: string[]): { code: number; out: string } {
   }
 }
 
+// TASK-382 owner ruling B: strip every member-file finding line before comparing against the shell
+// oracle, which never produces them. `exitCode` is recomputed from the FILTERED lines too -- a
+// sprint whose only FAIL is a member-file finding must compare as exit 0 against the shell, not
+// exit 1 against exit 0 (a divergence that would be this filter's own defect, not the port's).
+const MEMBER_FINDING = /^(FAIL|PASS) {2}authority-(undeclared: .* member |plan-member-mismatch:|member-declared:)/;
+
 function runTs(args: string[]): { code: number; out: string } {
   const r = runCheckAuthority(args);
-  return { code: r.exitCode, out: r.lines.join("\n") + (r.lines.length ? "\n" : "") };
+  const filtered = r.lines.filter((l) => !MEMBER_FINDING.test(l));
+  const code = filtered.some((l) => l.startsWith("FAIL")) ? 1 : 0;
+  return { code, out: filtered.join("\n") + (filtered.length ? "\n" : "") };
 }
 
 function compare(name: string, args: string[]): boolean {
@@ -139,6 +156,7 @@ if (compare("zero-args", [])) trivialIdentical++;
 else divergences.push("zero-args");
 
 console.log("----------------------------------------");
+console.log("EXCLUDED FROM COMPARISON (TASK-382, owner ruling B): member-file authority findings -- authority-undeclared naming a member, authority-plan-member-mismatch, authority-member-declared. check-authority.sh reads only the Plan header and never emits these; check-authority.ts's output is filtered to Plan-header-shaped lines before diffing.");
 console.log(`AUTHORITY DIFFERENTIAL, REAL-LOGIC inputs (fixtures + any active sprint): ${realIdentical}/${realCompared} identical`);
 console.log(`AUTHORITY DIFFERENTIAL, CONFIRMED-TRIVIAL-PATH inputs (archived sprints + zero-args): ${trivialIdentical}/${trivialCompared} identical`);
 console.log(`Combined, for reference only -- NOT the headline: ${realIdentical + trivialIdentical}/${realCompared + trivialCompared}`);

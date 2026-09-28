@@ -162,4 +162,45 @@ describe("check-authority.ts -- retained fixtures", () => {
     expect(r.exitCode).toBe(1);
     expect(r.lines.join("\n")).toContain("authority: file not found:");
   });
+
+  // --- TASK-382 owner ruling B: member-file authority (docs/work/ store) -------------------------
+  // Nested `docs/sprint/` + `docs/work/` fixture shape (unlike the flat cases above) so
+  // runCheckAuthority's root derivation (`dirname(dirname(dirname(sp)))`) finds a real store.
+
+  test("member case A (must-FAIL): a listed member with no authority: is caught by name", () => {
+    const r = run("member-missing-authority/docs/sprint/SPRINT-913-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).toContain("authority-undeclared: ");
+    expect(r.text).toContain("member docs/work/todo/TASK-913-alpha.md (TASK-913) declares no valid authority:");
+  });
+
+  test("member case A sibling (L-142 discrimination): the declared member stays PASS", () => {
+    const r = run("member-missing-authority/docs/sprint/SPRINT-913-fx.md");
+    expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-914 \(docs\/work\/todo\/TASK-914-beta\.md\) authority: J2$/m);
+  });
+
+  test("member case B (must-FAIL): a Tn's bracket class disagrees with its cited member's authority:", () => {
+    const r = run("member-plan-mismatch/docs/sprint/SPRINT-915-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).toContain("authority-plan-member-mismatch: ");
+    expect(r.text).toContain("T1 Plan declares J1, member docs/work/todo/TASK-915-alpha.md (TASK-915) declares J2");
+  });
+
+  test("member case B sibling (L-142 discrimination): the agreeing Tn/member pair stays PASS", () => {
+    const r = run("member-plan-mismatch/docs/sprint/SPRINT-915-fx.md");
+    expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-916 \(docs\/work\/todo\/TASK-916-beta\.md\) authority: J2$/m);
+    expect(r.text).not.toMatch(/T2 Plan declares/);
+  });
+
+  test("member case C (must-FAIL, L-186 selection): a sprint with NO ### Tn blocks and NO ## Members section still examines its stamp-only members -- never a vacuous pass", () => {
+    const r = run("member-only-no-plan/docs/sprint/SPRINT-917-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).not.toMatch(/skip \(no ### Tn task blocks\)/);
+    expect(r.text).toContain("member docs/work/todo/TASK-917-no-authority.md (TASK-917) declares no valid authority:");
+  });
+
+  test("member case C sibling (L-186 selection, folder arm): a stamp-only member in done/ (not todo/) is reached and stays PASS", () => {
+    const r = run("member-only-no-plan/docs/sprint/SPRINT-917-fx.md");
+    expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-918 \(docs\/work\/done\/TASK-918-valid\.md\) authority: J1$/m);
+  });
 });

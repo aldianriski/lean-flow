@@ -9,6 +9,21 @@
 // See check-authority.sh's own header comment for the FULL rationale (TD-123/TD-124 mode signal,
 // the de-fenced-copy fix, the two assertions' different kinds) -- not re-derived here, only ported.
 //
+// MEMBER-FILE READING IS TS-ONLY (TASK-382, owner ruling B). check-authority.sh keeps reading ONLY
+// the Plan header meta -- it stays the differential oracle for that half, unchanged. This file
+// additionally resolves the sprint's CURRENT docs/work/ members (scripts/lib/sprint-members.ts,
+// live tree only -- no git) and reads each member's own `authority:` frontmatter field:
+//   - missing/invalid `authority:` -> FAIL authority-undeclared, naming the MEMBER FILE (distinct
+//     from the Plan-header authority-undeclared above, which names a `Tn` instead).
+//   - a `### Tn` block whose `Cites:` names the member, where Tn's bracket J-class DIFFERS from
+//     the member's declared `authority:` -> FAIL authority-plan-member-mismatch, naming Tn, the
+//     TASK id, and both values.
+//   - otherwise -> PASS authority-member-declared.
+// A sprint with NO `### Tn` blocks but with members is NOT a skip -- the member checks still run
+// (see evaluateSprintFile below). Because check-authority.sh does not read member files at all,
+// evals/run-authority-differential.ts's comparison against it EXCLUDES every line this addition
+// produces -- stated there explicitly, not silently (owner ruling B's own requirement).
+//
 // PARITY CLAIM, STATED PRECISELY (outside-review correction, TASK-355 revise): differential parity
 // was run over every retained fixture PLUS every real archived and active docs/sprint/*.md this
 // repo has -- but every ARCHIVED sprint carries `status: closed`, which returns from
@@ -26,6 +41,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
+import { resolveMembers, type Member } from "./sprint-members.ts";
 
 // --- frontmatter (pure) -----------------------------------------------------------------------
 
@@ -162,6 +178,75 @@ function j2Verdict(sp: string, tid: string, defenced: string, mode: ModeSignal):
   return `PASS  authority-j2-honoured: ${sp} ${tid} (${parked} park record(s), ${executed} execution record(s), ${ruled} owner ruling(s))`;
 }
 
+// --- member-file authority (TASK-382, owner ruling B; pure) -------------------------------------
+
+const VALID_CLASSES = new Set(["J0", "J1", "J2"]);
+
+/**
+ * `Tn -> the TASK ids its Cites: line names`, read from the sprint's OWN `### Tn` blocks (never
+ * fence/comment-aware like check-sprint-by-reference.ts's Execution Log parsing -- a Plan header's
+ * `Cites:` line is not the kind of place this repo's own docs quote a worked example inside a bare
+ * fence, so that hardening was judged out of scope here; noted as a deliberate narrower reading of
+ * the oracle's own rigor, not an oversight).
+ */
+export function parseCites(spContent: string): Map<string, Set<string>> {
+  const map = new Map<string, Set<string>>();
+  let curT: string | null = null;
+  for (const line of spContent.split(/\r?\n/)) {
+    const h = line.match(/^### (T\d+)\b/);
+    if (h) {
+      curT = h[1]!;
+      continue;
+    }
+    if (/^#{1,3} /.test(line)) {
+      curT = null;
+      continue;
+    }
+    if (curT && /^Cites:/.test(line)) {
+      const ids = new Set([...line.matchAll(/\bTASK-\d+\b/g)].map((m) => m[0]));
+      if (ids.size > 0) map.set(curT, ids);
+    }
+  }
+  return map;
+}
+
+/**
+ * For each CURRENT member (already resolved by the I/O boundary via sprint-members.ts): its own
+ * `authority:` frontmatter must be a valid J0/J1/J2, and if some `Tn`'s `Cites:` names it, that
+ * Tn's bracket J-class must agree with the member's declared authority. A sprint with no `### Tn`
+ * blocks still runs this -- there is simply nothing to cross-check against, so every member either
+ * passes on its own declaration or fails FOR THAT REASON, never silently skipped.
+ */
+export function evaluateMemberAuthority(sp: string, members: readonly Member[], tCites: Map<string, Set<string>>, tnClass: Map<string, string>): string[] {
+  const out: string[] = [];
+  for (const m of members) {
+    const auth = (m.frontmatter.authority ?? "").trim();
+    if (!VALID_CLASSES.has(auth)) {
+      out.push(
+        `FAIL  authority-undeclared: ${sp} member ${m.path} (${m.id}) declares no valid authority: (J0/J1/J2 required, got ${auth ? `"${auth}"` : "none"})`,
+      );
+      continue;
+    }
+    let mismatch: { tid: string; cls: string } | null = null;
+    for (const [tid, cited] of tCites) {
+      if (!cited.has(m.id)) continue;
+      const cls = tnClass.get(tid);
+      if (cls && cls !== auth) {
+        mismatch = { tid, cls };
+        break;
+      }
+    }
+    if (mismatch) {
+      out.push(
+        `FAIL  authority-plan-member-mismatch: ${sp} ${mismatch.tid} Plan declares ${mismatch.cls}, member ${m.path} (${m.id}) declares ${auth}`,
+      );
+    } else {
+      out.push(`PASS  authority-member-declared: ${sp} ${m.id} (${m.path}) authority: ${auth}`);
+    }
+  }
+  return out;
+}
+
 // --- per-file evaluation ------------------------------------------------------------------------
 
 export interface SprintFileInput {
@@ -171,10 +256,15 @@ export interface SprintFileInput {
   readonly logExists: boolean;
   /** Raw log content (only meaningful when `logExists`). */
   readonly logContent: string;
+  /** TASK-382 owner ruling B: the sprint's CURRENT docs/work/ members, resolved by the I/O
+   * boundary (runCheckAuthority) via sprint-members.ts. `[]` for a store-less root -- every
+   * pre-existing fixture and every input that predates this ruling, so wiring this in changes
+   * nothing for them. */
+  readonly members: readonly Member[];
 }
 
 export function evaluateSprintFile(input: SprintFileInput): string[] {
-  const { path: sp, content, logExists, logContent } = input;
+  const { path: sp, content, logExists, logContent, members } = input;
   const out: string[] = [];
 
   if (content === null) {
@@ -194,7 +284,7 @@ export function evaluateSprintFile(input: SprintFileInput): string[] {
   const mode = computeModeSignal(logExists, defenced, content);
 
   const records = parseTaskRecords(content);
-  if (records.length === 0) {
+  if (records.length === 0 && members.length === 0) {
     out.push(`      authority: skip (no ### Tn task blocks): ${sp}`);
     return out;
   }
@@ -213,6 +303,13 @@ export function evaluateSprintFile(input: SprintFileInput): string[] {
     if (!logExists) continue; // nothing has run; the honoured half is not yet checkable
 
     out.push(j2Verdict(sp, tid, defenced, mode));
+  }
+
+  // TASK-382 owner ruling B: member-file authority, independent of whether any ### Tn exists.
+  if (members.length > 0) {
+    const tCites = parseCites(content);
+    const tnClass = new Map(records.filter((r) => r.cls.length > 0).map((r) => [r.tid, r.cls] as const));
+    out.push(...evaluateMemberAuthority(sp, members, tCites, tnClass));
   }
 
   return out;
@@ -250,7 +347,14 @@ export function runCheckAuthority(sprintFilePaths: readonly string[]): CheckAuth
         logContent = "";
       }
     }
-    lines.push(...evaluateSprintFile({ path: sp, content, logExists, logContent }));
+    // TASK-382 owner ruling B: `root` is `sp`'s grandparent-of-grandparent under the
+    // `<root>/docs/sprint/<file>` convention every real sprint doc AND every member-shaped fixture
+    // (evals/fixtures/authority/<case>/docs/sprint/<file>) follows. resolveMembers() degrades to
+    // [] when that root has no docs/work/ at all -- every PRE-EXISTING flat fixture (no docs/sprint
+    // subdir), so this addition changes nothing for any input that predates this ruling.
+    const root = dirname(dirname(dirname(sp)));
+    const members = content !== null ? resolveMembers(root, sp) : [];
+    lines.push(...evaluateSprintFile({ path: sp, content, logExists, logContent, members }));
   }
 
   const exitCode = lines.some((l) => l.startsWith("FAIL")) ? 1 : 0;
