@@ -442,7 +442,7 @@ function main(argv: string[]) {
       bad(`NO-DONE-WHEN ${id}`, `no ## Done when ${frozen === null || doneLines(frozen).length === 0 ? `at ${base.label}` : "now"} -- nothing frozen to compare`);
     } else if (sameDoneWhen(frozen, live)) {
       ok(`freeze ${id}`, `## Done when unchanged since ${base.label} (ticks ignored; now at ${nowP[0]})`);
-    } else if (base.commit !== null && names(scopedSince(base.commit), id)) {
+    } else if (base.commit != null && names(scopedSince(base.commit), id)) {
       ok(`freeze ${id}`, `## Done when changed since ${base.label}, covered by a scope-change entry new since then naming ${id}`);
     } else {
       bad(`FREEZE-EDIT ${id}`, `## Done when changed since ${base.label} with no scope-change entry new since then naming ${id}`);
