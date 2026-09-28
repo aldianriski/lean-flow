@@ -11,14 +11,14 @@ tier: G
 authority: J1
 origin: decomposer
 state: ready
-depends-on: [TASK-363, TASK-387, TASK-382, TASK-383]
+depends-on: [TASK-390, TASK-391, TASK-387, TASK-382, TASK-383]
 ---
 
 # TASK-381 — Reconcile the eval inventory against the guard tasks
 
 ## Done when
 
-- [ ] A two-selector inventory (literal TODO.md + Plan/Backlog concepts) of evals/ exists, and every file in it is owned by TASK-363 / 387 / 382 / 383 or retargeted here.
+- [ ] A two-selector inventory (literal TODO.md + Plan/Backlog concepts) of evals/ exists, and every file in it is owned by TASK-390 / 391 / 387 / 382 / 383 or retargeted here.
 - [ ] Each retargeted harness has a v2 fixture that varies the selection, not only the verdict.
 
 ## Touches

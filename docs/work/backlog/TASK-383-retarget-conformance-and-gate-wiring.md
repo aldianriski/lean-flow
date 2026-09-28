@@ -11,7 +11,7 @@ tier: G
 authority: J2
 origin: decomposer
 state: ready
-depends-on: [TASK-377, TASK-363, TASK-387, TASK-382]
+depends-on: [TASK-377, TASK-390, TASK-391, TASK-387, TASK-382]
 ---
 
 # TASK-383 — Retarget the conformance engine, qa-check and night-run onto the store

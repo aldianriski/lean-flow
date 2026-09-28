@@ -21,6 +21,10 @@ depends-on: [TASK-360, TASK-362]
 - [ ] check-layers-completeness (sh + ts) and check-layers-observed (sh + ts) read Layers from member task files; per guard a retained must-FAIL fixture with its named finding plus one fixture varying the selection (L-186); worktree-isolated outside review (L-165 · L-168).
 - [ ] A v2 sprint with **no inline Plan** makes each retargeted guard examine member files, never pass vacuously — retained must-FAIL fixture per guard (Codex r1 F1).
 
+## Amended 2026-09-28
+
+- **Split at the SPRINT-109 promote, one task per guard (owner, 2026-09-28)**, because it was size L: check-layers-completeness → `TASK-390` · check-layers-observed → `TASK-391`. Moved to `cancel/`; its dependents (`TASK-380` · `381` · `383`) now depend on 390 and 391.
+
 ## Amended 2026-09-23
 
 - **Narrowed 2026-09-23 (Codex r1 · r2).** Scope is the Plan-shape layers guards only: check-layers-completeness (sh + ts) and check-layers-observed (sh + ts), plus their eval harnesses. dod-delta and verify-reaches moved to TASK-387; authority and task-origin to TASK-382; the conformance engine, qa-check wiring and night-run to TASK-383. Deleting TODO.md moved to TASK-380.
