@@ -2,6 +2,7 @@
 id: TASK-383
 title: "Retarget the conformance engine onto the store"
 epic: EPIC-017
+sprint: SPRINT-110
 priority: P1
 size: M
 risk: high

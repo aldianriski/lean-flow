@@ -2,6 +2,7 @@
 id: TASK-391
 title: "Retarget check-layers-observed onto member task files"
 epic: EPIC-017
+sprint: SPRINT-110
 priority: P1
 size: M
 risk: high

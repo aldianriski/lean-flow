@@ -16,7 +16,9 @@ status: current
 
 ## Active Sprint
 
-> _None active._ Last closed: **SPRINT-109 — Unlock the Critical Path**, closed 2026-09-29 with all 4 members
+> **SPRINT-110 — Retarget the Gate** → docs/sprint/SPRINT-110-retarget-the-gate.md
+>
+> Last closed: **SPRINT-109 — Unlock the Critical Path**, closed 2026-09-29 with all 4 members
 > done, 10 of 10 `## Done when` (`TASK-377` spec 0.12.0 · `TASK-364` token budget · `TASK-382`/`TASK-387` guards
 > on member files). See `CHANGELOG.md` and the sprint pair.
 

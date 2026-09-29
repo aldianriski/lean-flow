@@ -2,6 +2,7 @@
 id: TASK-392
 title: "Retarget qa-check and night-run onto the store"
 epic: EPIC-017
+sprint: SPRINT-110
 priority: P1
 size: M
 risk: high
