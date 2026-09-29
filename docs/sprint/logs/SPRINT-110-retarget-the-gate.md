@@ -32,3 +32,6 @@ The signed governance checklist, line by line (owner-signed; applied in `642d23f
 - **handoff ledger:** none.
 Owner rulings at this promote: D1 (`.ts` gates, carried from SPRINT-109) · D2 (the store is exempt from the ownership
 header) · D4 (the 383 split). G1/G2 are not signed yet.
+
+### 2026-09-29 | progress | plan_commit recorded: 4ddc80d
+The `plan locked` commit is `4ddc80d`; this entry and the frontmatter field land in the next commit (the SPRINT-109 shape).
