@@ -512,9 +512,9 @@ launcher's fire step at all, because getting there already proves a recognised m
 present (Part 0's mode-signal gate refuses anything else before launch). Decision and its trade →
 **ADR-016**.
 
-**This prose contract leads the script.** The shipped `scripts/night-run.sh` still counts boxes in
-the sprint file itself and is retargeted onto member files under TASK-383; until then it finds no
-Plan boxes to count on a by-reference sprint.
+**The script follows this contract (TASK-392).** `scripts/night-run.sh` counts member boxes through
+`scripts/lib/sprint-members-cli.ts`; a v1 sprint (inline Plan DoD, no members) is counted as before, and a
+by-reference sprint whose members cannot be counted ends `HARD_FAILURE`, never a quiet `0 of 0`.
 
 **Pre-existing defect, fixed at SPRINT-093 T3's retry.** This used to fire only when the raw
 command text contained the literal substring `sprint-bulk` — stale from before SPRINT-088 T3
