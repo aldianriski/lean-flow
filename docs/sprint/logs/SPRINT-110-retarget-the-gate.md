@@ -82,3 +82,10 @@ consequence · T4 · behaviour:material · governance:high
 All four are Tier G: a worktree-isolated outside reviewer each, with a threat model and a stop rule (L-165 · L-168 · L-217).
 Not staged: an uncommitted EPIC-016 edit from another session (the workdoo SPRINT-008/009 rollup), which currently FAILs prose-density
 (9 > 8 dense lines). It isn't this sprint's (L-042).
+
+### 2026-09-29 | progress | rank 0 dispatched (T1 ∥ T2, sonnet + /tdd); worktree-base guard PASS ×2
+Declared base `0595043`, the TASK-390/391 todo → in_progress move. `worktree-base` PASS for T1 (`agent-a10d5993…`) and for T2
+(`agent-aa04be0b…`), both branched from `0595043`. The briefs carry R1, D1, D6, the full Tier G bar (a must-FAIL per finding, a
+selection-varying fixture, the motivating artifacts, seeded breaks under `git hash-object` = `rev-parse HEAD:path`), and a
+typecheck route through the main checkout's `tsc` (TD-194's workaround). 14 worktrees left from SPRINT-106–109 are still present
+and were not removed. Some hold commits, so the owner is asked.
