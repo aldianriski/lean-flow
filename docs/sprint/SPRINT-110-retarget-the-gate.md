@@ -131,5 +131,8 @@ is CLEAR.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-layers-observed.ts` | T2 | member-out-of-layers · member-layers-undeclared (R1) · members-derived atClose · `--no-members` for the oracle diff | High (Tier G) | 13 tests · diff 29/29 · seeds S1–S5 · review CLEAR |
+| `evals/layers-observed.test.ts` (new) · `evals/run-layers-observed-fixtures.sh` · `…-differential.ts` | T2 | TS member cases wired into the runner; exclusion named | Low | runner verdict |
+| `TECH-DEBT.md` | T2 | TD-196/197/198 from the outside review (census-zero) | Low | — |
 
 ## Retro

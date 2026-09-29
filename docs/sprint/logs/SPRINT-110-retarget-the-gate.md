@@ -89,3 +89,18 @@ Declared base `0595043`, the TASK-390/391 todo → in_progress move. `worktree-b
 selection-varying fixture, the motivating artifacts, seeded breaks under `git hash-object` = `rev-parse HEAD:path`), and a
 typecheck route through the main checkout's `tsc` (TD-194's workaround). 14 worktrees left from SPRINT-106–109 are still present
 and were not removed. Some hold commits, so the owner is asked.
+
+### 2026-09-29 | progress | T2 TASK-391 merged at `ca162ec`. Outside review CLEAR, 3 census-zero gaps → TD-196/197/198
+Builder (sonnet + /tdd, worktree `0595043`): `02eb691`. check-layers-observed.ts resolves members (`resolveMembers`, read-only)
+and adds two findings. `member-layers-undeclared` covers R1: no governing `### Tn`, including a no-Tn sprint, so there is no
+vacuous PASS. `member-out-of-layers` checks a `Task: TASK-NNN` trailer against its governing Tn blocks' Layers. On v2, "at close"
+is now derived from members, which fixes the recon bug. `--no-members` keeps the `.sh` oracle's v1 parity in the differential (D1).
+The new `evals/layers-observed.test.ts` (13 tests) is wired into the runner. Seeded breaks S1–S5 each reddened exactly their own
+cases; restored `8ae2b75f` (`git hash-object` = `rev-parse HEAD:path`). Coordinator re-check: 4 files, all in Layers; runner
+`13 tests, 0 fail`, `all green`.
+Isolated review (sonnet, 9 probes, ~60k tokens): **CLEAR**. Gaps, each census 0: TD-196 (two `Task:` trailers are concatenated and
+the commit PASSes) · TD-197 (a backtick-wrapped trailer value) · TD-198 (`--no-members` is silent when on). No fixture covers a
+member cited by two Tn blocks (minor).
+Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 0 FAIL · layers-observed FAIL on exactly one file:
+the other session's uncommitted EPIC-016 edit (WIP no task declares, correctly flagged, not a T2 defect).
+review · T2 · scoped-reviewer · behaviour:material · governance:high

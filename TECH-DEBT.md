@@ -315,6 +315,23 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-198** severity: low | status: open | created: Sprint-110 (T2 outside review)
+  - Summary: **`--no-members` turns off check-layers-observed's member legs without printing anything.** It exists so the
+    differential keeps v1 parity with the `.sh` oracle (D1), and its only caller is `evals/run-layers-observed-differential.ts`
+    (not qa-check.sh, not night-run.sh). A future caller could bypass the member legs with no trace in the output.
+  - Mitigation (hypothesis): print a NOTE naming the exclusion whenever the flag is on (the TD-042 rule: a skip must be visible).
+
+- **TD-197** severity: low | status: open | created: Sprint-110 (T2 outside review)
+  - Summary: **A backtick-wrapped `Task:` trailer value escapes member attribution.** A `Task:` value of TASK-901 wrapped in backticks, on a `sprint(N):`
+    (COORD) subject falls through to the bookkeeping exemption, and an out-of-layers file PASSes. Census 2026-09-29: 0 such trailers.
+  - Mitigation (hypothesis): strip backticks and quotes from the trailer value before the lookup, the way the TS frontmatter readers normalise. A fixture (L-186).
+
+- **TD-196** severity: low | status: open | created: Sprint-110 (T2 outside review)
+  - Summary: **Two `Task:` trailers on one commit PASS silently.** `gitLogTrailerTask` joins them into `TASK-901TASK-902`, which
+    matches no member, so a `sprint(N):` subject reads as COORD and is exempt. Census 2026-09-29: 0 multi-trailer commits, and 0
+    `Task: TASK-NNN` trailers at all (23 `Task:` trailers in 1514 commits, all single and all `T1`–`T6`).
+  - Mitigation (hypothesis): read one trailer per line and check each; a two-trailer must-FAIL fixture.
+
 - **TD-195** severity: low | status: open | created: Sprint-109 (close)
   - Summary: **The dispatch preflight reads brace shorthand in `Layers:` as a bare directory.** `scripts/lib/check-doc-caps.{sh,ts}`
     was taken as `scripts/lib/`, which then "overlapped" every other `scripts/lib/` file: 7 `shared-file-unowned` FAILs across

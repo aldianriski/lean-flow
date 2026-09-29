@@ -25,8 +25,8 @@ sprint the `Layers:` it needs sits beside member files that the guard does not y
 
 ## Done when
 
-- [ ] check-layers-observed (sh + ts) reads Layers for each member task file; a retained must-FAIL fixture with its named finding plus one fixture varying the selection (L-186); worktree-isolated outside review (L-165 · L-168).
-- [ ] A v2 sprint with **no inline Plan** makes the guard examine member files, never pass vacuously — retained must-FAIL fixture (Codex r1 F1).
+- [x] check-layers-observed (sh + ts) reads Layers for each member task file; a retained must-FAIL fixture with its named finding plus one fixture varying the selection (L-186); worktree-isolated outside review (L-165 · L-168). ✓ `02eb691` (merged `ca162ec`): member-out-of-layers + member-layers-undeclared, retained must-FAIL each with sibling, selection varied (stamp-only member · trailer vs subject); `.ts` gates, `.sh` stays the Plan-path oracle (D1); runner `13 tests, 0 fail`, differential 29/29; isolated review CLEAR (9 probes).
+- [x] A v2 sprint with **no inline Plan** makes the guard examine member files, never pass vacuously — retained must-FAIL fixture (Codex r1 F1). ✓ no-Tn v2 sprint with all-COORD commits → `member-layers-undeclared` (retained, `evals/layers-observed.test.ts`); seeded break S2 reddened exactly its 3 cases.
 
 ## Touches
 
