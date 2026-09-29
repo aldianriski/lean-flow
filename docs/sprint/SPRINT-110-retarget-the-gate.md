@@ -83,7 +83,8 @@ is CLEAR.
 Layers: `scripts/qa-check.sh` · `scripts/night-run.sh` · `evals/run-night-run-rollup-fixtures.sh` ·
   `evals/night-run-rollup.test.ts` · `evals/fixtures/night-run-rollup/` · `scripts/lib/sprint-members-cli.ts` (new) ·
   `evals/run-reap-terminal-fixtures.sh` · `evals/run-night-run-outcome-fixtures.sh` · `evals/fixtures/night-run-outcome/` ·
-  `evals/run-revise-loop-ceiling-fixtures.sh` · `evals/fixtures/night-run-reaper/` · `skills/orchestrator/references/night-run.md`
+  `evals/run-revise-loop-ceiling-fixtures.sh` · `evals/fixtures/night-run-reaper/` · `skills/orchestrator/references/night-run.md` ·
+  `evals/run-qa-store-legs-fixtures.ts` (new)
 Depends-on: T1 · T2 (TASK-392's `depends-on`)
 Cites: `TASK-392` · night-run.md Part 4 (in Layers: its :516 is stale) · ADR-047 · L-020 · `TODO.md` (named, not touched)
 

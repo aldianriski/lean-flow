@@ -104,3 +104,13 @@ member cited by two Tn blocks (minor).
 Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 0 FAIL · layers-observed FAIL on exactly one file:
 the other session's uncommitted EPIC-016 edit (WIP no task declares, correctly flagged, not a T2 defect).
 review · T2 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-09-29 | scope-change | T4 Layers + `evals/run-qa-store-legs-fixtures.ts` (new): legs 3/5/7/8 have no harness
+**What broke:** TASK-392's second box needs a retained must-FAIL fixture per changed leg. Recon found that qa-check legs 3 (:660),
+5 (:825-835), 7 (:874-897) and 8 (:899-913) have no harness at all, so no file in T4's Layers can hold those fixtures.
+**Impact:** T4 adds one new TypeScript harness (no new `.sh`, owner rule), registered in `qa-check.sh`'s always-run list. qa-check.sh
+is already T4's file. The default profile already truncates at its budget, so the harness must stay fast (seconds, no git spawn
+per case where avoidable). Coordinator-owned design constraint, not an owner ruling: substantive new logic (member counting for
+`reap()` and leg 2g) lives in TypeScript (`sprint-members-cli.ts`), and the `.sh` edits are thin call sites. Legs whose subject is
+`TODO.md` itself follow R2's principle: scoped to while `TODO.md` exists, and retired with it by `TASK-380`.
+**Re-confirm G2:** within R2/R3 as signed. No member `## Done when` edited.
