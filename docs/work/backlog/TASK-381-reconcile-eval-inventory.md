@@ -11,7 +11,7 @@ tier: G
 authority: J1
 origin: decomposer
 state: ready
-depends-on: [TASK-390, TASK-391, TASK-387, TASK-382, TASK-383]
+depends-on: [TASK-390, TASK-391, TASK-387, TASK-382, TASK-383, TASK-392]
 ---
 
 # TASK-381 — Reconcile the eval inventory against the guard tasks

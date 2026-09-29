@@ -1,6 +1,6 @@
 ---
 id: TASK-383
-title: "Retarget the conformance engine, qa-check and night-run onto the store"
+title: "Retarget the conformance engine onto the store"
 epic: EPIC-017
 priority: P1
 size: M
@@ -14,21 +14,27 @@ state: ready
 depends-on: [TASK-377, TASK-390, TASK-391, TASK-387, TASK-382]
 ---
 
-# TASK-383 — Retarget the conformance engine, qa-check and night-run onto the store
+# TASK-383 — Retarget the conformance engine onto the store
 
 ## Done when
 
 - [ ] Conformance rules keyed to TODO.md re-point to the store per TASK-377's contract; the engine ships the layout to consumers.
-- [ ] qa-check.sh and night-run.sh read the store.
 - [ ] Retained must-FAIL fixture per changed rule; outside review, worktree-isolated.
 
 ## Touches
 
-scripts/lib/conformance-engine.sh · scripts/qa-check.sh · scripts/night-run.sh
+scripts/lib/conformance-engine.sh · its eval harness + fixtures
 
 ## Assumes
 
 none
+
+## Amended 2026-09-29
+
+- **Split at the SPRINT-110 promote (owner, 2026-09-29).** `qa-check.sh` and `night-run.sh` moved to `TASK-392`, one task
+  per surface, the way `TASK-363` split into `390`/`391`. This task keeps the conformance engine.
+- **`_own_docs` ruling (owner, 2026-09-29): exempt the store.** Task files carry their own schema (ADR-045), and status is the
+  folder. So the engine skips `docs/work/*/TASK-*.md` for S1.LAW3/S3.SCHEMA, and does not require an ownership header there.
 
 ## Amended 2026-09-28
 
@@ -41,11 +47,7 @@ none
   - `assert_S9_PLANFROZEN` (~2081) / `assert_S9_SCOPECHANGE` (~2126): compare § Plan only, so they miss a member `## Done when` edit. Retarget to the ADR-047 freeze.
   - `assert_S9_VERIFYCLAUSE` (~2174): greps `- [x]` in the sprint file, so it always reports nothing to verify on a by-reference sprint.
   - `_own_docs` (~1154-1159): lists TODO.md, and `find docs` sweeps task files → about 28 S1.LAW3/S3.SCHEMA FAILs. This needs a ruling: exempt the store, or require the header.
-  - Outside the engine: `qa-check.sh` ~654, 819-828, 870 (TODO hygiene, Active Sprint).
-
-## Amended 2026-09-26
-
-- Carried from SPRINT-107 T4: `scripts/night-run.sh` `reap()` still counts `- [x]`/`- [ ]` in the sprint FILE and `### Tn` blocks there. The prose contract (`skills/orchestrator/references/night-run.md` Part 4) now counts `## Done when` boxes across member files (Members ∪ `sprint:` stamps), and a unit is delivered when every member its `Cites:` names has no open box. On a by-reference sprint the script reports `0 of 0`. The contract leads, so retarget the script to it.
+  - Outside the engine: `qa-check.sh` ~654, 819-828, 870 → moved to `TASK-392` (split 2026-09-29).
 
 ## Tracker
 
