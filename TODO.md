@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-23
+last_updated: 2026-09-29
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,10 +16,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-109 — Unlock the Critical Path** → docs/sprint/SPRINT-109-unlock-the-critical-path.md
->
-> Last closed: **SPRINT-108 — Guard the Freeze**, closed 2026-09-26 with 10 of 10 Plan DoD
-> (`TASK-388` freeze checker · `TASK-389` locale-independent index). See `CHANGELOG.md` and the sprint pair.
+> _None active._ Last closed: **SPRINT-109 — Unlock the Critical Path**, closed 2026-09-29 with all 4 members
+> done, 10 of 10 `## Done when` (`TASK-377` spec 0.12.0 · `TASK-364` token budget · `TASK-382`/`TASK-387` guards
+> on member files). See `CHANGELOG.md` and the sprint pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
@@ -197,7 +196,7 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
                   21.0 → 3.4 s) survive into the total. UNCONFIRMED — that is the question, and the
                   arithmetic must not be substituted for the run (D2).
       tracker:    ADR-039 · ADR-043 · TD-168 · TD-171 · Round 19/20/21 · TD-090 · TD-117 · TD-128
-                  (severity: high, re-routed here at the SPRINT-109 promote -- their owners TASK-349/329 are gone)
+                  (severity: high, re-routed here 2026-09-28 -- their owners TASK-349/329 are gone)
       carried:    SPRINT-104 T4, parked twice, 0 of 6 DoD. 2026-09-23: `wsl --shutdown` freed 5.35 GB
                   and run 1 completed at **1863 s, `275 pass, 4 fail`** — but under paging (min 311 MB
                   free), so it is an observation, not a range member. Run 2 was reaped for memory at

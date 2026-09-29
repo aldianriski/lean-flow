@@ -2,8 +2,8 @@
 sprint: 109
 slug: unlock-the-critical-path
 owner: Maintainer
-last_updated: 2026-09-28
-status: active
+last_updated: 2026-09-29
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -184,3 +184,32 @@ per-task check had missed:
   `node_modules/.bin/tsc`, so neither could run the leg. Fixed with `!= null`; tsc 0 errors, by-reference 127/0.
 - `corpus metadata`: ADR-048 was tagged `governance`, which is outside the TAGS vocabulary → `[docs, tooling]`.
 - `knowledge index STALE`: ADR-048 is new, so the index was regenerated. `docs/knowledge-index.md` joins T2's Layers (generated).
+
+### 2026-09-29 | surprise | layers-completeness FAILs on T1 from plan_commit, although the promote entry recorded PASS
+The close's default gate printed `FAIL layers completeness: … ### T1 … DoD/Acceptance implies TODO.md, absent from Layers:`.
+Run against the sprint file at `1834c83`, `56dc057` and `3c85e84`, the checker FAILs at every one, so the finding is as old as the
+Plan. The promote entry's "layers-completeness … PASS" does not reproduce at the commit it describes. It stayed hidden because no
+full gate completed during the sprint. T1 names `TODO.md` in its prose without touching it (its Layers are the spec files), so it
+is declared on T1's `Cites:` line, which is the checker's own remedy and a live declaration like the Layers edits above. `## Done when`
+is untouched. Re-run over `docs/sprint/SPRINT-*.md`: 8 PASS, 0 FAIL.
+
+### 2026-09-29 | close | SPRINT-109 closed: 4 of 4 members done, 10 of 10 `## Done when`
+**System-verify** (owner: default profile, detached; `sh scripts/qa-check.sh` run as its own call, verdict line read):
+`QA-CHECK: 285 pass, 2 fail`, TRUNCATED at 552 s / 520 s with 4 harnesses named as unrun.
+- `qa-check-budget-exceeded` is the truncation itself (ADR-042).
+- The 4 unrun harnesses, each run as its own call: dispatch-preflight `all green` · conformance-engine `all green` (207 s) ·
+  store-readers `21 pass, 0 fail` · store-writers `29 pass, 0 fail`.
+- `layers completeness` on T1: fixed (entry above).
+- The three FAILs from the reaper-killed `QA_FULL` run were fixed in `095ba3b` and `2c42d1b` and are PASS in this run.
+
+Handoff reconciliation: no `handoff` entries this sprint.
+Retro written and routed:
+- **Shipped** → `CHANGELOG.md` § SPRINT-109
+- **Debt** → `TD-194` · `TD-195` (`TD-188`…`193` were filed at the T3/T4 reviews)
+- **Follow-ups** → none
+- **Learnings** → `L-218`, and `L-198` bumped to count 3
+
+TODO pointer cleared, and the one SPRINT-109 reference outside § Active Sprint re-worded to a date. EPIC-017's SPRINT-109 row is
+rolled up (no Closed-when newly met). Knowledge index regenerated, `--check` PASS. No release (D2).
+§11 retention (owner-approved: archival only) follows in its own commit. `## Members` keeps its plan-time `todo/` paths,
+following the SPRINT-107 archive precedent (members resolve by id).

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-23
+last_updated: 2026-09-29
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -28,6 +28,34 @@ and an active sprint's Plan onto `docs/work/` field by field, plan → approve �
 removes `TODO.md` once every task has moved and no conflict is left unresolved (non-task prose is
 listed for the owner to relocate or drop, never dropped silently). Mapping + verification: `skills/lean-doc-generator/references/
 migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md § Upgrading to 2.x.
+
+---
+## SPRINT-109 — Unlock the Critical Path (2026-09-29)
+
+EPIC-017's third member sprint. **Unreleased**: no version bump (D2); the whole epic gates `2.0.0`.
+
+- **The standard describes the store (spec `0.12.0`, breaking).**
+  - STANDARD §2 adds a `docs/work/` row and labels `TODO.md` *v1 layout, retired at 1.0, read only by migrate*.
+  - §9 describes a sprint by reference, and §10 routes Retro follow-ups to task files.
+  - §11 prunes `done/` and `cancel/`, never the highest id, with a deleted task's citations resolved through git.
+  - `1.0.0` stays behind §15's bar of two pinned repositories.
+  - `TASK-383` carries the named list of conformance rules that still read `TODO.md`.
+- **Caps measure tokens, not newlines (`ADR-048`, superseding ADR-015/017/019).** `check-doc-caps` budgets the always-loaded
+  read set in tokens with a named tokenizer (`claude-opus-5-5`), calibrated once at 2.991 bytes/token.
+  - The byte count is content-normalised, so a CRLF checkout reads the same as LF.
+  - The budget ratchets from its adoption value (16087): growth past it FAILs unless a disposition is recorded.
+  - `--calibrate` runs with an API key or through headless Claude Code on a subscription.
+  - Line counts stay as a secondary signal.
+- **Four guards read member task files.** On a by-reference sprint these guards found nothing in the Plan and passed without
+  examining anything.
+  - authority reads each member's `authority:` and FAILs `authority-plan-member-mismatch` when a Plan block disagrees with the
+    member it cites.
+  - task-origin covers every `docs/work/*/TASK-*.md`.
+  - dod-delta correlates member `## Done when` ticks through the Plan's `Cites:`.
+  - verify-reaches is ported to TypeScript and reads the Plan together with member Done-when. The `.sh` is deleted and every
+    caller re-pointed.
+
+  The member lookup is one shared module, `scripts/lib/sprint-members.ts`.
 
 ---
 ## SPRINT-108 — Guard the Freeze (2026-09-26)

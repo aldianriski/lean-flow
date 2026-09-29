@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-23
+last_updated: 2026-09-29
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -27,6 +27,14 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-218 [tags: process] [status: active]: **A per-task accept that re-runs only the task's own harness leaves every cross-cutting leg to the close, so a merge can sit red on `main` for the rest of the sprint.** SPRINT-109 accepted four Tier G tasks, each after its own fixtures, seeded breaks and an outside review went green on `main`. The close's first full gate found three FAILs those merges had introduced: `typecheck` (TS2345: T3 made `Tree.commit` optional, and a call site still tested `!== null`), `corpus metadata` (ADR-048 tagged outside the TAGS vocabulary) and a STALE knowledge index (a new ADR, never regenerated). None belonged to any task's harness, so no accept check covered them. `typecheck` could not have run anywhere but `main`, because the worktrees have no `tsc` (TD-194). A fourth finding was older still: a layers-completeness FAIL on the Plan itself, present from `plan_commit`, which the promote log had recorded as PASS. It hid all sprint because no full gate completed until close. **Durable form: after each merge, the coordinator runs the fast cross-cutting legs on `main` (`typecheck` · corpus metadata · the knowledge-index `--check` · layers-completeness over the sprint file), not only the task's harness.** They take seconds. The full gate that otherwise finds them takes about ten minutes, truncates at its budget, and on this host has been killed before printing a verdict.
+- seen: 2026-09-29 (SPRINT-109 close, system-verify: a reaper-killed partial run, then a truncated default run)
+- count: 1
+- promoted: no
+- related: L-165 (outside review covers the task's surface, not the repo's) · L-120 (read the gate's own verdict line) · L-067 (a result across an environment boundary) · TD-194
 
 ---
 
@@ -137,7 +145,8 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ## L-198 [tags: process] [status: active]: **An inverse cross-check tests the PARTITION, never the SELECTION — both halves share the selection rule, so they agree perfectly on the wrong population.** SPRINT-098's A2 had to size the population a new guard would run over. The derivation anchored one half correctly by shape (`^### <date> | run-complete |`, [[L-108]] applied) and selected sprints with a bare whole-file `grep -lE '^- \[ \] '`. It was then cross-checked the way this repository's own rule prescribes — a second query whose sum is the known total: `37 open + 60 closed = 97`. The arithmetic was flawless and the answer was wrong. Scoped to the `## Plan` section, where a DoD actually lives, the real figure is **5**, not 37; the other 32 were `## Owner-action checklist` items. **The inverse could not have caught it, because the inverse *is* the same selection rule run over the complement** — both halves counted the same wrong thing and partitioned it correctly. It was caught by a dispatched builder returning a differently-derived number, and by nothing else. **Durable form: a cross-check must vary the SELECTION rule, not the direction of the count. An inverse whose sum is the total proves only that the rows were partitioned; a second query that reaches the population by a different route is what proves the right rows entered it.** The cheap tell is that both halves of the check would break identically if the selector were wrong. This is [[L-186]] arriving at the instrument rather than the guard: that rule says fixtures discriminate a guard's branches while nothing discriminates its input set — this one says an inverse discriminates a count's partition while nothing discriminates its selector. Sharpened by where it happened: the coordinator cited L-186 in the dispatch brief of the very builder whose disagreeing number corrected it.
 - seen: 2026-09-11 (SPRINT-098 A2: `37 + 60 = 97` agreed with itself against a real figure of 5; corrected only by an independently-derived second number)
 - seen: 2026-09-13 (SPRINT-099 T3: ten archive-exclusion sites derived by grepping the case-glob SHAPE; the eleventh used `grep -v` and was structurally unreachable to that query — the cross-check re-ran the same shape and agreed with itself. Found by outside review, on a live gate leg, failing in the silent direction)
-- count: 2
+- seen: 2026-09-28 (SPRINT-109 promote: the signed checklist counted 4 soft OVER-CAP files from a cap run cut by `tail -15`; the real figure was 5. The first query truncated its own population, and it was caught only by re-running the check on the rendered file, a second route)
+- count: 3
 - promoted: yes → `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check bullet — placed beside L-108/L-130/L-143/L-170 because that is where a reader meets the act of deriving a number, and every flow that derives one reads it. Both sightings were derivations acted on immediately, with no review between query and conclusion.
 - related: L-186 (the population sibling, one level up) · L-108 · L-130 · L-165
 

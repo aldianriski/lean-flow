@@ -3,8 +3,8 @@ sprint: 109
 slug: unlock-the-critical-path
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-09-28
-status: active
+last_updated: 2026-09-29
+status: closed
 plan_commit: 1834c83
 gates_signed: G1,G2 @ 56dc057
 update_trigger: sprint execute/close events
@@ -42,7 +42,7 @@ filed at this promote) · any release (D2).
 ### T1 — Amend STANDARD for the work-item store and bump the spec MAJOR `[size: M · risk: high · class: decision · HITL · J2]`
 Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/work/README.md` · `docs/architecture/overview.md`
 Depends-on: none
-Cites: `TASK-377` · EPIC-017 D1 · D2 · ADR-045 · ADR-046 · ADR-047
+Cites: `TASK-377` · EPIC-017 D1 · D2 · ADR-045 · ADR-046 · ADR-047 · `TODO.md` (named in the prose, not touched)
 
 Tier P. The standard is the SSOT (ADR-023), and it still places `TODO.md` and describes a sprint by copy.
 Every guard retarget after this sprint cites it, so it goes first. The hand-off list of conformance rules
@@ -141,3 +141,45 @@ clauses and redden on a planted violation with a named finding, and an isolated 
 | `docs/research/logs/token-calibration.md` (new) | T2 | calibration method, raw numbers, error band | Low | — |
 
 ## Retro
+
+**Shipped** → `CHANGELOG.md` § SPRINT-109. All four members are in `done/`, with `## Done when` 10 of 10
+(377: 3 · 364: 1 · 382: 3 · 387: 3).
+**System-verify:** default profile, detached: `QA-CHECK: 285 pass, 2 fail`, TRUNCATED at 552 s against the 520 s budget
+with 4 harnesses named as unrun (a `QA_FULL=1` run before it was reaper-killed at 283 PASS).
+- `qa-check-budget-exceeded` is the truncation itself (ADR-042). The 4 unrun harnesses were then each run as their own call:
+  dispatch-preflight all green · conformance-engine all green (207 s) · store-readers 21/0 · store-writers 29/0.
+- `layers completeness` on T1 was real and dated from `plan_commit`: the prose names `TODO.md` without touching it. It is now
+  declared on T1's `Cites:` line, and a re-run gives 8 PASS, 0 FAIL.
+
+**Tech debt** → `TD-188`…`193` (filed at the T3/T4 outside reviews) · `TD-194` (a worktree cannot run `typecheck`) ·
+`TD-195` (the preflight reads brace shorthand as a directory). **Follow-ups** → none. **Learnings** → `L-218` ·
+`L-198` bumped to count 3.
+
+**Retrieval check:** yes, twice.
+- L-198 fired at promote: the checklist's soft-cap count came from a `tail -15` that cut its own population (4, really 5).
+  A second route caught it: the check re-run on the rendered file.
+- T1's recon read §2 and §9–§11 but not §15. A1 was ruled `1.0.0` against §15's own bar, and re-ruled `0.12.0` after the
+  scoped review.
+
+**Cost:** coordinator plus 4 builders (T1 opus; T2–T4 sonnet, T2 in two phases), 4 scoped reviews (T2–T4 worktree-isolated),
+one revise each for T1 and T2, and 5 headless calibration calls. Per-agent tokens were recorded only for the T3 (~65k) and
+T4 (~85k) reviews; the rest is unavailable. Each Tier G review took one round (L-217's threat model and stop rule held).
+Gate time: one reaper-killed `QA_FULL` run, then one default run truncated at 552 s with 4 harnesses finished by hand.
+
+**Worked**
+- Parallel worktree ranks (T1 ∥ T3, then T2 ∥ T4). T4's dependency on T3 was ruled at G2 when A3 proved false at recon,
+  not found at merge.
+- Reviewers briefed with a threat model and a stop rule: each census-zero miss went to TD, not into another round.
+- The deleted `.sh`'s three live callers joined T4's Layers before dispatch (L-020), so the port shipped wired.
+- Owner rulings at each blocked premise (A1 · A2's channel · box 1's `sh + ts`), logged as scope-change entries.
+
+**Friction**
+- Four FAILs sat on `main` until close. Three came from merges: a TS2345 from T3's extraction, an out-of-vocabulary ADR tag,
+  and a stale knowledge index. The fourth, a layers-completeness FAIL on T1, was present from `plan_commit` even though
+  the promote log recorded PASS. Each accept re-ran only its own harness, and no worktree can run `typecheck` (L-218).
+- The close's first `QA_FULL=1` run was killed by the host's memory reaper at 283 PASS.
+- The dispatch preflight read brace-shorthand Layers as a bare directory: 7 spurious FAILs (TD-195).
+- A1 was ruled against a section recon had not read (§15).
+- The calibration channel assumed an API key the owner does not have, so phase 2 was rebuilt on headless Claude Code.
+
+**Pattern candidate** → `L-218` (count 1).

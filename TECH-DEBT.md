@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-28
+last_updated: 2026-09-29
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -308,6 +308,22 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-195** severity: low | status: open | created: Sprint-109 (close)
+  - Summary: **The dispatch preflight reads brace shorthand in `Layers:` as a bare directory.** `scripts/lib/check-doc-caps.{sh,ts}`
+    was taken as `scripts/lib/`, which then "overlapped" every other `scripts/lib/` file: 7 `shared-file-unowned` FAILs across
+    T2–T4 at SPRINT-109, none of them real. Loud, not silent, so it costs a re-declaration rather than a miss. Census 2026-09-29:
+    0 brace forms left in live `Layers:` lines (written out at SPRINT-109).
+  - Mitigation (hypothesis): expand `{a,b}` before building the overlap map, or FAIL `layers-brace-shorthand` by name so the
+    author knows to write the paths out. A fixture for each arm (L-186).
+
+- **TD-194** severity: medium | status: open | created: Sprint-109 (close)
+  - Summary: **A dispatched worktree cannot run the `typecheck` leg, and nothing says so.** The builder and reviewer worktrees
+    have no `node_modules/.bin/tsc`, so a TS error a task introduces is invisible to every check its builder and reviewer can run.
+    At SPRINT-109, T3's `Tree.commit` → optional left a call site on `!== null` (TS2345). Every per-task check and an outside
+    review were green, and it surfaced only at the close's full gate. Census: every Tier G task since the TS ports is exposed.
+  - Mitigation (hypothesis): the worktree run resolves `tsc` from the main checkout's `node_modules` (or the brief says the leg is
+    unrunnable, loudly), and the coordinator's post-merge check includes `typecheck` (L-218).
 
 - **TD-193** severity: low | status: open | created: Sprint-109 (T4 outside review)
   - Summary: **A `*Verify:*` clause that wraps onto a second line vanishes without a trace.** `extractClause` needs the
