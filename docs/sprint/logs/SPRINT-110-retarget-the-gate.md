@@ -114,3 +114,11 @@ per case where avoidable). Coordinator-owned design constraint, not an owner rul
 `reap()` and leg 2g) lives in TypeScript (`sprint-members-cli.ts`), and the `.sh` edits are thin call sites. Legs whose subject is
 `TODO.md` itself follow R2's principle: scoped to while `TODO.md` exists, and retired with it by `TASK-380`.
 **Re-confirm G2:** within R2/R3 as signed. No member `## Done when` edited.
+
+### 2026-09-29 | surprise | T4's first dispatch branched from T1's commit; the worktree-base guard caught it, re-dispatched clean
+The first T4 worktree came up at `9910ec3` (T1's branch tip), 8 commits behind the declared base `20a8076`:
+`FAIL worktree-base-stale`. Cause: the coordinator had run a command with `cd` into T1's worktree to re-check it, the harness
+adopted that worktree as the session's working directory, and a new isolated worktree branches from the session checkout's
+HEAD, not from `main`. The builder was stopped before doing any work (0 commits, clean, auto-removed). T1's worktree (merged,
+clean) was fast-forwarded to `20a8076`, and T4 was re-dispatched: `PASS worktree-base` at `20a8076`. This is the guard doing
+exactly its job (TD-054). The rule for the rest of the sprint: re-check a worktree through `git -C <path>`, never `cd` into it.
