@@ -71,3 +71,14 @@ The `plan locked` commit is `4ddc80d`; this entry and the frontmatter field land
 layers-completeness over the edited Plan: 8 PASS, 0 FAIL, after the `Cites:`/`Layers:` contradiction on T4 was resolved (night-run.md is
 now touched, so it moves off the `Cites:` line). Pre-screen: verify-reaches NOTE, 4 members and 0 mechanical `Verify:` clauses, so every
 criterion is a judgment tick evidenced by its harness verdict line.
+
+### 2026-09-29 | progress | G1 + G2 signed by the owner at `04e517c`; rank 0 to be dispatched (T1 ∥ T2, worktree-isolated)
+The owner signed the batch G1 table and the G2 design and rulings R1–R3 (entry above) in one popup: "Sign, dispatch T1 ∥ T2".
+G1: every member ran the full checklist (`manual` origins, and TASK-383 was changed by the split). Review depth, read from the skip table now:
+consequence · T1 · behaviour:material · governance:high
+consequence · T2 · behaviour:material · governance:high
+consequence · T3 · behaviour:material · governance:high
+consequence · T4 · behaviour:material · governance:high
+All four are Tier G: a worktree-isolated outside reviewer each, with a threat model and a stop rule (L-165 · L-168 · L-217).
+Not staged: an uncommitted EPIC-016 edit from another session (the workdoo SPRINT-008/009 rollup), which currently FAILs prose-density
+(9 > 8 dense lines). It isn't this sprint's (L-042).
