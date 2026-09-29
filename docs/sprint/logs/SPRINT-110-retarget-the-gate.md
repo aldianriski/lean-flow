@@ -35,3 +35,39 @@ header) · D4 (the 383 split). G1/G2 are not signed yet.
 
 ### 2026-09-29 | progress | plan_commit recorded: 4ddc80d
 The `plan locked` commit is `4ddc80d`; this entry and the frontmatter field land in the next commit (the SPRINT-109 shape).
+
+### 2026-09-29 | scope-change | G2 rulings after recon: A1 false, two missing rules, Layers widened, T3 now after T4
+**What broke:** two read-only recon passes (Explore; about 92k and 132k tokens) refuted or widened four premises.
+- **A1 false.** Nothing (ADR-047 · sprint-by-reference.md · dispatch.md:65-68) defines a member's Layers on a sprint with
+  no `### Tn` blocks. `## Touches` is free prose that no script parses (brace shorthand, directories, "its eval harness").
+- **A2 does not apply to T1/T2.** The 15 → 24 · 38 · 50 inventory counts `TODO.md` parsers (EPIC-017:79), not layers-guard
+  files. It is `383`/`392`'s ground, and their recon re-derived it (below).
+- **A3 holds only if S11.TODOCAP is not retired.** Retiring it touches `spec/STANDARD.md` §2/§11/§14 and 4 more files.
+- **A4 confirmed.** qa-check.sh:1411-1437 and 1529-1537 need no change for T1/T2.
+- **Missed by the hand-off:** `assert_S9_TWOFILES` (engine :2017, greps `^- \[x\]` in the sprint file) and qa-check **leg 2g**
+  (:557, counts Plan `- [ ]`). Both are silent on a by-reference sprint.
+- **Also found:** check-layers-observed.ts:483 `atClose` is always true on v2 (no Plan `- [ ]`), so close-time exclusions apply
+  during execution. Its runner asserts only the `.sh` oracle, so a member fixture needs a TS home. `.conformance-exempt` cannot
+  express a glob. The engine's S9–S11 fixtures live in `run-sprint-family-fixtures.sh`, and S3/LAW3's in
+  `run-ownership-header-fixtures.sh`. `reap()` is driven by four harnesses beyond T4's Layers, and neither shell script can
+  reach `resolveMembers` without a CLI.
+**Owner rulings (2026-09-29, G2 popup):**
+- **R1 (A1):** on a sprint with no governing Plan block for a member → a named FAIL `member-layers-undeclared` per member.
+  With a Plan, the guard correlates members through `Cites:` (check-authority's pattern). `## Touches` stays prose.
+- **R2 (TODOCAP):** scoped to v1/mixed trees (fires only while `TODO.md` exists, message → `migrate`), and retired by
+  `TASK-380` with the file. No spec edit this sprint, so A3 holds.
+- **R3 (CLI):** a new `scripts/lib/sprint-members-cli.ts` (a thin argv wrapper; `sprint-members.ts` stays read-only, D6) is
+  **owned by T4**, and **T3 now depends on T4**. Waves: T1 ∥ T2 → T4 → T3.
+**Impact on § Plan (Layers and Depends-on are live declarations; no member `## Done when` edited):**
+- T2 Layers + `evals/layers-observed.test.ts` (new; the runner calls it the way the completeness runner does).
+- T3 Layers: `.conformance-exempt` out; `evals/run-sprint-family-fixtures.sh` + `evals/run-ownership-header-fixtures.sh` in.
+  Depends-on + T4.
+- T4 Layers + `scripts/lib/sprint-members-cli.ts` (new) · `evals/run-reap-terminal-fixtures.sh` ·
+  `evals/run-night-run-outcome-fixtures.sh` · `evals/fixtures/night-run-outcome/` · `evals/run-revise-loop-ceiling-fixtures.sh` ·
+  `evals/fixtures/night-run-reaper/` · `skills/orchestrator/references/night-run.md` (:516 is stale).
+**Re-confirm G2:** the preflight is re-run after the edit (next entry).
+
+### 2026-09-29 | progress | preflight re-run after the scope-change: CLEAR, waves T1=0 T2=0 T4=1 T3=2
+layers-completeness over the edited Plan: 8 PASS, 0 FAIL, after the `Cites:`/`Layers:` contradiction on T4 was resolved (night-run.md is
+now touched, so it moves off the `Cites:` line). Pre-screen: verify-reaches NOTE, 4 members and 0 mechanical `Verify:` clauses, so every
+criterion is a judgment tick evidenced by its harness verdict line.

@@ -53,7 +53,7 @@ instead of passing vacuously. An isolated outside review is CLEAR.
 
 ### T2 — Retarget check-layers-observed onto member task files `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `scripts/lib/check-layers-observed.ts` · `evals/run-layers-observed-fixtures.sh` ·
-  `evals/run-layers-observed-differential.ts` · `evals/fixtures/layers-observed/`
+  `evals/run-layers-observed-differential.ts` · `evals/fixtures/layers-observed/` · `evals/layers-observed.test.ts` (new)
 Depends-on: none
 Cites: `TASK-391` · EPIC-017 scope 4 · Codex r1 F1 · ADR-039 · L-166 · L-186 · `scripts/lib/sprint-members.ts` (imported, read-only)
 
@@ -65,8 +65,9 @@ with its named finding. A sprint with no inline Plan reddens instead of passing 
 review is CLEAR.
 
 ### T3 — Retarget the conformance engine onto the store `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `.conformance-exempt`
-Depends-on: T1 · T2 (TASK-383's `depends-on`)
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` ·
+  `evals/run-sprint-family-fixtures.sh` · `evals/run-ownership-header-fixtures.sh`
+Depends-on: T1 · T2 (TASK-383's `depends-on`) · T4 (owns `scripts/lib/sprint-members-cli.ts`, G2 ruling R3)
 Cites: `TASK-383` · its hand-off list (SPRINT-109 T1, `3c85e84`) · `spec/STANDARD.md` 0.12.0 §2 · §9 · §10 · §11 · ADR-045 · ADR-047 · D2 · `TODO.md` (named, not touched)
 
 Tier G. The engine is what ships the standard to consumers, and seven of its rules still read `TODO.md` or a
@@ -79,9 +80,11 @@ is CLEAR.
 
 ### T4 — Retarget qa-check and night-run onto the store `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `scripts/qa-check.sh` · `scripts/night-run.sh` · `evals/run-night-run-rollup-fixtures.sh` ·
-  `evals/night-run-rollup.test.ts` · `evals/fixtures/night-run-rollup/`
+  `evals/night-run-rollup.test.ts` · `evals/fixtures/night-run-rollup/` · `scripts/lib/sprint-members-cli.ts` (new) ·
+  `evals/run-reap-terminal-fixtures.sh` · `evals/run-night-run-outcome-fixtures.sh` · `evals/fixtures/night-run-outcome/` ·
+  `evals/run-revise-loop-ceiling-fixtures.sh` · `evals/fixtures/night-run-reaper/` · `skills/orchestrator/references/night-run.md`
 Depends-on: T1 · T2 (TASK-392's `depends-on`)
-Cites: `TASK-392` · `skills/orchestrator/references/night-run.md` Part 4 · ADR-047 · L-020 · `TODO.md` (named, not touched)
+Cites: `TASK-392` · night-run.md Part 4 (in Layers: its :516 is stale) · ADR-047 · L-020 · `TODO.md` (named, not touched)
 
 Tier G. The gate's TODO-hygiene and Active Sprint legs read `TODO.md`, and `reap()` counts boxes in the sprint
 file. So on a by-reference sprint the gate checks nothing and a night run reports `0 of 0`. The prose contract
