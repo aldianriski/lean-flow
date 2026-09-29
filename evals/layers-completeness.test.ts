@@ -266,3 +266,68 @@ describe("space-token-wordsplit (retained must-FAIL fixture -- the oracle's IFS 
     expect(r.output).toContain("T2 Depends-on completeness (prose-referenced tasks all declared)");
   });
 });
+
+// --- SPRINT-110 T1 (TASK-390): member task files on a by-reference (v2) sprint ---------------------
+// The Plan-shape checks above read a Plan's INLINE DoD; a v2 sprint's DoD lives in its member files, so
+// the guard used to pass without looking at any of it (Codex r1 F1). Each fixture below is a
+// self-contained `<root>/docs/sprint + docs/work` tree -- the shape resolveMembers() reads.
+//
+// member-mixed carries every VERDICT and varies the SELECTION (L-186): T1 cites TWO members (the second
+// wrapped onto a continuation line), T2 is covered by a Layers DIRECTORY, T3's member is reached ONLY by
+// its `sprint:` stamp (absent from `## Members`), and TASK-936 is listed but no block cites it.
+describe("member-mixed (retained must-FAIL fixture -- member-layers-incomplete + member-layers-undeclared)", () => {
+  let r: Captured;
+  const dir = posix.join(FIXTURES, "member-mixed/docs/sprint/SPRINT-921-fx.md");
+  beforeAll(() => {
+    r = capture([dir]);
+  });
+  const M = "member-layers-incomplete";
+  test("FAILs naming the block, the member and the file its Done when implies", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(
+      `FAIL  ${M}: ${dir} ### T1 member docs/work/todo/TASK-935-second-of-two.md (TASK-935) Done when implies b-missing.ts, absent from that block's Layers:`,
+    );
+  });
+  test("selection: a member reached only via its sprint: stamp is examined (TD-marked-resolved -> TECH-DEBT.md)", () => {
+    expect(r.output).toContain(
+      `FAIL  ${M}: ${dir} ### T3 member docs/work/in_progress/TASK-934-stamp-only.md (TASK-934) Done when implies TECH-DEBT.md(TD-marked-resolved), absent from that block's Layers:`,
+    );
+  });
+  test("selection: a member no block cites is a named member-layers-undeclared FAIL", () => {
+    expect(r.output).toContain(
+      `FAIL  member-layers-undeclared: ${dir} member docs/work/todo/TASK-936-no-block.md (TASK-936) has no governing Plan block`,
+    );
+  });
+  test("siblings stay green: T1's first cited member, and the directory-covered member", () => {
+    expect(r.output).toContain(`PASS  member-layers-complete: ${dir} ### T1 member docs/work/todo/TASK-931-clean.md (TASK-931)`);
+    expect(r.output).toContain(`PASS  member-layers-complete: ${dir} ### T2 member docs/work/todo/TASK-932-dir-covered.md (TASK-932)`);
+    expect(r.output).not.toContain("TASK-931) Done when implies");
+    expect(r.output).not.toContain("TASK-932) Done when implies");
+  });
+});
+
+describe("member-no-plan (retained must-FAIL fixture -- a v2 sprint with no ### Tn block, R1)", () => {
+  let r: Captured;
+  const dir = posix.join(FIXTURES, "member-no-plan/docs/sprint/SPRINT-922-fx.md");
+  beforeAll(() => {
+    r = capture([dir]);
+  });
+  test("FAILs member-layers-undeclared per member (listed AND stamp-only), never silent", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(`FAIL  member-layers-undeclared: ${dir} member docs/work/todo/TASK-937-listed.md (TASK-937)`);
+    expect(r.output).toContain(`FAIL  member-layers-undeclared: ${dir} member docs/work/review/TASK-938-stamp-only.md (TASK-938)`);
+  });
+});
+
+describe("member-clean (sibling control -- every member governed and covered)", () => {
+  let r: Captured;
+  const dir = posix.join(FIXTURES, "member-clean/docs/sprint/SPRINT-923-fx.md");
+  beforeAll(() => {
+    r = capture([dir]);
+  });
+  test("exits 0 with a member-layers-complete PASS and no FAIL", () => {
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain(`PASS  member-layers-complete: ${dir} ### T1 member docs/work/todo/TASK-939-ok.md (TASK-939)`);
+    expect(r.output.split("\n").filter((l) => l.startsWith("FAIL")).length).toBe(0);
+  });
+});

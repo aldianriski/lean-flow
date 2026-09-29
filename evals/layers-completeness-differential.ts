@@ -64,10 +64,29 @@ function runOracle(args: readonly string[]): Oracle {
   }
 }
 
+// EXCLUDED FROM PARITY, BY NAME (SPRINT-110 T1, decision D1): the member-file findings --
+// member-layers-complete / member-layers-incomplete / member-layers-undeclared -- exist ONLY in the TS
+// port. The .sh oracle stays a Plan-path oracle and is deliberately NOT taught to read docs/work/
+// members, so those lines have no oracle counterpart to compare. They are filtered out of the port's
+// output here (and the exit code recomputed from the remaining lines) so parity is asserted over
+// everything the oracle CAN say -- i.e. every v1 sprint, and the Plan half of a v2 one -- while the
+// exclusion stays visible and greppable rather than an unexplained divergence. The member findings
+// themselves are guarded by evals/layers-completeness.test.ts. `memberLinesExcluded` is printed in the
+// summary so a run that excluded nothing (the exclusion silently dead) reads differently from one that did.
+const MEMBER_FINDING_RE = /^(PASS|FAIL)  member-layers-(complete|incomplete|undeclared): /;
+let memberLinesExcluded = 0;
+
 function runPort(args: readonly string[]): Oracle {
   const result = runLayersCompleteness(args);
-  const output = result.lines.length > 0 ? result.lines.join("\n") + "\n" : "";
-  return { exitCode: result.fail ? 1 : 0, output };
+  const kept = result.lines.filter((l) => {
+    if (MEMBER_FINDING_RE.test(l)) {
+      memberLinesExcluded++;
+      return false;
+    }
+    return true;
+  });
+  const output = kept.length > 0 ? kept.join("\n") + "\n" : "";
+  return { exitCode: kept.some((l) => l.startsWith("FAIL")) ? 1 : 0, output };
 }
 
 let total = 0;
@@ -152,7 +171,12 @@ const fixtureFiles = readdirSync(fixtureDir)
 for (const f of fixtureFiles) {
   compare(`static fixture ${f.slice(repoRoot.length + 1)}`, [f]);
 }
-progress(`population 1 done: ${fixtureFiles.length} static fixtures`);
+// The v2 member trees (SPRINT-110 T1): the oracle reads only their Plan, the port also reads members;
+// parity is asserted on the Plan half, with the member-* findings excluded by name (see runPort).
+for (const t of ["member-mixed/docs/sprint/SPRINT-921-fx.md", "member-no-plan/docs/sprint/SPRINT-922-fx.md", "member-clean/docs/sprint/SPRINT-923-fx.md"]) {
+  compare(`v2 member fixture ${t}`, [posix.join(fixtureDir, t)]);
+}
+progress(`population 1 done: ${fixtureFiles.length} static fixtures + 3 v2 member trees`);
 // dir-token-prefix.md is exercised twice by the harness (two different assertions against the same
 // output) -- already covered by running it once here, since the differential compares full output,
 // not a single assertion; running it twice would just repeat the identical comparison.
@@ -217,6 +241,7 @@ try {
 }
 
 console.log(`layers-completeness differential: ${identical}/${total} identical (exit code + stdout)`);
+console.log(`  member-* findings excluded from parity (TS-only, decision D1): ${memberLinesExcluded} line(s)`);
 if (divergences.length > 0) {
   console.log(`${divergences.length} DIVERGENCE(S):\n`);
   console.log(divergences.join("\n\n"));

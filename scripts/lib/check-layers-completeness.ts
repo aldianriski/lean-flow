@@ -51,6 +51,8 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { resolveMembers, section, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151) ---------------------------------------
 // Ported from scripts/lib/archive-path.sh's lf_is_archived_path(). Two tests, in the SAME order:
@@ -372,6 +374,68 @@ const FILE_TOKEN_RE = /`[A-Za-z0-9_./-]+\.[A-Za-z]+`/g;
 const BARE_TOKEN_RE = /[A-Za-z0-9_./-]+\.[A-Za-z]+/g;
 const TID_RE = /\bT[0-9]+\b/g;
 
+// --- SPRINT-110 T1 (TASK-390): member task files on a by-reference (v2) sprint --------------------
+// A v2 sprint keeps its DoD in member task files (docs/work/), not in the inline Plan, so the
+// Plan-shape checks above can pass without reading any of it (Codex r1 F1). For each member
+// (resolveMembers: `## Members` UNION `sprint:`-stamped, live tree) find the `### Tn` block(s) whose
+// Cites: names its TASK id -- that block's Layers/Cites are the declaration the member's `## Done when`
+// is checked against, by the SAME "implies file X" rule the Plan prose gets (backticked file tokens +
+// the TD-NNN "resolved" -> TECH-DEBT.md rule). A member NO block cites has no declaration to check
+// against and is a named FAIL, never silence (owner ruling R1). scripts/lib/check-layers-completeness.sh
+// is NOT taught this (decision D1: it stays the Plan-path oracle); the differential names the exclusion.
+// `## Touches` stays prose and is not parsed. An id resolveMembers cannot resolve to exactly one file
+// is dropped by it silently (TD-188) -- reported by check-sprint-by-reference (MEMBER-MISSING), not here.
+interface BlockDecl {
+  tidFull: string;
+  citedTasks: Set<string>;
+  layersToks: string[];
+  citesToks: string[];
+}
+
+export function evaluateMemberLayers(
+  sp: string,
+  members: readonly Member[],
+  blocks: readonly BlockDecl[],
+  readMember: (m: Member) => string,
+): { lines: string[]; anyFail: boolean } {
+  const lines: string[] = [];
+  let anyFail = false;
+  for (const m of members) {
+    const governing = blocks.filter((b) => b.citedTasks.has(m.id));
+    if (governing.length === 0) {
+      anyFail = true;
+      lines.push(
+        `FAIL  member-layers-undeclared: ${sp} member ${m.path} (${m.id}) has no governing Plan block -- no ### Tn whose Cites: names ${m.id}, so its Layers are checked against nothing`,
+      );
+      continue;
+    }
+    const doneWhen = section(readMember(m), "Done when") ?? "";
+    const implied = [...new Set((doneWhen.match(FILE_TOKEN_RE) ?? []).map((t) => t.slice(1, -1)))];
+    for (const b of governing) {
+      const layers = new Set(b.layersToks);
+      const cites = new Set(b.citesToks);
+      const dirs = b.layersToks.filter((t) => t.endsWith("/"));
+      let miss = "";
+      for (const t of implied) {
+        if (layers.has(t) || cites.has(t) || dirs.some((d) => t.startsWith(d))) continue;
+        miss += " " + t;
+      }
+      if (/TD-[0-9]+/.test(doneWhen) && /resolved/i.test(doneWhen)) {
+        if (!layers.has("TECH-DEBT.md") && !cites.has("TECH-DEBT.md")) miss += " TECH-DEBT.md(TD-marked-resolved)";
+      }
+      if (miss !== "") {
+        anyFail = true;
+        lines.push(
+          `FAIL  member-layers-incomplete: ${sp} ${b.tidFull} member ${m.path} (${m.id}) Done when implies${miss}, absent from that block's Layers: -- if the prose only cites it rather than touching it, declare it on that block's Cites: line`,
+        );
+      } else {
+        lines.push(`PASS  member-layers-complete: ${sp} ${b.tidFull} member ${m.path} (${m.id}) Done when files all declared`);
+      }
+    }
+  }
+  return { lines, anyFail };
+}
+
 export function runLayersCompleteness(args: readonly string[]): RunResult {
   if (args.length === 0) {
     return { lines: ["      layers completeness: no sprint files given -- nothing verified"], fail: false };
@@ -379,7 +443,10 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
 
   // emit[] holds the FINAL output in original order: either a fixed string (file-not-found) or a
   // pending block whose lines are filled in after the one batched sort call.
-  type Emit = { kind: "line"; text: string } | { kind: "block"; index: number };
+  type Emit =
+    | { kind: "line"; text: string }
+    | { kind: "block"; index: number }
+    | { kind: "member"; lines: string[]; anyFail: boolean };
   const emit: Emit[] = [];
   const pending: {
     sp: string;
@@ -414,6 +481,7 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
     const content = readFileSync(sp, "utf8");
     const planLines = extractPlanLines(content);
     const blocks = extractBlocks(planLines);
+    const decls: BlockDecl[] = [];
 
     for (const block of blocks) {
       const tshortMatch = /T[0-9]+/.exec(block.tidFull);
@@ -452,6 +520,22 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
         oidItems,
       });
       emit.push({ kind: "block", index });
+      decls.push({
+        tidFull: block.tidFull,
+        citedTasks: new Set(citesLine.match(/\bTASK-\d+\b/g) ?? []),
+        layersToks: layersTokItems,
+        citesToks: citesTokItems,
+      });
+    }
+
+    // Member files (SPRINT-110 T1). root = the sprint file's grandparent-of-grandparent under the
+    // `<root>/docs/sprint/<file>` convention (same derivation as check-authority.ts); resolveMembers
+    // returns [] when that root has no docs/work/, so a v1 sprint adds nothing here.
+    const members = resolveMembers(dirname(dirname(dirname(sp))), sp);
+    if (members.length > 0) {
+      const root = dirname(dirname(dirname(sp)));
+      const res = evaluateMemberLayers(sp, members, decls, (m) => readFileSync(join(root, m.path), "utf8"));
+      emit.push({ kind: "member", lines: res.lines, anyFail: res.anyFail });
     }
   }
 
@@ -479,6 +563,11 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
     if (e.kind === "line") {
       finalLines.push(e.text);
       fail = true;
+      continue;
+    }
+    if (e.kind === "member") {
+      finalLines.push(...e.lines);
+      if (e.anyFail) fail = true;
       continue;
     }
     const i = e.index;
