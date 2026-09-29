@@ -35,6 +35,12 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-110 promote (2026-09-29).** **105 of 115 open rows** are ≥3 sprints unaddressed, counted
+> against sprint 110: the 99 named below, plus **6** newly aged, all `low` and filed at SPRINT-107, as re-review prompts:
+> TD-180 · TD-181 · TD-182 · TD-183 · TD-184 · TD-185. Second route: 115 open − 10 filed at 108/109 = 105. Seven `high` rows,
+> all owned: TD-143 → `TASK-348` · TD-150 → `TASK-345` · TD-090/117/128/168 → `TASK-357` · TD-174 → `TASK-384`.
+> TD-179 (resolved at SPRINT-107) deleted under §11; its citations resolve through git.
+>
 > **Aging sweep — SPRINT-109 promote (2026-09-28).** **99 of 107 open rows** are ≥3 sprints unaddressed,
 > counted against sprint 109. 69 of them are named in the SPRINT-098 sweep below. The **30** it could not name
 > (filed after it) are named here, as re-review prompts: TD-142 · TD-144 · TD-145 · TD-147 · TD-148 · TD-149 · TD-151 · TD-152 · TD-153 · TD-154 · TD-155 · TD-156 · TD-158 · TD-159 · TD-160 · TD-161 · TD-162 · TD-163 · TD-164 · TD-165 · TD-166 · TD-167 · TD-168 · TD-171 · TD-172 · TD-173 · TD-174 · TD-176 · TD-177 · TD-178.
@@ -443,23 +449,6 @@ status: current
   - Mitigation: match with `.*` (or the literal dash) instead of `.`. It is one line, and Tier G
     discipline applies to the fixture itself.
   - **Re-file fresh if** the gate starts pinning a UTF-8 locale for every harness.
-
-- **TD-179** severity: medium | status: resolved → TASK-362 (SPRINT-107 T1, ADR-047) | created: Sprint-106
-  - **Resolved on evidence (SPRINT-107 T1):** `promote` now works by reference — the Plan's `Tn` blocks
-    carry no DoD, so each task has one DoD, its member file's `## Done when`, and there is nothing to
-    mirror (`templates/SPRINT.md.template`, `references/sprint-by-reference.md`). The freeze the copy
-    used to carry is kept by `plan_commit` and checked mechanically: `bun evals/run-by-reference-fixtures.ts`
-    → `by-reference-fixtures: 25 pass, 0 fail` (must-FAIL per finding, selection-varying cases, 15-seed break
-    proof); pointed at SPRINT-107 (`plan_commit 3e0e710`) the checker reports 5 members unedited.
-    **Scope of the fix:** sprints promoted from here on. SPRINT-107's own Plan was locked with copies
-    before this landed, so D3's mirroring duty runs to its close.
-  - Summary: **a sprint's Plan and its member task files each carry a DoD, and only the Plan gets ticked.**
-    SPRINT-106's Plan was ticked for T0–T3 while the five member files' `## Done when` stayed unticked;
-    `migrate`'s real-input exercise found it (17 ticked in the Plan, 0 in the files) and reported five
-    conflicts. A v2 `/prime` counts the files, so it would have misreported the sprint.
-  - **Owner ruling (SPRINT-106 close):** the coordinator mirrors ticks into member files, truthfully —
-    only what is actually true of the file's own wording — until the Plan copy is removed.
-  - **Resolve when** TASK-362 (promote/close by reference) removes the Plan copy, leaving one DoD per task.
 
 - **TD-178** severity: low | status: open | created: Sprint-104
   - Summary: **layers-completeness reads a bare filename in DoD prose as undeclared when `Layers:` names
