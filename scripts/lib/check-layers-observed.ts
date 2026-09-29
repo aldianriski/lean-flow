@@ -31,7 +31,8 @@
 // downstream regexes can assume LF-only text, exactly like the oracle's.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { posix } from "node:path";
+import { join, posix } from "node:path";
+import { section, resolveMembers, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151), identical logic to the copy in
 // check-layers-completeness.ts -- both are independent, byte-identical ports of the SAME shell
@@ -179,6 +180,55 @@ export function taskDecls(planLines: readonly string[]): TaskDecl[] {
     inl = false;
   }
   return out;
+}
+
+/** SPRINT-110 T2 (TASK-391): `Tn` -> the TASK ids its `Cites:` line (plus indented continuation lines)
+ *  names, read from the Plan's own `### Tn` blocks. Pattern: check-authority.ts parseCites. A Tn with
+ *  no Cites: line, or none TASK-shaped, is absent from the map. */
+export function planCites(planLines: readonly string[]): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  let cur: string | null = null;
+  let inCites = false;
+  for (const line of planLines) {
+    const h = /^### (T[0-9]+)\b/.exec(line);
+    if (h) {
+      cur = h[1]!;
+      inCites = false;
+      continue;
+    }
+    if (/^#{1,3} /.test(line)) {
+      cur = null;
+      inCites = false;
+      continue;
+    }
+    if (cur === null) continue;
+    const isCites = /^Cites:/.test(line);
+    if (isCites || (inCites && /^[ \t]+[^ \t]/.test(line))) {
+      inCites = true;
+      const ids = [...line.matchAll(/\bTASK-[0-9]+(?![0-9])/g)].map((m) => m[0]);
+      if (ids.length > 0) map.set(cur, [...(map.get(cur) ?? []), ...ids]);
+      continue;
+    }
+    inCites = false;
+  }
+  return map;
+}
+
+/** v2 "at close", derived from the members (a by-reference Plan has no `- [ ]` boxes, so the v1 rule
+ *  is vacuously true there). Closed = in done/ or cancel/, or its `## Done when` has boxes, all ticked. */
+export function membersClosed(root: string, members: readonly Member[]): boolean {
+  for (const m of members) {
+    if (m.folder === "done" || m.folder === "cancel") continue;
+    let body: string | null = null;
+    try {
+      body = section(readFileSync(join(root, m.path), "utf8"), "Done when");
+    } catch {
+      body = null;
+    }
+    const boxes = (body ?? "").split("\n").filter((l) => /^\s*- \[[ xX]\]/.test(l));
+    if (boxes.length === 0 || boxes.some((l) => /^\s*- \[ \]/.test(l))) return false;
+  }
+  return true;
 }
 
 /** covers(): <space-separated declared tokens>, <path> -- ported literally, INCLUDING the shell's
@@ -358,7 +408,13 @@ export interface RunResult {
   fail: boolean;
 }
 
-export function runLayersObserved(args: readonly string[]): RunResult {
+export function runLayersObserved(argv: readonly string[]): RunResult {
+  // `--no-members` turns the member-aware legs OFF (v1 behaviour only). It exists for
+  // evals/run-layers-observed-differential.ts, which compares this port to the shell oracle -- and
+  // the oracle is a Plan-path oracle that was deliberately not taught members (D1). qa-check.sh
+  // never passes it.
+  const noMembers = argv.includes("--no-members");
+  const args = argv.filter((a) => a !== "--no-members");
   if (args.length === 0) {
     return { lines: ["      layers observed: no sprint files given -- nothing verified"], fail: false };
   }
@@ -454,9 +510,27 @@ export function runLayersObserved(args: readonly string[]): RunResult {
       siblingSprints.add(an);
     }
 
+    // ---- members (SPRINT-110 T2): a by-reference sprint's task files, each governed by the ### Tn
+    // block whose Cites: names it. `## Touches` stays prose -- never parsed. ---------------------
+    const root = posix.dirname(posix.dirname(posix.dirname(sp.replace(/\\/g, "/"))));
+    const members = noMembers ? [] : resolveMembers(root, sp);
+    const cites = planCites(planLines);
+    const governing = (id: string): string[] => [...cites].filter(([, ids]) => ids.includes(id)).map(([t]) => t);
+    const memberIds = new Set(members.map((m) => m.id));
+    let undeclaredMembers = false;
+    for (const m of members) {
+      if (governing(m.id).length === 0) {
+        undeclaredMembers = true;
+        bad(
+          `${sp} layers observed: member-layers-undeclared: ${m.id} (${m.path}) is cited by no ### Tn block's Cites: -- no Plan Layers govern it`,
+        );
+      }
+    }
+
     // ---- path 1: COMMITTED changes -- attributed, checked PER TASK ------------------------
     let unattr = "";
     let missAttr = "";
+    let missMember = "";
     for (const c of gitRevList(`${planCommit}..HEAD`)) {
       const subject = gitLogSubject(c);
       const cSprint = commitSprint(subject);
@@ -464,6 +538,17 @@ export function runLayersObserved(args: readonly string[]): RunResult {
 
       const files = gitDiffTreeNameOnly(c);
       const trailerTask = gitLogTrailerTask(c);
+      if (memberIds.has(trailerTask)) {
+        // `Task: TASK-NNN` on a member: check against the union of its governing Tn blocks' Layers.
+        // An ungoverned member is already a member-layers-undeclared FAIL -- not re-reported per file.
+        const gov = governing(trailerTask);
+        const toks = gov.flatMap((t) => declsByTask.get(t) ?? []).join(" ");
+        for (const f of files) {
+          if (isExcludedCommitted(f) || gov.length === 0) continue;
+          if (!covers(toks, f)) missMember += ` ${trailerTask}(${gov.join("+")}):${f}`;
+        }
+        continue;
+      }
       const who = attribute(subject, trailerTask, () => isGovernanceCommit(files));
       const shortSha = who === "UNATTRIBUTED" ? gitRevParseShort(c) : "";
       const whoToks = who === "UNATTRIBUTED" || who === "COORD" || who === "GOVERNANCE" ? "" : (declsByTask.get(who) ?? []).join(" ");
@@ -480,7 +565,9 @@ export function runLayersObserved(args: readonly string[]): RunResult {
     }
 
     // ---- path 2: UNCOMMITTED work in progress -- unattributable, checked against the union --
-    const atClose = planLines.filter((l) => /^- \[ \]/.test(l)).length === 0;
+    // v2 (members present): "at close" comes from the members -- the by-reference Plan has no boxes,
+    // so the v1 rule is vacuously true there and applied close-time exclusions mid-execution.
+    const atClose = members.length > 0 ? membersClosed(root, members) : planLines.filter((l) => /^- \[ \]/.test(l)).length === 0;
     let miss = "";
     let nWip = 0;
     for (const f of wip()) {
@@ -489,7 +576,11 @@ export function runLayersObserved(args: readonly string[]): RunResult {
       if (!covers(layersAll, f)) miss += ` ${f}`;
     }
 
-    let hit = false;
+    let hit = undeclaredMembers;
+    if (missMember !== "") {
+      bad(`${sp} layers observed: member-out-of-layers: changed by a member outside its governing Tn's Layers:${missMember}`);
+      hit = true;
+    }
     if (unattr !== "") {
       bad(`${sp} layers observed: commit attributable to no task and not coordinator bookkeeping:${unattr}`);
       hit = true;

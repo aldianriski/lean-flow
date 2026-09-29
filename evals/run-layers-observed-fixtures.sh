@@ -1681,6 +1681,29 @@ case "$out13b" in
     echo "PASS fixture(unbackticked-declaration sibling control): T2's backtick-declared edit stayed clean" ;;
 esac
 
+# --- TS member-aware leg (SPRINT-110 T2 / TASK-391) -----------------------------------------------
+# Everything above asserts the .sh oracle, which stays a Plan-path oracle (D1). The member-aware
+# findings live only in the TS port and are asserted by evals/layers-observed.test.ts. `min_tests` is
+# a floor, not just an exit code: bun exits 0 on a file with zero live tests. RAISE it with the file.
+ts_test="evals/layers-observed.test.ts"
+min_tests=13
+if ! command -v bun >/dev/null 2>&1; then
+  echo "FAIL harness: bun not found on PATH -- the member-aware layers-observed suite cannot run"; fail=1
+elif [ ! -f "$repo_root/$ts_test" ]; then
+  echo "FAIL harness: $ts_test not found"; fail=1
+else
+  ts_out=$(cd "$repo_root" && bun test "$ts_test" 2>&1); ts_code=$?
+  ts_pass=$(printf '%s\n' "$ts_out" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+  [ -n "$ts_pass" ] || ts_pass=0
+  if [ "$ts_code" -ne 0 ]; then
+    echo "FAIL fixture(layers-observed member-aware): bun test exit $ts_code -- output:"; printf '%s\n' "$ts_out"; fail=1
+  elif [ "$ts_pass" -lt "$min_tests" ]; then
+    echo "FAIL fixture(layers-observed member-aware): only $ts_pass test(s) ran, expected at least $min_tests"; fail=1
+  else
+    echo "PASS fixture(layers-observed member-aware): $ts_pass tests, 0 fail"
+  fi
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail

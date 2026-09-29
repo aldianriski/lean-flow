@@ -70,9 +70,16 @@ function runOracle(cwd: string, args: readonly string[]): Outcome {
   }
 }
 
+// NAMED EXCLUSION (SPRINT-110 T2 / TASK-391): the port gained a member-aware leg -- the findings
+// `member-layers-undeclared` and `member-out-of-layers`, plus the members-derived "at close" -- that
+// the shell oracle does NOT have and by decision D1 will not get (it stays a Plan-path oracle). This
+// differential therefore runs the port with `--no-members`, which disables exactly those legs, so
+// oracle/port parity is still asserted byte-for-byte on the v1 path (and on the live SPRINT-110 file,
+// which is a v2 sprint whose member findings would otherwise read as divergences). The member legs
+// are asserted where they live: evals/layers-observed.test.ts.
 function runPort(cwd: string, args: readonly string[]): Outcome {
   try {
-    const out = execFileSync("bun", [tsChecker, ...args], { cwd, encoding: "utf8" });
+    const out = execFileSync("bun", [tsChecker, "--no-members", ...args], { cwd, encoding: "utf8" });
     return { code: 0, out };
   } catch (e) {
     const err = e as { status: number | null; stdout?: string; stderr?: string };
