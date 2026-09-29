@@ -122,3 +122,17 @@ adopted that worktree as the session's working directory, and a new isolated wor
 HEAD, not from `main`. The builder was stopped before doing any work (0 commits, clean, auto-removed). T1's worktree (merged,
 clean) was fast-forwarded to `20a8076`, and T4 was re-dispatched: `PASS worktree-base` at `20a8076`. This is the guard doing
 exactly its job (TD-054). The rule for the rest of the sprint: re-check a worktree through `git -C <path>`, never `cd` into it.
+
+### 2026-09-29 | progress | T1 TASK-390 merged at `d23d8e2`. Outside review CLEAR; the differential re-run on main gives 16/16
+Builder (sonnet + /tdd, worktree `0595043`): `9910ec3`. check-layers-completeness.ts resolves members (`resolveMembers`, read-only)
+and applies the existing implied-file rule to each member's `## Done when` against the Layers of the Tn block that cites it:
+`member-layers-incomplete`, and `member-layers-undeclared` for a member no block governs, including a sprint with zero `### Tn` (R1).
+Fixture trees member-mixed / member-no-plan / member-clean vary the selection: a stamp-only member, a Tn citing two members, a
+directory-covered file. Seeds A/B each reddened exactly their 2 tests; restored `d39554ff` (`git hash-object` = `rev-parse HEAD:path`).
+Isolated review (sonnet, ~60k tokens): **CLEAR**. Stale `## Members` paths (390/391 listed under todo/) resolve by id. The
+differential's filter is anchored, so it cannot hide a v1 line. Its own differential run did not finish (>25 min on this host), so
+the coordinator re-ran it on main: `16/16 identical`, 12 member lines excluded by name (D1), `PASS: TS port matches the LIVE Shell
+oracle byte-for-byte`. TD-199 filed (census 0): an id merely mentioned on a `Cites:` line governs. `taskIds` is shared, so
+check-authority and check-dod-delta read it the same way (verified at sprint-members.ts:160).
+Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 12 PASS / 0 FAIL, SPRINT-110's 4 members resolved.
+review · T1 · scoped-reviewer · behaviour:material · governance:high

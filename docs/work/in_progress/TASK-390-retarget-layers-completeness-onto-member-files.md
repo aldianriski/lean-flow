@@ -25,8 +25,8 @@ member files, so the guard can pass without looking at anything.
 
 ## Done when
 
-- [ ] check-layers-completeness (sh + ts) reads Layers for each member task file; a retained must-FAIL fixture with its named finding plus one fixture varying the selection (L-186); worktree-isolated outside review (L-165 · L-168).
-- [ ] A v2 sprint with **no inline Plan** makes the guard examine member files, never pass vacuously — retained must-FAIL fixture (Codex r1 F1).
+- [x] check-layers-completeness (sh + ts) reads Layers for each member task file; a retained must-FAIL fixture with its named finding plus one fixture varying the selection (L-186); worktree-isolated outside review (L-165 · L-168). ✓ `9910ec3` (merged `d23d8e2`): member-layers-incomplete + member-layers-undeclared, retained must-FAIL each (member-mixed · member-no-plan) with siblings, selection varied (stamp-only · two-member Tn · dir-covered); `.ts` gates, `.sh` stays the Plan-path oracle (D1); runner `25 tests, 0 fail`; differential on main `16/16 identical`, 12 member lines excluded by name; isolated review CLEAR.
+- [x] A v2 sprint with **no inline Plan** makes the guard examine member files, never pass vacuously — retained must-FAIL fixture (Codex r1 F1). ✓ `member-no-plan` (zero `### Tn`) → `member-layers-undeclared` ×2 (retained); seeded break B reddened exactly its 2 tests.
 
 ## Touches
 

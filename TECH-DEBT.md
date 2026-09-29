@@ -315,6 +315,14 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-199** severity: low | status: open | created: Sprint-110 (T1 outside review)
+  - Summary: **A task id merely MENTIONED on a `Cites:` line makes that block govern the member.** `Cites: split from TASK-991`
+    counts as citing 991, which masks `member-layers-undeclared` for it. It yields a false PASS only when the mentioning block's
+    Layers happen to cover 991's Done-when files. Census 2026-09-29: 0 (every live `Cites:` names only its own task's id).
+    check-authority and check-dod-delta read `Cites:` the same way, so the rule is shared.
+  - Mitigation (hypothesis): count a cited id as governing only as a leading backticked TASK-NNN token, not anywhere in the line's prose.
+    One rule for all three readers (L-186).
+
 - **TD-198** severity: low | status: open | created: Sprint-110 (T2 outside review)
   - Summary: **`--no-members` turns off check-layers-observed's member legs without printing anything.** It exists so the
     differential keeps v1 parity with the `.sh` oracle (D1), and its only caller is `evals/run-layers-observed-differential.ts`
