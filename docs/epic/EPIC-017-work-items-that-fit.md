@@ -195,7 +195,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 |---|---|---|---|
 | [SPRINT-106](../sprint/archive/SPRINT-106-the-store-and-the-way-in.md) | The store, and the way in | closed `fc6c003` | The store exists and is the queue's home (schema, ADR-045, first `git mv` transitions as pure renames); 2.x queue skills refuse a v1/mixed tree by existence alone (ADR-046); `migrate` carries a v1 repo across with owner-resolved conflicts; before-baseline frozen (9/26 · 11/12 · 22). No § Closed-when fully met: derived progress (5) is proven on a fixture but this repo's own sprint drifted (TD-179). |
 | [SPRINT-107](../sprint/archive/SPRINT-107-retarget-the-loop.md) | Retarget the loop | closed `cef7344` | The loop runs on the store: sprints reference members, `plan_commit` is the freeze (ADR-047); five skills read and write task files. Met Closed-when **1** and **5**. |
-| [SPRINT-109](../sprint/archive/SPRINT-109-unlock-the-critical-path.md) | Unlock the critical path | closed | Spec 0.12.0 describes the store; caps measure tokens (ADR-048, budget 16087 — half of CW 4); four guards read member files (part of CW 2). No Closed-when fully met. |
+| [SPRINT-109](../sprint/archive/SPRINT-109-unlock-the-critical-path.md) | Unlock the critical path | closed `6761016` | Spec 0.12.0 describes the store; caps measure tokens (ADR-048, budget 16087 — half of CW 4); four guards read member files (part of CW 2). No Closed-when fully met. |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
