@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-29
+last_updated: 2026-09-30
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -27,6 +27,22 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-220 [tags: process] [status: active]: **A design ruling that changes what a shipped entry point requires is checked against that entry point's own ADR before it is recommended. A recommendation is a query result too.** At SPRINT-110 G2 the coordinator recommended R3: the conformance engine should call a new Bun CLI for its member lookup, and the owner signed it. `conformance.sh` is the adopter-facing entry to that engine, and ADR-043 records exactly one irreversible property for it: it needs only `sh`, and adding a runtime is a decision of its own. The coordinator had not read ADR-043. It surfaced only while writing T3's brief, a sprint-day later and before any build. The owner then took the requirement deliberately (ADR-049). The cost was one extra ruling round, not a shipped break, but it was luck of sequencing: had T3 been dispatched at rank 1, the brief that caught it would never have been written first. **Durable form: before recommending a design that adds a dependency, a runtime or a file to anything an adopter runs, grep `docs/adr/` for that entry point's name and read what it promises.** The tell is a recommendation phrased as plumbing ("the engine calls the CLI") whose subject is a shipped surface.
+- seen: 2026-09-30 (SPRINT-110, R3 → R4 / ADR-049; caught at T3 briefing)
+- count: 1
+- promoted: no
+- related: L-015 (check the consumer surface) · L-143 (a value entering a frozen artifact is a query result) · ADR-043 · ADR-049
+
+---
+
+## L-219 [tags: edit-safety] [status: active]: **A coordinator that `cd`s into a dispatched worktree moves the session's working directory there, and every later isolated worktree branches from THAT checkout's HEAD, not from `main`.** At SPRINT-110 the coordinator re-checked T1's worktree with a command that `cd`'d into it. The harness then adopted that worktree as the session's primary directory. The next dispatch, T4, came up at T1's branch tip, 8 commits behind the declared base. The worktree-base guard (TD-054) caught it before the builder did any work: `FAIL worktree-base-stale`. Nothing else would have, since the preflight's base-ref leg compares the declared base to `main`'s HEAD, which was correct. Recovered by stopping the builder, fast-forwarding the adopted checkout to `main`, and re-dispatching. **Durable form: inspect a worktree with `git -C <path>` and absolute paths, never `cd`. Before each dispatch, the session checkout's HEAD must equal the declared base (fast-forward it if the harness has moved it).** It is a second instance of the guard earning its keep: this is exactly the "base the worktree actually got" gap it exists for.
+- seen: 2026-09-29 (SPRINT-110 T4 first dispatch; guard FAIL, re-dispatched clean at `20a8076`)
+- count: 1
+- promoted: no
+- related: L-055 (declared base) · L-216 (a background job owns the tree it rewrites) · L-067 (a result across an environment boundary) · TD-054
 
 ---
 

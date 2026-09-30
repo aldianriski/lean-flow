@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-29
+last_updated: 2026-09-30
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,11 +16,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-110 — Retarget the Gate** → docs/sprint/SPRINT-110-retarget-the-gate.md
->
-> Last closed: **SPRINT-109 — Unlock the Critical Path**, closed 2026-09-29 with all 4 members
-> done, 10 of 10 `## Done when` (`TASK-377` spec 0.12.0 · `TASK-364` token budget · `TASK-382`/`TASK-387` guards
-> on member files). See `CHANGELOG.md` and the sprint pair.
+> _None active._ Last closed: **SPRINT-110 — Retarget the Gate**, closed 2026-09-30 with all 4 members done,
+> 8 of 8 `## Done when` (`TASK-390`/`391` layers guards · `TASK-392` qa-check + night-run · `TASK-383` conformance engine, ADR-049).
+> See `CHANGELOG.md` and the sprint pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and

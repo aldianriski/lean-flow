@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-29
+last_updated: 2026-09-30
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -32,6 +32,26 @@ migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md §
 **New runtime requirement (`ADR-049`):** checking a 2.x (v2) tree with `conformance.sh`, the gate or night-run
 needs `bun`. Without it the run fails with `bun-required` rather than passing unexamined. A 1.x tree is still
 checked with `sh` alone.
+
+---
+## SPRINT-110 — Retarget the Gate (2026-09-30)
+
+EPIC-017's fourth member sprint. **Unreleased**: no version bump (D3); the whole epic gates `2.0.0`.
+
+- **The rest of the gate reads the work-item store.** On a by-reference sprint these checks used to find nothing in the Plan and
+  pass without examining anything.
+  - check-layers-completeness checks each member's `## Done when` against the Layers of the Plan block that cites it.
+  - check-layers-observed checks a member-attributed commit against those Layers, and judges "at close" from the members.
+  - Both FAIL `member-layers-undeclared` for a member no Plan block governs, including a sprint with no Plan blocks at all.
+  - qa-check's log-owed and active-sprint legs, and night-run's `reap()` rollup, count member boxes and Cites-based units.
+  - The legs whose subject is `TODO.md` apply only while the file exists.
+  - The conformance engine's S9, S10 and S11 rules read members. S9.PLANFROZEN reuses the ADR-047 freeze checker. Task files are
+    exempt from the ownership header. §11 gains a store prune, `closed-task-past-retention`.
+- **One member lookup for shell callers.** `scripts/lib/sprint-members-cli.ts` (`kind · members · counts · active`) wraps the shared
+  lookup, with named exits for an unresolvable member, so no shell script re-implements how members are selected.
+- **Checking a v2 tree requires `bun` (`ADR-049`).** The engine reads members through that lookup, and a v2 tree without `bun` fails
+  with `bun-required` instead of passing unexamined. A v1 tree stays `sh`-only, with byte-identical output (354 fixture trees and
+  109 archived plans compared).
 
 ---
 ## SPRINT-109 — Unlock the Critical Path (2026-09-29)

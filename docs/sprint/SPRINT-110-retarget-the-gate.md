@@ -3,8 +3,8 @@ sprint: 110
 slug: retarget-the-gate
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-09-29
-status: active
+last_updated: 2026-09-30
+status: closed
 plan_commit: 4ddc80d
 gates_signed: G1,G2 @ 04e517c
 update_trigger: sprint execute/close events
@@ -149,3 +149,40 @@ is CLEAR.
 | `TECH-DEBT.md` | T2 | TD-196/197/198 from the outside review (census-zero) | Low | — |
 
 ## Retro
+
+**Shipped** → `CHANGELOG.md` § SPRINT-110. All four members are in `done/`, with `## Done when` 8 of 8 (390: 2 · 391: 2 · 392: 2 ·
+383: 2), derived by `sprint-members-cli.ts counts` → `dod 8 0`, `units 4 4`.
+**System-verify:** default profile, detached: `QA-CHECK: 284 pass, 3 fail`, TRUNCATED at 529 s against the 520 s budget with 7
+harnesses named as unrun.
+- `qa-check-budget-exceeded` is the truncation itself (ADR-042). The 7 unrun harnesses, each run as its own call: night-run-outcome,
+  foreign-repo, dispatch-preflight and conformance-engine all `all green` · store-readers `21 pass, 0 fail` · store-writers `29 pass,
+  0 fail` · qa-store-legs `36 pass, 0 fail`.
+- prose-density and layers-observed FAIL on `docs/epic/EPIC-016-…md`. That is another session's uncommitted edit (the workdoo
+  SPRINT-008/009 rollup), confirmed by `git diff`, and not this sprint's (owner: record as foreign, close).
+- No FAIL was introduced by a merge. D5's post-merge checks caught nothing, because nothing slipped (L-218 applied).
+
+**Tech debt** → `TD-196`…`208` (filed at the four outside reviews and two owner rulings). **Follow-ups** → `TASK-393` (the TS
+engine port after 2.0, filed mid-sprint, origin `manual`). **Learnings** → `L-219` · `L-220`.
+
+**Retrieval check:** yes. R3 was recommended without reading ADR-043, which governs the very entry point it changed. It was caught while
+briefing T3, before any build (L-220). L-218 and L-217 were both applied and held: every merge was followed by the cross-cutting checks,
+and every Tier G review was one bounded round.
+
+**Cost:** coordinator plus 5 recon agents (~92k · 132k · 56k and two smaller), 5 builder runs (T1 ~135k · T2 ~129k · T4 ~217k, one
+aborted at 0 work · T3 ~336k across a stall and a resume) and 4 isolated reviews (~60k · 60k · 60k · 90k), about 1.4M sub-agent tokens
+in all. Wall-clock went mostly to the gate (one default run, 529 s + 7 harnesses at ~6 min) and to T3's 8-minute harness.
+
+**Worked**
+- Recon before G2 refuted A1 and found two readers the hand-off missed (`S9.TWOFILES`, leg 2g), before anything was built.
+- Threat model + stop rule + census for every review: 4 of 4 CLEAR in one round, 13 census-zero shapes sent to TD, not into rounds.
+- The worktree-base guard caught a wrong-base dispatch before any work was done.
+- Verifying a "failed" agent's disk state rather than its report saved T3's 539 lines (edit-safety (c)).
+
+**Friction**
+- The coordinator's `cd` into a worktree moved the session's checkout, and the next dispatch branched from it (L-219).
+- R3 conflicted with ADR-043 and cost an extra ruling round (L-220).
+- T3's builder sat silent in a multi-minute foreground harness until the watchdog killed it. It was resumed with "commit first,
+  background the long runs".
+- The default gate now truncates by design, so every close carries a manual follow-up run of the unrun harnesses.
+
+**Pattern candidate** → `L-219` · `L-220` (count 1 each).

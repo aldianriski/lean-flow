@@ -2,8 +2,8 @@
 sprint: 110
 slug: retarget-the-gate
 owner: Maintainer
-last_updated: 2026-09-29
-status: active
+last_updated: 2026-09-30
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -214,3 +214,18 @@ Derived, not asserted: `bun scripts/lib/sprint-members-cli.ts counts docs/sprint
 `units 4 4`; all four members in `docs/work/done/`. System verify (the final-wave full gate) runs next against the integrated tree.
 Known foreign WIP in the main checkout: another session's uncommitted EPIC-016 edit, which FAILs prose-density and layers-observed.
 It is not this sprint's.
+
+### 2026-09-30 | close | SPRINT-110 closed: 4 of 4 members done, 8 of 8 `## Done when`
+**System-verify** (default profile, detached; `sh scripts/qa-check.sh` run as its own call, verdict line read): `QA-CHECK: 284 pass,
+3 fail`, TRUNCATED at 529 s / 520 s with 7 harnesses named as unrun. All 7 were then run alone and are green (night-run-outcome ·
+foreign-repo · dispatch-preflight · conformance-engine `all green`; store-readers 21/0 · store-writers 29/0 · qa-store-legs 36/0).
+The truncation FAIL is ADR-042's outcome. Both other FAILs are another session's uncommitted EPIC-016 edit (owner: record as foreign).
+Owner rulings at close: the §11 store prune keeps TASK-359/360/374 until TD-206 rules on "live-named"; archival only.
+Handoff reconciliation: no `handoff` entries this sprint.
+Retro written and routed:
+- **Shipped** → `CHANGELOG.md` § SPRINT-110
+- **Debt** → `TD-196`…`208` (filed during the sprint)
+- **Follow-ups** → `TASK-393` (filed mid-sprint)
+- **Learnings** → `L-219` · `L-220`
+TODO pointer cleared. EPIC-017's SPRINT-110 row rolled up (no Closed-when newly met). Knowledge index regenerated. No release (D3).
+§11 retention (owner-approved: archival only) follows in its own commit.
