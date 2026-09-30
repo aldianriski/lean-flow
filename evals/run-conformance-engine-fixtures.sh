@@ -1073,6 +1073,99 @@ fi
 
 rm -f "$leg2fter_wrapper" "$leg2fter_body" 2>/dev/null
 
+# =====================================================================================================
+# ADR-049 -- a v2 tree (`docs/work/` exists) is checked through `bun`; a v1 tree stays `sh`-only.
+# (SPRINT-110 T3 · TASK-383.) On a v2 tree with no `bun` on PATH every rule that reads members FAILs
+# `bun-required` -- never a skip, never a fallback to reading the Plan. A v1 tree makes ZERO bun calls.
+#
+# The lookup's own behaviour (members, ticks, freeze) is proven in run-sprint-family-fixtures.sh, which
+# has git. This block owns the RUNTIME boundary, and needs none: the rules asserted here answer from the
+# working tree and the lookup's exit status.
+#
+# HOW A PATH WITHOUT bun IS BUILT. The caller's PATH minus every directory holding a bun -- so the engine
+# still finds sh/awk/sed/grep and only the runtime is missing. The harness proves the strip worked before
+# any case relies on it (a PATH that still finds bun would turn every case below into a vacuous pass).
+# HOW "ZERO CALLS" IS OBSERVED. A shim `bun` first on PATH appends a line to a log on every invocation;
+# the assertion is that the log does not exist -- an observation, not a claim about the code.
+# =====================================================================================================
+echo "=== ADR-049: bun-required / v1 makes zero bun calls ==="
+_nb=""; _oifs=$IFS; IFS=:
+for _pd in $PATH; do
+  [ -e "$_pd/bun" ] || [ -e "$_pd/bun.exe" ] || [ -e "$_pd/bun.cmd" ] || _nb="${_nb:+$_nb:}$_pd"
+done
+IFS=$_oifs
+if [ -n "$(PATH=$_nb command -v bun 2>/dev/null)" ]; then
+  echo "FAIL harness: could not build a PATH without bun -- the ADR-049 cases would prove nothing"; fail=1
+else
+  spec_s9s11="$work/spec-s9s11.md"
+  awk '/^\| `S(9|11)\./ { print; next } /^\| `S[0-9]/ { next } { print }' "$spec" > "$spec_s9s11"
+  FXR="$repo_root/evals/fixtures/by-reference"
+  mk_v2() {   # <dir> -- the by-reference fixture sprint (no git), one member ticked with no evidence, no log
+    mkdir -p "$1/docs/sprint" "$1/docs/work/todo"
+    cp "$FXR/SPRINT-901-fixture.md" "$1/docs/sprint/"; cp "$FXR/TASK-901-alpha.md" "$FXR/TASK-902-beta.md" "$1/docs/work/todo/"
+    sed -i 's/^- \[ \] alpha returns/- [x] alpha returns/' "$1/docs/work/todo/TASK-901-alpha.md"
+  }
+  mk_v1() {   # <dir> -- an inline-DoD sprint with the same shape of problem (ticked box, no log), NO docs/work/
+    mkdir -p "$1/docs/sprint"
+    { printf -- '---\nsprint: 900\nslug: fixture\nowner: Maintainer\nlast_updated: 2026-01-01\nstatus: active\nupdate_trigger: x\n---\n\n# S\n\n## Plan\n\n### T1 --- t\n\n**DoD:**\n- [x] a thing with nothing behind it\n\n## Retro\n'; } > "$1/docs/sprint/SPRINT-900-fixture.md"
+  }
+  engine_nb() {   # <dir> -- the engine, over a PATH that cannot find bun
+    PATH=$_nb sh "$engine" "$1" --spec "$spec_s9s11" 2>&1
+  }
+  want_line() {   # <name> <output> <extended-regex> -- one anchored line, or the case fails with the lines that matter
+    if printf '%s\n' "$2" | grep -qE "$3"; then echo "PASS fixture($1): matched /$3/"
+    else echo "FAIL fixture($1): no line matched /$3/ -- bun/S9/S11 lines were:"; printf '%s\n' "$2" | grep -E 'bun|S9\.|S11\.|sprint-|dod-' | sed 's/^/    /'; fail=1; fi
+  }
+  no_line() {     # <name> <output> <extended-regex>
+    if printf '%s\n' "$2" | grep -qE "$3"; then echo "FAIL fixture($1): /$3/ matched on a shape that must not produce it:"; printf '%s\n' "$2" | grep -E "$3" | sed 's/^/    /'; fail=1
+    else echo "PASS fixture($1): /$3/ correctly absent"; fi
+  }
+
+  d="$work/adr49-v2"; mk_v2 "$d"; out=$(engine_nb "$d")
+  want_line "adr49-twofiles-bun-required" "$out" '^FAIL  bun-required: docs/sprint/SPRINT-901-fixture\.md -- S9\.TWOFILES needs .*ADR-049'
+  want_line "adr49-verifyclause-bun-required" "$out" '^FAIL  bun-required: docs/sprint/SPRINT-901-fixture\.md -- S9\.VERIFYCLAUSE needs'
+  want_line "adr49-backlog-bun-required" "$out" "^FAIL  bun-required: .* -- S11\.BACKLOG's store prune"
+  # never a fallback to the Plan: the rules that could not read members produced NO verdict of their own
+  no_line "adr49-no-plan-fallback-pass" "$out" '^PASS  S9\.(TWOFILES|VERIFYCLAUSE)'
+  no_line "adr49-no-plan-fallback-finding" "$out" '^FAIL  (sprint-log-missing|dod-criterion-names-no-check)'
+
+  # control (L-142): the SAME v2 tree with bun present raises no bun-required, and reads the member's tick
+  out=$(sh "$engine" "$d" --spec "$spec_s9s11" 2>&1)
+  no_line "adr49-control-bun-present" "$out" 'bun-required'
+  want_line "adr49-control-bun-present-reads-members" "$out" '^FAIL  sprint-log-missing: docs/sprint/logs/SPRINT-901-fixture\.md -- .* has ticked DoD'
+
+  # control: a v1 tree on the SAME bun-less PATH is unchanged -- its findings, not a bun complaint
+  d="$work/adr49-v1"; mk_v1 "$d"; out=$(engine_nb "$d")
+  no_line "adr49-v1-no-bun-required" "$out" 'bun-required'
+  want_line "adr49-v1-unchanged-log-missing" "$out" '^FAIL  sprint-log-missing: docs/sprint/logs/SPRINT-900-fixture\.md'
+  want_line "adr49-v1-unchanged-verifyclause" "$out" '^FAIL  dod-criterion-names-no-check: docs/sprint/SPRINT-900-fixture\.md'
+
+  # ZERO bun calls on a v1 tree, OBSERVED through a shim that logs every invocation.
+  mkdir -p "$work/shim"; bunlog="$work/shim/calls.log"
+  printf '#!/bin/sh\nprintf "called %%s\\n" "$*" >> "%s"\nexit "${SHIM_RC:-99}"\n' "$bunlog" > "$work/shim/bun"; chmod +x "$work/shim/bun"
+  rm -f "$bunlog"; d="$work/adr49-v1-shim"; mk_v1 "$d"
+  PATH="$work/shim:$PATH" sh "$engine" "$d" --spec "$spec_s9s11" > "$work/adr49-v1-shim.out" 2>&1
+  if [ ! -e "$bunlog" ]; then echo "PASS fixture(adr49-v1-zero-bun-calls): a v1 tree ran the engine with a logging bun first on PATH and it was never invoked"
+  else echo "FAIL fixture(adr49-v1-zero-bun-calls): the engine invoked bun on a v1 tree:"; sed 's/^/    /' "$bunlog"; fail=1; fi
+  # ...and the shim really is reachable, so the absence above is an observation and not a broken probe
+  d="$work/adr49-v2-shim"; mk_v2 "$d"; rm -f "$bunlog"
+  PATH="$work/shim:$PATH" sh "$engine" "$d" --spec "$spec_s9s11" > "$work/adr49-v2-shim.out" 2>&1
+  if [ -s "$bunlog" ]; then echo "PASS fixture(adr49-shim-is-observable-control): the same shim IS invoked on a v2 tree ($(wc -l < "$bunlog" | tr -d ' ') call(s)), so its silence on v1 means something"
+  else echo "FAIL fixture(adr49-shim-is-observable-control): the shim was never invoked on a v2 tree -- the zero-calls case above proves nothing"; fail=1; fi
+  # one call per sprint file for the four sprint rules (counts), not one per rule
+  n_counts=$(grep -c '^called .*sprint-members-cli.ts counts ' "$bunlog" | tr -d ' ')
+  if [ "$n_counts" -eq 1 ]; then echo "PASS fixture(adr49-one-lookup-per-sprint): TWOFILES, VERIFYCLAUSE and BACKLOG share ONE members lookup for the one sprint file"
+  else echo "FAIL fixture(adr49-one-lookup-per-sprint): expected exactly 1 'counts' call for one sprint file, saw $n_counts"; sed 's/^/    /' "$bunlog"; fail=1; fi
+
+  # the CLI's EXIT STATUS is read, never inferred from its output (TD-202): exit 99 with nothing printed
+  out=$(cat "$work/adr49-v2-shim.out")
+  want_line "adr49-cli-nonzero-no-output-is-a-fail" "$out" '^FAIL  sprint-members-cli exited 99 with no message -- docs/sprint/SPRINT-901-fixture\.md: S9\.TWOFILES could not read'
+  no_line "adr49-cli-nonzero-not-read-as-empty-members" "$out" '^PASS  S9\.(TWOFILES|VERIFYCLAUSE)'
+  # exit 0 with an output that lacks the contract's `dod` line is a moved contract, not an empty sprint
+  d="$work/adr49-v2-shim0"; mk_v2 "$d"; out=$(SHIM_RC=0 PATH="$work/shim:$PATH" sh "$engine" "$d" --spec "$spec_s9s11" 2>&1)
+  want_line "adr49-cli-exit0-no-dod-line-is-a-fail" "$out" '^FAIL  SPRINT-MEMBERS-CLI-UNPARSED: '
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "CONFORMANCE ENGINE FIXTURES: all green"
