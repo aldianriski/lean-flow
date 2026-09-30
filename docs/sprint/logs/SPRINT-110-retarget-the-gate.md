@@ -136,3 +136,19 @@ oracle byte-for-byte`. TD-199 filed (census 0): an id merely mentioned on a `Cit
 check-authority and check-dod-delta read it the same way (verified at sprint-members.ts:160).
 Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 12 PASS / 0 FAIL, SPRINT-110's 4 members resolved.
 review · T1 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-09-30 | progress | T4 TASK-392 merged at `745bb86`. Outside review CLEAR; TD-200…203, TD-203 handed to TASK-380 (owner)
+Builder (sonnet + /tdd, worktree `20a8076`): `b896800` · `dccdca1`. New `scripts/lib/sprint-members-cli.ts` (`kind · members · counts ·
+active`; exit 2 `SPRINT-MEMBER-UNRESOLVED`/`SPRINT-FILE-MISSING`, 3 `NOT-BY-REFERENCE`, 64 usage), owned by T4 and consumed by T3 next
+(R3). On v2, `reap()` counts member `## Done when` boxes and Cites-based units, and unreadable members end `HARD_FAILURE`. Leg 2g decides
+"log owed" from members' open boxes. Leg 7 reads the active sprint from sprint files. Legs 3/5/8 apply only while TODO.md exists (R2).
+The new `evals/run-qa-store-legs-fixtures.ts` is registered. 19 seeded breaks; one demolition seed (S13) replaced by a targeted one.
+Restores `cbc3913`/`a474f67`/`4bb5ba3` (`git hash-object` = `rev-parse HEAD:path`). Coordinator re-check: 36 files, all in Layers;
+store-legs `36 pass, 0 fail`; reap-terminal `all green`; hashes match.
+Isolated review (sonnet, ~11 probes, ~60k tokens): **CLEAR**. On the real SPRINT-110, `counts` agrees with a hand count. TD-200 (a
+zero-box member counts as delivered) · TD-201 (a Tn citing no current member drops out of the units, so a false `PLAN_EXHAUSTED` is
+possible; medium) · TD-202 (two sites ignore `kind`'s exit status), each census 0. Owner ruling: TD-203 (leg 7's TD-aging half greps
+a TODO.md holding 0 TD rows, which predates the store) is owned by TASK-380.
+Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 0 FAIL · `sh -n` both scripts · store-legs 36/0 ·
+live `counts`: `dod 4 4`, `units 4 2` (T1, T2 delivered), equal to a hand count.
+review · T4 · scoped-reviewer · behaviour:material · governance:high

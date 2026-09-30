@@ -132,6 +132,11 @@ is CLEAR.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/sprint-members-cli.ts` (new) | T4 | `kind · members · counts · active` for shell callers; named exits 2/3/64 (R3, T3 consumes it) | High (Tier G, shared) | 36/0 · seeds · review CLEAR |
+| `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` | T4 | `reap()` counts member Done-when boxes on v2; the stale :516 fixed | High (Tier G) | reap/outcome/revise-loop green · seeds |
+| `scripts/qa-check.sh` | T4 | leg 2g/7 read the store; legs 3/5/8 only while TODO.md exists (R2); new harness registered | High (Tier G) | store-legs 36/0 · rollup green |
+| `evals/run-qa-store-legs-fixtures.ts` (new) · reap/rollup harnesses + fixture trees | T4 | retained must-FAIL per leg, selection varied | Low | verdict lines |
+| `TECH-DEBT.md` · `docs/work/backlog/TASK-380-*.md` | T4 | TD-200…203; TD-203 handed to TASK-380 (owner) | Low | — |
 | `scripts/lib/check-layers-completeness.ts` | T1 | member-layers-incomplete · member-layers-undeclared (R1) over member `## Done when` | High (Tier G) | 25 tests · diff 16/16 · seeds A/B · review CLEAR |
 | `evals/layers-completeness*.ts` · runner floor 19→25 · 3 member fixture trees | T1 | member cases; differential excludes member-* by name (D1) | Low | runner verdict |
 | `TECH-DEBT.md` | T1 | TD-199 from the outside review (census-zero) | Low | — |

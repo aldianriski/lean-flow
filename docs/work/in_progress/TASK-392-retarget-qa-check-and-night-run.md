@@ -25,8 +25,8 @@ by-reference sprint they check nothing and `reap()` reports `0 of 0`.
 
 ## Done when
 
-- [ ] qa-check.sh and night-run.sh read the store.
-- [ ] Retained must-FAIL fixture per changed leg; outside review, worktree-isolated.
+- [x] qa-check.sh and night-run.sh read the store. ✓ `b896800` · `dccdca1` (merged `745bb86`): legs 2g/7 read members and sprint files through the new `scripts/lib/sprint-members-cli.ts`; legs 3/5/8 apply only while TODO.md exists (R2); `reap()` counts member `## Done when` boxes. Live SPRINT-110: `dod 4 4`, `units 4 2`, equal to a hand count. Leg 7's TD-row half is vacuous and predates the store (TODO.md holds 0 TD rows): owner ruling, filed as TD-203, and TASK-380 owns it.
+- [x] Retained must-FAIL fixture per changed leg; outside review, worktree-isolated. ✓ must-FAIL per leg + reap case, each with a sibling (`evals/run-qa-store-legs-fixtures.ts` `36 pass, 0 fail` · reap/rollup/outcome/revise-loop all green · rollup test 46/0); 19 seeded breaks; isolated review CLEAR (~11 probes, 3 census-zero TD).
 
 ## Touches
 

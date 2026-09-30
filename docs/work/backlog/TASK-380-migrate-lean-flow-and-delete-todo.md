@@ -30,6 +30,12 @@ TODO.md (deleted) · docs/work/
 
 none
 
+## Amended 2026-09-30
+
+- **TD-203 (owner ruling, SPRINT-110 T4):** qa-check leg 7's TD-aging half greps TODO.md, which holds 0 TD rows. Deleting TODO.md means
+  this task retires that half, or retargets it at `TECH-DEBT.md` with an aging rule the gate can check. The retarget would redden about
+  105 rows, so it needs a disposition.
+
 ## Tracker
 
 EPIC-017 Closed-when 2 · Codex r2 R2-1a

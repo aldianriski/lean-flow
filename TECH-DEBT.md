@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-29
+last_updated: 2026-09-30
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -314,6 +314,32 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-203** severity: medium | status: open | created: Sprint-110 (T4, owner ruling)
+  - Summary: **qa-check leg 7's TD-aging half has checked nothing since the ledger left TODO.md.** It greps `TODO.md` for TD rows, and
+    TODO.md holds 0 of them. The ledger is `TECH-DEBT.md`: 118 open rows, no `re-reviewed:` marker. Pointing the leg there as it stands
+    would redden about 105 aged rows. The real aging happens at the promote governance review, not in the gate. T4 retargeted the leg's
+    active-sprint half only.
+  - **Owner ruling (2026-09-30):** file it, and `TASK-380` owns it. TASK-380 deletes TODO.md, so it must retire this half or retarget
+    it with an aging rule the gate can check.
+
+- **TD-202** severity: low | status: open | created: Sprint-110 (T4 outside review)
+  - Summary: **Two shell call sites read the CLI's `kind` output and ignore its exit status.** `night-run.sh` (~:231) and qa-check leg 2g
+    run `[ "$(bun … kind … 2>/dev/null)" = "v2" ]`, so any CLI failure falls to the v1 arm, which counts 0 Plan boxes. The `counts` calls
+    do read their exit status and fail closed. Census 2026-09-30: 0 (both sites pass only real sprint files).
+  - Mitigation (hypothesis): capture `kind`'s exit status and fail with a named finding on anything but 0 (L-120).
+
+- **TD-201** severity: medium | status: open | created: Sprint-110 (T4 outside review)
+  - Summary: **A Tn whose `Cites:` names no current member drops out of the unit counts, and so can the open box of an uncited member.**
+    `counts` gives `units 0 0` beside `dod 1 1`. `reap()` builds its unattempted list from open counted units only, so the run can
+    end `PLAN_EXHAUSTED` while its own DoD line shows open boxes. Census 2026-09-30: 0 (every live Tn cites a member).
+    TD-199's mention rule is the sibling.
+  - Mitigation (hypothesis): an open box on a member no counted unit covers is itself unattempted work (or a named finding); never a clean exhaustion.
+
+- **TD-200** severity: low | status: open | created: Sprint-110 (T4 outside review)
+  - Summary: **A member whose `## Done when` has no boxes counts as delivered.** `counts` gives `dod 0 0`, `units 1 1`. Census 2026-09-30:
+    0 of 29 task files. CRLF files parse correctly.
+  - Mitigation (hypothesis): a member with zero boxes is a named finding, as TASK-360's schema already requires a Done-when box.
 
 - **TD-199** severity: low | status: open | created: Sprint-110 (T1 outside review)
   - Summary: **A task id merely MENTIONED on a `Cites:` line makes that block govern the member.** `Cites: split from TASK-991`
