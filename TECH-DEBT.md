@@ -315,6 +315,14 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-204** severity: medium | status: open | created: Sprint-110 (T4, owner ruling; ADR-049)
+  - Summary: **`night-run.sh`'s v2 `reap()` needs `bun` on the adopter's machine.** It reads members through
+    `sprint-members-cli.ts`. Without `bun` the rollup adds a `warnings` line, and unreadable members end `HARD_FAILURE`
+    (loud, not silent). ADR-049 takes the same requirement for `conformance.sh` at 2.0.0. This row keeps the night-run half
+    visible until the consumer-parity tasks confirm it.
+  - **Owner ruling (2026-09-30):** accept for now. `TASK-372`/`TASK-373` (both layout directions and consumer parity) confirm
+    it before release, together with README § Upgrading to 2.x.
+
 - **TD-203** severity: medium | status: open | created: Sprint-110 (T4, owner ruling)
   - Summary: **qa-check leg 7's TD-aging half has checked nothing since the ledger left TODO.md.** It greps `TODO.md` for TD rows, and
     TODO.md holds 0 of them. The ledger is `TECH-DEBT.md`: 118 open rows, no `re-reviewed:` marker. Pointing the leg there as it stands

@@ -29,6 +29,10 @@ removes `TODO.md` once every task has moved and no conflict is left unresolved (
 listed for the owner to relocate or drop, never dropped silently). Mapping + verification: `skills/lean-doc-generator/references/
 migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md § Upgrading to 2.x.
 
+**New runtime requirement (`ADR-049`):** checking a 2.x (v2) tree with `conformance.sh`, the gate or night-run
+needs `bun`. Without it the run fails with `bun-required` rather than passing unexamined. A 1.x tree is still
+checked with `sh` alone.
+
 ---
 ## SPRINT-109 — Unlock the Critical Path (2026-09-29)
 

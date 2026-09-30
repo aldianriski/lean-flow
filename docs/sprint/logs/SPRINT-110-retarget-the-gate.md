@@ -152,3 +152,19 @@ a TODO.md holding 0 TD rows, which predates the store) is owned by TASK-380.
 Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 0 FAIL · `sh -n` both scripts · store-legs 36/0 ·
 live `counts`: `dod 4 4`, `units 4 2` (T1, T2 delivered), equal to a hand count.
 review · T4 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-09-30 | scope-change | R3 met ADR-043 before T3 dispatch: owner rules `bun` required for v2 checks (ADR-049)
+**What broke:** R3 (signed 2026-09-29) had the conformance engine call T4's `sprint-members-cli.ts`. `conformance.sh` is the
+adopter-facing entry point, and ADR-043 records that it needs only `sh` and that adding a runtime is irreversible, a decision of
+its own. The coordinator recommended R3 without reading ADR-043: a **retrieval miss**, caught while briefing T3 and before any build.
+**Owner rulings (2026-09-30, popups):**
+- **R4:** the owner asked for "the best, high performance" runtime rather than pure `sh`, pointing at kalasuara (Python). Recon:
+  kalasuara runs Python only on machines it controls and ships no runtime to others, and its own ADR-010 rejects a second runtime.
+  Per-call startup on this host: `sh` 33 ms · node 60 ms · `bun` 100 ms · python3 159 ms. The ruling is `bun`, required on a v2 tree,
+  with a named `bun-required` FAIL when it is absent; a v1 tree stays `sh`-only. Recorded as **ADR-049**, with a README § Upgrading to
+  2.x note and a `CHANGELOG [Unreleased]` note.
+- **R5:** T4's merged `reap()` bun dependency is accepted and filed as **TD-204** for TASK-372/373 to confirm before release.
+- **R6:** a TypeScript engine port (the TD-168 cost centre) is filed as **TASK-393**, backlog, after 2.0.0.
+**Impact on § Plan:** none. T3 keeps its Layers and its T4 dependency. Its brief now includes the `bun-required` finding and a must-FAIL
+fixture for it. The ADR, DECISIONS, README, CHANGELOG, TD-204 and TASK-393 are coordinator-owned governance writes.
+**Re-confirm G2:** R3 stands as amended by R4. No member `## Done when` edited.

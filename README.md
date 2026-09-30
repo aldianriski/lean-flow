@@ -410,6 +410,11 @@ graceful window — every `2.x` queue skill carries exactly one read path.
    its member task files instead of copying their DoD into its Plan. Each task's DoD lives only in
    its own `## Done when`, and `plan_commit` is the freeze (ADR-047).
 
+**New requirement: `bun` for checking a 2.x tree.** `conformance.sh` (and the gate and night-run) read a
+sprint's members through one TypeScript lookup, so checking a migrated repo needs [`bun`](https://bun.sh)
+on the machine that runs it, CI included. Without it the run fails with a named `bun-required`
+finding and is never silently green. A 1.x tree is still checked with `sh` alone (ADR-049).
+
 **Why the refusal instead of dual support?** A `2.x` queue skill that finds `TODO.md` still present
 (alone, or alongside `docs/work/`) names the layout it found and does nothing else — it never
 guesses which one is authoritative. `/prime` is the one exception: read-only, so it reports the
