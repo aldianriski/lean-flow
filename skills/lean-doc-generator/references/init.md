@@ -86,7 +86,7 @@ tier down. The two substrates that gate a base row:
 | `AGENTS.md` | | `AGENTS.md.template` |
 | `CHANGELOG.md` | | `CHANGELOG.md.template` |
 | `LICENSE` | | safe-scaffold (below) — no markdown template |
-| `TODO.md` | | `TODO.md.template` |
+| `docs/work/` | | the work-item store (`backlog/ todo/ in_progress/ review/ done/ cancel/`) — **create-lazily**, never pre-created empty: `/task-decomposer` writes the first task file into `backlog/`; no template, no `TODO.md` |
 | `TECH-DEBT.md` | | `TECH-DEBT.md.template` |
 | `.claude/CLAUDE.md` | | `CLAUDE.md.template` |
 | `.claude/CONTEXT.md` | | `CONTEXT.md.template` |

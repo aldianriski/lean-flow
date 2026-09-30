@@ -10,7 +10,7 @@ status: current
 > **How to use this file**
 > - **Filed automatically** — the Sprint Close Retro routes its tech-debt bucket here as `TD-NNN` rows.
 > - **Aged at Sprint Promote** — unaddressed ≥ 3 sprints → re-review prompt; `severity: high` →
->   auto-escalate to `TODO.md` Backlog P1.
+>   auto-escalate to a `docs/work/backlog/` task file (P1).
 > - **Never deleted** — resolved debt is marked `status: resolved → TASK-NNN` for the audit trail;
 >   a row resolved ≥ 3 sprints ago collapses to one line in § Resolved (§11).
 > - IDs use the `TD-NNN` namespace (separate from `TASK-NNN`); ids are monotonic, never reused.
