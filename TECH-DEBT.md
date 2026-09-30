@@ -35,6 +35,11 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-111 promote (2026-09-30).** **106 of 128 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 111: the 105 named in earlier sweeps plus **1** newly aged, TD-186 (low, Sprint-108), as a re-review prompt. Second route:
+> 128 open − 22 filed at 109/110 = 106. All 7 `high` rows are owned (TD-143 → 348 · TD-150 → 345 · TD-090/117/128/168 → 357 ·
+> TD-174 → 384). TASK-345/348/357 still live in TODO.md and move to the store with TASK-380.
+>
 > **Aging sweep — SPRINT-110 promote (2026-09-29).** **105 of 115 open rows** are ≥3 sprints unaddressed, counted
 > against sprint 110: the 99 named below, plus **6** newly aged, all `low` and filed at SPRINT-107, as re-review prompts:
 > TD-180 · TD-181 · TD-182 · TD-183 · TD-184 · TD-185. Second route: 115 open − 10 filed at 108/109 = 105. Seven `high` rows,
