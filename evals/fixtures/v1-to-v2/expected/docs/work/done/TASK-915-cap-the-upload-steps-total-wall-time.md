@@ -18,7 +18,7 @@ depends-on: [TASK-913]
 
 ## Why
 
-An unbounded retry once hung a whole run.
+an unbounded retry once hung a whole run
 
 ## Done when
 

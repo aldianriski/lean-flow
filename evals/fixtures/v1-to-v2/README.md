@@ -94,6 +94,36 @@ Same as `conflict-expected/`, minus `TODO.md` (simulating a migrate that removed
 open conflict). The check must redden: `TODO.md` is absent although `TASK-917` is still
 unresolved.
 
+## Scenario 3 — a by-reference sprint: `input-byref/` → `expected-byref/` (SPRINT-111 T1)
+
+A sprint file with `## Members` is by-reference: its `### Tn` are **not mapped**, its members are
+never written. `input-byref/` = one Backlog row (`TASK-921`) + `SPRINT-905` (`## Members` →
+`TASK-922` in `todo/`, unticked · `TASK-923` in `done/`, ticked; its `Tn` cite both). `expected-byref/`
+= those two member files **byte-identical** + the one migrated file. Cases: `byref-members-not-mapped`
+(v1 ids = `{TASK-921}`) · `id-set-byref` · `ticked-box-count-byref` (0 = 0; a run that mapped the
+members would count `TASK-923`'s tick) · `preservation-byref` (every `docs/work` file present before is
+byte-identical after).
+
+**`expected-byref-member-altered/`** — must-FAIL sibling: `TASK-922`'s box ticked. Preservation must
+redden with exactly `altered: docs/work/todo/TASK-922-…md`; `id-set-byref-member-altered` on the same
+tree is the sibling control and stays green.
+
+## Scenario 4 — an interrupted run resumes: `interrupted-partial/` → `expected/`
+
+`interrupted-partial/` is **real partial state**: the migrate procedure executed on `input/` and
+stopped after 2 task files (`TASK-913`, `TASK-914`); `TODO.md` still present, untouched. Re-running the
+procedure on it was done for real and its `docs/work/` tree diffed identical to `expected/` (and to an
+uninterrupted run's full tree). The retained case `resume-partial-subset-of-expected` asserts the
+checkable half: the partial's files are a byte-identical **proper subset** of `expected/`, `TODO.md`
+present and identical to `input/TODO.md`. **`interrupted-partial-diverged/`** — must-FAIL sibling:
+`TASK-913` altered → `diverged: docs/work/backlog/TASK-913-…md`; the `TODO.md` checks on that tree are
+the sibling control.
+
+## Real-copy mode
+
+`bun evals/run-v1-to-v2-fixtures.ts --before <pristine copy> --after <migrated copy>` runs the id-set
+(both ways), ticked-box, preservation and TODO.md-removed invariants over a real repo copy and exits.
+
 ## Discrimination proof (run by hand, not baked into the harness — TD-012 / L-142 convention)
 
 The fixture trees above already prove the checks redden on real broken data (that *is* the

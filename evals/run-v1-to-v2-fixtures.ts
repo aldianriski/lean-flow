@@ -67,6 +67,11 @@ const EXPECTED_DUPLICATE_OVERLAP = join(FIXTURES, "expected-duplicate-overlap");
 const CONFLICT_INPUT = join(FIXTURES, "conflict-input");
 const CONFLICT_EXPECTED = join(FIXTURES, "conflict-expected");
 const CONFLICT_EXPECTED_WRONGLY_REMOVED = join(FIXTURES, "conflict-expected-wrongly-removed");
+const INPUT_BYREF = join(FIXTURES, "input-byref");
+const EXPECTED_BYREF = join(FIXTURES, "expected-byref");
+const EXPECTED_BYREF_MEMBER_ALTERED = join(FIXTURES, "expected-byref-member-altered");
+const INTERRUPTED_PARTIAL = join(FIXTURES, "interrupted-partial");
+const INTERRUPTED_PARTIAL_DIVERGED = join(FIXTURES, "interrupted-partial-diverged");
 
 // Real docs/work/README.md, or (discrimination proof only) a scratch copy named by this env var --
 // never the real file mutated in place.
@@ -91,6 +96,12 @@ function report(name: string, ok: boolean, detail: string) {
 
 // --- v1 side: parse TODO.md Backlog ids + every sprint file's Plan `Cites:` ids ----------------
 
+// A sprint file with a `## Members` section is by-reference (its members already live in docs/work/):
+// the v1 collectors below skip it, exactly as the migrate procedure does not map its `### Tn`.
+function isByReference(sprintText: string): boolean {
+  return /^## Members\s*$/m.test(sprintText);
+}
+
 function v1BacklogIds(root: string): string[] {
   const todoPath = join(root, "TODO.md");
   if (!existsSync(todoPath)) return [];
@@ -109,6 +120,7 @@ function v1PlanCitesIds(root: string): string[] {
   for (const entry of readdirSync(sprintDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
     const text = readFileSync(join(sprintDir, entry.name), "utf8");
+    if (isByReference(text)) continue; // by-reference sprint: its Tn are NOT mapped (migration-map.md)
     // Only the Cites: line immediately following a ### Tn heading (a Plan task's own citation),
     // not any other TASK-NNN mention in the file.
     const blocks = text.split(/^### T\d+/m).slice(1);
@@ -129,6 +141,7 @@ function v1TickedBoxCount(root: string): number {
   for (const entry of readdirSync(sprintDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
     const text = readFileSync(join(sprintDir, entry.name), "utf8");
+    if (isByReference(text)) continue; // by-reference sprint: its Tn are NOT mapped (migration-map.md)
     const blocks = text.split(/^### T\d+/m).slice(1);
     for (const block of blocks) {
       const ticked = block.match(/^-\s\[x\]\s/gm);
@@ -147,6 +160,7 @@ function v1PlanDodById(root: string): Map<string, { ticked: number; total: numbe
   for (const entry of readdirSync(sprintDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
     const text = readFileSync(join(sprintDir, entry.name), "utf8");
+    if (isByReference(text)) continue; // by-reference sprint: its Tn are NOT mapped (migration-map.md)
     const blocks = text.split(/^### T\d+/m).slice(1);
     for (const block of blocks) {
       const citesLine = block.match(/^Cites:\s*(.+)$/m);
@@ -195,7 +209,7 @@ function v2Ids(root: string): string[] {
 function splitFrontmatter(raw: string): { frontmatter: string; body: string } {
   const lines = raw.split("\n");
   if (lines[0]?.trim() !== "---") return { frontmatter: "", body: raw };
-  const closeIdx = lines.indexOf("---", 1);
+  const closeIdx = lines.findIndex((l, i) => i > 0 && l.trim() === "---"); // CRLF-safe (autocrlf checkouts)
   if (closeIdx === -1) return { frontmatter: "", body: raw };
   return { frontmatter: lines.slice(1, closeIdx).join("\n"), body: lines.slice(closeIdx + 1).join("\n") };
 }
@@ -209,9 +223,12 @@ function extractSection(body: string, heading: string): string | null {
   return nextHeading === -1 ? rest : rest.slice(0, nextHeading);
 }
 
-function v2TickedBoxCount(root: string): number {
+// `onlyIds`: count only the files of those ids (the ids this run migrated) -- a pre-existing member
+// file's ticks were never the Plan's to preserve, so they must not enter the "after" sum.
+function v2TickedBoxCount(root: string, onlyIds?: ReadonlySet<string>): number {
   let total = 0;
   for (const f of findV2Files(root)) {
+    if (onlyIds && !onlyIds.has(f.id)) continue;
     const { body } = splitFrontmatter(readFileSync(f.path, "utf8"));
     const section = extractSection(body, "## Done when");
     if (section === null) continue;
@@ -250,9 +267,49 @@ function diffIdSets(before: string[], after: string[]): { beforeOnly: string[]; 
   };
 }
 
-function runIdSetCase(name: string, expectedRoot: string) {
-  const before = [...new Set([...v1BacklogIds(INPUT), ...v1PlanCitesIds(INPUT)])];
-  const after = v2Ids(expectedRoot);
+// --- preservation: every docs/work/** file present BEFORE is byte-identical AFTER -------------
+// (a by-reference sprint's members, and any other pre-existing store file, are never written).
+// Findings are named: `altered: <path>` / `missing: <path>`.
+
+function workFilesRel(root: string): string[] {
+  const work = join(root, "docs", "work");
+  if (!existsSync(work)) return [];
+  const out: string[] = [];
+  function walk(dir: string, rel: string) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${rel}/${entry.name}`);
+      else if (entry.isFile()) out.push(`${rel}/${entry.name}`);
+    }
+  }
+  walk(work, "docs/work");
+  return out.sort();
+}
+
+function preservationFindings(beforeRoot: string, afterRoot: string): string[] {
+  const findings: string[] = [];
+  for (const rel of workFilesRel(beforeRoot)) {
+    const a = join(afterRoot, rel);
+    if (!existsSync(a)) findings.push(`missing: ${rel}`);
+    else if (!readFileSync(join(beforeRoot, rel)).equals(readFileSync(a))) findings.push(`altered: ${rel}`);
+  }
+  return findings;
+}
+
+// The ids this run migrated, as the v2 side sees them: every id now in the store, minus the ones
+// that were already there and that v1 never cites (untouched members / unrelated store files).
+function migratedV2Ids(beforeRoot: string, afterRoot: string, v1Ids: string[]): string[] {
+  const cited = new Set(v1Ids);
+  const preexistingUncited = new Set(v2Ids(beforeRoot).filter((id) => !cited.has(id)));
+  return v2Ids(afterRoot).filter((id) => !preexistingUncited.has(id));
+}
+
+function v1Ids(root: string): string[] {
+  return [...new Set([...v1BacklogIds(root), ...v1PlanCitesIds(root)])];
+}
+
+function runIdSetCase(name: string, expectedRoot: string, inputRoot: string = INPUT) {
+  const before = v1Ids(inputRoot);
+  const after = migratedV2Ids(inputRoot, expectedRoot, before);
   const { beforeOnly, afterOnly } = diffIdSets(before, after);
   const ok = beforeOnly.length === 0 && afterOnly.length === 0;
   report(
@@ -262,6 +319,52 @@ function runIdSetCase(name: string, expectedRoot: string) {
       ? `v1 ids {${before.join(", ")}} == v2 ids {${after.join(", ")}}, diffed both ways, both empty`
       : `v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}} -- not empty`,
   );
+}
+
+// --- REAL-COPY MODE: `--before <dir> --after <dir>` ----------------------------------------------
+// Runs the same invariants over a real repo copy (before = pristine v1 copy, after = the same copy
+// once migrate ran) instead of the fixture trees, then exits. SPRINT-111 T1 (TASK-370).
+
+function argValue(flag: string): string | null {
+  const i = process.argv.indexOf(flag);
+  return i >= 0 && process.argv[i + 1] ? process.argv[i + 1]! : null;
+}
+
+{
+  const beforeDir = argValue("--before");
+  const afterDir = argValue("--after");
+  if (beforeDir || afterDir) {
+    if (!beforeDir || !afterDir || !existsSync(beforeDir) || !existsSync(afterDir)) {
+      console.log("usage: bun evals/run-v1-to-v2-fixtures.ts --before <dir> --after <dir> (both must exist)");
+      process.exit(2);
+    }
+    const ids = v1Ids(beforeDir);
+    const after = migratedV2Ids(beforeDir, afterDir, ids);
+    const { beforeOnly, afterOnly } = diffIdSets(ids, after);
+    const idOk = ids.length > 0 && beforeOnly.length === 0 && afterOnly.length === 0;
+    report(
+      "real-id-set",
+      idOk,
+      idOk
+        ? `v1 ids (${ids.length}) == migrated v2 ids (${after.length}), diffed both ways, both empty`
+        : `v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}} (v1 ids: ${ids.length})`,
+    );
+    const tb = v1TickedBoxCount(beforeDir);
+    const ta = v2TickedBoxCount(afterDir, new Set(ids));
+    report("real-ticked-box-count", tb === ta, `Plan DoD ticked (before, by-value sprints) = ${tb}, ## Done when ticked over migrated ids (after) = ${ta}`);
+    const pres = preservationFindings(beforeDir, afterDir);
+    report(
+      "real-preservation",
+      pres.length === 0,
+      pres.length === 0
+        ? `${workFilesRel(beforeDir).length} docs/work file(s) present before are byte-identical after`
+        : pres.join("; "),
+    );
+    const todoGone = !existsSync(join(afterDir, "TODO.md"));
+    report("real-todo-removed", todoGone, todoGone ? "TODO.md absent after" : "TODO.md still present after (run halted or a conflict is open)");
+    console.log(`\nv1-to-v2-fixtures: ${pass} pass, ${fail} fail`);
+    process.exit(fail > 0 ? 1 : 0);
+  }
 }
 
 // --- (1) id-set: must PASS on expected/ ---------------------------------------------------------
@@ -562,6 +665,128 @@ function parseReadmeSections(text: string): { required: string[]; optional: stri
     ok
       ? `README § Filename rule still states \`TASK-NNN-kebab-slug.md\` and \`[a-z0-9-]\` -- matches FILENAME_RULE's components`
       : `README § Filename rule (${readmePath()}) missing or no longer states the pattern/character-class FILENAME_RULE encodes`,
+  );
+}
+
+// --- SCENARIO 3 (SPRINT-111 T1): by-reference sprint + preservation ------------------------------
+// input-byref/ holds an active sprint with `## Members` whose two members already exist in
+// docs/work/ (one ticked). Migrate maps only the Backlog row (TASK-921); the members are never
+// mapped, written or modified.
+
+{
+  const ids = v1Ids(INPUT_BYREF);
+  const ok = ids.length === 1 && ids[0] === "TASK-921";
+  report(
+    "byref-members-not-mapped",
+    ok,
+    ok
+      ? `v1 ids from input-byref/ = {${ids.join(", ")}} -- the by-reference sprint's Tn (TASK-922, TASK-923) are not collected`
+      : `v1 ids from input-byref/ = {${ids.join(", ")}} -- a by-reference sprint's Tn leaked into the mapped set`,
+  );
+}
+
+runIdSetCase("id-set-byref", EXPECTED_BYREF, INPUT_BYREF);
+
+{
+  const ids = new Set(v1Ids(INPUT_BYREF));
+  const before = v1TickedBoxCount(INPUT_BYREF);
+  const after = v2TickedBoxCount(EXPECTED_BYREF, ids);
+  report("ticked-box-count-byref", before === after, `before (by-value sprints) = ${before}, after (migrated ids only) = ${after}`);
+}
+
+{
+  const findings = preservationFindings(INPUT_BYREF, EXPECTED_BYREF);
+  const n = workFilesRel(INPUT_BYREF).length;
+  const ok = n > 0 && findings.length === 0;
+  report("preservation-byref", ok, ok ? `${n} member file(s) byte-identical before and after` : `n=${n} ${findings.join("; ")}`);
+}
+
+// must-FAIL sibling: a member file altered (its box ticked) -> preservation must redden with the
+// NAMED finding; the id-set case on the SAME tree stays green (sibling control).
+{
+  const findings = preservationFindings(INPUT_BYREF, EXPECTED_BYREF_MEMBER_ALTERED);
+  const named = "altered: docs/work/todo/TASK-922-verify-the-upload-steps-exit-code.md";
+  const ok = findings.length === 1 && findings[0] === named;
+  report(
+    "preservation-member-altered (must-FAIL sibling)",
+    ok,
+    ok
+      ? `preservation reddens with exactly the named finding '${named}'`
+      : `preservation findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`,
+  );
+  const before = v1Ids(INPUT_BYREF);
+  const { beforeOnly, afterOnly } = diffIdSets(before, migratedV2Ids(INPUT_BYREF, EXPECTED_BYREF_MEMBER_ALTERED, before));
+  const controlOk = beforeOnly.length === 0 && afterOnly.length === 0;
+  report(
+    "id-set-byref-member-altered (sibling control, must stay PASS)",
+    controlOk,
+    controlOk
+      ? "id-set still agrees on the SAME tree that reddens preservation -- the redden is specific to the altered member"
+      : `id set also disagrees: v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}}`,
+  );
+}
+
+// --- SCENARIO 4 (SPRINT-111 T1): an interrupted run resumes to the uninterrupted tree -------------
+// interrupted-partial/ is REAL partial state: the migrate procedure run on input/ and stopped
+// after 2 task files. Re-running it lands on expected/ iff (a) every store file already written is
+// a byte-identical member of expected/ (so the resume's "identical -> skip" branch is what fires),
+// (b) TODO.md is still present and untouched (removal only after every id resolves), and (c) the
+// run really was partial (fewer files than expected/).
+
+// Two fixture trees in one working copy: EOL depends on the checkout (autocrlf), identically for
+// both, so the cross-tree compare ignores CR. (preservationFindings stays raw: its before/after
+// are one copy, so a CRLF-only rewrite of a member IS a violation there.)
+function sameModuloEol(a: string, b: string): boolean {
+  return readFileSync(a, "utf8").replace(/\r\n/g, "\n") === readFileSync(b, "utf8").replace(/\r\n/g, "\n");
+}
+
+function resumeFindings(partialRoot: string): string[] {
+  const findings: string[] = [];
+  const partial = workFilesRel(partialRoot);
+  const expected = new Set(workFilesRel(EXPECTED));
+  if (partial.length === 0) findings.push("empty-partial");
+  if (partial.length >= expected.size) findings.push("not-partial");
+  for (const rel of partial) {
+    if (!expected.has(rel)) findings.push(`not-in-expected: ${rel}`);
+    else if (!sameModuloEol(join(partialRoot, rel), join(EXPECTED, rel))) findings.push(`diverged: ${rel}`);
+  }
+  if (!existsSync(join(partialRoot, "TODO.md"))) findings.push("todo-missing");
+  else if (!sameModuloEol(join(partialRoot, "TODO.md"), join(INPUT, "TODO.md"))) findings.push("todo-altered");
+  return findings;
+}
+
+{
+  const findings = resumeFindings(INTERRUPTED_PARTIAL);
+  const ok = findings.length === 0;
+  report(
+    "resume-partial-subset-of-expected",
+    ok,
+    ok
+      ? `interrupted-partial/ holds ${workFilesRel(INTERRUPTED_PARTIAL).length} of ${workFilesRel(EXPECTED).length} expected file(s), each byte-identical; TODO.md present and untouched`
+      : findings.join("; "),
+  );
+}
+
+// must-FAIL sibling: a written file diverged from expected/ -> the resume case must redden with
+// the NAMED finding, while the TODO.md checks on the SAME tree stay green (sibling control).
+{
+  const findings = resumeFindings(INTERRUPTED_PARTIAL_DIVERGED);
+  const named = "diverged: docs/work/backlog/TASK-913-add-a-retry-to-the-flaky-upload-step.md";
+  const ok = findings.includes(named);
+  report(
+    "resume-partial-diverged (must-FAIL sibling)",
+    ok,
+    ok
+      ? `resume case reddens with the named finding '${named}'`
+      : `findings = [${findings.join("; ")}], wanted '${named}' -- the check cannot discriminate`,
+  );
+  const controlOk = !findings.includes("todo-missing") && !findings.includes("todo-altered");
+  report(
+    "resume-todo-intact-diverged (sibling control, must stay PASS)",
+    controlOk,
+    controlOk
+      ? "TODO.md checks still green on the SAME tree that reddens the resume case -- the redden is specific to the diverged file"
+      : `TODO.md checks also red: [${findings.join("; ")}]`,
   );
 }
 
