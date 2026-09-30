@@ -168,3 +168,10 @@ its own. The coordinator recommended R3 without reading ADR-043: a **retrieval m
 **Impact on § Plan:** none. T3 keeps its Layers and its T4 dependency. Its brief now includes the `bun-required` finding and a must-FAIL
 fixture for it. The ADR, DECISIONS, README, CHANGELOG, TD-204 and TASK-393 are coordinator-owned governance writes.
 **Re-confirm G2:** R3 stands as amended by R4. No member `## Done when` edited.
+
+### 2026-09-30 | progress | rank 2 dispatched: T3 (sonnet + /tdd); worktree-base guard PASS at `18d9ccc`
+Declared base `18d9ccc`, the TASK-383 todo → in_progress move. The session checkout was fast-forwarded to `main` first, so the
+worktree branches from the right base this time. `worktree-base` PASS (`agent-ab8e9dbc…`). The brief carries D2 (`_own_docs` exempts
+task files), R2 (TODOCAP only while TODO.md exists), R4/ADR-049 (`bun-required`, the CLI's exit status read at every call site, zero
+bun calls on a v1 tree), and ADR-043's v1 parity bar (exit code and report text), proven before and after over v1 fixtures, the
+archive, and this repo with every diff line explained.
