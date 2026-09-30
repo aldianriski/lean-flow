@@ -767,6 +767,206 @@ d="$work/s12-vscode-personal"; mkdir -p "$d"; lookalike_repo "$d"
 printf '{ "editor.fontSize": 13 }\n' > "$d/.vscode/settings.json"
 commit_msg "$d" "commit personal editor settings"
 assert_finding "s12-generated-vscode-settings" "$d" "generated-artifact-committed"
+echo "=== v2 (by-reference) store fixtures (SPRINT-110 T3 · ADR-047 · ADR-049) ==="
+# The engine's sprint-family rules read a by-reference sprint's DoD from its MEMBER task files, through
+# scripts/lib/sprint-members-cli.ts (Bun) and check-sprint-by-reference.ts -- never from the Plan, which
+# carries no DoD boxes. Every case builds the real fixture sprint (evals/fixtures/by-reference/, the same
+# one run-by-reference-fixtures.ts freezes): TASK-901 + TASK-902, both in todo/, stamped SPRINT-901.
+#
+# THE POPULATION IS VARIED, NOT ONLY THE VERDICT (L-186): a member reached ONLY by its `sprint:` stamp
+# (TASK-903, absent from ## Members), a member listed under todo/ whose file has moved (stale ## Members
+# path), and a Tn that cites two members. Each must-FAIL below has a sibling control that leaves the
+# verdict shape alone and moves ONE thing.
+FXR="$root/evals/fixtures/by-reference"
+V2SP="docs/sprint/SPRINT-901-fixture.md"
+V2LOG="docs/sprint/logs/SPRINT-901-fixture.md"
+T901="docs/work/todo/TASK-901-alpha.md"
+T902="docs/work/todo/TASK-902-beta.md"
+T903="docs/work/todo/TASK-903-gamma.md"
+
+# v2_repo <dir> [log] [stamp] -- promote commit, then plan_commit recorded, as a real promote does.
+v2_repo() {
+  _d=$1; mkdir -p "$_d/docs/sprint/logs" "$_d/docs/work/todo"
+  git -C "$_d" init -q >/dev/null 2>&1 || { echo "FAIL harness: git init failed"; exit 2; }
+  cp "$FXR/SPRINT-901-fixture.md" "$_d/$V2SP"
+  cp "$FXR/TASK-901-alpha.md" "$_d/$T901"; cp "$FXR/TASK-902-beta.md" "$_d/$T902"
+  sed -i 's/^plan_commit: .*/plan_commit: [sha - set at promote]/' "$_d/$V2SP"
+  case " $* " in *" log "*) cp "$FXR/log-SPRINT-901-fixture.md" "$_d/$V2LOG" ;; esac
+  case " $* " in *" stamp "*)   # TASK-903: stamped, deliberately NOT listed under ## Members
+    sed -e 's/TASK-902/TASK-903/g' -e 's/Deliver beta/Deliver gamma/' -e 's/^depends-on: .*/depends-on: []/' \
+      -e 's/beta consumes alpha.s output unchanged/gamma stands alone/' "$FXR/TASK-902-beta.md" > "$_d/$T903" ;; esac
+  commit_msg "$_d" "sprint(901): plan locked"
+  _pc=$(git -C "$_d" rev-parse --short HEAD)
+  sed -i "s/^plan_commit: .*/plan_commit: $_pc/" "$_d/$V2SP"
+  commit_msg "$_d" "sprint(901): record plan_commit"
+}
+v2_edit_done() { sed -i 's/^\(- \[[ x]\] .*\)$/\1, reworded/' "$1"; }   # a TEXT change to every box line
+v2_tick() { sed -i "0,/^- \[ \]/s//- [x]/" "$1"; }                       # tick the first open box, text untouched
+
+# --- freeze: a member's ## Done when edited after plan_commit (S9.PLANFROZEN) -----------------------
+d="$work/v2-freeze"; mkdir -p "$d"; v2_repo "$d" log
+v2_edit_done "$d/$T901"; commit_msg "$d" "sprint(901) T1: reword the DoD quietly"
+assert_finding "v2-freeze-edit" "$d" "FREEZE-EDIT TASK-901"
+assert_finding "v2-freeze-edit-named-as-plan-edit" "$d" "plan-edited-after-freeze: docs/sprint/SPRINT-901-fixture.md -- member freeze (ADR-047)"
+
+d="$work/v2-freeze-tick"; mkdir -p "$d"; v2_repo "$d" log
+v2_tick "$d/$T901"; commit_msg "$d" "sprint(901) T1: tick a box"
+assert_absent "v2-freeze-edit-control-tick-only" "$d" "plan-edited-after-freeze"
+
+# SELECTION (L-186): a member reached only by its stamp.
+d="$work/v2-freeze-stamp"; mkdir -p "$d"; v2_repo "$d" log stamp
+v2_edit_done "$d/$T903"; commit_msg "$d" "sprint(901): reword the stamp-only member"
+assert_finding "v2-freeze-edit-stamp-only-member" "$d" "FREEZE-EDIT TASK-903"
+# ...and the sibling that keeps the population and changes nothing: the stamp-only member ticked.
+d="$work/v2-freeze-stamp-ok"; mkdir -p "$d"; v2_repo "$d" log stamp
+v2_tick "$d/$T903"; commit_msg "$d" "sprint(901): tick the stamp-only member"
+assert_absent "v2-freeze-edit-stamp-only-control" "$d" "plan-edited-after-freeze"
+
+# SELECTION (L-186): ## Members still names todo/, the file now lives in in_progress/ and was edited there.
+d="$work/v2-freeze-stale"; mkdir -p "$d"; v2_repo "$d" log
+mkdir -p "$d/docs/work/in_progress"; git -C "$d" mv "$T902" docs/work/in_progress/TASK-902-beta.md
+commit_msg "$d" "sprint(901): move TASK-902 in_progress"
+v2_edit_done "$d/docs/work/in_progress/TASK-902-beta.md"; commit_msg "$d" "sprint(901) T2: reword after the move"
+assert_finding "v2-freeze-edit-stale-members-path" "$d" "FREEZE-EDIT TASK-902"
+d="$work/v2-freeze-stale-ok"; mkdir -p "$d"; v2_repo "$d" log
+mkdir -p "$d/docs/work/in_progress"; git -C "$d" mv "$T902" docs/work/in_progress/TASK-902-beta.md
+commit_msg "$d" "sprint(901): move TASK-902 in_progress"
+assert_absent "v2-freeze-edit-stale-members-path-control" "$d" "plan-edited-after-freeze"
+
+# --- the CLI's named error is the finding, never an empty member list (TD-202) -----------------------
+d="$work/v2-unresolved"; mkdir -p "$d"; v2_repo "$d" log
+sed -i 's|^- docs/work/todo/TASK-902-beta.md$|&\n- docs/work/todo/TASK-999-ghost.md|' "$d/$V2SP"
+commit_msg "$d" "sprint(901): list a member that has no file"
+assert_finding "v2-members-unresolved-planfrozen" "$d" "SPRINT-MEMBER-UNRESOLVED"
+assert_finding "v2-members-unresolved-is-a-fail" "$d" "FAIL  SPRINT-MEMBER-UNRESOLVED: TASK-999"
+d="$work/v2-unresolved-ok"; mkdir -p "$d"; v2_repo "$d" log
+assert_absent "v2-members-unresolved-control" "$d" "SPRINT-MEMBER-UNRESOLVED"
+
+# --- S9.TWOFILES: the log is owed once a MEMBER box is ticked ---------------------------------------
+d="$work/v2-nolog"; mkdir -p "$d"; v2_repo "$d"
+v2_tick "$d/$T901"; commit_msg "$d" "sprint(901) T1: tick, no log yet"
+assert_finding "v2-log-missing" "$d" "sprint-log-missing"
+d="$work/v2-nolog-noticks"; mkdir -p "$d"; v2_repo "$d"
+assert_absent "v2-log-missing-control-lazy" "$d" "sprint-log-missing"
+d="$work/v2-nolog-haslog"; mkdir -p "$d"; v2_repo "$d" log
+v2_tick "$d/$T901"; commit_msg "$d" "sprint(901) T1: tick with a log"
+assert_absent "v2-log-missing-control-has-log" "$d" "sprint-log-missing"
+# SELECTION: the only tick is in the stamp-only member.
+d="$work/v2-nolog-stamp"; mkdir -p "$d"; v2_repo "$d" "" stamp
+v2_tick "$d/$T903"; commit_msg "$d" "sprint(901): tick only the stamp-only member"
+assert_finding "v2-log-missing-stamp-only-tick" "$d" "sprint-log-missing"
+# SELECTION: T1 cites TASK-901 and T2 TASK-902; make ONE Tn cite BOTH and tick only the second member.
+d="$work/v2-nolog-twocite"; mkdir -p "$d"; v2_repo "$d"
+sed -i 's/^Cites: `TASK-901`$/Cites: `TASK-901` · `TASK-902`/' "$d/$V2SP"
+commit_msg "$d" "sprint(901): T1 cites two members"
+v2_tick "$d/$T902"; commit_msg "$d" "sprint(901) T2: tick the second cited member"
+assert_finding "v2-log-missing-tn-cites-two-members" "$d" "sprint-log-missing"
+
+# --- S9.VERIFYCLAUSE: a ticked member box naming no evidence ----------------------------------------
+d="$work/v2-verify"; mkdir -p "$d"; v2_repo "$d" log
+v2_tick "$d/$T901"; commit_msg "$d" "sprint(901) T1: tick without proof"
+assert_finding "v2-dod-names-no-check" "$d" "dod-criterion-names-no-check"
+d="$work/v2-verify-ok"; mkdir -p "$d"; v2_repo "$d" log
+v2_tick "$d/$T901"; sed -i 's/^\(- \[x\] .*\)$/\1 ✓ proved by the run above/' "$d/$T901"; commit_msg "$d" "sprint(901) T1: tick with proof"
+assert_absent "v2-dod-names-no-check-control-evidence" "$d" "dod-criterion-names-no-check"
+d="$work/v2-verify-none"; mkdir -p "$d"; v2_repo "$d" log
+assert_absent "v2-dod-names-no-check-control-zero-ticks" "$d" "dod-criterion-names-no-check"
+# SELECTION: the unproven tick is in the stamp-only member.
+d="$work/v2-verify-stamp"; mkdir -p "$d"; v2_repo "$d" log stamp
+v2_tick "$d/$T903"; commit_msg "$d" "sprint(901): tick the stamp-only member without proof"
+assert_finding "v2-dod-names-no-check-stamp-only" "$d" "dod-criterion-names-no-check"
+# SELECTION: a `- [x]` inside a fenced block of ## Done when is not a box (the CLI ignores it; so must the reader).
+d="$work/v2-verify-fence"; mkdir -p "$d"; v2_repo "$d" log
+sed -i 's/^## Done when$/&\n\n```\n- [x] an example in a fence, not a box\n```/' "$d/$T901"; commit_msg "$d" "sprint(901): a fenced example"
+assert_absent "v2-dod-names-no-check-control-fenced-example" "$d" "dod-criterion-names-no-check"
+
+# --- S10.FOURBUCKETS: the follow-ups bucket is an ADDED docs/work/backlog/TASK-*.md -----------------
+v2_closed() {  # <dir> <mutation-fn> -- the close commit is made by <mutation-fn>, then stamped closed
+  _d=$1; mkdir -p "$_d"; v2_repo "$_d" log
+  mkdir -p "$_d/docs/work/backlog"
+  printf -- '---\nid: TASK-050\ntitle: "old follow-up"\nsprint: \n---\n\n## Done when\n\n- [ ] x\n' > "$_d/docs/work/backlog/TASK-050-old.md"
+  commit_msg "$_d" "sprint(901): a backlog task that already existed"
+  "$2" "$_d"
+  sed -i '/^close_commit:/d' "$_d/$V2SP"   # drop the template placeholder, or _fm reads IT first and the stamp is invisible
+  close_at "$_d/$V2SP" "$_d"
+}
+close_adds_backlog() { printf -- '---\nid: TASK-051\ntitle: "follow-up"\n---\n\n## Done when\n\n- [ ] y\n' > "$1/docs/work/backlog/TASK-051-new.md"; commit_msg "$1" "sprint(901): close"; }
+close_edits_backlog() { printf 'edited\n' >> "$1/docs/work/backlog/TASK-050-old.md"; commit_msg "$1" "sprint(901): close"; }
+close_touches_nothing() { printf 'x\n' > "$1/scratch.txt"; commit_msg "$1" "sprint(901): close"; }
+v2_closed "$work/v2-close-adds" close_adds_backlog
+assert_absent "v2-retro-bucket-control-added-backlog-task" "$work/v2-close-adds" "retro-bucket-unrouted"
+v2_closed "$work/v2-close-nothing" close_touches_nothing
+assert_finding "v2-retro-bucket-unrouted" "$work/v2-close-nothing" "retro-bucket-unrouted"
+assert_finding "v2-retro-bucket-names-the-store" "$work/v2-close-nothing" "an added docs/work/backlog/TASK-*.md"
+# SELECTION: EDITING an existing backlog task is not a new follow-up.
+v2_closed "$work/v2-close-edits" close_edits_backlog
+assert_finding "v2-retro-bucket-unrouted-edit-is-not-add" "$work/v2-close-edits" "retro-bucket-unrouted"
+
+# --- S11.TODOCAP: fires only while TODO.md exists; on a store tree it points at migrate (R2) ---------
+d="$work/v2-todocap"; mkdir -p "$d"; ledger_repo "$d"; mkdir -p "$d/docs/work/backlog"
+printf -- '---\nid: TASK-001\ntitle: "t"\n---\n\n## Done when\n\n- [ ] z\n' > "$d/docs/work/backlog/TASK-001-t.md"
+i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
+assert_finding "v2-todo-over-cap" "$d" "todo-over-cap-at-promote"
+assert_finding "v2-todo-over-cap-points-at-migrate" "$d" "/lean-doc-generator migrate"
+d="$work/v2-todocap-gone"; mkdir -p "$d"; ledger_repo "$d"; mkdir -p "$d/docs/work/backlog"
+printf -- '---\nid: TASK-001\ntitle: "t"\n---\n\n## Done when\n\n- [ ] z\n' > "$d/docs/work/backlog/TASK-001-t.md"
+rm -f "$d/TODO.md"
+assert_absent "v2-todo-over-cap-control-no-todo" "$d" "todo-over-cap-at-promote"
+# v1 parity: the same over-cap TODO.md on a tree WITHOUT the store keeps its original wording.
+d="$work/v1-todocap"; mkdir -p "$d"; ledger_repo "$d"
+i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
+assert_finding "v1-todo-over-cap-message-unchanged" "$d" "prunes it with the user, never silently"
+
+# --- S11.BACKLOG: the done/ · cancel/ prune (§11 store row) ------------------------------------------
+# v2_old_task <dir> <folder> <id> <sprint-field> -- a closed task file. Sprint 901 is current, so a
+# stamp of 880 is 21 sprints old and 898 is exactly the spec's 3.
+v2_old_task() {
+  mkdir -p "$1/docs/work/$2"
+  printf -- '---\nid: TASK-%s\ntitle: "old"\nsprint: %s\n---\n\n## Done when\n\n- [x] done ✓ proved\n' "$3" "$4" > "$1/docs/work/$2/TASK-$3-old.md"
+}
+d="$work/v2-prune"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 010 SPRINT-880
+assert_finding "v2-closed-task-past-retention" "$d" "closed-task-past-retention: docs/work/done/TASK-010-old.md"
+d="$work/v2-prune-cancel"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" cancel 011 SPRINT-880   # SELECTION: the other folder
+assert_finding "v2-closed-task-past-retention-cancel-folder" "$d" "closed-task-past-retention: docs/work/cancel/TASK-011-old.md"
+d="$work/v2-prune-boundary"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 012 SPRINT-898     # exactly the spec's delay
+assert_finding "v2-closed-task-past-retention-at-the-delay" "$d" "closed-task-past-retention: docs/work/done/TASK-012-old.md"
+d="$work/v2-prune-recent"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 013 SPRINT-899        # one short of it
+assert_absent "v2-closed-task-past-retention-control-recent" "$d" "closed-task-past-retention"
+d="$work/v2-prune-highest"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 950 SPRINT-880       # highest id in the store
+assert_absent "v2-closed-task-past-retention-control-highest-id" "$d" "closed-task-past-retention"
+d="$work/v2-prune-depends"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 014 SPRINT-880
+sed -i 's/^depends-on: .*/depends-on: [TASK-014]/' "$d/$T902"
+assert_absent "v2-closed-task-past-retention-control-open-depends-on" "$d" "closed-task-past-retention"
+# SELECTION: named by an ACTIVE sprint's ## Members through a stale (todo/) path while the file sits in done/.
+d="$work/v2-prune-live"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 015 SPRINT-880
+sed -i 's|^- docs/work/todo/TASK-902-beta.md$|&\n- docs/work/todo/TASK-015-old.md|' "$d/$V2SP"
+assert_absent "v2-closed-task-past-retention-control-live-member-stale-path" "$d" "closed-task-past-retention"
+d="$work/v2-prune-unstamped"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" cancel 016 ""              # never scheduled: judged from history, not here
+assert_absent "v2-closed-task-past-retention-control-unscheduled-cancel" "$d" "closed-task-past-retention"
+
+# --- bun-required (ADR-049) for S9.PLANFROZEN: a v2 tree, no bun on PATH -----------------------------
+# The PATH is the caller's minus every directory that holds a bun; git must survive the strip, or the
+# case would be reddening for the wrong reason (the rule reads history before it needs the lookup).
+_nb=""; _oifs=$IFS; IFS=:
+for _pd in $PATH; do
+  [ -e "$_pd/bun" ] || [ -e "$_pd/bun.exe" ] || [ -e "$_pd/bun.cmd" ] || _nb="${_nb:+$_nb:}$_pd"
+done
+IFS=$_oifs
+if [ -n "$(PATH=$_nb command -v bun 2>/dev/null)" ]; then
+  echo "FAIL harness: could not build a PATH without bun -- the bun-required cases below would prove nothing"; fail=1
+elif [ -z "$(PATH=$_nb command -v git 2>/dev/null)" ]; then
+  echo "FAIL harness: the bun-less PATH lost git too -- the PLANFROZEN bun-required case cannot run"; fail=1
+else
+  d="$work/v2-nobun"; mkdir -p "$d"; v2_repo "$d" log
+  _o=$(PATH=$_nb sh "$engine" "$d" --spec "$spec" 2>&1)
+  if printf '%s\n' "$_o" | grep -qE '^FAIL  bun-required: docs/sprint/SPRINT-901-fixture\.md -- S9\.PLANFROZEN needs'; then
+    echo "PASS fixture(v2-planfrozen-bun-required): a v2 tree with no bun FAILs bun-required naming S9.PLANFROZEN"
+  else
+    echo "FAIL fixture(v2-planfrozen-bun-required): expected FAIL bun-required for S9.PLANFROZEN -- got:"
+    printf '%s\n' "$_o" | grep -E 'bun|PLANFROZEN' | sed 's/^/    /'; fail=1
+  fi
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "SPRINT-FAMILY FIXTURES: all green"

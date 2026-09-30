@@ -1166,6 +1166,12 @@ _own_docs() {
         docs/adr/ADR-*.md) continue ;;
         */templates/*)     continue ;;
         */SKILL.md)        continue ;;
+        # A store task file carries its own schema (ADR-045; work/README.md), and its status is its
+        # folder -- so the ownership header is not owed there (owner ruling D2, SPRINT-110 T3). Exactly
+        # docs/work/<status>/TASK-*.md: a `case` `*` crosses `/`, so the inner case refuses a deeper
+        # path, and any OTHER doc under docs/work/ (its README) stays checked.
+        docs/work/*/TASK-*.md)
+          case ${rel#docs/work/*/} in */*) ;; *) continue ;; esac ;;
       esac
       skip=0
       for off in $_own_off; do
@@ -2014,6 +2020,73 @@ _fm_real() {   # <file> <key> -- the value only when it is not a bracketed place
   case "$_v" in ""|\[*) printf '' ;; *) printf '%s' "$_v" ;; esac
 }
 
+# --- by-reference (v2) sprints: members read through ONE lookup (ADR-049, SPRINT-110 T3) -----------
+# A v2 tree is one with a `docs/work/` store. On it a sprint's DoD lives in its member task files, and
+# membership is `## Members` UNION every `sprint:` stamp -- which the Plan alone cannot answer. The one
+# selector for that population is scripts/lib/sprint-members-cli.ts (Bun), resolved beside this
+# engine exactly as spec/STANDARD.md is, so an adopter's repo needs no copy. A second selector in awk
+# would drift from it silently (L-186), which is why there is none here.
+#
+# A v1 tree (no docs/work/) makes ZERO bun calls: the rules below take their original branch, byte for
+# byte. On a v2 tree without `bun` the rule FAILs `bun-required` -- never a skip, never a fallback to the
+# Plan (a skip on a gate is a pass nobody examined).
+#
+# THE CLI'S EXIT STATUS IS READ, never inferred from empty output (TD-202: an empty answer taken for
+# "no members" is a green run over a sprint the lookup could not resolve). 0 = by-reference; 3 =
+# NOT-BY-REFERENCE, i.e. this sprint is an inline-DoD (v1) sprint sitting in a v2 tree; anything else is
+# a named FAIL carrying the CLI's own error. One call per sprint file, cached: the rules below each ask.
+_is_v2() { [ -d "$1/docs/work" ]; }
+_SR_STATE=""; _SR_OUT=""; _SR_ERR=""
+_sr_load() {   # <repo> <plan-rel> -> _SR_STATE: v1 | v2 | nobun | err ; _SR_OUT (counts) ; _SR_ERR
+  _is_v2 "$1" || { _SR_STATE=v1; _SR_OUT=""; _SR_ERR=""; return 0; }   # no spawn at all on a v1 tree
+  _srk=$(printf '%s' "$1/$2" | tr -c 'A-Za-z0-9' '_')
+  eval "_SR_STATE=\${_SR_S_$_srk:-}"
+  if [ -n "$_SR_STATE" ]; then eval "_SR_OUT=\${_SR_O_$_srk:-}; _SR_ERR=\${_SR_E_$_srk:-}"; return 0; fi
+  _SR_OUT=""; _SR_ERR=""
+  if ! _is_v2 "$1"; then
+    _SR_STATE=v1
+  elif ! command -v bun >/dev/null 2>&1; then
+    _SR_STATE=nobun
+  else
+    _SR_OUT=$(bun "$here/sprint-members-cli.ts" counts "$1/$2" --root "$1" 2>&1); _src=$?
+    case $_src in
+      0) _SR_STATE=v2
+         # exit 0 with no `dod` line is a CLI whose contract moved, not a sprint with no boxes
+         printf '%s\n' "$_SR_OUT" | grep -q '^dod [0-9][0-9]* [0-9][0-9]*$' || {
+           _SR_STATE=err; _SR_ERR="SPRINT-MEMBERS-CLI-UNPARSED: exit 0 but no \`dod <ticked> <open>\` line in its output"; _SR_OUT=""; } ;;
+      3) _SR_STATE=v1; _SR_OUT="" ;;
+      *) _SR_STATE=err
+         _SR_ERR=$(printf '%s\n' "$_SR_OUT" | sed -n '1p')
+         [ -n "$_SR_ERR" ] || _SR_ERR="sprint-members-cli exited $_src with no message"
+         _SR_OUT="" ;;
+    esac
+  fi
+  eval "_SR_S_$_srk=\$_SR_STATE; _SR_O_$_srk=\$_SR_OUT; _SR_E_$_srk=\$_SR_ERR"
+}
+# _sr_blocked <what> <subject> -- reports the FAIL and returns 0 when the members could not be read.
+_sr_blocked() {
+  case $_SR_STATE in
+    nobun) bad "bun-required: $2 -- $1 needs its member task files, this is a by-reference tree (docs/work/ exists) and \`bun\` is not on PATH. ADR-049: a v2 tree is checked through scripts/lib/sprint-members-cli.ts, so \`bun\` is a requirement here. Reported rather than skipped -- a skipped gate is a pass nobody examined"; return 0 ;;
+    err)   bad "$_SR_ERR -- $2: $1 could not read this sprint's members, so it checks nothing about it (an unreadable member set is a failure, not an empty one)"; return 0 ;;
+  esac
+  return 1
+}
+_sr_ticked() { printf '%s\n' "$_SR_OUT" | sed -n 's/^dod \([0-9][0-9]*\) [0-9][0-9]*$/\1/p'; }
+# _sr_ticked_lines <repo> -- every ticked `## Done when` box line of the sprint's members. Which files is
+# the CLI's answer; only the LINE TEXT is read here, fence- and comment-aware like the CLI's own box scan.
+_sr_ticked_lines() {
+  printf '%s\n' "$_SR_OUT" | sed -n 's/^member [^ ]* [0-9][0-9]* [0-9][0-9]* //p' | while IFS= read -r _mp; do
+    [ -f "$1/$_mp" ] || continue
+    awk '/^## /{ dw = ($0 ~ /^## Done when[ \t]*$/); fence = 0; next }
+         !dw { next }
+         /^(```|~~~)/ { fence = !fence; next }
+         fence { next }
+         /^<!--/ { if ($0 !~ /-->/) cm = 1; next }
+         cm { if ($0 ~ /-->/) cm = 0; next }
+         /^- \[[xX]\]/ { print }' "$1/$_mp"
+  done
+}
+
 assert_S9_TWOFILES() {
   repo=$1
   plans=$(_sprint_plans "$repo")
@@ -2027,6 +2100,8 @@ assert_S9_TWOFILES() {
     [ -n "$cap" ] || cap=400
     [ "$n" -gt "$cap" ] && bad "sprint-plan-over-hard-cap: $p is $n lines against §2's $cap hard -- the Plan's budget is what bounds how many tasks a sprint may hold, so a breach here is not cosmetic"
     log="docs/sprint/logs/${p##*/}"
+    _sr_load "$repo" "$p"
+    _sr_blocked "S9.TWOFILES" "$p" && continue
     if [ -f "$repo/$log" ]; then
       n_ok=$((n_ok + 1)); continue
     fi
@@ -2034,7 +2109,14 @@ assert_S9_TWOFILES() {
     # sprint has done work. A ticked DoD box is that substrate, and it is mechanical: a Plan with no
     # tick has nothing to have logged. Without this the check would fire on every sprint in the gap
     # between promote and the first task -- a finding about correct behaviour.
-    if grep -q '^- \[x\]' "$repo/$p" 2>/dev/null; then
+    # A by-reference sprint's Plan carries no DoD boxes (ADR-047): the ticks live in its members.
+    _has_tick=0
+    if [ "$_SR_STATE" = v2 ]; then
+      [ "$(_sr_ticked)" -gt 0 ] && _has_tick=1
+    elif grep -q '^- \[x\]' "$repo/$p" 2>/dev/null; then
+      _has_tick=1
+    fi
+    if [ "$_has_tick" -eq 1 ]; then
       bad "sprint-log-missing: $log -- $p has ticked DoD, so work has happened and the Execution Log is owed. The Log is the append-only record the Retro is written from; work with no log leaves the Retro sourced from memory"
     else
       note "S9.TWOFILES         -- $p has no ticked DoD, so its Execution Log is not yet owed (§9 creates it lazily at the first entry)"
@@ -2078,6 +2160,27 @@ _plan_section() { awk '/^## Plan$/ { inp = 1; next } inp && /^## / { exit } inp 
 # section below and is deliberately left untouched here.
 _norm_dod_checkbox() { sed 's/^- \[[xX]\]/- [ ]/'; }
 
+# _s9_freeze_v2 <repo> <plan-rel> -- the ADR-047 freeze for one by-reference sprint, run once through
+# scripts/lib/check-sprint-by-reference.ts (beside this engine) and mapped into this engine's finding
+# format. Its exit status is read: a non-zero exit with no FAIL line is itself a finding, never a pass.
+_s9_freeze_v2() {
+  _fo=$(bun "$here/check-sprint-by-reference.ts" "$1/$2" 2>&1); _frc=$?
+  _fn=0; _fp=0
+  while IFS= read -r _fl; do
+    case $_fl in
+      'FAIL  '*) _fn=$((_fn + 1)); bad "plan-edited-after-freeze: $2 -- member freeze (ADR-047): ${_fl#FAIL  }" ;;
+      'PASS  freeze TASK-'*) _fp=$((_fp + 1)) ;;
+    esac
+  done <<EOF
+$_fo
+EOF
+  if [ "$_frc" -ne 0 ] && [ "$_fn" -eq 0 ]; then
+    bad "plan-edited-after-freeze: $2 -- check-sprint-by-reference.ts exited $_frc with no FAIL line, so the member freeze was not answered: $(printf '%s\n' "$_fo" | sed -n '1p')"
+  elif [ "$_frc" -eq 0 ]; then
+    note "S9.PLANFROZEN       -- $2 (by reference): $_fp member \`## Done when\` freeze(s) hold since plan_commit, ticks ignored (ADR-047)"
+  fi
+}
+
 assert_S9_PLANFROZEN() {
   repo=$1
   plans=$(_sprint_plans "$repo")
@@ -2088,6 +2191,8 @@ assert_S9_PLANFROZEN() {
   fi
   n_frozen=0; n_accounted=0
   for p in $plans; do
+    _sr_load "$repo" "$p"
+    _sr_blocked "S9.PLANFROZEN" "$p" && continue
     pc=$(_fm_real "$repo/$p" plan_commit)
     if [ -z "$pc" ]; then
       note "S9.PLANFROZEN       -- $p records no plan_commit (absent, or still the promote-time placeholder), so there is no freeze point to measure against. Not a pass: an unmeasurable Plan is not a frozen one"
@@ -2097,6 +2202,11 @@ assert_S9_PLANFROZEN() {
       bad "plan-edited-after-freeze: $p records plan_commit $pc, which is not a commit in this repository. A freeze point nobody can resolve cannot be compared against, and a record that looks like evidence and is not is worse than none (§9)"
       continue
     fi
+    # By reference (ADR-047) the DoD is not in § Plan at all, so the § Plan diff below cannot see a
+    # member's `## Done when` being edited. That freeze is check-sprint-by-reference.ts's -- one
+    # implementation (ADR-049) -- and its verdict is mapped into this finding. § Plan is still diffed
+    # below: a Tn block is Plan text on either layout.
+    [ "$_SR_STATE" = v2 ] && _s9_freeze_v2 "$repo" "$p"
     was=$(git -C "$repo" show "$pc:$p" 2>/dev/null | _plan_section | _norm_dod_checkbox)
     now=$(_plan_section < "$repo/$p" | _norm_dod_checkbox)
     if [ "$was" = "$now" ]; then
@@ -2191,7 +2301,18 @@ assert_S9_VERIFYCLAUSE() {
     # exactly this case was dead code. Guarded here rather than inside the loop, because the loop
     # cannot tell a real empty criterion from the phantom (L-058 -- a false positive here is a false
     # negative about the contract).
-    ticked=$(grep '^- \[x\]' "$repo/$p" 2>/dev/null)
+    _sr_load "$repo" "$p"
+    _sr_blocked "S9.VERIFYCLAUSE" "$p" && continue
+    if [ "$_SR_STATE" = v2 ]; then
+      # By reference the ticks are the members' own `## Done when` boxes (ADR-047), not the Plan's.
+      ticked=$(_sr_ticked_lines "$repo")
+      if [ -z "$ticked" ] && [ "$(_sr_ticked)" -gt 0 ]; then
+        bad "dod-criterion-names-no-check: $p -- sprint-members-cli counts $(_sr_ticked) ticked member box(es) but none could be read back to check their evidence, so their proof is unexamined"
+        continue
+      fi
+    else
+      ticked=$(grep '^- \[x\]' "$repo/$p" 2>/dev/null)
+    fi
     [ -n "$ticked" ] || continue
     while IFS= read -r line; do
       case "$line" in
@@ -2250,13 +2371,22 @@ assert_S10_FOURBUCKETS() {
     for f in CHANGELOG.md TECH-DEBT.md TODO.md docs/LEARNINGS.md; do
       printf '%s\n' "$touched" | grep -qx "$f" && hit="$hit $f"
     done
+    # On the store the follow-ups bucket is a task file, not a TODO.md edit: an ADDED
+    # docs/work/backlog/TASK-*.md in the close commit counts (TODO.md still does while it exists).
+    # `--diff-filter=A` because a backlog task merely edited or moved out is not a new follow-up.
+    if _is_v2 "$repo"; then
+      added=$(git -C "$repo" show --diff-filter=A --name-only --format= "$cc" 2>/dev/null)
+      printf '%s\n' "$added" | grep -qE '^docs/work/backlog/TASK-[^/]+\.md$' && hit="$hit docs/work/backlog/TASK-*.md"
+    fi
     # NONE of the four is the finding, not "fewer than four". A bucket can be legitimately empty --
     # a sprint that incurred no debt files no TD-NNN -- so demanding all four would fail a correct
     # close, the same false-positive class §2's create-lazily rows raise. A close that routed to
     # NOTHING is unambiguous: the Retro was written and left in the sprint file, which is exactly
     # what §10's "don't leave them in the sprint file" forbids.
     if [ -z "$hit" ]; then
-      bad "retro-bucket-unrouted: $p -- its close commit $cc touched none of CHANGELOG.md, TECH-DEBT.md, TODO.md or docs/LEARNINGS.md. §10 routes each Retro bucket to a durable home; a Retro that reached none of them stayed in the sprint file, where nothing reads it again"
+      if _is_v2 "$repo"; then _homes="CHANGELOG.md, TECH-DEBT.md, TODO.md, an added docs/work/backlog/TASK-*.md or docs/LEARNINGS.md"
+      else _homes="CHANGELOG.md, TECH-DEBT.md, TODO.md or docs/LEARNINGS.md"; fi
+      bad "retro-bucket-unrouted: $p -- its close commit $cc touched none of $_homes. §10 routes each Retro bucket to a durable home; a Retro that reached none of them stayed in the sprint file, where nothing reads it again"
     else
       note "S10.FOURBUCKETS     -- $p routed to:$hit. Which buckets had content is judged, so the check reads that the close reached a durable home, never that all four were owed"
     fi
@@ -2483,7 +2613,14 @@ assert_S11_TODOCAP() {
   [ -n "$cap" ] || { bad "spec-table-unreadable: §2 states no numeric cap for TODO.md, so 'over its cap' has nothing to compare against"; return; }
   n=$(awk 'END{print NR}' "$f")
   if [ "$n" -gt "$cap" ]; then
-    bad "todo-over-cap-at-promote: TODO.md is $n lines against §2's cap of $cap -- §11 flags this in the promote governance review and prunes it with the user, never silently"
+    if _is_v2 "$repo"; then
+      # Owner ruling R2 (SPRINT-110 T3): on a tree that has the store, TODO.md is the retired v1 layout
+      # (STANDARD 0.12.0). This rule fires only while the file exists, and its remedy is to migrate --
+      # not to prune a file whose whole row §11 has retired. It goes with TODO.md (TASK-380).
+      bad "todo-over-cap-at-promote: TODO.md is $n lines against §2's cap of $cap -- TODO.md is the retired v1 layout on a tree that has docs/work/; run \`/lean-doc-generator migrate\` to convert it into the store, which deletes the file and this finding with it"
+    else
+      bad "todo-over-cap-at-promote: TODO.md is $n lines against §2's cap of $cap -- §11 flags this in the promote governance review and prunes it with the user, never silently"
+    fi
   else
     ok "S11.TODOCAP         -- TODO.md is $n lines, within §2's cap of $cap"
   fi
@@ -2543,7 +2680,67 @@ assert_S11_LEARNINGS() {
   fi
 }
 
+# assert_S11_BACKLOG -- on a v1 tree (no docs/work/) exactly the TODO.md breadcrumb scan below. On a tree
+# with the store it is §11's `done/`/`cancel/` prune (`_s11_backlog_store`); the breadcrumb half then
+# applies only while TODO.md still exists (retired at 0.12.0, deleted by TASK-380).
 assert_S11_BACKLOG() {
+  repo=$1
+  if ! _is_v2 "$repo"; then _s11_backlog_todo "$repo"; return; fi
+  [ -f "$repo/TODO.md" ] && _s11_backlog_todo "$repo"
+  [ "$last_bad" -eq 1 ] && return
+  _s11_backlog_store "$repo"
+}
+
+# _s11_backlog_store <repo> -- §11's store row: a `done/`/`cancel/` task file closed >= N sprints ago, that
+# nothing live names and that is not the store's highest id, is due for deletion (propose->approve).
+#
+# MECHANICAL HALF ONLY, and the boundary is stated: "closed" is read as the file's `sprint:` stamp being
+# >= N sprints behind the newest SPRINT-NNN file (the scale S11.TDDELETE uses). A cancelled task that was
+# never scheduled has no `sprint:` to age -- its age is the sprint of the commit that moved it, which is
+# history and judged, so it is reported as unjudged rather than passed silently.
+# "Nothing live names it": no open task's `depends-on:` (backlog/todo/in_progress/review) and no active
+# sprint's members -- the latter through the shared lookup (ADR-049), so this rule too needs `bun`.
+_s11_backlog_store() {
+  repo=$1
+  if ! command -v bun >/dev/null 2>&1; then
+    bad "bun-required: $repo -- S11.BACKLOG's store prune must know which tasks an active sprint's members name, this is a by-reference tree (docs/work/ exists) and \`bun\` is not on PATH. ADR-049: a v2 tree is checked through scripts/lib/sprint-members-cli.ts. Reported rather than skipped -- a skipped gate is a pass nobody examined"
+    return
+  fi
+  thr=$(awk '/^## §11/{s=1} /^## §12/{s=0} s && /^\| `docs\/work\/done\/`/ { if (match($0, /≥ *[0-9]+ *sprints/)) { t=substr($0, RSTART, RLENGTH); gsub(/[^0-9]/, "", t); print t; exit } }' "$spec")
+  [ -n "$thr" ] || { bad "spec-table-unreadable: §11's done/ · cancel/ row states no '≥ N sprints' delay, so no task's age can be judged against it"; return; }
+  cur=$(_s11_sprint_max "$repo")
+  [ -n "$cur" ] || { note "S11.BACKLOG         -- no SPRINT-NNN files, so 'N sprints ago' has no scale in this repository -- not judged"; return; }
+  # The store's highest id (all six folders) and every id an open task's depends-on names.
+  hi=$(ls "$repo"/docs/work/*/TASK-*.md 2>/dev/null | sed -n 's|.*/TASK-\([0-9][0-9]*\)-.*|\1|p' | sed 's/^0*//' | sort -n | tail -1)
+  deps=$(for _f in "$repo"/docs/work/backlog/TASK-*.md "$repo"/docs/work/todo/TASK-*.md "$repo"/docs/work/in_progress/TASK-*.md "$repo"/docs/work/review/TASK-*.md; do
+      [ -f "$_f" ] && _fm "$_f" depends-on
+    done | grep -o 'TASK-[0-9][0-9]*' | sed 's/TASK-0*//' | sort -u)
+  live=""
+  for _p in $(_sprint_plans "$repo"); do
+    [ "$(_fm "$repo/$_p" status)" = "active" ] || continue
+    _sr_load "$repo" "$_p"
+    _sr_blocked "S11.BACKLOG" "$_p" && return
+    [ "$_SR_STATE" = v2 ] && live="$live $(printf '%s\n' "$_SR_OUT" | sed -n 's/^member TASK-0*\([0-9][0-9]*\) .*/\1/p' | tr '\n' ' ')"
+  done
+  n_over=0; n_unjudged=0
+  for _f in "$repo"/docs/work/done/TASK-*.md "$repo"/docs/work/cancel/TASK-*.md; do
+    [ -f "$_f" ] || continue
+    _b=${_f##*/}
+    tid=$(printf '%s' "$_b" | sed -n 's/^TASK-\([0-9][0-9]*\)-.*/\1/p' | sed 's/^0*//')
+    [ -n "$tid" ] || continue
+    sn=$(_fm "$_f" sprint | sed -n 's/^[^0-9]*\([0-9][0-9]*\).*/\1/p' | sed 's/^0*//')
+    if [ -z "$sn" ]; then n_unjudged=$((n_unjudged + 1)); continue; fi
+    [ $((cur - sn)) -ge "$thr" ] || continue
+    [ "$tid" = "$hi" ] && continue
+    case " $live " in *" $tid "*) continue ;; esac
+    printf '%s\n' "$deps" | grep -qx "$tid" && continue
+    bad "closed-task-past-retention: docs/work/${_f#"$repo"/docs/work/} closed at SPRINT-$sn, $((cur - sn)) sprints before the current SPRINT-$cur, and nothing live names it -- §11 deletes a done/ or cancel/ task file once it is $thr sprints old (propose->approve). Its record lives in CHANGELOG.md, docs/sprint/archive/ and git; the id is never reused because the next id is derived from the store's highest"
+    n_over=$((n_over + 1))
+  done
+  [ "$n_over" -eq 0 ] && ok "S11.BACKLOG         -- no done/ or cancel/ task file has reached §11's $thr-sprint prune trigger (current SPRINT-$cur)$([ "$n_unjudged" -gt 0 ] && printf '; %s carry no sprint: stamp, so their age is judged from history and not here' "$n_unjudged")"
+}
+
+_s11_backlog_todo() {
   repo=$1
   f="$repo/TODO.md"
   [ -f "$f" ] || { note "S11.BACKLOG         -- no TODO.md -- there is no Backlog to retain anything in"; return; }

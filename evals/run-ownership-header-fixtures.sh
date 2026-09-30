@@ -164,6 +164,51 @@ run_case_anywhere "governed-false-in-prose-does-not-exempt" 1 "ownership-header-
 # incidental to how the fixtures happen to be written.
 echo "PASS fixture(silence-means-governed): the remaining $(ls -d "$fx"/*/ | wc -l | tr -d ' ') fixture trees declare nothing and are all still evaluated above"
 
+# --- the work-item store is exempt: task files carry their own schema (SPRINT-110 T3, owner ruling D2) ---
+# docs/work/<status>/TASK-*.md is governed by work/README.md and ADR-045, and its status is its FOLDER, so
+# the §3 ownership header is not owed there -- sweeping it produced ~28 S1.LAW3/S3.SCHEMA findings on a
+# repository doing nothing wrong. The exemption is bounded to EXACTLY that shape, and each bound is a
+# case: any other doc under docs/work/ is still checked (SELECTION -- L-186), a task file nested one
+# level deeper than the store allows is still checked, and a `TASK-*.md` OUTSIDE docs/work/ is still checked.
+mk_store() {   # <dir> -- one clean, headed doc plus the header-less task files under test
+  mkdir -p "$1"; cp -R "$fx/clean/." "$1/"
+  for _st in backlog todo in_progress review done cancel; do
+    mkdir -p "$1/docs/work/$_st"
+    printf -- '---\nid: TASK-00%s\ntitle: "t"\n---\n\n## Done when\n\n- [ ] x\n' "1" > "$1/docs/work/$_st/TASK-001-$_st.md"
+  done
+}
+d="$work/store-exempt"; mk_store "$d"
+out=$(sh "$engine" "$d" --spec "$own_spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -qE '^FAIL +(ownership-header|update-trigger|owner-not)'; then
+  echo "PASS fixture(store-task-files-exempt): a header-less task file in each of the six status folders raised no ownership finding, exit 0"
+else
+  echo "FAIL fixture(store-task-files-exempt): expected exit 0 and no ownership finding on six header-less docs/work/<status>/TASK-*.md -- got exit $rc:"
+  printf '%s\n' "$out" | grep -E '^FAIL '; fail=1
+fi
+# the exemption does not touch the count of docs actually carrying a header
+if printf '%s\n' "$out" | grep -q 'all 1 doc(s) carry a complete ownership header'; then
+  echo "PASS fixture(store-task-files-exempt-control-count): only the 1 headed doc is counted -- the six task files left the swept set, not the report"
+else
+  echo "FAIL fixture(store-task-files-exempt-control-count): expected 'all 1 doc(s) carry a complete ownership header' -- got:"
+  printf '%s\n' "$out" | grep -E 'S1\.LAW3|S3\.SCHEMA'; fail=1
+fi
+# SELECTION: a non-task doc under docs/work/ (its README) is a doc like any other.
+d="$work/store-readme"; mk_store "$d"; printf '# work store README with no header\n' > "$d/docs/work/README.md"
+run_case_anywhere "store-non-task-doc-still-checked" 1 "ownership-header-missing: docs/work/README.md" -- \
+  sh "$engine" "$d" --spec "$own_spec"
+# SELECTION: the other glob arm -- a non-TASK file INSIDE a status folder.
+d="$work/store-notes"; mk_store "$d"; printf '# scratch notes\n' > "$d/docs/work/done/NOTES.md"
+run_case_anywhere "store-non-task-file-in-status-folder-still-checked" 1 "ownership-header-missing: docs/work/done/NOTES.md" -- \
+  sh "$engine" "$d" --spec "$own_spec"
+# SELECTION: a task file nested deeper than docs/work/<status>/ is not the store's shape (work/README.md forbids nesting).
+d="$work/store-nested"; mk_store "$d"; mkdir -p "$d/docs/work/done/sprint-9"; printf '# nested task\n' > "$d/docs/work/done/sprint-9/TASK-002-nested.md"
+run_case_anywhere "store-nested-task-file-still-checked" 1 "ownership-header-missing: docs/work/done/sprint-9/TASK-002-nested.md" -- \
+  sh "$engine" "$d" --spec "$own_spec"
+# SELECTION: a TASK-*.md outside docs/work/ is an ordinary doc.
+d="$work/store-outside"; mk_store "$d"; printf '# a task-shaped doc elsewhere\n' > "$d/docs/TASK-003-elsewhere.md"
+run_case_anywhere "task-named-file-outside-the-store-still-checked" 1 "ownership-header-missing: docs/TASK-003-elsewhere.md" -- \
+  sh "$engine" "$d" --spec "$own_spec"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "OWNERSHIP-HEADER FIXTURES: all green"
