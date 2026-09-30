@@ -11,7 +11,7 @@ tier: G
 authority: J2
 origin: decomposer
 state: ready
-depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-391, TASK-387, TASK-382, TASK-383, TASK-392, TASK-381]
+depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-391, TASK-387, TASK-382, TASK-383, TASK-392, TASK-381, TASK-394]
 ---
 
 # TASK-380 — Migrate lean-flow itself and delete TODO.md
@@ -19,7 +19,6 @@ depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-39
 ## Done when
 
 - [ ] This repo's remaining Backlog migrated with `migrate`; TODO.md deleted.
-- [ ] Zero non-test readers of TODO.md across scripts/, evals/, skills/ — derived mechanically by two selectors — except the allowlist: migrate's reference procedure and a bare existence check in layout detection.
 - [ ] The full gate is green afterwards, read from its own verdict line.
 
 ## Touches
@@ -29,6 +28,11 @@ TODO.md (deleted) · docs/work/
 ## Assumes
 
 none
+
+## Amended 2026-09-30 (SPRINT-111 promote)
+
+- **Split (owner, 2026-09-30):** size L at pull time (15 legacy tasks to migrate, 22 + 17 files mentioning TODO.md, and a spec
+  retirement). The zero-readers box moved to `TASK-394`, which runs first. This task keeps the migration, the deletion, and a green gate.
 
 ## Amended 2026-09-30
 

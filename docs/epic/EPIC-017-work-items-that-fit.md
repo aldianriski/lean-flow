@@ -200,7 +200,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
-2 → `TASK-380` (with `390` · `391` · `387` · `382` · `383` · `392` · `381`) · 3 → `TASK-384` · 4 → `TASK-364` + `384` ·
+2 → `TASK-380` (with `390` · `391` · `387` · `382` · `383` · `392` · `381` · `394`) · 3 → `TASK-384` · 4 → `TASK-364` + `384` ·
 5 → `TASK-360` · 6 → `TASK-365` + `385` · 7 → `TASK-374` + `386` · 8 → `TASK-373` · 9 → `TASK-372` ·
 10 → `TASK-371`. Loop and surface: `361` · `362` · `375` · `376` · `377` · `378` · `379`.
 
