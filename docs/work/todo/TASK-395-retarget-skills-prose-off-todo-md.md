@@ -26,9 +26,9 @@ it. So do two templates. None of these is executable, but every one is a consume
 
 ## Done when
 
-- [ ] No `skills/` file directs a TODO.md read or write except the allowlist: migrate's v1→v2 procedure, existence-only layout detection, and v1-refusal text.
-- [ ] `init` scaffolds the store (`docs/work/`), not TODO.md; migration-map's dev-flow/adlc section produces store files.
-- [ ] README and CHANGELOG `[Unreleased]` carry the consumer-visible change; `templates/TODO.md.template` kept with a TD row for its 2.0 cleanup.
+- [x] No `skills/` file directs a TODO.md read or write except the allowlist: migrate's v1→v2 procedure, existence-only layout detection, and v1-refusal text. ✓ `eadd3a8` — two-selector grep over skills/: every remaining hit is allowlist, a "never read" statement, or the kept template
+- [x] `init` scaffolds the store (`docs/work/`), not TODO.md; migration-map's dev-flow/adlc section produces store files. ✓ `eadd3a8` — create-lazily per STANDARD §2 (no empty folders pre-created)
+- [x] README and CHANGELOG `[Unreleased]` carry the consumer-visible change; `templates/TODO.md.template` kept with a TD row for its 2.0 cleanup. ✓ `eadd3a8` — TD-209
 
 ## Touches
 

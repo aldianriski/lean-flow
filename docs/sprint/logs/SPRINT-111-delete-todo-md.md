@@ -102,3 +102,15 @@ owner-ruling: bookkeeping-gate — overridden: four reds of known cause, none fr
 - Review: consequence · T1 · behaviour: migrate procedure + harness · governance: workflow contract → a worktree-isolated outside review.
   **CLEAR**, 3 low notes: the tick count is a net sum (a pre-existing design), `isByReference` is exact-heading only (fails loud), and
   `docs/sprint/archive/` is out of scope by design. DoD 3/3.
+
+### 2026-09-30 | progress | T5 (TASK-395) skills stop directing TODO.md reads/writes; commit eadd3a8, merged fb11c8f
+- prime resolves from `docs/work/` and the `status: active` sprints' `## Members`. lean-doc-generator's promote/close/retro use store files and
+  drop the pointer steps. init scaffolds the store lazily (STANDARD §2) and no longer creates TODO.md. The migration-map dev-flow/adlc rows now
+  produce store task files. README, CHANGELOG `[Unreleased]` and two templates are updated. TD-209 is filed (max was TD-208, 0 git hits):
+  `TODO.md.template` is kept and deleted in the 2.0 cleanup.
+- Two-selector grep over skills/: every remaining hit is the allowlist, a "never read" statement, or the kept template. Largest SKILL.md is 138 lines.
+- Review: consequence · T5 · behaviour: skill procedure prose · governance: consumer-facing skill contract → a scoped review by the non-author
+  coordinator of the 9-file diff. One finding, fixed in a follow-up commit: prime counted open DoD from "each member's task file", which read as
+  the listed path. Member paths are frozen at promote and go stale once a task moves folder (TASK-370/381 already sit in done/), so prime now finds
+  members **by id**, as sprint-by-reference.md already did. Two items are left as they were: TECH-DEBT.md:10 and README's tree line still say
+  TODO.md, and T4 owns both. DoD 3/3.
