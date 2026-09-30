@@ -214,19 +214,48 @@ reap() {
   # creating the file here would be this script inventing a record rather than completing one.
   [ -f "$rp_logdoc" ] || return 0
 
-  # DoD boxes -- the header count.
-  rp_done=$(grep -c '^- \[x\]' "$rp_sprint" 2>/dev/null)
-  rp_open=$(grep -c '^- \[ \]' "$rp_sprint" 2>/dev/null)
-  rp_total=$((rp_done + rp_open))
-
+  # DoD boxes -- the header count -- and UNITS. Two shapes of sprint, one contract (night-run.md
+  # Part 4): a v1 sprint carries its DoD inline in the Plan; a by-reference (v2) sprint's Plan carries
+  # NO boxes, its DoD is the `## Done when` boxes of its member files (`## Members` UNION `sprint:`
+  # stamps), counted by scripts/lib/sprint-members-cli.ts (TASK-392, ADR-047). The v2 arm is chosen by
+  # the CLI's `kind`, never inferred here.
+  #
   # UNITS are Plan tasks, not checkboxes. The calibration series reads "4 of 7 units" and
   # means tasks; reporting DoD boxes in that field would silently redefine every existing
-  # row's scale. A unit is delivered when its block has no open box left.
-  rp_units=$(grep -c '^### T[0-9]' "$rp_sprint" 2>/dev/null)
-  rp_units_done=$(awk '
-    /^### T[0-9]+ /{ if (t!="") { if (!o) d++ } t=$2; o=0 }
-    /^- \[ \]/{ if (t!="") o=1 }
-    END{ if (t!="" && !o) d++; print d+0 }' "$rp_sprint" 2>/dev/null)
+  # row's scale. v1: a unit is delivered when its block has no open box left. v2: when every current
+  # member its `Cites:` names has no open box; a Tn citing no current member leaves both counts.
+  # rp_unit_list is the OPEN units, one Tn per line, from whichever shape applies.
+  rp_cli="$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd)/lib/sprint-members-cli.ts"
+  rp_v2=0; rp_cnt_err=""
+  if command -v bun >/dev/null 2>&1 && [ -f "$rp_cli" ]; then
+    [ "$(bun "$rp_cli" kind "$rp_sprint" --root "$rp_root" 2>/dev/null)" = "v2" ] && rp_v2=1
+  elif grep -q '^## Members' "$rp_sprint" 2>/dev/null; then
+    # A by-reference sprint we cannot count is SAID, not left as a quiet 0 of 0.
+    rp_cnt_err="bun or sprint-members-cli.ts unavailable -- a by-reference sprint's member DoD was not counted"
+  fi
+  if [ "$rp_v2" -eq 1 ]; then
+    rp_cnt=$(bun "$rp_cli" counts "$rp_sprint" --root "$rp_root" 2>&1); rp_cnt_rc=$?
+    if [ "$rp_cnt_rc" -eq 0 ]; then
+      rp_done=$(printf '%s\n' "$rp_cnt" | awk '$1=="dod"{print $2}')
+      rp_open=$(printf '%s\n' "$rp_cnt" | awk '$1=="dod"{print $3}')
+      rp_units=$(printf '%s\n' "$rp_cnt" | awk '$1=="units"{print $2}')
+      rp_units_done=$(printf '%s\n' "$rp_cnt" | awk '$1=="units"{print $3}')
+      rp_unit_list=$(printf '%s\n' "$rp_cnt" | awk '$1=="unit" && $3=="open"{print $2}')
+    else
+      rp_cnt_err="member DoD unreadable: $(printf '%s' "$rp_cnt" | head -n1)"
+      rp_done=0; rp_open=0; rp_units=0; rp_units_done=0; rp_unit_list=""
+    fi
+  else
+    rp_done=$(grep -c '^- \[x\]' "$rp_sprint" 2>/dev/null)
+    rp_open=$(grep -c '^- \[ \]' "$rp_sprint" 2>/dev/null)
+    rp_units=$(grep -c '^### T[0-9]' "$rp_sprint" 2>/dev/null)
+    rp_units_done=$(awk '
+      /^### T[0-9]+ /{ if (t!="") { if (!o) d++ } t=$2; o=0 }
+      /^- \[ \]/{ if (t!="") o=1 }
+      END{ if (t!="" && !o) d++; print d+0 }' "$rp_sprint" 2>/dev/null)
+    rp_unit_list=$(awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" 2>/dev/null)
+  fi
+  rp_total=$((rp_done + rp_open))
 
   rp_cost=$(grep -o '"total_cost_usd":[0-9.]*' "$rp_log" 2>/dev/null | tail -n1 | cut -d: -f2)
   rp_turns=$(grep -o '"num_turns":[0-9]*' "$rp_log" 2>/dev/null | tail -n1 | cut -d: -f2)
@@ -280,7 +309,7 @@ reap() {
   # nothing can ever produce, so it is named as out-of-scope rather than silently absent (L-166).
   rp_ec=$(cat "$rp_log.exit" 2>/dev/null || printf '')
   rp_unatt=0
-  for tn in $(awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" 2>/dev/null); do
+  for tn in $rp_unit_list; do
     tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " || rp_unatt=$((rp_unatt + 1))
   done
   # `grep -c` already PRINTS 0 when it matches nothing -- it just exits 1 while doing so. An
@@ -305,6 +334,10 @@ reap() {
   esac
   if [ "$rp_term_ok" -eq 0 ]; then
     rp_term="HARD_FAILURE"; rp_term_why="wrapped process exited with status $rp_ec"
+  elif [ -n "$rp_cnt_err" ] && [ "$rp_v2" -eq 1 ]; then
+    # A by-reference sprint whose members cannot be counted has NO trustworthy DoD or unit figure;
+    # reporting a clean ending over it is the silent `0 of 0` this retarget exists to remove.
+    rp_term="HARD_FAILURE"; rp_term_why="$rp_cnt_err"
   elif [ "$rp_ceiling_rc" -ne 0 ]; then
     # Ranked above stalled/denied-tool/parked/exhausted: a breach means the run did something
     # Part 0 never authorised (a second firing, or a still-open that never escalated) -- its
@@ -367,6 +400,7 @@ reap() {
   rp_warn=""
   [ "$rp_cost" = "cost unavailable" ] && rp_warn="${rp_warn}${rp_warn:+; }cost unavailable"
   [ "$rp_turns" = "?" ] && rp_warn="${rp_warn}${rp_warn:+; }turn count unavailable"
+  [ -n "$rp_cnt_err" ] && rp_warn="${rp_warn}${rp_warn:+; }$rp_cnt_err"
   [ -n "$rp_warn" ] || rp_warn="none"
 
   {
@@ -392,7 +426,8 @@ reap() {
     # whole-file grep read that documentation as this run's output and silently dropped T5
     # from the rollup. A guard that reads the wrong window fails exactly like one that is
     # absent, which is the failure family this whole protocol is about.
-    awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" | while read -r tn; do
+    printf '%s\n' "$rp_unit_list" | while read -r tn; do
+      [ -n "$tn" ] || continue
       tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " && continue
       printf '%s · unattempted · run ended before this task was started — re-fire; the Plan is unchanged\n' "$tn"
     done

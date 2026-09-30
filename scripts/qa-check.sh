@@ -528,6 +528,7 @@ qb_checkpoint "leg 2g: recorded-run rollup"
 # wrapper so the model cannot drop it. This is the enforcement half of that pair (SPRINT-059 T3).
 # Covered by evals/run-night-run-rollup-fixtures.sh.
 nr_script="scripts/lib/check-night-run-rollup.ts"
+nr_cli="scripts/lib/sprint-members-cli.ts"
 if ! command -v bun >/dev/null 2>&1; then
   bad "night-run rollup: bun not found on PATH -- cannot run $nr_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
 elif [ ! -f "$nr_script" ]; then
@@ -554,7 +555,19 @@ else
     if [ -f "$nr_lg" ]; then
       nr_files="$nr_files $nr_lg"
     else
+      # v1 sprint: the DoD is inline in the Plan. By-reference (v2) sprint: the Plan carries NO boxes,
+      # so the same derivation read 0 and waved a dead run through -- the DoD is the members'
+      # `## Done when` boxes, counted by sprint-members-cli.ts (TASK-392, ADR-047). An unreadable
+      # member set reddens rather than skipping: a count nobody can account for is not a pass.
       nr_open=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f && /^- \[ \]/{n++} END{print n+0}' "$nr_sp")
+      if command -v bun >/dev/null 2>&1 && [ "$(bun "$nr_cli" kind "$nr_sp" --root . 2>/dev/null)" = "v2" ]; then
+        nr_cnt=$(bun "$nr_cli" counts "$nr_sp" --root . 2>&1); nr_cnt_rc=$?
+        if [ "$nr_cnt_rc" -ne 0 ]; then
+          bad "night-run rollup: $nr_sp members unreadable, cannot tell whether its Execution Log is owed -- $(printf '%s' "$nr_cnt" | head -n1)"
+          continue
+        fi
+        nr_open=$(printf '%s\n' "$nr_cnt" | awk '$1=="dod"{print $3}')
+      fi
       [ "$nr_open" -gt 0 ] && nr_files="$nr_files $nr_lg"
     fi
   done
@@ -658,6 +671,12 @@ for s in skills/*/SKILL.md; do
 done
 
 for d in TODO.md .claude/CLAUDE.md .claude/CONTEXT.md docs/architecture/overview.md docs/LEARNINGS.md docs/DECISIONS.md CHANGELOG.md docs/knowledge-index.md; do
+  # TODO.md is the v1 tracker: this leg covers it only while it exists, and is retired with the file
+  # (TASK-380). Task files carry no ownership header (D2), so there is no store-side equivalent.
+  if [ "$d" = "TODO.md" ] && [ ! -f "$d" ]; then
+    note "skip: TODO.md absent -- ownership of the v1 tracker is checked only while it exists; retired with TODO.md (TASK-380)"
+    continue
+  fi
   [ -f "$d" ] || { note "skip (missing): $d"; continue; }
   if has_field "$d" owner && has_field "$d" last_updated && has_field "$d" status
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
@@ -831,7 +850,7 @@ if [ -f TODO.md ]; then
   if [ -z "$crumbs" ]; then ok "TODO.md hygiene (no shipped-task breadcrumb comments)"
   else bad "TODO.md hygiene: breadcrumb comment(s) found — $(printf '%s' "$crumbs" | tr '\n' ';')"; fi
 else
-  note "skip (missing): TODO.md"
+  note "skip: TODO.md absent -- breadcrumb hygiene is a property of the v1 tracker, checked only while it exists; retired with TODO.md (TASK-380)"
 fi
 
 qb_checkpoint "leg 6: README footer version lint"
@@ -872,13 +891,31 @@ else
 fi
 
 qb_checkpoint "leg 7: TD aging"
-# --- 7. TD aging: open TD >=3 sprints behind Active Sprint, no re-review ----
+# --- 7. TD aging: open TD >=3 sprints behind the active sprint, no re-review ----
+# The reference sprint is read from the sprint FILES once the tree has a docs/work/ store (the highest
+# `status: active` docs/sprint/SPRINT-*.md, via sprint-members-cli.ts -- ADR-047, TASK-392): the TODO.md
+# `## Active Sprint` pointer is a v1 artifact and goes stale. Without docs/work/ the pointer is still
+# the source. The TD ROWS are still read from TODO.md, so the leg applies only while it exists and is
+# retired with it (TASK-380). In this repo the rows live in TECH-DEBT.md and carry no `re-reviewed:`
+# marker there, so re-pointing the rows is a separate ruling -- not made here.
 if [ -f TODO.md ]; then
-  active=$(awk '/^## Active Sprint/{f=1;next} /^## /{f=0} f' TODO.md)
-  cur_raw=$(printf '%s' "$active" | grep -oE 'SPRINT-[0-9]+' | head -n1 | grep -oE '[0-9]+')
-  if [ -z "$cur_raw" ]; then
-    note "TD aging: no Active Sprint pointer found — skipping (no reference point)"
+  cur_raw=""
+  if [ -d docs/work ]; then
+    if ! command -v bun >/dev/null 2>&1; then
+      bad "TD aging: bun not found on PATH -- cannot derive the active sprint from the sprint files. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037)"
+    else
+      cur_raw=$(bun "$ROOT/scripts/lib/sprint-members-cli.ts" active --root . 2>&1 | tail -n1)
+      case "$cur_raw" in
+        '') note "TD aging: no active sprint file (docs/sprint/SPRINT-*.md with status: active) — skipping (no reference point)" ;;
+        *[!0-9]*) bad "TD aging: active-sprint derivation failed: $cur_raw"; cur_raw="" ;;
+      esac
+    fi
   else
+    active=$(awk '/^## Active Sprint/{f=1;next} /^## /{f=0} f' TODO.md)
+    cur_raw=$(printf '%s' "$active" | grep -oE 'SPRINT-[0-9]+' | head -n1 | grep -oE '[0-9]+')
+    [ -n "$cur_raw" ] || note "TD aging: no Active Sprint pointer found — skipping (no reference point)"
+  fi
+  if [ -n "$cur_raw" ]; then
     cur=$((10#$cur_raw))
     tdbad=$(grep -E '^- \*\*TD-[0-9]+\*\* severity:.*status: open' TODO.md | while IFS= read -r tl; do
       id=$(printf '%s' "$tl" | grep -oE 'TD-[0-9]+' | head -n1)
@@ -893,7 +930,7 @@ if [ -f TODO.md ]; then
     else bad "TD aging: stale >=3 sprints behind, no re-review: $tdbad"; fi
   fi
 else
-  note "skip (missing): TODO.md"
+  note "skip: TODO.md absent -- the TD rows this leg ages are read from the v1 tracker, checked only while it exists; retired with TODO.md (TASK-380)"
 fi
 
 qb_checkpoint "leg 8: temp-tracker lint"
@@ -909,7 +946,7 @@ if [ -f TODO.md ]; then
   if [ -z "$trkbad" ]; then ok "TODO.md trackers (no (temp) or bare verdict-*.md refs)"
   else bad "TODO.md trackers: $trkbad"; fi
 else
-  note "skip (missing): TODO.md"
+  note "skip: TODO.md absent -- tracker: lint is a property of the v1 tracker, checked only while it exists; retired with TODO.md (TASK-380)"
 fi
 
 qb_checkpoint "leg 9: QA.md hygiene"
@@ -1202,7 +1239,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts"
 eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove

@@ -182,7 +182,7 @@ awk '
   /qb_checkpoint "leg 2g: recorded-run rollup"/ {f=1; next}
   f && /qb_checkpoint/ {exit}
   f
-' "$qa_check" | sed "s#scripts/lib/check-night-run-rollup.ts#$repo_root/scripts/lib/check-night-run-rollup.ts#" > "$leg2g_body"
+' "$qa_check" | sed -e "s#scripts/lib/check-night-run-rollup.ts#$repo_root/scripts/lib/check-night-run-rollup.ts#" -e "s#scripts/lib/sprint-members-cli.ts#$repo_root/scripts/lib/sprint-members-cli.ts#" > "$leg2g_body"
 [ -s "$leg2g_body" ] || {
   echo "FAIL harness: leg 2g extraction from $qa_check produced nothing -- the leg's shape (or its qb_checkpoint marker text) changed, re-derive the awk pattern"
   fail=1
@@ -259,6 +259,57 @@ if [ "$ec12c" -eq 0 ] \
   echo "PASS fixture(qa-leg2g-closed-no-log-excluded): a closed-DoD sprint's missing log is never handed to the checker (selection, not verdict)"
 else
   echo "FAIL fixture(qa-leg2g-closed-no-log-excluded): expected total exclusion from the population -- got exit $ec12c:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
+# case 12d family (SPRINT-110 T4 · TASK-392): the SAME leg on a BY-REFERENCE sprint, whose Plan
+# carries no DoD boxes. Before the retarget the leg counted `^- \[ \]` in the Plan, read 0, and waved
+# a dead v2 run through with no log at all. The DoD is now the members' `## Done when` boxes.
+# 12d (must-FAIL): started members (one stale `## Members` path, one stamp-only) and no log.
+d="$fx/qa-leg2g-v2-open-members-no-log"
+out=$(run_leg2g "$d"); ec=$?
+if [ "$ec" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'no Execution Log found at docs/sprint/logs/SPRINT-976-v2-open-no-log.md' \
+   && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=0 fail=1'; then
+  echo "PASS fixture(qa-leg2g-v2-open-no-log-fails): a by-reference sprint with open member DoD and no log FAILs named (was waved through)"
+else
+  echo "FAIL fixture(qa-leg2g-v2-open-no-log-fails): expected a named 'no Execution Log found' FAIL -- got exit $ec:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+# 12e (sibling control): the same v2 shape with a wellformed log stays green.
+d="$fx/qa-leg2g-v2-open-members-with-log"
+out=$(run_leg2g "$d"); ec=$?
+if [ "$ec" -eq 0 ] && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=1 fail=0'; then
+  echo "PASS fixture(qa-leg2g-v2-open-with-log-ok): a by-reference sprint whose log exists stays green"
+else
+  echo "FAIL fixture(qa-leg2g-v2-open-with-log-ok): expected a clean PASS -- got exit $ec:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+# 12f (selection): every member ticked -> the missing log is not owed; excluded from the population.
+d="$fx/qa-leg2g-v2-closed-members-no-log"
+out=$(run_leg2g "$d"); ec=$?
+if [ "$ec" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'skip -- no active sprint Plan found' \
+   && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=0 fail=0'; then
+  echo "PASS fixture(qa-leg2g-v2-closed-no-log-excluded): a by-reference sprint with every member ticked is not owed a log"
+else
+  echo "FAIL fixture(qa-leg2g-v2-closed-no-log-excluded): expected total exclusion -- got exit $ec:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+# 12g (must-FAIL): a listed member with no file -> the count cannot be trusted; named FAIL, no skip.
+d="$fx/qa-leg2g-v2-unresolved-member"
+out=$(run_leg2g "$d"); ec=$?
+if [ "$ec" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'members unreadable' \
+   && printf '%s\n' "$out" | grep -q 'SPRINT-MEMBER-UNRESOLVED: TASK-9782' \
+   && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=0 fail=1'; then
+  echo "PASS fixture(qa-leg2g-v2-unresolved-member-fails): an unresolvable member reddens with SPRINT-MEMBER-UNRESOLVED instead of counting 0"
+else
+  echo "FAIL fixture(qa-leg2g-v2-unresolved-member-fails): expected a named 'members unreadable' FAIL -- got exit $ec:"
   printf '%s\n' "$out"
   fail=1
 fi
