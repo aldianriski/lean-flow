@@ -2,7 +2,7 @@
 id: TASK-913
 title: "Add a retry to the flaky upload step"
 priority: P1
-size: S
+size: M
 risk: low
 autonomy: HITL
 class: execution

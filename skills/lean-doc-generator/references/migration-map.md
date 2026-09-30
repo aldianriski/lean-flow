@@ -162,7 +162,7 @@ task; `TODO.md` itself, once empty of tasks.
 | v1 (`TODO.md` Backlog row) | v2 frontmatter / section | Note |
 |---|---|---|
 | `TASK-NNN` (the row's id) | `id:` + filename `TASK-NNN-kebab-slug.md` | id never changes |
-| title (after the em dash) | `title:` + filename slug | kebab-case the slug, `[a-z0-9-]` only |
+| title (after the em dash) | `title:` + filename slug | kebab-case the slug, `[a-z0-9-]` only (apostrophes dropped, not hyphenated) |
 | which `### P0`–`P3` heading the row sits under | `priority:` | `P0`/`P1`/`P2`/`P3` |
 | `[size: X]` | `size:` | verbatim |
 | `[risk: X]` | `risk:` | verbatim |
@@ -181,7 +181,16 @@ task; `TODO.md` itself, once empty of tasks.
 | `assumes:` | `## Assumes` | prose/bullet, verbatim |
 | `tracker:` | `## Tracker` | bullet per item, verbatim |
 
+Prose is carried **verbatim** — never re-capitalised or re-punctuated. A row with no `done-when:` gets one
+placeholder box, flagged in the plan for the owner. Any v1 field the table does not name (`pair-with:` ·
+`carried:` · `guardrail:` …) → a `- key: value` bullet under `## Tracker`; free prose under the row → `## Why`.
+
 ### Plan-task mapping (active sprint)
+
+**By-reference sprint — skipped.** A sprint file with a `## Members` section is by-reference: its
+members already live in `docs/work/`, so its `### Tn` are **not mapped** (they hold sprint-scoped meta,
+never a DoD). Each member path must exist — a missing one is reported in the plan. Member files are
+**never written or modified**: the run leaves every pre-existing `docs/work/**` file byte-identical.
 
 Each `### Tn — title `[size · risk · class · HITL · Jn]`` block in the sprint file's § Plan:
 
@@ -201,8 +210,8 @@ a Backlog-only task → `backlog/`. A Plan task → `todo/`, unless every one of
 
 **Plan-only task (no Backlog row) — the common v1 case.** `TODO.md.template` has a promoted task
 *leave* the Backlog, so a `Tn` citing an id with no matching Backlog row is normal, not an error.
-Nothing in the Plan block supplies `priority:`, `state:`, or `origin:` — the Plan carries no P0–P3
-tier, no readiness, no filing provenance. These three fields have **no v1 source** for a Plan-only
+Nothing in the Plan block supplies `priority:`, `state:`, `origin:` (or `tier:`, unless the `Tn` declares
+one) — the Plan carries no P0–P3 tier, no readiness, no filing provenance. These fields have **no v1 source** for a Plan-only
 task: list them in the migrate plan for **owner input**, exactly like an absent `class:`/`tier:`
 above — **never guessed, never defaulted.** (Only when the id *also* has a Backlog row — the
 overlap case below — do `priority:`/`state:`/`origin:` come from that row as usual.) The file is
@@ -265,16 +274,19 @@ ingests the stray task.
 ### Verification (run every time, plan and apply alike)
 
 - **Id set, diffed both ways.** `v1_ids` = every `TASK-NNN` in the Backlog + every Plan `Tn`'s
-  `Cites:` id, taken before the run. `v2_ids` = every id now present as a `docs/work/**/
+  `Cites:` id, taken before the run (by-reference sprints contribute none). `v2_ids` = every id now present as a `docs/work/**/
   TASK-NNN-*.md` file (written this run, or already-present/resumed). `v1_ids ∖ v2_ids` and
   `v2_ids ∖ v1_ids` must both be empty — a count alone does not prove this (two different sets of
   the same size still passes a count check).
-- **Ticked-box count, before vs. after.** Sum of `- [x]` under every Plan `Tn`'s DoD (before) must
+- **Ticked-box count, before vs. after.** Sum of `- [x]` under every by-value Plan `Tn`'s DoD (before) must
   equal the sum of `- [x]` under `## Done when` across the files those `Tn`s mapped to (after,
   including resumed files whose count was never touched by this run). A mismatch on a *resumed*
   file (pre-existing content this run correctly left alone) is reported, not silently passed —
   it means that file's tick state and the Plan's tick state have already drifted apart, a fact
   worth surfacing even though fixing it is outside `migrate`'s write path (never-overwrite still
   holds).
+- **Preservation.** Every `docs/work/**` file present before the run is byte-identical after —
+  by-reference members and any other pre-existing file. (A run may only add files, or — on an owner's
+  explicit "apply the delta" — replace a conflicted one.)
 - **Re-run is report-only.** A second run against an already-migrated tree produces zero writes
   and zero new conflicts (`git status` clean) — every id resolves to "already present, identical."
