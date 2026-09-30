@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-29
+last_updated: 2026-09-30
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-110 — Retarget the Gate — closed 2026-09-30 · `370fd9f` · 8 of 8 DoD, all four members in `done/` (unreleased; D3) · `epic: EPIC-017` — the layers guards, qa-check's store legs, night-run's `reap()` and the conformance engine read member files; one shell-callable member lookup (`sprint-members-cli.ts`); a v2 tree requires `bun` (ADR-049) · TD-196…208 · TASK-393 · L-219/L-220
 - SPRINT-109 — Unlock the Critical Path — closed 2026-09-29 · `6761016` · 10 of 10 DoD, all four members in `done/` (unreleased; D2) · `epic: EPIC-017` — spec 0.12.0 describes the store, caps measure tokens (ADR-048, budget 16087), and the authority, task-origin, dod-delta and verify-reaches guards read member files · TD-188…195 · L-218
 - SPRINT-108 — Guard the Freeze — closed 2026-09-26 · `379fa24` · 10 of 10 DoD (unreleased; D2) · standalone, no `epic:` stamp — follow-up to the SPRINT-107 outside review: the by-reference freeze checker stops letting Markdown hide an edit (CommonMark fences, block comments, real-path spelling; A5 err loud, stop parsing; 73 → 127 retained cases) and the knowledge index is byte-identical under any locale. T1 was accepted under owner ruling A6 after three revise rounds and about 2.4M sub-agent tokens → `L-217` (a Tier G review needs a threat model and a stop rule) · `TD-182`…`186` filed
 - SPRINT-107 — Retarget the Loop — closed 2026-09-26 · `cef7344` · 18 of 18 DoD, all five members in `done/` (unreleased; the whole of EPIC-017 gates 2.0.0) · `epic: EPIC-017` — sprints reference their members, and `plan_commit` is the freeze (ADR-047, a Tier G checker, CLEAR at the third outside round); triage/decomposer/handoff/flow/orchestrator run on `docs/work/`; EPIC-017 Closed-when 1 + 5 met; gate `259 pass, 1 fail` (owner-ruled exception, TD-181) · TD-180/181 · L-215/216
