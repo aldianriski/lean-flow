@@ -204,3 +204,13 @@ backlog DoDs, and all three by EPIC-017's Task map) · TD-207 (the exemption acc
 are not, so it goes back to the owner at the close.
 Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 0 FAIL · `sh -n` ok · live `counts`: `dod 6 2`, `units 4 3`.
 review · T3 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-09-30 | progress | Plan exhausted: 8 of 8 member Done-when boxes ticked, 4 of 4 units; system verify next
+run · 8 of 8 DoD ticked
+tasks · 4 attempted / 4 completed / 4 total (T1 390 · T2 391 · T4 392 · T3 383)
+terminal · PLAN_EXHAUSTED
+parks · none · reviews · 4 isolated Tier G, all CLEAR · revise rounds · 0 (one stalled builder resumed)
+Derived, not asserted: `bun scripts/lib/sprint-members-cli.ts counts docs/sprint/SPRINT-110-retarget-the-gate.md` → `dod 8 0`,
+`units 4 4`; all four members in `docs/work/done/`. System verify (the final-wave full gate) runs next against the integrated tree.
+Known foreign WIP in the main checkout: another session's uncommitted EPIC-016 edit, which FAILs prose-density and layers-observed.
+It is not this sprint's.
