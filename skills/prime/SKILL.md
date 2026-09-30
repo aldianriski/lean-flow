@@ -40,7 +40,8 @@ the priming token cost for near-zero new signal.
 
 **Resolution** (v2 store): backlog = `docs/work/backlog/`. Active sprint = each `docs/sprint/SPRINT-NNN-<slug>.md`
 with `status: active` (a multi-stream repo has one per stream) — read only its frontmatter + `## Members`.
-Open DoD = count of `- [ ]` lines under `## Done when` in each member's task file, summed per active
+Open DoD = count of `- [ ]` lines under `## Done when` in each member's task file — found **by id**
+(`docs/work/**/TASK-NNN-*.md`), never by the listed path, which goes stale once a member moves folder — summed per active
 sprint (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); no active
 sprint → fall back to the backlog.
 `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
