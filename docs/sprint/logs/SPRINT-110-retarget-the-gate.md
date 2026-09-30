@@ -184,3 +184,23 @@ and `engine-base-tmp.sh` equals base `18d9ccc`. All three harnesses parse, and n
 from its transcript with this order: verify, then commit the green work first, then run the remaining seeds against their one
 target case in the background (a multi-minute foreground harness is the likely stall), delete every temp file, prove the restore
 with `git hash-object` = `rev-parse HEAD:path`, then report.
+
+### 2026-09-30 | progress | T3 TASK-383 merged at `dffbcb1`. Outside review CLEAR; owner accepts two departures; TD-205…208
+Builder (sonnet + /tdd, worktree `18d9ccc`, resumed once after the watchdog stall): `cbc6464`. `_own_docs` exempts
+`docs/work/<status>/TASK-*.md` (D2). TODOCAP applies only while TODO.md exists (R2). BACKLOG gains the §11 store prune
+`closed-task-past-retention`. FOURBUCKETS counts an added backlog task. TWOFILES/VERIFYCLAUSE read members through the CLI, and
+PLANFROZEN reuses check-sprint-by-reference.ts (ADR-049). `bun-required` is a named FAIL, the CLI's exit status is read everywhere,
+and a v1 tree makes zero bun calls (observed through a shim). About 72 retained v2 cases; seeded breaks for every new branch
+(S2c is an equivalent mutant). v1 parity: 354 fixture trees + 109 archived plans byte-identical. On this repo, 77 → 20 FAILs:
+−60 task-file header lines, +3 prune findings. Restore `99552a5` (`git hash-object` = `rev-parse HEAD:path`). Coordinator re-check:
+1 commit, 4 files in Layers, hash matches, `sh -n` ok.
+Isolated review (sonnet, ~8 probes, ~90k tokens): **CLEAR**. The PLANFROZEN mapping, `CHECK-ERROR` and the bun paths are clean. A
+parity sample of 13 trees is byte-identical (narrower than the builder's claim, and said so).
+**Owner rulings (2026-09-30):** S9.SCOPECHANGE stays on § Plan, with the member freeze in PLANFROZEN (the split is accepted). TODOCAP's
+migrate text only on a store tree (v1 text unchanged, per ADR-043; accepted). Filed: TD-205 (the ordering half is lost for member
+edits) · TD-206 (the prune's "live-named" is narrower than the open-task and epic citations: TASK-359/374 are still cited by open
+backlog DoDs, and all three by EPIC-017's Task map) · TD-207 (the exemption accepts any folder name) · TD-208 (VERIFYCLAUSE partial read-back).
+**The prune ruling is conditional:** the owner's "delete at close" was pending the three being truly unnamed. TD-206 shows they
+are not, so it goes back to the owner at the close.
+Post-merge on main (D5): tsc 0 errors · gen-index current · layers-completeness 0 FAIL · `sh -n` ok · live `counts`: `dod 6 2`, `units 4 3`.
+review · T3 · scoped-reviewer · behaviour:material · governance:high

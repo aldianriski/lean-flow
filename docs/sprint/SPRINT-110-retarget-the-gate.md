@@ -132,6 +132,10 @@ is CLEAR.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/conformance-engine.sh` | T3 | S9/S10/S11/S3 rules read the store; `bun-required` (ADR-049); task files exempt (D2); §11 store prune | High (Tier G, adopter-facing) | 3 harnesses green · seeds · v1 parity 354+109 · review CLEAR |
+| `evals/run-sprint-family-fixtures.sh` · `run-ownership-header-fixtures.sh` · `run-conformance-engine-fixtures.sh` | T3 | ~72 retained v2 cases (sprint-family is opt-in, 3 → ~8 min) | Low | verdict lines |
+| `docs/adr/ADR-049-*.md` · `docs/DECISIONS.md` · README · CHANGELOG | T3 (coordinator) | a v2 tree requires `bun` (R4) | Med (consumer-facing) | read-through |
+| `TECH-DEBT.md` · `docs/work/backlog/TASK-393-*.md` | T3 (coordinator) | TD-204…208; the TS engine port after 2.0 (R6) | Low | — |
 | `scripts/lib/sprint-members-cli.ts` (new) | T4 | `kind · members · counts · active` for shell callers; named exits 2/3/64 (R3, T3 consumes it) | High (Tier G, shared) | 36/0 · seeds · review CLEAR |
 | `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` | T4 | `reap()` counts member Done-when boxes on v2; the stale :516 fixed | High (Tier G) | reap/outcome/revise-loop green · seeds |
 | `scripts/qa-check.sh` | T4 | leg 2g/7 read the store; legs 3/5/8 only while TODO.md exists (R2); new harness registered | High (Tier G) | store-legs 36/0 · rollup green |

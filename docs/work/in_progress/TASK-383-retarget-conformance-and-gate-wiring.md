@@ -19,8 +19,8 @@ depends-on: [TASK-377, TASK-390, TASK-391, TASK-387, TASK-382]
 
 ## Done when
 
-- [ ] Conformance rules keyed to TODO.md re-point to the store per TASK-377's contract; the engine ships the layout to consumers.
-- [ ] Retained must-FAIL fixture per changed rule; outside review, worktree-isolated.
+- [x] Conformance rules keyed to TODO.md re-point to the store per TASK-377's contract; the engine ships the layout to consumers. ✓ `cbc6464` (merged `dffbcb1`): `_own_docs` exempts `docs/work/<status>/TASK-*.md` (D2); TODOCAP only while TODO.md exists and points at migrate on a store tree (R2; v1 text unchanged, owner-accepted); BACKLOG gains the §11 store prune; FOURBUCKETS counts an added backlog task; TWOFILES/VERIFYCLAUSE/PLANFROZEN read members via the CLI and check-sprint-by-reference (ADR-049, `bun-required`). SCOPECHANGE stays on § Plan, with the member freeze in PLANFROZEN (owner-accepted split). v1 parity: 354 fixture trees + 109 archived plans byte-identical; real repo 77 → 20 FAILs, every line explained.
+- [x] Retained must-FAIL fixture per changed rule; outside review, worktree-isolated. ✓ ~72 retained v2 cases with controls across 3 harnesses (all green); seeded breaks for every new branch (S2c an equivalent mutant, S2d the real break); isolated review CLEAR (~8 probes, 4 census-zero/TD).
 
 ## Touches
 

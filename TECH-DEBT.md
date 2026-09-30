@@ -315,6 +315,31 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-208** severity: low | status: open | created: Sprint-110 (T3 outside review)
+  - Summary: **S9.VERIFYCLAUSE checks a partial member read-back only at zero.** It FAILs when no ticked line could be read back
+    while the CLI counts more than zero. A 3-counted, 2-read case leaves the third unexamined. Census 2026-09-30: 0.
+  - Mitigation (hypothesis): FAIL whenever the read-back count differs from the CLI's ticked count.
+
+- **TD-207** severity: low | status: open | created: Sprint-110 (T3 outside review)
+  - Summary: **The engine's task-file exemption accepts any folder name as a status.** `docs/work/*/TASK-*.md` exempts
+    `docs/work/anything/TASK-1.md` from the ownership-header check. Census 2026-09-30: 0 non-status folders.
+  - Mitigation (hypothesis): enumerate the six status folders (backlog · todo · in_progress · review · done · cancel), as ADR-045 names them.
+
+- **TD-206** severity: medium | status: open | created: Sprint-110 (T3 outside review)
+  - Summary: **The store prune reads §11's "not live-named" as only `depends-on:`, active Members and the highest id.** On this
+    repo it flags TASK-359, TASK-360 and TASK-374 as `closed-task-past-retention`. Open backlog tasks still cite two of them in their
+    `## Done when` (TASK-378 → 359, TASK-386 → 374), and EPIC-017's Task map names all three. The message says "nothing live names it",
+    which overclaims. The rule is propose → approve, so nothing is deleted automatically.
+  - Mitigation (hypothesis): either clarify §11's "live-named" (a spec edit), or widen the exclusion to ids cited by open task
+    files and active epics. Owner to rule at the SPRINT-110 close before any of the three is deleted.
+
+- **TD-205** severity: low | status: open | created: Sprint-110 (T3 outside review)
+  - Summary: **The ordering half of S9.SCOPECHANGE is lost for member-file edits.** The owner accepted the split: the member freeze
+    lives in S9.PLANFROZEN, through check-sprint-by-reference.ts. That checker only requires a scope-change entry "NEW since baseline",
+    not one that precedes the edit, while SCOPECHANGE's ordering walk covers § Plan only. A member `## Done when` edit logged after
+    the fact passes. Census 2026-09-30: 0 on SPRINT-110.
+  - Mitigation (hypothesis): check-sprint-by-reference.ts compares the entry's commit to the edit's commit (one implementation). A fixture.
+
 - **TD-204** severity: medium | status: open | created: Sprint-110 (T4, owner ruling; ADR-049)
   - Summary: **`night-run.sh`'s v2 `reap()` needs `bun` on the adopter's machine.** It reads members through
     `sprint-members-cli.ts`. Without `bun` the rollup adds a `warnings` line, and unreadable members end `HARD_FAILURE`
