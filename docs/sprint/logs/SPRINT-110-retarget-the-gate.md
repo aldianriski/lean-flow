@@ -175,3 +175,12 @@ worktree branches from the right base this time. `worktree-base` PASS (`agent-ab
 task files), R2 (TODOCAP only while TODO.md exists), R4/ADR-049 (`bun-required`, the CLI's exit status read at every call site, zero
 bun calls on a v1 tree), and ADR-043's v1 parity bar (exit code and report text), proven before and after over v1 fixtures, the
 archive, and this repo with every diff line explained.
+
+### 2026-09-30 | surprise | T3 builder stalled (stream watchdog, 600 s silent) mid seeded-break proof; work intact, resumed
+The agent was reported `failed`, but the report is about the reporter, not the artifact (edit-safety (c)). Worktree inspected:
+0 commits, 539 uncommitted lines across exactly the 4 Layers files, plus 31 temp seed/base copies. The working
+`conformance-engine.sh` parses and is **not** a seeded copy: each of the 12 `engine-seed-*.sh` differs from it by exactly one line,
+and `engine-base-tmp.sh` equals base `18d9ccc`. All three harnesses parse, and none equals a temp copy. The same agent was resumed
+from its transcript with this order: verify, then commit the green work first, then run the remaining seeds against their one
+target case in the background (a multi-minute foreground harness is the likely stall), delete every temp file, prove the restore
+with `git hash-object` = `rev-parse HEAD:path`, then report.
