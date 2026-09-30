@@ -33,6 +33,11 @@ migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md §
 needs `bun`. Without it the run fails with `bun-required` rather than passing unexamined. A 1.x tree is still
 checked with `sh` alone.
 
+**No skill reads `TODO.md` any more.** `/prime` counts open work from `docs/work/` and the `status: active`
+sprints' `## Members`; `/lean-doc-generator init` scaffolds the store (create-lazily) instead of `TODO.md`;
+promote, close and retro follow-ups use store task files; the dev-flow/adlc-flow migration map produces store files.
+`TODO.md` survives only in `migrate`'s v1→v2 path and the v1 refusal text.
+
 ---
 ## SPRINT-110 — Retarget the Gate (2026-09-30)
 

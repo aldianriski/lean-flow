@@ -36,10 +36,10 @@ don't hand-reconcile, and you're not lost in your own existing code.
      session with **no artifact that migrate ran at all**, which is what an overnight owner wakes up
      to: the safety property held, and nothing recorded that it did (TD-017 · night-run.md Part 0).
 3. **Apply incrementally** — preserve **content**; change only format / placement / wiring. Update
-   cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, TODO § Active Sprint pointer,
+   cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, sprint `status: active` + `## Members`,
    `/prime` read-order). Flag anything ambiguous instead of guessing.
    - **After each relocate/rename**: `grep` the old filename/path across the repo and fix every inbound link before moving to the next file.
-4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, sprint pointer valid.
+4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, every sprint `## Members` id resolves to a task file.
 
 ## Re-run (update sync — report-only)
 
@@ -91,7 +91,7 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 | `SETUP.md` (root) or `docs/SETUP.md` (pre-ADR-012 lean placement) | `docs/development/setup.md` |
 | `DEPLOY.md` / `deploy/` (root) or `docs/DEPLOY.md` (pre-ADR-012 lean placement) | `docs/deployment/deployment-guide.md` — **split out** any rollback-specific content into `docs/deployment/rollback-guide.md` (present source) rather than folding it into the guide |
 | `CONTEXT.md` / `CLAUDE.md` (root) | `.claude/CONTEXT.md` / `.claude/CLAUDE.md` |
-| `README.md` · `TODO.md` · `TECH-DEBT.md` | stay at root (front-door · daily working files) — never relocate |
+| `README.md` · `TECH-DEBT.md` | stay at root (front-door · daily working files) — never relocate |
 
 ## Legacy-lean layout → TemiDev layout (ADR-012 re-run)
 
@@ -121,8 +121,8 @@ itself.
 | `.claude/CONTEXT.md` (dev-flow vocab · gates · agent roster) | reformat | lean-flow `CONTEXT.md` (loop · gates · modes · roster) |
 | `.claude/CLAUDE.md` | reformat | `CLAUDE.md.template` shape (Behavioral Guidelines incl. concise-reporting) |
 | sprint files | reformat | `SPRINT.md.template` (Retro → §10 routing) |
-| `TODO.md` | reformat | Backlog-pool (P0–P3) + Active-Sprint **pointer**; a § Tech Debt inside it **splits out** (next row) |
-| tech debt inside `TODO.md` (or an ad-hoc debt list) | split + relocate | root `TECH-DEBT.md` via `TECH-DEBT.md.template` — `TD-NNN` rows move verbatim; `TODO.md` keeps a pointer line |
+| `TODO.md` | reformat | one task file per row in `docs/work/<status>/` — mapping in § v1 → v2 work-item store; a § Tech Debt inside it **splits out** (next row) |
+| tech debt inside `TODO.md` (or an ad-hoc debt list) | split + relocate | root `TECH-DEBT.md` via `TECH-DEBT.md.template` — `TD-NNN` rows move verbatim |
 | `CHANGELOG.md` | keep / align | Keep-a-Changelog; sprint-close feeds it |
 | ad-hoc deploy doc · `deploy/` · `RELEASE.md` | reformat + relocate | `docs/deployment/deployment-guide.md` via `deployment-guide.md.template` (operational runbook; code-HOW → comments); split rollback steps → `docs/deployment/rollback-guide.md` via `deployment-rollback.md.template` |
 | research · spike · decision write-ups · `notes/` | reformat | `docs/research/<slug>.md` via `RESEARCH.md.template` (desk synthesis → feeds an ADR) |
@@ -139,7 +139,7 @@ itself.
 - Existing research / spike / decision write-up → `docs/research/<slug>.md` (`RESEARCH.md.template`).
 - Existing decision notes / ADRs (any shape) → rich `docs/adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index.
 - Existing changelog → keep; align to Keep-a-Changelog if it diverges.
-- Existing backlog / issues file → `TODO.md` Backlog-pool + sprint pointer.
+- Existing backlog / issues file → one task file per item in `docs/work/backlog/` (§ v1 → v2 work-item store for the field mapping).
 - Existing `CONTEXT`/`CLAUDE`/agent-instruction file → lean-flow `CONTEXT.md` / `CLAUDE.md` format.
 - **Unrecognized docs** → leave untouched, list them, ask where they belong (don't force a mapping).
 

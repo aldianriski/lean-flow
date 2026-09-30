@@ -320,6 +320,11 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-209** severity: low | status: open | created: Sprint-111 (T5)
+  - Summary: **`skills/lean-doc-generator/templates/TODO.md.template` is kept though nothing scaffolds it any more.** `init` now
+    scaffolds the store, and no skill reads or writes `TODO.md` outside migrate's v1→v2 path. Census 2026-09-30: 0 skill callers.
+  - Mitigation (hypothesis): delete it in the 2.0 cleanup. The delete ripples into the template counts in CLAUDE.md, CONTEXT.md and README.
+
 - **TD-208** severity: low | status: open | created: Sprint-110 (T3 outside review)
   - Summary: **S9.VERIFYCLAUSE checks a partial member read-back only at zero.** It FAILs when no ticked line could be read back
     while the CLI counts more than zero. A 3-counted, 2-read case leaves the third unexamined. Census 2026-09-30: 0.

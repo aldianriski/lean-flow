@@ -29,7 +29,7 @@ locations second. Adapt the globs to the host project's layout.
 | 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Vocabulary · gates · modes (if the project uses one) |
 | 3 | `README.md` — *presence-check by default* | Front-door (humans); overlaps 1·2·6 → **full read deferred** (note below) |
 | 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
-| 5 | `TODO.md`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Active task list + debt ledger — frontmatter + open `- [ ]` items only |
+| 5 | `docs/work/`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Work-item store + debt ledger — frontmatter + open `- [ ]` items only |
 | 6 | `docs/architecture/overview.md`, `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
 
 **README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +
@@ -38,16 +38,13 @@ content only when CLAUDE.md *or* CONTEXT.md is MISSING** (then it is the best av
 Why: the README duplicates CLAUDE.md/CONTEXT.md/ARCHITECTURE.md content, so reading it in full doubles
 the priming token cost for near-zero new signal.
 
-**Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer (format: `> **SPRINT-NNN — <name>** → docs/sprint/SPRINT-NNN-<slug>.md`) — a
-multi-stream repo lists one pointer per stream — to each active `docs/sprint/SPRINT-NNN-<slug>.md`
-and read only its frontmatter + Plan (~50 lines). Count open **DoD `[ ]`** across all active
-sprints (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); if
-no sprint is active, fall back to the Backlog.
-**v2 tree** (`docs/work/` present): open DoD = count of `- [ ]` lines under each file's own
-`## Done when` section, summed across `docs/work/**/TASK-*.md` whose frontmatter `sprint:` line
-**exactly** matches an active sprint's id — a member of another sprint is never counted.
+**Resolution** (v2 store): backlog = `docs/work/backlog/`. Active sprint = each `docs/sprint/SPRINT-NNN-<slug>.md`
+with `status: active` (a multi-stream repo has one per stream) — read only its frontmatter + `## Members`.
+Open DoD = count of `- [ ]` lines under `## Done when` in each member's task file, summed per active
+sprint (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); no active
+sprint → fall back to the backlog.
 `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
-**On v1 or mixed** — prime reports the `Layout:` row naming it, skips the task count, and continues; it never aborts. The row points to `/lean-doc-generator migrate`.
+**On v1 or mixed** — prime reports the `Layout:` row `v1 layout → run /lean-doc-generator migrate`, skips the task count, and continues; it never aborts.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
 
 **Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root
@@ -104,7 +101,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 [OK]      CONTEXT.md
 [OK]      README.md
 [MISSING] MEMORY index
-[OK]      TODO.md
+[OK]      docs/work/
 [OK]      ARCHITECTURE.md
 Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open

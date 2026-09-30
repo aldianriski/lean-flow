@@ -294,7 +294,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 
 | Artifact | Written by | Holds |
 |---|---|---|
-| `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · active-sprint pointer(s) |
+| `docs/work/<status>/TASK-NNN-*.md` | `/task-decomposer` · `/triage` · `/orchestrator` | one file per task — the folder is its status (`backlog/` → `todo/` → `in_progress/` → `review/` → `done/` \| `cancel/`) |
 | `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
 | `docs/epic/EPIC-NNN-*.md` | `/lean-doc-generator epic` | a **multi-sprint** outcome + the sprints that carried it. Skip it when the work fits one sprint |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · files changed · retro (400-line hard cap) |
@@ -373,7 +373,7 @@ on trust — and it is the engine's own count, not the repo's wider checker set.
 ## Adapting to your repo
 
 Skills auto-discover at the repo root after install. There is **nothing to scaffold** — the skills
-read whatever context files your project already has (`CLAUDE.md`, `README.md`, `TODO.md`,
+read whatever context files your project already has (`CLAUDE.md`, `README.md`,
 `docs/CHANGELOG.md`, `docs/ARCHITECTURE.md` — legacy root locations still matched) and degrade
 gracefully when one is missing. `/prime` aborts on
 nothing. No code-graph dependency — lean-flow neither integrates nor depends on
