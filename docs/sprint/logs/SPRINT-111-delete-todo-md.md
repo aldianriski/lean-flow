@@ -84,3 +84,21 @@ owner-ruling: bookkeeping-gate — overridden: four reds of known cause, none fr
   Stale doc mentions remain in evals/README.md (177 · 380–390 · 440–443) and docs/QA.md:48 → TASK-396's sweep.
 - Review: consequence · T2 · behaviour: none (headers + opt-in list) · governance: gate composition → a scoped review by the non-author
   coordinator over the 9-file diff: CLEAR (in Layers only; the list edit removes exactly the 4 names). DoD 2/2 ticked; box 2 is vacuous by owner ruling.
+
+### 2026-09-30 | progress | T1 (TASK-370) migrate proven on a real copy; commit 1146449, merged 9f82a28
+- Harness `v1-to-v2-fixtures: 24 pass, 0 fail` (on the branch and again on main after the merge). The map gains a by-reference rule (a `## Members` sprint:
+  its `Tn` are not mapped, members must exist and are never written) and a preservation invariant. The real run also forced four small rules:
+  prose is carried verbatim, apostrophes are dropped from slugs, unmapped v1 fields go to `## Tracker` and free prose to `## Why`, and a missing
+  done-when gets a flagged placeholder. A Plan-only `tier:` comes from the owner.
+- Real input (`git archive` copies of 26929c4, outside the repo). Copy a, full run: 15 ids written, SPRINT-111 skipped as by-reference, 0 conflicts,
+  TODO.md removed, 17 non-task prose blocks listed for the owner. Copy b, stopped after 5 files then resumed: `diff -r a b` identical. Harness
+  `--before/--after`: ids 15 = 15 both ways, ticks 0 = 0, preservation 38/38. **Caveat:** the procedure was driven by a scratch Bun script
+  written to the map, not by an agent reading the prose. T4 is the first agent-run on this repo.
+- Flags the real run raised, which T4's plan step will put to the owner: 9 legacy tasks lack `tier`, 2 lack `class`/`authority`, and TASK-319 and
+  TASK-188 have done-when/assumes gaps.
+- Seeded breaks (preservation · resume · by-reference skip) each reddened exactly the targeted case. Hash convention: `git hash-object` against the
+  HEAD blob `38c62cf8f8ab…`, restored and verified. Also fixed: `splitFrontmatter` was not CRLF-safe, so the harness had been red on an autocrlf
+  checkout; the `expected/` 913–915 text is now verbatim.
+- Review: consequence · T1 · behaviour: migrate procedure + harness · governance: workflow contract → a worktree-isolated outside review.
+  **CLEAR**, 3 low notes: the tick count is a net sum (a pre-existing design), `isByReference` is exact-heading only (fails loud), and
+  `docs/sprint/archive/` is out of scope by design. DoD 3/3.

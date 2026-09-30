@@ -20,8 +20,8 @@ depends-on: [TASK-369]
 ## Done when
 
 - [x] `migrate` maps v1 Backlog → one file per task, plan → approve → apply, re-run report-only; id set equal both ways on a copy of this repo's Backlog; `TODO.md` left as a tombstone (deletion is TASK-363) whose stray v1 writes a v2 skill surfaces. ✓ `14d2c9f` — owner ruling: no tombstone; `migrate` removes TODO.md, unresolved conflicts block removal
-- [ ] Verified on a copy of this repo: id sets equal both ways AND ticked-box count equal before/after, incl. an active-sprint fixture.
-- [ ] An interrupted run (killed mid-way) re-run to completion produces the same tree as an uninterrupted one — retained fixture.
+- [x] Verified on a copy of this repo: id sets equal both ways AND ticked-box count equal before/after, incl. an active-sprint fixture. ✓ `1146449` — real copy: ids 15 = 15 both ways, ticks 0 = 0 (this repo has no ticked by-value box; ticks proven on the fixture, 1 = 1), preservation 38/38 byte-identical incl. the 4 by-reference SPRINT-111 members
+- [x] An interrupted run (killed mid-way) re-run to completion produces the same tree as an uninterrupted one — retained fixture. ✓ `1146449` — real copy stopped after 5 files then resumed: `diff -r` identical to the full run; retained `interrupted-partial/` (+ must-FAIL `interrupted-partial-diverged/`)
 
 ## Amended 2026-09-23
 
