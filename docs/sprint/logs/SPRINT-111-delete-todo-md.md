@@ -36,3 +36,39 @@ CLEAR, waves T1=0 T2=0 T3=1 T4=2, shared `evals/run-sprint-family-fixtures.sh` o
 
 ### 2026-09-30 | progress | plan_commit recorded: ab0c748
 The `plan locked` commit is `ab0c748`; this entry and the frontmatter field land in the next commit.
+
+### 2026-09-30 | scope-change | recon + outside review reshape the Plan before wave 0; G1/G2 signed on the lean re-plan
+**What broke.** Three read-only censuses (T1 · T2 · T3) found gaps in the frozen Plan. (1) `migrate` does not know
+by-reference sprints: on this repo it maps SPRINT-111's four `### Tn` (no DoD boxes) as tasks, reports the four member
+store files as conflicts, and so blocks TODO.md removal. Its harness paths are hard-coded. (2) A3 is false: `skills/`
+holds real prose readers — prime (row 5 · Resolution), lean-doc-generator SKILL.md ("TODO.md is the Backlog pool"),
+`references/init.md` (scaffolds a v1 TODO.md unconditionally), two templates. (3) A hidden gate breaker:
+`prose-density-baseline.txt` carries `TODO.md 1`; deleting TODO.md without the row turns leg 2b-ter red. (4) One
+unlisted v1 reader in evals/: `assert-judgement-retry.sh`. (5) A2: STANDARD §15 counts a removed rule id as MAJOR in
+meaning. An outside review (Codex) then measured evals + scripts/**/*.sh at 45,076 lines against 6,854 for all of
+`skills/` (6.6×), counted 5 of sprints 101–110 as predominantly guard maintenance, and corrected the draft: ADR-043
+makes the conformance engine consumer-facing, so "nothing ships to consumers" was wrong.
+**Owner rulings (popups).** Fix by-reference in T1 · split the skills prose into T5 = `TASK-395` (id: store max 394;
+395 has 0 hits in the tree and `git log --all`; the 5xx/8xx/9xx hits are fixture tokens) · retire leg 7's TD-aging half
+(TD-203) · S11.TODOCAP retired as spec 0.13.0 labelled **breaking** · **lean re-plan**: guards for the retired v1 shape
+are retired or frozen, never retargeted · governance diet → ADR-050 under a backlog task (`TASK-396`), after this sprint.
+**Impact on § Plan.** T1 re-tiered X → G (it changes an invariant-checking harness), with a preservation check and a
+real interrupted run. T2 shrinks to a disposition inventory + freezing the 4 v1 park asserts and their 4 selftests; its
+DoD box 2 ("each retargeted harness has a v2 fixture") holds vacuously because nothing is retargeted — that is this
+ruling, not a re-read (L-088). T3 retires rather than retargets, and gains `run-s2-placement-fixtures.sh`, the compat
+fixture and `check-task-origin`'s harness. T5 added (Depends-on T1). T4 gains the baseline row and depends on T5.
+**Consequence lookups (TD-092):** T1 · behaviour: migrate procedure + harness · governance: workflow contract → Tier G
+scoped reviewer, worktree-isolated · T2 · behaviour: none (freeze + opt-in list) · governance: gate composition → scoped
+reviewer · T3 · behaviour: gate legs + engine rule · governance: spec semantics (MAJOR-meaning) → worktree-isolated
+outside review · T5 · behaviour: skill procedure prose · governance: consumer-facing skill contract → one scoped sonnet
+reviewer · T4 · behaviour: data migration · governance: none new → full gate + scoped reviewer.
+**G1** full checklist (origins: 370/394 manual, 381/380 decomposer) — goal, size (all M, T2 S), files, out-of-scope,
+assumptions — confirmed at the owner's plan sign-off. **G2** signed (plan approved, 2026-09-30).
+
+### 2026-09-30 | progress | bookkeeping gate read; committed through 4 reds of known cause (owner ruling)
+Layers completeness 10 PASS · 0 FAIL after the prose named full paths. Dispatch preflight CLEAR: waves T1=0 T2=0 T3=1 T5=1 T4=2;
+shared files owned T1→T5 (lean-doc-generator SKILL.md, migration-map.md) · T2→T3 (qa-check.sh) · T3→T4 (prose-density
+baseline) · T5→T4 (TECH-DEBT.md). The gate prints `QA-CHECK: 275 pass, 4 fail`, TRUNCATED at 547s against a 520s budget, with 17 harnesses unrun.
+The four: prose-density and layers-observed both name `docs/epic/EPIC-016-…` (foreign WIP in the checkout, unstaged); `run-doc-caps-fixtures`
+case 8 timed out at 5.0s against a 5s limit (it passes alone: 1 pass, 0 fail, 5.02s); and the budget. None is this commit's.
+owner-ruling: bookkeeping-gate — overridden: four reds of known cause, none from this change; the full gate at raised budget runs at system-verify.

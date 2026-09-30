@@ -33,7 +33,7 @@ skills/lean-doc-generator/SKILL.md · skills/lean-doc-generator/references/migra
 
 ## Assumes
 
-that installed 1.66.x skills read a tombstone as an empty Backlog. UNCONFIRMED
+none — the tombstone assumption ("installed 1.66.x skills read a tombstone as an empty Backlog") is superseded by the 2026-09-24 owner ruling: no tombstone, migrate removes TODO.md (SPRINT-111 scope-change).
 
 ## Tracker
 

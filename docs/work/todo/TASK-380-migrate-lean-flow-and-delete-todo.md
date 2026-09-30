@@ -12,7 +12,7 @@ tier: G
 authority: J2
 origin: decomposer
 state: ready
-depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-391, TASK-387, TASK-382, TASK-383, TASK-392, TASK-381, TASK-394]
+depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-391, TASK-387, TASK-382, TASK-383, TASK-392, TASK-381, TASK-394, TASK-395]
 ---
 
 # TASK-380 — Migrate lean-flow itself and delete TODO.md
