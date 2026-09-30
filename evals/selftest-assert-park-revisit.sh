@@ -1,4 +1,5 @@
 #!/bin/sh
+# FROZEN — v1 historical coverage (SPRINT-111 T2, owner lean ruling 2026-09-30). Reads the retired v1 shape (TODO.md / Plan DoD boxes); not run by any gate. v2 authority coverage: evals/run-authority-fixtures.sh (TASK-382). Do not retarget; delete when TASK-396 audits it.
 # selftest-assert-park-revisit.sh -- proves evals/assert-park-revisit.sh actually FAILS on the
 # violation it exists to catch, and passes on the compliant shape (SPRINT-059 T4).
 #

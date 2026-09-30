@@ -1,4 +1,5 @@
 #!/bin/sh
+# FROZEN — v1 historical coverage (SPRINT-111 T2, owner lean ruling 2026-09-30). Reads the retired v1 shape (TODO.md / Plan DoD boxes); not run by any gate. v2 authority coverage: evals/run-authority-fixtures.sh (TASK-382). Do not retarget; delete when TASK-396 audits it.
 # assert-boundary-park.sh -- deterministic artifact-contract assertions for three real-run fixtures:
 # residual-grill (SPRINT-902) and close-park (SPRINT-903) (TASK-124, SPRINT-038 T2 salvage of
 # TD-012), plus release-patch-push (SPRINT-908, SPRINT-039 T1). Takes a COMPLETED run's repo

@@ -1,4 +1,5 @@
 #!/bin/sh
+# FROZEN — v1 historical coverage (SPRINT-111 T2, owner lean ruling 2026-09-30). Reads the retired v1 shape (TODO.md / Plan DoD boxes); not run by any gate. v2 authority coverage: evals/run-authority-fixtures.sh (TASK-382). Do not retarget; delete when TASK-396 audits it.
 # assert-park-revisit.sh -- artifact-contract assertion for night-run.md Part 0 step 4
 # (SPRINT-059 T4): an open park whose unblock condition names a task the SAME run later completed
 # must be revisited, or else say so in the rollup. Takes a completed run's repo directory.

@@ -1,4 +1,5 @@
 #!/bin/sh
+# FROZEN — v1 historical coverage (SPRINT-111 T2, owner lean ruling 2026-09-30). Reads the retired v1 shape (TODO.md / Plan DoD boxes); not run by any gate. v2 authority coverage: evals/run-authority-fixtures.sh (TASK-382). Do not retarget; delete when TASK-396 audits it.
 # selftest-assert-noaction-park.sh -- self-test for assert-noaction-park.sh. ZERO API calls, ZERO
 # git writes in THIS repo (SPRINT-039 T1).
 #
