@@ -27,3 +27,12 @@ The signed governance checklist, line by line (owner-signed; applied in `5e0d75b
 - **epic rollup currency:** EPIC-017 current (`035508b`). EPIC-014/015 unchanged. EPIC-016 has foreign WIP in the checkout.
 - **handoff ledger:** none.
 G1/G2 are not signed yet.
+
+### 2026-09-30 | surprise | the layers guards SPRINT-110 built caught two findings on this Plan at render
+On their first live input, check-layers-completeness flagged T1: prose naming T4 without `Depends-on`, and TASK-370's own
+`## Done when` naming `TODO.md` absent from T1's Layers (`member-layers-incomplete`, TASK-390's new rule). Both were fixed before
+the lock: the prose reworded, and `TODO.md` declared on T1's `Cites:` (named, not touched). Re-run: 12 PASS, 0 FAIL. Preflight
+CLEAR, waves T1=0 T2=0 T3=1 T4=2, shared `evals/run-sprint-family-fixtures.sh` owned T2 → T3.
+
+### 2026-09-30 | progress | plan_commit recorded: ab0c748
+The `plan locked` commit is `ab0c748`; this entry and the frontmatter field land in the next commit.
