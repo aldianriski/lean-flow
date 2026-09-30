@@ -2,6 +2,7 @@
 id: TASK-381
 title: "Reconcile the eval inventory against the guard tasks"
 epic: EPIC-017
+sprint: SPRINT-111
 priority: P1
 size: M
 risk: med

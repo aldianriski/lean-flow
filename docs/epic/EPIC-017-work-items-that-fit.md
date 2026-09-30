@@ -4,7 +4,7 @@ slug: work-items-that-fit
 owner: Maintainer
 last_updated: 2026-09-30
 status: active
-member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110]
+member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -197,6 +197,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | [SPRINT-107](../sprint/archive/SPRINT-107-retarget-the-loop.md) | Retarget the loop | closed `cef7344` | The loop runs on the store: sprints reference members, `plan_commit` is the freeze (ADR-047); five skills read and write task files. Met Closed-when **1** and **5**. |
 | [SPRINT-109](../sprint/archive/SPRINT-109-unlock-the-critical-path.md) | Unlock the critical path | closed `6761016` | Spec 0.12.0 describes the store; caps measure tokens (ADR-048, budget 16087 — half of CW 4); four guards read member files (part of CW 2). No Closed-when fully met. |
 | [SPRINT-110](../sprint/archive/SPRINT-110-retarget-the-gate.md) | Retarget the gate | closed `370fd9f` | Layers guards, qa-check, night-run and the engine read the store (6 of CW 2's 7 guard retargets done; `381`/`380` remain); a v2 tree needs `bun` (ADR-049). No Closed-when fully met. |
+| [SPRINT-111](../sprint/SPRINT-111-delete-todo-md.md) | Delete TODO.md | active | — (in progress: `370` · `381` · `394` · `380`) |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·

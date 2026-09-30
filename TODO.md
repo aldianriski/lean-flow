@@ -16,7 +16,9 @@ status: current
 
 ## Active Sprint
 
-> _None active._ Last closed: **SPRINT-110 — Retarget the Gate**, closed 2026-09-30 with all 4 members done,
+> **SPRINT-111 — Delete TODO.md** → docs/sprint/SPRINT-111-delete-todo-md.md
+>
+> Last closed: **SPRINT-110 — Retarget the Gate**, closed 2026-09-30 with all 4 members done,
 > 8 of 8 `## Done when` (`TASK-390`/`391` layers guards · `TASK-392` qa-check + night-run · `TASK-383` conformance engine, ADR-049).
 > See `CHANGELOG.md` and the sprint pair.
 
