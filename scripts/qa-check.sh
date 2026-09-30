@@ -5,7 +5,7 @@
 # Exit 0 = every mechanical rule passes; exit 1 = at least one FAIL.
 #
 # Usage:  sh scripts/qa-check.sh          (runs from anywhere; resolves the repo root via git)
-#         QA_FULL=1 sh scripts/qa-check.sh  (also runs the 4 opt-in selftest-assert-* harnesses;
+#         QA_FULL=1 sh scripts/qa-check.sh  (also runs the opt-in fixture harnesses;
 #                                             see leg 12, TD-016)
 
 set -u
@@ -1112,7 +1112,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # harness that can't even be found or that exits non-zero for any reason is its own named FAIL,
 # never a silent skip.
 #
-# TD-016 split: the 3 selftest-assert-* harnesses each spin up many throwaway git repos and are the
+# TD-016 split: the (since frozen, SPRINT-111 T2) selftest-assert-* harnesses each spun up many throwaway git repos and are the
 # slow part of this leg, so they moved behind an opt-in flag (QA_FULL=1) instead of running bare.
 # TD-016's own row phrased the cut as "snippet runners vs selftests" -- but that phrasing is a proxy
 # for the real axis, which is runtime. run-layers-completeness-fixtures.sh is maintainer-facing like
@@ -1240,7 +1240,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
 eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts"
-eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
+eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-s4-differential-parity.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
 # the git mv round trip (~2.5s) -- opt-in by the git-repo rule below (SPRINT-043 T1).
