@@ -19,8 +19,8 @@ depends-on: [TASK-390, TASK-391, TASK-387, TASK-382, TASK-383, TASK-392]
 
 ## Done when
 
-- [ ] A two-selector inventory (literal TODO.md + Plan/Backlog concepts) of evals/ exists, and every file in it is owned by TASK-390 / 391 / 387 / 382 / 383 or retargeted here.
-- [ ] Each retargeted harness has a v2 fixture that varies the selection, not only the verdict.
+- [x] A two-selector inventory (literal TODO.md + Plan/Backlog concepts) of evals/ exists, and every file in it is owned by TASK-390 / 391 / 387 / 382 / 383 or retargeted here. ✓ `2cf71b9` — 81 harnesses, A∪B 34, each dispositioned (SPRINT-111 log); the 8 v1-only ones FROZEN, not retargeted (owner lean ruling)
+- [x] Each retargeted harness has a v2 fixture that varies the selection, not only the verdict. ✓ vacuous by owner ruling (SPRINT-111 scope-change): nothing is retargeted, so no fixture is owed
 
 ## Touches
 

@@ -72,3 +72,15 @@ baseline) · T5→T4 (TECH-DEBT.md). The gate prints `QA-CHECK: 275 pass, 4 fail
 The four: prose-density and layers-observed both name `docs/epic/EPIC-016-…` (foreign WIP in the checkout, unstaged); `run-doc-caps-fixtures`
 case 8 timed out at 5.0s against a 5s limit (it passes alone: 1 pass, 0 fail, 5.02s); and the budget. None is this commit's.
 owner-ruling: bookkeeping-gate — overridden: four reds of known cause, none from this change; the full gate at raised budget runs at system-verify.
+
+### 2026-09-30 | progress | T2 (TASK-381) inventory + freeze, commit 2cf71b9, merged 404dfc6
+- Two-selector inventory of evals/ harnesses (fixtures excluded): total 81 · A (literal `TODO.md`) 16 · B (v1 concepts, `grep -F`) 33 ·
+  A∩B 15 · A∖B 1 · B∖A 18 · A∪B 34. Cross-check: 34 + 47 = 81, and a third route (`git ls-files | grep -v '^evals/fixtures/'`) = 81,
+  `cmp`-identical to the find list. A naive `grep -v fixtures` gave 27 because it drops every `run-*-fixtures.*` name (a wrong-selector trap).
+- Dispositions: FROZEN 8 · OWNED 382 ×3, 387 ×1, 390 ×2, 391 ×3, 392 ×2, 383 ×1 · T3-OWNS ×4 (sprint-family, s2-placement,
+  task-origin, conformance-engine TODOCAP) · V2-ALREADY ×7 · TEXT-ONLY ×1 · CURRENT-SHAPE ×3 (dispatch-preflight, v1-to-v2,
+  night-run-outcome). No READS-V1-UNOWNED file outside the frozen 8.
+- Freeze: a `# FROZEN — v1 historical coverage` header on 8 files; the 4 selftests left qa-check's `eval_harnesses_optin`. `sh -n` OK.
+  Stale doc mentions remain in evals/README.md (177 · 380–390 · 440–443) and docs/QA.md:48 → TASK-396's sweep.
+- Review: consequence · T2 · behaviour: none (headers + opt-in list) · governance: gate composition → a scoped review by the non-author
+  coordinator over the 9-file diff: CLEAR (in Layers only; the list edit removes exactly the 4 names). DoD 2/2 ticked; box 2 is vacuous by owner ruling.
