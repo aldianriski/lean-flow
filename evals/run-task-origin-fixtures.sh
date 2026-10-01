@@ -7,7 +7,7 @@
 # close-Retro follow-up and a /triage-converted bug both reach G1 having never been grilled, and
 # nothing distinguished them from a decomposer entry that had.
 #
-# The legacy TODO.md cases map to the three ways the field fails to do its job:
+# The three ways the field fails to do its job (each exercised against the store below):
 #   missing-origin  -- the state the old prose could not distinguish (unstamped reads as fine)
 #   invalid-origin  -- a plausible-looking value outside the vocabulary, e.g. someone writing
 #                      `origin: grilled` because it sounds like what G1 wants to know
@@ -18,10 +18,12 @@
 # G1's clause is the procedural half (what to do once the origin is known). Only the first is
 # checkable, and conflating them would make the suite claim more coverage than it has.
 #
-# POPULATION (owner ruling C, L-186): the checker now reads TWO sources -- every
-# docs/work/<folder>/TASK-NNN-*.md across all six status folders, PLUS TODO.md's own § Backlog
-# while it exists. The three legacy cases above exercise TODO.md; store-missing/store-invalid/
-# store-stamped below exercise the SAME three shapes against the store instead, and
+# POPULATION (owner ruling C, L-186; TODO.md retired, SPRINT-111 T3 / spec 0.13.0): the checker reads ONE
+# source -- every docs/work/<folder>/TASK-NNN-*.md across all six status folders. The legacy TODO.md
+# § Backlog population was RETIRED, not retargeted: the three fixtures under legacy-retired-* keep the
+# old must-FAIL TODO.md trees (missing / invalid origin) and now prove the retired branch NO LONGER
+# FIRES -- exit 0, a skip line, no legacy finding -- while store-missing/store-invalid/store-stamped
+# exercise the same three shapes against the store (the sibling controls that still redden), and
 # store-no-todo/store-other-folders vary the SELECTION (no TODO.md at all; a task outside todo/).
 #
 # Retained, never deleted with the scaffolding that built them (L-058, TD-012's lesson).
@@ -39,22 +41,18 @@ fx="$here/fixtures/task-origin"
 
 fail=0
 
-# --- legacy population: TODO.md § Backlog --------------------------------------------------------
-
-# --- case 1: no origin: at all -> FAIL -----------------------------------------------------------
-run_case_anywhere "missing-origin" 1 \
-  "TASK-800 (TODO.md: legacy backlog) declares no origin:" -- \
-  sh "$checker" "$fx/missing-origin"
-
-# --- case 2: origin outside the vocabulary -> FAIL -----------------------------------------------
-run_case_anywhere "invalid-origin" 1 \
-  "TASK-801 (TODO.md: legacy backlog) has origin: 'grilled', which is not one of:" -- \
-  sh "$checker" "$fx/invalid-origin"
-
-# --- case 3: stamped entries -> exit 0 (control) -------------------------------------------------
-run_case_anywhere "stamped" 0 \
-  "TASK-803 (TODO.md: legacy backlog) origin: triage-bug" -- \
-  sh "$checker" "$fx/stamped"
+# --- retired legacy population: TODO.md § Backlog (SPRINT-111 T3 / spec 0.13.0) -------------------
+# A leftover TODO.md with an UNSTAMPED or INVALID entry used to FAIL. It must now exit 0, print the
+# no-entries skip (the store is empty here), and name no legacy finding. A retired branch that still
+# fired would print "(TODO.md: legacy backlog)" or exit 1.
+for c in missing-origin invalid-origin stamped; do
+  out=$(sh "$checker" "$fx/$c" 2>&1); rc=$?
+  case "$rc:$out" in
+    0:*"legacy backlog"*) echo "FAIL fixture(legacy-retired-$c): exit 0 but a legacy-backlog line was printed -- got: $out"; fail=1 ;;
+    0:*"skip (no task entries in docs/work/)"*) echo "PASS fixture(legacy-retired-$c): TODO.md ignored -- exit 0, skip line, no legacy finding" ;;
+    *) echo "FAIL fixture(legacy-retired-$c): expected exit 0 + skip line, got exit $rc -- $out"; fail=1 ;;
+  esac
+done
 
 # --- store population: docs/work/<folder>/TASK-NNN-*.md -------------------------------------------
 
@@ -115,16 +113,24 @@ case "$out" in
     ;;
 esac
 
-# --- case 9 (both populations at once, control): a store task AND a legacy TODO.md task, both
-# valid -> exit 0. Proves the two populations combine (union), neither shadowing the other.
-run_case_anywhere "store-and-todo-both-valid" 0 \
+# --- case 9 (retired branch, must stay silent beside a live store): a store task with a valid origin AND
+# a legacy TODO.md task with NO origin -> exit 0. Before the retirement the legacy side FAILed; the
+# store-side PASS line proves the store was still examined (the sibling control is store-missing above).
+run_case_anywhere "store-and-todo-store-side" 0 \
   "TASK-910 (store: docs/work/todo/) origin: manual" -- \
   sh "$checker" "$fx/store-and-todo"
-run_case_anywhere "store-and-todo-both-valid-legacy-side" 0 \
-  "TASK-911 (TODO.md: legacy backlog) origin: decomposer" -- \
-  sh "$checker" "$fx/store-and-todo"
+out=$(sh "$checker" "$fx/store-and-todo" 2>&1)
+case "$out" in
+  *"TASK-911"*|*"legacy backlog"*)
+    echo "FAIL fixture(store-and-todo-legacy-silent): the retired TODO.md population fired -- got: $out"
+    fail=1
+    ;;
+  *)
+    echo "PASS fixture(store-and-todo-legacy-silent): unstamped TODO.md entry produced no finding"
+    ;;
+esac
 
-min_tests=15
+min_tests=11
 n_run=$(grep -c '^run_case_anywhere' "$0")
 if [ "$n_run" -lt "$min_tests" ]; then
   echo "FAIL harness: only $n_run case(s) wired in this file, expected at least $min_tests -- coverage SHRANK"

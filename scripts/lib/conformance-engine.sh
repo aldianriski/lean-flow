@@ -1156,7 +1156,8 @@ _own_docs() {
   r=$1
   _own_off=$(_own_governed_off "$r")
   _OWN_DOCS_CACHE=$({
-    for c in TODO.md TECH-DEBT.md CHANGELOG.md CONTRIBUTING.md SECURITY.md \
+    # TODO.md left this list when it was retired (SPRINT-111 T3 / spec 0.13.0): its ownership header is no longer read.
+    for c in TECH-DEBT.md CHANGELOG.md CONTRIBUTING.md SECURITY.md \
              CLAUDE.md CONTEXT.md .claude/CLAUDE.md .claude/CONTEXT.md; do
       [ -f "$r/$c" ] && printf '%s\n' "$c"
     done
@@ -2511,7 +2512,7 @@ $(cat "$repo/$log")"
 # built to the shape its author already has in mind, and real input is not.
 #
 # Every threshold is READ FROM THE SPEC, never written here -- the retention delay from §11's own
-# S11.TDDELETE row, the TODO cap from §2's row, the collapse-exception markers from §11's exception
+# S11.TDDELETE row, the collapse-exception markers from §11's exception
 # clause. A figure a checker hard-codes is a second SSOT that drifts from the row it copied the
 # moment the standard moves (L-097 - L-130).
 #
@@ -2602,28 +2603,12 @@ assert_S11_TDDELETE() {
   [ "$n_over" -eq 0 ] && ok "S11.TDDELETE        -- no resolved TECH-DEBT row has reached §11's $thr-sprint deletion trigger (current SPRINT-$cur)"
 }
 
+# assert_S11_TODOCAP -- RETIRED NO-OP (TODO.md retired, SPRINT-111 T3 / spec 0.13.0). The id, level and mark stay
+# in §11 because ADR-034 freezes the rule-ID surface at 100; only the READER is gone. It takes no path and
+# touches no file -- a leftover TODO.md is never opened, sized or read -- and emits a note, so the rule stays
+# dispatched and the coverage line (45 of 51 checkable) stays honest.
 assert_S11_TODOCAP() {
-  repo=$1
-  f="$repo/TODO.md"
-  [ -f "$f" ] || { note "S11.TODOCAP         -- no TODO.md -- §2 makes it substrate-conditional, so its absence is not a breach"; return; }
-  # Column 4: TODO.md sits in §2's ROOT table, which has no Tier column, so its Cap is one cell left
-  # of a docs-tree row's. Read as a LEADING integer, because this cell reads "320 soft (ADR-019)" and
-  # taking every digit in it yields 320019 -- L-130's shape, inside a parser.
-  cap=$(_s2_cap_for "$spec" "TODO.md" 4)
-  [ -n "$cap" ] || { bad "spec-table-unreadable: §2 states no numeric cap for TODO.md, so 'over its cap' has nothing to compare against"; return; }
-  n=$(awk 'END{print NR}' "$f")
-  if [ "$n" -gt "$cap" ]; then
-    if _is_v2 "$repo"; then
-      # Owner ruling R2 (SPRINT-110 T3): on a tree that has the store, TODO.md is the retired v1 layout
-      # (STANDARD 0.12.0). This rule fires only while the file exists, and its remedy is to migrate --
-      # not to prune a file whose whole row §11 has retired. It goes with TODO.md (TASK-380).
-      bad "todo-over-cap-at-promote: TODO.md is $n lines against §2's cap of $cap -- TODO.md is the retired v1 layout on a tree that has docs/work/; run \`/lean-doc-generator migrate\` to convert it into the store, which deletes the file and this finding with it"
-    else
-      bad "todo-over-cap-at-promote: TODO.md is $n lines against §2's cap of $cap -- §11 flags this in the promote governance review and prunes it with the user, never silently"
-    fi
-  else
-    ok "S11.TODOCAP         -- TODO.md is $n lines, within §2's cap of $cap"
-  fi
+  note "S11.TODOCAP         -- retired no-op since spec 0.13.0: TODO.md is not a v2 file, so nothing measures it (the id is kept, ADR-034)"
 }
 
 assert_S11_LEARNINGS() {
@@ -2680,14 +2665,12 @@ assert_S11_LEARNINGS() {
   fi
 }
 
-# assert_S11_BACKLOG -- on a v1 tree (no docs/work/) exactly the TODO.md breadcrumb scan below. On a tree
-# with the store it is §11's `done/`/`cancel/` prune (`_s11_backlog_store`); the breadcrumb half then
-# applies only while TODO.md still exists (retired at 0.12.0, deleted by TASK-380).
+# assert_S11_BACKLOG -- §11's `done/`/`cancel/` prune (`_s11_backlog_store`) on a tree with the store. The
+# v1 TODO.md breadcrumb scan (`_s11_backlog_todo`) was retired (TODO.md retired, SPRINT-111 T3 / spec 0.13.0):
+# a tree without docs/work/ now has nothing here to prune, and says so rather than passing.
 assert_S11_BACKLOG() {
   repo=$1
-  if ! _is_v2 "$repo"; then _s11_backlog_todo "$repo"; return; fi
-  [ -f "$repo/TODO.md" ] && _s11_backlog_todo "$repo"
-  [ "$last_bad" -eq 1 ] && return
+  if ! _is_v2 "$repo"; then note "S11.BACKLOG         -- no docs/work/ store -- nothing to prune (the v1 TODO.md breadcrumb scan was retired at spec 0.13.0)"; return; fi
   _s11_backlog_store "$repo"
 }
 
@@ -2738,33 +2721,6 @@ _s11_backlog_store() {
     n_over=$((n_over + 1))
   done
   [ "$n_over" -eq 0 ] && ok "S11.BACKLOG         -- no done/ or cancel/ task file has reached §11's $thr-sprint prune trigger (current SPRINT-$cur)$([ "$n_unjudged" -gt 0 ] && printf '; %s carry no sprint: stamp, so their age is judged from history and not here' "$n_unjudged")"
-}
-
-_s11_backlog_todo() {
-  repo=$1
-  f="$repo/TODO.md"
-  [ -f "$f" ] || { note "S11.BACKLOG         -- no TODO.md -- there is no Backlog to retain anything in"; return; }
-  # SPLIT rule: whether an entry counts as "shipped/promoted" is judged, and this half does not judge
-  # it. The MECHANICAL half is §11's own words -- "no shipped-in-SPRINT breadcrumb comments left in
-  # TODO.md" -- so what is detected is the BREADCRUMB: a line ANNOUNCING the shipping, not a task that
-  # merely cites a sprint. Anchored to a list item or an HTML comment and scoped to § Backlog, because
-  # § Active Sprint names a sprint on every healthy repo and task bodies quote sprint ids constantly.
-  # An unanchored corpus grep would report this file's prose about itself (L-108).
-  out=$(awk '
-    /^## / { inb = ($0 ~ /Backlog/); next }
-    !inb { next }
-    /^[ \t]*(-|<!--)/ {
-      low = tolower($0)
-      if (low ~ /shipped|delivered/ && low ~ /sprint-[0-9]/) printf "%d\n", NR
-    }
-  ' "$f")
-  if [ -n "$out" ]; then
-    for l in $out; do
-      bad "shipped-backlog-entry-retained: TODO.md:$l is a shipped-in-SPRINT breadcrumb left in § Backlog -- §11 removes a shipped entry outright (propose→approve); its durable homes are root CHANGELOG.md and docs/sprint/archive/, so a pointer left here is a breadcrumb rather than a record"
-    done
-  else
-    ok "S11.BACKLOG         -- § Backlog carries no shipped-in-SPRINT breadcrumb (the mechanical half; whether an entry is shipped stays judged)"
-  fi
 }
 
 # ==================================================================================================

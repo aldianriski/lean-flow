@@ -475,38 +475,47 @@ else
   fi
 fi
 
-# --- S11.TODOCAP: over §2's cap for TODO.md -----------------------------------------------------
-# The cap is read from §2's ROOT-table row, whose cell says "320 soft (ADR-019)". Padding to a size
-# that clears whatever that row says, rather than to a number written here (L-146: a fixture that
-# restates a value the spec owns decays the moment the spec moves).
+# --- S11.TODOCAP RETIRED (TODO.md retired, SPRINT-111 T3 / spec 0.13.0) ---------------------------
+# Was: over §2's cap for TODO.md -> `todo-over-cap-at-promote`. The rule id left §11, so a tree with an
+# over-cap TODO.md must now read NOTHING from it. Padding clears whatever §2's TODO.md row says, rather
+# than a number written here (L-146).
 d="$work/todocap"; mkdir -p "$d"; ledger_repo "$d"
 i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
-assert_finding "s11-todo-over-cap" "$d" "todo-over-cap-at-promote"
+assert_absent "s11-todo-over-cap-retired" "$d" "todo-over-cap-at-promote"
+# The id is KEPT (ADR-034 freezes the rule-ID surface at 100), so the rule stays dispatched: on an over-cap
+# TODO.md it must emit its retirement NOTE and no finding. With the row present these two assert_absent cases
+# are load-bearing -- a reinstated reader would print todo-over-cap-at-promote here.
+_o=$(sh "$engine" "$d" --spec "$spec" 2>&1)
+if printf '%s\n' "$_o" | grep -F "S11.TODOCAP" | grep -qF "retired no-op" && ! printf '%s\n' "$_o" | grep -E '^(FAIL|GAP) .*S11\.TODOCAP'; then
+  echo "PASS fixture(s11-todocap-note-only): S11.TODOCAP is dispatched, emits its retirement note, and no FAIL/GAP line names it"
+else
+  echo "FAIL fixture(s11-todocap-note-only): expected a 'retired no-op' note and no FAIL/GAP for S11.TODOCAP -- got: $(printf '%s\n' "$_o" | grep -F 'S11.TODOCAP')"
+  fail=1
+fi
+# The stub reads nothing: its body (up to its closing brace) is ONE `note "..."` line whose text carries no
+# `$` or backtick, so there is no variable, argument, command substitution, redirect or second statement
+# that could open, size or read TODO.md. Extracted from the shipped engine, never re-typed.
+_body=$(awk '/^assert_S11_TODOCAP\(\) \{/ {f=1; next} f && /^\}/ {exit} f' "$engine")
+_rest=$(printf '%s\n' "$_body" | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*note "[^$`]*"[[:space:]]*$')
+if [ -z "$_body" ]; then
+  echo "FAIL fixture(s11-todocap-stub-reads-nothing): assert_S11_TODOCAP body not found in the engine -- the extraction is vacuous"
+  fail=1
+elif [ -n "$_rest" ]; then
+  echo "FAIL fixture(s11-todocap-stub-reads-nothing): the stub does more than emit one literal note and could read TODO.md -- extra: $_rest"
+  fail=1
+else
+  echo "PASS fixture(s11-todocap-stub-reads-nothing): the stub body is a single literal note, no variable or file operation"
+fi
 
-d="$work/todocap-ok"; mkdir -p "$d"; ledger_repo "$d"
-assert_absent "s11-todo-over-cap-control" "$d" "todo-over-cap-at-promote"
-
-# --- S11.BACKLOG: a shipped-in-SPRINT breadcrumb left in § Backlog -------------------------------
+# --- S11.BACKLOG: the v1 TODO.md breadcrumb scan is RETIRED (SPRINT-111 T3 / spec 0.13.0) -------------
+# Was: a shipped-in-SPRINT breadcrumb left in TODO.md § Backlog -> `shipped-backlog-entry-retained`.
+# A v1 tree (no docs/work/) now names the retirement and prunes nothing; the store half (below, the
+# v2-closed-task-past-retention cases) is the sibling that still reddens.
 d="$work/backlog"; mkdir -p "$d"; ledger_repo "$d"
 printf -- '- ~~TASK-002~~ --- shipped in SPRINT-880, kept here for reference\n' >> "$d/TODO.md"
-assert_finding "s11-shipped-backlog-retained" "$d" "shipped-backlog-entry-retained"
+assert_absent "s11-shipped-backlog-retired" "$d" "shipped-backlog-entry-retained"
+assert_finding "s11-backlog-v1-names-the-retirement" "$d" "no docs/work/ store -- nothing to prune"
 
-# Control, and the load-bearing one: § Active Sprint names a sprint on EVERY healthy repo, and task
-# bodies cite sprint ids constantly. An unanchored corpus grep would report both. ledger_repo already
-# carries the pointer; this adds a task that cites a sprint in its own body.
-d="$work/backlog-ok"; mkdir -p "$d"; ledger_repo "$d"
-printf -- '      tracker:    SPRINT-870 --- the design this task implements was shipped there\n' >> "$d/TODO.md"
-# ...and a § Changelog release note, which is where a shipped line legitimately lives. Without
-# this line the control passes VACUOUSLY: every other candidate sits inside § Backlog already,
-# so deleting the section scoping changes no verdict and the scoping goes untested. Caught by
-# seeding exactly that break and watching the case stay GREEN -- a break that does not redden
-# its case has tested nothing (L-142).
-printf -- '
-## Changelog (current sprint only)
-
-- shipped TASK-002 in SPRINT-880 --- the release note, in its own section
-' >> "$d/TODO.md"
-assert_absent "s11-shipped-backlog-retained-control" "$d" "shipped-backlog-entry-retained"
 
 # --- S11.LEARNINGS: a promoted entry still carrying its body, with no exception recorded ---------
 learn_entry() {  # <dir> <heading-tail> [body-lines...]
@@ -902,20 +911,12 @@ assert_finding "v2-retro-bucket-names-the-store" "$work/v2-close-nothing" "an ad
 v2_closed "$work/v2-close-edits" close_edits_backlog
 assert_finding "v2-retro-bucket-unrouted-edit-is-not-add" "$work/v2-close-edits" "retro-bucket-unrouted"
 
-# --- S11.TODOCAP: fires only while TODO.md exists; on a store tree it points at migrate (R2) ---------
+# --- S11.TODOCAP retired on a STORE tree too (SPRINT-111 T3): an over-cap TODO.md beside docs/work/ no longer
+# points at migrate -- it is not read at all. (SELECTION: the other layout arm, v2, from the v1 case above.)
 d="$work/v2-todocap"; mkdir -p "$d"; ledger_repo "$d"; mkdir -p "$d/docs/work/backlog"
 printf -- '---\nid: TASK-001\ntitle: "t"\n---\n\n## Done when\n\n- [ ] z\n' > "$d/docs/work/backlog/TASK-001-t.md"
 i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
-assert_finding "v2-todo-over-cap" "$d" "todo-over-cap-at-promote"
-assert_finding "v2-todo-over-cap-points-at-migrate" "$d" "/lean-doc-generator migrate"
-d="$work/v2-todocap-gone"; mkdir -p "$d"; ledger_repo "$d"; mkdir -p "$d/docs/work/backlog"
-printf -- '---\nid: TASK-001\ntitle: "t"\n---\n\n## Done when\n\n- [ ] z\n' > "$d/docs/work/backlog/TASK-001-t.md"
-rm -f "$d/TODO.md"
-assert_absent "v2-todo-over-cap-control-no-todo" "$d" "todo-over-cap-at-promote"
-# v1 parity: the same over-cap TODO.md on a tree WITHOUT the store keeps its original wording.
-d="$work/v1-todocap"; mkdir -p "$d"; ledger_repo "$d"
-i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
-assert_finding "v1-todo-over-cap-message-unchanged" "$d" "prunes it with the user, never silently"
+assert_absent "v2-todo-over-cap-retired" "$d" "todo-over-cap-at-promote"
 
 # --- S11.BACKLOG: the done/ · cancel/ prune (§11 store row) ------------------------------------------
 # v2_old_task <dir> <folder> <id> <sprint-field> -- a closed task file. Sprint 901 is current, so a

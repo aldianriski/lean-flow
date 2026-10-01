@@ -972,8 +972,8 @@ HARNESS_TAIL
 # line per family this leg cares about: gates-signed (gating), S13.<ID> (gating, letters only --
 # `[A-Z]+` has no digit arm, so the id below must not carry one), a GAP (rule-unimplemented, already
 # its own token, untouched by this task), two informational FAIL findings using the exact finding
-# names TD-146's own Evidence recorded (`file-outside-canonical-placement`, `todo-over-cap-at-
-# promote`) plus one informational PASS -- proving PASS lines are deliberately left alone (only the
+# names TD-146's own Evidence recorded (`file-outside-canonical-placement`, and `todo-over-cap-at-
+# promote`, retired at SPRINT-111 T3, so `resolved-td-row-past-retention` stands in) plus one informational PASS -- proving PASS lines are deliberately left alone (only the
 # uncounted FAIL is the defect T4 fixes; an uncounted PASS cannot masquerade as a hidden regression)
 # -- and a `conformance: ...` FAIL, the engine's OWN setup/usage-failure shape (bad()'s
 # `S[0-9]*|conformance:*` case, conformance-engine.sh lines 173/174/183/188): it means the engine
@@ -991,7 +991,7 @@ printf 'FAIL  S13.ATTESTBAD -- bad\n'
 printf 'GAP   S9.SOMEGAP -- rule-unimplemented: engine has no assertion yet\n'
 printf 'PASS  S9.SCOPECHANGE -- informational pass, not folded\n'
 printf 'FAIL  file-outside-canonical-placement: docs/foo.md\n'
-printf 'FAIL  todo-over-cap-at-promote: TODO.md\n'
+printf 'FAIL  resolved-td-row-past-retention: TECH-DEBT.md\n'
 printf 'FAIL  conformance: reader-missing -- read-spec-rules.sh not found beside this script\n'
 printf '      coverage: 3 checkable rule(s) have an assertion; 1 are unchecked\n'
 exit 1
@@ -1003,8 +1003,8 @@ out=$(run_leg2fter)
 # assertion, never folded into this leg's tally -- no longer prints the same `FAIL ` prefix as a
 # gating one. It must print as INFO, and the literal `FAIL ` form of the SAME finding must be absent.
 if printf '%s\n' "$out" | grep -qE '^INFO  file-outside-canonical-placement:' &&
-   printf '%s\n' "$out" | grep -qE '^INFO  todo-over-cap-at-promote:' &&
-   ! printf '%s\n' "$out" | grep -qE '^FAIL  (file-outside-canonical-placement|todo-over-cap-at-promote):'; then
+   printf '%s\n' "$out" | grep -qE '^INFO  resolved-td-row-past-retention:' &&
+   ! printf '%s\n' "$out" | grep -qE '^FAIL  (file-outside-canonical-placement|resolved-td-row-past-retention):'; then
   echo "PASS fixture(ce-relay-informational-fail-prints-info): both informational FAIL findings print as INFO, never FAIL"
 else
   echo "FAIL fixture(ce-relay-informational-fail-prints-info): expected INFO, not FAIL, for the uncounted findings -- output:"

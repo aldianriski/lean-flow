@@ -209,6 +209,21 @@ d="$work/store-outside"; mk_store "$d"; printf '# a task-shaped doc elsewhere\n'
 run_case_anywhere "task-named-file-outside-the-store-still-checked" 1 "ownership-header-missing: docs/TASK-003-elsewhere.md" -- \
   sh "$engine" "$d" --spec "$own_spec"
 
+# --- TODO.md retired from the governed set (SPRINT-111 T3 / spec 0.13.0) ----------------------------
+# A leftover v1 root TODO.md with NO ownership header used to raise ownership-header-missing: TODO.md. It is
+# no longer read: the same clean tree plus that file must still report exactly one governed doc and exit 0.
+# The sibling control is header-missing-fires above (a headerless doc elsewhere still reddens).
+d="$work/todo-retired"; mkdir -p "$d"; cp -R "$fx/clean/." "$d/"; printf '# TODO
+
+## Backlog
+' > "$d/TODO.md"
+[ -f "$d/TODO.md" ] || { echo "FAIL harness: the todo-retired seed was not built"; exit 2; }
+run_case_anywhere "todo-md-no-longer-governed" 0 "all 1 doc(s) carry a complete ownership header" --   sh "$engine" "$d" --spec "$own_spec"
+case $(sh "$engine" "$d" --spec "$own_spec" 2>&1) in
+  *"TODO.md"*) echo "FAIL fixture(todo-md-no-longer-governed-silent): a finding names TODO.md"; fail=1 ;;
+  *) echo "PASS fixture(todo-md-no-longer-governed-silent): nothing names TODO.md" ;;
+esac
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "OWNERSHIP-HEADER FIXTURES: all green"

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,28 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.13.0 — 2026-10-01
+
+**MINOR (§15) — `S11.TODOCAP` becomes a retired no-op; the rule surface does not move.** §15's mechanical
+test asks whether any verdict changes from pass to fail over an unchanged repository: none does (an
+over-cap `TODO.md` goes from a finding to a note, which is fail → pass), no id is removed or renumbered,
+and no rule is tightened — so not MAJOR. It is more than PATCH because one rule's meaning does move (it
+stops measuring anything). MINOR clause applied: a change whose findings bind nothing a repository has
+already cleared. The owner kept the id rather than amend ADR-034, which freezes the rule-ID surface at 100.
+
+- **§11** keeps the `S11.TODOCAP` row — id, level (Structural) and mark (mechanical) **unchanged** — and
+  rewords its text: `TODO.md` is not a v2 file, nothing measures it, the engine emits a note. §11 still
+  states 11 rules; §14's counts stay **100 classified · 51 checkable**.
+- **§2** and the §11 whole-file row say nothing measures the `TODO.md` cap any more; the §2 cap cell stays.
+- **Engine, same release:** the other v1 `TODO.md` readers go — `S11.BACKLOG`'s breadcrumb scan (its store
+  half stays), the ownership read of `TODO.md` in the `S3.SCHEMA` doc set, `check-task-origin`'s legacy
+  population, and qa-check legs 3 (the `TODO.md` subject), 5, 7 and 8. Retired, not retargeted.
+
+**Verdict movement.** A repository carrying an over-cap `TODO.md` stops reading `todo-over-cap-at-promote`
+and reads a note; a v1 tree stops reading `shipped-backlog-entry-retained`. No verdict moves from pass to
+fail. `read-spec-rules.sh --reconcile` still reconciles to 100, and the frozen
+`evals/fixtures/compat/rule-ids-v0.10.0.txt` surface is unchanged.
 
 ## 0.12.0 — 2026-09-28
 
