@@ -4,9 +4,11 @@
 //
 // WHAT IT COVERS. (1) scripts/lib/sprint-members-cli.ts, the argv wrapper over resolveMembers that the
 // shell gates call (qa-check.sh leg 2g / leg 7, night-run.sh reap(), T3's conformance engine).
-// (2) qa-check.sh legs 3 / 5 / 7 / 8, which had NO harness: their subject is TODO.md, so they apply
-// only while TODO.md exists and skip with a named NOTE otherwise; leg 7 reads the active sprint from
-// the sprint FILES once docs/work/ exists. reap() and leg 2g cases live in the existing reap/rollup
+// (2) qa-check.sh leg 3 (ownership fields) and the RETIRED legs 5 / 7 / 8. Their subject was TODO.md
+// (breadcrumb lint, TD aging, tracker: lint, plus TODO.md as one subject of leg 3); SPRINT-111 T3
+// retired them rather than retargeting them, so the cases that proved them now prove they NO LONGER
+// FIRE on a tree that still carries every shape they used to reject, and leg 3's other subjects
+// are the sibling controls that still redden. reap() and leg 2g cases live in the existing reap/rollup
 // harnesses, not here.
 //
 // HOW A LEG IS RUN. The leg body is EXTRACTED from the real scripts/qa-check.sh at run time (between
@@ -18,7 +20,7 @@
 //     a member reached ONLY by its `sprint:` stamp, a shared-prefix id (TASK-9710 vs TASK-971), a Tn
 //     citing two members, a Tn citing no current member, a box outside `## Done when`, a box in a fence.
 //   active sprints: an archived and a log file both carry `status: active` and must not count; two
-//     active sprint files (the highest wins); a stale TODO.md pointer that would give a different verdict.
+//     active sprint files (the highest wins) (the TODO.md pointer that once competed with them was retired, SPRINT-111 T3).
 
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -201,7 +203,7 @@ function v2(): string {
   check("cli active: only top-level docs/sprint/SPRINT-*.md with status: active (archive, logs, closed excluded)", x.code === 0 && x.out === "110\n112\n", JSON.stringify(x.out));
 }
 
-// ================= (2) qa-check.sh legs 3 / 5 / 7 / 8 =================
+// ================= (2) qa-check.sh leg 3, and the retired legs 5 / 7 / 8 =================
 const qaText = readFileSync(QA, "utf8").replace(/\r\n/g, "\n");
 function legBody(n: string): string {
   const lines = qaText.split("\n");
@@ -228,93 +230,50 @@ function leg(n: string, cwd: string) {
   return r;
 }
 const summary = (o: string) => o.match(/LEG-SUMMARY pass=(\d+) fail=(\d+)/)?.slice(1).map(Number) ?? [-1, -1];
-const legs = ["3", "5", "7", "8"];
+// leg 3 is run on its own; "6" is the region leg 6 + 6b, which now ends at leg 9's marker and therefore
+// contains the retired legs 5 / 7 / 8's tombstones (comments only) -- the region the retired legs sat beside.
+const legs = ["3", "6"];
 for (const n of legs) check(`leg ${n}: marker present in qa-check.sh (extraction is not vacuous)`, legBody(n).length > 100);
 
 const OWN = "---\nowner: M\nlast_updated: 2026-09-29\nstatus: current\n---\n\n";
 const SKILL = { "skills/x/SKILL.md": "---\nname: x\ndescription: d\n---\n" };
-const ACTIVE = (n: number) => `---\nsprint: ${n}\nstatus: active\n---\n`;
-const ptr = (n: number) => `## Active Sprint\n\n> **SPRINT-${n} — x** → docs/sprint/SPRINT-${n}-x.md\n\n## Backlog\n`;
-const td = (n: number, extra = "") => `- **TD-900** severity: low | status: open | created: Sprint-${n}${extra}\n`;
-const NO_TODO_NOTE = /skip: TODO\.md absent .*retired with TODO\.md \(TASK-380\)/;
+const base = { ...SKILL, "README.md": "<sub>Doc owner: M · last updated 2026-09-29 · status: current v1.2.3</sub>\n" };
 
-// --- leg 5 (breadcrumb comments in TODO.md)
+// --- retired legs 5 / 7 / 8: static, then behavioural
 {
-  let d = tree({ "TODO.md": OWN + "<!-- shipped in SPRINT-3 -->\n" });
-  let x = leg("5", d);
-  check("leg 5 must-FAIL: TODO.md carries a shipped-task breadcrumb comment -> FAIL 'TODO.md hygiene: breadcrumb'", /^FAIL  TODO\.md hygiene: breadcrumb/m.test(x.out) && summary(x.out)[1] === 1, x.out);
-  d = tree({ "TODO.md": OWN + "live prose mentions SPRINT-3 and CHANGELOG, not in a comment\n" });
-  x = leg("5", d);
-  check("leg 5 control: same words outside an HTML comment -> PASS", summary(x.out)[0] === 1 && summary(x.out)[1] === 0, x.out);
-  d = tree({ "docs/work/todo/.gitkeep": "" });
-  x = leg("5", d);
-  check("leg 5 selection: no TODO.md (v2) -> no verdict, a NOTE naming why", summary(x.out).join() === "0,0" && NO_TODO_NOTE.test(x.out), x.out);
+  const code = qaText.split("\n").filter((l) => !l.trim().startsWith("#"));
+  check("retired legs: no non-comment line of qa-check.sh names TODO.md (no reader left, in any leg)", code.filter((l) => /TODO\.md/.test(l)).length === 0, code.filter((l) => /TODO\.md/.test(l)).join("\n"));
+  check("retired legs: no qb_checkpoint marker for leg 5 / 7 / 8 remains", !/^qb_checkpoint "leg [578]:/m.test(qaText));
+  // A tree carrying EVERY shape those legs used to reject: a breadcrumb comment (5), a stale open TD row against
+  // an Active Sprint pointer (7), a (temp) tracker and a bare verdict-*.md tracker (8). Run over the region the
+  // legs sat in: nothing may name TODO.md or TD aging.
+  const legacy = OWN + "## Active Sprint\n\n> **SPRINT-110 — x** → docs/sprint/SPRINT-110-x.md\n\n## Backlog\n\n<!-- shipped in SPRINT-3 -->\n"
+    + "- **TD-900** severity: low | status: open | created: Sprint-100\n  tracker: docs/research/x.md (temp)\n  tracker: verdict-foo.md\n";
+  const pj = { ".claude-plugin/plugin.json": '{ "version": "1.2.3" }\n' };
+  let d = tree({ ...base, ...pj, "TODO.md": legacy, "docs/work/todo/.gitkeep": "", "docs/sprint/SPRINT-110-x.md": "---\nsprint: 110\nstatus: active\n---\n" });
+  let x = leg("6", d);
+  check("retired legs 5/7/8: a tree with a breadcrumb, a stale TD row and bad trackers yields no TODO.md / TD aging / tracker finding",
+    !/TODO\.md|TD aging|tracker/i.test(x.out), x.out);
+  check("retired legs 5/7/8 control: the same region still ran (leg 6's README footer PASS is present, so the silence is not an empty extraction)",
+    /^PASS  README footer version \(1\.2\.3 = plugin\.json 1\.2\.3\)/m.test(x.out), x.out);
+  d = tree({ ...base, ...pj, "README.md": "<sub>Doc owner: M · last updated 2026-09-29 · status: current v9.9.9</sub>\n", "TODO.md": legacy });
+  x = leg("6", d);
+  check("retired legs sibling control: the surviving leg in that region still reddens (footer 9.9.9 vs plugin.json 1.2.3 -> FAIL README footer version)",
+    /^FAIL  README footer version/m.test(x.out), x.out);
 }
-// --- leg 8 (tracker: lint over TODO.md)
+// --- leg 3 (ownership fields; TODO.md was one subject of many and is retired from the list)
 {
-  let d = tree({ "TODO.md": OWN + "  tracker: docs/research/x.md (temp)\n" });
-  let x = leg("8", d);
-  check("leg 8 must-FAIL: a `(temp)` tracker line -> FAIL 'TODO.md trackers' naming temp", /^FAIL  TODO\.md trackers: .*temp/m.test(x.out), x.out);
-  d = tree({ "TODO.md": OWN + "  tracker: verdict-foo.md\n" });
-  x = leg("8", d);
-  check("leg 8 must-FAIL: a bare verdict-*.md tracker -> FAIL naming bare-verdict", /^FAIL  TODO\.md trackers: .*bare-verdict/m.test(x.out), x.out);
-  d = tree({ "TODO.md": OWN + "  tracker: docs/research/verdict-foo.md\n" });
-  x = leg("8", d);
-  check("leg 8 control: a pathed verdict ref -> PASS", summary(x.out).join() === "1,0", x.out);
-  d = tree({ "docs/work/todo/.gitkeep": "" });
-  x = leg("8", d);
-  check("leg 8 selection: no TODO.md -> no verdict, a NOTE naming why", summary(x.out).join() === "0,0" && NO_TODO_NOTE.test(x.out), x.out);
-}
-// --- leg 3 (ownership fields; TODO.md is one subject of many)
-{
-  const base = { ...SKILL, "README.md": "<sub>Doc owner: M · last updated 2026-09-29 · status: current</sub>\n" };
-  let d = tree({ ...base, "TODO.md": "---\nowner: M\nstatus: current\n---\n" });
+  let d = tree({ ...base, ".claude/CLAUDE.md": "---\nowner: M\nstatus: current\n---\n" });
   let x = leg("3", d);
-  check("leg 3 must-FAIL: TODO.md lacks last_updated -> FAIL 'ownership TODO.md'", /^FAIL  ownership TODO\.md/m.test(x.out) && summary(x.out)[1] === 1, x.out);
-  d = tree({ ...base, "TODO.md": OWN });
+  check("leg 3 must-FAIL: .claude/CLAUDE.md lacks last_updated -> FAIL 'ownership .claude/CLAUDE.md'", /^FAIL  ownership \.claude\/CLAUDE\.md/m.test(x.out) && summary(x.out)[1] === 1, x.out);
+  d = tree({ ...base, ".claude/CLAUDE.md": OWN });
   x = leg("3", d);
-  check("leg 3 control: TODO.md carries all three fields -> PASS", /^PASS  ownership TODO\.md/m.test(x.out) && summary(x.out)[1] === 0, x.out);
-  d = tree({ ...base, "docs/work/todo/.gitkeep": "" });
+  check("leg 3 control: .claude/CLAUDE.md carries all three fields -> PASS", /^PASS  ownership \.claude\/CLAUDE\.md/m.test(x.out) && summary(x.out)[1] === 0, x.out);
+  // retired subject: a TODO.md with NO ownership fields, beside a conformant CLAUDE.md. Must be neither FAIL, PASS, nor skip-NOTE.
+  d = tree({ ...base, ".claude/CLAUDE.md": OWN, "TODO.md": "---\nowner: M\nstatus: current\n---\n" });
   x = leg("3", d);
-  check("leg 3 selection: no TODO.md -> NOTE naming why, still no FAIL from the other subjects", NO_TODO_NOTE.test(x.out) && summary(x.out)[1] === 0, x.out);
-}
-// --- leg 7 (TD aging against the active sprint)
-{
-  const v2files = (extra: Record<string, string>) => ({ "docs/work/todo/.gitkeep": "", ...extra });
-  // must-FAIL, selection: TODO.md's pointer is STALE (105 -> age 1, would pass); the sprint file says 110 -> age 4.
-  let d = tree(v2files({ "TODO.md": OWN + ptr(105) + td(106), "docs/sprint/SPRINT-110-x.md": ACTIVE(110) }));
-  let x = leg("7", d);
-  check("leg 7 must-FAIL (v2): active sprint derived from the sprint file (110), not the stale TODO.md pointer (105) -> stale TD-900 named", /^FAIL  TD aging: .*TD-900/m.test(x.out), x.out);
-  // control: a row young against 110 stays green
-  d = tree(v2files({ "TODO.md": OWN + ptr(105) + td(108), "docs/sprint/SPRINT-110-x.md": ACTIVE(110) }));
-  x = leg("7", d);
-  check("leg 7 control (v2): a row 2 sprints behind the derived active sprint -> PASS", summary(x.out).join() === "1,0", x.out);
-  // selection: archived / log files claiming status: active are not the active sprint
-  d = tree(v2files({ "TODO.md": OWN + td(108), "docs/sprint/SPRINT-110-x.md": ACTIVE(110), "docs/sprint/archive/SPRINT-300-y.md": ACTIVE(300), "docs/sprint/logs/SPRINT-301-z.md": ACTIVE(301) }));
-  x = leg("7", d);
-  check("leg 7 selection (v2): archive/ and logs/ files with status: active are ignored (else 300 would age the row out)", summary(x.out).join() === "1,0", x.out);
-  // selection: two active sprints -> the most advanced one is the reference
-  d = tree(v2files({ "TODO.md": OWN + td(108), "docs/sprint/SPRINT-110-x.md": ACTIVE(110), "docs/sprint/SPRINT-112-y.md": ACTIVE(112) }));
-  x = leg("7", d);
-  check("leg 7 selection (v2): two active sprint files -> the highest (112) is the reference; row created at 108 is stale", /^FAIL  TD aging: .*TD-900/m.test(x.out), x.out);
-  // v2 with no active sprint file: no reference point, named skip, never a silent pass
-  d = tree(v2files({ "TODO.md": OWN + ptr(110) + td(100), "docs/sprint/SPRINT-105-x.md": "---\nsprint: 105\nstatus: closed\n---\n" }));
-  x = leg("7", d);
-  check("leg 7 selection (v2): no status: active sprint file -> NOTE 'no active sprint file', no verdict", summary(x.out).join() === "0,0" && /no active sprint file/.test(x.out), x.out);
-  // no TODO.md at all
-  d = tree(v2files({ "docs/sprint/SPRINT-110-x.md": ACTIVE(110) }));
-  x = leg("7", d);
-  check("leg 7 selection (v2): no TODO.md -> no verdict, a NOTE naming why", summary(x.out).join() === "0,0" && NO_TODO_NOTE.test(x.out), x.out);
-  // v1 path untouched: no docs/work -> the TODO.md pointer, even if a sprint file says otherwise
-  d = tree({ "TODO.md": OWN + ptr(110) + td(106) });
-  x = leg("7", d);
-  check("leg 7 v1 must-FAIL: no docs/work -> pointer (110) used, row at 106 stale", /^FAIL  TD aging: .*TD-900/m.test(x.out), x.out);
-  d = tree({ "TODO.md": OWN + ptr(110) + td(108), "docs/sprint/SPRINT-200-x.md": ACTIVE(200) });
-  x = leg("7", d);
-  check("leg 7 v1 control: no docs/work -> pointer used, a stray active sprint file (200) is NOT consulted", summary(x.out).join() === "1,0", x.out);
-  d = tree({ "TODO.md": OWN + td(100) });
-  x = leg("7", d);
-  check("leg 7 v1: no pointer -> the historical 'no Active Sprint pointer' skip", summary(x.out).join() === "0,0" && /no Active Sprint pointer/.test(x.out), x.out);
+  check("leg 3 retired subject: a TODO.md lacking last_updated yields no finding and no NOTE (it is not read), the sibling still PASSes",
+    !/TODO\.md/.test(x.out) && /^PASS  ownership \.claude\/CLAUDE\.md/m.test(x.out) && summary(x.out)[1] === 0, x.out);
 }
 
 for (const t of tmps) rmSync(t, { recursive: true, force: true });

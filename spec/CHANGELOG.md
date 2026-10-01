@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,31 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.13.0 — 2026-10-01
+
+**0.x MINOR carrying MAJOR meaning (§15) — breaking: rule `S11.TODOCAP` is removed.** §15 counts a
+removed rule id as MAJOR, because an adopter or tool that names the id in a pin, report or allowlist
+now names nothing. Below `1.0.0` the number is MINOR and this label is the warning (owner ruling,
+SPRINT-111). The reason is the retired layout: `TODO.md` stopped being a tracked file at 0.12.0, and
+the only rule that measured it — over its §2 cap at promote — has nothing left to measure once the
+file is deleted (`TASK-380` · `TASK-394`).
+
+- **§11** drops the `S11.TODOCAP` row: **11 → 10 rules**. The id is **retired, never reused** (§14 now
+  lists it under *Retired ids*). The `TODO.md` whole-file row stays, retired as before — `migrate` is
+  its only prune — and no longer promises a cap flag.
+- **§2** keeps the `TODO.md` row and its cap, now noting that no conformance rule measures it.
+- **§14** counts re-derived: **100 → 99 classified**, **51 → 50 checkable** (mechanical 40 → 39, split
+  11 unchanged); §11's column 11 → 10. `read-spec-rules.sh --reconcile` reconciles to 99.
+- **Engine, same release:** the v1 `TODO.md` readers go with it — `S11.BACKLOG`'s breadcrumb scan (its
+  store half stays), the ownership read of `TODO.md` in the `S3.SCHEMA` doc set, `check-task-origin`'s
+  legacy-backlog population, and qa-check legs 3 (the `TODO.md` subject), 5, 7 and 8. Retired, not
+  retargeted: a guard that existed only for the v1 shape is removed rather than ported to the store.
+
+**Verdict movement.** A repository carrying an over-cap `TODO.md` stops reading `todo-over-cap-at-promote`;
+a v1 tree stops reading `shipped-backlog-entry-retained`. No verdict moves from pass to fail. The
+frozen `evals/fixtures/compat/rule-ids-v0.10.0.txt` is a v0.10.0 surface and is deliberately not edited:
+it records what 0.10.0 said, and `S11.TODOCAP` is correct in it.
 
 ## 0.12.0 — 2026-09-28
 

@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.12.0
+version: 0.13.0
 status: current
 ---
 
@@ -58,7 +58,7 @@ gating → §6.
 | `AGENTS.md` | AI tools | 12 (ADR-015) | init (lean loop — an AI assistant reads this repo) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
 | `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
-| `TODO.md` — **v1 layout, retired at 0.12.0** | Dev / AI | 320 soft (ADR-019) | none since 0.12.0 — the queue lives in the `docs/work/` store (below); a v1 repo's file is read only by `/lean-doc-generator migrate` | none — not edited under 0.12.0 | `migrate` converts it into `docs/work/`, then deletes it (§11) |
+| `TODO.md` — **v1 layout, retired at 0.12.0** | Dev / AI | 320 soft (ADR-019) | none since 0.12.0 — the queue lives in the `docs/work/` store (below); a v1 repo's file is read only by `/lean-doc-generator migrate`; no conformance rule measures it since 0.13.0 (`S11.TODOCAP` retired) | none — not edited under 0.12.0 | `migrate` converts it into `docs/work/`, then deletes it (§11) |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
 | `HANDOFF-LEDGER.md` | Dev / AI | append-only | **create-lazily** — the first handoff taken with **no active sprint to log into** (governance work · a `/triage` pass · a research session); never pre-created empty (§7) | a handoff is taken, resumed, or reconciled — its status moves `live` → `consumed` → `spent` | §11 prune (entries `spent` ≥ 3 sprints) |
 
@@ -734,7 +734,7 @@ them**. Append-only is preserved *inside* each archive file.
 |---|---|---|
 | `docs/work/done/` · `docs/work/cancel/` task files | closed ≥ 3 sprints ago — its `sprint:` closed then, or, never scheduled, it moved to `cancel/` then — **and** nothing live names it: no open task's `depends-on:`, no active sprint's `## Members` — **and** it is not the store's highest-numbered task file (the next id is derived from the store, so ids stay monotonic) | **delete the file** (propose→approve). History's durable homes are root `CHANGELOG.md`, `docs/sprint/archive/` and git. An ADR, CHANGELOG or archived sprint may still cite the id; the citation resolves through git history — the file was a breadcrumb, not the record |
 | `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | **delete the row.** The substance already lives in `CHANGELOG.md`, the sprint archive and git, so a permanent in-file pointer is a breadcrumb rather than a record — and a ledger that only ever grows stops being read. **Ids stay monotonic: deleting a row never frees its id for reuse.** The 3-sprint delay is deliberate — a just-resolved debt is still context at the next promote |
-| `TODO.md` whole file — **v1 layout, retired at 0.12.0** | a v1 or mixed tree is found | `/lean-doc-generator migrate` converts it into `docs/work/`, then deletes it — the only prune a retired file gets. Until then its §2 cap still reads, and a breach is flagged in the governance review |
+| `TODO.md` whole file — **v1 layout, retired at 0.12.0** | a v1 or mixed tree is found | `/lean-doc-generator migrate` converts it into `docs/work/`, then deletes it — the only prune a retired file gets. No rule measures its §2 cap any more — `S11.TODOCAP` was retired at 0.13.0 |
 | `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1. **The collapse consumes the trigger it fires on:** a promoted entry ends up as `[status: promoted]` + the pointer, so `promoted: yes` is *never* the stored form and grepping for it returns zero on a perfectly healthy corpus. Count promotion state by `[status: promoted]` (position-anchored, per L-108); a zero here is evidence about the query, not about the corpus (SPRINT-062 T3) **Deliberate non-collapse is recorded** — a promoted entry may keep its body when the durable rule has not yet taken hold, but only on the record: the entry carries a body bullet containing `§11 collapse deliberately NOT applied` and naming a `Re-collapse when` condition. Both markers present ⇒ conformant; neither ⇒ the entry is simply uncollapsed. This is the exception clause of the collapse action, not a further rule — §11 still states eleven. |
 | `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
@@ -761,7 +761,6 @@ gone?) and **split** wherever the trigger is itself judged.
 |---|---|---|---|
 | `S11.BACKLOG` | Gated | split | removal is mechanical; "shipped/promoted" is judged. Propose→approve |
 | `S11.TDDELETE` | Structural | mechanical | `resolved` ≥ 3 sprints ⇒ the row is gone; ids stay monotonic |
-| `S11.TODOCAP` | Structural | mechanical | over its §2 cap at promote |
 | `S11.CHANGELOG` | Structural | mechanical | current + previous minor inline; older → `docs/changelog/` + a link line |
 | `S11.LEARNINGS` | Structural | mechanical | count by `[status: promoted]`, position-anchored — `promoted: yes` is never the stored form |
 | `S11.SPRINT` | Structural | mechanical | moved → `docs/sprint/archive/` + one INDEX line |
@@ -771,10 +770,10 @@ gone?) and **split** wherever the trigger is itself judged.
 | `S11.WHENITRUNS` | Gated | split | close-time triggers execute at **close**, scan-based ones at **promote**; the phase is mechanical from commit history, whether the right trigger fired is not |
 | `S11.APPROVE` | Gated | judgment-only | always propose → approve, never silent; no artifact records that approval was *sought* |
 
-**11 rules.** *"Doc-aging is not bounded by this table"* is **rationale** — it explains the boundary
+**10 rules.** *"Doc-aging is not bounded by this table"* is **rationale** — it explains the boundary
 against §2, and deleting it changes no repository's conformance. *"Git is the full audit trail"* is
-likewise rationale for why compression is safe. It is why this table has 11 rows where the SPRINT-072
-inventory counted 12.
+likewise rationale for why compression is safe. It is why this table has 10 rows where the SPRINT-072
+inventory counted 12 — 11 until `S11.TODOCAP` was retired at 0.13.0.
 
 ---
 
@@ -1044,19 +1043,19 @@ nothing was reclassified out of the standard, only out of the set a tool evaluat
 
 **Reading a rule id.** `S<section>.<key>` — `S13.TRAILERS` is §13's three-trailer rule. Ids are stable
 across spec versions and are what a finding names, so a report stays comparable as the standard evolves.
-An id is retired, never reused.
+An id is retired, never reused. **Retired ids:** `S11.TODOCAP` (0.13.0 — over-cap check on the retired v1 `TODO.md`; removed from §11, the id stays burned).
 
 **A `?` mark means unclassified, and is a real state.** It marks a rule this specification states and
 whose classification has not yet been ruled. It is not a silent skip and it is not a pass — a tool
 reporting on a `?` rule says so. **No rule carries `?` at this version**; the mark stays defined because
 a rule added to a later version arrives unruled, and the honest state for it is this one.
 
-**Counts, re-derived from this document.** **100 classified rules and 0 unclassified**, 100 candidates
+**Counts, re-derived from this document.** **99 classified rules and 0 unclassified**, 99 candidates
 across §1–§13:
 
 | § | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| classified | 4 | 21 | 3 | 7 | 2 | 4 | 9 | **0** | 10 | 10 | 11 | 12 | 7 | **100** |
+| classified | 4 | 21 | 3 | 7 | 2 | 4 | 9 | **0** | 10 | 10 | 10 | 12 | 7 | **99** |
 | unclassified | | | | 0 | 0 | | | | | | | | | **0** |
 
 **§14 and §15 publish no rule rows** and are absent from this table for opposite-looking but identical
@@ -1126,4 +1125,4 @@ today, and costs a change to the engine's rule source, which reads a fixed §1�
 **They are published in one pass, not two, when the fleet pin rule lands** — that rule is the first
 §15 constraint an *adopting repository* can be evaluated against, and it is deliberately unspecified
 above. Until then this section is normative prose that a human release decision reads, and §14's counts
-stay at **100 classified · 51 checkable**, unchanged by this section's arrival.
+stay at **99 classified · 50 checkable**, unchanged by this section's arrival.

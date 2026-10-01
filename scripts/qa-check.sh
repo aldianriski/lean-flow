@@ -670,13 +670,8 @@ for s in skills/*/SKILL.md; do
   then ok "frontmatter $s"; else bad "frontmatter $s (need ---/name/description)"; fi
 done
 
-for d in TODO.md .claude/CLAUDE.md .claude/CONTEXT.md docs/architecture/overview.md docs/LEARNINGS.md docs/DECISIONS.md CHANGELOG.md docs/knowledge-index.md; do
-  # TODO.md is the v1 tracker: this leg covers it only while it exists, and is retired with the file
-  # (TASK-380). Task files carry no ownership header (D2), so there is no store-side equivalent.
-  if [ "$d" = "TODO.md" ] && [ ! -f "$d" ]; then
-    note "skip: TODO.md absent -- ownership of the v1 tracker is checked only while it exists; retired with TODO.md (TASK-380)"
-    continue
-  fi
+# TODO.md ownership check retired (TODO.md retired, SPRINT-111 T3 / spec 0.13.0): no list entry, no skip arm.
+for d in .claude/CLAUDE.md .claude/CONTEXT.md docs/architecture/overview.md docs/LEARNINGS.md docs/DECISIONS.md CHANGELOG.md docs/knowledge-index.md; do
   [ -f "$d" ] || { note "skip (missing): $d"; continue; }
   if has_field "$d" owner && has_field "$d" last_updated && has_field "$d" status
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
@@ -841,17 +836,8 @@ else bad "corpus dangling refs:$cdang"; fi
 if [ -z "$cmeta" ]; then ok "corpus metadata complete (id+tags+domain+status, known vocab)"
 else bad "corpus metadata:$cmeta"; fi
 
-qb_checkpoint "leg 5: TODO.md hygiene"
-# --- 5. TODO.md hygiene: no shipped-task breadcrumb comments (D1, SPRINT-024) ----------
-# Scoped to HTML comment lines only — live task prose (done-when/decision fields) legitimately
-# references sprint/changelog numbers and must never false-positive.
-if [ -f TODO.md ]; then
-  crumbs=$(grep -E '<!--' TODO.md | grep -iE 'shipped in SPRINT-|done .*(→|->).*(SPRINT|CHANGELOG)|promoted (→|->) SPRINT')
-  if [ -z "$crumbs" ]; then ok "TODO.md hygiene (no shipped-task breadcrumb comments)"
-  else bad "TODO.md hygiene: breadcrumb comment(s) found — $(printf '%s' "$crumbs" | tr '\n' ';')"; fi
-else
-  note "skip: TODO.md absent -- breadcrumb hygiene is a property of the v1 tracker, checked only while it exists; retired with TODO.md (TASK-380)"
-fi
+# --- 5. RETIRED (TODO.md retired, SPRINT-111 T3 / spec 0.13.0): shipped-task breadcrumb lint over TODO.md.
+# A guard that existed only for the v1 TODO.md shape is removed, not ported to the store.
 
 qb_checkpoint "leg 6: README footer version lint"
 # --- 6. README footer version lint (footer vX.Y.Z == plugin.json version) --
@@ -890,64 +876,10 @@ else
   fi
 fi
 
-qb_checkpoint "leg 7: TD aging"
-# --- 7. TD aging: open TD >=3 sprints behind the active sprint, no re-review ----
-# The reference sprint is read from the sprint FILES once the tree has a docs/work/ store (the highest
-# `status: active` docs/sprint/SPRINT-*.md, via sprint-members-cli.ts -- ADR-047, TASK-392): the TODO.md
-# `## Active Sprint` pointer is a v1 artifact and goes stale. Without docs/work/ the pointer is still
-# the source. The TD ROWS are still read from TODO.md, so the leg applies only while it exists and is
-# retired with it (TASK-380). In this repo the rows live in TECH-DEBT.md and carry no `re-reviewed:`
-# marker there, so re-pointing the rows is a separate ruling -- not made here.
-if [ -f TODO.md ]; then
-  cur_raw=""
-  if [ -d docs/work ]; then
-    if ! command -v bun >/dev/null 2>&1; then
-      bad "TD aging: bun not found on PATH -- cannot derive the active sprint from the sprint files. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037)"
-    else
-      cur_raw=$(bun "$ROOT/scripts/lib/sprint-members-cli.ts" active --root . 2>&1 | tail -n1)
-      case "$cur_raw" in
-        '') note "TD aging: no active sprint file (docs/sprint/SPRINT-*.md with status: active) — skipping (no reference point)" ;;
-        *[!0-9]*) bad "TD aging: active-sprint derivation failed: $cur_raw"; cur_raw="" ;;
-      esac
-    fi
-  else
-    active=$(awk '/^## Active Sprint/{f=1;next} /^## /{f=0} f' TODO.md)
-    cur_raw=$(printf '%s' "$active" | grep -oE 'SPRINT-[0-9]+' | head -n1 | grep -oE '[0-9]+')
-    [ -n "$cur_raw" ] || note "TD aging: no Active Sprint pointer found — skipping (no reference point)"
-  fi
-  if [ -n "$cur_raw" ]; then
-    cur=$((10#$cur_raw))
-    tdbad=$(grep -E '^- \*\*TD-[0-9]+\*\* severity:.*status: open' TODO.md | while IFS= read -r tl; do
-      id=$(printf '%s' "$tl" | grep -oE 'TD-[0-9]+' | head -n1)
-      craw=$(printf '%s' "$tl" | grep -oiE 'created: *Sprint-[0-9]+' | grep -oE '[0-9]+')
-      [ -n "$craw" ] || continue
-      created=$((10#$craw))
-      age=$((cur - created))
-      if [ "$age" -ge 3 ] && ! printf '%s' "$tl" | grep -q 're-reviewed:'
-      then printf '%s ' "$id"; fi
-    done)
-    if [ -z "$tdbad" ]; then ok "TD aging (no stale open TD missing re-review)"
-    else bad "TD aging: stale >=3 sprints behind, no re-review: $tdbad"; fi
-  fi
-else
-  note "skip: TODO.md absent -- the TD rows this leg ages are read from the v1 tracker, checked only while it exists; retired with TODO.md (TASK-380)"
-fi
-
-qb_checkpoint "leg 8: temp-tracker lint"
-# --- 8. Temp-tracker lint: TODO.md tracker: lines ---------------------------
-if [ -f TODO.md ]; then
-  trkbad=$(grep -E '^ *tracker:' TODO.md | while IFS= read -r tl; do
-    reason=""
-    printf '%s' "$tl" | grep -q '(temp)' && reason="temp"
-    stripped=$(printf '%s' "$tl" | sed -E 's#docs/[A-Za-z0-9_./-]*verdict-[A-Za-z0-9_-]+\.md##g')
-    printf '%s' "$stripped" | grep -qE 'verdict-[A-Za-z0-9_-]+\.md' && reason="${reason:+$reason+}bare-verdict"
-    [ -n "$reason" ] && printf '[%s:%s] ' "$(printf '%s' "$tl" | sed -E 's/^ *tracker: *//' | cut -c1-30)" "$reason"
-  done)
-  if [ -z "$trkbad" ]; then ok "TODO.md trackers (no (temp) or bare verdict-*.md refs)"
-  else bad "TODO.md trackers: $trkbad"; fi
-else
-  note "skip: TODO.md absent -- tracker: lint is a property of the v1 tracker, checked only while it exists; retired with TODO.md (TASK-380)"
-fi
+# --- 7. RETIRED (TODO.md retired, SPRINT-111 T3 / spec 0.13.0; closes TD-203): TD aging read its rows from
+# TODO.md. Retired, not retargeted to TECH-DEBT.md -- those rows carry no `re-reviewed:` marker, so a port
+# would redden ~105 rows. The sprint-members-cli `active` mode it called stays (covered by its own harness).
+# --- 8. RETIRED (TODO.md retired, SPRINT-111 T3 / spec 0.13.0): temp-tracker lint over TODO.md `tracker:` lines.
 
 qb_checkpoint "leg 9: QA.md hygiene"
 # --- 9. QA.md hygiene: no hand-written live cap snapshot --------------------

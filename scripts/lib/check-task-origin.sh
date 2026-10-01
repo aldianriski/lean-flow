@@ -16,23 +16,18 @@
 # the first is checkable, so that is what this guards. A MISSING origin is a FAIL rather than a
 # default, because "unstamped" is exactly the state the old prose could not distinguish.
 #
-# POPULATION (owner ruling C): TWO sources, both checked, kept separate ONLY in what each finding
-# names, never in vocabulary or shape:
-#   1. every docs/work/<folder>/TASK-NNN-*.md, across ALL SIX status folders (backlog todo
-#      in_progress review done cancel) -- the store is now the primary population.
-#   2. TODO.md's own § Backlog entries, while TODO.md still exists -- the legacy population, kept
-#      live for a mixed tree still mid-migration. TODO.md's ABSENCE is not a skip when the store has
-#      task files: this checker only ever skips-with-nothing-to-verify when BOTH populations are
-#      empty.
+# POPULATION: every docs/work/<folder>/TASK-NNN-*.md, across ALL SIX status folders (backlog todo
+# in_progress review done cancel). The legacy TODO.md § Backlog population was retired (TODO.md
+# retired, SPRINT-111 T3 / spec 0.13.0); this checker skips-with-nothing-to-verify only when the
+# store has no task files.
 #
 # Usage: sh check-task-origin.sh <repo-root>
-# Prints one PASS/FAIL line per task, naming which population it came from (store: docs/work/<folder>/
-# or TODO.md: legacy backlog); exits 1 if any FAIL line was printed, 0 otherwise. Dependency-free
+# Prints one PASS/FAIL line per task, naming which population it came from (store: docs/work/<folder>/);
+# exits 1 if any FAIL line was printed, 0 otherwise. Dependency-free
 # POSIX sh.
 set -u
 
 root=${1:?usage: check-task-origin.sh <repo-root>}
-todo="$root/TODO.md"
 
 VALID='decomposer close-retro triage-bug manual'
 
@@ -61,41 +56,11 @@ for folder in backlog todo in_progress review done cancel; do
   done
 done
 
-# --- population 2: legacy TODO.md § Backlog entries, only while TODO.md exists -------------------
-if [ -f "$todo" ]; then
-  # Emit "<TASK-id>\t<origin-or-empty>" for every task entry inside § Backlog. A task block runs
-  # from its "- [ ] TASK-NNN" line to the next one or the next "## " heading, so an origin: line is
-  # only ever attributed to the task it sits under.
-  records=$(awk '
-    /^## Backlog/     { inb=1; next }
-    /^## /            { if (inb) { if (tid != "") print tid "\t" org; tid=""; org=""; inb=0 } }
-    !inb              { next }
-    /^- \[[ x]\] TASK-/ {
-        if (tid != "") print tid "\t" org
-        tid=$0; sub(/^- \[[ x]\] /,"",tid); sub(/ .*/,"",tid); org=""; next
-    }
-    /^[ \t]*origin:/  { if (tid != "") { o=$0; sub(/^[ \t]*origin:[ \t]*/,"",o); sub(/[ \t].*$/,"",o); org=o } }
-    END               { if (tid != "") print tid "\t" org }
-  ' "$todo")
-
-  if [ -n "$records" ]; then
-    seen=1
-    printf '%s\n' "$records" | while IFS="$(printf '\t')" read -r tid org; do
-      [ -n "$tid" ] || continue
-      if [ -z "$org" ]; then
-        printf 'FAIL  %s\n' "task-origin: $tid (TODO.md: legacy backlog) declares no origin: -- G1 cannot tell whether it met the intake grill, and an unstamped task is exactly what the old 'decomposer-approved' prose could not distinguish. Stamp decomposer | close-retro | triage-bug | manual"
-      else
-        case " $VALID " in
-          *" $org "*) printf 'PASS  %s\n' "task-origin: $tid (TODO.md: legacy backlog) origin: $org" ;;
-          *)          printf 'FAIL  %s\n' "task-origin: $tid (TODO.md: legacy backlog) has origin: '$org', which is not one of: $VALID" ;;
-        esac
-      fi
-    done >> "$out"
-  fi
-fi
+# --- population 2 (legacy TODO.md § Backlog) retired: TODO.md retired, SPRINT-111 T3 / spec 0.13.0. --
+# A leftover TODO.md is no longer read here; the store above is the only population.
 
 if [ "$seen" -eq 0 ]; then
-  printf '      %s\n' "task-origin: skip (no task entries in docs/work/ or TODO.md § Backlog)" >> "$out"
+  printf '      %s\n' "task-origin: skip (no task entries in docs/work/)" >> "$out"
 fi
 
 cat "$out"
