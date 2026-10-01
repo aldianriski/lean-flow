@@ -11,28 +11,25 @@ status: current
 
 ## 0.13.0 — 2026-10-01
 
-**0.x MINOR carrying MAJOR meaning (§15) — breaking: rule `S11.TODOCAP` is removed.** §15 counts a
-removed rule id as MAJOR, because an adopter or tool that names the id in a pin, report or allowlist
-now names nothing. Below `1.0.0` the number is MINOR and this label is the warning (owner ruling,
-SPRINT-111). The reason is the retired layout: `TODO.md` stopped being a tracked file at 0.12.0, and
-the only rule that measured it — over its §2 cap at promote — has nothing left to measure once the
-file is deleted (`TASK-380` · `TASK-394`).
+**MINOR (§15) — `S11.TODOCAP` becomes a retired no-op; the rule surface does not move.** §15's mechanical
+test asks whether any verdict changes from pass to fail over an unchanged repository: none does (an
+over-cap `TODO.md` goes from a finding to a note, which is fail → pass), no id is removed or renumbered,
+and no rule is tightened — so not MAJOR. It is more than PATCH because one rule's meaning does move (it
+stops measuring anything). MINOR clause applied: a change whose findings bind nothing a repository has
+already cleared. The owner kept the id rather than amend ADR-034, which freezes the rule-ID surface at 100.
 
-- **§11** drops the `S11.TODOCAP` row: **11 → 10 rules**. The id is **retired, never reused** (§14 now
-  lists it under *Retired ids*). The `TODO.md` whole-file row stays, retired as before — `migrate` is
-  its only prune — and no longer promises a cap flag.
-- **§2** keeps the `TODO.md` row and its cap, now noting that no conformance rule measures it.
-- **§14** counts re-derived: **100 → 99 classified**, **51 → 50 checkable** (mechanical 40 → 39, split
-  11 unchanged); §11's column 11 → 10. `read-spec-rules.sh --reconcile` reconciles to 99.
-- **Engine, same release:** the v1 `TODO.md` readers go with it — `S11.BACKLOG`'s breadcrumb scan (its
-  store half stays), the ownership read of `TODO.md` in the `S3.SCHEMA` doc set, `check-task-origin`'s
-  legacy-backlog population, and qa-check legs 3 (the `TODO.md` subject), 5, 7 and 8. Retired, not
-  retargeted: a guard that existed only for the v1 shape is removed rather than ported to the store.
+- **§11** keeps the `S11.TODOCAP` row — id, level (Structural) and mark (mechanical) **unchanged** — and
+  rewords its text: `TODO.md` is not a v2 file, nothing measures it, the engine emits a note. §11 still
+  states 11 rules; §14's counts stay **100 classified · 51 checkable**.
+- **§2** and the §11 whole-file row say nothing measures the `TODO.md` cap any more; the §2 cap cell stays.
+- **Engine, same release:** the other v1 `TODO.md` readers go — `S11.BACKLOG`'s breadcrumb scan (its store
+  half stays), the ownership read of `TODO.md` in the `S3.SCHEMA` doc set, `check-task-origin`'s legacy
+  population, and qa-check legs 3 (the `TODO.md` subject), 5, 7 and 8. Retired, not retargeted.
 
-**Verdict movement.** A repository carrying an over-cap `TODO.md` stops reading `todo-over-cap-at-promote`;
-a v1 tree stops reading `shipped-backlog-entry-retained`. No verdict moves from pass to fail. The
-frozen `evals/fixtures/compat/rule-ids-v0.10.0.txt` is a v0.10.0 surface and is deliberately not edited:
-it records what 0.10.0 said, and `S11.TODOCAP` is correct in it.
+**Verdict movement.** A repository carrying an over-cap `TODO.md` stops reading `todo-over-cap-at-promote`
+and reads a note; a v1 tree stops reading `shipped-backlog-entry-retained`. No verdict moves from pass to
+fail. `read-spec-rules.sh --reconcile` still reconciles to 100, and the frozen
+`evals/fixtures/compat/rule-ids-v0.10.0.txt` surface is unchanged.
 
 ## 0.12.0 — 2026-09-28
 

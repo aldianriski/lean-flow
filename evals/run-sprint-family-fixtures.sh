@@ -482,23 +482,29 @@ fi
 d="$work/todocap"; mkdir -p "$d"; ledger_repo "$d"
 i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
 assert_absent "s11-todo-over-cap-retired" "$d" "todo-over-cap-at-promote"
-assert_absent "s11-todocap-id-retired" "$d" "S11.TODOCAP"
-# The assertion FUNCTION is gone too, not merely unreachable: re-add the row to a SCRATCH spec and the
-# engine must report the id as unimplemented rather than measure the file. (A reintroduced assert_S11_TODOCAP
-# with no spec row would also stay silent, so this is what discriminates deleting the code from deleting the row.)
-scratch_todocap="$work/spec-todocap-readded.md"
-sed '/^| `S11.TDDELETE` |/a | `S11.TODOCAP` | Structural | mechanical | over its §2 cap at promote |' "$spec" > "$scratch_todocap"
-if cmp -s "$spec" "$scratch_todocap"; then
-  echo "FAIL fixture(s11-todocap-function-gone): the scratch spec is byte-identical to the shipped one -- the seed did not land, so a green result below would prove nothing (L-137)"
+# The id is KEPT (ADR-034 freezes the rule-ID surface at 100), so the rule stays dispatched: on an over-cap
+# TODO.md it must emit its retirement NOTE and no finding. With the row present these two assert_absent cases
+# are load-bearing -- a reinstated reader would print todo-over-cap-at-promote here.
+_o=$(sh "$engine" "$d" --spec "$spec" 2>&1)
+if printf '%s\n' "$_o" | grep -F "S11.TODOCAP" | grep -qF "retired no-op" && ! printf '%s\n' "$_o" | grep -E '^(FAIL|GAP) .*S11\.TODOCAP'; then
+  echo "PASS fixture(s11-todocap-note-only): S11.TODOCAP is dispatched, emits its retirement note, and no FAIL/GAP line names it"
+else
+  echo "FAIL fixture(s11-todocap-note-only): expected a 'retired no-op' note and no FAIL/GAP for S11.TODOCAP -- got: $(printf '%s\n' "$_o" | grep -F 'S11.TODOCAP')"
+  fail=1
+fi
+# The stub reads nothing: its body (up to its closing brace) is ONE `note "..."` line whose text carries no
+# `$` or backtick, so there is no variable, argument, command substitution, redirect or second statement
+# that could open, size or read TODO.md. Extracted from the shipped engine, never re-typed.
+_body=$(awk '/^assert_S11_TODOCAP\(\) \{/ {f=1; next} f && /^\}/ {exit} f' "$engine")
+_rest=$(printf '%s\n' "$_body" | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*note "[^$`]*"[[:space:]]*$')
+if [ -z "$_body" ]; then
+  echo "FAIL fixture(s11-todocap-stub-reads-nothing): assert_S11_TODOCAP body not found in the engine -- the extraction is vacuous"
+  fail=1
+elif [ -n "$_rest" ]; then
+  echo "FAIL fixture(s11-todocap-stub-reads-nothing): the stub does more than emit one literal note and could read TODO.md -- extra: $_rest"
   fail=1
 else
-  _o=$(sh "$engine" "$d" --spec "$scratch_todocap" 2>&1)
-  if printf '%s\n' "$_o" | grep -F "S11.TODOCAP" | grep -qF "rule-unimplemented" && ! printf '%s\n' "$_o" | grep -qF "todo-over-cap-at-promote"; then
-    echo "PASS fixture(s11-todocap-function-gone): a re-added S11.TODOCAP row reads rule-unimplemented and the over-cap TODO.md is not measured"
-  else
-    echo "FAIL fixture(s11-todocap-function-gone): the engine still carries an S11.TODOCAP assertion, or the gap line is missing -- got: $(printf '%s\n' "$_o" | grep -F 'S11.TODOCAP')"
-    fail=1
-  fi
+  echo "PASS fixture(s11-todocap-stub-reads-nothing): the stub body is a single literal note, no variable or file operation"
 fi
 
 # --- S11.BACKLOG: the v1 TODO.md breadcrumb scan is RETIRED (SPRINT-111 T3 / spec 0.13.0) -------------

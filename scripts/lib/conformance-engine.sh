@@ -2603,8 +2603,13 @@ assert_S11_TDDELETE() {
   [ "$n_over" -eq 0 ] && ok "S11.TDDELETE        -- no resolved TECH-DEBT row has reached §11's $thr-sprint deletion trigger (current SPRINT-$cur)"
 }
 
-# assert_S11_TODOCAP retired (TODO.md retired, SPRINT-111 T3 / spec 0.13.0, breaking per §15): the rule id left
-# §11 and is never reused. A leftover TODO.md is no longer measured against §2's cap.
+# assert_S11_TODOCAP -- RETIRED NO-OP (TODO.md retired, SPRINT-111 T3 / spec 0.13.0). The id, level and mark stay
+# in §11 because ADR-034 freezes the rule-ID surface at 100; only the READER is gone. It takes no path and
+# touches no file -- a leftover TODO.md is never opened, sized or read -- and emits a note, so the rule stays
+# dispatched and the coverage line (45 of 51 checkable) stays honest.
+assert_S11_TODOCAP() {
+  note "S11.TODOCAP         -- retired no-op since spec 0.13.0: TODO.md is not a v2 file, so nothing measures it (the id is kept, ADR-034)"
+}
 
 assert_S11_LEARNINGS() {
   repo=$1

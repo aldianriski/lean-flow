@@ -207,6 +207,15 @@ function v2(): string {
 const qaText = readFileSync(QA, "utf8").replace(/\r\n/g, "\n");
 function legBody(n: string): string {
   const lines = qaText.split("\n");
+  if (n === "5-9") {
+    // The WHOLE region the retired legs 5 / 7 / 8 sat in: from the old leg-5 position (its marker if a pre-retirement
+    // qa-check.sh is restored, else its tombstone) up to leg 9's marker, so legs 6 / 6b ride along and a restored
+    // leg 5, 7 or 8 is INSIDE what runs. Review F1: the earlier "6" region ended at the old leg-7 marker.
+    const st = lines.findIndex((l) => /^qb_checkpoint "leg 5:|^# --- 5\. RETIRED/.test(l));
+    const en = lines.findIndex((l, i) => i > st && l.startsWith('qb_checkpoint "leg 9:'));
+    if (st < 0 || en < 0) return "";
+    return lines.slice(st, en).filter((l) => !l.startsWith("qb_checkpoint ")).join("\n");
+  }
   const start = lines.findIndex((l) => l.startsWith(`qb_checkpoint "leg ${n}:`));
   if (start < 0) return "";
   let end = lines.findIndex((l, i) => i > start && l.startsWith("qb_checkpoint "));
@@ -222,7 +231,7 @@ bad()  { fail=$((fail + 1)); printf 'FAIL  %s\\n' "$1"; }
 `;
 function leg(n: string, cwd: string) {
   const body = legBody(n);
-  if (!body) return { code: 99, out: "", err: `marker 'qb_checkpoint "leg ${n}:' not found in qa-check.sh` };
+  if (!body) return { code: 99, out: "", err: `marker for leg ${n} not found in qa-check.sh` };
   const f = join(cwd, ".leg.sh");
   writeFileSync(f, PRELUDE + body + `\nprintf 'LEG-SUMMARY pass=%s fail=%s\\n' "$pass" "$fail"\n`);
   const r = run(["sh", ".leg.sh"], cwd);
@@ -230,9 +239,9 @@ function leg(n: string, cwd: string) {
   return r;
 }
 const summary = (o: string) => o.match(/LEG-SUMMARY pass=(\d+) fail=(\d+)/)?.slice(1).map(Number) ?? [-1, -1];
-// leg 3 is run on its own; "6" is the region leg 6 + 6b, which now ends at leg 9's marker and therefore
-// contains the retired legs 5 / 7 / 8's tombstones (comments only) -- the region the retired legs sat beside.
-const legs = ["3", "6"];
+// leg 3 is run on its own; "5-9" is the whole region from the old leg-5 position to leg 9 (legs 6 / 6b plus the
+// retired legs 5 / 7 / 8's tombstones, comments only); a restored old leg would sit INSIDE it.
+const legs = ["3", "5-9"];
 for (const n of legs) check(`leg ${n}: marker present in qa-check.sh (extraction is not vacuous)`, legBody(n).length > 100);
 
 const OWN = "---\nowner: M\nlast_updated: 2026-09-29\nstatus: current\n---\n\n";
@@ -251,13 +260,13 @@ const base = { ...SKILL, "README.md": "<sub>Doc owner: M · last updated 2026-09
     + "- **TD-900** severity: low | status: open | created: Sprint-100\n  tracker: docs/research/x.md (temp)\n  tracker: verdict-foo.md\n";
   const pj = { ".claude-plugin/plugin.json": '{ "version": "1.2.3" }\n' };
   let d = tree({ ...base, ...pj, "TODO.md": legacy, "docs/work/todo/.gitkeep": "", "docs/sprint/SPRINT-110-x.md": "---\nsprint: 110\nstatus: active\n---\n" });
-  let x = leg("6", d);
+  let x = leg("5-9", d);
   check("retired legs 5/7/8: a tree with a breadcrumb, a stale TD row and bad trackers yields no TODO.md / TD aging / tracker finding",
     !/TODO\.md|TD aging|tracker/i.test(x.out), x.out);
   check("retired legs 5/7/8 control: the same region still ran (leg 6's README footer PASS is present, so the silence is not an empty extraction)",
     /^PASS  README footer version \(1\.2\.3 = plugin\.json 1\.2\.3\)/m.test(x.out), x.out);
   d = tree({ ...base, ...pj, "README.md": "<sub>Doc owner: M · last updated 2026-09-29 · status: current v9.9.9</sub>\n", "TODO.md": legacy });
-  x = leg("6", d);
+  x = leg("5-9", d);
   check("retired legs sibling control: the surviving leg in that region still reddens (footer 9.9.9 vs plugin.json 1.2.3 -> FAIL README footer version)",
     /^FAIL  README footer version/m.test(x.out), x.out);
 }
