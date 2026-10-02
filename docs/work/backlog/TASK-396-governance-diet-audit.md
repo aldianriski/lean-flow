@@ -25,16 +25,21 @@ grew from "delete one file" to five tasks, because its guards read the retired s
 ## Done when
 
 - [ ] ADR-050 records the principle: the proof bar scales with consequence (seeded-mutation campaigns and worktree-isolated outside review are kept for consequential guard logic, not every Tier G change); no new standing rule without a retirement; shell/TS parity is not grown beyond supported contracts.
-- [ ] An audit lists every guard/leg with the real defects it caught (git log · LEARNINGS), and each is kept, frozen, or cut. The cuts land.
-- [ ] `.claude/CLAUDE.md` § Anti-Patterns is slimmed to pointers (the L-NNN detail lives in LEARNINGS / CONTEXT), within its 80-line cap.
+- [ ] An audit (`docs/research/`, feeding ADR-050) lists every guard/leg with the real defects it caught (git log · LEARNINGS), and each carries an owner-ruled disposition: keep · freeze · cut. Landing the cuts is TASK-398.
 
 ## Touches
 
-docs/adr/ · .claude/CLAUDE.md · .claude/CONTEXT.md · scripts/qa-check.sh · evals/
+docs/adr/ · docs/DECISIONS.md · docs/research/
 
 ## Assumes
 
 none. The ADR-043 consumer contract bounds any cut to the conformance engine.
+
+## Amended 2026-10-02 (SPRINT-112 promote)
+
+- **Split (owner, 2026-10-02):** size L at pull time (ADR + a ~120-guard audit + landed cuts + a CLAUDE.md slim). This task keeps
+  ADR-050 and the audit with its dispositions. Landing the cuts → `TASK-398`. The CLAUDE.md slim → `TASK-384`, which already demotes a
+  CLAUDE.md rule, so one task owns that file.
 
 ## Tracker
 

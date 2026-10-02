@@ -21,6 +21,7 @@ depends-on: [TASK-364, TASK-377]
 - [ ] Promotion requires a stated disposition: replace · merge · move to an on-demand reference · automate into a check · retain with justification.
 - [ ] At least one rule is demoted out of .claude/CLAUDE.md through that route, destination recorded (Closed-when 4).
 - [ ] Every soft OVER-CAP row is closed by a recorded disposition, not a diet — the gate reports zero (Closed-when 3).
+- [ ] `.claude/CLAUDE.md` § Anti-Patterns is slimmed to pointers (the L-NNN detail lives in LEARNINGS / CONTEXT), within its 80-line cap; each moved rule's destination is recorded through the disposition route.
 
 ## Touches
 
@@ -29,6 +30,10 @@ spec/STANDARD.md · skills/lean-doc-generator/SKILL.md (promote governance) · .
 ## Assumes
 
 none
+
+## Amended 2026-10-02 (SPRINT-112 promote)
+
+- **Gains the CLAUDE.md slim** from `TASK-396`'s split (owner, 2026-10-02), so one task owns `.claude/CLAUDE.md`.
 
 ## Tracker
 
