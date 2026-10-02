@@ -117,6 +117,39 @@ mv "$mis/docs/architecture/overview.md" "$mis/documentation/overview.md"
 run_case_anywhere "outside-canonical-placement-fires" 1 "file-outside-canonical-placement: docs/architecture/overview.md" -- \
   sh "$engine" "$mis" --spec "$s2_spec"
 
+# --- selection: the retired-row matcher is a SHAPE, not a substring (Codex F3, L-186) -------------
+# Replace the real TODO.md row with rows that vary which ROWS are selected. Observable: S2.F-FILE names
+# every parsed `always` row that is absent from an empty repo, so a row the parser dropped is silent.
+# Must be named: LIVEA (prose "retired at 0.12.0" in the label, no bold span) · LIVEB (bold label says
+# retired, no version) · LIVEC ("retired at" in a non-first column) · CONTROL. Must be silent: GONE
+# (the spec's own shape: `path` -- **label, retired at N.N.N**).
+selspec="$work/spec-selection.md"
+awk '
+  /^\| `TODO\.md` — / {
+    print "| `LIVEA.md` — live; legacy alias retired at 0.12.0 | Dev | 100 | init (always) | x | — |"
+    print "| `LIVEB.md` — **retired soon, not yet** | Dev | 100 | init (always) | x | — |"
+    print "| `LIVEC.md` | Dev | 100 | init (always; retired at 0.12.0 elsewhere) | x | — |"
+    print "| `CONTROL.md` | Dev | 100 | init (always) | x | — |"
+    print "| `GONE.md` — **v1 layout, retired at 0.12.0** | Dev | 320 | init (always) | x | — |"
+    next
+  }
+  { print }
+' "$s2_spec" > "$selspec"
+mkdir -p "$work/selection-empty"
+outsel=$(sh "$engine" "$work/selection-empty" --spec "$selspec" 2>&1)
+sel_ok=1
+for want in LIVEA.md LIVEB.md LIVEC.md CONTROL.md; do
+  printf '%s\n' "$outsel" | grep -q "core-file-missing: $want" || { sel_ok=0; echo "FAIL fixture(retired-match-selection): live row $want was dropped by the retired matcher"; }
+done
+if printf '%s\n' "$outsel" | grep -q 'core-file-missing: GONE\.md'; then
+  sel_ok=0; echo "FAIL fixture(retired-match-selection): the retired-shape row GONE.md was still parsed as live"
+fi
+if [ "$sel_ok" -eq 1 ]; then
+  echo "PASS fixture(retired-match-selection): live rows with incidental 'retired' prose are kept, only the spec's marker shape is dropped"
+else
+  fail=1
+fi
+
 # --- retired §2 rows are not placed (SPRINT-111 T4 / spec 0.13.0) ---------------------------------
 # §2's TODO.md row is marked "retired at"; with no root TODO.md a same-name file elsewhere is not a
 # stray, it is a stranger's own notes. (a) must-PASS: no placement finding names TODO.md.
