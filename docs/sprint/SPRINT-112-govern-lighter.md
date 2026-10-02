@@ -5,6 +5,7 @@ epic: EPIC-017
 owner: Maintainer
 last_updated: 2026-10-02
 status: active
+gates_signed: G1,G2 @ ee324e0
 plan_commit: ceffdad
 update_trigger: sprint execute/close events
 ---
