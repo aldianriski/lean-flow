@@ -145,3 +145,16 @@ the retired `_own_docs` TODO.md read. A2 ("retiring is a MINOR") is resolved by 
   `discovery-order.test.ts` rung-1 bypass, an existing row (TECH-DEBT.md:977), untouched by T3.
 - Open, not T3's: check-doc-caps and check-prose-density still reach TODO.md through §2's `320 soft` cell until T4 deletes the file;
   evals/README.md:226 → TASK-396's sweep. DoD 3/3 (box 2 by ruling, box 3 vacuous because nothing was retargeted).
+
+### 2026-10-02 | scope-change | T4 plan step done (agent-run migrate, no writes); owner rulings; Layers widened for stale docs; Codex gauntlet review
+**Plan (first agent-run of the migrate prose on this repo).** 15 legacy tasks (row census `grep -c '^- \[.\] TASK-'` = parsed list = T1's 15),
+all to `backlog/`, 0 conflicts (33 store files checked), SPRINT-111 skipped as by-reference. Every TECH-DEBT owner pointer resolves by id.
+T1's flag count was imprecise: 3 lack `authority` (319 · 188 · 327), not 2. The plan found 10 places where the map's prose was ambiguous;
+they go to a migration-map fix after this sprint.
+**Owner rulings (popups).** (1) tiers: G for 346 · 347 · 320 · 322, P for 348 · 345 · 321, X for 319 · 188. (2) 319: execution · J2 · EPIC-015, with a written
+done-when. 188: execution · J1, with a written done-when. 327: J1. (3) normalise: frontmatter is plain enums; comments and qualifiers go verbatim into
+`## Why`/`## Assumes`; `none — but …` becomes an Assumes line; 366/367 split into one box per lettered clause; needs-info tasks get an `**open:**` line;
+full slugs are kept. (4) 16 prose blocks are dropped and block 14 (L-111 "opportunistic") moves into the `## Why` of 188 and 327. (5) **Layers widened (Tier P):**
+the stale "TODO.md present" lines in README.md · docs/architecture/overview.md · .claude/CONTEXT.md · docs/QA.md ·
+docs/qa/QA-001 · QA-002 · evals/README.md are fixed in T4. TECH-DEBT.md:11/:41 and TD-203's status were already in Layers.
+(6) **All execution is reviewed by Codex in a gauntlet loop** (review → fix → re-review until clean). That covers T4 and, retroactively, T3's merged range.
