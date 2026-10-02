@@ -2,13 +2,13 @@
 id: ADR-050
 tags: [process, tooling]
 domain: governance
-status: proposed
+status: accepted
 related: [ADR-029, ADR-043, ADR-044, ADR-039, ADR-048, guard-audit]
 ---
 
 # ADR-050 — The proof bar scales with consequence, and a new standing rule retires an old one
 
-- **Status:** proposed
+- **Status:** accepted (2026-10-03, owner)
 - **Deciders:** Maintainer
 - **Context driver:** the owner's observation (2026-09-30, mid SPRINT-111) that every new standard grows development time while only small changes ship; `TASK-396`.
 
