@@ -53,3 +53,21 @@ amendment + spec (if §2/§11 change) → Tier G, worktree-isolated build, Codex
 `check-doc-caps.sh` is the AUTHORITY and `.ts` the port (`run-doc-caps-differential.ts` header), and `conformance-engine.sh` calls the checker,
 so the disposition path must land in both, in parity, under ADR-043's adopter contract. Added to T2: `scripts/lib/check-doc-caps.sh` ·
 `evals/doc-caps.test.ts` · `evals/run-doc-caps-differential.ts`. Found by enumerating every runner of the checker before the build (L-221).
+
+### 2026-10-03 | progress | T2 (TASK-384) accepted: soft-cap dispositions + CLAUDE.md slim; merged ea180d1
+- Built `04f9e3b` · `7eda91d` · `14e5b49`, then Codex fixes `c5148a7` · `1420952` · `45bedf7` · `81c58fe`. `check-doc-caps` (Shell authority + TS port,
+  differential 26/26) honours a repo-root `.cap-dispositions` (`path -- kind -- reason`) for SOFT over-caps only, printing a named `retained:` line.
+  Malformed or stale rows are named FAILs (reason-missing · kind-unknown · duplicate · stale · hard-cap · malformed TAB). Hard caps and the token
+  budget stay FAIL (ADR-048 amended). The engine does NOT call the checker (comments only), so ADR-043 is untouched; ADR-034 is untouched (a gate leg, not a rule).
+- The 4 soft rows are each a recorded `retain` (EPIC-017 until §11 archive · adlc-epic-sequencing holds the L-151 freeze · epic-017-effectiveness is
+  TASK-386's comparand · V3 cited by ADR-036), so the gate prints 0 OVER-CAP. TD-174 resolved.
+- CLAUDE.md § Anti-Patterns: 5 rules moved verbatim to LEARNINGS § Durable rules (byte-verified). Codex round 1 found that the one-liners dropped
+  actions (Tier G seed/parse/control/hash · edit-safety · cache read-before-edit). Owner: restore them tersely. Round 2 asked for the Tier X/P bars
+  and "seed the rejected design"; round 3 for "fails with its named finding" (applied verbatim). Result: 79 lines, ~16081 → ~13323 tokens, every action always-loaded.
+- Codex gauntlet (hybrid; one round could not read files, so the coordinator ran the checks and pasted them inline). F1 (a TAB in a path split
+  the Shell TSV, so the Shell retained what TS reported stale) was confirmed by execution and fixed with 2 retained fixtures through the differential and a seeded break.
+  The EXIT trap preserves the exit status (measured rc 1/1/1/0).
+- On main after the merge: doc-caps fixtures 46/0 · bun test 0 fail · differential 26/26 · both checkers 0 OVER-CAP, 4 retained · count-claims
+  green · prose-density red only on the foreign uncommitted EPIC-016. The engine baseline is 32 FAIL, measured on main at ccb87e2 before T2 (its +9 over
+  SPRINT-111's 23 is SPRINT-112 becoming current: 8 aged TD rows and 2 more held store-prune tasks; T2 adds 0).
+- Owner ruling: box 2 ("a rule demoted out of CLAUDE.md") is met by the 5 detail moves, each keeping an always-loaded one-liner (L-088). DoD 4/4.
