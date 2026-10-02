@@ -1,31 +1,44 @@
 # work-store membership fixture
 
-A mini v2 tree (`docs/work/`) with three synthetic task files (reserved 900-block ids), used by
-`evals/run-work-store-fixtures.ts` (SPRINT-106 T2) to prove `/prime`'s v2 open-DoD derivation
-(`skills/prime/SKILL.md` § Resolution) matches a hand count and that a foreign-sprint member is
-excluded (T2 DoD, L-186).
+A mini v2 tree (`docs/work/` + three sprint files) with seven synthetic task files (reserved 900-block
+ids), used by `evals/run-work-store-fixtures.ts` (SPRINT-106 T2, retargeted SPRINT-111 T5) to prove
+`/prime`'s v2 open-DoD derivation (`skills/prime/SKILL.md` § Resolution) matches a hand count.
+Active sprints (`status: active`) are summed; a member is a list-item line under `## Members` that is
+outside any HTML comment and names a `TASK-NNN-<slug>.md` path; its task file is found **by id** in
+any status folder -- never by the listed path, never by the task's `sprint:` stamp (L-186: the
+fixtures vary the SELECTION). The contract is written once in the harness header.
 
-## Members
+## Population
 
-| File | Status folder | `sprint:` | `## Done when` boxes | Open (`- [ ]`) |
+| Sprint file | `status:` | Members (as listed) |
+|---|---|---|
+| `SPRINT-901-membership.md` | `active` | TASK-910, 911, 913, 914 -- plus four lines that must NOT count (below) |
+| `SPRINT-902-membership-closed.md` | `closed` | TASK-915 |
+| `SPRINT-903-membership-active.md` | `active` | TASK-916 |
+
+| Task | Folder | `sprint:` | In a `## Members` list? | Open (`- [ ]` under `## Done when`) |
 |---|---|---|---|---|
-| `TASK-910-membership-alpha.md` | `todo/` | `SPRINT-901` | 1 closed, 2 open (+1 open **outside** `## Done when`, under `## Touches`) | 2 |
-| `TASK-911-membership-beta.md` | `in_progress/` | `SPRINT-901` | 2 closed, 1 open | 1 |
-| `TASK-912-membership-decoy.md` | `todo/` | `SPRINT-902` | 4 open | 4 (excluded — foreign sprint) |
+| TASK-910 alpha | `todo/` | 901 | 901, path current | 2 (+1 open under `## Touches`, not counted) |
+| TASK-911 beta | `in_progress/` | 901 | 901, path **stale** (listed as `todo/`) | 1 |
+| TASK-912 decoy | `todo/` | 901 | **no** | 4 (never counted) |
+| TASK-913 gamma | `done/` | 901 | 901 | 1 |
+| TASK-914 delta | `cancel/` | 901 | 901 (listed in backticks) | 2 |
+| TASK-915 epsilon | `todo/` | 902 | 902 (a closed sprint) | 5 (never counted) |
+| TASK-916 zeta | `in_progress/` | 903 | 903 | 2 |
 
-## Hand-counted expected figure
+SPRINT-901's `## Members` also holds four lines that all name TASK-912 and must be excluded: a
+single-line HTML comment, a multi-line HTML comment (with a list item inside), a prose line, and a list
+item with no path.
 
-**`SPRINT-901` open DoD = 3** (TASK-910's 2 + TASK-911's 1).
+## Hand-counted expected figures
 
-Why not more, why not less:
-- TASK-910's stray `- [ ]` under `## Touches` does **not** count — the rule scopes to lines under
-  `## Done when` only, not any `- [ ]` anywhere in the file.
-- TASK-912's four open boxes do **not** count — its `sprint:` is `SPRINT-902`, not `SPRINT-901`;
-  the match is exact, not "any task file under `docs/work/`" (T2 DoD: "A fixture member whose
-  `sprint:` names another sprint is not counted").
-- Status folder is irrelevant to the count — TASK-910 (`todo/`) and TASK-911 (`in_progress/`) both
-  count, because membership (`sprint:`) and status (folder) are orthogonal axes (ADR-045 D1).
+- **`SPRINT-901` open DoD = 6** (910: 2, 911: 1, 913: 1, 914: 2).
+- **Active total = 8** (SPRINT-901: 6 + SPRINT-903: 2). SPRINT-902 is closed and adds nothing.
+- Task-file census = **7** (TASK-910 .. TASK-916), across `todo/ in_progress/ done/ cancel/`.
 
-If a broken implementation ignored the `sprint:` filter (or included the decoy), the figure would
-read **7** (3 + TASK-912's 4) instead of **3** — a different number, which is what proves the
-filter matters (the selection-varying must-FAIL, `evals/run-work-store-fixtures.ts`).
+Why the wrong rules read differently:
+- the old `sprint:`-stamp rule counts the unlisted decoy: SPRINT-901 reads **10** (6 + 4);
+- reading the listed path drops the moved TASK-911 and the `cancel/` item written with backticks: **3**;
+- ignoring `status:` also sums the closed sprint: **13** (8 + 5);
+- a walker that skips `done/` or `cancel/` loses TASK-913 / TASK-914.
+The count is the same on a CRLF copy of this tree (a fresh Windows checkout), which the harness checks.
