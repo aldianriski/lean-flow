@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-24
+last_updated: 2026-10-02
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-050](adr/ADR-050-proof-bar-scales-with-consequence.md) | **The proof bar scales with consequence, and a new standing rule retires an old one.** Tier G keeps the full bar (seeded-mutation proof, worktree-isolated outside review) only for consequential guard logic (engine rules and files an adopter's `conformance.sh` reaches, procedures a shipped skill tells an adopter to run); every other guard change takes the retained must-FAIL fixture plus one exercise on its real artifact. No new anti-pattern line, DoD checkbox, gate leg or spec rule without naming what it retires. Shell/TS parity is kept only for consumer-contract ports. Grounded in `docs/research/guard-audit.md`: 22 of 57 guards ever caught a real defect (>=62 catches) against ~235 upkeep events. Narrows ADR-039 mandatory-parity moments; builds on ADR-029 · ADR-043 | proposed | 2026-10-02 |
 | [ADR-049](adr/ADR-049-a-v2-tree-requires-bun-for-conformance.md) | **Checking a v2 tree requires `bun`; a v1 tree stays `sh`-only.** The conformance engine reads members through `sprint-members-cli.ts`, the one selector every reader shares, rather than a second copy in awk (L-186). A v2 tree without `bun` FAILs `bun-required` and is never skipped. It takes ADR-043's deferred runtime requirement at the 2.0 MAJOR, which already breaks. | accepted | 2026-09-30 |
 | [ADR-048](adr/ADR-048-the-always-loaded-read-set-is-budgeted-in-tokens.md) | **The always-loaded read set (`.claude/CLAUDE.md` + `.claude/CONTEXT.md`) is budgeted in tokens, not lines.** `check-doc-caps` estimates the pair's combined token cost as bytes ÷ ratio against `scripts/lib/token-budget.txt`, ratio measured once via `--calibrate` (Claude's `count_tokens` API, or a headless `claude -p` differential with no API key) and adopted by the owner (ratchet, mirroring the grandfather-file pattern); line caps stay as a secondary signal. Adopted 2026-09-28 via the headless path: ratio 2.991 bytes/token, budget 16087 tokens. Supersedes ADR-015 · ADR-017 · ADR-019 (EPIC-017 D3, TASK-364) | accepted | 2026-09-28 |
 | [ADR-047](adr/ADR-047-a-sprint-references-its-members-and-plan-commit-is-the-freeze.md) | **A sprint references its members; `plan_commit` is the freeze.** `promote` `git mv`s members backlog → todo in their own commit and stamps `sprint:`; the sprint file lists them under `## Members` and its Plan carries sprint-scoped meta only, **no DoD copy**, so each task has one DoD (resolves TD-179). The freeze adds no hash field: each member is resolved **by id** in the `plan_commit` tree and its `## Done when` compared with the current file's — ticks, ` ✓` evidence and `## Amended` sections are not edits; any other change FAILs without a `scope-change` Log entry naming the id. `close` requires every member in `done/`/`cancel/` and never counts Plan boxes (EPIC-017 D2) | accepted | 2026-09-24 |
