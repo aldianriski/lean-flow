@@ -39,6 +39,10 @@ MINOR (`TASK-394`) · this repo migrated, `TODO.md` deleted, full gate green (`T
 > **Amended 2026-09-30 before wave 0** — `scope-change` in the Execution Log (recon + outside review; owner rulings,
 > lean re-plan). T1 re-tiered X → G · T2 re-scoped to inventory + freeze · T3 retires rather than retargets · T5 added ·
 > T4 depends on T5.
+>
+> **Amended 2026-10-02 (Layers only)**: the `scope-change` entries of 2026-10-02 in the Execution Log. T3 gains the ownership
+> fixture harness it edited. T4 gains the stale-doc files (owner ruling), the engine and placement fixtures (the missed T3
+> retirement), and the research doc (Codex F2). A Codex gauntlet review found these were undeclared (`check-layers-observed`).
 
 ### T1 — Prove migrate on a real copy, including an interrupted run `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/migration-map.md` ·
@@ -76,7 +80,8 @@ Layers: `scripts/qa-check.sh` · `scripts/lib/conformance-engine.sh` · `scripts
   `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-observed.ts` · `scripts/lib/check-prose-density.ts` ·
   `scripts/lib/check-task-origin.sh` · `scripts/lib/prose-density-baseline.txt` · `spec/STANDARD.md` · `spec/CHANGELOG.md` ·
   `evals/run-qa-store-legs-fixtures.ts` · `evals/run-sprint-family-fixtures.sh` · `evals/run-conformance-engine-fixtures.sh` ·
-  `evals/run-s2-placement-fixtures.sh` · `evals/run-task-origin-fixtures.sh` · `evals/fixtures/task-origin/` · `evals/fixtures/compat/`
+  `evals/run-s2-placement-fixtures.sh` · `evals/run-task-origin-fixtures.sh` · `evals/fixtures/task-origin/` · `evals/fixtures/compat/` ·
+  `evals/run-ownership-header-fixtures.sh`
 Depends-on: T1 · T2 (shared `scripts/qa-check.sh` with T2; TASK-394's `depends-on`)
 Cites: `TASK-394` · TD-203 · SPRINT-110 R2 · ADR-043 · ADR-049 · `TODO.md` (named, not touched) · T5 (took the `skills/` prose; not a dependency)
 
@@ -92,7 +97,10 @@ reader to retarget or retire, a test, or allowlisted text (`migrate`'s procedure
 dispositioned, and an isolated outside review CLEAR.
 
 ### T4 — Migrate this repo onto the store and delete TODO.md `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `TODO.md` · `docs/work/backlog/` · `TECH-DEBT.md` · `scripts/lib/prose-density-baseline.txt`
+Layers: `TODO.md` · `docs/work/backlog/` · `TECH-DEBT.md` · `scripts/lib/prose-density-baseline.txt` · `README.md` ·
+  `docs/architecture/overview.md` · `.claude/CONTEXT.md` · `docs/QA.md` · `docs/qa/QA-001-prime-entry-detection.md` ·
+  `docs/qa/QA-002-intake-to-plan-pipeline.md` · `evals/README.md` · `scripts/lib/conformance-engine.sh` ·
+  `evals/run-s2-placement-fixtures.sh` · `docs/research/structarmed-adaptation.md`
 Depends-on: T1 · T3 · T5 (TASK-380's `depends-on`; the baseline row leaves with the file it names)
 Cites: `TASK-380` · EPIC-017 Closed-when 2 · ADR-046 · D8
 
