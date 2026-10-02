@@ -1250,7 +1250,12 @@ eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-
 # ruling (SPRINT-103): take the ~104s now, and rule this one separately once the post-sprint gate
 # total is known, rather than deciding a 189s recurring cost against a total nobody has re-measured.
 # Its cost is stated here so the trade stays visible; nothing pretends it ran.
-eval_harnesses_excluded="run-layers-observed-differential.ts"
+#
+# The four selftest-assert-*.sh are EXCLUDED because they are FROZEN: each guards only the retired v1
+# TODO.md park/retry shape and carries a `# FROZEN -- v1 historical coverage` header (SPRINT-111 T2,
+# owner ruling: freeze, never retarget). T2 removed them from the opt-in list but did not name them
+# here, so the completeness check below reddened all four -- the gap a full gate run caught after T4.
+eval_harnesses_excluded="run-layers-observed-differential.ts selftest-assert-boundary-park.sh selftest-assert-judgement-retry.sh selftest-assert-noaction-park.sh selftest-assert-park-revisit.sh"
 
 eval_harnesses="$eval_harnesses_always"
 if [ "${QA_FULL:-0}" = "1" ]; then
