@@ -168,3 +168,21 @@ docs/qa/QA-001 · QA-002 · evals/README.md are fixed in T4. TECH-DEBT.md:11/:41
 - Round 2 (runner, then Codex verdict): collateral diff at both revisions. Every OLD∖NEW case is a retired TODO.md branch; leg 7 was confirmed
   wholly TODO.md-dependent at `3fe3320:scripts/qa-check.sh:901–932`. Swapping each old script back in reddens every retired-branch fixture
   (qa-store-legs 19/4 · sprint-family 6 FAIL · ownership 2 FAIL · task-origin 5 FAIL). Restores were hash-checked. `bun test` (4 spec/cli files) 138/0. **Codex: CLEAR.**
+
+### 2026-10-02 | scope-change | T5 follow-up: the opt-in work-store harness still encodes prime's old rule; T4 Codex round 1 + 2
+**What broke.** Opt-in harnesses were run one by one on the T4 trial merge, because the owner ruled the QA_FULL run, which the memory
+reaper had killed, should be done in the foreground. `run-work-store-fixtures.ts` is red. (1) `prime-skill-contract` is red on main too:
+T5 changed prime's open-DoD rule (`289dc7c`, its review fix) from "tasks whose `sprint:` field matches" to "members of `## Members`
+found **by id**". The harness's contract text and its reference count still encode the old rule. Nothing caught it because the
+harness is opt-in and T5's review never ran QA_FULL. (2) `membership-open-dod` ×2 is red only on a fresh worktree: the fixture
+files are unchanged, but the checkout is CRLF and the harness's `splitFrontmatter` is not CRLF-safe. This is latent and hits any
+fresh Windows checkout.
+**Owner ruling (popup).** Retarget the harness to the by-id rule, with a moved-member fixture (T5's motivating case) and a seeded break,
+and make its frontmatter parsing CRLF-safe. T5's Layers gain the harness and its fixtures. Tier G, Codex gauntlet.
+**T4 Codex gauntlet so far.** Round 1 (static, then the runner): 3 findings, all confirmed. F1: Layers undeclared, fixed in Plan `5a73d77`.
+F2: dead TODO.md link in a research doc. F3: `_s2_rows` matched `retired at` as a substring and dropped live rows; the matcher is now structural.
+F2 and F3 were fixed in `3df4be4`. The full gate on the T4 branch also found T2's four frozen selftests neither gated nor excluded, fixed on
+main in `5b415d4`. Round 2: threats 1–4 CLEAR (gawk: 1 of 35 rows dropped, TODO.md only; the substring and any-bold mutants each redden
+`retired-match-selection`; layers 10/0 · 15/0 · observed PASS). mawk and busybox are absent on this host, so they are unverified, and
+Codex rules that this does not block. Threat 5 stays open until QA_FULL coverage is shown. The bare gate on the trial merge printed
+`281 pass, 1 fail` (the budget only), and its 9 unrun harnesses were each green when run individually.

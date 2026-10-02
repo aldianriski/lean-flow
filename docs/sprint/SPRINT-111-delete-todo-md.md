@@ -43,6 +43,7 @@ MINOR (`TASK-394`) · this repo migrated, `TODO.md` deleted, full gate green (`T
 > **Amended 2026-10-02 (Layers only)**: the `scope-change` entries of 2026-10-02 in the Execution Log. T3 gains the ownership
 > fixture harness it edited. T4 gains the stale-doc files (owner ruling), the engine and placement fixtures (the missed T3
 > retirement), and the research doc (Codex F2). A Codex gauntlet review found these were undeclared (`check-layers-observed`).
+> T5 gains the work-store harness and its fixtures (an opt-in harness still encoded prime's old `sprint:`-field rule; owner ruling).
 
 ### T1 — Prove migrate on a real copy, including an interrupted run `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/migration-map.md` ·
@@ -114,7 +115,8 @@ gate is green, read from its own verdict line.
 ### T5 — Skills stop directing TODO.md reads and writes `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/prime/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/init.md` ·
   `skills/lean-doc-generator/references/migration-map.md` · `skills/lean-doc-generator/templates/TECH-DEBT.md.template` ·
-  `skills/lean-doc-generator/templates/CHANGELOG.md.template` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+  `skills/lean-doc-generator/templates/CHANGELOG.md.template` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` ·
+  `evals/run-work-store-fixtures.ts` · `evals/fixtures/work-store/`
 Depends-on: T1 (shared `skills/lean-doc-generator/SKILL.md` and `migration-map.md`)
 Cites: `TASK-395` · A3 (false) · L-015 · `TODO.md` · `templates/TODO.md.template` (both named, not touched)
 
