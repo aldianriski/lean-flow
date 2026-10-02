@@ -29,3 +29,6 @@ the tree and `git log --all`), and the CLAUDE.md slim → `TASK-384`. Members we
   the checkout, not assessed.
 - **handoff ledger:** none.
 G1/G2 are not signed yet.
+
+### 2026-10-02 | progress | plan_commit recorded: ceffdad
+The `plan locked` commit is `ceffdad`; this entry and the frontmatter field land in the next commit.
