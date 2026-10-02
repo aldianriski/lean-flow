@@ -12,8 +12,8 @@ related: [ADR-050, ADR-029, ADR-043, qa-gate-timing, guard-audit-legs, guard-aud
 # Research — Which guards earn their upkeep, judged by the defects they actually caught?
 
 > **Question.** Of every guard in this repo, which caught a real defect, which are consumer-facing, and which should be kept, frozen or cut?
-> **Verdict.** 60 guards: **39 keep · 19 freeze · 2 cut**, by six class rules. 24 ever caught a real defect (>=70 catch events: G 49, E 7, S 12, T 2; E03 only via
-> the event it shares with E01; G08's 7 are on a retired shape); 36 caught none or have no record. Upkeep is ~235 events against those catches. The two cuts are small, so the saving is the proof bar (ADR-050).
+> **Verdict.** 60 guards: **39 keep · 18 freeze · 3 cut**, by six class rules. 24 ever caught a real defect (>=70 catch events: G 49, E 7, S 12, T 2; E03 only via
+> the event it shares with E01; G08's 7 are on a retired shape); 36 caught none or have no record. Upkeep is ~235 events against those catches. The three cuts are small, so the saving is the proof bar (ADR-050).
 
 ## Why this matters
 SPRINT-111 grew from "delete one file" to five tasks and ~22 agent dispatches because its guards read the retired shape (Retro · Cost). ADR-050
@@ -68,15 +68,15 @@ Default always-on profile: freeze 70 s of 645 (11%). Opt-in: freeze 609 of 1,514
 - **R4 0 or unknowable, not consumer, shape live -> freeze (14).** Freeze = existing fixtures stay, no new cases, no parity port, ADR-029 Tier X bar.
 - **R5 duplicate -> cut the weaker (0).** None: G10/S4.INDEX overlap but S4.INDEX is R1; legs 2b-2d are the only implementers of their spec rows. K01 duplicates the Shell engine (Q9).
 - **R6 row types.** Tests of non-guard tooling S07-S09 are Tier X keep (3). A parity harness is kept iff its Shell oracle is a consumer contract (P5), frozen
-  otherwise (P1 P2 P3 P6 P7), cut if **no runner of any kind executes it** (neither a `qa-check.sh` list nor `bun test` discovery). Facts: P4 is `excluded` and not a
+  otherwise (P1 P2 P3 P6), cut if **no runner of any kind executes it** (neither a `qa-check.sh` list nor `bun test` discovery). Facts: P4 is `excluded` and not a
   `.test.ts` -> cut. P6 is a `*.test.ts`, so `bun test` runs it -> freeze. P7 is a plain `.ts`, header "Run standalone ... not wired into qa-check.sh" -> no runner -> **cut by this
-  criterion, pending owner ruling** (held at freeze in the totals). The "no runner of any kind" wording is the sharpening Codex round 2 asked for; ADR-050 clause 3 uses it.
+  criterion (owner-ruled cut)**. The "no runner of any kind" wording is the sharpening Codex round 2 asked for; ADR-050 clause 3 uses it.
 - **K01 is bounded** (Codex round 2): the 11 `packages/standard` tests named by `run-s4-ts-evaluators.sh` (9) and `run-s4-differential-parity.sh` (2) belong to E04 and P5 (kept);
   K01's freeze covers the other 61 files (19 packages tests, 2 apps tests, 40 sources); the S4 rule sources those 11 tests exercise take E04's bar when changed.
-- **Owner rulings:** T01 keep (exception, +1 keep). Totals: keep 21 + 14 + 3 + 1 = **39** · freeze 14 + 5 = **19** · cut 1 + 1 = **2**. Second query: legs 17/11/0, rest 22/8/2.
+- **Owner rulings:** T01 keep (exception, +1 keep). Totals: keep 21 + 14 + 3 + 1 = **39** · freeze 14 + 4 = **18** · cut 1 + 2 = **3**. Second query: legs 17/11/0, rest 22/7/3.
 
 ## Recommendation
-Adopt ADR-050 (proposed). `TASK-398` cuts: **S10** (4 selftests + 4 subjects, 1,403 lines) and **P4** (`run-layers-observed-differential.ts`, 714 lines, 154 s). Apply the freezes by edit-bar,
+Adopt ADR-050 (proposed). `TASK-398` cuts: **S10** (4 selftests + 4 subjects, 1,403 lines) **P4** (`run-layers-observed-differential.ts`, 714 lines, 154 s) and **P7** (`evals/layers-completeness-differential.ts`, 251 lines, plus the comments naming it at `layers-completeness.test.ts:5,241` and `run-layers-completeness-fixtures.sh:12`). Apply the freezes by edit-bar,
 not deletion. Re-run the audit when a sprint adds a guard.
 
 ## Out of scope / open questions
@@ -84,6 +84,6 @@ not deletion. Re-run the audit when a sprint adds a guard.
   Q8 G23 keep, re-rule at the next audit · **Q7** P1 freeze, G17 stays keep (R2, L-176; ADR-039 covers §4 only, nothing to amend) · **Q9** K01 freeze now (R5 would cut
   72 files, 10,802 lines, untouched since 2026-08-29); cut-or-finish is EPIC-014's decision, to be filed as a follow-up task at close · **Q10** R1(b) stands as written
   (G25 G18 S03 S05 keep). Totals unchanged by Q7/Q9/Q10: every ruling matched the recommended disposition.
-- **Open: one.** **P7 `layers-completeness-differential.ts`:** no runner executes it, so R6 as sharpened cuts it (251 lines, untimed). *Rec: cut.*
-  If cut: 39 keep · 18 freeze · 3 cut; the table holds freeze until the owner rules. Follow-ups for close (coordinator files): the K01 task above, and a TD row for an L-015 leak: a shipped skill names repo-only `scripts/...` paths an adopter does not have.
+- **Open: none.** P7 `layers-completeness-differential.ts` (no runner executes it; 251 lines, untimed) was ruled **cut** by the owner (sharpened R6). Follow-ups for close (coordinator files):
+  the K01 task above, and a TD row for an L-015 leak: a shipped skill names repo-only `scripts/...` paths an adopter does not have.
 - Not settled: whether `bun test` joins the gate (TD-212); the freezes' touch-twice review is a proposal, not an ADR-050 clause.

@@ -51,9 +51,9 @@ the ledgers by two routes):
    can name none is added only on the owner's G2 sign-off stating its net cost.
 3. **Shell/TS parity is not grown beyond supported contracts.** A Shell oracle and its TypeScript port keep a differential harness only
    where the Shell file is what an adopter runs. By the trace that is one pair today: the engine's §4 evaluators against the TS port
-   (`run-s4-differential-parity`). Every other differential harness (authority, doc-caps, night-run rollup, epic-archive,
-   layers-completeness) freezes, and one that **no runner of any kind executes** (not a `qa-check.sh` list, not `bun test` discovery) is cut:
-   today `layers-observed-differential`; `layers-completeness-differential` meets the same test and awaits the owner's ruling.
+   (`run-s4-differential-parity`). Every other differential harness (authority, doc-caps, night-run rollup, epic-archive)
+   freezes, and one that **no runner of any kind executes** (not a `qa-check.sh` list, not `bun test` discovery) is cut:
+   today `layers-observed-differential` and `layers-completeness-differential` (owner-ruled).
 4. **The audit's class rules are the standing dispositions** (keep · freeze · cut, `docs/research/guard-audit.md` § Class rules); the
    audit is re-run when a sprint adds a guard, so a guard's cost is weighed against its catches once, not rediscovered each sprint.
 
@@ -70,7 +70,7 @@ the ledgers by two routes):
 
 ## Consequences
 
-**Positive:** of 60 guards, 39 keep their bar (21 consequential), 19 freeze at the Tier X bar and 2 are cut, so most guard edits shed the
+**Positive:** of 60 guards, 39 keep their bar (21 consequential), 18 freeze at the Tier X bar and 3 are cut, so most guard edits shed the
 seeded-mutation campaign and the outside-review round that dominated SPRINT-111's cost; the consumer-facing surface is untouched.
 **Negative (trade-offs accepted):** a silent false negative in a *maintainer-only* guard now lives longer before an independent pass finds
 it (L-165's finding was that nothing the author runs finds these); the catch counts are lower bounds (engine FAILs reach the gate as

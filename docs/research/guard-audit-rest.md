@@ -12,7 +12,7 @@ related: [guard-audit, guard-audit-legs, ADR-050]
 # Research — Per-guard record: engine families, skill procedures, `test/` guards, the TS port and parity harnesses (32 rows of `guard-audit`)
 
 > **Question.** For every guard outside the `qa-check.sh` legs: what did it catch, cost, and what do the class rules rule?
-> **Verdict.** 22 keep · 8 freeze · 2 cut (E 11 keep · S 8 keep, 1 freeze, 1 cut · T 2 keep, 1 freeze · K 1 freeze · P 1 keep, 5 freeze, 1 cut).
+> **Verdict.** 22 keep · 7 freeze · 3 cut (E 11 keep · S 8 keep, 1 freeze, 1 cut · T 2 keep, 1 freeze · K 1 freeze · P 1 keep, 4 freeze, 2 cut).
 > Legs: [`guard-audit-legs.md`](guard-audit-legs.md). Method and totals: [`guard-audit.md`](guard-audit.md).
 
 ## Why this matters
@@ -61,7 +61,7 @@ Spec rows `S2.R-TEMPDIR`, `S11.EPIC`, `S11.RESEARCH` have no `assert_` in the en
 | P4 | layers-observed-differential (X, 154 s; no runner of any kind) | oracle no | not mined | not tallied | R6 cut (**owner: cut**) |
 | P5 | s4-differential-parity (O; names 2 `packages/standard` tests: `adr-family-fixtures.test`, `s4-append-oracle.test`) | oracle = the engine | not mined | not tallied | R1 keep |
 | P6 | `epic-archive-differential.test.ts` (`bun test` discovers it, so a runner exists) | oracle no | not mined | not tallied | R6 freeze |
-| P7 | `layers-completeness-differential.ts` (251 lines; "run standalone", no runner) | oracle no | not mined | not tallied | R6 freeze held; **pending owner ruling** (the sharpened R6 cuts it) |
+| P7 | `layers-completeness-differential.ts` (251 lines; "run standalone", no runner) | oracle no | not mined | not tallied | R6 cut (**owner-ruled**; no runner of any kind) |
 
 ## Recommendation
 Rows E, S, T, K, P follow the class rules in `guard-audit.md`; every exception (Q1-Q10) is owner-ruled there.
