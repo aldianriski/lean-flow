@@ -320,6 +320,20 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-213** severity: low | status: open | created: Sprint-111 (T4 Codex round 2)
+  - Summary: **The engine's retired-row marker regex has only been run under gawk.** `_s2_rows` matches a literal em dash
+    (`—`) inside a single-quoted awk program. mawk (Debian's default awk) and busybox awk are absent on the dev host, so
+    adopter portability is unverified. A mismatch fails safe: the retired row becomes live again and is placed, never dropped.
+  - Mitigation (hypothesis): run `run-s2-placement-fixtures.sh` under mawk and busybox in CI or a container once one exists.
+
+- **TD-212** severity: medium | status: open | created: Sprint-111 (close retro, L-221)
+  - Summary: **Neither the default gate nor any review brief runs the test surfaces that pin a spec or skill change.**
+    `qa-check.sh` never invokes `bun test`, and opt-in harnesses run only under QA_FULL, which no builder or reviewer brief
+    required. SPRINT-111 shipped four breaks through green default gates (T3's 9 TS assertions pinned to 100 rules · T5's
+    work-store contract · T2's unexcluded frozen selftests · TD-211), each found only by running those surfaces by hand.
+  - Mitigation (hypothesis): a gate leg (or the dispatch brief) that greps `evals/` and `**/*.test.ts` for the changed artifact's
+    path or pinned values and runs every hit, opt-in included. Census first: how many past sprints changed a pinned artifact.
+
 - **TD-211** severity: low | status: open | created: Sprint-111 (T4 opt-in run)
   - Summary: **`evals/run-orchestrator-store-fixtures.ts` has been red since SPRINT-110 T4 (`dccdca1`).** Its text-contract case
     expects `night-run.md` to contain "retargeted onto member files under TASK-383". `dccdca1` rewrote that passage, and the harness

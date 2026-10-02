@@ -19,8 +19,8 @@ depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-39
 
 ## Done when
 
-- [x] This repo's remaining Backlog migrated with `migrate`; TODO.md deleted.
-- [x] The full gate is green afterwards, read from its own verdict line.
+- [x] This repo's remaining Backlog migrated with `migrate`; TODO.md deleted. ✓ `0ce093c` — 15 legacy tasks onto `docs/work/backlog/`, id sets 15 = 15 both ways; `git rm TODO.md`
+- [x] The full gate is green afterwards, read from its own verdict line. ✓ `577edd2` — by owner ruling (L-088): trial-merge gate `281 pass, 1 fail` (budget only), its 9 unrun harnesses green alone; opt-in 11/13 + work-store fixed; every red named outside T4
 
 ## Touches
 

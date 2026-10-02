@@ -2,8 +2,8 @@
 sprint: 111
 slug: delete-todo-md
 owner: Maintainer
-last_updated: 2026-09-30
-status: active
+last_updated: 2026-10-02
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -204,3 +204,11 @@ Codex rules that this does not block. Threat 5 stays open until QA_FULL coverage
   foreign WIP, and the SPRINT-110 opt-in. The TD rows were filed with ids derived from the max (TD-209, worktrees excluded; 0 hits for 210/211):
   TD-210 (the work-store selectors diverge on member syntax and quoted status; census 0, so they go to TD per the owner's rule) and TD-211 (orchestrator-store).
 - For close: S9.VERIFYCLAUSE flags TASK-394's ticked boxes for not naming their check. It is inside the 23-FAIL baseline. DoD 2/2.
+
+### 2026-10-02 | close | 5 of 5 members in done/, 13 of 13 Done-when; EPIC-017 Closed-when 2 met
+- Close by reference: `check-sprint-by-reference` 7 pass, 0 fail (freeze point · 5 members unchanged since baseline · TASK-395 admitted
+  by its scope-change). Ticked boxes on TASK-394 and TASK-380 gained ` ✓ <sha> — <evidence>`; S9.VERIFYCLAUSE no longer names SPRINT-111.
+- Retro routed. Shipped → CHANGELOG § SPRINT-111. Debt → TD-210 · TD-211 · TD-212 · TD-213 (ids derived from max TD-209, worktrees
+  excluded). Follow-up → TASK-397 (`origin: close-retro`; max was TASK-396). Learnings → L-220 count 2 (retrieval miss) · L-221 · L-222
+  (max L-220; L-998/999 are test tokens). EPIC-017: row + Closed-when 2 `[x]`; the epic stays active (CW 3–10 open).
+- No handoff entry to reconcile. No release (D3).

@@ -39,6 +39,25 @@ promote, close and retro follow-ups use store task files; the dev-flow/adlc-flow
 `TODO.md` survives only in `migrate`'s v1→v2 path and the v1 refusal text.
 
 ---
+## SPRINT-111 — Delete TODO.md (2026-10-02)
+
+EPIC-017's fifth member sprint. **Unreleased**: no version bump (D3).
+
+- **Nothing reads `TODO.md` any more (spec 0.13.0, MINOR).** The engine's `S11.TODOCAP` keeps its id, level and mark, because
+  ADR-034 freezes the rule-ID surface at 100. It is now a retired no-op: an over-cap `TODO.md` gets a note, not a finding. The
+  engine no longer scans TODO.md for v1 breadcrumbs or holds it to the ownership header. qa-check legs 5, 7 and 8, leg 3's TODO.md
+  subject, and check-task-origin's legacy population are retired. §14 stays at 100 classified and 51 checkable.
+- **§2 rows the spec marks retired are no longer placed.** S2.R-PLACEMENT and S2.F-FILE skip a row whose first cell carries the
+  spec's own marker (`` `path` — **… retired at X.Y.Z** ``), so a stray `docs/TODO.md` in a v2 repo is not flagged as a misplaced
+  v1 queue. A live row that merely mentions retirement is unaffected.
+- **`migrate` handles by-reference sprints.** A sprint with `## Members` has its `Tn` skipped; its members must exist and are never
+  written. Existing store files are preserved byte for byte, and an interrupted run re-runs to the same tree. Proven on a real
+  copy of this repo, then run by an agent on the repo itself.
+- **This repository is on the store.** 15 legacy tasks were migrated and `TODO.md` deleted, which meets EPIC-017 Closed-when 2. Eight
+  harnesses that guarded only the v1 park/retry shape are frozen and excluded from the gate. The work-store harness follows prime's
+  by-id membership rule.
+
+---
 ## SPRINT-110 — Retarget the Gate (2026-09-30)
 
 EPIC-017's fourth member sprint. **Unreleased**: no version bump (D3); the whole epic gates `2.0.0`.

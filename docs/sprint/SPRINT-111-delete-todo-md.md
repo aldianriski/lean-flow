@@ -3,9 +3,10 @@ sprint: 111
 slug: delete-todo-md
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-09-30
-status: active
+last_updated: 2026-10-02
+status: closed
 plan_commit: ab0c748
+close_commit: CLOSE_SHA
 update_trigger: sprint execute/close events
 ---
 
@@ -153,5 +154,40 @@ layout detection, and v1-refusal text); init scaffolds the store; README and CHA
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/lean-doc-generator/references/migration-map.md` · `evals/run-v1-to-v2-fixtures.ts` · `evals/fixtures/v1-to-v2/` | T1 | migrate learns by-reference sprints + a preservation invariant; real-copy and interrupted-run proof | High | v1-to-v2 24/0 · worktree outside review CLEAR |
+| 8 `evals/assert-*` / `selftest-assert-*` · `scripts/qa-check.sh` | T2 | v1-only park/retry harnesses frozen; the 4 selftests excluded by name (`5b415d4`, found at T4) | Med | qa-check completeness leg |
+| `scripts/qa-check.sh` · `scripts/lib/conformance-engine.sh` · `scripts/lib/check-task-origin.sh` · `spec/STANDARD.md` · `spec/CHANGELOG.md` · 6 eval harnesses | T3 | every TODO.md reader retired; S11.TODOCAP kept as a note (ADR-034); spec 0.13.0 MINOR | High | 8 seeded breaks · bun test 138/0 · Codex CLEAR |
+| 15 `docs/work/backlog/TASK-*.md` · `TODO.md` (deleted) · `scripts/lib/prose-density-baseline.txt` · `TECH-DEBT.md` | T4 | this repo migrated by an agent-run migrate; TODO.md gone (EPIC-017 CW 2) | High | ids 15 = 15 both ways · gate by owner ruling |
+| `README.md` · `docs/architecture/overview.md` · `.claude/CONTEXT.md` · `docs/QA.md` · `docs/qa/QA-001/002` · `evals/README.md` · `docs/research/structarmed-adaptation.md` | T4 | stale "TODO.md present" lines and a dead link fixed | Low | doc-caps · research-archive 0 FAIL |
+| `scripts/lib/conformance-engine.sh` · `evals/run-s2-placement-fixtures.sh` | T4 | `_s2_rows` skips §2 rows on the spec's whole-cell retirement marker (the missed T3 retirement) | High | selection fixture · substring + any-bold mutants redden · Codex CLEAR |
+| `skills/prime/SKILL.md` · `skills/lean-doc-generator/**` · README · CHANGELOG | T5 | skills stop directing TODO.md reads/writes; prime finds members by id | Med | two-selector grep · scoped review |
+| `evals/run-work-store-fixtures.ts` · `evals/fixtures/work-store/**` | T5 | opt-in harness follows prime's by-id rule; independent walkers; CRLF-safe; explicit prime path | High | 21/0 LF + CRLF · 3 Codex rounds CLEAR |
 
 ## Retro
+
+**Retrieval check** — **yes, a miss.** L-220 (check a shipped entry point's own ADR before recommending a ruling that changes it)
+was loaded and quoted in D4, and T3's S11.TODOCAP retirement was still put to the owner without reading ADR-034. A grep for stale
+counts, a different route, found it after the build (9 TS assertions red). L-220 is now count 2 and a promotion candidate.
+
+**Cost** — coordinator (Opus) + ~22 dispatched agents: 5 Sonnet builder lines (T3 ×2 rounds · T4 plan + apply + 2 fix rounds · T5
+harness ×3 rounds), 1 Sonnet outside reviewer, 2 Sonnet executors for Codex, and ~11 Codex passes (hybrid mode: Codex reads, Claude
+runs, because Codex's sandbox cannot spawn processes on this host). Dispatched-agent tokens ≈ 2.2M, of which builders ≈ 1.7M and review
+≈ 0.5M. Delivered: 5 members, 13 of 13 DoD, and EPIC-017 Closed-when 2. The review loop found real defects every round, at a cost, and
+that cost is TASK-396's evidence.
+
+**Worked**
+- A disagreeing second route caught the escapes that one route could not: the stale-count grep (ADR-034), Codex's static read
+  (Layers, live-row drop), and per-harness opt-in runs (T2, T5, TD-211). L-198 held at session scale.
+- Owner rulings by popup at each fork (keep the id · Layers widened · hybrid Codex · box-2 ruling), each logged before the edit it governed.
+- Seeded-mutant proofs with ONE hash convention; every one applied, parsed and was restored.
+
+**Friction**
+- Four breaks rode green default gates (L-221 → TD-212). Every builder ran its own harnesses faithfully, so the gap was in what "verified" meant.
+- The full gate is longer than both the default budget and the foreground ceiling, and the host reaped a QA_FULL run for memory;
+  per-harness foreground runs were the workaround (TD-143 lineage).
+- Leftover worktrees accumulate (11 at the start); two refused deletion; one runner looped re-sending its report.
+
+**Pattern candidate**
+- L-220 (count 2) → promote at the next promote's governance review, placed where the ruling is offered: the orchestrator's
+  scope-change step and G2, not CLAUDE.md alone.
+- L-221 / L-222 (count 1): watch.

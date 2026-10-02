@@ -26,9 +26,9 @@ the spec saying so.
 
 ## Done when
 
-- [x] Zero non-test readers of TODO.md across scripts/, evals/, skills/ — derived mechanically by two selectors — except the allowlist: migrate's reference procedure, a bare existence check in layout detection, and v1-refusal text.
-- [x] S11.TODOCAP retired: spec/STANDARD.md §2 TODO.md row, §11 row and §14 counts updated, a spec MINOR with a CHANGELOG entry, and the engine rule removed. qa-check legs 3/5/8 and leg 7's TD-aging half (TD-203) retired or retargeted.
-- [x] Retained must-FAIL fixture for any retargeted reader; worktree-isolated outside review.
+- [x] Zero non-test readers of TODO.md across scripts/, evals/, skills/ — derived mechanically by two selectors — except the allowlist: migrate's reference procedure, a bare existence check in layout detection, and v1-refusal text. ✓ `45961bc` — two selectors over scripts/ + evals/ (after: A=29 · B=7, 0 retired-reader rows); skills/ allowlist-only after T5; Codex CLEAR
+- [x] S11.TODOCAP retired: spec/STANDARD.md §2 TODO.md row, §11 row and §14 counts updated, a spec MINOR with a CHANGELOG entry, and the engine rule removed. qa-check legs 3/5/8 and leg 7's TD-aging half (TD-203) retired or retargeted. ✓ `b324740` — owner ruling (ADR-034): reader removed, id kept as a reader-free note; spec 0.13.0 MINOR, §14 stays 100 · 51; legs 3/5/7/8 retired (TD-203)
+- [x] Retained must-FAIL fixture for any retargeted reader; worktree-isolated outside review. ✓ `45961bc` — holds vacuously (nothing retargeted, owner ruling); worktree-isolated outside review, then Codex gauntlet CLEAR
 
 ## Touches
 
