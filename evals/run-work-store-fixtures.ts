@@ -426,6 +426,9 @@ function extractSection(body: string, heading: string): string | null {
 // Selector A (reference) and selector B (grep-style) differ in: the directory walk (readdirSync vs
 // Bun.Glob), the sprint walk and `status:` read, comment stripping (regex vs a char scanner), the
 // member-line parse (regex vs first-token basename), the task key (filename id vs frontmatter id).
+// KNOWN DIVERGENCES, NOT proven by A/B agreement here: bare-id or `.bak`-suffixed member paths (A's
+// unanchored regex vs B's anchored basename) and a quoted `status: "active"` (A literal vs B
+// quote-stripping); neither shape exists in the real sprint files -- see TD (filed at SPRINT-111 close).
 
 // Selector A: the active sprint files, via readdirSync + splitFrontmatter.
 function referenceSprintFiles(root: string, onlyActive: boolean): string[] {
@@ -535,12 +538,18 @@ function referenceOpenDoD(root: string, sprintFile: string): number {
   return total;
 }
 
-// Selector B: iterates the STORE (its own Bun.Glob walk); id from the FRONTMATTER `id:`; kept iff
+// Selector B's task-file walker (Bun.Glob; distinct from A's readdirSync walker `findTaskFiles`).
+// B's counting AND the census below both call THIS function, so the census sees B's real walk.
+function grepStyleTaskFiles(root: string): string[] {
+  return [...new Glob("docs/work/**/TASK-*.md").scanSync({ cwd: root, absolute: true })];
+}
+
+// Selector B: iterates the STORE (its own walk); id from the FRONTMATTER `id:`; kept iff
 // in the Members id-set; counted by a per-line state machine.
 function grepStyleOpenDoD(root: string, sprintFile: string): number {
   const inSet = new Set(grepStyleMemberIds(sprintFile));
   let total = 0;
-  for (const file of new Glob("docs/work/**/TASK-*.md").scanSync({ cwd: root, absolute: true })) {
+  for (const file of grepStyleTaskFiles(root)) {
     let inFrontmatter = false;
     let frontmatterClosed = false;
     let fileId: string | undefined;
@@ -709,14 +718,12 @@ const fmt = (xs: string[]) => `[${xs.join(", ")}]`;
   );
 }
 
-// Case (f): census. Both walkers must reach every task file (todo/ in_progress/ done/ cancel/),
+// Case (f): census. A (findTaskFiles) and B (grepStyleTaskFiles) -- their REAL walkers -- must reach every task file (todo/ in_progress/ done/ cancel/),
 // counted by hand (TASK_CENSUS) -- a walker that skips a status folder cannot hide in both.
 {
   const rel = (f: string) => f.replace(/\\/g, "/").split("/docs/work/")[1];
   const a = findTaskFiles(MEMBERSHIP_FIXTURE_ROOT).map(rel).sort();
-  const b = [...new Glob("docs/work/**/TASK-*.md").scanSync({ cwd: MEMBERSHIP_FIXTURE_ROOT, absolute: true })]
-    .map(rel)
-    .sort();
+  const b = grepStyleTaskFiles(MEMBERSHIP_FIXTURE_ROOT).map(rel).sort();
   const ok = a.length === TASK_CENSUS && fmt(a) === fmt(b);
   report(
     "membership-census (both walkers reach every task file in every status folder)",
