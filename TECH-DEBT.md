@@ -616,7 +616,7 @@ status: current
     `docs/knowledge-index.md` is generated, so it cannot fall behind again.
   - **Re-file fresh if** the gap grows after a close that was supposed to append.
 
-- **TD-174** severity: high | status: open | created: Sprint-104
+- **TD-174** severity: high | status: resolved → TASK-384 | created: Sprint-104
   - Summary: **The soft-cap route reports and nothing acts on it.** `check-doc-caps` prints three
     `OVER-CAP (soft)` rows on every run — `TODO.md` 536 > 320, `docs/research/adlc-epic-sequencing.md`
     140 > 130, and `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` **3,050 > 130, which
@@ -633,6 +633,9 @@ status: current
     the three standing rows get dispositions now and the class is re-examined. `EPIC-017` `TASK-364`
     carries the design; this row is the evidence, not the plan.
   - **Re-file fresh if** a fourth soft breach appears before the three are closed.
+  - **Resolved (SPRINT-112 T2, TASK-384):** the soft class got its forcing function — `check-doc-caps` reads a repo-root
+    `.cap-dispositions` and names every disposed soft breach, and the four standing rows now each carry a recorded `retain` (with its
+    exit condition). A hard cap and the token budget are deliberately not dispositionable (ADR-048 § Amended 2026-10-02).
 
 - **TD-173** severity: medium | status: open | created: Sprint-104
   - Summary: **Two synthetic id blocks exist; only one is documented.** `TODO.md`'s standing-facts

@@ -1,0 +1,19 @@
+# Recorded dispositions for SOFT over-cap rows (TASK-384, ADR-048 amendment).
+#
+# One row per line: <path> -- <kind> -- <reason>, kind in: replace | merge | move-to-reference |
+# automate-into-check | retain.  check-doc-caps reads this file and prints a NAMED `retained:` line
+# for each disposed soft OVER-CAP instead of `OVER-CAP (soft)` -- never silently.  A row with no
+# reason, an unknown kind, a duplicate path, or a STALE path (absent / mis-cased / ./-prefixed, no
+# longer over its cap, or FROZEN) is itself a FAIL: a disposition that outlived its breach must not
+# linger.  A HARD cap and the always-loaded token budget are NOT dispositionable -- a row naming a
+# hard-capped path is reported and the hard FAIL stands (a promoted rule leaves CLAUDE.md through the
+# `disposition:` pointer on its LEARNINGS line instead, see ADR-048 § Amended 2026-10-02).
+#
+# `retain` keeps the overage and so needs a real justification plus the condition that ends it; the
+# other four kinds describe a move the file's diff must show.  A trim to squeeze under a cap is not
+# a disposition ("not a diet").  The path is matched EXACTLY (trimmed, case-sensitive, no ./ prefix).
+
+docs/epic/EPIC-017-work-items-that-fit.md -- retain -- an ACTIVE epic: its Decisions and Member-sprints rollup are the live register every EPIC-017 sprint reads and updates, so a trim now deletes the record in use; §11 archives the epic at close, which ends this row
+docs/research/adlc-epic-sequencing.md -- retain -- the FROZEN-architecture ruling and its amendment sit in this file on purpose (L-151: a freeze recorded anywhere else governs nothing) and EPIC-015's last Closed-when re-arms the freeze here; moving them would unmoor the register. Revisit when EPIC-015 closes
+docs/research/epic-017-effectiveness.md -- retain -- the "before" baseline that TASK-386 re-runs unchanged and diffs against, so trimming it alters the comparand; archive via §11 once TASK-386 has consumed it and nothing live cites it
+docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md -- retain -- the 3,050-line authoritative handoff, still cited by ADR-036 (§9), EPIC-017 and TECH-DEBT, so it cannot be archived (§11 needs nothing live citing it) and splitting it breaks those pointers; a diet cannot earn the cap. Revisit when a ruling supersedes it
