@@ -158,3 +158,13 @@ full slugs are kept. (4) 16 prose blocks are dropped and block 14 (L-111 "opport
 the stale "TODO.md present" lines in README.md · docs/architecture/overview.md · .claude/CONTEXT.md · docs/QA.md ·
 docs/qa/QA-001 · QA-002 · evals/README.md are fixed in T4. TECH-DEBT.md:11/:41 and TD-203's status were already in Layers.
 (6) **All execution is reviewed by Codex in a gauntlet loop** (review → fix → re-review until clean). That covers T4 and, retroactively, T3's merged range.
+
+### 2026-10-02 | progress | T3 Codex gauntlet (retroactive, owner ruling): CLEAR in hybrid mode
+- Codex's sandbox on this machine cannot spawn processes (`Win32 error 5`, `uv_spawn EPERM`) or write git index locks, in read-only or `--write` mode.
+  Owner ruling: **hybrid**. Codex reviews statically and names the confirming commands; a Claude runner executes them in an isolated worktree;
+  Codex gives the verdict on the verbatim output.
+- Round 1 (static, 3fe3320..45961bc): 1 PLAUSIBLE. `check-research-archive.sh` `live_citer`'s generic `*.md` grep includes TODO.md. Ruled a
+  generic population member, not a v1-shape reader, and moot at T4's delete. Threats 1, 3 and 5 could not be run.
+- Round 2 (runner, then Codex verdict): collateral diff at both revisions. Every OLD∖NEW case is a retired TODO.md branch; leg 7 was confirmed
+  wholly TODO.md-dependent at `3fe3320:scripts/qa-check.sh:901–932`. Swapping each old script back in reddens every retired-branch fixture
+  (qa-store-legs 19/4 · sprint-family 6 FAIL · ownership 2 FAIL · task-origin 5 FAIL). Restores were hash-checked. `bun test` (4 spec/cli files) 138/0. **Codex: CLEAR.**
