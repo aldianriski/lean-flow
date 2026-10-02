@@ -54,7 +54,7 @@ preceded a fix. *Maint* = defects in the guard itself; `~` = lower bound from co
 | G21 | gate runtime budget (A qa-budget-fixtures, -default-; O -position-) | no | 0 strict; 1 report (SPRINT-086 T3 tripped at 461 s) | ~8 | R4 → freeze (**owner: freeze**) |
 | G22 | sprint-by-reference (`check-sprint-by-reference.ts`; O by-reference-fixtures) | yes, spawned at `conformance-engine.sh:2171` | 0 (clean re-runs only) | ~15 | R1 → keep checker; **owner: freeze the harness** (328 s) |
 | G23 | recorded-run rollup, leg 2g (A night-run-rollup-fixtures; `night-run-rollup.test.ts`) | no (skill names `night-run.sh` only) | >=1 (SPRINT-082 rollup rewritten); 2 misfires (L-177, L-197) | ~10 | R2 → keep (**owner: keep; re-rule at the next audit**) |
-| G24 | review depth (A review-depth-fixtures) | skill names it | >=3 (SPRINT-087 T8; SPRINT-091 12 FAILs "correct", close blocked) | ~6 | R2 → keep |
+| G24 | review depth (A review-depth-fixtures) | skill names it (`orchestrator/SKILL.md:119`, `review-scoping.md:152`) | >=3 (SPRINT-087 T8; SPRINT-091 12 FAILs "correct", close blocked) | ~6 | R1(b) → keep (Codex round 2; was R2) |
 | G25 | mechanical Verify reaches, leg 2c-bis (A verify-reaches-fixtures, system-verify-fixtures) | skill names it (`orchestrator/SKILL.md:50`, `review-scoping.md:218`) | 0 (every FAIL overridden or ruled a false positive: TD-086/087) | ~8 | R1(b) → keep (Codex finding 2 confirmed; **owner-ruled** Q10) |
 
-Totals: keep 17 (R1: G18 G22 G25 = 3 · R2: 14) · freeze 11 (all R4).
+Totals: keep 17 (R1: G18 G22 G24 G25 = 4 · R2: 13) · freeze 11 (all R4).

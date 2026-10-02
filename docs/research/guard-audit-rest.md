@@ -30,7 +30,7 @@ Spec rows `S2.R-TEMPDIR`, `S11.EPIC`, `S11.RESEARCH` have no `assert_` in the en
 | E01 | S1.LAW2/LAW3 | >=1 (da72f59: 16 headers; SPRINT-075 T6 first live run: 28 gaps) | ~2 | R1 keep |
 | E02 | S2.F-FILE, S2.R-PLACEMENT (A s2-placement) | 0 | ~3 | R1 keep |
 | E03 | S3.AGENTS, S3.SCHEMA | shares E01's da72f59 event | 0 | R1 keep |
-| E04 | S4.* (A s4-ts-evaluators; O adr-family; `test/adr-family-harness-parity`, `test/s4-retained-fixtures`) | 0 | ~3 | R1 keep |
+| E04 | S4.* (A s4-ts-evaluators, which names 9 `packages/standard` rule tests + the 2 `test/` files below; O adr-family; `test/adr-family-harness-parity`, `test/s4-retained-fixtures`) | 0 | ~3 | R1 keep |
 | E05 | S6.BASE/BACKEND/MEDIUM/MULTISVC | 0 (lean-flow declares no tier, L-016) | ~2 | R1 keep |
 | E06 | S9.* (A spec-reduction, gates-signed; O sprint-family ~137-184 s) | >=4, all VERIFYCLAUSE (SPRINT-081, 087) | ~6 | R1 keep |
 | E07 | S10.* | >=1 (S10.TDAGING x4 at SPRINT-087 close; routes disagree) | ~2 | R1 keep |
@@ -54,14 +54,14 @@ Spec rows `S2.R-TEMPDIR`, `S11.EPIC`, `S11.RESEARCH` have no `assert_` in the en
 | T01 | `test/architecture` unwired-exports + dependency-direction | no | 0 (first run reproduced TD-103, still open) | ~5 | R4 → **owner: keep** |
 | T02 | `test/gate-discovery` | no | 0 | ~2 | R4 freeze |
 | T03 | `qa-verdict.ts` (`qa-verdict.test.ts`) | no | >=2 run-level (SPRINT-099 truncated runs read as pass; SPRINT-109, L-218) | ~4 | R2 keep |
-| K01 | TS engine port: `packages/standard` (40 src files, 4,005 lines; 30 tests, 6,797 lines) + `apps/cli` (S4 · S12 · F4 · F12 rules) | no (`conformance.sh` runs Shell only; `bun test` only) | 0 on a skim of its 35 commits (last 2026-08-29); not ledger-mined | not tallied | R4 freeze (**owner-ruled**: freeze now; cut-or-finish is EPIC-014's decision) |
+| K01 | TS engine port: `packages/standard` (40 src files, 4,005 lines; 30 tests, 6,797 lines) + `apps/cli` (S4 · S12 · F4 · F12 rules). **Freeze covers 61 files** (19 packages tests, 2 apps tests, 40 sources); the 11 S4 tests named by the E04/P5 harnesses belong to those rows | no (`conformance.sh` runs Shell only; `bun test` only) | 0 on a skim of its 35 commits (last 2026-08-29); not ledger-mined | not tallied | R4 freeze (**owner-ruled**: freeze now; cut-or-finish is EPIC-014's decision) |
 | P1 | authority-differential (O, 55 s) | oracle no | not mined | not tallied | R6 freeze (**owner-ruled**) |
 | P2 | doc-caps-differential (O, 80 s) | oracle no (see G01) | not mined | not tallied | R6 freeze |
 | P3 | night-run-rollup-differential-parity (O, 78 s) | oracle no | not mined | not tallied | R6 freeze |
-| P4 | layers-observed-differential (X, 154 s, ungated) | oracle no | not mined | not tallied | R6 cut (**owner: cut**) |
-| P5 | s4-differential-parity (O) | oracle = the engine | not mined | not tallied | R1 keep |
-| P6 | `epic-archive-differential.test.ts` (bun test) | oracle no | not mined | not tallied | R6 freeze |
-| P7 | `layers-completeness-differential.ts` | oracle no | not mined | not tallied | R6 freeze |
+| P4 | layers-observed-differential (X, 154 s; no runner of any kind) | oracle no | not mined | not tallied | R6 cut (**owner: cut**) |
+| P5 | s4-differential-parity (O; names 2 `packages/standard` tests: `adr-family-fixtures.test`, `s4-append-oracle.test`) | oracle = the engine | not mined | not tallied | R1 keep |
+| P6 | `epic-archive-differential.test.ts` (`bun test` discovers it, so a runner exists) | oracle no | not mined | not tallied | R6 freeze |
+| P7 | `layers-completeness-differential.ts` (251 lines; "run standalone", no runner) | oracle no | not mined | not tallied | R6 freeze held; **pending owner ruling** (the sharpened R6 cuts it) |
 
 ## Recommendation
 Rows E, S, T, K, P follow the class rules in `guard-audit.md`; every exception (Q1-Q10) is owner-ruled there.

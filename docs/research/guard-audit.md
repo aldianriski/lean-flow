@@ -12,8 +12,8 @@ related: [ADR-050, ADR-029, ADR-043, qa-gate-timing, guard-audit-legs, guard-aud
 # Research — Which guards earn their upkeep, judged by the defects they actually caught?
 
 > **Question.** Of every guard in this repo, which caught a real defect, which are consumer-facing, and which should be kept, frozen or cut?
-> **Verdict.** 60 guards: **39 keep · 19 freeze · 2 cut**, by six class rules. 23 ever caught a real defect (>=63 recorded catches; E03 only via a catch
-> shared with E01); 37 caught none or have no record. Upkeep is ~235 events against those catches. The two cuts are small, so the saving is the proof bar (ADR-050).
+> **Verdict.** 60 guards: **39 keep · 19 freeze · 2 cut**, by six class rules. 24 ever caught a real defect (>=70 catch events: G 49, E 7, S 12, T 2; E03 only via
+> the event it shares with E01; G08's 7 are on a retired shape); 36 caught none or have no record. Upkeep is ~235 events against those catches. The two cuts are small, so the saving is the proof bar (ADR-050).
 
 ## Why this matters
 SPRINT-111 grew from "delete one file" to five tasks and ~22 agent dispatches because its guards read the retired shape (Retro · Cost). ADR-050
@@ -53,23 +53,27 @@ comments; its only executable call is `qa-check.sh:166`. So **G01 is not R1** (i
 whose Shell side an adopter runs is the engine's §4 against the TS port (P5).
 
 **What the record says.** Catches cluster in few events: SPRINT-081 T1 (16 headers), `VERIFYCLAUSE` lines (>=4), and **first live runs** (SPRINT-055, L-102).
-Maintenance leaders: G19 ~20, G22 ~15 (0 catches), E11 >=10, G03 ~10, G23 ~10, S01 ~9. **Unknowable, not zero:** G12b, G13. 0-catch is common: 14 of 28 legs, 6 of 11
+Maintenance leaders: G19 ~20, G22 ~15 (0 catches), E11 >=10, G03 ~10, G23 ~10, S01 ~9. **Unknowable, not zero:** G12b, G13. Guards counted from the table rows (second route): 15 G + 5 E + 3 S + 1 T = 24 with catches. 0-catch is common: 13 of 28 legs, 6 of 11
 engine families, 6 of 13 procedure/test rows, and every parity harness and K01 (no record).
 
 **Runtime** (every harness alone, once; ordinary not exact; table in `guard-audit-runtime`). All 64 = **2,351 s**: keep 1,480 · **freeze 679 · cut 192 = 871 s (37%)**.
 Default always-on profile: freeze 70 s of 645 (11%). Opt-in: freeze 609 of 1,514. The cut set is all excluded (runs in no gate), so it saves upkeep, not gate time.
 
 ## Class rules (order R1 > R2 > R5 > R3 > R4; counts are rows)
-- **R1 consumer-facing -> keep (20).** (a) executed by `conformance.sh` per the trace (engine E01-E11, G22's checker, P5), or (b) a script a shipped skill names as the
-  mechanism of an adopter-run step (S01-S05, G18, G25; Codex finding 2, confirmed: `orchestrator/SKILL.md:50`, `review-scoping.md:218`). (b) is broad; see Q10.
-- **R2 caught >=1 real defect on a shape still produced -> keep (15).** *Changed from "in its life":* a catch on a retired shape (G08) does not count.
-  G01 G02 G03 G04 G10 G11 G12a G14 G15a G16 G17 G19 G23 G24 T03.
+- **R1 consumer-facing -> keep (21).** (a) executed by `conformance.sh` per the trace (engine E01-E11, G22's checker, P5), or (b) a script a shipped skill names as the
+  mechanism of an adopter-run step (S01-S05, G18, G24, G25; G24 per `orchestrator/SKILL.md:119` and `review-scoping.md:152`, Codex round 2; Codex finding 2, confirmed: `orchestrator/SKILL.md:50`, `review-scoping.md:218`). (b) is broad; see Q10.
+- **R2 caught >=1 real defect on a shape still produced -> keep (14).** *Changed from "in its life":* a catch on a retired shape (G08) does not earn R2, though G08 still counts as having caught.
+  G01 G02 G03 G04 G10 G11 G12a G14 G15a G16 G17 G19 G23 T03.
 - **R3 0 catches, not consumer, shape retired -> cut (1).** S10, the v1 park/retry selftests (+ their 4 subjects, 1,403 lines).
 - **R4 0 or unknowable, not consumer, shape live -> freeze (14).** Freeze = existing fixtures stay, no new cases, no parity port, ADR-029 Tier X bar.
 - **R5 duplicate -> cut the weaker (0).** None: G10/S4.INDEX overlap but S4.INDEX is R1; legs 2b-2d are the only implementers of their spec rows. K01 duplicates the Shell engine (Q9).
 - **R6 row types.** Tests of non-guard tooling S07-S09 are Tier X keep (3). A parity harness is kept iff its Shell oracle is a consumer contract (P5), frozen
-  otherwise (P1 P2 P3 P6 P7), cut if no gate runs it (P4).
-- **Owner rulings:** T01 keep (exception, +1 keep). Totals: keep 20 + 15 + 3 + 1 = **39** · freeze 14 + 5 = **19** · cut 1 + 1 = **2**. Second query: legs 17/11/0, rest 22/8/2.
+  otherwise (P1 P2 P3 P6 P7), cut if **no runner of any kind executes it** (neither a `qa-check.sh` list nor `bun test` discovery). Facts: P4 is `excluded` and not a
+  `.test.ts` -> cut. P6 is a `*.test.ts`, so `bun test` runs it -> freeze. P7 is a plain `.ts`, header "Run standalone ... not wired into qa-check.sh" -> no runner -> **cut by this
+  criterion, pending owner ruling** (held at freeze in the totals). The "no runner of any kind" wording is the sharpening Codex round 2 asked for; ADR-050 clause 3 uses it.
+- **K01 is bounded** (Codex round 2): the 11 `packages/standard` tests named by `run-s4-ts-evaluators.sh` (9) and `run-s4-differential-parity.sh` (2) belong to E04 and P5 (kept);
+  K01's freeze covers the other 61 files (19 packages tests, 2 apps tests, 40 sources); the S4 rule sources those 11 tests exercise take E04's bar when changed.
+- **Owner rulings:** T01 keep (exception, +1 keep). Totals: keep 21 + 14 + 3 + 1 = **39** · freeze 14 + 5 = **19** · cut 1 + 1 = **2**. Second query: legs 17/11/0, rest 22/8/2.
 
 ## Recommendation
 Adopt ADR-050 (proposed). `TASK-398` cuts: **S10** (4 selftests + 4 subjects, 1,403 lines) and **P4** (`run-layers-observed-differential.ts`, 714 lines, 154 s). Apply the freezes by edit-bar,
@@ -80,5 +84,6 @@ not deletion. Re-run the audit when a sprint adds a guard.
   Q8 G23 keep, re-rule at the next audit · **Q7** P1 freeze, G17 stays keep (R2, L-176; ADR-039 covers §4 only, nothing to amend) · **Q9** K01 freeze now (R5 would cut
   72 files, 10,802 lines, untouched since 2026-08-29); cut-or-finish is EPIC-014's decision, to be filed as a follow-up task at close · **Q10** R1(b) stands as written
   (G25 G18 S03 S05 keep). Totals unchanged by Q7/Q9/Q10: every ruling matched the recommended disposition.
-- **Open: none.** Follow-ups for close (coordinator files): the K01 task above, and a TD row for an L-015 leak: a shipped skill names repo-only `scripts/...` paths an adopter does not have.
+- **Open: one.** **P7 `layers-completeness-differential.ts`:** no runner executes it, so R6 as sharpened cuts it (251 lines, untimed). *Rec: cut.*
+  If cut: 39 keep · 18 freeze · 3 cut; the table holds freeze until the owner rules. Follow-ups for close (coordinator files): the K01 task above, and a TD row for an L-015 leak: a shipped skill names repo-only `scripts/...` paths an adopter does not have.
 - Not settled: whether `bun test` joins the gate (TD-212); the freezes' touch-twice review is a proposal, not an ADR-050 clause.

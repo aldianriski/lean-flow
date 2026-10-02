@@ -25,7 +25,7 @@ worktree-isolated outside review. That discipline was earned (L-058, L-137, L-14
 where it is *worth its cost*, and the repo's own record answers it (`docs/research/guard-audit.md`, 60 guards, derived from git history and
 the ledgers by two routes):
 
-- **23 of 60 guards ever caught a real defect** (>=63 recorded catches); **37 caught none**, or have no derivable record.
+- **24 of 60 guards ever caught a real defect** (>=70 recorded catch events); **36 caught none**, or have no derivable record.
 - Against those catches the guards' own maintenance is **~235 events** (fixes to the guard itself found by review, a first live run or a
   seeded break; three late-added rows are not tallied). Both figures are lower bounds, in different units; the order of magnitude is the
   point: ~4 events of guard upkeep per defect found in the repo.
@@ -52,7 +52,8 @@ the ledgers by two routes):
 3. **Shell/TS parity is not grown beyond supported contracts.** A Shell oracle and its TypeScript port keep a differential harness only
    where the Shell file is what an adopter runs. By the trace that is one pair today: the engine's §4 evaluators against the TS port
    (`run-s4-differential-parity`). Every other differential harness (authority, doc-caps, night-run rollup, epic-archive,
-   layers-completeness) freezes, and one that no gate runs (layers-observed-differential) is cut.
+   layers-completeness) freezes, and one that **no runner of any kind executes** (not a `qa-check.sh` list, not `bun test` discovery) is cut:
+   today `layers-observed-differential`; `layers-completeness-differential` meets the same test and awaits the owner's ruling.
 4. **The audit's class rules are the standing dispositions** (keep · freeze · cut, `docs/research/guard-audit.md` § Class rules); the
    audit is re-run when a sprint adds a guard, so a guard's cost is weighed against its catches once, not rediscovered each sprint.
 
@@ -69,7 +70,7 @@ the ledgers by two routes):
 
 ## Consequences
 
-**Positive:** of 60 guards, 39 keep their bar (20 consequential), 19 freeze at the Tier X bar and 2 are cut, so most guard edits shed the
+**Positive:** of 60 guards, 39 keep their bar (21 consequential), 19 freeze at the Tier X bar and 2 are cut, so most guard edits shed the
 seeded-mutation campaign and the outside-review round that dominated SPRINT-111's cost; the consumer-facing surface is untouched.
 **Negative (trade-offs accepted):** a silent false negative in a *maintainer-only* guard now lives longer before an independent pass finds
 it (L-165's finding was that nothing the author runs finds these); the catch counts are lower bounds (engine FAILs reach the gate as
@@ -80,7 +81,7 @@ informational, so a fix prompted by one may leave no ledger trace), so a "0 catc
 
 | Option | Why rejected |
 |---|---|
-| Keep the uniform Tier G bar (status quo) | ~235 upkeep events against >=63 catches; SPRINT-111's cost is this bar applied to a one-file deletion |
+| Keep the uniform Tier G bar (status quo) | ~235 upkeep events against >=70 catch events; SPRINT-111's cost is this bar applied to a one-file deletion |
 | Drop the outside review altogether | L-165: every guard defect in two sprints was found by an independent pass; the engine is what adopters gate CI on |
 | Cut by age or size alone | Catches are rare and unrelated to either; the audit's evidence, not a proxy, picks the rows |
 | Rule each of the 60 guards with the owner one by one | Class rules plus exceptions give the same result at one decision per class |
