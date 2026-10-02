@@ -10,7 +10,7 @@ status: current
 # QA-002 — intake-to-plan pipeline yields a sprint with DoD
 
 - **Area under test:** `/task-decomposer` → `/triage` → `/lean-doc-generator promote`
-- **Preconditions / fixture:** a repo with a `TODO.md` Backlog and a freeform feature intent
+- **Preconditions / fixture:** a repo with a `docs/work/backlog/` store and a freeform feature intent
 - **Last run:** 2026-06-21 — pass
 
 ## Steps

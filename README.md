@@ -474,7 +474,7 @@ apps/cli/         the `leanflow` CLI (pre-release — no commands implemented ye
 packages/         domain + application
 test/             architecture fitness + gate-discovery guards, and their fixtures
   ────────────────────────────────────────────────────────────────────────────────
-TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
+TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
 ```
 
 **You do not need Bun.** The engine is being built family by family under a strangler migration
