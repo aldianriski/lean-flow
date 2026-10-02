@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-30
+last_updated: 2026-10-02
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -319,6 +319,19 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-211** severity: low | status: open | created: Sprint-111 (T4 opt-in run)
+  - Summary: **`evals/run-orchestrator-store-fixtures.ts` has been red since SPRINT-110 T4 (`dccdca1`).** Its text-contract case
+    expects `night-run.md` to contain "retargeted onto member files under TASK-383". `dccdca1` rewrote that passage, and the harness
+    is opt-in, so no default gate saw it. Found by SPRINT-111's per-harness opt-in run: `41 pass, 1 fail`.
+  - Mitigation (hypothesis): re-anchor the contract on night-run.md's current by-reference wording, with a seeded break.
+
+- **TD-210** severity: low | status: open | created: Sprint-111 (T5 follow-up, Codex r2)
+  - Summary: **The work-store harness's two membership selectors diverge on two shapes neither fixture varies.** (a) Member
+    syntax: A's unanchored path regex admits `TASK-912-x.md.bak`, B's anchored basename rejects it, and prime never says whether a
+    bare-id member is valid. (b) A compares `status:` literally, while B strips quotes, so `status: "active"` splits them.
+    Census 2026-10-02: 0 quoted sprint statuses; all 18 Members entries across 4 by-reference sprints are plain paths.
+  - Mitigation (hypothesis): settle the member syntax in prime § Resolution, then align both selectors with a fixture per shape.
 
 - **TD-209** severity: low | status: open | created: Sprint-111 (T5)
   - Summary: **`skills/lean-doc-generator/templates/TODO.md.template` is kept though nothing scaffolds it any more.** `init` now

@@ -19,8 +19,8 @@ depends-on: [TASK-370, TASK-361, TASK-362, TASK-375, TASK-376, TASK-390, TASK-39
 
 ## Done when
 
-- [ ] This repo's remaining Backlog migrated with `migrate`; TODO.md deleted.
-- [ ] The full gate is green afterwards, read from its own verdict line.
+- [x] This repo's remaining Backlog migrated with `migrate`; TODO.md deleted.
+- [x] The full gate is green afterwards, read from its own verdict line.
 
 ## Touches
 

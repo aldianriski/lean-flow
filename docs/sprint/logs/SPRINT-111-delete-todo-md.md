@@ -186,3 +186,21 @@ main in `5b415d4`. Round 2: threats 1–4 CLEAR (gawk: 1 of 35 rows dropped, TOD
 `retired-match-selection`; layers 10/0 · 15/0 · observed PASS). mawk and busybox are absent on this host, so they are unverified, and
 Codex rules that this does not block. Threat 5 stays open until QA_FULL coverage is shown. The bare gate on the trial merge printed
 `281 pass, 1 fail` (the budget only), and its 9 unrun harnesses were each green when run individually.
+
+### 2026-10-02 | progress | T4 (TASK-380) accepted: 15 legacy tasks on the store, TODO.md deleted; T5 follow-up landed; merged 62b23d9 + 577edd2
+- Migrate apply `0ce093c` (15 files to `docs/work/backlog/`, id sets 15 = 15 both ways, rulings applied, block 14 to the `## Why` of 188 and 327, `git rm TODO.md`,
+  baseline row removed) · stale dependents fixed `2e5c725` (README · overview · CONTEXT · QA · QA-001/002 · evals/README · TECH-DEBT :11/:41,
+  TD-203 resolved) · `28c2381` + `3df4be4`: `_s2_rows` skips a §2 row only on the spec's own whole-cell retirement marker (the missed T3
+  retirement; Codex F3 found the first substring form dropped live rows); research doc's dead TODO.md link → the out-of-scope disposition (F2).
+- Codex gauntlet, hybrid mode, 2 rounds: CLEAR on threats 1–4. Threat 5 was closed by execution. The trial-merge bare gate printed
+  `281 pass, 1 fail` (the budget only), and its 9 unrun harnesses were each green alone. Opt-in, one by one in the foreground after the QA_FULL run was reaped for memory: 11 of 13 green.
+  work-store was red from T5's rule change and was retargeted by a T5 follow-up (`c3acd07` · `df33954` · `18330a1`: by-id selectors with
+  independent walkers, a stale-path member, an unlisted decoy, done/ and cancel/ members, active/closed/multi-active sprints, CRLF-safe, an explicit
+  `--prime-skill` path). That took 3 Codex rounds and ended CLEAR; 21/0 on LF and CRLF. orchestrator-store has been red since SPRINT-110 `dccdca1`, filed as TD-211.
+- On main after the merges: work-store 21/0 · s2-placement · conformance-engine · task-origin all green, v1-to-v2 24/0, prose-density fixtures
+  10/0, doc-caps and research-archive 0 FAIL, layers-completeness 10/0, and the engine at 23 FAIL (= the 78c16cb baseline). prose-density
+  and layers-observed are each red only on `docs/epic/EPIC-016-…`, the foreign uncommitted WIP that predates this sprint.
+- Owner rulings: box 2 ("full gate green") holds **by ruling** (L-088), because every red has a named cause outside T4: the budget,
+  foreign WIP, and the SPRINT-110 opt-in. The TD rows were filed with ids derived from the max (TD-209, worktrees excluded; 0 hits for 210/211):
+  TD-210 (the work-store selectors diverge on member syntax and quoted status; census 0, so they go to TD per the owner's rule) and TD-211 (orchestrator-store).
+- For close: S9.VERIFYCLAUSE flags TASK-394's ticked boxes for not naming their check. It is inside the 23-FAIL baseline. DoD 2/2.
