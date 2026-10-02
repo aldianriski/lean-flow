@@ -44,26 +44,28 @@
 //                          uppercase letter, a reserved character, and a valid slug.
 //
 // SPRINT-106 T2 ADDITIONS, retargeted at SPRINT-111 T5 (membership / derived progress, EPIC-017
-// D1 / D2, L-186). Fixture: evals/fixtures/work-store/membership/ -- a mini v2 tree: a sprint file
-// plus three synthetic TASK-91x files (hand count in that fixture's README). Membership is the
-// sprint's `## Members` list, each member found BY ID in any status folder (prime § Resolution).
+// D1 / D2, L-186). Fixture: evals/fixtures/work-store/membership/ -- three sprint files and seven
+// synthetic TASK-91x files (hand counts in that fixture's README). The membership contract is
+// written once, above `memberIds` below, and implemented independently by selector A and B.
 //
-//   membership-open-dod (reference matches hand count)  -- referenceOpenDoD(), selector A
-//                          (iterates Members, id from the listed path, store lookup by FILENAME id).
-//   membership-open-dod (second selector agrees)         -- grepStyleOpenDoD(), selector B (iterates
-//                          the STORE, id from FRONTMATTER, kept iff in the Members id-set).
-//   membership-open-dod (must-FAIL x2)                   -- the OLD `sprint:`-stamp rule (counts the
-//                          unlisted decoy) and the listed-PATH rule (drops the moved member) must
-//                          each read a figure that differs from the by-id one.
-//   membership-open-dod (CRLF copy ...)                  -- both selectors over a CRLF-converted temp
-//                          copy of the fixture tree must still give the hand count.
-//   prime-skill-contract                                 -- prime's SKILL.md carries the by-id rule.
+//   membership-open-dod (reference / second selector / must-FAIL x2 / active sprints summed /
+//                          status-ignoring must-FAIL)   -- figures vs hand count; wrong selection
+//                          rules (sprint: stamp, listed path, ignoring status) must read differently.
+//   membership-contract                                  -- comment / prose / pathless lines excluded.
+//   membership-active-sprints                            -- a real `status: active` scan.
+//   membership-census                                    -- both walkers reach every task file.
+//   splitFrontmatter (direct CRLF unit case)             -- the function itself, not via readText.
+//   membership-open-dod (CRLF copy ...)                  -- end to end on a CRLF-converted tree copy.
+//   prime-skill-contract                                 -- a prime SKILL.md carries the by-id rule;
+//                          `--prime-skill <path>` redirects the read (never an env var); the message
+//                          names the path actually inspected.
 //
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Glob } from "bun";
 
 const FIXTURE_FILE = fileURLToPath(
   new URL("fixtures/work-store/round-trip/TASK-901-round-trip-fixture.md", import.meta.url),
@@ -410,20 +412,105 @@ function extractSection(body: string, heading: string): string | null {
   return nextHeading === -1 ? rest : rest.slice(0, nextHeading);
 }
 
-// The `TASK-NNN` ids in a sprint file's `## Members` list, in list order, de-duplicated. HTML
-// comments are stripped first (the template's own guidance comment names `TASK-NNN`). Only list
-// lines (`- ...`) count; the id is parsed from the LISTED PATH, never read from the file it names.
+// MEMBERSHIP CONTRACT -- the ONE definition both selectors implement, each independently. It
+// mirrors skills/prime/SKILL.md § Resolution, NOT the freeze checker in sprint-by-reference.md
+// (which deliberately counts commented ids; prime is not that checker):
+//   - active sprints = every `docs/sprint/SPRINT-*.md` whose frontmatter `status:` is `active`;
+//     their open-DoD figures are summed (a closed sprint contributes nothing);
+//   - a member = a LIST-ITEM line (`- ` or `* `) under `## Members`, OUTSIDE any HTML comment
+//     (single- or multi-line), naming a task path whose basename is `TASK-NNN-<slug>.md`. A prose
+//     line, or a list item with no such path, is not a member;
+//   - the member's task file is found BY ID in ANY status folder (todo/ in_progress/ done/ cancel/
+//     backlog/), never by the listed path and never by the task's `sprint:` stamp;
+//   - open DoD = the `- [ ] ` lines under `## Done when` in that file.
+// Selector A (reference) and selector B (grep-style) differ in: the directory walk (readdirSync vs
+// Bun.Glob), the sprint walk and `status:` read, comment stripping (regex vs a char scanner), the
+// member-line parse (regex vs first-token basename), the task key (filename id vs frontmatter id).
+
+// Selector A: the active sprint files, via readdirSync + splitFrontmatter.
+function referenceSprintFiles(root: string, onlyActive: boolean): string[] {
+  const dir = join(root, "docs", "sprint");
+  return readdirSync(dir)
+    .filter((n) => /^SPRINT-\d+.*\.md$/.test(n))
+    .map((n) => join(dir, n))
+    .filter(
+      (f) =>
+        !onlyActive ||
+        splitFrontmatter(readText(f)).frontmatter.match(/^status:\s*(\S+)\s*$/m)?.[1] === "active",
+    )
+    .sort();
+}
+
+// Selector B: the same selection, via Bun.Glob and a line scan of the frontmatter.
+function grepStyleSprintFiles(root: string, onlyActive: boolean): string[] {
+  const out: string[] = [];
+  for (const f of new Glob("docs/sprint/SPRINT-*.md").scanSync({ cwd: root, absolute: true })) {
+    let inFm = false;
+    let status = "";
+    for (const line of readFileSync(f, "utf8").split(/\r?\n/)) {
+      const t = line.trim();
+      if (t === "---") {
+        if (inFm) break;
+        inFm = true;
+      } else if (inFm && t.startsWith("status:")) status = t.slice(7).trim().replace(/^["']|["']$/g, "");
+    }
+    if (!onlyActive || status === "active") out.push(f);
+  }
+  return out.sort();
+}
+
+// Selector A: member ids -- comments stripped by regex, then a list-item regex on the listed path.
 function memberIds(sprintFile: string): string[] {
   const { body } = splitFrontmatter(readText(sprintFile));
   const section = extractSection(body.replace(/<!--[\s\S]*?-->/g, ""), "## Members");
   if (section === null) return [];
   const ids: string[] = [];
   for (const line of section.split("\n")) {
-    if (!/^\s*[-*]\s/.test(line)) continue;
-    const m = line.match(/\bTASK-\d+\b/);
-    if (m && !ids.includes(m[0])) ids.push(m[0]);
+    const m = line.match(/^\s*[-*]\s+`?[^\s`]*\bTASK-(\d+)-[^\s`]*\.md/);
+    if (m && !ids.includes(`TASK-${m[1]}`)) ids.push(`TASK-${m[1]}`);
   }
   return ids;
+}
+
+// Selector B: member ids -- a character scanner removes comments (several per line, spanning
+// lines), then the first token of each list item is split on `/` and its basename matched.
+function grepStyleMemberIds(sprintFile: string): string[] {
+  const set = new Set<string>();
+  let inMembers = false;
+  let inComment = false;
+  for (const raw of readFileSync(sprintFile, "utf8").split(/\r?\n/)) {
+    let visible = "";
+    for (let i = 0; i < raw.length; ) {
+      if (inComment) {
+        const close = raw.indexOf("-->", i);
+        if (close === -1) i = raw.length;
+        else {
+          inComment = false;
+          i = close + 3;
+        }
+      } else {
+        const open = raw.indexOf("<!--", i);
+        if (open === -1) {
+          visible += raw.slice(i);
+          i = raw.length;
+        } else {
+          visible += raw.slice(i, open);
+          inComment = true;
+          i = open + 4;
+        }
+      }
+    }
+    const line = visible.trim();
+    if (line.startsWith("## ")) {
+      inMembers = line === "## Members";
+      continue;
+    }
+    if (!inMembers || !(line.startsWith("- ") || line.startsWith("* "))) continue;
+    const token = line.slice(2).trim().split(/\s+/)[0].replace(/`/g, "");
+    const m = (token.split("/").pop() ?? "").match(/^TASK-(\d+)-.+\.md$/);
+    if (m) set.add(`TASK-${m[1]}`);
+  }
+  return [...set];
 }
 
 function openBoxesUnderDoneWhen(file: string): number {
@@ -433,13 +520,7 @@ function openBoxesUnderDoneWhen(file: string): number {
   return (section.match(/^- \[ \] /gm) ?? []).length;
 }
 
-// Reference implementation -- EXACTLY the rule stated in skills/prime/SKILL.md § Resolution
-// (lean-doc-generator/references/sprint-by-reference.md: a sprint references, never copies):
-// the sprint's `## Members` lists the member files; open DoD = `- [ ]` lines under `## Done when`
-// in each member's task file, found BY ID (`docs/work/**/TASK-NNN-*.md`, any status folder),
-// never by the listed path (stale once a member moves folder), never by the task's `sprint:` stamp.
-// SELECTOR A (iterates Members): id parsed from each listed path -> look the id up in the store
-// by FILENAME. Breaks on: a stale/unparsable listed id, a filename whose id differs from its file.
+// Selector A: iterates Members; id from the listed path; store lookup by FILENAME id.
 function referenceOpenDoD(root: string, sprintFile: string): number {
   const byFilenameId = new Map<string, string>();
   for (const file of findTaskFiles(root)) {
@@ -454,30 +535,12 @@ function referenceOpenDoD(root: string, sprintFile: string): number {
   return total;
 }
 
-// Second, INDEPENDENTLY-implemented selector (L-198: vary the SELECTION, not the counting
-// direction). SELECTOR B (iterates the STORE): walk every task file, read the id from its
-// FRONTMATTER `id:` (not its filename), keep it iff that id is in the Members id-set, then count
-// with a per-line state machine rather than A's whole-body regex slice. Breaks on: a frontmatter
-// id that disagrees with the filename, a Members id-set that A and B parse differently (B takes
-// the set by a line scan of its own); it does NOT break on a stale listed path or a folder move.
+// Selector B: iterates the STORE (its own Bun.Glob walk); id from the FRONTMATTER `id:`; kept iff
+// in the Members id-set; counted by a per-line state machine.
 function grepStyleOpenDoD(root: string, sprintFile: string): number {
-  const inSet = new Set<string>();
-  let inMembers = false;
-  let inComment = false;
-  for (const line of readFileSync(sprintFile, "utf8").split(/\r?\n/)) {
-    if (inComment) {
-      if (line.includes("-->")) inComment = false;
-      continue;
-    }
-    if (line.includes("<!--") && !line.includes("-->")) {
-      inComment = true;
-      continue;
-    }
-    if (/^## /.test(line)) inMembers = line.trim() === "## Members";
-    else if (inMembers) for (const m of line.matchAll(/\bTASK-\d+\b/g)) inSet.add(m[0]);
-  }
+  const inSet = new Set(grepStyleMemberIds(sprintFile));
   let total = 0;
-  for (const file of findTaskFiles(root)) {
+  for (const file of new Glob("docs/work/**/TASK-*.md").scanSync({ cwd: root, absolute: true })) {
     let inFrontmatter = false;
     let frontmatterClosed = false;
     let fileId: string | undefined;
@@ -491,9 +554,7 @@ function grepStyleOpenDoD(root: string, sprintFile: string): number {
           else frontmatterClosed = true;
           continue;
         }
-        if (inFrontmatter && trimmed.startsWith("id:")) {
-          fileId = trimmed.slice("id:".length).trim();
-        }
+        if (inFrontmatter && trimmed.startsWith("id:")) fileId = trimmed.slice("id:".length).trim();
         continue;
       }
       if (trimmed.startsWith("## ")) {
@@ -507,8 +568,10 @@ function grepStyleOpenDoD(root: string, sprintFile: string): number {
   return total;
 }
 
-// Must-FAIL counterpart 1 (the OLD rule, pre-289dc7c): select by the task's frontmatter `sprint:`
-// stamp instead of `## Members`. The decoy (stamped SPRINT-901, not listed) is wrongly included.
+const sumOver = (files: string[], f: (file: string) => number) => files.reduce((n, x) => n + f(x), 0);
+const base = (f: string) => f.replace(/\\/g, "/").split("/").pop()!;
+
+// Must-FAIL counterpart 1 (the OLD rule): select by the task's frontmatter `sprint:` stamp.
 function openDoDBySprintStamp(root: string, sprintId: string): number {
   let total = 0;
   for (const file of findTaskFiles(root)) {
@@ -519,12 +582,12 @@ function openDoDBySprintStamp(root: string, sprintId: string): number {
   return total;
 }
 
-// Must-FAIL counterpart 2 (read the LISTED PATH, not by id): a member moved to another status
-// folder is silently dropped -- the stale-path trap prime's rule names.
+// Must-FAIL counterpart 2 (read the LISTED PATH, not by id): a moved member is silently dropped.
 function openDoDByListedPath(root: string, sprintFile: string): number {
   const { body } = splitFrontmatter(readText(sprintFile));
+  const section = extractSection(body.replace(/<!--[\s\S]*?-->/g, ""), "## Members") ?? "";
   let total = 0;
-  for (const line of (extractSection(body, "## Members") ?? "").split("\n")) {
+  for (const line of section.split("\n")) {
     const m = line.match(/^\s*[-*]\s+`?(\S+?\.md)`?\s*$/);
     if (!m) continue;
     try {
@@ -537,7 +600,11 @@ function openDoDByListedPath(root: string, sprintFile: string): number {
 }
 
 const SPRINT_FILE = join(MEMBERSHIP_FIXTURE_ROOT, "docs", "sprint", "SPRINT-901-membership.md");
-const HAND_COUNT = 3; // membership/README.md § Hand-counted expected figure
+const HAND_COUNT = 6; // membership/README.md: SPRINT-901 = 2 + 1 + 1 + 2
+const ACTIVE_HAND_COUNT = 8; // SPRINT-901 (6) + SPRINT-903 (2); SPRINT-902 is closed
+const TASK_CENSUS = 7; // TASK-910 .. TASK-916 under docs/work/, counted by hand
+const EXPECT_MEMBERS = ["TASK-910", "TASK-911", "TASK-913", "TASK-914"];
+const fmt = (xs: string[]) => `[${xs.join(", ")}]`;
 
 // Case (a): reference figure vs. the fixture README's hand count.
 {
@@ -546,9 +613,7 @@ const HAND_COUNT = 3; // membership/README.md § Hand-counted expected figure
   report(
     "membership-open-dod (reference matches hand count)",
     ok,
-    ok
-      ? `referenceOpenDoD(SPRINT-901 ## Members, by id) = ${got}, matches the fixture README's hand count of ${HAND_COUNT}`
-      : `referenceOpenDoD(SPRINT-901 ## Members, by id) = ${got}, expected the fixture README's hand count of ${HAND_COUNT}`,
+    `referenceOpenDoD(SPRINT-901 ## Members, by id) = ${got}, ${ok ? "matches" : "expected"} the fixture README's hand count of ${HAND_COUNT}`,
   );
 }
 
@@ -561,13 +626,26 @@ const HAND_COUNT = 3; // membership/README.md § Hand-counted expected figure
     "membership-open-dod (second selector agrees)",
     ok,
     ok
-      ? `referenceOpenDoD (iterates Members, filename id) = ${ref} and grepStyleOpenDoD (iterates the store, frontmatter id) = ${second} agree`
+      ? `referenceOpenDoD (iterates Members, filename id) = ${ref} and grepStyleOpenDoD (own Glob walk, frontmatter id) = ${second} agree`
       : `referenceOpenDoD = ${ref} but grepStyleOpenDoD = ${second} -- the two selectors disagree`,
   );
 }
 
-// Case (c): selection-varying must-FAIL siblings (L-186). Each wrong selection rule MUST yield a
-// figure that differs from the by-id figure; reports PASS when the sibling correctly reddens.
+// Case (c): the membership contract. SPRINT-901's `## Members` carries a single-line comment, a
+// multi-line comment, a prose line and a pathless list item that all name TASK-912; both
+// selectors must exclude every one and agree on exactly the four real members.
+{
+  const a = memberIds(SPRINT_FILE).sort();
+  const b = grepStyleMemberIds(SPRINT_FILE).sort();
+  const ok = fmt(a) === fmt(EXPECT_MEMBERS) && fmt(b) === fmt(EXPECT_MEMBERS);
+  report(
+    "membership-contract (single-line comment, multi-line comment, prose line, pathless list item all excluded by BOTH selectors)",
+    ok,
+    `A = ${fmt(a)}, B = ${fmt(b)}, expected ${fmt(EXPECT_MEMBERS)}`,
+  );
+}
+
+// Case (d): selection-varying must-FAIL siblings (L-186).
 {
   const byId = referenceOpenDoD(MEMBERSHIP_FIXTURE_ROOT, SPRINT_FILE);
   const stamp = openDoDBySprintStamp(MEMBERSHIP_FIXTURE_ROOT, "SPRINT-901");
@@ -575,9 +653,7 @@ const HAND_COUNT = 3; // membership/README.md § Hand-counted expected figure
   report(
     "membership-open-dod (must-FAIL sibling -- old sprint: stamp rule counts the unlisted decoy)",
     ok,
-    ok
-      ? `by id = ${byId}, by sprint: stamp = ${stamp} (includes TASK-912, stamped SPRINT-901 but not in ## Members) -- correctly DIFFER`
-      : `by id = ${byId} and by sprint: stamp = ${stamp} are the SAME -- the decoy is not discriminating`,
+    `by id = ${byId}, by sprint: stamp = ${stamp} (includes TASK-912, stamped SPRINT-901 but not a member) -- ${ok ? "correctly DIFFER" : "SAME, the decoy is not discriminating"}`,
   );
 }
 {
@@ -587,14 +663,82 @@ const HAND_COUNT = 3; // membership/README.md § Hand-counted expected figure
   report(
     "membership-open-dod (must-FAIL sibling -- listed path goes stale after a folder move)",
     ok,
-    ok
-      ? `by id = ${byId}, by listed path = ${listed} (TASK-911 is listed under todo/ but sits in in_progress/) -- correctly DIFFER`
-      : `by id = ${byId} and by listed path = ${listed} are the SAME -- the stale-member fixture is not discriminating`,
+    `by id = ${byId}, by listed path = ${listed} (TASK-911 is listed under todo/ but sits in in_progress/) -- ${ok ? "correctly DIFFER" : "SAME, the stale member is not discriminating"}`,
   );
 }
 
-// Case (d): CRLF. The same selectors over a CRLF-converted temp copy of the fixture tree must give
-// the same hand count (a fresh Windows checkout materialises the fixtures as CRLF).
+// Case (e): sprint selection is a real `status: active` scan, in both selectors: SPRINT-901 and
+// SPRINT-903 are active (summed), SPRINT-902 is closed (its five open boxes must not count).
+{
+  const aFiles = referenceSprintFiles(MEMBERSHIP_FIXTURE_ROOT, true).map(base);
+  const bFiles = grepStyleSprintFiles(MEMBERSHIP_FIXTURE_ROOT, true).map(base);
+  const want = ["SPRINT-901-membership.md", "SPRINT-903-membership-active.md"];
+  const ok = fmt(aFiles) === fmt(want) && fmt(bFiles) === fmt(want);
+  report(
+    "membership-active-sprints (status: active scan; closed sprint excluded, two active both selected, by BOTH selectors)",
+    ok,
+    `A = ${fmt(aFiles)}, B = ${fmt(bFiles)}, expected ${fmt(want)}`,
+  );
+}
+{
+  const aTotal = sumOver(referenceSprintFiles(MEMBERSHIP_FIXTURE_ROOT, true), (f) =>
+    referenceOpenDoD(MEMBERSHIP_FIXTURE_ROOT, f),
+  );
+  const bTotal = sumOver(grepStyleSprintFiles(MEMBERSHIP_FIXTURE_ROOT, true), (f) =>
+    grepStyleOpenDoD(MEMBERSHIP_FIXTURE_ROOT, f),
+  );
+  const ok = aTotal === ACTIVE_HAND_COUNT && bTotal === ACTIVE_HAND_COUNT;
+  report(
+    "membership-open-dod (active sprints summed: 901 + 903, closed 902 excluded)",
+    ok,
+    `A = ${aTotal}, B = ${bTotal}, expected ${ACTIVE_HAND_COUNT} (6 + 2)`,
+  );
+}
+{
+  const active = sumOver(referenceSprintFiles(MEMBERSHIP_FIXTURE_ROOT, true), (f) =>
+    referenceOpenDoD(MEMBERSHIP_FIXTURE_ROOT, f),
+  );
+  const all = sumOver(referenceSprintFiles(MEMBERSHIP_FIXTURE_ROOT, false), (f) =>
+    referenceOpenDoD(MEMBERSHIP_FIXTURE_ROOT, f),
+  );
+  const ok = active !== all;
+  report(
+    "membership-open-dod (must-FAIL sibling -- ignoring status: also sums the closed sprint)",
+    ok,
+    `active only = ${active}, every sprint file = ${all} -- ${ok ? "correctly DIFFER" : "SAME, the status filter is not discriminating"}`,
+  );
+}
+
+// Case (f): census. Both walkers must reach every task file (todo/ in_progress/ done/ cancel/),
+// counted by hand (TASK_CENSUS) -- a walker that skips a status folder cannot hide in both.
+{
+  const rel = (f: string) => f.replace(/\\/g, "/").split("/docs/work/")[1];
+  const a = findTaskFiles(MEMBERSHIP_FIXTURE_ROOT).map(rel).sort();
+  const b = [...new Glob("docs/work/**/TASK-*.md").scanSync({ cwd: MEMBERSHIP_FIXTURE_ROOT, absolute: true })]
+    .map(rel)
+    .sort();
+  const ok = a.length === TASK_CENSUS && fmt(a) === fmt(b);
+  report(
+    "membership-census (both walkers reach every task file in every status folder)",
+    ok,
+    `A walked ${a.length}, B walked ${b.length}, hand census ${TASK_CENSUS}${ok ? "" : `; A-only/B-only differ: A=${fmt(a)} B=${fmt(b)}`}`,
+  );
+}
+
+// Case (g): splitFrontmatter itself, directly (every selector feeds it readText() output, which is
+// already LF, so only a direct call can notice its own CRLF handling go missing).
+{
+  const r = splitFrontmatter("---\r\nid: TASK-910\r\n---\r\nbody");
+  const ok = r.frontmatter === "id: TASK-910" && r.body === "body";
+  report(
+    "splitFrontmatter (direct CRLF unit case)",
+    ok,
+    `frontmatter = ${JSON.stringify(r.frontmatter)}, body = ${JSON.stringify(r.body)}, expected "id: TASK-910" and "body"`,
+  );
+}
+
+// Case (h): CRLF. The same selectors over a CRLF-converted temp copy of the fixture tree must give
+// the same figures (a fresh Windows checkout materialises the fixtures as CRLF).
 {
   const tmp = mkdtempSync(join(tmpdir(), "membership-crlf-"));
   try {
@@ -613,41 +757,54 @@ const HAND_COUNT = 3; // membership/README.md § Hand-counted expected figure
     const sample = readFileSync(crlfSprint, "utf8");
     const ref = referenceOpenDoD(tmp, crlfSprint);
     const second = grepStyleOpenDoD(tmp, crlfSprint);
-    // The stamp rule is the one selector that reads FRONTMATTER (splitFrontmatter -- the function
-    // whose CRLF-unsafety was the original bug); its LF figure is 7, so a CRLF parse failure reads 0.
+    const aActive = sumOver(referenceSprintFiles(tmp, true), (f) => referenceOpenDoD(tmp, f));
+    const bActive = sumOver(grepStyleSprintFiles(tmp, true), (f) => grepStyleOpenDoD(tmp, f));
+    // The stamp rule reads FRONTMATTER (splitFrontmatter); its LF figure is 10, a parse failure reads 0.
     const stamp = openDoDBySprintStamp(tmp, "SPRINT-901");
     const ok =
-      sample.includes("\r\n") && ref === HAND_COUNT && second === HAND_COUNT && stamp === 7;
+      sample.includes("\r\n") &&
+      ref === HAND_COUNT &&
+      second === HAND_COUNT &&
+      aActive === ACTIVE_HAND_COUNT &&
+      bActive === ACTIVE_HAND_COUNT &&
+      stamp === 10;
     report(
-      "membership-open-dod (CRLF copy of the fixture tree gives the same hand count)",
+      "membership-open-dod (CRLF copy of the fixture tree gives the same figures)",
       ok,
-      ok
-        ? `CRLF copy: referenceOpenDoD = ${ref}, grepStyleOpenDoD = ${second}, both ${HAND_COUNT}; frontmatter parse (sprint: stamp) = ${stamp}`
-        : `CRLF copy (really CRLF: ${sample.includes("\r\n")}): referenceOpenDoD = ${ref}, grepStyleOpenDoD = ${second}, expected ${HAND_COUNT}; frontmatter parse (sprint: stamp) = ${stamp}, expected 7`,
+      `CRLF copy (really CRLF: ${sample.includes("\r\n")}): A = ${ref}, B = ${second} (expected ${HAND_COUNT}); active A = ${aActive}, B = ${bActive} (expected ${ACTIVE_HAND_COUNT}); frontmatter parse (sprint: stamp) = ${stamp} (expected 10)`,
     );
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
 }
 
-// Case (e): contract check -- skills/prime/SKILL.md must carry the by-id rule text. Anchors (each
-// present at 4501cbf and specific to the by-id rule): the `## Members` list as the membership
-// source, the "**by id**" lookup, and the `docs/work/**/TASK-NNN-*.md` glob. Override the path with
-// WORK_STORE_PRIME_SKILL (used only by the seeded-break proof against a temp copy).
+// Case (i): contract check -- a prime SKILL.md must carry the by-id rule text. Anchors (present at
+// 4501cbf, specific to the by-id rule): the `## Members` list as the membership source, the
+// "**by id**" lookup, the `docs/work/**/TASK-NNN-*.md` glob. The file read is the repo's prime
+// SKILL.md unless `--prime-skill <path>` is passed on THIS command line (the seeded-break proof
+// uses it). Deliberately NOT an environment variable: an inherited env var would silently
+// redirect the gate (L-067). The message always names the path actually inspected.
 {
+  const argAt = process.argv.indexOf("--prime-skill");
+  const argPath = argAt === -1 ? undefined : process.argv[argAt + 1];
   const skillPath =
-    process.env.WORK_STORE_PRIME_SKILL ??
-    fileURLToPath(new URL("../skills/prime/SKILL.md", import.meta.url));
-  const skillText = readText(skillPath);
+    argPath ?? fileURLToPath(new URL("../skills/prime/SKILL.md", import.meta.url));
   const ANCHORS = ["## Members", "**by id**", "docs/work/**/TASK-NNN-*.md"];
+  let skillText = "";
+  let readErr = "";
+  try {
+    skillText = readText(skillPath);
+  } catch (err) {
+    readErr = ` (could not read: ${(err as Error).message})`;
+  }
   const missing = ANCHORS.filter((a) => !skillText.includes(a));
-  const ok = missing.length === 0;
+  const ok = missing.length === 0 && readErr === "";
   report(
     "prime-skill-contract (v2 by-id membership rule text present)",
     ok,
     ok
-      ? `skills/prime/SKILL.md names ${ANCHORS.map((a) => `"${a}"`).join(", ")}`
-      : `skills/prime/SKILL.md missing: ${missing.map((a) => `"${a}"`).join(", ")}`,
+      ? `${skillPath} names ${ANCHORS.map((a) => `"${a}"`).join(", ")}`
+      : `${skillPath} missing: ${missing.map((a) => `"${a}"`).join(", ")}${readErr}`,
   );
 }
 

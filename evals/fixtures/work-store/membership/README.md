@@ -1,31 +1,44 @@
 # work-store membership fixture
 
-A mini v2 tree (`docs/work/` + one sprint file) with three synthetic task files (reserved 900-block ids),
-used by `evals/run-work-store-fixtures.ts` (SPRINT-106 T2, retargeted SPRINT-111 T5) to prove `/prime`'s v2
-open-DoD derivation (`skills/prime/SKILL.md` ง Resolution) matches a hand count: membership is the
-sprint's `## Members` list, each member's task file found **by id** in any status folder -- never by the
-listed path, never by the task's `sprint:` stamp (L-186: the fixtures vary the SELECTION).
+A mini v2 tree (`docs/work/` + three sprint files) with seven synthetic task files (reserved 900-block
+ids), used by `evals/run-work-store-fixtures.ts` (SPRINT-106 T2, retargeted SPRINT-111 T5) to prove
+`/prime`'s v2 open-DoD derivation (`skills/prime/SKILL.md` ยง Resolution) matches a hand count.
+Active sprints (`status: active`) are summed; a member is a list-item line under `## Members` that is
+outside any HTML comment and names a `TASK-NNN-<slug>.md` path; its task file is found **by id** in
+any status folder -- never by the listed path, never by the task's `sprint:` stamp (L-186: the
+fixtures vary the SELECTION). The contract is written once in the harness header.
 
 ## Population
 
-| Item | Where | In `## Members`? | `sprint:` stamp | `## Done when` boxes | Open (`- [ ]`) |
-|---|---|---|---|---|---|
-| `SPRINT-901-membership.md` | `docs/sprint/` | -- | -- | -- | lists TASK-910 and TASK-911 |
-| `TASK-910-membership-alpha.md` | `todo/` | yes, path current | `SPRINT-901` | 1 closed, 2 open (+1 open **outside** `## Done when`, under `## Touches`) | 2 |
-| `TASK-911-membership-beta.md` | `in_progress/` | yes, path **stale** (listed as `todo/`) | `SPRINT-901` | 2 closed, 1 open | 1 |
-| `TASK-912-membership-decoy.md` | `todo/` | **no** | `SPRINT-901` | 4 open | 4 (excluded -- unlisted) |
+| Sprint file | `status:` | Members (as listed) |
+|---|---|---|
+| `SPRINT-901-membership.md` | `active` | TASK-910, 911, 913, 914 -- plus four lines that must NOT count (below) |
+| `SPRINT-902-membership-closed.md` | `closed` | TASK-915 |
+| `SPRINT-903-membership-active.md` | `active` | TASK-916 |
 
-## Hand-counted expected figure
+| Task | Folder | `sprint:` | In a `## Members` list? | Open (`- [ ]` under `## Done when`) |
+|---|---|---|---|---|
+| TASK-910 alpha | `todo/` | 901 | 901, path current | 2 (+1 open under `## Touches`, not counted) |
+| TASK-911 beta | `in_progress/` | 901 | 901, path **stale** (listed as `todo/`) | 1 |
+| TASK-912 decoy | `todo/` | 901 | **no** | 4 (never counted) |
+| TASK-913 gamma | `done/` | 901 | 901 | 1 |
+| TASK-914 delta | `cancel/` | 901 | 901 (listed in backticks) | 2 |
+| TASK-915 epsilon | `todo/` | 902 | 902 (a closed sprint) | 5 (never counted) |
+| TASK-916 zeta | `in_progress/` | 903 | 903 | 2 |
 
-**`SPRINT-901` open DoD = 3** (TASK-910's 2 + TASK-911's 1).
+SPRINT-901's `## Members` also holds four lines that all name TASK-912 and must be excluded: a
+single-line HTML comment, a multi-line HTML comment (with a list item inside), a prose line, and a list
+item with no path.
 
-Why not more, why not less:
-- TASK-910's stray `- [ ]` under `## Touches` does **not** count -- the rule scopes to lines under
-  `## Done when` only.
-- TASK-912's four open boxes do **not** count -- it is stamped `sprint: SPRINT-901` but not listed in
-  `## Members`. The old `sprint:`-field rule would read **7** (3 + 4); this is the case that
-  discriminates old rule from new.
-- TASK-911 **does** count although its listed path (`docs/work/todo/...`) no longer exists -- it moved
-  to `in_progress/`; the id is what is looked up. Reading the listed path would read **2**.
-- The count is the same on a CRLF copy of this tree (a fresh Windows checkout), which the harness
-  checks against a temp copy.
+## Hand-counted expected figures
+
+- **`SPRINT-901` open DoD = 6** (910: 2, 911: 1, 913: 1, 914: 2).
+- **Active total = 8** (SPRINT-901: 6 + SPRINT-903: 2). SPRINT-902 is closed and adds nothing.
+- Task-file census = **7** (TASK-910 .. TASK-916), across `todo/ in_progress/ done/ cancel/`.
+
+Why the wrong rules read differently:
+- the old `sprint:`-stamp rule counts the unlisted decoy: SPRINT-901 reads **10** (6 + 4);
+- reading the listed path drops the moved TASK-911 and the `cancel/` item written with backticks: **3**;
+- ignoring `status:` also sums the closed sprint: **13** (8 + 5);
+- a walker that skips `done/` or `cancel/` loses TASK-913 / TASK-914.
+The count is the same on a CRLF copy of this tree (a fresh Windows checkout), which the harness checks.
