@@ -48,3 +48,8 @@ by **class rules + exceptions**: the owner approves the class rules, the builder
 gauntlet (D4) over the drafts · T2 · behaviour: check-doc-caps gains a disposition path · governance: a gate contract + an ADR-048
 amendment + spec (if §2/§11 change) → Tier G, worktree-isolated build, Codex gauntlet (hybrid), all touched surfaces run (L-221).
 **Dispatch:** preflight CLEAR (T1 = 0, T2 = 0, disjoint), so the two go out in parallel, worktree-isolated.
+
+### 2026-10-02 | scope-change | T2 Layers gain the shell oracle and the parity harnesses (found before dispatch)
+`check-doc-caps.sh` is the AUTHORITY and `.ts` the port (`run-doc-caps-differential.ts` header), and `conformance-engine.sh` calls the checker,
+so the disposition path must land in both, in parity, under ADR-043's adopter contract. Added to T2: `scripts/lib/check-doc-caps.sh` ·
+`evals/doc-caps.test.ts` · `evals/run-doc-caps-differential.ts`. Found by enumerating every runner of the checker before the build (L-221).

@@ -33,7 +33,8 @@ the 4 soft OVER-CAP rows closed by recorded dispositions, and CLAUDE.md § Anti-
 ## Plan
 
 > **Amended 2026-10-02 at G2 (Layers only)**: a `scope-change` in the Execution Log. T2 gains `.cap-dispositions` and the ADR-048
-> amendment (owner ruling: the checker reads a local disposition file). A2 proved false.
+> amendment (owner ruling: the checker reads a local disposition file). A2 proved false. It also gains the shell oracle `check-doc-caps.sh`
+> (Shell retains authority; the engine calls it, so ADR-043's adopter contract applies) and the two harnesses pinning TS/Shell parity.
 
 ### T1 — Rule the proof bar and audit every guard by the defects it caught `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/adr/ADR-050-proof-bar-scales-with-consequence.md` · `docs/DECISIONS.md` · `docs/research/guard-audit.md`
@@ -52,7 +53,8 @@ Layers: `skills/lean-doc-generator/SKILL.md` · `spec/STANDARD.md` · `spec/CHAN
   `docs/LEARNINGS.md` · `docs/epic/EPIC-017-work-items-that-fit.md` · `docs/research/adlc-epic-sequencing.md` ·
   `docs/research/epic-017-effectiveness.md` · `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` · `TECH-DEBT.md` ·
   `scripts/lib/check-doc-caps.ts` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/` · `.cap-dispositions` ·
-  `docs/adr/ADR-048-the-always-loaded-read-set-is-budgeted-in-tokens.md`
+  `docs/adr/ADR-048-the-always-loaded-read-set-is-budgeted-in-tokens.md` · `scripts/lib/check-doc-caps.sh` · `evals/doc-caps.test.ts` ·
+  `evals/run-doc-caps-differential.ts`
 Depends-on: none
 Cites: `TASK-384` · EPIC-017 Closed-when 3 · 4 · TD-174 · ADR-048 (token budget) · L-106 · L-220 (any spec or check change reads its ADR first)
 
