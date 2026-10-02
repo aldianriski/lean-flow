@@ -32,3 +32,19 @@ G1/G2 are not signed yet.
 
 ### 2026-10-02 | progress | plan_commit recorded: ceffdad
 The `plan locked` commit is `ceffdad`; this entry and the frontmatter field land in the next commit.
+
+### 2026-10-02 | scope-change | G1/G2 signed; A2 false; T2's disposition mechanism is a file the checker reads (owner rulings)
+**G1** (full checklist for both: 396 is `origin: manual`, and 384's scope changed at promote). Goal, size (M, M), files, out-of-scope
+and assumptions confirmed. Recon: § Anti-Patterns is 13 KB of `CLAUDE.md`'s 23 KB, and the always-loaded set is at ~16081 of 16087
+tokens. **A2 is false**: all 3 over-cap research docs are still cited by live docs (V3 by ADR-036 · EPIC-017 · TECH-DEBT), so §11's
+superseded-then-archive route is closed to them. ADR-048 (read first, per L-220) names TASK-384 as the source of the missing escape route.
+**Owner rulings (popup).** (1) A disposition is recorded in a local `.cap-dispositions` (`<path> -- <kind> -- <reason>`), mirroring
+`.conformance-exempt`, and `check-doc-caps` honours it and names it on every run. A missing reason, an unknown kind or a stale path is
+itself reported. T2 is Tier G, and ADR-048 is amended. (2) "Promotion requires a disposition" is enforced by prose + the pointer format
+(`disposition:` on the promoted pointer line), Tier P. A check is added only if ADR-050 later says it earns one. (3) The T1 audit is ruled
+by **class rules + exceptions**: the owner approves the class rules, the builder applies them, and only exception rows come back.
+**Impact on § Plan.** T2's Layers gain `.cap-dispositions` and the ADR-048 amendment. No task added, no DoD changed.
+**Consequence lookups (TD-092):** T1 · behaviour: none (ADR + research doc) · governance: a binding ADR on the proof bar → Codex
+gauntlet (D4) over the drafts · T2 · behaviour: check-doc-caps gains a disposition path · governance: a gate contract + an ADR-048
+amendment + spec (if §2/§11 change) → Tier G, worktree-isolated build, Codex gauntlet (hybrid), all touched surfaces run (L-221).
+**Dispatch:** preflight CLEAR (T1 = 0, T2 = 0, disjoint), so the two go out in parallel, worktree-isolated.
