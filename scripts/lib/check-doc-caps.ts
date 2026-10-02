@@ -136,6 +136,123 @@ export function gfReason(gfRaw: string, f: string): string | null {
   return gfField(gfRaw, f, 2);
 }
 
+// --- recorded dispositions for SOFT over-cap rows (TASK-384, ADR-048 amendment) ---------------------
+//
+// `<root>/.cap-dispositions`, mirroring `.conformance-exempt`: `<path> -- <kind> -- <reason>`. Ported
+// from the authority, check-doc-caps.sh (read its header for the rulings: what is and is not
+// dispositionable, EXACT-path matching, first-row-wins). A soft OVER-CAP with a VALID row prints a
+// named `retained:` line; a malformed or stale row is a named FAIL, never a silent skip.
+
+export const DISPOSITION_KINDS = ["replace", "merge", "move-to-reference", "automate-into-check", "retain"] as const;
+export const DISPOSITIONS_FILE = ".cap-dispositions";
+
+/** status: "ok" | "T" (TAB in path/kind) | "D" (duplicate path) | any of "K" (kind unknown) + "R" (reason missing). */
+export interface DispositionRow {
+  readonly status: string;
+  readonly path: string;
+  readonly kind: string;
+  readonly reason: string;
+}
+
+export function parseDispositions(content: string): DispositionRow[] {
+  const rows: DispositionRow[] = [];
+  const seenPaths = new Set<string>();
+  const trim = (x: string) => x.replace(/^[ \t]+|[ \t]+$/g, "");
+  for (const rawLine of content.replace(/\r/g, "").split("\n")) {
+    if (/^#/.test(rawLine) || /^[ \t]*$/.test(rawLine)) continue;
+    const line = `${rawLine} `;
+    const p = line.indexOf(" -- ");
+    let path: string;
+    let rest: string;
+    if (p === -1) {
+      path = line;
+      rest = "";
+    } else {
+      path = line.slice(0, p);
+      rest = line.slice(p + 4);
+    }
+    const q = rest.indexOf(" -- ");
+    let kind: string;
+    let reason: string;
+    if (q === -1) {
+      kind = rest;
+      reason = "";
+    } else {
+      kind = rest.slice(0, q);
+      reason = rest.slice(q + 4);
+    }
+    path = trim(path);
+    kind = trim(kind);
+    reason = trim(reason).replace(/\t/g, " ");
+    let status: string;
+    if (path.includes("\t") || kind.includes("\t")) {
+      // a TAB in path/kind: the Shell hands rows on as TSV and would split it, so both reject (T).
+      status = "T";
+      path = path.replace(/\t/g, "<TAB>");
+      kind = kind.replace(/\t/g, "<TAB>");
+    } else if (seenPaths.has(path)) {
+      status = "D";
+    } else {
+      seenPaths.add(path);
+      status = "";
+      if (!(DISPOSITION_KINDS as readonly string[]).includes(kind)) status += "K";
+      if (reason === "") status += "R";
+      if (status === "") status = "ok";
+    }
+    rows.push({ status, path, kind, reason });
+  }
+  return rows;
+}
+
+export function loadDispositions(root: string): DispositionRow[] {
+  const file = join(root, DISPOSITIONS_FILE);
+  if (!existsSync(file)) return [];
+  try {
+    return parseDispositions(readFileSync(file, "utf8"));
+  } catch {
+    return [];
+  }
+}
+
+export type SeenState = "under" | "frozen" | "hard" | "soft";
+export interface SeenEntry {
+  readonly n: number;
+  readonly capn: number;
+  readonly state: SeenState;
+}
+
+/** Findings for the disposition file, in FILE order, judged against what evaluateRows examined. */
+export function evaluateDispositions(rows: readonly DispositionRow[], seen: ReadonlyMap<string, SeenEntry>): string[] {
+  const out: string[] = [];
+  const tag = "[.cap-dispositions]";
+  for (const r of rows) {
+    if (r.status === "T") {
+      out.push(`FAIL  doc-caps: disposition-malformed: ${r.path} -- a TAB inside the path or kind (${r.kind}); the row is not honoured, rewrite it with spaces ${tag}`);
+    } else if (r.status === "D") {
+      out.push(`FAIL  doc-caps: disposition-duplicate: ${r.path} -- a second row for the same path; the first wins, delete one ${tag}`);
+    } else if (r.status !== "ok") {
+      if (r.status.includes("K")) {
+        out.push(`FAIL  doc-caps: disposition-kind-unknown: ${r.path} -- kind "${r.kind}" is not one of replace|merge|move-to-reference|automate-into-check|retain ${tag}`);
+      }
+      if (r.status.includes("R")) {
+        out.push(`FAIL  doc-caps: disposition-reason-missing: ${r.path} -- a disposition with no reason is the finding turned off, not a ruling ${tag}`);
+      }
+    } else {
+      const e = seen.get(r.path);
+      if (e === undefined) {
+        out.push(`FAIL  doc-caps: disposition-stale: ${r.path} -- no §2-capped file at that exact path (absent, mis-cased or ./-prefixed); delete the row ${tag}`);
+      } else if (e.state === "under") {
+        out.push(`FAIL  doc-caps: disposition-stale: ${r.path} -- no longer over its cap (${e.n} <= ${e.capn}); a disposition that outlived its breach must not linger, delete the row ${tag}`);
+      } else if (e.state === "frozen") {
+        out.push(`FAIL  doc-caps: disposition-stale: ${r.path} -- FROZEN (superseded), not an active soft OVER-CAP; delete the row ${tag}`);
+      } else if (e.state === "hard") {
+        out.push(`FAIL  doc-caps: disposition-hard-cap: ${r.path} -- a HARD cap (${e.capn}) is not dispositionable; the FAIL stands, fix the file or route a promoted rule per ADR-048 ${tag}`);
+      }
+    }
+  }
+  return out;
+}
+
 // --- frontmatter status (pure) -----------------------------------------------------------------
 
 /**
@@ -216,6 +333,8 @@ function countLines(content: string): number {
 export interface DocCapsRunOptions {
   readonly root: string;
   readonly gfRaw: string;
+  /** TASK-384: parsed `.cap-dispositions` rows; absent = none (adopters without the file see no change). */
+  readonly dispositions?: readonly DispositionRow[];
 }
 
 /**
@@ -223,9 +342,17 @@ export interface DocCapsRunOptions {
  * check-doc-caps.sh's main loop prints (in the same order: row order, then glob-match order within
  * a row), plus whether any FAIL line was emitted.
  */
-export function evaluateRows(rows: readonly DerivedRow[], opts: DocCapsRunOptions): { lines: string[]; anyFail: boolean } {
+export function evaluateRows(
+  rows: readonly DerivedRow[],
+  opts: DocCapsRunOptions,
+): { lines: string[]; anyFail: boolean; seen: Map<string, SeenEntry> } {
   const { root, gfRaw } = opts;
+  const dispositions = opts.dispositions ?? [];
   const out: string[] = [];
+  const seen = new Map<string, SeenEntry>();
+  const see = (f: string, n: number, capn: number, state: SeenState) => {
+    if (!seen.has(f)) seen.set(f, { n, capn, state });
+  };
   let anyFail = false;
 
   for (const row of rows) {
@@ -270,23 +397,35 @@ export function evaluateRows(rows: readonly DerivedRow[], opts: DocCapsRunOption
       }
 
       if (n <= capn) {
+        see(f, n, capn, "under");
         if (rec !== null) {
           out.push(`PASS  cap ${f} (${n} <= ${capn}) [§2] -- back under cap: DELETE its grandfather row`);
         } else {
           out.push(`PASS  cap ${f} (${n} <= ${capn}) [§2]`);
         }
       } else if (fmStatus(content) === "superseded") {
+        see(f, n, capn, "frozen");
         out.push(
           `      FROZEN (superseded): ${f} (${n} lines, cap ${capn}) [§2 · ADR-020] -- uncapped while spent; exits via §11 archive once nothing live cites it, never via a diet`,
         );
       } else if (rec !== null && n <= parseInt(rec, 10)) {
+        see(f, n, capn, "hard");
         out.push(`      OVER-CAP (grandfathered): ${f} (${n} > ${capn}, recorded ${rec}) -- ${gfReason(gfRaw, f) ?? ""}`);
       } else if (rec !== null) {
+        see(f, n, capn, "hard");
         out.push(`FAIL  cap ${f} (${n} > ${capn}) [§2] -- grandfathered at ${rec} and it GREW; a grandfather clause is not a licence to drift`);
         anyFail = true;
       } else if (row.soft) {
-        out.push(`      OVER-CAP (soft): ${f} (${n} > ${capn}) [§2 soft] -- prune at the next promote governance review (§11)`);
+        see(f, n, capn, "soft");
+        // TASK-384: first VALID row for the exact path turns the report into a named retained line.
+        const d = dispositions.find((x) => x.status === "ok" && x.path === f);
+        if (d !== undefined) {
+          out.push(`      retained: ${f} (${n} > ${capn}) [${d.kind}] -- ${d.reason}`);
+        } else {
+          out.push(`      OVER-CAP (soft): ${f} (${n} > ${capn}) [§2 soft] -- prune at the next promote governance review (§11)`);
+        }
       } else {
+        see(f, n, capn, "hard");
         out.push(`FAIL  cap ${f} (${n} > ${capn}) [§2]`);
         anyFail = true;
       }
@@ -297,7 +436,7 @@ export function evaluateRows(rows: readonly DerivedRow[], opts: DocCapsRunOption
     }
   }
 
-  return { lines: out, anyFail };
+  return { lines: out, anyFail, seen };
 }
 
 /** The `skills/<name>/SKILL.md` allowlist (ADR-006, not §2) -- appended after the §2 rows loop. */
@@ -879,13 +1018,16 @@ export function runCheckDocCaps(
   }
 
   const gfRaw = loadGrandfatherRaw(gfFilePath);
-  const rowResult = evaluateRows(rows, { root, gfRaw });
+  const dispositions = loadDispositions(root);
+  const rowResult = evaluateRows(rows, { root, gfRaw, dispositions });
   lines.push(...rowResult.lines);
+  const dispLines = evaluateDispositions(dispositions, rowResult.seen);
+  lines.push(...dispLines);
 
   const skillResult = evaluateSkillCaps(root);
   lines.push(...skillResult.lines);
 
-  let anyFail = rowResult.anyFail || skillResult.anyFail;
+  let anyFail = rowResult.anyFail || skillResult.anyFail || dispLines.length > 0;
 
   if (tokenBudgetPath !== undefined) {
     const tb = evaluateTokenBudget(root, tokenBudgetPath);

@@ -37,6 +37,18 @@ const cases: Case[] = [
   { name: "soft-cap-grandfathered(soft)", guide: `${FX}soft-cap-grandfathered/DOCS_Guide.md`, root: `${FX}soft-cap-grandfathered`, gf: `${FX}soft-cap-grandfathered/gf-soft.txt` },
   { name: "soft-cap-grandfathered(hard)", guide: `${FX}soft-cap-grandfathered/DOCS_Guide.md`, root: `${FX}soft-cap-grandfathered`, gf: `${FX}soft-cap-grandfathered/gf-hard.txt` },
   { name: "frozen-spent", guide: `${FX}frozen-spent/DOCS_Guide.md`, root: `${FX}frozen-spent`, gf: `${FX}frozen-spent/none.txt` },
+  // TASK-384: every `.cap-dispositions` case -- the checkers read `<root>/.cap-dispositions`, so the root IS the selector.
+  { name: "disp-retained", guide: `${FX}disp-retained/DOCS_Guide.md`, root: `${FX}disp-retained`, gf: `${FX}disp-retained/none.txt` },
+  { name: "disp-reason-missing", guide: `${FX}disp-reason-missing/DOCS_Guide.md`, root: `${FX}disp-reason-missing`, gf: `${FX}disp-reason-missing/none.txt` },
+  { name: "disp-kind-unknown", guide: `${FX}disp-kind-unknown/DOCS_Guide.md`, root: `${FX}disp-kind-unknown`, gf: `${FX}disp-kind-unknown/none.txt` },
+  { name: "disp-stale-absent", guide: `${FX}disp-stale-absent/DOCS_Guide.md`, root: `${FX}disp-stale-absent`, gf: `${FX}disp-stale-absent/none.txt` },
+  { name: "disp-stale-under", guide: `${FX}disp-stale-under/DOCS_Guide.md`, root: `${FX}disp-stale-under`, gf: `${FX}disp-stale-under/none.txt` },
+  { name: "disp-hard-cap", guide: `${FX}disp-hard-cap/DOCS_Guide.md`, root: `${FX}disp-hard-cap`, gf: `${FX}disp-hard-cap/none.txt` },
+  { name: "disp-duplicate", guide: `${FX}disp-duplicate/DOCS_Guide.md`, root: `${FX}disp-duplicate`, gf: `${FX}disp-duplicate/none.txt` },
+  { name: "disp-frozen", guide: `${FX}disp-frozen/DOCS_Guide.md`, root: `${FX}disp-frozen`, gf: `${FX}disp-frozen/none.txt` },
+  { name: "disp-selection", guide: `${FX}disp-selection/DOCS_Guide.md`, root: `${FX}disp-selection`, gf: `${FX}disp-selection/none.txt` },
+  { name: "disp-tab-path", guide: `${FX}disp-tab-path/DOCS_Guide.md`, root: `${FX}disp-tab-path`, gf: `${FX}disp-tab-path/none.txt` },
+  { name: "disp-tab-kind", guide: `${FX}disp-tab-kind/DOCS_Guide.md`, root: `${FX}disp-tab-kind`, gf: `${FX}disp-tab-kind/none.txt` },
   // The live repo's own STANDARD.md over the real docs tree -- the whole cap-covered corpus this
   // checker applies to (research/ADR/sprint/epic/product/architecture/etc.), including any doc
   // presently `status: superseded` in place (behavioral-eval-feasibility.md, loop-hygiene-* -- the

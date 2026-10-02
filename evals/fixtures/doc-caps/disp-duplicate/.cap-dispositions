@@ -1,0 +1,3 @@
+# .cap-dispositions fixture
+soft.md -- retain -- first
+soft.md -- merge -- second
