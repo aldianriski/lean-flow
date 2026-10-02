@@ -341,3 +341,90 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
     expect(u).toEqual({ input_tokens: 5, cache_creation_input_tokens: 10, cache_read_input_tokens: 20 });
   });
 });
+
+// TASK-384 / ADR-048 amendment: `<root>/.cap-dispositions` closes a SOFT over-cap by a recorded
+// disposition. One must-FAIL per new check, each failing with its NAMED finding, plus the must-PASS
+// and the selection-varying case (L-186). Every fixture is also run through the Shell oracle by
+// evals/run-doc-caps-differential.ts.
+describe("check-doc-caps.ts -- .cap-dispositions (TASK-384)", () => {
+  test("must-PASS: a valid retain row turns one soft OVER-CAP into a named `retained` line; the unrowed sibling still reports", () => {
+    const r = run("disp-retained", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(0);
+    expect(text).toContain("retained: soft.md (5 > 3) [retain] -- the fixture says this overage is intended");
+    expect(text).not.toContain("OVER-CAP (soft): soft.md");
+    expect(text).toContain("OVER-CAP (soft): other.md (5 > 3)"); // sibling control: no row, no exemption
+  });
+
+  test("must-FAIL (reason missing): a bare kind is the finding turned off, not a ruling -- and it does not honour the row", () => {
+    const r = run("disp-reason-missing", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("FAIL  doc-caps: disposition-reason-missing: soft.md");
+    expect(text).toContain("OVER-CAP (soft): soft.md (5 > 3)");
+    expect(text).not.toContain("retained:");
+  });
+
+  test("must-FAIL (kind unknown): a kind outside the closed set is named, and not honoured", () => {
+    const r = run("disp-kind-unknown", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain('FAIL  doc-caps: disposition-kind-unknown: soft.md -- kind "ignore"');
+    expect(text).not.toContain("retained:");
+    expect(text).not.toContain("disposition-reason-missing");
+  });
+
+  test("must-FAIL (stale, absent): a row whose path matches no examined file", () => {
+    const r = run("disp-stale-absent", "none.txt");
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("FAIL  doc-caps: disposition-stale: gone.md -- no §2-capped file at that exact path");
+  });
+
+  test("must-FAIL (stale, no longer over cap): a disposition that outlived its breach must not linger", () => {
+    const r = run("disp-stale-under", "none.txt");
+    expect(r.exitCode).toBe(1);
+    expect(r.lines.join("\n")).toContain("FAIL  doc-caps: disposition-stale: soft.md -- no longer over its cap (2 <= 3)");
+  });
+
+  test("must-FAIL (hard cap not dispositionable): the row is reported AND the hard FAIL stands", () => {
+    const r = run("disp-hard-cap", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("FAIL  cap hard.md (4 > 3)");
+    expect(text).toContain("FAIL  doc-caps: disposition-hard-cap: hard.md -- a HARD cap (3)");
+    expect(text).not.toContain("retained:");
+  });
+
+  test("must-FAIL (duplicate): the first row wins, the second is a named finding", () => {
+    const r = run("disp-duplicate", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("retained: soft.md (5 > 3) [retain] -- first");
+    expect(text).toContain("FAIL  doc-caps: disposition-duplicate: soft.md");
+  });
+
+  test("must-FAIL (frozen): a FROZEN superseded doc is not an active soft OVER-CAP, so its row is stale", () => {
+    const r = run("disp-frozen", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("FROZEN (superseded): soft.md");
+    expect(text).toContain("FAIL  doc-caps: disposition-stale: soft.md -- FROZEN");
+  });
+
+  test("selection-varying (L-186): padded row honoured; `./` and case-differing rows stale; a file reached via the <slug> glob arm honoured", () => {
+    const r = run("disp-selection", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("retained: soft.md (5 > 3) [merge] -- padded path honoured (trim)");
+    expect(text).toContain("retained: docs/a.md (5 > 3) [move-to-reference] -- reached via the <slug> glob arm");
+    expect(text).toContain("FAIL  doc-caps: disposition-stale: ./soft.md");
+    expect(text).toContain("FAIL  doc-caps: disposition-stale: Soft.md");
+  });
+
+  test("no `.cap-dispositions` file: output is the pre-TASK-384 output (adopters see no change)", () => {
+    const r = run("soft-cap", "none.txt");
+    expect(r.exitCode).toBe(0);
+    expect(r.lines.join("\n")).toContain("OVER-CAP (soft): soft.md (5 > 3)");
+    expect(r.lines.join("\n")).not.toContain("disposition");
+  });
+});

@@ -146,3 +146,37 @@ This amendment adds a second measurement path and records the first real adoptio
 already decided above — the gate stays offline and zero-dependency either way (`Bun.spawn`, no SDK,
 no new package), and Phase 1's "no disposition mechanism exists yet" and "line caps retained as a
 secondary signal" both stand unchanged.
+
+## Amended 2026-10-02 (TASK-384 — the disposition route ships, for soft caps only)
+
+Phase 1 said an over-budget always-loaded set is "a FAIL with no escape route" until `TASK-384` ships a
+disposition mechanism. It has shipped, and it is **narrower than that sentence promised**.
+
+**What shipped.** A repo-root `.cap-dispositions` (`<path> -- <kind> -- <reason>`, mirroring
+`.conformance-exempt`) read by `check-doc-caps` in both implementations — the Shell authority and the TS
+port, held in parity by `evals/run-doc-caps-differential.ts`. The closed set of kinds is replace · merge ·
+move-to-reference · automate-into-check · retain. A **soft** `OVER-CAP` whose path carries a valid row
+prints a named `retained: <path> (<n> > <cap>) [<kind>] -- <reason>` line instead of `OVER-CAP (soft)` —
+named on every run, never silent. A malformed row is itself a FAIL: `disposition-reason-missing`,
+`disposition-kind-unknown`, `disposition-duplicate`, and `disposition-stale` (the path matches no examined
+file, the file is no longer over its cap, or it is FROZEN) — a disposition that outlived its breach must
+not linger. Matching is exact: trimmed, case-sensitive, no `./` tolerance.
+
+**What did not ship.** A **hard cap and the token budget are not dispositionable.** A row naming a
+hard-capped path is reported (`disposition-hard-cap`) and the hard FAIL stands; the token-budget FAIL is
+unchanged. The route for an always-loaded breach is the prose one: a promoted rule must name its
+`disposition: <kind>` on the LEARNINGS pointer line, and a rule moved out of `.claude/CLAUDE.md` is recorded
+with its destination — that, not a file row, is what makes room under the budget.
+
+**Why.** TD-174's failure was a soft cap that reports and nothing acts: this route gives every standing
+`OVER-CAP` a recorded ruling and a reader (the gate names it). Making hard caps and the budget
+dispositionable would turn a ratchet into a log line — the same silent-pass the budget exists to prevent.
+`retain` is the only kind that keeps the overage and so needs a real justification; the other four describe
+a move the file's diff must show.
+
+**What this does not change.** No ADR-034 element moves: `check-doc-caps` is a gate leg, not an engine
+rule, and every finding id and severity already in force stays — a dispositioned row is an explicit,
+named exclusion of the same kind as `.conformance-exempt`. The engine does not call the checker
+(`qa-check.sh` leg 1 does), so ADR-043's adopter contract is untouched: no file, no change. Phase 1's
+"no disposition mechanism exists yet" now reads as scoped to the always-loaded budget; the line caps
+as a secondary signal stand.

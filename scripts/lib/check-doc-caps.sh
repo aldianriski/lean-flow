@@ -103,6 +103,41 @@ rows=$(awk '
 GFFILE=${3:-"$here/doc-caps-grandfathered.txt"}
 GF=$([ -f "$GFFILE" ] && grep -v '^#' "$GFFILE" | grep -v '^[[:space:]]*$')
 
+# --- recorded dispositions for SOFT over-cap rows (TASK-384, ADR-048 amendment) -------------------
+# `<root>/.cap-dispositions`, mirroring `.conformance-exempt`: one row per line, `<path> -- <kind> --
+# <reason>`, kind in the closed set below. A soft OVER-CAP whose path has a VALID row prints a NAMED
+# `retained:` line instead of `OVER-CAP (soft)` -- never silent. Malformed rows are findings, not
+# skips: kind unknown, reason missing, duplicate path, and a STALE row (the path is not an examined
+# §2-capped file, or it is no longer over its cap, or it is FROZEN) -- a disposition that outlived its
+# breach must not linger. A HARD cap and the token budget are NOT dispositionable: a row naming a
+# hard-capped path is a named FAIL and the hard FAIL stands. Matching is EXACT: the row path is
+# trimmed of surrounding blanks and compared byte for byte to the root-relative path §2 resolves --
+# case-sensitive, no `./` prefix tolerance -- so a mis-cased or `./` row is reported stale, never
+# silently honoured on a case-insensitive filesystem. No file means no dispositions: adopters who
+# never create one see no change at all.
+# The pre-pass emits `status<TAB>path<TAB>kind<TAB>reason`; status is ok | D(uplicate) | K(ind bad)
+# and/or R(eason missing). Duplicates: the first row wins, later ones are findings.
+tmpb="${TMPDIR:-/tmp}/doc-caps.$$"
+parsed="$tmpb.parsed"; seen="$tmpb.seen"
+: > "$seen"; : > "$parsed"
+if [ -f "$root/.cap-dispositions" ]; then
+  tr -d '\r' < "$root/.cap-dispositions" | awk '
+    BEGIN { split("replace merge move-to-reference automate-into-check retain", K, " "); for (i in K) okk[K[i]] = 1 }
+    /^#/ || /^[ \t]*$/ { next }
+    {
+      line = $0 " "
+      p = index(line, " -- ")
+      if (p == 0) { path = line; rest = "" } else { path = substr(line, 1, p - 1); rest = substr(line, p + 4) }
+      q = index(rest, " -- ")
+      if (q == 0) { kind = rest; reason = "" } else { kind = substr(rest, 1, q - 1); reason = substr(rest, q + 4) }
+      gsub(/^[ \t]+|[ \t]+$/, "", path); gsub(/^[ \t]+|[ \t]+$/, "", kind); gsub(/^[ \t]+|[ \t]+$/, "", reason)
+      gsub(/\t/, " ", reason)
+      if (path in P) st = "D"
+      else { P[path] = 1; st = ""; if (!(kind in okk)) st = st "K"; if (reason == "") st = st "R"; if (st == "") st = "ok" }
+      printf "%s\t%s\t%s\t%s\n", st, path, kind, reason
+    }' > "$parsed"
+fi
+
 gf_recorded() { printf '%s\n' "$GF" | awk -v p="$1" '$1==p{print $2}'; }
 gf_reason()   { printf '%s\n' "$GF" | awk -v p="$1" '$1==p{print $3}'; }
 
@@ -154,12 +189,14 @@ printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn soft; do
       rec=""
     fi
     if [ "$n" -le "$capn" ]; then
+      printf '%s\t%s\t%s\t%s\n' "$f" "$n" "$capn" under >> "$seen"
       if [ -n "$rec" ]; then
         printf 'PASS  cap %s (%s <= %s) [§2] -- back under cap: DELETE its grandfather row\n' "$f" "$n" "$capn"
       else
         printf 'PASS  cap %s (%s <= %s) [§2]\n' "$f" "$n" "$capn"
       fi
     elif [ "$(fm_status "$root/$f")" = "superseded" ]; then
+      printf '%s\t%s\t%s\t%s\n' "$f" "$n" "$capn" frozen >> "$seen"
       # FROZEN (ADR-020, SPRINT-063 T3). §2's research row says a spent verdict is "marked
       # `status: superseded` **rather than edited**", and §11's only exit for it is archival once
       # nothing live cites it. So a cap here measures the one thing that can still legally grow on the
@@ -172,23 +209,54 @@ printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn soft; do
       # never be read as a pass earned by shrinking.
       printf '      FROZEN (superseded): %s (%s lines, cap %s) [§2 · ADR-020] -- uncapped while spent; exits via §11 archive once nothing live cites it, never via a diet\n' "$f" "$n" "$capn"
     elif [ -n "$rec" ] && [ "$n" -le "$rec" ]; then
+      printf '%s\t%s\t%s\t%s\n' "$f" "$n" "$capn" hard >> "$seen"
       printf '      OVER-CAP (grandfathered): %s (%s > %s, recorded %s) -- %s\n' "$f" "$n" "$capn" "$rec" "$(gf_reason "$f")"
     elif [ -n "$rec" ]; then
+      printf '%s\t%s\t%s\t%s\n' "$f" "$n" "$capn" hard >> "$seen"
       printf 'FAIL  cap %s (%s > %s) [§2] -- grandfathered at %s and it GREW; a grandfather clause is not a licence to drift\n' "$f" "$n" "$capn" "$rec"
     elif [ "$soft" = 1 ]; then
       # A soft cap REPORTS. §11 routes its trigger to the governance review for a prune-with-the-owner,
       # so failing the gate here would block the very commit that does the pruning.
-      printf '      OVER-CAP (soft): %s (%s > %s) [§2 soft] -- prune at the next promote governance review (§11)\n' "$f" "$n" "$capn"
+      #
+      # TASK-384: a valid recorded disposition turns the report into a NAMED retained line (`parsed`
+      # holds status=ok only for the FIRST row of a path).
+      printf '%s\t%s\t%s\t%s\n' "$f" "$n" "$capn" soft >> "$seen"
+      drow=$(awk -F'\t' -v p="$f" '$1 == "ok" && $2 == p { print $3 "|" $4; exit }' "$parsed")
+      if [ -n "$drow" ]; then
+        printf '      retained: %s (%s > %s) [%s] -- %s\n' "$f" "$n" "$capn" "${drow%%|*}" "${drow#*|}"
+      else
+        printf '      OVER-CAP (soft): %s (%s > %s) [§2 soft] -- prune at the next promote governance review (§11)\n' "$f" "$n" "$capn"
+      fi
     else
+      printf '%s\t%s\t%s\t%s\n' "$f" "$n" "$capn" hard >> "$seen"
       printf 'FAIL  cap %s (%s > %s) [§2]\n' "$f" "$n" "$capn"
     fi
   done
   [ "$matched" = 1 ] || printf '      skip (absent): %s [§2 cap %s]\n' "$glob" "$capn"
-done > "${TMPDIR:-/tmp}/doc-caps.$$"
+done > "$tmpb"
 
-cat "${TMPDIR:-/tmp}/doc-caps.$$"
-grep -q '^FAIL' "${TMPDIR:-/tmp}/doc-caps.$$" && fail=1
-rm -f "${TMPDIR:-/tmp}/doc-caps.$$"
+# Disposition-file findings, after every §2 row, in FILE order (TASK-384). Malformed rows get only
+# their malformed finding; a valid row is judged against what the loop above actually examined.
+if [ -s "$parsed" ]; then
+  awk -F'\t' '
+    FILENAME == ARGV[1] { if (!($1 in S)) { S[$1] = $4; N[$1] = $2; C[$1] = $3 } ; next }
+    {
+      st = $1; path = $2; kind = $3
+      if (st == "D") print "FAIL  doc-caps: disposition-duplicate: " path " -- a second row for the same path; the first wins, delete one [.cap-dispositions]"
+      else if (st != "ok") {
+        if (st ~ /K/) print "FAIL  doc-caps: disposition-kind-unknown: " path " -- kind \"" kind "\" is not one of replace|merge|move-to-reference|automate-into-check|retain [.cap-dispositions]"
+        if (st ~ /R/) print "FAIL  doc-caps: disposition-reason-missing: " path " -- a disposition with no reason is the finding turned off, not a ruling [.cap-dispositions]"
+      }
+      else if (!(path in S)) print "FAIL  doc-caps: disposition-stale: " path " -- no §2-capped file at that exact path (absent, mis-cased or ./-prefixed); delete the row [.cap-dispositions]"
+      else if (S[path] == "under") print "FAIL  doc-caps: disposition-stale: " path " -- no longer over its cap (" N[path] " <= " C[path] "); a disposition that outlived its breach must not linger, delete the row [.cap-dispositions]"
+      else if (S[path] == "frozen") print "FAIL  doc-caps: disposition-stale: " path " -- FROZEN (superseded), not an active soft OVER-CAP; delete the row [.cap-dispositions]"
+      else if (S[path] == "hard") print "FAIL  doc-caps: disposition-hard-cap: " path " -- a HARD cap (" C[path] ") is not dispositionable; the FAIL stands, fix the file or route a promoted rule per ADR-048 [.cap-dispositions]"
+    }' "$seen" "$parsed" >> "$tmpb"
+fi
+
+cat "$tmpb"
+grep -q '^FAIL' "$tmpb" && fail=1
+rm -f "$tmpb" "$seen" "$parsed"
 
 # --- non-§2 caps: an explicit allowlist, each naming its authority (L-082) ------------------------
 # `skills/*/SKILL.md` is the one cap this repo enforces that §2 does not state, because §2 describes a

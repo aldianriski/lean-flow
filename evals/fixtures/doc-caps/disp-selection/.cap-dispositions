@@ -1,0 +1,5 @@
+# .cap-dispositions fixture
+soft.md   -- merge -- padded path honoured (trim)
+./soft.md -- retain -- ./ prefix is not tolerated
+Soft.md -- retain -- case differs, stale
+docs/a.md -- move-to-reference -- reached via the <slug> glob arm
