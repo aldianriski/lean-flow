@@ -37,8 +37,8 @@ adjacent by name only.
 The single idea with any philosophical overlap is **"encode a decision as an *enforced*, automated
 check" (gate-as-code / rules-as-code)** — structarmed enforces architecture rules rather than leaving
 them as documentation. lean-flow deliberately makes its gates **suggestion + human sign-off**, not
-enforcement (ADR: agent-free, no hooks). Whether enforced gates are worth it is **already the open
-question in [TASK-006](../../TODO.md)** (opt-in PreToolUse gate-guard hook). structarmed adds no new
+enforcement (ADR: agent-free, no hooks). Whether enforced gates are worth it was **already ruled out of scope
+(TASK-006, [gate-guard-hook](../../.out-of-scope/gate-guard-hook.md))** (opt-in PreToolUse gate-guard hook). structarmed adds no new
 information there beyond confirming the enforcement-vs-suggestion tension is a real, recurring design axis.
 
 **No follow-up filed** — no keepers; TASK-006 already owns the only adjacent question.

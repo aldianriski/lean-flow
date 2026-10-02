@@ -223,7 +223,7 @@ this list as still-current:
   calls `promote`. Exercising this pair needs a headless `claude -p "/lean-doc-generator promote"` run
   against a populated-Backlog fixture — a different, heavier fixture shape than anything here or in
   Part A.
-- **`/triage` re-rank** — `/triage` operates on `TODO.md` Backlog directly and is never invoked by
+- **`/triage` re-rank** — `/triage` operates on the `docs/work/backlog/` store directly and is never invoked by
   `sprint-bulk`. Needs its own headless-`/triage` fixture shape.
 - **`migrate` / `init` per-item approvals** — both are user-invoked directly, never reached from
   `sprint-bulk`. Needs its own headless-`/migrate`/`/init` fixture shape.

@@ -69,7 +69,7 @@ test/             architecture/ — dependency-direction fitness tests (T3) · g
                   guards that a discovered gate still runs the declared one · fixtures/ (retained)
   ─────────────────────────────────────────────────────────────────────────────────────
 
-TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
+TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
 ```
 
 **The TS tree owes no `spec/STANDARD.md` §2 rows** — §2 is a *documentation* lifecycle standard

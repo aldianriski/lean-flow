@@ -10,7 +10,7 @@ status: current
 # QA-001 — prime detects the loop's context slots on a fresh repo
 
 - **Area under test:** `/prime` read-order + health check
-- **Preconditions / fixture:** a throwaway repo with README · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `TODO.md` (Active Sprint pointer + a Backlog task) · `docs/sprint/SPRINT-NNN.md` (open DoD)
+- **Preconditions / fixture:** a throwaway repo with README · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · a `docs/work/backlog/` task file · `docs/sprint/SPRINT-NNN.md` (open DoD)
 - **Last run:** 2026-06-21 — pass
 
 ## Steps
