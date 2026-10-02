@@ -77,10 +77,8 @@ not deletion. Re-run the audit when a sprint adds a guard.
 
 ## Out of scope / open questions
 - **Ruled (owner, 2026-10-02):** Q1 G08 freeze · Q2 G22 keep checker, freeze harness · Q3 keep G10 and S4.INDEX · Q4 P4 cut · Q5 T01 keep · Q6 G21 freeze ·
-  Q8 G23 keep, re-rule at the next audit.
-- **Q7 G17 authority + P1.** G17 is now R2 keep (a real catch, L-176). P1 (its parity harness) is R6 freeze: the oracle `check-authority.sh` is not an adopter contract.
-  *Rec: freeze P1; ADR-039 covers §4 only, so nothing needs amending.*
-- **Q9 K01 TS port.** R4 freeze, but R5 (it duplicates the Shell engine, which keeps authority, and no adopter runs it) would cut 72 files and 10,802 lines. Not touched since 2026-08-29.
-  *Rec: freeze now; the cut-or-finish call belongs to EPIC-014's owner, not this diet.*
-- **Q10 R1(b) breadth.** Applying "a skill names it" to G25 also moved G18, S03 and S05 from freeze to keep. *Rec: keep (b) but treat a skill naming a repo-only `scripts/` path as its own consumer-leak finding (L-015).*
+  Q8 G23 keep, re-rule at the next audit · **Q7** P1 freeze, G17 stays keep (R2, L-176; ADR-039 covers §4 only, nothing to amend) · **Q9** K01 freeze now (R5 would cut
+  72 files, 10,802 lines, untouched since 2026-08-29); cut-or-finish is EPIC-014's decision, to be filed as a follow-up task at close · **Q10** R1(b) stands as written
+  (G25 G18 S03 S05 keep). Totals unchanged by Q7/Q9/Q10: every ruling matched the recommended disposition.
+- **Open: none.** Follow-ups for close (coordinator files): the K01 task above, and a TD row for an L-015 leak: a shipped skill names repo-only `scripts/...` paths an adopter does not have.
 - Not settled: whether `bun test` joins the gate (TD-212); the freezes' touch-twice review is a proposal, not an ADR-050 clause.

@@ -61,7 +61,7 @@ the ledgers by two routes):
 | Decision | Effect of ADR-050 | Amend path |
 |---|---|---|
 | ADR-029 (tiers by failure visibility) | **Narrowed in part**: Tier G splits into consequential (full bar, unchanged) and other (fixture + real exercise). Tiers X and P unchanged | Owner accepts ADR-050; the `DECISIONS.md` row for ADR-029 gains a pointer; `CLAUDE.md` § Anti-Patterns' Tier G wording is reduced to a pointer by `TASK-384`'s disposition route |
-| ADR-039 (§4 parity opt-in, mandatory at promote/close) | **Unchanged for §4**, which is the one pair clause 3 keeps; its mandatory moments never covered the other ports, which `qa-check.sh` comments extended by analogy and which now freeze | Owner ruling Q7 (audit); wording in `qa-check.sh` is `TASK-398`'s |
+| ADR-039 (§4 parity opt-in, mandatory at promote/close) | **Unchanged for §4**, which is the one pair clause 3 keeps; its mandatory moments never covered the other ports, which `qa-check.sh` comments extended by analogy and which now freeze | Owner ruled it (audit Q7: authority parity freezes); wording in `qa-check.sh` is `TASK-398`'s |
 | ADR-043 (engine consumer contract) | **Unchanged**; it is the boundary clauses 1 and 3 are drawn on. No cut touches the engine | None |
 | ADR-021 (a named check's FAIL blocks a quiet DoD tick) | **Unchanged**: no cut or freeze removes a check that blocks a tick; freezing only limits new cases | None |
 | ADR-022 (unattended retry carve-out) | **Unchanged**; the audit's cut (S10) removes the only frozen *v1-shape* fixtures of its retry behaviour, so v2 coverage, if wanted, is a new guard that clause 2 prices | `TASK-398` lands the cut |

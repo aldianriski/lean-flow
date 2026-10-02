@@ -43,9 +43,9 @@ Spec rows `S2.R-TEMPDIR`, `S11.EPIC`, `S11.RESEARCH` have no `assert_` in the en
 |---|---|---|---|---|---|
 | S01 | dispatch preflight (A dispatch-preflight) | yes, `dispatch.md` | >=8 (SPRINT-055 HALT on the Plan's own gap, L-099; 069 HALT on 7 findings) | ~9 | R1 keep |
 | S02 | skill freshness (A skill-freshness) | yes, `night-run.md` | >=3 (SPRINT-041 BLOCK 1.22.0 != 1.23.0; SPRINT-039) | ~3 | R1 keep |
-| S03 | night-run family (A gate-exception, outcome, reap-terminal, revise-loop-ceiling) | skill names `night-run.sh` | 0 | ~8 | R1(b) keep |
+| S03 | night-run family (A gate-exception, outcome, reap-terminal, revise-loop-ceiling) | skill names `night-run.sh` | 0 | ~8 | R1(b) keep (**owner-ruled** Q10) |
 | S04 | worktree usability + base (A usability; O worktree-base) | yes, `dispatch.md` | 1 (SPRINT-110 T4 `worktree-base-stale`, e4fba9c, L-219) | ~2 | R1 keep |
-| S05 | run-mode resolver (A run-mode) | skill names it (`night-run.md:24`) | 0 (thin) | ~1 | R1(b) keep |
+| S05 | run-mode resolver (A run-mode) | skill names it (`night-run.md:24`) | 0 (thin) | ~1 | R1(b) keep (**owner-ruled** Q10) |
 | S06 | sprint-close + sprint-log-layout (A x2) | no | 0 (fixtures of legs) | 0 | R4 freeze |
 | S07 | emitter-column (A) | no | n/a, tests code | ~3 | R6 keep |
 | S08 | layout + v1-to-v2 migrate (A x2) | migrate path | n/a, tests code | ~2 | R6 keep |
@@ -54,8 +54,8 @@ Spec rows `S2.R-TEMPDIR`, `S11.EPIC`, `S11.RESEARCH` have no `assert_` in the en
 | T01 | `test/architecture` unwired-exports + dependency-direction | no | 0 (first run reproduced TD-103, still open) | ~5 | R4 → **owner: keep** |
 | T02 | `test/gate-discovery` | no | 0 | ~2 | R4 freeze |
 | T03 | `qa-verdict.ts` (`qa-verdict.test.ts`) | no | >=2 run-level (SPRINT-099 truncated runs read as pass; SPRINT-109, L-218) | ~4 | R2 keep |
-| K01 | TS engine port: `packages/standard` (40 src files, 4,005 lines; 30 tests, 6,797 lines) + `apps/cli` (S4 · S12 · F4 · F12 rules) | no (`conformance.sh` runs Shell only; `bun test` only) | 0 on a skim of its 35 commits (last 2026-08-29); not ledger-mined | not tallied | R4 freeze; R5 would cut it (Q9) |
-| P1 | authority-differential (O, 55 s) | oracle no | not mined | not tallied | R6 freeze |
+| K01 | TS engine port: `packages/standard` (40 src files, 4,005 lines; 30 tests, 6,797 lines) + `apps/cli` (S4 · S12 · F4 · F12 rules) | no (`conformance.sh` runs Shell only; `bun test` only) | 0 on a skim of its 35 commits (last 2026-08-29); not ledger-mined | not tallied | R4 freeze (**owner-ruled**: freeze now; cut-or-finish is EPIC-014's decision) |
+| P1 | authority-differential (O, 55 s) | oracle no | not mined | not tallied | R6 freeze (**owner-ruled**) |
 | P2 | doc-caps-differential (O, 80 s) | oracle no (see G01) | not mined | not tallied | R6 freeze |
 | P3 | night-run-rollup-differential-parity (O, 78 s) | oracle no | not mined | not tallied | R6 freeze |
 | P4 | layers-observed-differential (X, 154 s, ungated) | oracle no | not mined | not tallied | R6 cut (**owner: cut**) |
@@ -64,7 +64,7 @@ Spec rows `S2.R-TEMPDIR`, `S11.EPIC`, `S11.RESEARCH` have no `assert_` in the en
 | P7 | `layers-completeness-differential.ts` | oracle no | not mined | not tallied | R6 freeze |
 
 ## Recommendation
-Rows E, S, T, K, P follow the class rules in `guard-audit.md`; the exceptions needing the owner are Q7, Q9 and Q10 there.
+Rows E, S, T, K, P follow the class rules in `guard-audit.md`; every exception (Q1-Q10) is owner-ruled there.
 
 ## Out of scope / open questions
 - P1-P7 and K01 got no ledger mining (added by the third selector late); their catch columns are `not mined`, not `0`.
