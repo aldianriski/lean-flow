@@ -146,7 +146,7 @@ export function gfReason(gfRaw: string, f: string): string | null {
 export const DISPOSITION_KINDS = ["replace", "merge", "move-to-reference", "automate-into-check", "retain"] as const;
 export const DISPOSITIONS_FILE = ".cap-dispositions";
 
-/** status: "ok" | "D" (duplicate path) | any of "K" (kind unknown) + "R" (reason missing). */
+/** status: "ok" | "T" (TAB in path/kind) | "D" (duplicate path) | any of "K" (kind unknown) + "R" (reason missing). */
 export interface DispositionRow {
   readonly status: string;
   readonly path: string;
@@ -185,7 +185,12 @@ export function parseDispositions(content: string): DispositionRow[] {
     kind = trim(kind);
     reason = trim(reason).replace(/\t/g, " ");
     let status: string;
-    if (seenPaths.has(path)) {
+    if (path.includes("\t") || kind.includes("\t")) {
+      // a TAB in path/kind: the Shell hands rows on as TSV and would split it, so both reject (T).
+      status = "T";
+      path = path.replace(/\t/g, "<TAB>");
+      kind = kind.replace(/\t/g, "<TAB>");
+    } else if (seenPaths.has(path)) {
       status = "D";
     } else {
       seenPaths.add(path);
@@ -221,7 +226,9 @@ export function evaluateDispositions(rows: readonly DispositionRow[], seen: Read
   const out: string[] = [];
   const tag = "[.cap-dispositions]";
   for (const r of rows) {
-    if (r.status === "D") {
+    if (r.status === "T") {
+      out.push(`FAIL  doc-caps: disposition-malformed: ${r.path} -- a TAB inside the path or kind (${r.kind}); the row is not honoured, rewrite it with spaces ${tag}`);
+    } else if (r.status === "D") {
       out.push(`FAIL  doc-caps: disposition-duplicate: ${r.path} -- a second row for the same path; the first wins, delete one ${tag}`);
     } else if (r.status !== "ok") {
       if (r.status.includes("K")) {

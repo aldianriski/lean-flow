@@ -116,9 +116,14 @@ GF=$([ -f "$GFFILE" ] && grep -v '^#' "$GFFILE" | grep -v '^[[:space:]]*$')
 # silently honoured on a case-insensitive filesystem. No file means no dispositions: adopters who
 # never create one see no change at all.
 # The pre-pass emits `status<TAB>path<TAB>kind<TAB>reason`; status is ok | D(uplicate) | K(ind bad)
-# and/or R(eason missing). Duplicates: the first row wins, later ones are findings.
+# and/or R(eason missing), or T (a TAB inside the path or kind: the pre-pass hands rows on as TSV, so
+# a tab there would split the row and honour a DIFFERENT path than the one written -- the row is
+# reported `disposition-malformed` and never honoured; both checkers agree). Duplicates: the first
+# row wins, later ones are findings.
 tmpb="${TMPDIR:-/tmp}/doc-caps.$$"
 parsed="$tmpb.parsed"; seen="$tmpb.seen"
+trap 'rm -f "$tmpb" "$seen" "$parsed"' EXIT
+trap 'exit 1' INT TERM
 : > "$seen"; : > "$parsed"
 if [ -f "$root/.cap-dispositions" ]; then
   tr -d '\r' < "$root/.cap-dispositions" | awk '
@@ -132,7 +137,8 @@ if [ -f "$root/.cap-dispositions" ]; then
       if (q == 0) { kind = rest; reason = "" } else { kind = substr(rest, 1, q - 1); reason = substr(rest, q + 4) }
       gsub(/^[ \t]+|[ \t]+$/, "", path); gsub(/^[ \t]+|[ \t]+$/, "", kind); gsub(/^[ \t]+|[ \t]+$/, "", reason)
       gsub(/\t/, " ", reason)
-      if (path in P) st = "D"
+      if (path ~ /\t/ || kind ~ /\t/) { st = "T"; gsub(/\t/, "<TAB>", path); gsub(/\t/, "<TAB>", kind) }
+      else if (path in P) st = "D"
       else { P[path] = 1; st = ""; if (!(kind in okk)) st = st "K"; if (reason == "") st = st "R"; if (st == "") st = "ok" }
       printf "%s\t%s\t%s\t%s\n", st, path, kind, reason
     }' > "$parsed"
@@ -242,7 +248,8 @@ if [ -s "$parsed" ]; then
     FILENAME == ARGV[1] { if (!($1 in S)) { S[$1] = $4; N[$1] = $2; C[$1] = $3 } ; next }
     {
       st = $1; path = $2; kind = $3
-      if (st == "D") print "FAIL  doc-caps: disposition-duplicate: " path " -- a second row for the same path; the first wins, delete one [.cap-dispositions]"
+      if (st == "T") print "FAIL  doc-caps: disposition-malformed: " path " -- a TAB inside the path or kind (" kind "); the row is not honoured, rewrite it with spaces [.cap-dispositions]"
+      else if (st == "D") print "FAIL  doc-caps: disposition-duplicate: " path " -- a second row for the same path; the first wins, delete one [.cap-dispositions]"
       else if (st != "ok") {
         if (st ~ /K/) print "FAIL  doc-caps: disposition-kind-unknown: " path " -- kind \"" kind "\" is not one of replace|merge|move-to-reference|automate-into-check|retain [.cap-dispositions]"
         if (st ~ /R/) print "FAIL  doc-caps: disposition-reason-missing: " path " -- a disposition with no reason is the finding turned off, not a ruling [.cap-dispositions]"

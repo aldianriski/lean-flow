@@ -47,6 +47,8 @@ const cases: Case[] = [
   { name: "disp-duplicate", guide: `${FX}disp-duplicate/DOCS_Guide.md`, root: `${FX}disp-duplicate`, gf: `${FX}disp-duplicate/none.txt` },
   { name: "disp-frozen", guide: `${FX}disp-frozen/DOCS_Guide.md`, root: `${FX}disp-frozen`, gf: `${FX}disp-frozen/none.txt` },
   { name: "disp-selection", guide: `${FX}disp-selection/DOCS_Guide.md`, root: `${FX}disp-selection`, gf: `${FX}disp-selection/none.txt` },
+  { name: "disp-tab-path", guide: `${FX}disp-tab-path/DOCS_Guide.md`, root: `${FX}disp-tab-path`, gf: `${FX}disp-tab-path/none.txt` },
+  { name: "disp-tab-kind", guide: `${FX}disp-tab-kind/DOCS_Guide.md`, root: `${FX}disp-tab-kind`, gf: `${FX}disp-tab-kind/none.txt` },
   // The live repo's own STANDARD.md over the real docs tree -- the whole cap-covered corpus this
   // checker applies to (research/ADR/sprint/epic/product/architecture/etc.), including any doc
   // presently `status: superseded` in place (behavioral-eval-feasibility.md, loop-hygiene-* -- the

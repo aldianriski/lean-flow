@@ -427,4 +427,22 @@ describe("check-doc-caps.ts -- .cap-dispositions (TASK-384)", () => {
     expect(r.lines.join("\n")).toContain("OVER-CAP (soft): soft.md (5 > 3)");
     expect(r.lines.join("\n")).not.toContain("disposition");
   });
+
+  test("must-FAIL (TAB in path, F1): the row is `disposition-malformed` and NOT honoured -- the Shell used to retain soft.md here", () => {
+    const r = run("disp-tab-path", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("FAIL  doc-caps: disposition-malformed: soft.md<TAB>retain");
+    expect(text).toContain("OVER-CAP (soft): soft.md (5 > 3)");
+    expect(text).not.toContain("retained:");
+  });
+
+  test("must-FAIL (TAB in kind, F1): malformed, not kind-unknown, not honoured", () => {
+    const r = run("disp-tab-kind", "none.txt");
+    const text = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(text).toContain("FAIL  doc-caps: disposition-malformed: soft.md -- a TAB inside the path or kind (ret<TAB>ain)");
+    expect(text).not.toContain("disposition-kind-unknown");
+    expect(text).not.toContain("retained:");
+  });
 });

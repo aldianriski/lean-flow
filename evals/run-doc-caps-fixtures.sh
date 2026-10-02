@@ -55,7 +55,8 @@ test_file="evals/doc-caps.test.ts"
 # TASK-384 added the `.cap-dispositions` cases (34 -> 44): retained must-PASS with its unrowed sibling,
 # reason-missing, kind-unknown, stale-absent, stale-under, hard-cap-rejected, duplicate, frozen, the
 # selection-varying case (padded / `./` / case-differing / glob-arm), and the no-file adopter case.
-min_tests=44
+# Codex round 1 F1 added the two TAB-in-path / TAB-in-kind cases (44 -> 46).
+min_tests=46
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
@@ -77,5 +78,5 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback, token-budget missing/malformed/pending/exceeded+siblings, token-budget selection-missing-file, token-budget selection-second-file-dominates, disp-retained/-reason-missing/-kind-unknown/-stale-absent/-stale-under/-hard-cap/-duplicate/-frozen/-selection (TASK-384), token-budget crlf/lf parity (B1), parseTokenBudget units, headless-calibration baseline-instability/missing-usage-field+siblings, parseHeadlessUsage units)"
+echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback, token-budget missing/malformed/pending/exceeded+siblings, token-budget selection-missing-file, token-budget selection-second-file-dominates, disp-retained/-reason-missing/-kind-unknown/-stale-absent/-stale-under/-hard-cap/-duplicate/-frozen/-selection/-tab-path/-tab-kind (TASK-384), token-budget crlf/lf parity (B1), parseTokenBudget units, headless-calibration baseline-instability/missing-usage-field+siblings, parseHeadlessUsage units)"
 exit 0
