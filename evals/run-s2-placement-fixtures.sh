@@ -117,6 +117,29 @@ mv "$mis/docs/architecture/overview.md" "$mis/documentation/overview.md"
 run_case_anywhere "outside-canonical-placement-fires" 1 "file-outside-canonical-placement: docs/architecture/overview.md" -- \
   sh "$engine" "$mis" --spec "$s2_spec"
 
+# --- retired §2 rows are not placed (SPRINT-111 T4 / spec 0.13.0) ---------------------------------
+# §2's TODO.md row is marked "retired at"; with no root TODO.md a same-name file elsewhere is not a
+# stray, it is a stranger's own notes. (a) must-PASS: no placement finding names TODO.md.
+# (b) sibling control, same tree plus a misplaced live row: still FAILs with that finding.
+ret="$work/retired-stray"
+build_conformant "$ret"
+printf '# my notes\n' > "$ret/docs/TODO.md"
+out3=$(sh "$engine" "$ret" --spec "$s2_spec" 2>&1)
+if ! printf '%s\n' "$out3" | grep -qE '^FAIL +file-outside-canonical-placement: TODO\.md'; then
+  echo "PASS fixture(retired-row-not-placed): a stray docs/TODO.md raises no placement finding naming TODO.md"
+else
+  echo "FAIL fixture(retired-row-not-placed): a retired §2 row was treated as live:"
+  printf '%s\n' "$out3" | grep -E '^FAIL +file-outside-canonical-placement: TODO'
+  fail=1
+fi
+retmis="$work/retired-stray-misplaced"
+build_conformant "$retmis"
+printf '# my notes\n' > "$retmis/docs/TODO.md"
+mkdir -p "$retmis/documentation"
+mv "$retmis/docs/architecture/overview.md" "$retmis/documentation/overview.md"
+run_case_anywhere "retired-row-sibling-live-row-still-fires" 1 "file-outside-canonical-placement: docs/architecture/overview.md" -- \
+  sh "$engine" "$retmis" --spec "$s2_spec"
+
 # --- the legacy path is matched SECOND: tolerated, and NAMED --------------------------------------
 # §2 records `docs/ARCHITECTURE.md` as the legacy path for `docs/architecture/overview.md`, and says
 # legacy paths are matched second. So R-PLACEMENT must not report it -- but an accepted fallback

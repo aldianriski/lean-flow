@@ -1815,6 +1815,7 @@ _s2_rows() {
       if ($0 ~ /^\|[-| ]*\|$/)      next
       n = split($0, c, "|"); if (n < 5) next
       file = c[2]
+      if (file ~ /retired at/) next    # retired §2 rows are not placed -- SPRINT-111 T4 / spec 0.13.0
       cre  = (pfx == "docs/") ? c[6] : c[5]              # trap 2
       if (match(file, /`[^`]+`/)) path = substr(file, RSTART + 1, RLENGTH - 2); else next
       if (path ~ /[<>*]/) next
