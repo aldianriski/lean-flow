@@ -71,3 +71,18 @@ so the disposition path must land in both, in parity, under ADR-043's adopter co
   green · prose-density red only on the foreign uncommitted EPIC-016. The engine baseline is 32 FAIL, measured on main at ccb87e2 before T2 (its +9 over
   SPRINT-111's 23 is SPRINT-112 becoming current: 8 aged TD rows and 2 more held store-prune tasks; T2 adds 0).
 - Owner ruling: box 2 ("a rule demoted out of CLAUDE.md") is met by the 5 detail moves, each keeping an always-loaded one-liner (L-088). DoD 4/4.
+
+### 2026-10-03 | progress | T1 (TASK-396) accepted; ADR-050 accepted; merged 917b8ed
+- Built `9649100`, then Codex fixes `58d7c59` · `e56e6bb` · `486d0bd` · `34e2bd1`. The audit covers 60 guards, drawn by three selectors (gate lists 64 · disk
+  prefixes 68 · every runnable .sh/.ts under evals/test/scripts/apps/packages 197). The third selector found P6, P7 and K01 (the TS engine
+  port, 72 files, untouched since 2026-08-29). Catches come from git history + ledgers, never recall: 24 of 60 guards ever caught a real defect
+  (≥70 events) against ~235 maintenance events. Capped companions under docs/research/ (no spec change).
+- Codex round 1 confirmed 5 findings: G17's missed catch (L-176); G25 is consumer-facing; the engine does NOT call check-doc-caps; the population
+  omitted parity guards; the placement violated §2:156. Round 2 confirmed 4: K01 overlapped E04/P5; G24 is R1(b); the catch count is 24, not 23;
+  R6 was sharpened to "cut iff no runner of any kind". Round 3 was CLEAR (totals reconcile; the ADR relationship claims are true; no guard family is omitted).
+- Owner rulings (11): G08 freeze · G22 checker keep + harness freeze · G10 and S4.INDEX keep · P4 cut · T01 keep · G21 freeze · G23 keep (re-rule
+  next audit) · P1 freeze · K01 freeze (EPIC-014 decides) · R1(b) stands (L-015 leak → TD at close) · P7 cut. Final: 39 keep · 18 freeze · 3 cut;
+  cut + freeze = 871 of 2,351 s. TASK-398 cut list: S10 (8 files, 1,403 lines) · P4 (714) · P7 (251) + its 2 comments + the excluded-list names.
+- **ADR-050 accepted (owner, 2026-10-03).** CLAUDE.md § spec-only now scopes the full bar (seeding + worktree-isolated review) to
+  **consequential** G. Maintainer-only G takes a must-FAIL fixture + one run on its real artifact; frozen G and X keep their fixtures. Two Codex wording rounds,
+  then CLEAR. CLAUDE.md is at 80/80 lines, ~13419 ≤ 16087 tokens. DoD 2/2.

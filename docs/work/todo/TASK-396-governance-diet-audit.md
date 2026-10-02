@@ -25,8 +25,8 @@ grew from "delete one file" to five tasks, because its guards read the retired s
 
 ## Done when
 
-- [ ] ADR-050 records the principle: the proof bar scales with consequence (seeded-mutation campaigns and worktree-isolated outside review are kept for consequential guard logic, not every Tier G change); no new standing rule without a retirement; shell/TS parity is not grown beyond supported contracts.
-- [ ] An audit (`docs/research/`, feeding ADR-050) lists every guard/leg with the real defects it caught (git log · LEARNINGS), and each carries an owner-ruled disposition: keep · freeze · cut. Landing the cuts is TASK-398.
+- [x] ADR-050 records the principle: the proof bar scales with consequence (seeded-mutation campaigns and worktree-isolated outside review are kept for consequential guard logic, not every Tier G change); no new standing rule without a retirement; shell/TS parity is not grown beyond supported contracts. ✓ `34e2bd1` — ADR-050 drafted with its ADR relationship table, then accepted by the owner 2026-10-03; CLAUDE.md Tier G bar narrowed accordingly (Codex wording CLEAR)
+- [x] An audit (`docs/research/`, feeding ADR-050) lists every guard/leg with the real defects it caught (git log · LEARNINGS), and each carries an owner-ruled disposition: keep · freeze · cut. Landing the cuts is TASK-398. ✓ `34e2bd1` — 60 guards drawn by three selectors (gate lists · disk prefixes · every runnable file); 24 with real catches; class rules + 11 owner rulings → 39 keep · 18 freeze · 3 cut; Codex 3 rounds CLEAR
 
 ## Touches
 
