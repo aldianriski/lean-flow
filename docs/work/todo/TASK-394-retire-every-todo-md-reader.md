@@ -26,9 +26,9 @@ the spec saying so.
 
 ## Done when
 
-- [ ] Zero non-test readers of TODO.md across scripts/, evals/, skills/ — derived mechanically by two selectors — except the allowlist: migrate's reference procedure, a bare existence check in layout detection, and v1-refusal text.
-- [ ] S11.TODOCAP retired: spec/STANDARD.md §2 TODO.md row, §11 row and §14 counts updated, a spec MINOR with a CHANGELOG entry, and the engine rule removed. qa-check legs 3/5/8 and leg 7's TD-aging half (TD-203) retired or retargeted.
-- [ ] Retained must-FAIL fixture for any retargeted reader; worktree-isolated outside review.
+- [x] Zero non-test readers of TODO.md across scripts/, evals/, skills/ — derived mechanically by two selectors — except the allowlist: migrate's reference procedure, a bare existence check in layout detection, and v1-refusal text.
+- [x] S11.TODOCAP retired: spec/STANDARD.md §2 TODO.md row, §11 row and §14 counts updated, a spec MINOR with a CHANGELOG entry, and the engine rule removed. qa-check legs 3/5/8 and leg 7's TD-aging half (TD-203) retired or retargeted.
+- [x] Retained must-FAIL fixture for any retargeted reader; worktree-isolated outside review.
 
 ## Touches
 

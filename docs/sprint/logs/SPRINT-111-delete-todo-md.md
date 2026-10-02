@@ -114,3 +114,34 @@ owner-ruling: bookkeeping-gate — overridden: four reds of known cause, none fr
   the listed path. Member paths are frozen at promote and go stale once a task moves folder (TASK-370/381 already sit in done/), so prime now finds
   members **by id**, as sprint-by-reference.md already did. Two items are left as they were: TECH-DEBT.md:10 and README's tree line still say
   TODO.md, and T4 owns both. DoD 3/3.
+
+### 2026-10-02 | scope-change | T3: ADR-034 keeps S11.TODOCAP's id; DoD box 2 read as "reader removed" (owner rulings)
+**What broke.** T3's first commit (`d75d861`) removed S11.TODOCAP from §11 (spec 100 → 99, 51 → 50 checkable, labelled breaking).
+ADR-034 freezes the rule-ID surface at 100 ("the contract's denominator"), and 9 assertions in 4 TS test files pin it
+(`apps/cli/src/main.test.ts` · `apps/cli/src/spec-file-reader.test.ts` · `packages/standard/src/spec-reader.test.ts`). They went red
+(`spec-reader.test.ts` 33 pass, 4 fail). Neither the builder's harnesses nor the outside review caught it, because `qa-check.sh`
+never runs `bun test`. It was found by a coordinator grep for stale count claims, a different route.
+**Owner rulings (popups, 2026-10-01/02).** (1) Keep the id and retire only its reader: `assert_S11_TODOCAP` becomes a note stub that
+touches no file, and the spec stays 100 / 51. 0.13.0 is a plain MINOR, the "breaking" label is withdrawn, and A2 is moot.
+(2) TASK-394 DoD box 2 ("the engine rule removed") is satisfied by "reader removed, id kept as a note stub". This is a ruling, not a re-read (L-088).
+**Impact.** T3 gains a second commit (`b324740`). One edit falls outside Layers: `evals/run-ownership-header-fixtures.sh` (+15), the direct test of
+the retired `_own_docs` TODO.md read. A2 ("retiring is a MINOR") is resolved by the ruling instead of being confirmed.
+
+### 2026-10-02 | progress | T3 (TASK-394) TODO.md readers retired, S11.TODOCAP kept as a reader-free note; d75d861 + b324740, merged 45961bc
+- Census (A=`TODO\.md`, B=`Active Sprint|## Backlog|Backlog pool|TODOCAP|§ Backlog`; scripts+evals without fixtures): before A=30 B=8 A∩B=8
+  A∪B=30, after 29/7/7/29, reconciled with the coordinator's pre-census (30). Zero retired-reader rows remain. skills/ was already clean after T5 (allowlist only).
+- Retired, not retargeted: qa-check legs 3 (the TODO.md subject), 5, 7 (the whole leg, all of it TD-aging: closes TD-203, row closed at
+  close) and 8. Engine: S11.BACKLOG's v1 breadcrumb scan and TODO.md from `_own_docs`. check-task-origin: population 2. Sibling checks stay.
+- Spec 0.13.0 plain MINOR (§15: no verdict moves pass→fail, no id removed). `--reconcile` gives 100. Engine coverage is 45 of 51 checkable, so README:365 holds.
+- Review: consequence · T3 · behaviour: gate legs + engine rule · governance: spec semantics. A worktree-isolated outside review
+  (threat model: missed reader · collateral · vacuous fixtures · spec consistency · gate breakage) found 3 findings, none high. F1 (med):
+  the retired-legs 5/7/8 case ran only leg 6's region and was vacuous. Fixed: the region now spans leg 5's old position to leg 9; restoring
+  3fe3320's qa-check.sh reddens it (19 pass, 4 fail). F2/F3 (stale 51/eleven counts) were dissolved by ruling (1). The rework was re-reviewed
+  by the non-author coordinator: CLEAR.
+- Seeded breaks: 8, each reddening only its own cases; files parse; line delta ≤1. Restores were checked by `git hash-object` == `git rev-parse HEAD:<p>`.
+  Stub seeds: a TODO.md read reddens only `s11-todocap-stub-reads-nothing`; an emitted finding reddens both over-cap-retired cases (now load-bearing).
+- On main after the merge: sprint-family, conformance-engine, ownership-header, task-origin and spec-reader all green, plus qa-store-legs
+  23/0 and s2-placement green. The 4 spec/cli TS files were 138/0 (re-run by the coordinator). The full `bun test` was 839 pass, 1 fail: the fail is
+  `discovery-order.test.ts` rung-1 bypass, an existing row (TECH-DEBT.md:977), untouched by T3.
+- Open, not T3's: check-doc-caps and check-prose-density still reach TODO.md through §2's `320 soft` cell until T4 deletes the file;
+  evals/README.md:226 → TASK-396's sweep. DoD 3/3 (box 2 by ruling, box 3 vacuous because nothing was retargeted).
