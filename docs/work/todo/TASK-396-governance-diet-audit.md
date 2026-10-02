@@ -1,6 +1,7 @@
 ---
 id: TASK-396
 title: "Governance diet: consequence-based proof bar, freeze new rules, cut guards that never caught a defect"
+sprint: SPRINT-112
 priority: P1
 size: M
 risk: med

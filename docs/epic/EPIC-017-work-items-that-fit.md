@@ -4,7 +4,7 @@ slug: work-items-that-fit
 owner: Maintainer
 last_updated: 2026-10-02
 status: active
-member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111]
+member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111, SPRINT-112]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -198,6 +198,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | [SPRINT-109](../sprint/archive/SPRINT-109-unlock-the-critical-path.md) | Unlock the critical path | closed `6761016` | Spec 0.12.0 describes the store; caps measure tokens (ADR-048, budget 16087 — half of CW 4); four guards read member files (part of CW 2). No Closed-when fully met. |
 | [SPRINT-110](../sprint/archive/SPRINT-110-retarget-the-gate.md) | Retarget the gate | closed `370fd9f` | Layers guards, qa-check, night-run and the engine read the store (6 of CW 2's 7 guard retargets done; `381`/`380` remain); a v2 tree needs `bun` (ADR-049). No Closed-when fully met. |
 | [SPRINT-111](../sprint/archive/SPRINT-111-delete-todo-md.md) | Delete TODO.md | closed `47f0595` | **Met Closed-when 2**: migrate proven on a real copy and run by an agent on this repo, 15 legacy tasks moved onto the store, `TODO.md` deleted, and every reader retired. S11.TODOCAP was kept as a note (ADR-034); spec 0.13.0. `371` now waits on `378` · `379` · `384` |
+| [SPRINT-112](../sprint/SPRINT-112-govern-lighter.md) | Govern lighter | active | — (in progress: `384` for CW 3 · 4; `396` is the governance diet, not an EPIC-017 member) |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·

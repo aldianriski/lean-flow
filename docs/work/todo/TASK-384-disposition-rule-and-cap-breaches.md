@@ -2,6 +2,7 @@
 id: TASK-384
 title: "Enforce a disposition per promoted rule and close the soft cap breaches"
 epic: EPIC-017
+sprint: SPRINT-112
 priority: P1
 size: M
 risk: high
