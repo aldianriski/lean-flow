@@ -130,3 +130,10 @@ pre-existing `bash`/`find` call remains (~line 146, `selection-varying-v2-empty-
 real run (dispatched, evidence only) · `migrate` withhold inconsistency: **TD-217** filed (next id derived from the ledger, `max = 216`; a broad
 grep's `TD-961` traced to SPRINT-103's recorded fixture token, i.e. contamination, not a row), with T1 guarding the workdoo migration
 mechanically · (d) the `--plugin-dir` stand-in is accepted, plus a post-push marketplace install check (owner action).
+
+### 2026-10-03 | progress | T3 (TASK-372): 1.x id-collision, real run PASS (owner-ruled addition to (b)); coordinator re-verified
+rc.1 `migrate` (loaded copy `D:\Project\lean-flow-rc1` 2.0.0-rc.1, from `system/init`) ran on a v2 store holding `TASK-901` plus a
+`TODO.md` row that is also `TASK-901` with a different title and Done-when. It printed `CONFLICT — TASK-901 (unresolved; file left exactly as
+it stood)` with a field-by-field diff and three owner choices; the plan pre-approval was not read as a choice. Coordinator re-check on
+`D:/t114/v2e`: store file `0c450ae3…` and `TODO.md` `54a4795f…` both equal their pre-run hashes, `git status` 0 on a 1-commit repo, and
+`docs/work/` holds the one original `TASK-901` file only. migration-map.md § Resume / conflict rule held as written. Headless runs: 25 of 30.
