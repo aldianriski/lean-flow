@@ -103,3 +103,28 @@ What *is* shown is structural, not effectiveness: decomposition no longer hits a
 both directions (T3). Fewer lines and fewer checkboxes are not the criterion, and this verdict does not lean on them.
 **Follow-ups:** (1) measure completeness at the next real epic decomposition; (2) R1's ambiguity: CONTEXT names `docs/work/<status>/`
 but not where a *new* task lands; (3) the retrieval method's single-run design cannot separate answerer variance from doc quality.
+
+## Round 3 — corrections to Round 2 (Codex review, SPRINT-114 T5)
+
+Round 2 stands as written; these supersede two statements in it.
+
+**1. Retrieval was not strictly scored on either side.** The rule is "hit = names the key path exactly, or the key's directory for a
+directory-level key". R7's key `skills/lean-doc-generator/SKILL.md` is a file, not a directory, so a bare skill name is a miss under the
+literal rule. The "before" round also accepted `.out-of-scope/` for the file-pattern key `.out-of-scope/<slug>.md` (R12). Two consistent
+readings, both reported:
+
+| Reading | Before | After |
+|---|---|---|
+| **Literal rule** (both rounds re-scored identically) | **9 / 12** (R7, R11, R12 miss) | **5 / 12** (R7 added to Round 2's misses) |
+| The baseline's own conventions (skill name accepted for R7; directory for R12) | 11 / 12 | 6 / 12 |
+
+Retrieval falls under either reading. Round 2's "6 / 12 strict" is withdrawn: 6 / 12 is the convention-matched figure, not the literal one.
+
+**2. The SPRINT-109/110/112 disagreement explanation is withdrawn.** Round 2 said selector (a) loses a bump that follows an earlier sprint
+token. Checked against the lines: each of 109, 110 and 112 appears only as the **first** token of its own `- seen:` line (L220, L101, L78),
+so no attribution is lost that way. Correct statement: **selector (a) counts one sighting line in each of 109/110/112; selector (b)
+reports two count-line additions each; the evidence does not establish why they differ.** The per-sprint figures and the 13 / 16 totals
+are unchanged.
+
+**Verdict unchanged:** the store's effectiveness is NOT demonstrated by this method. The corrected retrieval figures move the "worse"
+reading further, not toward a pass.
