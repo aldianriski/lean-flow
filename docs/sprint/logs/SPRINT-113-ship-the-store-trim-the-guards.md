@@ -31,3 +31,12 @@ bar plus a coordinator self-review (D3). G1/G2 are not signed yet.
 
 ### 2026-10-03 | progress | plan_commit recorded: 4f21040
 The `plan locked` commit is `4f21040`; this entry and the frontmatter field land in the next commit.
+
+### 2026-10-03 | progress | G1/G2 signed (owner); TODO.md.template ruled DELETE
+**G1** (full checklist for all four: 398 is manual, 397 close-retro, and 378/379 are decomposer-origin but SPRINT-111 already did part of their scope).
+Goal, size, files, out-of-scope and assumptions confirmed. **G2:** T1 ∥ T2 ∥ T4 in parallel, worktree-isolated; T3 after T2 (shared CLAUDE/CONTEXT/README;
+preflight CLEAR, waves T1 = T2 = T4 = 0, T3 = 1). Owner ruling: `TODO.md.template` is **deleted** (not a tombstone); TD-209 closes with T2.
+**Consequence lookups (TD-092):** T1 · behaviour: guards removed · governance: gate composition, maintainer-only → ADR-050 bar (no runner reaches
+the cut + full gate default/opt-in) + coordinator self-review · T2 · behaviour: shipped templates + init procedure · governance: consumer-facing
+skill contract → Codex loop · T3 · behaviour: doc prose + one skill wording · governance: consumer-facing skill text → Codex loop · T4 · behaviour:
+shipped migrate reference + harness · governance: consumer-facing procedure → Codex loop.
