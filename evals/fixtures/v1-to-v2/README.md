@@ -143,3 +143,29 @@ diffed both ways. Proof that this cross-check itself discriminates: point it at 
 of the README (`WORK_STORE_README_OVERRIDE` env var — the real file is never edited) with one
 field dropped from § Frontmatter fields; the `schema-cross-check-fields` case must redden.
 Verbatim output is in the SPRINT-106 T4 report, not committed here.
+
+## Scenario 5 — field-shape normalisation: `input-normalise/` → `expected-normalised/` (SPRINT-113 T4, TASK-397)
+
+Three Backlog rows, one per script-checkable rule in migration-map.md § Field-shape rules: `TASK-931` a
+decorated enum (`class: execution   # was "spike" …`, `tier: G (guard — …)` → plain enum in frontmatter, the
+decoration verbatim in `## Why`) · `TASK-932` `depends-on: none — but …` (field omitted, original line in
+`## Assumes`) · `TASK-933` a lettered done-when `(a) … ; (b) … ; (c) …` (three boxes). Each check derives its
+expectation from the input row. Must-FAIL siblings, one defect each, each reddening only its own check with a
+named finding (the other two checks are the sibling control on the same tree): `expected-normalised-comment-in-frontmatter/`
+→ `enum-not-plain: TASK-931 class=…` · `expected-normalised-depends-prose/` → `depends-prose-kept: TASK-932 …` ·
+`expected-normalised-lettered-merged/` → `lettered-box-count: TASK-933 want 3 got 1`. As everywhere in this
+harness, these prove the invariants of a correct run's output, **not** an agent reading the prose.
+
+**Round 2 (Codex review).** The checks now demand the exact carried form: `- <field>: <decoration>` bullets in
+`## Why`/`## Assumes`, the full `- depends-on: <original>` line, an annotated id list kept in the array
+(`TASK-935`), and every lettered clause as its own box with its own text. Rows `TASK-934` (`tier:G(…)` with no
+space, `(A)`/`(B)`) and `TASK-935` (`a)`/`b)`, annotated id list) vary the SELECTION (L-186). New must-FAIL trees,
+one defect each: `-lost-label` (`decoration-not-labelled`) · `-truncated-value` (`depends-line-not-verbatim`) ·
+`-replaced-clause` (`lettered-clause-missing`) · `-selection-nospace` · `-selection-upper` · `-selection-bare-paren`
+(each names the row the parser must reach) · `-annotated-ids-dropped` (`depends-ids-lost`).
+
+**Round 3 (Codex review).** The id-set check derives the run's OUTPUT from the store (files after, absent before),
+independently of the ids v1 cites: `output ⊆ meant` and `meant = output ∪ kept ∪ pending`. `expected-stray-output/` =
+`expected/` + a `TASK-999` file → `stray-output-id: TASK-999` (ticked-box count is the sibling control).
+`id-set-kept-conflict` passes `conflict-input/` → `conflict-expected/` (TASK-917 kept, TASK-918 written);
+`expected-missing-task/` → `unaccounted-id: TASK-914`, and declared `--pending TASK-914` it passes.

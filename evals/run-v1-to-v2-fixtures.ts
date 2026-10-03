@@ -38,6 +38,9 @@
 // and TASK-917's file must be left untouched. conflict-expected-wrongly-removed/ is the must-FAIL
 // sibling: same tree, TODO.md removed anyway -> must redden.
 //
+// SCENARIO 5 (SPRINT-113 T4, TASK-397): normalise-* cases prove the field-shape rules (plain enum,
+// `none -- but ...` -> Assumes, lettered split) with one must-FAIL tree per check -- see README.
+//
 // SCHEMA CROSS-CHECK (revise round, outside review MED #4): REQUIRED_FIELDS / REQUIRED_SECTIONS /
 // FILENAME_RULE below were a literal copy of docs/work/README.md's own declared schema, free to
 // drift silently. schema-cross-check-* re-reads the real README (or a scratch copy pointed to by
@@ -72,6 +75,9 @@ const EXPECTED_BYREF = join(FIXTURES, "expected-byref");
 const EXPECTED_BYREF_MEMBER_ALTERED = join(FIXTURES, "expected-byref-member-altered");
 const INTERRUPTED_PARTIAL = join(FIXTURES, "interrupted-partial");
 const INTERRUPTED_PARTIAL_DIVERGED = join(FIXTURES, "interrupted-partial-diverged");
+const EXPECTED_STRAY_OUTPUT = join(FIXTURES, "expected-stray-output");
+const INPUT_NORMALISE =join(FIXTURES, "input-normalise");
+const EXPECTED_NORMALISED = join(FIXTURES, "expected-normalised");
 
 // Real docs/work/README.md, or (discrimination proof only) a scratch copy named by this env var --
 // never the real file mutated in place.
@@ -295,29 +301,35 @@ function preservationFindings(beforeRoot: string, afterRoot: string): string[] {
   return findings;
 }
 
-// The ids this run migrated, as the v2 side sees them: every id now in the store, minus the ones
-// that were already there and that v1 never cites (untouched members / unrelated store files).
-function migratedV2Ids(beforeRoot: string, afterRoot: string, v1Ids: string[]): string[] {
-  const cited = new Set(v1Ids);
-  const preexistingUncited = new Set(v2Ids(beforeRoot).filter((id) => !cited.has(id)));
-  return v2Ids(afterRoot).filter((id) => !preexistingUncited.has(id));
-}
-
 function v1Ids(root: string): string[] {
   return [...new Set([...v1BacklogIds(root), ...v1PlanCitesIds(root)])];
 }
 
+// The run's ACTUAL OUTPUT ids, derived independently of `meant`: store files present after the run
+// and absent before it (pre-existing files -- unrelated, by-reference members, kept -- are never
+// output). LIMITATION: `kept` here is any meant id that had a file before, so it also absorbs the map's
+// owner-approved `replaced` ids (apply the delta); owner choice is not tracked. Findings are named: `stray-output-id: X` (output not in meant) and `unaccounted-id: X`
+// (a meant id that is neither output, nor `kept` = already had a file before, nor `pending`).
+function idSetFindings(beforeRoot: string, afterRoot: string, pending: readonly string[] = []): string[] {
+  const meant = new Set(v1Ids(beforeRoot));
+  const existedBefore = new Set(v2Ids(beforeRoot));
+  const output = new Set(v2Ids(afterRoot).filter((id) => !existedBefore.has(id)));
+  const settled = new Set([...output, ...[...meant].filter((id) => existedBefore.has(id)), ...pending]);
+  return [
+    ...[...output].filter((id) => !meant.has(id)).map((id) => `stray-output-id: ${id}`),
+    ...[...meant].filter((id) => !settled.has(id)).map((id) => `unaccounted-id: ${id}`),
+  ];
+}
+
 function runIdSetCase(name: string, expectedRoot: string, inputRoot: string = INPUT) {
-  const before = v1Ids(inputRoot);
-  const after = migratedV2Ids(inputRoot, expectedRoot, before);
-  const { beforeOnly, afterOnly } = diffIdSets(before, after);
-  const ok = beforeOnly.length === 0 && afterOnly.length === 0;
+  const findings = idSetFindings(inputRoot, expectedRoot);
+  const ok = findings.length === 0;
   report(
     name,
     ok,
     ok
-      ? `v1 ids {${before.join(", ")}} == v2 ids {${after.join(", ")}}, diffed both ways, both empty`
-      : `v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}} -- not empty`,
+      ? `meant {${v1Ids(inputRoot).join(", ")}} = output ∪ kept ∪ pending, and output ⊆ meant`
+      : findings.join("; "),
   );
 }
 
@@ -339,15 +351,15 @@ function argValue(flag: string): string | null {
       process.exit(2);
     }
     const ids = v1Ids(beforeDir);
-    const after = migratedV2Ids(beforeDir, afterDir, ids);
-    const { beforeOnly, afterOnly } = diffIdSets(ids, after);
-    const idOk = ids.length > 0 && beforeOnly.length === 0 && afterOnly.length === 0;
+    const pending = (argValue("--pending") ?? "").split(",").filter(Boolean); // withheld / unresolved ids, from the report
+    const idFindings = idSetFindings(beforeDir, afterDir, pending);
+    const idOk = ids.length > 0 && idFindings.length === 0;
     report(
       "real-id-set",
       idOk,
       idOk
-        ? `v1 ids (${ids.length}) == migrated v2 ids (${after.length}), diffed both ways, both empty`
-        : `v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}} (v1 ids: ${ids.length})`,
+        ? `meant ids (${ids.length}) = output ∪ kept ∪ pending (${pending.length}), and output ⊆ meant`
+        : `${idFindings.join("; ")} (meant ids: ${ids.length})`,
     );
     const tb = v1TickedBoxCount(beforeDir);
     const ta = v2TickedBoxCount(afterDir, new Set(ids));
@@ -370,6 +382,36 @@ function argValue(flag: string): string | null {
 // --- (1) id-set: must PASS on expected/ ---------------------------------------------------------
 
 runIdSetCase("id-set-expected", EXPECTED);
+
+// `kept`: conflict-input/ has a differing pre-existing TASK-917 the owner keeps; conflict-expected/
+// leaves it as it stood and writes only TASK-918. meant {917, 918} = output {918} ∪ kept {917}.
+runIdSetCase("id-set-kept-conflict", CONFLICT_EXPECTED, CONFLICT_INPUT);
+
+// must-FAIL (stray output): expected-stray-output/ = expected/ + one file for TASK-999, which no row
+// or Plan Tn cites. The old "v2 ids minus pre-existing uncited" comparison could not see it.
+{
+  const findings = idSetFindings(INPUT, EXPECTED_STRAY_OUTPUT);
+  const named = "stray-output-id: TASK-999";
+  const ok = findings.length === 1 && findings[0] === named;
+  report(
+    "id-set-stray-output (must-FAIL sibling)",
+    ok,
+    ok ? `id-set reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`,
+  );
+  const tickedOk = v1TickedBoxCount(INPUT) === v2TickedBoxCount(EXPECTED_STRAY_OUTPUT);
+  report("ticked-box-count-stray-output (sibling control, must stay PASS)", tickedOk, tickedOk ? "ticked-box count still agrees on the same tree" : "ticked-box count also red");
+}
+
+// must-FAIL (unaccounted): expected-missing-task/ lacks TASK-914 -- same check, other branch.
+{
+  const findings = idSetFindings(INPUT, EXPECTED_MISSING_TASK);
+  const named = "unaccounted-id: TASK-914";
+  const ok = findings.length === 1 && findings[0] === named;
+  report("id-set-unaccounted (must-FAIL sibling)", ok, ok ? `id-set reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}']`);
+  // pending: the same absence declared as withheld is settled, not an inequality
+  const pendingFindings = idSetFindings(INPUT, EXPECTED_MISSING_TASK, ["TASK-914"]);
+  report("id-set-pending-declared (sibling control, must stay PASS)", pendingFindings.length === 0, pendingFindings.length === 0 ? "TASK-914 declared pending -> settled" : pendingFindings.join("; "));
+}
 
 // --- (2) ticked-box count: must PASS on expected/ -----------------------------------------------
 
@@ -714,15 +756,14 @@ runIdSetCase("id-set-byref", EXPECTED_BYREF, INPUT_BYREF);
       ? `preservation reddens with exactly the named finding '${named}'`
       : `preservation findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`,
   );
-  const before = v1Ids(INPUT_BYREF);
-  const { beforeOnly, afterOnly } = diffIdSets(before, migratedV2Ids(INPUT_BYREF, EXPECTED_BYREF_MEMBER_ALTERED, before));
-  const controlOk = beforeOnly.length === 0 && afterOnly.length === 0;
+  const idFindings = idSetFindings(INPUT_BYREF, EXPECTED_BYREF_MEMBER_ALTERED);
+  const controlOk = idFindings.length === 0;
   report(
     "id-set-byref-member-altered (sibling control, must stay PASS)",
     controlOk,
     controlOk
       ? "id-set still agrees on the SAME tree that reddens preservation -- the redden is specific to the altered member"
-      : `id set also disagrees: v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}}`,
+      : `id set also disagrees: ${idFindings.join("; ")}`,
   );
 }
 
@@ -788,6 +829,162 @@ function resumeFindings(partialRoot: string): string[] {
       ? "TODO.md checks still green on the SAME tree that reddens the resume case -- the redden is specific to the diverged file"
       : `TODO.md checks also red: [${findings.join("; ")}]`,
   );
+}
+
+// --- SCENARIO 5 (SPRINT-113 T4, TASK-397): normalisation rules -----------------------------------
+// input-normalise/ carries one row per rule migration-map.md § v1 -> v2 states: a decorated enum
+// (`# comment` / trailing parenthetical -> plain enum in frontmatter, the decoration verbatim in
+// ## Why), a prose `depends-on:` (`none -- but ...` -> field omitted, verbatim line in ## Assumes),
+// and a lettered done-when (one box per lettered clause). Each check derives its expectation from
+// the INPUT row, so it reads the shape in the input, not a hard-coded id. As with every case here,
+// this proves the invariants of a correct run's output, not an agent reading the prose.
+
+interface V1Row {
+  readonly id: string;
+  readonly fields: Map<string, string>;
+}
+
+function v1Rows(root: string): V1Row[] {
+  const todoPath = join(root, "TODO.md");
+  if (!existsSync(todoPath)) return [];
+  const rows: V1Row[] = [];
+  let cur: V1Row | null = null;
+  for (const line of readFileSync(todoPath, "utf8").split(/\r?\n/)) {
+    const head = line.match(/^-\s\[[ x]\]\s(TASK-\d+)\s/);
+    if (head) {
+      cur = { id: head[1]!, fields: new Map() };
+      rows.push(cur);
+      continue;
+    }
+    const kv = line.match(/^\s+([a-z-]+):\s*(.*\S)\s*$/);
+    if (cur && kv) cur.fields.set(kv[1]!, kv[2]!);
+    else if (!line.trim()) cur = cur && /^\s/.test(line) ? cur : null;
+  }
+  return rows;
+}
+
+function v2FileFor(root: string, id: string): { fm: Map<string, string>; body: string } | null {
+  const f = findV2Files(root).find((x) => x.id === id);
+  if (!f) return null;
+  const { frontmatter, body } = splitFrontmatter(readFileSync(f.path, "utf8"));
+  const fm = new Map<string, string>();
+  for (const l of frontmatter.split(/\r?\n/)) {
+    const m = l.match(/^([a-z-]+):\s*(.*)$/);
+    if (m) fm.set(m[1]!, m[2]!.trim());
+  }
+  return { fm, body };
+}
+
+const DECORATED_KEYS = ["class", "tier", "authority", "origin", "state"] as const;
+
+// The `## Why` / `## Assumes` lines of a v2 file, trimmed -- bullets are matched whole, never by substring.
+function carriedLines(body: string): string[] {
+  return `${extractSection(body, "## Why") ?? ""}\n${extractSection(body, "## Assumes") ?? ""}`.split(/\r?\n/).map((l) => l.trim());
+}
+
+function enumFindings(inputRoot: string, expectedRoot: string): string[] {
+  const findings: string[] = [];
+  for (const row of v1Rows(inputRoot)) {
+    const out = v2FileFor(expectedRoot, row.id);
+    if (!out) { findings.push(`no-file: ${row.id}`); continue; }
+    const lines = carriedLines(out.body);
+    for (const key of DECORATED_KEYS) {
+      const raw = row.fields.get(key);
+      if (raw === undefined) continue;
+      const plain = raw.match(/^[A-Za-z0-9-]+/)?.[0] ?? "";
+      const decoration = raw.slice(plain.length).trim();
+      if (decoration === "") continue;
+      if (out.fm.get(key) !== plain) findings.push(`enum-not-plain: ${row.id} ${key}=${out.fm.get(key) ?? "(absent)"}`);
+      if (!lines.includes(`- ${key}: ${decoration}`)) findings.push(`decoration-not-labelled: ${row.id} ${key}`);
+    }
+  }
+  return findings;
+}
+
+const BARE_IDS = /^TASK-\d+(\s*,\s*TASK-\d+)*$/;
+
+function dependsFindings(inputRoot: string, expectedRoot: string): string[] {
+  const findings: string[] = [];
+  for (const row of v1Rows(inputRoot)) {
+    const raw = row.fields.get("depends-on");
+    if (raw === undefined || raw === "none" || BARE_IDS.test(raw)) continue; // bare: no annotation to carry
+    const out = v2FileFor(expectedRoot, row.id);
+    if (!out) { findings.push(`no-file: ${row.id}`); continue; }
+    const listed = raw.match(/^TASK-\d+(\s*,\s*TASK-\d+)*/)?.[0];
+    if (listed === undefined) {
+      // qualified `none`: the field is omitted
+      if (out.fm.has("depends-on")) findings.push(`depends-prose-kept: ${row.id} depends-on=${out.fm.get("depends-on")}`);
+    } else {
+      // annotated id list: the ids stay in the array
+      const want = `[${listed.split(/\s*,\s*/).join(", ")}]`;
+      if (out.fm.get("depends-on") !== want) findings.push(`depends-ids-lost: ${row.id} depends-on=${out.fm.get("depends-on") ?? "(absent)"}`);
+    }
+    if (!carriedLines(out.body).includes(`- depends-on: ${raw}`)) findings.push(`depends-line-not-verbatim: ${row.id}`);
+  }
+  return findings;
+}
+
+// A lettered done-when: `;`-separated pieces that each start `(a)` / `(A)` / `a)`.
+function letteredClauses(raw: string | undefined): string[] | null {
+  if (raw === undefined) return null;
+  const pieces = raw.split(/\s*;\s*(?=\(?[A-Za-z]\))/).map((p) => p.trim());
+  return pieces.length >= 2 && pieces.every((p) => /^\(?[A-Za-z]\)/.test(p)) ? pieces : null;
+}
+
+function letteredFindings(inputRoot: string, expectedRoot: string): string[] {
+  const findings: string[] = [];
+  for (const row of v1Rows(inputRoot)) {
+    const clauses = letteredClauses(row.fields.get("done-when"));
+    if (!clauses) continue;
+    const out = v2FileFor(expectedRoot, row.id);
+    if (!out) { findings.push(`no-file: ${row.id}`); continue; }
+    const boxes = [...(extractSection(out.body, "## Done when") ?? "").matchAll(/^- \[[ x]\] (.*\S)\s*$/gm)].map((m) => m[1]!.trim());
+    if (boxes.length !== clauses.length) {
+      findings.push(`lettered-box-count: ${row.id} want ${clauses.length} got ${boxes.length}`);
+      continue;
+    }
+    for (const clause of clauses) if (!boxes.includes(clause)) findings.push(`lettered-clause-missing: ${row.id} ${clause}`);
+  }
+  return findings;
+}
+
+const NORM_CHECKS = [
+  ["normalise-enum-plain", enumFindings],
+  ["normalise-depends-prose-to-assumes", dependsFindings],
+  ["normalise-lettered-split", letteredFindings],
+] as const;
+
+for (const [name, fn] of NORM_CHECKS) {
+  const findings = fn(INPUT_NORMALISE, EXPECTED_NORMALISED);
+  report(name, findings.length === 0, findings.length === 0 ? `expected-normalised/ satisfies ${name}` : findings.join("; "));
+}
+
+// must-FAIL siblings: one broken tree per defect; the culprit check reddens with its NAMED finding
+// while the other two checks stay green on the SAME tree (sibling control). The `selection-*` trees
+// vary which input rows the checks must REACH (no-space `tier:G(x)`, `(A)`, bare `a)`) rather than
+// the verdict (L-186); `annotated-ids-dropped` is the id-list-with-annotation branch of rule 6.
+for (const [suffix, culprit, named] of [
+  ["comment-in-frontmatter", "normalise-enum-plain", "enum-not-plain: TASK-931 class=execution   # was \"spike\" before G2"],
+  ["depends-prose", "normalise-depends-prose-to-assumes", "depends-prose-kept: TASK-932 depends-on=none — but the rollback script must exist first"],
+  ["lettered-merged", "normalise-lettered-split", "lettered-box-count: TASK-933 want 3 got 1"],
+  ["lost-label", "normalise-enum-plain", "decoration-not-labelled: TASK-931 tier"],
+  ["truncated-value", "normalise-depends-prose-to-assumes", "depends-line-not-verbatim: TASK-932"],
+  ["replaced-clause", "normalise-lettered-split", "lettered-clause-missing: TASK-933 (b) exit 1 on a transient failure after retries"],
+  ["selection-nospace", "normalise-enum-plain", "enum-not-plain: TASK-934 tier=G(pins the ceiling)"],
+  ["selection-upper", "normalise-lettered-split", "lettered-box-count: TASK-934 want 2 got 1"],
+  ["selection-bare-paren", "normalise-lettered-split", "lettered-box-count: TASK-935 want 2 got 1"],
+  ["annotated-ids-dropped", "normalise-depends-prose-to-assumes", "depends-ids-lost: TASK-935 depends-on=(absent)"],
+] as const) {
+  const root = join(FIXTURES, `expected-normalised-${suffix}`);
+  for (const [name, fn] of NORM_CHECKS) {
+    const findings = fn(INPUT_NORMALISE, root);
+    if (name === culprit) {
+      const ok = findings.length === 1 && findings[0] === named;
+      report(`${name} on ${suffix} (must-FAIL sibling)`, ok, ok ? `reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`);
+    } else {
+      report(`${name} on ${suffix} (sibling control, must stay PASS)`, findings.length === 0, findings.length === 0 ? "still green on the tree that reddens the sibling check" : `also red: [${findings.join("; ")}]`);
+    }
+  }
 }
 
 // --- summary --------------------------------------------------------------------------------
