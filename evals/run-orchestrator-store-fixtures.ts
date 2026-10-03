@@ -517,7 +517,7 @@ const CONTRACT: Record<string, string[]> = {
     "a `TASK-NNN` file in `docs/work/backlog/`", "the files in `docs/work/backlog/` are ungroomed",
     "no active sprint holds the work — no top-level `docs/sprint/SPRINT-*.md` with `status: active` has the task as a member",
     "at least one of its **members** still has an open `## Done when`", "never Plan boxes",
-    "counts the `## Done when` boxes across the active sprint's\n**member files**", "retargeted onto member files under TASK-383",
+    "counts the `## Done when` boxes across the active sprint's\n**member files**", "**The script follows this contract (TASK-392).**",
     "`N of M` counts the `## Done when` boxes across the\nsprint's **member files**",
     "a unit is **delivered** when every member its `Cites:` names has no open\n`## Done when` box",
   ],
