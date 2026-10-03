@@ -98,3 +98,11 @@ Read from the gate's own verdict line. Each FAIL dispositioned, none introduced 
 - `run-orchestrator-store-fixtures.ts` text-contract: **TD-211**, red since SPRINT-110 `dccdca1` and filed at SPRINT-111. The harness runs
   only in the opt-in profile, and the last three closes ran the truncated default profile, so it was carried, not seen.
 **Owner ruling:** cut the RC now from the committed tree and carry TD-211; it must be green before T6 (D4).
+
+### 2026-10-03 | progress | T1 step 1: `2.0.0-rc.1` cut -- `release/2.0.0-rc.1` @ `915385e`, annotated tag `v2.0.0-rc.1`
+Manifests derived with `grep -l '"version"' .*-plugin/*.json` (4 files) plus the README footer: all five read `2.0.0-rc.1` on the side branch;
+`main` still reads 1.66.1. Checked out detached at the tag to `D:/Project/lean-flow-rc1` (outside the repo, 0 dirty files);
+`claude plugin validate` passes with 2 warnings, both pre-existing in `marketplace.json` (unknown `schema_version`, no description).
+**Surprise:** `check-manifest-lockstep.sh` cannot read a pre-release version (`ver_of` matches only `X.Y.Z`), so on the rc branch it FAILs
+`no parseable version`. Lockstep for the candidate was verified by reading all five values. It is maintainer-only (no shipped skill calls it)
+and the final `2.0.0` parses. Retro TD candidate.
