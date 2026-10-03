@@ -245,3 +245,18 @@ The probe reuses those args, so the pin check observes exactly what workers load
 environment) and works in any checkout. VPS deployment itself is gated on workdoo `TASK-010`; T2 verifies locally with
 `LEANFLOW_PLUGIN_DIR=D:/Project/lean-flow-rc1` and `LEANFLOW_PLUGIN_VERSION_PIN=2.0.0-rc.1`.
 **Sequencing:** that change lands after workdoo T4 merges, because it touches the same `buildArgs` T4 builds on.
+
+### 2026-10-03 | progress | T2 (TASK-365) done: workdoo main runs the store on 2.0.0-rc.1; the running plugin is verified by the real probe
+**Chain on workdoo `main`:** migration fast-forward `629f91c` (owner re-ruled D3) → workdoo T4 / TASK-050 pin gate `447e208` (Codex 4 rounds
+→ CLEAR; the builder's false "real taskkill path" claim caught at r3 and fixed) → `LEANFLOW_PLUGIN_DIR` for workers `2983b66` (Codex 3 rounds
+→ CLEAR; the builder correctly stopped at `apps/worker/src/main.ts`, which my brief had left out; the coordinator wired `adapterFor` with a
+must-FAIL; the live origin test now asserts entry path == dir, version == that dir's plugin.json, case folded only on win32; P1 probe/worker
+read-timing filed as workdoo TD-035, census-zero).
+**Config** (workdoo `.env`, gitignored; only key names were read, values only for the two pins): `RUNTIME_VERSION_PIN=2.1.288`,
+`LEANFLOW_PLUGIN_VERSION_PIN=2.0.0-rc.1`, `LEANFLOW_PLUGIN_DIR=D:/Project/lean-flow-rc1`; `RUNTIME_ADAPTER` left `fake` (switching to
+`claude-code` would run real agents, which T2 does not ask for). The secret-bearing `.env` backup was deleted after use.
+**Verification through the supervisor's own path** (`versionPinOption(process.env)` → real probe → `readVersionPins` + `checkVersionPins`):
+`{"status":"match","running":{"runtime":"2.1.288","leanflowPlugin":"2.0.0-rc.1"}}`; control with a wrong plugin pin `2.0.0` →
+`mismatch` (configured 2.0.0, running 2.0.0-rc.1). Post-merge workdoo legs: typecheck 0, lint clean, tests 530/1 (TD-034, `DATABASE_URL` unset).
+**Owner-action notes:** workdoo's `.claude/settings.local.json` still disables the 1.66.1 install; after 2.0.0 is installed, remove it,
+then unset `LEANFLOW_PLUGIN_DIR` (or point it at the 2.0.0 tree) and set the pin to `2.0.0`.

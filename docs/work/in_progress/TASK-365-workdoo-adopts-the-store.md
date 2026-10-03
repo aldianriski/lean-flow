@@ -19,7 +19,7 @@ depends-on: [TASK-371]
 
 ## Done when
 
-- [ ] workdoo main runs the store on an immutable release candidate, LEANFLOW_PLUGIN_VERSION_PIN set to that version, and the running plugin verified to report it — before TASK-373. Approval and run state stay in workdoo's durable store (workdoo ADR-001).
+- [x] workdoo main runs the store on an immutable release candidate, LEANFLOW_PLUGIN_VERSION_PIN set to that version, and the running plugin verified to report it — before TASK-373. Approval and run state stay in workdoo's durable store (workdoo ADR-001). ✓ workdoo main on the store (`629f91c` ff) + pin gate (`447e208`) + `LEANFLOW_PLUGIN_DIR` (`2983b66`); `.env` pins 2.1.288 / 2.0.0-rc.1 with dir = the rc tag checkout; the supervisor path reads `match` with probed runtime 2.1.288, leanflowPlugin 2.0.0-rc.1 (wrong-pin control: `mismatch`); approval and run state untouched (still in workdoo DB, ADR-001)
 
 ## Amended 2026-09-23
 
