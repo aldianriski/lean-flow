@@ -272,3 +272,14 @@ checkout's `docs/work/<folder>/TASK-NNN-*.md` (under `REPO_CHECKOUT_ROOT`), **ne
 named `unknown`; `GET /work-items` returns both fields; an optional Task-id field in the form; the view shows both side by side.
 **Owner ruling (DB):** a throwaway `postgres:16` container on a spare port, so the migration and store suites run rather than skip.
 consequence · T4 · behaviour:material · governance:low
+
+### 2026-10-03 | surprise | the workdoo pin-gate merge (`447e208`) broke 6 DB-backed tests on workdoo main, unseen until now
+**Found by** the TASK-385 builder (7 DB-suite failures it called pre-existing) and **re-attributed by the coordinator**: its "baseline" `ed66734`
+already contained the gate. Bisected on a throwaway Postgres over park/permission/verification-check-dispatch/wiring: `05885a7` (pre-gate)
+**56 pass / 1 fail** (the Windows SIGKILL sibling of TD-034) → `ed66734` **50 / 7**, the 6 new ones all `AUTHORITY_BOUNDARY`. Those tests
+dispatch `claude-code` through real routes with no pin, which the fail-closed gate correctly holds. The product is right; the tests predate it.
+**Why it was missed:** every T4 verification ran without `DATABASE_URL`, so those suites **skipped**, and the coordinator read "skipped" as
+"not affected". It was L-218's shape exactly (a cross-cutting leg not run at merge), with a skip, not a missing leg, as the carrier.
+**Fix in flight:** test-only, a shared matching fake pin gate (the `app.test.ts` pattern), with a must-FAIL; branch `pin-gate-db-tests`.
+Retro learning candidate: *a suite that skips on a missing environment variable is silent coverage loss. Count skips per merge and treat a
+skipped suite touching the changed code as unverified, not green.*
