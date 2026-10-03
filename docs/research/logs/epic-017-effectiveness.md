@@ -128,3 +128,9 @@ are unchanged.
 
 **Verdict unchanged:** the store's effectiveness is NOT demonstrated by this method. The corrected retrieval figures move the "worse"
 reading further, not toward a pass.
+
+## Round 4 — correction to Round 3's verdict sentence (Codex re-review)
+
+Round 3 said the corrected figures "move the 'worse' reading further". **Withdrawn: the literal decline (9 → 5, four points) is smaller than
+the convention-matched one (11 → 6, five points).** The literal "after" score is lower, but the measured drop is not larger. Both readings
+still read "worse as measured", and the verdict stands: **effectiveness is NOT demonstrated by this method.**
