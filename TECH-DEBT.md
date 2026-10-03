@@ -320,6 +320,20 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-216** severity: low | status: open | created: Sprint-113 (T1 seeded break B)
+  - Summary: **`qa-check.sh` has no listed-but-missing check for `eval_harnesses_excluded`.** A name in the excluded list whose file no
+    longer exists passes silently; the completeness leg checks only disk → list, and "script not found" covers only the always-on and opt-in
+    lists. Census 2026-10-03: the excluded list is empty after TASK-398, so the gap is moot today (census-zero → TD, owner rule).
+  - Mitigation (hypothesis): one loop over the excluded names asserting each file exists, with a must-FAIL fixture (ADR-050 maintainer-only bar).
+
+- **TD-215** severity: low | status: open | created: Sprint-113 (T4 / system-verify)
+  - Summary: **The Shell and TS `check-layers-completeness` disagree on a member Done-when's bare filename.** The Shell matches a bare
+    `migration-map.md` against a full-path Layers entry by basename and PASSes; the TS port (the one the gate runs) compares literally and FAILs
+    `member-layers-incomplete`, a false positive on a declared file. Worked around in SPRINT-113 by naming the bare token on `Cites:`. Its
+    differential (P7) was never run and was cut (owner ruling, ADR-050: a maintainer-only parity port).
+  - Mitigation (hypothesis): make the TS port match by basename as the Shell does (the TS is the gate), or rule the stricter behaviour correct and
+    align the Shell. Either way, a fixture with a bare name against a full-path Layers entry.
+
 - **TD-214** severity: low | status: open | created: Sprint-112 (T1 audit, owner ruling Q10)
   - Summary: **Shipped skills name repo-only `scripts/…` checkers as the mechanism of a step an adopter runs.** For example,
     `skills/orchestrator/SKILL.md`'s G2 checklist names `scripts/lib/check-verify-reaches.ts`, and review-scoping and night-run name

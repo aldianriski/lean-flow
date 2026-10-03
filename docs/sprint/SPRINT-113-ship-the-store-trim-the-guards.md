@@ -4,9 +4,10 @@ slug: ship-the-store-trim-the-guards
 epic: EPIC-017
 owner: Maintainer
 last_updated: 2026-10-03
-status: active
+status: closed
 gates_signed: G1,G2 @ 7e9a9cf
 plan_commit: 4f21040
+close_commit: CLOSE_SHA
 update_trigger: sprint execute/close events
 ---
 
@@ -108,5 +109,33 @@ script can check (enum normalisation · `none — but …` · lettered split).
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| 10 `evals/` asserts, selftests and differentials (deleted) · `scripts/qa-check.sh` · `evals/README.md` · 2 layers-completeness files | T1 | owner-ruled audit cuts land (ADR-050) | Med | 2-route census (0 runners) · seeded restore named · full gate |
+| `skills/lean-doc-generator/templates/TASK.md.template` (new) · `TODO.md.template` (deleted) · `QA-TESTCASE.md.template` · `TECH-DEBT.md` | T2 | the store ships in templates; TD-209 resolved | Med | count-claims 35 · init on an empty dir · Codex CLEAR |
+| `.claude/CONTEXT.md` · `docs/architecture/overview.md` · `docs/qa/QA-001/002` · `skills/council/SKILL.md` | T3 | the durable docs describe the v2 loop | Low | caps 150/150 · Codex + fixes |
+| `skills/lean-doc-generator/references/migration-map.md` · `evals/run-v1-to-v2-fixtures.ts` · `evals/fixtures/v1-to-v2/` | T4 | 10 migrate rules + store-derived id-set verification; CRLF-safe harness | Med | 96/0 incl. a CRLF run · Codex 3 rounds |
 
 ## Retro
+
+**Retrieval check:** two hits and one miss. **Hits:** L-218 (promoted at this promote) ran the cross-cutting legs right after each merge and caught
+T4's CRLF red within minutes. L-221 had builders enumerate every runner of what they changed. **Miss:** L-182 (verifying on a tree your own tooling
+wrote is not verifying what git hands out) was on file, and T4's builder still certified 62/0 on the LF files it had just written. It is now at
+count 3 (SPRINT-093 · 111 · 113), a promotion candidate.
+
+**Cost:** coordinator (Opus) + 4 Sonnet builder lines (T1 ×1 · T2 ×1 · T3 ×2 · T4 ×5 rounds incl. the CRLF repair) + 6 Codex passes (T2 ×1 ·
+T3 ×1 · T4 ×3 + 1 helper). T1 was not sent to Codex: it is maintainer-only under ADR-050 and the owner's D3 ruling, so it got a coordinator
+self-review, the first sprint at the lighter bar. Dispatched-agent tokens ≈ 0.9M. Delivered: 4 members, 11 of 11 DoD, EPIC-017 step 1 (unblocks `371`).
+
+**Worked**
+- The ADR-050 split: T1's 2,442-line cut needed no Codex round. Its two-route census plus a seeded restore and the full gate carried it.
+- Post-merge legs (L-218): a red on main was found and fixed inside the same hour.
+- Codex on the shipped migrate reference found 8 real procedure defects across 3 rounds (id-set equality, the missing `kept`/`replaced` outcomes).
+
+**Friction**
+- Line endings again (L-182 ×3), plus a Shell/TS checker divergence (TD-215) that only the gate's TS port showed, and that the coordinator's own
+  evidence suffix tripped a second time (L-224).
+- CONTEXT.md is at its 150-line cap with no headroom, so the next doc that has to grow there needs a disposition first (ADR-050 clause 2).
+
+**Pattern candidate**
+- L-182 (count 3): promote at the next promote. Placement: wherever a builder certifies a harness (the dispatch brief's evidence bar, "run on a
+  fresh checkout or a CRLF copy, not only your own written files").
+- L-224 (count 2): promote alongside it ("verify with the checker the gate runs, and re-run it after any write, evidence included").

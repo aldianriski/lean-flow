@@ -88,3 +88,13 @@ harness that would have caught it (P7 `layers-completeness-differential.ts`) was
 
 ### 2026-10-03 | progress | All four accepted by the owner: TASK-398 (J2) · 378 · 379 · 397; DoD 11/11
 Each box carries ` ✓ <sha> — <evidence>`. Next: system-verify on the final tree, then close.
+
+### 2026-10-03 | close | 4 of 4 members in done/, 11 of 11 Done-when; EPIC-017 step 1 done (unblocks 371)
+- Close by reference: `check-sprint-by-reference` 5 pass, 0 fail. System-verify on main `2e6be35`: `QA-CHECK: 290 pass, 5 fail`, TRUNCATED (565 s
+  of 555). The 5: the foreign EPIC-016 WIP ×2 · the budget · `run-qa-budget-fixtures` (it inherits the run's `QA_BUDGET_SECONDS`, an L-067 shape;
+  run alone it is rc=0, 0 FAIL) · layers-completeness on TASK-378, tripped by the coordinator's own evidence suffix (a partial path), fixed. The 3
+  unrun harnesses run alone: 21/0 · 29/0 · 23/0. TS and Shell completeness both 0 FAIL.
+- Retro routed. Shipped → CHANGELOG § SPRINT-113. Debt → TD-215 (Shell/TS completeness disagree on bare names) · TD-216 (no listed-but-missing check
+  on the excluded list). Follow-up → TASK-400 (sweep ~12 stale references to the cut guards; `origin: close-retro`). Learnings → L-182 at count 3
+  (retrieval miss) · L-224 (count 2). Ids derived from the maxima (TD-214 · TASK-399 · L-223) with 0 hits for the new ones.
+- EPIC-017: row added; no Closed-when newly met (still 5 of 10); the epic stays active. No handoff entry to reconcile. No release (D2).

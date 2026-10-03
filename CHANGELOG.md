@@ -39,6 +39,21 @@ promote, close and retro follow-ups use store task files; the dev-flow/adlc-flow
 `TODO.md` survives only in `migrate`'s v1→v2 path and the v1 refusal text.
 
 ---
+## SPRINT-113 — Ship the Store, Trim the Guards (2026-10-03)
+
+EPIC-017's seventh member sprint. **Unreleased**: no version bump (D2).
+
+- **`TASK.md.template` ships; `TODO.md.template` is gone.** `/lean-doc-generator` bundles a task-file template that matches the store's schema,
+  and a fresh repo's `init` scaffolds `docs/work/` lazily, with no TODO.md (exercised on an empty directory).
+- **`migrate` states the rules its first real run had to ask for.** Members are found by id in any folder; a row missing class, tier or
+  authority is flagged and withheld until the owner supplies it; frontmatter carries plain enums, with comments moved verbatim to `## Why`; `none — but …`
+  becomes an Assumes line; lettered done-when clauses become one box each; and needs-info tasks get an `**open:**` line. Its verification now
+  derives what the run wrote from the store itself (`output ⊆ meant`, `meant = output ∪ kept ∪ replaced ∪ pending`), so a stray file or an
+  owner-approved conflict outcome is accounted for, not mis-counted.
+- **The docs describe the v2 loop.** CONTEXT, the architecture map and the QA cases describe the store, and `/council` no longer says "TODO tracker".
+- **Guards cut (this repository).** SPRINT-112's audit cuts landed: the v1 park/retry selftests and two never-run parity harnesses (2,442 lines).
+
+---
 ## SPRINT-112 — Govern Lighter (2026-10-03)
 
 EPIC-017's sixth member sprint. **Unreleased**: no version bump (D3).
