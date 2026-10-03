@@ -38,6 +38,9 @@
 // and TASK-917's file must be left untouched. conflict-expected-wrongly-removed/ is the must-FAIL
 // sibling: same tree, TODO.md removed anyway -> must redden.
 //
+// SCENARIO 5 (SPRINT-113 T4, TASK-397): normalise-* cases prove the field-shape rules (plain enum,
+// `none -- but ...` -> Assumes, lettered split) with one must-FAIL tree per check -- see README.
+//
 // SCHEMA CROSS-CHECK (revise round, outside review MED #4): REQUIRED_FIELDS / REQUIRED_SECTIONS /
 // FILENAME_RULE below were a literal copy of docs/work/README.md's own declared schema, free to
 // drift silently. schema-cross-check-* re-reads the real README (or a scratch copy pointed to by
@@ -72,6 +75,11 @@ const EXPECTED_BYREF = join(FIXTURES, "expected-byref");
 const EXPECTED_BYREF_MEMBER_ALTERED = join(FIXTURES, "expected-byref-member-altered");
 const INTERRUPTED_PARTIAL = join(FIXTURES, "interrupted-partial");
 const INTERRUPTED_PARTIAL_DIVERGED = join(FIXTURES, "interrupted-partial-diverged");
+const INPUT_NORMALISE = join(FIXTURES, "input-normalise");
+const EXPECTED_NORMALISED = join(FIXTURES, "expected-normalised");
+const EXPECTED_NORMALISED_COMMENT = join(FIXTURES, "expected-normalised-comment-in-frontmatter");
+const EXPECTED_NORMALISED_DEPENDS = join(FIXTURES, "expected-normalised-depends-prose");
+const EXPECTED_NORMALISED_LETTERED = join(FIXTURES, "expected-normalised-lettered-merged");
 
 // Real docs/work/README.md, or (discrimination proof only) a scratch copy named by this env var --
 // never the real file mutated in place.
@@ -788,6 +796,128 @@ function resumeFindings(partialRoot: string): string[] {
       ? "TODO.md checks still green on the SAME tree that reddens the resume case -- the redden is specific to the diverged file"
       : `TODO.md checks also red: [${findings.join("; ")}]`,
   );
+}
+
+// --- SCENARIO 5 (SPRINT-113 T4, TASK-397): normalisation rules -----------------------------------
+// input-normalise/ carries one row per rule migration-map.md § v1 -> v2 states: a decorated enum
+// (`# comment` / trailing parenthetical -> plain enum in frontmatter, the decoration verbatim in
+// ## Why), a prose `depends-on:` (`none -- but ...` -> field omitted, verbatim line in ## Assumes),
+// and a lettered done-when (one box per lettered clause). Each check derives its expectation from
+// the INPUT row, so it reads the shape in the input, not a hard-coded id. As with every case here,
+// this proves the invariants of a correct run's output, not an agent reading the prose.
+
+interface V1Row {
+  readonly id: string;
+  readonly fields: Map<string, string>;
+}
+
+function v1Rows(root: string): V1Row[] {
+  const todoPath = join(root, "TODO.md");
+  if (!existsSync(todoPath)) return [];
+  const rows: V1Row[] = [];
+  let cur: V1Row | null = null;
+  for (const line of readFileSync(todoPath, "utf8").split(/\r?\n/)) {
+    const head = line.match(/^-\s\[[ x]\]\s(TASK-\d+)\s/);
+    if (head) {
+      cur = { id: head[1]!, fields: new Map() };
+      rows.push(cur);
+      continue;
+    }
+    const kv = line.match(/^\s+([a-z-]+):\s+(.*\S)\s*$/);
+    if (cur && kv) cur.fields.set(kv[1]!, kv[2]!);
+    else if (!line.trim()) cur = cur && /^\s/.test(line) ? cur : null;
+  }
+  return rows;
+}
+
+function v2FileFor(root: string, id: string): { fm: Map<string, string>; body: string } | null {
+  const f = findV2Files(root).find((x) => x.id === id);
+  if (!f) return null;
+  const { frontmatter, body } = splitFrontmatter(readFileSync(f.path, "utf8"));
+  const fm = new Map<string, string>();
+  for (const l of frontmatter.split(/\r?\n/)) {
+    const m = l.match(/^([a-z-]+):\s*(.*)$/);
+    if (m) fm.set(m[1]!, m[2]!.trim());
+  }
+  return { fm, body };
+}
+
+const DECORATED_KEYS = ["class", "tier", "authority", "origin", "state"] as const;
+
+function enumFindings(inputRoot: string, expectedRoot: string): string[] {
+  const findings: string[] = [];
+  for (const row of v1Rows(inputRoot)) {
+    const out = v2FileFor(expectedRoot, row.id);
+    if (!out) { findings.push(`no-file: ${row.id}`); continue; }
+    const carried = `${extractSection(out.body, "## Why") ?? ""}\n${extractSection(out.body, "## Assumes") ?? ""}`;
+    for (const key of DECORATED_KEYS) {
+      const raw = row.fields.get(key);
+      if (raw === undefined) continue;
+      const plain = raw.match(/^[A-Za-z0-9-]+/)?.[0] ?? "";
+      const decoration = raw.slice(plain.length).trim();
+      if (decoration === "") continue;
+      if (out.fm.get(key) !== plain) findings.push(`enum-not-plain: ${row.id} ${key}=${out.fm.get(key) ?? "(absent)"}`);
+      if (!carried.includes(decoration)) findings.push(`decoration-lost: ${row.id} ${key}`);
+    }
+  }
+  return findings;
+}
+
+function dependsFindings(inputRoot: string, expectedRoot: string): string[] {
+  const findings: string[] = [];
+  for (const row of v1Rows(inputRoot)) {
+    const raw = row.fields.get("depends-on");
+    const qualifier = raw?.match(/^none\s*[—-]+\s*(.+)$/)?.[1];
+    if (qualifier === undefined) continue;
+    const out = v2FileFor(expectedRoot, row.id);
+    if (!out) { findings.push(`no-file: ${row.id}`); continue; }
+    if (out.fm.has("depends-on")) findings.push(`depends-prose-kept: ${row.id} depends-on=${out.fm.get("depends-on")}`);
+    if (!(extractSection(out.body, "## Assumes") ?? "").includes(qualifier)) findings.push(`qualifier-lost: ${row.id}`);
+  }
+  return findings;
+}
+
+function letteredFindings(inputRoot: string, expectedRoot: string): string[] {
+  const findings: string[] = [];
+  for (const row of v1Rows(inputRoot)) {
+    const raw = row.fields.get("done-when");
+    const clauses = raw?.match(/\([a-z]\)/g);
+    if (!clauses || clauses.length < 2) continue;
+    const out = v2FileFor(expectedRoot, row.id);
+    if (!out) { findings.push(`no-file: ${row.id}`); continue; }
+    const boxes = (extractSection(out.body, "## Done when") ?? "").match(/^- \[[ x]\] /gm) ?? [];
+    if (boxes.length !== clauses.length) findings.push(`lettered-box-count: ${row.id} want ${clauses.length} got ${boxes.length}`);
+  }
+  return findings;
+}
+
+const NORM_CHECKS = [
+  ["normalise-enum-plain", enumFindings],
+  ["normalise-depends-prose-to-assumes", dependsFindings],
+  ["normalise-lettered-split", letteredFindings],
+] as const;
+
+for (const [name, fn] of NORM_CHECKS) {
+  const findings = fn(INPUT_NORMALISE, EXPECTED_NORMALISED);
+  report(name, findings.length === 0, findings.length === 0 ? `expected-normalised/ satisfies ${name}` : findings.join("; "));
+}
+
+// must-FAIL siblings: one broken tree per check; that check reddens with its NAMED finding while
+// the other two checks stay green on the SAME tree (sibling control).
+for (const [tree, root, culprit, named] of [
+  ["comment-in-frontmatter", EXPECTED_NORMALISED_COMMENT, "normalise-enum-plain", "enum-not-plain: TASK-931 class=execution   # was \"spike\" before G2"],
+  ["depends-prose", EXPECTED_NORMALISED_DEPENDS, "normalise-depends-prose-to-assumes", "depends-prose-kept: TASK-932 depends-on=none — but the rollback script must exist first"],
+  ["lettered-merged", EXPECTED_NORMALISED_LETTERED, "normalise-lettered-split", "lettered-box-count: TASK-933 want 3 got 1"],
+] as const) {
+  for (const [name, fn] of NORM_CHECKS) {
+    const findings = fn(INPUT_NORMALISE, root);
+    if (name === culprit) {
+      const ok = findings.length === 1 && findings[0] === named;
+      report(`${name} on ${tree} (must-FAIL sibling)`, ok, ok ? `reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`);
+    } else {
+      report(`${name} on ${tree} (sibling control, must stay PASS)`, findings.length === 0, findings.length === 0 ? "still green on the tree that reddens the sibling check" : `also red: [${findings.join("; ")}]`);
+    }
+  }
 }
 
 // --- summary --------------------------------------------------------------------------------

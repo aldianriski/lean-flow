@@ -143,3 +143,15 @@ diffed both ways. Proof that this cross-check itself discriminates: point it at 
 of the README (`WORK_STORE_README_OVERRIDE` env var — the real file is never edited) with one
 field dropped from § Frontmatter fields; the `schema-cross-check-fields` case must redden.
 Verbatim output is in the SPRINT-106 T4 report, not committed here.
+
+## Scenario 5 — field-shape normalisation: `input-normalise/` → `expected-normalised/` (SPRINT-113 T4, TASK-397)
+
+Three Backlog rows, one per script-checkable rule in migration-map.md § Field-shape rules: `TASK-931` a
+decorated enum (`class: execution   # was "spike" …`, `tier: G (guard — …)` → plain enum in frontmatter, the
+decoration verbatim in `## Why`) · `TASK-932` `depends-on: none — but …` (field omitted, original line in
+`## Assumes`) · `TASK-933` a lettered done-when `(a) … ; (b) … ; (c) …` (three boxes). Each check derives its
+expectation from the input row. Must-FAIL siblings, one defect each, each reddening only its own check with a
+named finding (the other two checks are the sibling control on the same tree): `expected-normalised-comment-in-frontmatter/`
+→ `enum-not-plain: TASK-931 class=…` · `expected-normalised-depends-prose/` → `depends-prose-kept: TASK-932 …` ·
+`expected-normalised-lettered-merged/` → `lettered-box-count: TASK-933 want 3 got 1`. As everywhere in this
+harness, these prove the invariants of a correct run's output, **not** an agent reading the prose.
