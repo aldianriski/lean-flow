@@ -2,8 +2,8 @@
 // scripts/lib/check-layers-completeness.ts, run via `bun test` by evals/run-layers-completeness-
 // fixtures.sh. Mirrors run-s4-ts-evaluators.sh's role for §4 and evals/dod-delta.test.ts's role for
 // check-dod-delta.ts: the shell oracle (scripts/lib/check-layers-completeness.sh) stays authoritative
-// and is checked against separately by evals/layers-completeness-differential.ts (opt-in, not run on
-// every gate); THIS file is what runs on every default gate, fork-free, calling the TS port in-process.
+// and was checked against separately by a differential harness (cut SPRINT-113 T1, ADR-050);
+// THIS file is what runs on every default gate, fork-free, calling the TS port in-process.
 //
 // Every must-FAIL fixture, sibling control, and population-selection case from the harness this file
 // replaces is retained (TD-012: don't delete fixtures with the prototype that built them) -- see each
@@ -237,10 +237,10 @@ describe("file not found", () => {
 // get wrong and an earlier draft of this comment did. `capture()` runs the TypeScript PORT, so these
 // assertions guard the PORT's behaviour on space-containing tokens. They do NOT guard the oracle's
 // IFS fix: re-breaking `scripts/lib/check-layers-completeness.sh` leaves this suite 19/19 green
-// (verified by seeding exactly that break). The guard on the ORACLE is the DIFFERENTIAL
-// (`evals/layers-completeness-differential.ts`), where the same seed makes shell and port diverge on
-// the T1 contradiction line -- also verified. Both instruments are needed and they cover different
-// halves; this fixture is the shared input that makes the oracle's half reachable at all.
+// (verified by seeding exactly that break). The guard on the ORACLE is the gate-reachable oracle
+// call in evals/run-layers-completeness-fixtures.sh; the full-corpus differential that once
+// also covered it was cut (SPRINT-113 T1, ADR-050). This fixture is the shared input that makes
+// the oracle's half reachable at all.
 //
 // Against the PRE-FIX oracle, both findings below were absent: the T1 contradiction was omitted
 // entirely and T2 printed "PASS ... Layers completeness (DoD-implied files all declared)" -- a false

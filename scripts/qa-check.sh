@@ -1244,18 +1244,9 @@ eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-
 # eval_harnesses_optin above. Measured 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s,
 # night-run-rollup 44.0s (~104s together, the cost of honouring ADR-039 for those three ports).
 #
-# run-layers-observed-differential.ts is EXCLUDED rather than opt-in, and named here because that is
-# what this variable is for. It measures 189.3s on its own -- nearly twice the other three combined,
-# and enough to swamp SPRINT-103's own saving at exactly the two moments ADR-039 cares about. Owner
-# ruling (SPRINT-103): take the ~104s now, and rule this one separately once the post-sprint gate
-# total is known, rather than deciding a 189s recurring cost against a total nobody has re-measured.
-# Its cost is stated here so the trade stays visible; nothing pretends it ran.
-#
-# The four selftest-assert-*.sh are EXCLUDED because they are FROZEN: each guards only the retired v1
-# TODO.md park/retry shape and carries a `# FROZEN -- v1 historical coverage` header (SPRINT-111 T2,
-# owner ruling: freeze, never retarget). T2 removed them from the opt-in list but did not name them
-# here, so the completeness check below reddened all four -- the gap a full gate run caught after T4.
-eval_harnesses_excluded="run-layers-observed-differential.ts selftest-assert-boundary-park.sh selftest-assert-judgement-retry.sh selftest-assert-noaction-park.sh selftest-assert-park-revisit.sh"
+# S10 selftests + P4/P7 cut, SPRINT-113 T1 / ADR-050 (the frozen selftest-assert-* set, the layers-observed
+# differential and its twin were deleted, not excluded).
+eval_harnesses_excluded=""
 
 eval_harnesses="$eval_harnesses_always"
 if [ "${QA_FULL:-0}" = "1" ]; then
@@ -1494,9 +1485,9 @@ fi
 # task's declared `Layers:` -- it reads history rather than intent, so it cannot be forgotten the
 # way a second sentence can. Fails toward over-reporting, same as leg 14.
 # SPRINT-103 T2: this leg now runs the TypeScript port. The .sh remains the ORACLE (D5) and is
-# retained, unmodified, as the parity reference -- evals/run-layers-observed-differential.ts is
-# the row-by-row proof they agree (29/29 identical over 19 git fixtures plus 103 real sprint
-# files). Measured on this leg's own call shape, three alternating runs each: oracle
+# retained, unmodified, as the parity reference -- its row-by-row differential proof (29/29 identical
+# over 19 git fixtures plus 103 real sprint files) was cut at SPRINT-113 T1 / ADR-050.
+# Measured on this leg's own call shape, three alternating runs each: oracle
 # 20.57-21.14s, port 2.76-3.69s, byte-identical output and equal exit codes every pair
 # (docs/research/logs/qa-gate-timing.md Round 21).
 lo_script="scripts/lib/check-layers-observed.ts"
