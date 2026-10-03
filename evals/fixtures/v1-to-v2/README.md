@@ -163,3 +163,9 @@ space, `(A)`/`(B)`) and `TASK-935` (`a)`/`b)`, annotated id list) vary the SELEC
 one defect each: `-lost-label` (`decoration-not-labelled`) · `-truncated-value` (`depends-line-not-verbatim`) ·
 `-replaced-clause` (`lettered-clause-missing`) · `-selection-nospace` · `-selection-upper` · `-selection-bare-paren`
 (each names the row the parser must reach) · `-annotated-ids-dropped` (`depends-ids-lost`).
+
+**Round 3 (Codex review).** The id-set check derives the run's OUTPUT from the store (files after, absent before),
+independently of the ids v1 cites: `output ⊆ meant` and `meant = output ∪ kept ∪ pending`. `expected-stray-output/` =
+`expected/` + a `TASK-999` file → `stray-output-id: TASK-999` (ticked-box count is the sibling control).
+`id-set-kept-conflict` passes `conflict-input/` → `conflict-expected/` (TASK-917 kept, TASK-918 written);
+`expected-missing-task/` → `unaccounted-id: TASK-914`, and declared `--pending TASK-914` it passes.

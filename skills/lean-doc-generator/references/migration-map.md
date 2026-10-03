@@ -228,7 +228,7 @@ Each `### Tn — title `[size · risk · class · HITL · Jn]`` block in the spr
 a Backlog-only task → `backlog/`. A Plan task → `todo/`, unless every one of its mapped
 `## Done when` boxes is ticked, in which case → `done/`.
 
-**Plan-only task (no Backlog row) — the common v1 case.** `TODO.md.template` has a promoted task
+**Plan-only task (no Backlog row) — the common v1 case.** A v1 `TODO.md` has a promoted task
 *leave* the Backlog, so a `Tn` citing an id with no matching Backlog row is normal, not an error.
 Nothing in the Plan block supplies `priority:`, `state:`, `origin:` (or `tier:`, unless the `Tn` declares
 one) — the Plan carries no P0–P3 tier, no readiness, no filing provenance. These fields have **no v1 source** for a Plan-only
@@ -295,10 +295,12 @@ ingests the stray task.
 
 - **Id set, diffed both ways.** `meant` = the id of every Backlog task **row header** (`- [ ] TASK-NNN — …`; an id merely
   mentioned in prose never counts) + every by-value Plan `Tn`'s `Cites:` id + each id newly allocated this run, taken before the
-  run (by-reference sprints contribute none). `pending` = `meant` ids not written yet (withheld for a flagged field, or at an
-  unresolved conflict) — **listed in the report, never counted as an inequality**. `resolved` = `meant` ids whose file this run wrote
-  or resumed (already present, identical). `meant ∖ (resolved ∪ pending)` and `resolved ∖ meant` must both be empty — a count alone
-  does not prove it. A pre-existing store file outside `meant` (a by-reference member, an unrelated task) is neither; Preservation covers it.
+  run (by-reference sprints contribute none). `output` = the ids of store files that exist after the run and did not exist before it —
+  derived from the store, never from `meant`. `kept` = `meant` ids that already had a file before the run and still do: identical
+  (resumed) or differing with the owner's "keep the existing file" choice; Preservation holds for them. `pending` = `meant` ids with
+  no file yet (withheld for a flagged field, or at an unresolved conflict) — listed in the report, never an inequality. Require
+  `output ⊆ meant` (a stray id is a defect) and `meant = output ∪ kept ∪ pending`; a count alone proves neither. A pre-existing store
+  file outside `meant` (a by-reference member, an unrelated task) is none of the four; Preservation covers it.
 - **Ticked-box count, before vs. after.** Sum of `- [x]` under every by-value Plan `Tn`'s DoD (before) must
   equal the sum of `- [x]` under `## Done when` across the files those `Tn`s mapped to (after,
   including resumed files whose count was never touched by this run). A mismatch on a *resumed*

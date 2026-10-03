@@ -75,7 +75,8 @@ const EXPECTED_BYREF = join(FIXTURES, "expected-byref");
 const EXPECTED_BYREF_MEMBER_ALTERED = join(FIXTURES, "expected-byref-member-altered");
 const INTERRUPTED_PARTIAL = join(FIXTURES, "interrupted-partial");
 const INTERRUPTED_PARTIAL_DIVERGED = join(FIXTURES, "interrupted-partial-diverged");
-const INPUT_NORMALISE = join(FIXTURES, "input-normalise");
+const EXPECTED_STRAY_OUTPUT = join(FIXTURES, "expected-stray-output");
+const INPUT_NORMALISE =join(FIXTURES, "input-normalise");
 const EXPECTED_NORMALISED = join(FIXTURES, "expected-normalised");
 
 // Real docs/work/README.md, or (discrimination proof only) a scratch copy named by this env var --
@@ -300,29 +301,34 @@ function preservationFindings(beforeRoot: string, afterRoot: string): string[] {
   return findings;
 }
 
-// The ids this run migrated, as the v2 side sees them: every id now in the store, minus the ones
-// that were already there and that v1 never cites (untouched members / unrelated store files).
-function migratedV2Ids(beforeRoot: string, afterRoot: string, v1Ids: string[]): string[] {
-  const cited = new Set(v1Ids);
-  const preexistingUncited = new Set(v2Ids(beforeRoot).filter((id) => !cited.has(id)));
-  return v2Ids(afterRoot).filter((id) => !preexistingUncited.has(id));
-}
-
 function v1Ids(root: string): string[] {
   return [...new Set([...v1BacklogIds(root), ...v1PlanCitesIds(root)])];
 }
 
+// The run's ACTUAL OUTPUT ids, derived independently of `meant`: store files present after the run
+// and absent before it (pre-existing files -- unrelated, by-reference members, kept -- are never
+// output). Findings are named: `stray-output-id: X` (output not in meant) and `unaccounted-id: X`
+// (a meant id that is neither output, nor `kept` = already had a file before, nor `pending`).
+function idSetFindings(beforeRoot: string, afterRoot: string, pending: readonly string[] = []): string[] {
+  const meant = new Set(v1Ids(beforeRoot));
+  const existedBefore = new Set(v2Ids(beforeRoot));
+  const output = new Set(v2Ids(afterRoot).filter((id) => !existedBefore.has(id)));
+  const settled = new Set([...output, ...[...meant].filter((id) => existedBefore.has(id)), ...pending]);
+  return [
+    ...[...output].filter((id) => !meant.has(id)).map((id) => `stray-output-id: ${id}`),
+    ...[...meant].filter((id) => !settled.has(id)).map((id) => `unaccounted-id: ${id}`),
+  ];
+}
+
 function runIdSetCase(name: string, expectedRoot: string, inputRoot: string = INPUT) {
-  const before = v1Ids(inputRoot);
-  const after = migratedV2Ids(inputRoot, expectedRoot, before);
-  const { beforeOnly, afterOnly } = diffIdSets(before, after);
-  const ok = beforeOnly.length === 0 && afterOnly.length === 0;
+  const findings = idSetFindings(inputRoot, expectedRoot);
+  const ok = findings.length === 0;
   report(
     name,
     ok,
     ok
-      ? `v1 ids {${before.join(", ")}} == v2 ids {${after.join(", ")}}, diffed both ways, both empty`
-      : `v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}} -- not empty`,
+      ? `meant {${v1Ids(inputRoot).join(", ")}} = output ∪ kept ∪ pending, and output ⊆ meant`
+      : findings.join("; "),
   );
 }
 
@@ -344,15 +350,15 @@ function argValue(flag: string): string | null {
       process.exit(2);
     }
     const ids = v1Ids(beforeDir);
-    const after = migratedV2Ids(beforeDir, afterDir, ids);
-    const { beforeOnly, afterOnly } = diffIdSets(ids, after);
-    const idOk = ids.length > 0 && beforeOnly.length === 0 && afterOnly.length === 0;
+    const pending = (argValue("--pending") ?? "").split(",").filter(Boolean); // withheld / unresolved ids, from the report
+    const idFindings = idSetFindings(beforeDir, afterDir, pending);
+    const idOk = ids.length > 0 && idFindings.length === 0;
     report(
       "real-id-set",
       idOk,
       idOk
-        ? `v1 ids (${ids.length}) == migrated v2 ids (${after.length}), diffed both ways, both empty`
-        : `v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}} (v1 ids: ${ids.length})`,
+        ? `meant ids (${ids.length}) = output ∪ kept ∪ pending (${pending.length}), and output ⊆ meant`
+        : `${idFindings.join("; ")} (meant ids: ${ids.length})`,
     );
     const tb = v1TickedBoxCount(beforeDir);
     const ta = v2TickedBoxCount(afterDir, new Set(ids));
@@ -375,6 +381,36 @@ function argValue(flag: string): string | null {
 // --- (1) id-set: must PASS on expected/ ---------------------------------------------------------
 
 runIdSetCase("id-set-expected", EXPECTED);
+
+// `kept`: conflict-input/ has a differing pre-existing TASK-917 the owner keeps; conflict-expected/
+// leaves it as it stood and writes only TASK-918. meant {917, 918} = output {918} ∪ kept {917}.
+runIdSetCase("id-set-kept-conflict", CONFLICT_EXPECTED, CONFLICT_INPUT);
+
+// must-FAIL (stray output): expected-stray-output/ = expected/ + one file for TASK-999, which no row
+// or Plan Tn cites. The old "v2 ids minus pre-existing uncited" comparison could not see it.
+{
+  const findings = idSetFindings(INPUT, EXPECTED_STRAY_OUTPUT);
+  const named = "stray-output-id: TASK-999";
+  const ok = findings.length === 1 && findings[0] === named;
+  report(
+    "id-set-stray-output (must-FAIL sibling)",
+    ok,
+    ok ? `id-set reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`,
+  );
+  const tickedOk = v1TickedBoxCount(INPUT) === v2TickedBoxCount(EXPECTED_STRAY_OUTPUT);
+  report("ticked-box-count-stray-output (sibling control, must stay PASS)", tickedOk, tickedOk ? "ticked-box count still agrees on the same tree" : "ticked-box count also red");
+}
+
+// must-FAIL (unaccounted): expected-missing-task/ lacks TASK-914 -- same check, other branch.
+{
+  const findings = idSetFindings(INPUT, EXPECTED_MISSING_TASK);
+  const named = "unaccounted-id: TASK-914";
+  const ok = findings.length === 1 && findings[0] === named;
+  report("id-set-unaccounted (must-FAIL sibling)", ok, ok ? `id-set reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}']`);
+  // pending: the same absence declared as withheld is settled, not an inequality
+  const pendingFindings = idSetFindings(INPUT, EXPECTED_MISSING_TASK, ["TASK-914"]);
+  report("id-set-pending-declared (sibling control, must stay PASS)", pendingFindings.length === 0, pendingFindings.length === 0 ? "TASK-914 declared pending -> settled" : pendingFindings.join("; "));
+}
 
 // --- (2) ticked-box count: must PASS on expected/ -----------------------------------------------
 
@@ -719,15 +755,14 @@ runIdSetCase("id-set-byref", EXPECTED_BYREF, INPUT_BYREF);
       ? `preservation reddens with exactly the named finding '${named}'`
       : `preservation findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`,
   );
-  const before = v1Ids(INPUT_BYREF);
-  const { beforeOnly, afterOnly } = diffIdSets(before, migratedV2Ids(INPUT_BYREF, EXPECTED_BYREF_MEMBER_ALTERED, before));
-  const controlOk = beforeOnly.length === 0 && afterOnly.length === 0;
+  const idFindings = idSetFindings(INPUT_BYREF, EXPECTED_BYREF_MEMBER_ALTERED);
+  const controlOk = idFindings.length === 0;
   report(
     "id-set-byref-member-altered (sibling control, must stay PASS)",
     controlOk,
     controlOk
       ? "id-set still agrees on the SAME tree that reddens preservation -- the redden is specific to the altered member"
-      : `id set also disagrees: v1∖v2 = {${beforeOnly.join(", ")}}, v2∖v1 = {${afterOnly.join(", ")}}`,
+      : `id set also disagrees: ${idFindings.join("; ")}`,
   );
 }
 
