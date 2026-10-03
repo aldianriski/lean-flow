@@ -69,7 +69,9 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    `Cites:` names no current member (all scoped out) is not counted as a unit at all.
 5. **Tick** — the coordinator ticks the member file's box, `- [ ]` → `- [x]`, appending
    ` ✓ <evidence>` after the frozen text. Nothing else in `## Done when` changes: any other edit
-   first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze).
+   first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze). Then re-run the
+   checker **the gate itself runs** over every file just written: the evidence suffix is content that
+   checker reads, and a sibling implementation's PASS or a pre-write PASS is not its verdict (L-224).
 6. **Transitions** — `todo/` → `in_progress/` when the task starts · → `review/` when its work is
    committed and awaits review or merge-back · → `done/` once every box is ticked and review accepted.
    Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/` in **its own commit**, never
@@ -470,6 +472,9 @@ which the map can see:
 **A dispatched agent returns its Execution Log entry inside its report; the coordinator appends it at
 merge-back.** The agent does not create or edit the Log, tick a DoD box, `git mv` a task file, or
 touch § Plan — it reports its evidence, and the coordinator ticks and moves (§ Merge-back queue).
+Evidence for a checkout-sensitive property (line endings · generated or filtered files) comes from a
+forced fresh checkout — `git checkout -- <path>` at minimum, a throwaway clone for anything line-ending
+or filter dependent — never only from a tree the builder's own tooling has written to (L-182 ×3).
 
 Proven live and this is why the clause is split: SPRINT-063 dispatched one agent whose brief correctly
 banned editing § Plan and ticking DoD **and said nothing about the Log** — so the coordinator and the

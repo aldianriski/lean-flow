@@ -407,15 +407,6 @@ status: current
   - **Owner ruling (2026-09-30):** accept for now. `TASK-372`/`TASK-373` (both layout directions and consumer parity) confirm
     it before release, together with README § Upgrading to 2.x.
 
-- **TD-203** severity: medium | status: resolved → TASK-394 | created: Sprint-110 (T4, owner ruling)
-  - Summary: **qa-check leg 7's TD-aging half has checked nothing since the ledger left TODO.md.** It greps `TODO.md` for TD rows, and
-    TODO.md holds 0 of them. The ledger is `TECH-DEBT.md`: 118 open rows, no `re-reviewed:` marker. Pointing the leg there as it stands
-    would redden about 105 aged rows. The real aging happens at the promote governance review, not in the gate. T4 retargeted the leg's
-    active-sprint half only.
-  - **Owner ruling (2026-09-30):** file it, and `TASK-380` owns it. TASK-380 deletes TODO.md, so it must retire this half or retarget
-    it with an aging rule the gate can check.
-  - **Resolved (SPRINT-111 T3, TASK-394):** leg 7 was retired whole, not retargeted. Its TD-aging half had no reader left once TODO.md went.
-
 - **TD-202** severity: low | status: open | created: Sprint-110 (T4 outside review)
   - Summary: **Two shell call sites read the CLI's `kind` output and ignore its exit status.** `night-run.sh` (~:231) and qa-check leg 2g
     run `[ "$(bun … kind … 2>/dev/null)" = "v2" ]`, so any CLI failure falls to the v1 arm, which counts 0 Plan boxes. The `counts` calls
