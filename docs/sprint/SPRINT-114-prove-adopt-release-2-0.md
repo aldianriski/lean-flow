@@ -114,7 +114,7 @@ entry is marked BREAKING and carries the upgrade section; nothing is pushed.
 - [ ] Commit workdoo's SPRINT-009 promote, so T1 can branch from a clean base (D2).
 - [ ] Open the workdoo-main window for T2 and T4's merges (D2). Until it opens, they park.
 - [ ] Push the release after T6 (owner-reserved).
-- [ ] T3(c): run `/plugins install D:/Project/lean-flow-rc1` once in an interactive Kimi session and report whether the 14 lean-flow skills appear (owner ruling 2026-10-03).
+- [~] ~~T3(c): run `/plugins install D:/Project/lean-flow-rc1` once in an interactive Kimi session and report whether the 14 lean-flow skills appear (owner ruling 2026-10-03).~~ — withdrawn: Kimi skipped by owner ruling (2026-10-03).
 - [ ] After pushing `2.0.0`: install from the marketplace once in a scratch profile and confirm it loads `2.0.0` (T3(d) was exercised via `--plugin-dir`; owner ruling 2026-10-03).
 
 ## Decisions (pre-locked)

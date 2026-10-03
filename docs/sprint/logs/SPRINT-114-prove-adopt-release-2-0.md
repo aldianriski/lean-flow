@@ -194,3 +194,11 @@ model: content lost or altered · ruling not applied · sprint conversion broke 
 back bare, with no per-class reasoning**, so the coordinator ran an independent check of the riskiest class (content loss) before accepting it:
 every v1 row's `done-when:` searched for in its task file. 9 rows carry one and all 9 are found; the 3 rows split on `;` were checked part by
 part (012 3/3 · 014 3/3 · 015 2/2). The other 2 (011, 018, superseded) carry none and got the procedure's `TODO: owner`. Review accepted.
+
+### 2026-10-03 | scope-change | T3 (TASK-372): (c)'s Kimi half is skipped (owner ruling: focus on Claude Code)
+**What broke:** the frozen (c) reads "the Codex and Kimi runtimes resolve the plugin's resources". The Kimi half needs an interactive Kimi
+session with the owner's credentials, and the owner ruled it out of scope: "we just focus for claude now, kimi we can skip".
+**Impact:** (c) is ticked on the Codex evidence (isolated `CODEX_HOME`, `codex plugin add` → installed, enabled 2.0.0-rc.1, all 14 skills
+resolved) with the Kimi half marked **skipped by owner ruling, not proven**. The static manifest case (`runtime-manifest-kimi-resolves-skills`)
+stays in the harness. The owner-action checklist's Kimi row is withdrawn. Nothing about Kimi is claimed in the release.
+**Re-confirm G2:** owner ruled 2026-10-03.
