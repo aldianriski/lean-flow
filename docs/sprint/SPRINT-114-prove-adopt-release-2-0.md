@@ -145,6 +145,7 @@ entry is marked BREAKING and carries the upgrade section; nothing is pushed.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| lean-flow `release/2.0.0-rc.1` (tag `v2.0.0-rc.1`, never `main`) · workdoo `lean-flow-2.0-migration` @ `629f91c` (external, retained) | T1 | the candidate cut; workdoo's queue moved onto the store by it (15 ids) | High | id/box/field census with seeded controls · Codex CLEAR + content spot-check · verify 3/1 under owner ruling (workdoo TD-034) |
 | `evals/run-layout-fixtures.ts` · `evals/fixtures/layout/` (6 new fixture trees) | T3 | 2.0's both-direction safety retained: stray-write (mixed) state, store census with exact-identity must-FAILs, Codex/Kimi manifest cases | Low | 41/0 fresh clone + autocrlf main · Codex r1→r3 CLEAR · tsc 0 |
 
 ## Retro
