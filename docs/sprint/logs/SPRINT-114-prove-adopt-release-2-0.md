@@ -81,3 +81,11 @@ T1 · data migration in a consumer repo · Codex loop (D3) · T2 · deployment o
 rests on → other-G bar + Codex loop · T4 · consumer view reads a new source · Codex loop · T5 · research measurement, method unchanged ·
 Codex loop · T6 · versioned manifests are the consumer contract → Codex loop + lockstep derived by `grep -l`.
 **State at sign-off:** T1 is waiting on the owner action "commit workdoo's SPRINT-009 promote" (still uncommitted at 2026-10-03).
+
+### 2026-10-03 | scope-change | T1's RC step runs first, so T3 can start before the workdoo half of T1
+**What broke:** the Plan orders T3 after T1 whole, but T3's only real input from T1 is the release candidate. T1's workdoo half is blocked on
+the owner action (workdoo's SPRINT-009 promote is uncommitted), which would idle T3 for no reason.
+**Impact:** T1 splits into two steps on the same task: (1) cut `release/2.0.0-rc.1` + tag `v2.0.0-rc.1` in lean-flow (a side branch, never
+`main`), once the promote full gate is green; (2) the workdoo branch migration, still waiting on the owner. T3 is dispatched after step 1,
+worktree-isolated. No `Layers:` change (the rc commit stays off `main`), and no task or DoD is added or removed. T2 still follows T1 step 2.
+**Re-confirm G2:** owner ruled 2026-10-03: "Cut RC, start T3".
