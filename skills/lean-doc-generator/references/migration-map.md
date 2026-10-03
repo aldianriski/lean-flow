@@ -297,10 +297,11 @@ ingests the stray task.
   mentioned in prose never counts) + every by-value Plan `Tn`'s `Cites:` id + each id newly allocated this run, taken before the
   run (by-reference sprints contribute none). `output` = the ids of store files that exist after the run and did not exist before it —
   derived from the store, never from `meant`. `kept` = `meant` ids that already had a file before the run and still do: identical
-  (resumed) or differing with the owner's "keep the existing file" choice; Preservation holds for them. `pending` = `meant` ids with
+  (resumed) or differing with the owner's "keep the existing file" choice; Preservation holds for them. `replaced` = `meant` ids whose
+  differing pre-existing file the owner approved replacing ("apply the delta"); reported, and the only files Preservation exempts. `pending` = `meant` ids with
   no file yet (withheld for a flagged field, or at an unresolved conflict) — listed in the report, never an inequality. Require
-  `output ⊆ meant` (a stray id is a defect) and `meant = output ∪ kept ∪ pending`; a count alone proves neither. A pre-existing store
-  file outside `meant` (a by-reference member, an unrelated task) is none of the four; Preservation covers it.
+  `output ⊆ meant` (a stray id is a defect) and `meant = output ∪ kept ∪ replaced ∪ pending`; a count alone proves neither. A pre-existing store
+  file outside `meant` (a by-reference member, an unrelated task) is none of the five; Preservation covers it.
 - **Ticked-box count, before vs. after.** Sum of `- [x]` under every by-value Plan `Tn`'s DoD (before) must
   equal the sum of `- [x]` under `## Done when` across the files those `Tn`s mapped to (after,
   including resumed files whose count was never touched by this run). A mismatch on a *resumed*
@@ -310,6 +311,6 @@ ingests the stray task.
   holds).
 - **Preservation.** Every `docs/work/**` file present before the run is byte-identical after —
   by-reference members and any other pre-existing file. (A run may only add files, or — on an owner's
-  explicit "apply the delta" — replace a conflicted one.)
+  explicit "apply the delta" — replace a conflicted one: exactly the `replaced` ids, nothing else.)
 - **Re-run is report-only.** A second run against an already-migrated tree produces zero writes
   and zero new conflicts (`git status` clean) — every id resolves to "already present, identical."

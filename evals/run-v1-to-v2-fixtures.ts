@@ -307,7 +307,8 @@ function v1Ids(root: string): string[] {
 
 // The run's ACTUAL OUTPUT ids, derived independently of `meant`: store files present after the run
 // and absent before it (pre-existing files -- unrelated, by-reference members, kept -- are never
-// output). Findings are named: `stray-output-id: X` (output not in meant) and `unaccounted-id: X`
+// output). LIMITATION: `kept` here is any meant id that had a file before, so it also absorbs the map's
+// owner-approved `replaced` ids (apply the delta); owner choice is not tracked. Findings are named: `stray-output-id: X` (output not in meant) and `unaccounted-id: X`
 // (a meant id that is neither output, nor `kept` = already had a file before, nor `pending`).
 function idSetFindings(beforeRoot: string, afterRoot: string, pending: readonly string[] = []): string[] {
   const meant = new Set(v1Ids(beforeRoot));
