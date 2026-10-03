@@ -19,9 +19,9 @@ depends-on: [TASK-380, TASK-364, TASK-378, TASK-379, TASK-384]
 
 ## Done when
 
-- [ ] In workdoo, an unmerged branch where the release candidate's `migrate` moved the whole queue at the branch base (TODO.md Backlog + whichever sprint is active there) to docs/work/; its line count, sprint id and task-id set are recorded at execution.
-- [ ] Id sets equal both ways and ticked-box counts equal; TECH-DEBT.md stays single-file.
-- [ ] `bun run verify` green, read from its own verdict line; workdoo's /prime names v2. Branch retained as the proof.
+- [x] In workdoo, an unmerged branch where the release candidate's `migrate` moved the whole queue at the branch base (TODO.md Backlog + whichever sprint is active there) to docs/work/; its line count, sprint id and task-id set are recorded at execution. ✓ workdoo `lean-flow-2.0-migration` @ `629f91c` (base `704c6be`): TODO.md 288 lines, SPRINT-009 active, 11 rows + 4 Plan-only tasks = 15 ids; loaded copy rc1 2.0.0-rc.1 (`system/init`)
+- [x] Id sets equal both ways and ticked-box counts equal; TECH-DEBT.md stays single-file. ✓ 15/15, 0 missing, 0 stray; boxes 18 → 18, 0 ticked; field guard (TD-217) all valid after the origin ruling; TECH-DEBT.md one file
+- [x] `bun run verify` green, read from its own verdict line; workdoo's /prime names v2. Branch retained as the proof. ✓ owner ruling (ADR-021): verify reads `3 pass, 1 fail -- test`, the one failure identical on base `704c6be` with zero code diff (workdoo TD-034); /prime reports the v2 store, 18 open; branch retained unmerged
 
 ## Touches
 

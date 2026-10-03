@@ -158,3 +158,32 @@ checkout reads 41/0; layers-completeness 18 PASS; by-reference 7/0; gen-index cu
 `fm[1] ?? ""`, `?? null`, `m[1] ?? ""`); tsc 0, harness 41/0, mutation still caught. `19670ac`.
 **Ticked:** (a) · (b) (tombstone n/a per the scope-change; collision run included) · (d) (`--plugin-dir` stand-in, owner-accepted).
 **Open:** (c) Kimi live install (owner action); Codex is resolved at install/prompt level. TASK-372 stays in `in_progress/` until (c).
+
+### 2026-10-03 | progress | T1 (TASK-371): workdoo migrated on retained branch `lean-flow-2.0-migration` @ `629f91c`; 3/3 boxes ticked (verify under owner ruling)
+**Unblocked by owner action:** workdoo's SPRINT-009 promote committed at the owner's request (`576e120` plan locked, `704c6be` records
+`plan_commit`). The lean-flow EPIC-016 rollup that had sat uncommitted (`d600628`) was committed with its new row trimmed under the
+prose-density ratchet (639 → 378 chars; 8 ≤ 8, baseline not raised).
+**Base, recorded at execution (owner amendment):** TODO.md 288 lines · SPRINT-009 active · 11 row headers (2 ticked) + 5 Plan `Tn`, of which
+T4 cites TASK-050, giving 15 ids. Cross-checked by a second selector (`TASK-NNN —` headers = 11). Sprint boxes: 18 Plan + 1 owner-action;
+migrate's "18" and the coordinator's "19" reconciled.
+**Run 1, plan-only** (`--permission-mode plan`, Opus, $1.87): wrote nothing, and **withheld all 15** for `tier:` (spec line 194, honoured
+this time; contrast TD-217). It raised O1–O10 + P1–P13. **Owner rulings:** the field set (tier G = 050/052/053/054 by retained must-FAIL,
+P = 018/033/051, X = rest; class/authority; P1/ready/manual for 051–054; 040 AFK) · mapping recommendations · sprint → `## Members` ·
+P1–P13 as proposed.
+**Run 2, apply** (`acceptEdits` + git/read allowlist, told not to commit; $1.99): 15/15 written, pending 0, `TODO.md` `git rm`'d. It
+self-reported that P7a/c/e were blocked (`.claude/` writes are sensitive) and that verify was not run.
+**Coordinator verification** (`store-check.ts`, seeded good/bad controls passed first): 15 files, 15 unique, 0 missing, 0 stray;
+Done-when 33 boxes (18 Plan + 15 row), 0 ticked. **TD-217 guard caught 2 invalid enums** migrate carried verbatim: 033 `origin: owner`
+(migrate did not flag it) and 050 `origin: promote` (flagged as C4). Owner ruling: both → `manual`, v1 word kept in `## Why`. The first
+instrument was itself defective (values read with a leading space), so the rewrite with controls is what made the verdict trustworthy.
+**Owner-ruled follow-ups applied by the coordinator:** P7a → workdoo CLAUDE.md (+3), P7c/P7e → CONTEXT.md (153 > 150, breach filed as
+workdoo **TD-033**); the Windows SIGKILL test filed as workdoo **TD-034** (workdoo ids derived: max 032; a `TD-054` hit was a citation of
+lean-flow's row).
+**Verify:** `VERIFY: 3 pass, 1 fail -- test` (typecheck, typecheck:web and lint ok). The single failure, `command-check.test.ts`
+(SIGKILL → `exited 1` on Windows), fails identically on untouched workdoo `main` `704c6be`; the migration diff touches no `packages/` or
+`apps/` file. Ticked under owner ruling (ADR-021). A test-spawned `bun --eval setTimeout` orphan held the pipe open for 10 minutes; it was
+killed by verified command line only.
+**/prime (rc1, read-only):** "docs/work/ (v2 store…)", SPRINT-009 with 5 members, 18 open.
+**Findings for the Retro:** under `--plugin-dir`, `/prime`'s `Skills:` row reads `n/a`, because the base-dir path has no version even though
+`plugin.json` sits in it; TASK-018's verbatim `## Why` still points at "§ Standing facts above", which now lives in CONTEXT.md.
+**Branch:** local only; pushing it to workdoo's remote is owner-reserved.
