@@ -202,3 +202,20 @@ session with the owner's credentials, and the owner ruled it out of scope: "we j
 resolved) with the Kimi half marked **skipped by owner ruling, not proven**. The static manifest case (`runtime-manifest-kimi-resolves-skills`)
 stays in the harness. The owner-action checklist's Kimi row is withdrawn. Nothing about Kimi is claimed in the release.
 **Re-confirm G2:** owner ruled 2026-10-03.
+
+### 2026-10-03 | scope-change | T5 (TASK-386): completeness is not re-run (no "after" event)
+**What broke:** the frozen criterion says "TASK-374's method re-run unchanged". Its completeness measure is *first decomposition pass ÷
+settled set* for one epic, and no epic has been decomposed since the store landed, so there is nothing to re-run it on.
+**Impact:** completeness is recorded as **not measurable**; retrieval and recurrence are re-run unchanged. A synthetic re-decomposition was
+offered and declined as an artificial, contaminated input. The gap is carried to the next real epic decomposition (Retro follow-up).
+**Re-confirm G2:** owner ruled 2026-10-03 ("Record as not measurable").
+
+### 2026-10-03 | progress | T5 (TASK-386): "after" measured; Codex loop 3 rounds → CLEAR; ticked → done
+Results in `docs/research/logs/epic-017-effectiveness.md` (Rounds 1–4). Key committed before answers (`fb3a526`). **Retrieval:** a fresh
+Haiku restricted to the two always-loaded files. Literal scoring: before 9/12 → after 5/12; the baseline's own conventions: 11 → 6. Falls
+either way, though 3 of the 5 new misses are stated in CONTEXT.md (answerer misreads at n = 1), and R1 is a real doc ambiguity.
+**Recurrence** (SPRINT-104…113): selector (a) 13 (before 22), selector (b) 16 (before 19): lower on both, on overlapping windows; (a)
+blind at 113 because of L-224's collapse at this promote. **Verdict: effectiveness NOT demonstrated by this method.**
+**Codex loop:** r1 FINDINGS 2 (retrieval not literal on either side → 9→5; an unsupported 109/110/112 attribution, the coordinator
+confirmed against L78/L101/L220) · r2 FINDINGS 1 (Round 3 overclaimed that the correction worsened the drop; literal drop 4 < 5) · r3 CLEAR.
+Coordinator instrument errors caught before any figure was used: selector (b)'s sprint-number extraction (fixed, re-run).

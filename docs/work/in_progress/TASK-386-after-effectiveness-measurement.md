@@ -19,7 +19,7 @@ depends-on: [TASK-372, TASK-384]
 
 ## Done when
 
-- [ ] TASK-374's method re-run unchanged on the finished plugin; the before/after comparison is recorded, verdict stated either way.
+- [x] TASK-374's method re-run unchanged on the finished plugin; the before/after comparison is recorded, verdict stated either way. ✓ retrieval + recurrence re-run unchanged, completeness not measurable (scope-change 2026-10-03); verdict NOT demonstrated; research log Rounds 1–4, Codex CLEAR
 
 ## Touches
 
