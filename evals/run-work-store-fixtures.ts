@@ -509,7 +509,7 @@ function grepStyleMemberIds(sprintFile: string): string[] {
       continue;
     }
     if (!inMembers || !(line.startsWith("- ") || line.startsWith("* "))) continue;
-    const token = line.slice(2).trim().split(/\s+/)[0].replace(/`/g, "");
+    const token = (line.slice(2).trim().split(/\s+/)[0] ?? "").replace(/`/g, "");
     const m = (token.split("/").pop() ?? "").match(/^TASK-(\d+)-.+\.md$/);
     if (m) set.add(`TASK-${m[1]}`);
   }
@@ -600,7 +600,7 @@ function openDoDByListedPath(root: string, sprintFile: string): number {
     const m = line.match(/^\s*[-*]\s+`?(\S+?\.md)`?\s*$/);
     if (!m) continue;
     try {
-      total += openBoxesUnderDoneWhen(join(root, m[1]));
+      total += openBoxesUnderDoneWhen(join(root, m[1] ?? ""));
     } catch {
       /* stale path: nothing read */
     }
@@ -721,7 +721,7 @@ const fmt = (xs: string[]) => `[${xs.join(", ")}]`;
 // Case (f): census. A (findTaskFiles) and B (grepStyleTaskFiles) -- their REAL walkers -- must reach every task file (todo/ in_progress/ done/ cancel/),
 // counted by hand (TASK_CENSUS) -- a walker that skips a status folder cannot hide in both.
 {
-  const rel = (f: string) => f.replace(/\\/g, "/").split("/docs/work/")[1];
+  const rel = (f: string): string => f.replace(/\\/g, "/").split("/docs/work/")[1] ?? f;
   const a = findTaskFiles(MEMBERSHIP_FIXTURE_ROOT).map(rel).sort();
   const b = grepStyleTaskFiles(MEMBERSHIP_FIXTURE_ROOT).map(rel).sort();
   const ok = a.length === TASK_CENSUS && fmt(a) === fmt(b);
