@@ -9,8 +9,8 @@
 # subprocess spawns per task block), not the checking work itself (milliseconds of text matching).
 # scripts/lib/check-layers-completeness.sh REMAINS THE ORACLE (owner ruling, mirroring EPIC-014 D2 --
 # "Shell retains §4 authority"): it is UNCHANGED, still what qa-check.sh's own gate leg spawns, and
-# still what evals/layers-completeness-differential.ts (opt-in, not run here) checks the TS port
-# against, row by row, over every retained fixture AND every real sprint Plan in this repository.
+# still what the TS port was checked against, row by row, before the differential harness was cut
+# (SPRINT-113 T1 / ADR-050; it ran standalone, no runner, so it guarded nothing the gate reached).
 # What moved is THIS harness: it now asserts against scripts/lib/check-layers-completeness.ts, the
 # fork-free TS port, called in-process via evals/layers-completeness.test.ts -- the same "TS
 # evaluator leg" shape run-s4-ts-evaluators.sh already established for §4, and the same "thin bun test
@@ -79,14 +79,14 @@ fi
 # --- ORACLE-SIDE GUARD: the IFS word-splitting fix (TASK-355) -------------------------------------
 # Everything above exercises the TS PORT. It cannot catch a regression in the SHELL oracle -- proven
 # by seeding the IFS fix out and watching this suite stay 19/19 green. The full shell/TS differential
-# (evals/layers-completeness-differential.ts) DOES catch it, but it is opt-in and takes ~14 minutes,
-# so it is not gate-reachable: an independent review found the oracle fix had NO automated coverage in
+# (cut at SPRINT-113 T1) caught it, but was opt-in and took ~14 minutes, so it was never
+# gate-reachable: an independent review found the oracle fix had NO automated coverage in
 # either gate profile, which makes it a rule with no matcher (STANDARD Sec 10 -- wire it or admit it is
 # documentation).
 #
 # This is the cheap gate-reachable half: ONE oracle invocation over ONE fixture, asserting the two
 # findings that word-splitting used to swallow. ~1 shell spawn, not 102. A full-corpus parity sweep
-# stays where it belongs, in the opt-in differential.
+# was retired with the differential (SPRINT-113 T1).
 oracle="scripts/lib/check-layers-completeness.sh"
 space_fx="evals/fixtures/layers-completeness/space-token-wordsplit.md"
 if [ ! -f "$oracle" ] || [ ! -f "$space_fx" ]; then
@@ -115,5 +115,5 @@ if [ -n "$o_missing" ]; then
 fi
 
 echo "PASS fixture(layers-completeness): TS port green -- $n_pass tests, 0 fail (retained: sprint-041-reconstructed, depends-on-omitted, sprint-048-citations sibling PASS, cites-contradiction, unindented-continuation, dir-token-prefix T1/T2, substring-declaration-not-declared T1/T2/T3, archive-path-excluded pair, archive-case-variant, file-not-found, space-token-wordsplit T1/T2+control)."
-echo "PASS fixture(layers-completeness): SHELL oracle still reports both space-token findings (the IFS fix, guarded gate-reachably). Full-corpus shell/TS parity remains opt-in: evals/layers-completeness-differential.ts."
+echo "PASS fixture(layers-completeness): SHELL oracle still reports both space-token findings (the IFS fix, guarded gate-reachably). Full-corpus shell/TS parity sweep retired (SPRINT-113 T1, ADR-050)."
 exit 0
