@@ -283,3 +283,23 @@ dispatch `claude-code` through real routes with no pin, which the fail-closed ga
 **Fix in flight:** test-only, a shared matching fake pin gate (the `app.test.ts` pattern), with a must-FAIL; branch `pin-gate-db-tests`.
 Retro learning candidate: *a suite that skips on a missing environment variable is silent coverage loss. Count skips per merge and treat a
 skipped suite touching the changed code as unverified, not green.*
+
+### 2026-10-03 | progress | T4 (TASK-385) done: work items link to task files (workdoo `fa5f39a`); pin-gate test regression fixed first (`0cb75b3`)
+**Regression fix merged first** (`0cb75b3`, test-only: a shared `matchingPinGate()` helper): the 4 DB files went 50/7 → 56/1 (only the
+Windows signal-kill sibling of TD-034); a must-FAIL removing it from the TD-011 Supervisor reddens only that test; Codex CLEAR (bare
+verdict, independently covered by the coordinator's run).
+**TASK-385 build:** WorkItem `taskId` (`^TASK-[0-9]+$`, migration 0010 + `chk_work_items_task_id`); a `TaskLifecycleReader` port with an
+fs adapter reading `<repository>/docs/work/<folder>/<taskId>-*.md` per request (`repository` is already the on-disk checkout path);
+`taskLifecycle` never stored; named unknowns `checkout-missing · task-file-missing · ambiguous · v1-layout · outside-checkout · read-failed ·
+reader-not-configured`; the API keeps `status` as an alias for `workItemStatus`; the form takes an optional Task id; the view shows both under separate labels.
+**Codex loop:** r1 FINDINGS 5, all confirmed by the coordinator (junction escape → `done` from outside the repo; every readdir error read as
+"absent"; a directory named like a task counted; the no-sync test never went through the API; the wiring matcher accepted a nested reader)
+→ fixed `3e98a0a` (realpath containment, ENOENT/ENOTDIR only, regular files only, symlinked task files rejected, an API test on Postgres moving
+the file between two GETs with a must-FAIL cache seed, top-level wiring match) → r2: all 5 FIXED; 3 residuals confirmed as mechanisms (a
+realpath/readdir race, Windows per-directory case sensitivity, a string-literal false positive in the wiring matcher), all census-zero → workdoo
+**TD-036** per the owner rule. The builder's "7 pre-existing DB failures" were re-attributed by bisect to the coordinator's own gate merge (see
+the surprise entry above).
+**Post-merge on workdoo main:** typecheck 0 · lint clean · 579 pass / 1 fail (TD-034) without DB · **DB suites 116 pass / 1 fail** (Windows
+signal) across park/permission/verification-check-dispatch/wiring/task-lifecycle-api/app/work-item-store/migrate. Reader against
+lean-flow's own store: TASK-385 `in_progress`, TASK-371 `done`. Throwaway containers removed; workdoo's own `workdoo-postgres` (stopped
+12 days) left untouched; it is why the main checkout's `.env` `DATABASE_URL` fails to connect.
