@@ -120,3 +120,13 @@ quoted frontmatter id → `TASK-901`, passes; (3) a non-`TASK-*` store file is i
 `ENOENT uv_spawn 'bash'`. All four sent back for one bounded retry with a must-FAIL plus a sibling control per fix, proven against the old harness.
 **Open for the owner:** Kimi live install · the untested 1.x id collision (spec lines 254–282 cover it) · `migrate`'s withhold rule applied
 inconsistently across runs (spec line 194: "never guessed, never defaulted") · "install 2.x" exercised via `--plugin-dir`, not a marketplace install.
+
+### 2026-10-03 | progress | T3 (TASK-372): Codex r1 fixed in `d3a1476` (coordinator re-ran: `layout-fixtures: 41 pass, 0 fail`); four owner rulings
+Builder fix round: `[ xX]`; frontmatter-only id (bare/double/single quoted, CRLF-safe); every store `*.md` except `README.md`, NOID fails;
+`readdirSync(recursive)` walk, no subprocess. 3 must-FAIL fixtures (`census-dup-xbox`, `census-dup-quoted-id`, `census-noid-nontask-file`)
+plus 2 controls, each shown old-green / new-caught. 3 mutations each redden only their own cases (restore verified by `git hash-object`). One
+pre-existing `bash`/`find` call remains (~line 146, `selection-varying-v2-empty-work`), outside this fix. Codex round 2 is dispatched.
+**Owner rulings on T3's open items (2026-10-03):** (c) Kimi: the owner runs the interactive install once (owner action) · (b) collision: add a
+real run (dispatched, evidence only) · `migrate` withhold inconsistency: **TD-217** filed (next id derived from the ledger, `max = 216`; a broad
+grep's `TD-961` traced to SPRINT-103's recorded fixture token, i.e. contamination, not a row), with T1 guarding the workdoo migration
+mechanically · (d) the `--plugin-dir` stand-in is accepted, plus a post-push marketplace install check (owner action).

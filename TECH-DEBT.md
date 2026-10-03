@@ -320,6 +320,17 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-217** severity: medium | status: open | created: Sprint-114 (T3 real runs, owner ruling)
+  - Summary: **`migrate`'s withhold rule is applied inconsistently across runs of the same procedure.** migration-map.md:194 says
+    a task missing a field with no source is "withheld … never guessed, never defaulted". In SPRINT-114 T3, the rc.1 `migrate`
+    withheld two 1.x tasks lacking `priority`/`tier`/`authority` on one tree (`v2c`), but on another (`v1d`, after "move everything")
+    wrote all 10 files without `tier:` and only flagged the missing fields afterwards. The rule is prose a model executes, so whether it
+    holds depends on the run. An adopter can end up with task files missing fields the store schema requires.
+  - **Owner ruling (2026-10-03):** file it; no skill change this sprint. T1 guards the real workdoo migration mechanically instead: after
+    `migrate`, every written task file is checked for every required field, and a file that fails is sent back.
+  - Mitigation (hypothesis): a post-write field check `migrate` runs on its own output (the v1→v2 harness already has the schema), so the
+    rule stops depending on the model honouring prose.
+
 - **TD-216** severity: low | status: open | created: Sprint-113 (T1 seeded break B)
   - Summary: **`qa-check.sh` has no listed-but-missing check for `eval_harnesses_excluded`.** A name in the excluded list whose file no
     longer exists passes silently; the completeness leg checks only disk → list, and "script not found" covers only the always-on and opt-in
