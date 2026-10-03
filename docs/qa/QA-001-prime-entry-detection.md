@@ -16,10 +16,10 @@ status: current
 ## Steps
 1. Scaffold the fixture (see Preconditions); `git init`.
 2. Run prime's read-order — resolve each of the 6 slots in order, mark `[OK]`/`[MISSING]`.
-3. Count open DoD in the active sprint and open Backlog `- [ ]` tasks.
+3. Resolve the active sprint (`status: active` under `docs/sprint/`, its `## Members`); count open `- [ ]` under each member task file's `## Done when`, and the files in `docs/work/backlog/`.
 
 ## Expected
-All present slots report `[OK]`, missing ones `[MISSING]` (never fatal); the open-DoD and Backlog counts match what the fixture seeded.
+All present slots report `[OK]`, missing ones `[MISSING]` (never fatal); the open-DoD and backlog counts match what the fixture seeded.
 
 ## Result
 pass — all 5 scaffolded slots `[OK]`; DoD=2, Backlog=1 as seeded (SPRINT-008 T4 fixture run, deleted after).
