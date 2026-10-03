@@ -260,3 +260,15 @@ read-timing filed as workdoo TD-035, census-zero).
 `mismatch` (configured 2.0.0, running 2.0.0-rc.1). Post-merge workdoo legs: typecheck 0, lint clean, tests 530/1 (TD-034, `DATABASE_URL` unset).
 **Owner-action notes:** workdoo's `.claude/settings.local.json` still disables the 1.66.1 install; after 2.0.0 is installed, remove it,
 then unset `LEANFLOW_PLUGIN_DIR` (or point it at the 2.0.0 tree) and set the pin to `2.0.0`.
+
+### 2026-10-03 | progress | T4 (TASK-385) design signed: link work items to tasks (ADR-006's fuller design); DB proven on a throwaway Postgres
+**Recon:** workdoo's Work & Queue view reads only `work_items` (`GET /work-items` → DB). Nothing in `apps/`/`packages/` reads `docs/work/`.
+Work items (`draft·ready·running·blocked·done`, execution requests) and task files (`backlog·todo·in_progress·review·done·cancel`,
+specifications) are different entities. **workdoo ADR-006 already rules:** the two vocabularies must not be mapped one-to-one; the view does "two
+reads, two owners, no sync layer" (store for execution state, repo for specification); name them `workItemStatus` and `taskLifecycle`.
+**Owner ruling (shape):** link them, over a read-only panel or a no-code ruling. **Design (signed):** optional `taskId` (`TASK-\d+`) on
+WorkItem plus a migration (nullable column + check), beside the existing `repository`; `taskLifecycle` computed at read time from the repo
+checkout's `docs/work/<folder>/TASK-NNN-*.md` (under `REPO_CHECKOUT_ROOT`), **never stored**; a missing checkout or file, or a v1 repo → a
+named `unknown`; `GET /work-items` returns both fields; an optional Task-id field in the form; the view shows both side by side.
+**Owner ruling (DB):** a throwaway `postgres:16` container on a spare port, so the migration and store suites run rather than skip.
+consequence · T4 · behaviour:material · governance:low
