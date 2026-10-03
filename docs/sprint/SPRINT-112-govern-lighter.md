@@ -3,10 +3,11 @@ sprint: 112
 slug: govern-lighter
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-10-02
-status: active
+last_updated: 2026-10-03
+status: closed
 gates_signed: G1,G2 @ ee324e0
 plan_commit: ceffdad
+close_commit: CLOSE_SHA
 update_trigger: sprint execute/close events
 ---
 
@@ -94,5 +95,37 @@ zero OVER-CAP rows, each closed by a recorded disposition, not a diet.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/guard-audit*.md` (4) · `docs/adr/ADR-050-*` · `docs/DECISIONS.md` | T1 | every guard ruled by the defects it caught; the proof bar scales with consequence | Med | 3 selectors · Codex 3 rounds CLEAR · owner rulings ×11 |
+| `.claude/CLAUDE.md` | T1/T2 | § Anti-Patterns slimmed with actions kept; Tier G bar scoped to consequential G (ADR-050) | High | caps 80/80 · ~13419 tokens · Codex wording CLEAR |
+| `scripts/lib/check-doc-caps.sh` · `.ts` · `.cap-dispositions` · doc-caps fixtures/test/differential | T2 | soft over-caps close by a recorded disposition, Shell+TS in parity | High | 46/0 · differential 26/26 · seeded S1–S4 |
+| `docs/LEARNINGS.md` · `skills/lean-doc-generator/SKILL.md` · `TECH-DEBT.md` · ADR-048 | T2 | moved rules' detail; promotion names its disposition; TD-174 resolved; ADR-048 amended | Med | density · count-claims · read-through |
+| `evals/run-work-store-fixtures.ts` | T2 | system-verify repair: 6 strict-null errors from SPRINT-111 `18330a1` | Low | tsc 0 errors · harness 21/0 |
 
 ## Retro
+
+**Retrieval check:** one hit and one miss. **Hit:** L-221 (enumerate every runner of what you change) fired before dispatch and found
+T2's missing Shell oracle (`check-doc-caps.sh`, the authority) and two parity harnesses, before any build. L-220 (read the ADR first) fired at
+G2 on ADR-048. **Miss:** L-218, cited in SPRINT-111's D4, did not stop a `typecheck` red from sitting on `main` from `577edd2` to this close.
+After the merge the coordinator re-ran the harness, not the typecheck leg, and that sprint's system-verify ran on a trial merge taken
+before its last fix. L-218 is now at count 2, a promotion candidate.
+
+**Cost:** coordinator (Opus) + 2 Sonnet builder lines (T1: 4 fix rounds · T2: 4 fix rounds) + ~10 Codex passes in hybrid mode. Two Codex
+runs could not read files, and one backgrounded its task and had to be fetched. Dispatched-agent tokens ≈ 1.0M (builders ≈ 0.8M,
+review ≈ 0.2M). Delivered: 2 members, 6 of 6 DoD, EPIC-017 Closed-when 3 and 4 (now 5 of 10), and ADR-050, which lowers the bar for
+maintainer-only guards from here on.
+
+**Worked**
+- Asking the owner by class rule, not row by row: 11 rulings decided 60 guards.
+- Codex caught what an author cannot: CLAUDE.md actions lost in the slim (3 rounds), the audit's wrong engine-call premise, missed catches
+  (G17), and a whole 72-file family (K01) outside both selectors. A third selector of a different kind is what found K01 (L-198).
+- Pre-dispatch enumeration of the checker's runners (L-221) moved a scope discovery from mid-build to before G2 closed.
+
+**Friction**
+- Codex's sandbox access varied between runs (it read git in one run, failed to read in the next). The hybrid "coordinator pastes inline"
+  route worked but costs coordinator context.
+- The full gate exceeds both the default budget and the foreground ceiling, so system-verify needs per-harness completion runs (TD-143 lineage).
+
+**Pattern candidate**
+- L-218 (count 2): promote at the next promote, placed where merges happen (the orchestrator's merge-back step: "after each merge, run the
+  full default gate's cross-cutting legs, typecheck included, not a hand-picked subset").
+- L-223 (count 1): watch.

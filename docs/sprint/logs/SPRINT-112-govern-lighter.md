@@ -97,3 +97,12 @@ were undeclared (the builder reported them as outside-Layers edits and the coord
 **Repair (coordinator, inline: type-only):** `?? ""` / `?? f` fallbacks where runtime already guarantees a value. `tsc --noEmit` 0 errors;
 `work-store-fixtures: 21 pass, 0 fail` unchanged. Attributed to T2 (gate hygiene). **Layers amended:** T1 gains the 3 companions + the removed
 table; T2 gains `evals/run-work-store-fixtures.ts`.
+
+### 2026-10-03 | close | 2 of 2 members in done/, 6 of 6 Done-when; EPIC-017 Closed-when 3 and 4 met (now 5 of 10)
+- Close by reference: `check-sprint-by-reference` 3 pass, 0 fail. System-verify on main `d8dd35c`: `QA-CHECK: 288 pass, 4 fail`, TRUNCATED (568 s
+  of 555). It found a SPRINT-111 typecheck regression (repaired `6dc5cd2`) and undeclared T1 Layers (amended `cded193`). The rest are the budget
+  and the foreign EPIC-016 WIP. The 3 unrun harnesses plus typecheck-population were run alone: 21/0 · 29/0 · 23/0 · 1/0. `tsc --noEmit` 0 errors.
+- Retro routed. Shipped → CHANGELOG § SPRINT-112. Debt → TD-214 (skills name repo-only `scripts/` paths, L-015; owner ruling Q10). Follow-up
+  → TASK-399 (EPIC-014: cut or finish the TS engine port, K01; `origin: close-retro`). Learnings → L-218 at count 2 (retrieval miss) · L-223.
+  Ids were derived from the maxima (TD-213 · TASK-398 · L-222) with 0 hits for the new ones. EPIC-017: row + Closed-when 3 and 4 `[x]`; the epic stays active.
+- No handoff entry to reconcile. No release (D3).

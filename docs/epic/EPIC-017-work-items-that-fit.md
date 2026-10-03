@@ -2,7 +2,7 @@
 epic: 017
 slug: work-items-that-fit
 owner: Maintainer
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 status: active
 member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111, SPRINT-112]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -198,7 +198,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | [SPRINT-109](../sprint/archive/SPRINT-109-unlock-the-critical-path.md) | Unlock the critical path | closed `6761016` | Spec 0.12.0 describes the store; caps measure tokens (ADR-048, budget 16087 — half of CW 4); four guards read member files (part of CW 2). No Closed-when fully met. |
 | [SPRINT-110](../sprint/archive/SPRINT-110-retarget-the-gate.md) | Retarget the gate | closed `370fd9f` | Layers guards, qa-check, night-run and the engine read the store (6 of CW 2's 7 guard retargets done; `381`/`380` remain); a v2 tree needs `bun` (ADR-049). No Closed-when fully met. |
 | [SPRINT-111](../sprint/archive/SPRINT-111-delete-todo-md.md) | Delete TODO.md | closed `47f0595` | **Met Closed-when 2**: migrate proven on a real copy and run by an agent on this repo, 15 legacy tasks moved onto the store, `TODO.md` deleted, and every reader retired. S11.TODOCAP was kept as a note (ADR-034); spec 0.13.0. `371` now waits on `378` · `379` · `384` |
-| [SPRINT-112](../sprint/SPRINT-112-govern-lighter.md) | Govern lighter | active | — (in progress: `384` for CW 3 · 4; `396` is the governance diet, not an EPIC-017 member) |
+| [SPRINT-112](../sprint/SPRINT-112-govern-lighter.md) | Govern lighter | closed `CLOSE_SHA` | **Met Closed-when 3 and 4**: soft caps closed by recorded dispositions (`.cap-dispositions`, Shell+TS parity), CLAUDE.md slimmed with actions kept (~16081 → ~13419 tokens). Also ADR-050 (the proof bar scales with consequence) from the guard audit (`396`, not an epic member) |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
@@ -214,10 +214,12 @@ rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 
 - [x] `TODO.md` is deleted and **no executable reads it** — derived mechanically (zero non-test
       references across `scripts/`, `evals/`, `skills/`), never asked of the author. ✓ SPRINT-111: T3 two-selector census
       over scripts/ + evals/ (0 retired-reader rows, Codex CLEAR) + T5 over skills/ (allowlist only); T4 `git rm TODO.md` (`0ce093c`)
-- [ ] The gate reports **zero OVER-CAP rows**, including the three standing today — each closed by a
-      recorded disposition, not by a diet.
-- [ ] `.claude/CLAUDE.md` is inside a **token** budget with a long-line guard, and at least one rule
-      has been demoted through the disposition route with its destination recorded.
+- [x] The gate reports **zero OVER-CAP rows**, including the three standing today — each closed by a
+      recorded disposition, not by a diet. ✓ SPRINT-112 T2: `.cap-dispositions` holds 4 `retain` rows with reasons and exits;
+      Shell and TS checkers both print 0 OVER-CAP + 4 named `retained:` lines (`7eda91d`)
+- [x] `.claude/CLAUDE.md` is inside a **token** budget with a long-line guard, and at least one rule
+      has been demoted through the disposition route with its destination recorded. ✓ SPRINT-112 T2: 5 rules moved
+      (move-to-reference → LEARNINGS § Durable rules) keeping one-liners with their actions, by owner ruling; ~16081 → ~13419 ≤ 16087 (`81c58fe`)
 - [x] A sprint's progress is **derived** from member files and matches a hand count. ✓ SPRINT-107:
       stamp-selected `## Done when` boxes gave 7 open / 5 ticked, equal to a hand count over the Members
       ids (TASK-360, `f6b3cf4`); close by reference then read 11/0 on the live sprint

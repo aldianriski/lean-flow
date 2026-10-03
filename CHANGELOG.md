@@ -39,6 +39,22 @@ promote, close and retro follow-ups use store task files; the dev-flow/adlc-flow
 `TODO.md` survives only in `migrate`'s v1→v2 path and the v1 refusal text.
 
 ---
+## SPRINT-112 — Govern Lighter (2026-10-03)
+
+EPIC-017's sixth member sprint. **Unreleased**: no version bump (D3).
+
+- **Promoting a learning now requires a disposition.** `/lean-doc-generator promote`'s governance step asks for one per promoted rule
+  (`replace` · `merge` · `move-to-reference` · `automate-into-check` · `retain`), written on the pointer line as `disposition: <kind>`.
+- **`/orchestrator` G2 gains an ADR check.** Before offering a ruling that changes a shipped entry point or a frozen contract, the
+  coordinator reads that entry point's own ADR and names it in the option (L-220, promoted), with a matching red flag.
+- **The proof bar scales with consequence (ADR-050, this repository's process).** A guard change an adopter can hit keeps the full Tier G bar.
+  A maintainer-only one takes a must-FAIL fixture and one run on its real artifact. A guard audit of 60 checks by the defects each actually
+  caught (24 had any) rules 39 keep, 18 freeze and 3 cut; the cuts land in TASK-398.
+- **Soft cap breaches close by a recorded disposition, not a diet.** This repository's `check-doc-caps` honours a root `.cap-dispositions`
+  (`path -- kind -- reason`) for soft over-caps only and names each `retained:` row on every run. Hard caps and the token budget stay FAIL.
+  The always-loaded read set fell from ~16081 to ~13419 tokens, and every rule kept its actions.
+
+---
 ## SPRINT-111 — Delete TODO.md (2026-10-02)
 
 EPIC-017's fifth member sprint. **Unreleased**: no version bump (D3).

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -319,6 +319,14 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-214** severity: low | status: open | created: Sprint-112 (T1 audit, owner ruling Q10)
+  - Summary: **Shipped skills name repo-only `scripts/…` checkers as the mechanism of a step an adopter runs.** For example,
+    `skills/orchestrator/SKILL.md`'s G2 checklist names `scripts/lib/check-verify-reaches.ts`, and review-scoping and night-run name
+    others (G18 · S03 · S05). An adopter has no `scripts/`, so the step's mechanism is absent for them (L-015). The audit keeps these guards
+    under R1(b), because a skill tells agents to use them; the leak is the skill wording, not the guard.
+  - Mitigation (hypothesis): each such step names the check as optional, or "where the host repo has one", or the check ships with the plugin.
+    Census first: grep `skills/` for `scripts/` paths.
 
 - **TD-213** severity: low | status: open | created: Sprint-111 (T4 Codex round 2)
   - Summary: **The engine's retired-row marker regex has only been run under gawk.** `_s2_rows` matches a literal em dash

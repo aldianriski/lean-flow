@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -71,6 +71,12 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-223 [tags: process] [status: active]: **Slimming an always-loaded rule to a pointer moves its history safely, but each imperative it carries has to stay always-loaded, because the reader that needs it is the one that never opens the pointer.** SPRINT-112 T2 moved five CLAUDE.md rules verbatim into LEARNINGS (byte-verified) and kept one-liners. Codex then found, over three rounds, actions the one-liners had dropped: verify the seed landed, parse with ±1 line and the assertion count, a sibling control, a checked-hash restore, `git add -p` then `git diff --cached`, re-reading the structure, scoping an env workaround, the cache read-before-edit rule, the Tier X/P bars and seeding the rejected design. Each was restored as a terse clause, and the always-loaded set still dropped ~16081 → ~13419 tokens. **Durable form: before slimming a rule, list its imperatives (what an agent must DO at the moment of action) and check each one against the kept text. History, sightings and examples may move; actions may not.**
+- seen: 2026-10-03 (SPRINT-112 T2, Codex rounds 1–3 on `.claude/CLAUDE.md`)
+- count: 1
+- promoted: no
+- related: L-221 · L-220 · ADR-050 · TASK-384
+
 ## L-222 [tags: process] [status: active]: **Retiring an entity means a census of every consumer of its registry row, not only of every reader of its file — and the gap surfaces only once the entity is gone.** SPRINT-111 T3 retired every TODO.md reader by two file-name selectors (a literal and its concepts) and cleared an outside review and a Codex gauntlet. But `S2.R-PLACEMENT` never names TODO.md. It walks spec §2's TABLE, where TODO.md is still a row, so it went red only after T4 deleted the file: it flagged three fixture copies as "misplaced". The selector set was the file's name, and the consumer keyed on the registry. The fix has two parts: enumerate the registries that list the entity (spec tables, allowlists, ownership sets), then census the readers of each.
 - seen: 2026-10-02 (SPRINT-111 T3 → found at T4, `28c2381` · `3df4be4`)
 - count: 1
@@ -97,8 +103,11 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ---
 
 ## L-218 [tags: process] [status: active]: **A per-task accept that re-runs only the task's own harness leaves every cross-cutting leg to the close, so a merge can sit red on `main` for the rest of the sprint.** SPRINT-109 accepted four Tier G tasks, each after its own fixtures, seeded breaks and an outside review went green on `main`. The close's first full gate found three FAILs those merges had introduced: `typecheck` (TS2345: T3 made `Tree.commit` optional, and a call site still tested `!== null`), `corpus metadata` (ADR-048 tagged outside the TAGS vocabulary) and a STALE knowledge index (a new ADR, never regenerated). None belonged to any task's harness, so no accept check covered them. `typecheck` could not have run anywhere but `main`, because the worktrees have no `tsc` (TD-194). A fourth finding was older still: a layers-completeness FAIL on the Plan itself, present from `plan_commit`, which the promote log had recorded as PASS. It hid all sprint because no full gate completed until close. **Durable form: after each merge, the coordinator runs the fast cross-cutting legs on `main` (`typecheck` · corpus metadata · the knowledge-index `--check` · layers-completeness over the sprint file), not only the task's harness.** They take seconds. The full gate that otherwise finds them takes about ten minutes, truncates at its budget, and on this host has been killed before printing a verdict.
-- seen: 2026-09-29 (SPRINT-109 close, system-verify: a reaper-killed partial run, then a truncated default run)
-- count: 1
+- seen: 2026-09-29 (SPRINT-109 close, system-verify: a reaper-killed partial run, then a truncated default run) · 2026-10-03 (SPRINT-112 close,
+  system-verify: `typecheck` red on 6 strict-null errors in `evals/run-work-store-fixtures.ts`, introduced by SPRINT-111's T5 follow-up
+  `18330a1` and on `main` since `577edd2`. SPRINT-111's D4 cited this rule; after each merge the coordinator re-ran the harness and a
+  hand-picked set of legs, never `typecheck`. Its own system-verify gate had run on a trial merge taken before the last fix.)
+- count: 2
 - promoted: no
 - related: L-165 (outside review covers the task's surface, not the repo's) · L-120 (read the gate's own verdict line) · L-067 (a result across an environment boundary) · TD-194
 
