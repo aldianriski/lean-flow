@@ -37,6 +37,8 @@ skills/           14 skills (auto-discovered at root)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · development/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md
                   · research/ · qa/
+  work/             <status>/TASK-NNN-<slug>.md — the task store, status = folder (backlog · todo · in_progress · review · done · cancel);
+                    a sprint lists its members by reference (## Members)
   epic/             EPIC-NNN-<slug>.md + INDEX.md — multi-sprint outcomes (ADR-014 era; archive/ once closed)
   sprint/           SPRINT-NNN-<slug>.md (Plan, 400 hard) · logs/ (Execution Log, uncapped — ADR-014)
                     · archive/ + archive/logs/ (the pair moves together at close) · INDEX.md

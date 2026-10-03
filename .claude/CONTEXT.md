@@ -23,7 +23,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (open a multi-sprint outcome) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — bundles templates + standard; **creates** every core doc, `/task-decomposer` consumes them |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
 | `/task-decomposer` | feed | intent / ticket / PRD / epic-slice → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake). **Consumes docs, never creates them** |
-| `/triage` | groom | re-prioritise + state the Backlog; flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
+| `/triage` | groom | re-prioritise + state the backlog (`docs/work/backlog/`); flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
 | `/prototype` | explore | throwaway code to answer one design question; capture → ADR/PRD, delete |
 | `/tdd` | test-first | build NEW behaviour test-first — vertical-slice red-green-refactor |
 | `/diagnose` | fix | 6-phase systematic debugging with a regression test |
@@ -106,7 +106,7 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 - **A sprint commit's SUBJECT is how leg 15 attributes it, so the subject is load-bearing, not prose.** `check-layers-observed` maps each commit in `plan_commit..HEAD` to a task via, in order: a `Task:` trailer · `sprint(NNN) Tn:` · `merge(...): Tn` · a trailing `(SPRINT-NNN Tn)` (the LAST one, if several) · `sprint(NNN) Tn <qualifier>:` · bare `sprint(NNN):` = COORD · all-governance-files = GOVERNANCE. **Anything else is `UNATTRIBUTED` and the gate reddens.** So work done inside a sprint commits as `sprint(NNN) Tn: …` (or carries a `Task:` trailer); `research:` / `todo:` / `fix(...)` prefixes are for commits made *outside* an active sprint's range. And the files in that commit must be covered by **that task's** `Layers:` — a mixed-concern commit that touches another task's files fails even with a correct subject. SPRINT-103 hit both halves (L-151: the convention was real, enforced, and written nowhere a committer reads).
 - **Promote and close run the OPT-IN profile** — `QA_FULL=1 sh scripts/qa-check.sh`, not the bare gate. The default profile deliberately does **not** compare the TS engine against the Shell oracle (ADR-039): §4 differential parity lives in the opt-in set, so a green bare gate says nothing about TS/Shell agreement. Parity is mandatory at exactly these two moments plus any full-profile run, and this line is where that becomes reachable — ADR-039 asserted the mandate for a sprint while **nothing in any procedure read it** (`QA_FULL` had zero hits outside the ADR), which is L-020's shipping-≠-wiring, caught by an independent review rather than by the author.
 - A task's **`Layers:` is a live declaration, corrected per task — not a frozen prediction to defend.** Written at promote, it cannot name the files implementation invents; a mid-sprint `Layers:` edit is the expected cost of declaring before the work, so log it, declare it, continue (L-100).
-- **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream); cross-stream file overlap → coordinate, never parallel-build. **Disjoint tasks may parallel-build in isolated worktrees** (one `Agent(isolation:"worktree")` per task + coordinator merge-back queue → `orchestrator/references/dispatch.md`); L-042's per-hunk staging rule (`git add -p` + verify `git diff --cached`, never a plain `git add <shared>` over another's WIP) binds **intra-tree** — one shared working tree, or the coordinator staging merge resolutions. Single-stream omits `stream:`.
+- **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one active sprint per stream); cross-stream file overlap → coordinate, never parallel-build. **Disjoint tasks may parallel-build in isolated worktrees** (one `Agent(isolation:"worktree")` per task + coordinator merge-back queue → `orchestrator/references/dispatch.md`); L-042's per-hunk staging rule (`git add -p` + verify `git diff --cached`, never a plain `git add <shared>` over another's WIP) binds **intra-tree** — one shared working tree, or the coordinator staging merge resolutions. Single-stream omits `stream:`.
 
 ## Doc standard
 
@@ -127,17 +127,21 @@ ask which flows can hit the failure, place it where all of them read (a skill re
 
 ## Task entry shape
 
+One file per task, `docs/work/<status>/TASK-NNN-<slug>.md` — status is the folder, never a field. Full schema → `skills/task-decomposer/references/task-file.md`.
+
 ```
-- [ ] TASK-NNN — <verb-first title>  [size: M] [risk: med] [HITL|AFK]
-      class:     decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
-      authority: J0 | J1 | J2   (whose authority it runs on — declared at promote/G2; ABSENT reads as J2)
-      done-when: <observable outcome>
-      touches:   <files / layers>
-      depends-on: <TASK-NNN/Tn list, or none>
-      assumes:   <key assumptions, or none>
-      tracker:   <ticket URL, or none — justification>
-      origin:    decomposer | close-retro | triage-bug | manual   (where the task came from — set by whoever files it)
-      state:     ready | needs-info | blocked   (Backlog only; set by /triage)
+---
+id: TASK-NNN
+title: "<verb-first title>"
+epic: EPIC-NNN · sprint: SPRINT-NNN   # each only when set (sprint by promote)
+priority: P0-P3 · size: S|M|L · risk: low|med|high · autonomy: HITL|AFK · tier: G|X|P
+class:     decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
+authority: J0 | J1 | J2   (whose authority it runs on — declared at promote/G2; ABSENT reads as J2)
+origin:    decomposer | close-retro | triage-bug | manual   (where the task came from — set by whoever files it)
+state:     ready | needs-info | blocked   (backlog only; set by /triage)
+depends-on: [TASK-NNN]
+---
+## Done when    <- the task's DoD, observable outcomes as `- [ ]`
 ```
 
 **States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal to `HITL`/`AFK` (who acts).
