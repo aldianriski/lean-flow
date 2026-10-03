@@ -53,3 +53,27 @@ status: current
       tracker:    none
       origin:     manual
       state:      ready
+
+- [ ] TASK-934 — Pin the retry ceiling  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:G(pins the ceiling)
+      authority:  J1
+      done-when:  (A) the ceiling is set; (B) the ceiling is logged
+      touches:    scripts/upload.ts
+      depends-on: none
+      assumes:    none
+      tracker:    none
+      origin:     manual
+      state:      ready
+
+- [ ] TASK-935 — Log the upload step's outcome  [size: S] [risk: low] [AFK]
+      class:      execution
+      tier:       X
+      authority:  J1
+      done-when:  a) log the attempt; b) log the outcome
+      touches:    scripts/upload.ts
+      depends-on: TASK-931 — after its rollout
+      assumes:    none
+      tracker:    none
+      origin:     manual
+      state:      ready

@@ -155,3 +155,11 @@ named finding (the other two checks are the sibling control on the same tree): `
 → `enum-not-plain: TASK-931 class=…` · `expected-normalised-depends-prose/` → `depends-prose-kept: TASK-932 …` ·
 `expected-normalised-lettered-merged/` → `lettered-box-count: TASK-933 want 3 got 1`. As everywhere in this
 harness, these prove the invariants of a correct run's output, **not** an agent reading the prose.
+
+**Round 2 (Codex review).** The checks now demand the exact carried form: `- <field>: <decoration>` bullets in
+`## Why`/`## Assumes`, the full `- depends-on: <original>` line, an annotated id list kept in the array
+(`TASK-935`), and every lettered clause as its own box with its own text. Rows `TASK-934` (`tier:G(…)` with no
+space, `(A)`/`(B)`) and `TASK-935` (`a)`/`b)`, annotated id list) vary the SELECTION (L-186). New must-FAIL trees,
+one defect each: `-lost-label` (`decoration-not-labelled`) · `-truncated-value` (`depends-line-not-verbatim`) ·
+`-replaced-clause` (`lettered-clause-missing`) · `-selection-nospace` · `-selection-upper` · `-selection-bare-paren`
+(each names the row the parser must reach) · `-annotated-ids-dropped` (`depends-ids-lost`).

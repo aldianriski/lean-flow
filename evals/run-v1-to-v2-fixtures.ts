@@ -77,9 +77,6 @@ const INTERRUPTED_PARTIAL = join(FIXTURES, "interrupted-partial");
 const INTERRUPTED_PARTIAL_DIVERGED = join(FIXTURES, "interrupted-partial-diverged");
 const INPUT_NORMALISE = join(FIXTURES, "input-normalise");
 const EXPECTED_NORMALISED = join(FIXTURES, "expected-normalised");
-const EXPECTED_NORMALISED_COMMENT = join(FIXTURES, "expected-normalised-comment-in-frontmatter");
-const EXPECTED_NORMALISED_DEPENDS = join(FIXTURES, "expected-normalised-depends-prose");
-const EXPECTED_NORMALISED_LETTERED = join(FIXTURES, "expected-normalised-lettered-merged");
 
 // Real docs/work/README.md, or (discrimination proof only) a scratch copy named by this env var --
 // never the real file mutated in place.
@@ -823,7 +820,7 @@ function v1Rows(root: string): V1Row[] {
       rows.push(cur);
       continue;
     }
-    const kv = line.match(/^\s+([a-z-]+):\s+(.*\S)\s*$/);
+    const kv = line.match(/^\s+([a-z-]+):\s*(.*\S)\s*$/);
     if (cur && kv) cur.fields.set(kv[1]!, kv[2]!);
     else if (!line.trim()) cur = cur && /^\s/.test(line) ? cur : null;
   }
@@ -844,12 +841,17 @@ function v2FileFor(root: string, id: string): { fm: Map<string, string>; body: s
 
 const DECORATED_KEYS = ["class", "tier", "authority", "origin", "state"] as const;
 
+// The `## Why` / `## Assumes` lines of a v2 file, trimmed -- bullets are matched whole, never by substring.
+function carriedLines(body: string): string[] {
+  return `${extractSection(body, "## Why") ?? ""}\n${extractSection(body, "## Assumes") ?? ""}`.split(/\r?\n/).map((l) => l.trim());
+}
+
 function enumFindings(inputRoot: string, expectedRoot: string): string[] {
   const findings: string[] = [];
   for (const row of v1Rows(inputRoot)) {
     const out = v2FileFor(expectedRoot, row.id);
     if (!out) { findings.push(`no-file: ${row.id}`); continue; }
-    const carried = `${extractSection(out.body, "## Why") ?? ""}\n${extractSection(out.body, "## Assumes") ?? ""}`;
+    const lines = carriedLines(out.body);
     for (const key of DECORATED_KEYS) {
       const raw = row.fields.get(key);
       if (raw === undefined) continue;
@@ -857,36 +859,55 @@ function enumFindings(inputRoot: string, expectedRoot: string): string[] {
       const decoration = raw.slice(plain.length).trim();
       if (decoration === "") continue;
       if (out.fm.get(key) !== plain) findings.push(`enum-not-plain: ${row.id} ${key}=${out.fm.get(key) ?? "(absent)"}`);
-      if (!carried.includes(decoration)) findings.push(`decoration-lost: ${row.id} ${key}`);
+      if (!lines.includes(`- ${key}: ${decoration}`)) findings.push(`decoration-not-labelled: ${row.id} ${key}`);
     }
   }
   return findings;
 }
 
+const BARE_IDS = /^TASK-\d+(\s*,\s*TASK-\d+)*$/;
+
 function dependsFindings(inputRoot: string, expectedRoot: string): string[] {
   const findings: string[] = [];
   for (const row of v1Rows(inputRoot)) {
     const raw = row.fields.get("depends-on");
-    const qualifier = raw?.match(/^none\s*[—-]+\s*(.+)$/)?.[1];
-    if (qualifier === undefined) continue;
+    if (raw === undefined || raw === "none" || BARE_IDS.test(raw)) continue; // bare: no annotation to carry
     const out = v2FileFor(expectedRoot, row.id);
     if (!out) { findings.push(`no-file: ${row.id}`); continue; }
-    if (out.fm.has("depends-on")) findings.push(`depends-prose-kept: ${row.id} depends-on=${out.fm.get("depends-on")}`);
-    if (!(extractSection(out.body, "## Assumes") ?? "").includes(qualifier)) findings.push(`qualifier-lost: ${row.id}`);
+    const listed = raw.match(/^TASK-\d+(\s*,\s*TASK-\d+)*/)?.[0];
+    if (listed === undefined) {
+      // qualified `none`: the field is omitted
+      if (out.fm.has("depends-on")) findings.push(`depends-prose-kept: ${row.id} depends-on=${out.fm.get("depends-on")}`);
+    } else {
+      // annotated id list: the ids stay in the array
+      const want = `[${listed.split(/\s*,\s*/).join(", ")}]`;
+      if (out.fm.get("depends-on") !== want) findings.push(`depends-ids-lost: ${row.id} depends-on=${out.fm.get("depends-on") ?? "(absent)"}`);
+    }
+    if (!carriedLines(out.body).includes(`- depends-on: ${raw}`)) findings.push(`depends-line-not-verbatim: ${row.id}`);
   }
   return findings;
+}
+
+// A lettered done-when: `;`-separated pieces that each start `(a)` / `(A)` / `a)`.
+function letteredClauses(raw: string | undefined): string[] | null {
+  if (raw === undefined) return null;
+  const pieces = raw.split(/\s*;\s*(?=\(?[A-Za-z]\))/).map((p) => p.trim());
+  return pieces.length >= 2 && pieces.every((p) => /^\(?[A-Za-z]\)/.test(p)) ? pieces : null;
 }
 
 function letteredFindings(inputRoot: string, expectedRoot: string): string[] {
   const findings: string[] = [];
   for (const row of v1Rows(inputRoot)) {
-    const raw = row.fields.get("done-when");
-    const clauses = raw?.match(/\([a-z]\)/g);
-    if (!clauses || clauses.length < 2) continue;
+    const clauses = letteredClauses(row.fields.get("done-when"));
+    if (!clauses) continue;
     const out = v2FileFor(expectedRoot, row.id);
     if (!out) { findings.push(`no-file: ${row.id}`); continue; }
-    const boxes = (extractSection(out.body, "## Done when") ?? "").match(/^- \[[ x]\] /gm) ?? [];
-    if (boxes.length !== clauses.length) findings.push(`lettered-box-count: ${row.id} want ${clauses.length} got ${boxes.length}`);
+    const boxes = [...(extractSection(out.body, "## Done when") ?? "").matchAll(/^- \[[ x]\] (.*\S)\s*$/gm)].map((m) => m[1]!.trim());
+    if (boxes.length !== clauses.length) {
+      findings.push(`lettered-box-count: ${row.id} want ${clauses.length} got ${boxes.length}`);
+      continue;
+    }
+    for (const clause of clauses) if (!boxes.includes(clause)) findings.push(`lettered-clause-missing: ${row.id} ${clause}`);
   }
   return findings;
 }
@@ -902,20 +923,30 @@ for (const [name, fn] of NORM_CHECKS) {
   report(name, findings.length === 0, findings.length === 0 ? `expected-normalised/ satisfies ${name}` : findings.join("; "));
 }
 
-// must-FAIL siblings: one broken tree per check; that check reddens with its NAMED finding while
-// the other two checks stay green on the SAME tree (sibling control).
-for (const [tree, root, culprit, named] of [
-  ["comment-in-frontmatter", EXPECTED_NORMALISED_COMMENT, "normalise-enum-plain", "enum-not-plain: TASK-931 class=execution   # was \"spike\" before G2"],
-  ["depends-prose", EXPECTED_NORMALISED_DEPENDS, "normalise-depends-prose-to-assumes", "depends-prose-kept: TASK-932 depends-on=none — but the rollback script must exist first"],
-  ["lettered-merged", EXPECTED_NORMALISED_LETTERED, "normalise-lettered-split", "lettered-box-count: TASK-933 want 3 got 1"],
+// must-FAIL siblings: one broken tree per defect; the culprit check reddens with its NAMED finding
+// while the other two checks stay green on the SAME tree (sibling control). The `selection-*` trees
+// vary which input rows the checks must REACH (no-space `tier:G(x)`, `(A)`, bare `a)`) rather than
+// the verdict (L-186); `annotated-ids-dropped` is the id-list-with-annotation branch of rule 6.
+for (const [suffix, culprit, named] of [
+  ["comment-in-frontmatter", "normalise-enum-plain", "enum-not-plain: TASK-931 class=execution   # was \"spike\" before G2"],
+  ["depends-prose", "normalise-depends-prose-to-assumes", "depends-prose-kept: TASK-932 depends-on=none — but the rollback script must exist first"],
+  ["lettered-merged", "normalise-lettered-split", "lettered-box-count: TASK-933 want 3 got 1"],
+  ["lost-label", "normalise-enum-plain", "decoration-not-labelled: TASK-931 tier"],
+  ["truncated-value", "normalise-depends-prose-to-assumes", "depends-line-not-verbatim: TASK-932"],
+  ["replaced-clause", "normalise-lettered-split", "lettered-clause-missing: TASK-933 (b) exit 1 on a transient failure after retries"],
+  ["selection-nospace", "normalise-enum-plain", "enum-not-plain: TASK-934 tier=G(pins the ceiling)"],
+  ["selection-upper", "normalise-lettered-split", "lettered-box-count: TASK-934 want 2 got 1"],
+  ["selection-bare-paren", "normalise-lettered-split", "lettered-box-count: TASK-935 want 2 got 1"],
+  ["annotated-ids-dropped", "normalise-depends-prose-to-assumes", "depends-ids-lost: TASK-935 depends-on=(absent)"],
 ] as const) {
+  const root = join(FIXTURES, `expected-normalised-${suffix}`);
   for (const [name, fn] of NORM_CHECKS) {
     const findings = fn(INPUT_NORMALISE, root);
     if (name === culprit) {
       const ok = findings.length === 1 && findings[0] === named;
-      report(`${name} on ${tree} (must-FAIL sibling)`, ok, ok ? `reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`);
+      report(`${name} on ${suffix} (must-FAIL sibling)`, ok, ok ? `reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`);
     } else {
-      report(`${name} on ${tree} (sibling control, must stay PASS)`, findings.length === 0, findings.length === 0 ? "still green on the tree that reddens the sibling check" : `also red: [${findings.join("; ")}]`);
+      report(`${name} on ${suffix} (sibling control, must stay PASS)`, findings.length === 0, findings.length === 0 ? "still green on the tree that reddens the sibling check" : `also red: [${findings.join("; ")}]`);
     }
   }
 }

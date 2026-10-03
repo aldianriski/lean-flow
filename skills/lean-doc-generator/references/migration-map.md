@@ -39,7 +39,7 @@ don't hand-reconcile, and you're not lost in your own existing code.
    cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, sprint `status: active` + `## Members`,
    `/prime` read-order). Flag anything ambiguous instead of guessing.
    - **After each relocate/rename**: `grep` the old filename/path across the repo and fix every inbound link before moving to the next file.
-4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, every sprint `## Members` id resolves to a task file.
+4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, every sprint `## Members` id resolves to a task file — a genuinely missing one is an owner-action in the report, not a failed run (§ v1 → v2, by-reference sprint).
 
 ## Re-run (update sync — report-only)
 
@@ -187,7 +187,7 @@ under the row → `## Why`. "Verbatim" in the table's Note column means the *val
 
 **Field-shape rules** (each one was an agent stop on the first run; owner-ruled, SPRINT-111):
 
-1. **Enums are plain.** Frontmatter carries the bare value only (`class: execution`, `tier: G`). Any inline `# comment`,
+1. **Enums are plain.** Frontmatter carries the bare value only (`class: execution`, `tier: G`; `tier:G(x)` with no space is the same field). Any inline `# comment`,
    trailing qualifier or parenthetical moves **verbatim** to `## Why` as a `- <field>: <text>` bullet (to `## Assumes` where
    the text is an assumption).
 2. **Missing `class:` / `tier:` / `authority:`** → flag the row in the plan; the owner supplies the value before apply. The
@@ -196,9 +196,11 @@ under the row → `## Why`. "Verbatim" in the table's Note column means the *val
    long slug can exceed `MAX_PATH` (260) with the repo path; the owner shortens it by hand, migrate does not.
 4. **No `done-when:`** → one placeholder box, flagged for the owner. Prefer a box written from the row's own text with the owner's
    approval; otherwise `- [ ] TODO: owner`.
-5. **Lettered clauses** — a `done-when:` written `(a) … ; (b) … ; (c) …` → one `- [ ]` box per lettered clause, letter kept.
-6. **`depends-on:` carrying prose** (`none — but …`) → omit the field; write one `## Assumes` line `- depends-on: <original value>`.
-   An id list (`TASK-1, TASK-2`) stays an array.
+5. **Lettered clauses** — a `done-when:` written `(a) … ; (b) … ; (c) …` (also `(A)` and `a)`) → one `- [ ]` box per lettered
+   clause, label and clause text kept verbatim, each clause its own box.
+6. **`depends-on:` with a qualifier.** Omit the field **only** for a qualified `none` (`none — but …`). An id list with an
+   annotation (`TASK-1 — after its rollout`) keeps its ids in the array. Either way the annotation moves verbatim to one
+   `## Assumes` line `- depends-on: <original value>`. A bare id list or bare `none` needs no line.
 7. **`state: needs-info`** → add `- **open:** <the question, from the row's own text>` to `## Assumes`.
 
 ### Plan-task mapping (active sprint)
@@ -207,7 +209,7 @@ under the row → `## Why`. "Verbatim" in the table's Note column means the *val
 members already live in `docs/work/`, so its `### Tn` are **not mapped** (they hold sprint-scoped meta,
 never a DoD). Resolve each member **by id in any status folder** — a `## Members` path whose file moved
 folder (`todo/` → `done/`) is found, not missing. Only an id with no file in any folder is reported in the
-plan; that is a report, never a failure, and the sprint stays skipped either way. Member files are
+plan; that is an **owner-action in the report**, not a migration failure: success does not depend on it, and the sprint stays skipped either way. Member files are
 **never written or modified**: the run leaves every pre-existing `docs/work/**` file byte-identical.
 
 Each `### Tn — title `[size · risk · class · HITL · Jn]`` block in the sprint file's § Plan:
@@ -291,11 +293,12 @@ ingests the stray task.
 
 ### Verification (run every time, plan and apply alike)
 
-- **Id set, diffed both ways.** `v1_ids` = the id of every Backlog task **row header** (`- [ ] TASK-NNN — …`; an id merely
-  mentioned in prose never counts) + every Plan `Tn`'s `Cites:` id, taken before the run (by-reference sprints contribute none). `v2_ids` = every id now present as a `docs/work/**/
-  TASK-NNN-*.md` file (written this run, or already-present/resumed). `v1_ids ∖ v2_ids` and
-  `v2_ids ∖ v1_ids` must both be empty — a count alone does not prove this (two different sets of
-  the same size still passes a count check).
+- **Id set, diffed both ways.** `meant` = the id of every Backlog task **row header** (`- [ ] TASK-NNN — …`; an id merely
+  mentioned in prose never counts) + every by-value Plan `Tn`'s `Cites:` id + each id newly allocated this run, taken before the
+  run (by-reference sprints contribute none). `pending` = `meant` ids not written yet (withheld for a flagged field, or at an
+  unresolved conflict) — **listed in the report, never counted as an inequality**. `resolved` = `meant` ids whose file this run wrote
+  or resumed (already present, identical). `meant ∖ (resolved ∪ pending)` and `resolved ∖ meant` must both be empty — a count alone
+  does not prove it. A pre-existing store file outside `meant` (a by-reference member, an unrelated task) is neither; Preservation covers it.
 - **Ticked-box count, before vs. after.** Sum of `- [x]` under every by-value Plan `Tn`'s DoD (before) must
   equal the sum of `- [x]` under `## Done when` across the files those `Tn`s mapped to (after,
   including resumed files whose count was never touched by this run). A mismatch on a *resumed*
