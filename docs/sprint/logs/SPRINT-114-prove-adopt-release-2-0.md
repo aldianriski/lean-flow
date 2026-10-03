@@ -187,3 +187,10 @@ killed by verified command line only.
 **Findings for the Retro:** under `--plugin-dir`, `/prime`'s `Skills:` row reads `n/a`, because the base-dir path has no version even though
 `plugin.json` sits in it; TASK-018's verbatim `## Why` still points at "§ Standing facts above", which now lives in CONTEXT.md.
 **Branch:** local only; pushing it to workdoo's remote is owner-reserved.
+
+### 2026-10-03 | progress | T1 (TASK-371): Codex CLEAR on the workdoo migration diff; coordinator spot-check agrees → done
+Codex static review of `704c6be..629f91c` (v1 TODO.md, full diff, approved plan and owner rulings inlined; ~101 KB, 1724 lines). Threat
+model: content lost or altered · ruling not applied · sprint conversion broke · links broken. Result: `CODEX: CLEAR`. **The verdict came
+back bare, with no per-class reasoning**, so the coordinator ran an independent check of the riskiest class (content loss) before accepting it:
+every v1 row's `done-when:` searched for in its task file. 9 rows carry one and all 9 are found; the 3 rows split on `;` were checked part by
+part (012 3/3 · 014 3/3 · 015 2/2). The other 2 (011, 018, superseded) carry none and got the procedure's `TODO: owner`. Review accepted.
