@@ -28,3 +28,6 @@ applied in `df8982d`):
 - **handoff ledger:** none.
 **Review ruling (owner):** the Codex loop covers consequential Tier G and every shipped skill/template change. Maintainer-only work takes ADR-050's
 bar plus a coordinator self-review (D3). G1/G2 are not signed yet.
+
+### 2026-10-03 | progress | plan_commit recorded: 4f21040
+The `plan locked` commit is `4f21040`; this entry and the frontmatter field land in the next commit.
