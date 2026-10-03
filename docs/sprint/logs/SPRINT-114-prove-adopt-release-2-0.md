@@ -89,3 +89,12 @@ the owner action (workdoo's SPRINT-009 promote is uncommitted), which would idle
 `main`), once the promote full gate is green; (2) the workdoo branch migration, still waiting on the owner. T3 is dispatched after step 1,
 worktree-isolated. No `Layers:` change (the rc commit stays off `main`), and no task or DoD is added or removed. T2 still follows T1 step 2.
 **Re-confirm G2:** owner ruled 2026-10-03: "Cut RC, start T3".
+
+### 2026-10-03 | progress | promote full gate (`QA_FULL=1`, detached, run as its own call): `QA-CHECK: 308 pass, 3 fail`, untruncated, 1983 s
+Read from the gate's own verdict line. Each FAIL dispositioned, none introduced by this sprint:
+- `prose-density` on EPIC-016 and `layers observed` naming EPIC-016 as undeclared: both read the **uncommitted EPIC-016 edit from another
+  session** in the working tree. Re-run in a clean detached worktree of HEAD `d2c8721` (L-182; `core.longpaths` scoped to that one `git`
+  call): prose-density 31 PASS / 0 FAIL, layers-observed 1 PASS / 0 FAIL, with EPIC-016 pristine there.
+- `run-orchestrator-store-fixtures.ts` text-contract: **TD-211**, red since SPRINT-110 `dccdca1` and filed at SPRINT-111. The harness runs
+  only in the opt-in profile, and the last three closes ran the truncated default profile, so it was carried, not seen.
+**Owner ruling:** cut the RC now from the committed tree and carry TD-211; it must be green before T6 (D4).
