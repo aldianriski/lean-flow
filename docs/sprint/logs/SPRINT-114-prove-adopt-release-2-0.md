@@ -40,3 +40,6 @@ Owner ruling: the criterion names the queue at the branch base and records its c
 ruling on timing: T1 branches only once workdoo's SPRINT-009 promote is committed, and T2/T4 write to workdoo main only inside a window the
 owner opens (D2).
 **Open for G2:** how the release candidate is cut (A1); whether T3 is *consequential* G (ADR-050).
+
+### 2026-10-03 | progress | plan_commit recorded: cd8d355
+The `plan locked` commit is `cd8d355`; this entry and the frontmatter field land in the next commit.
