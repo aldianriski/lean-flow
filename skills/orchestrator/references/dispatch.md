@@ -594,8 +594,10 @@ allowlist derivation in `night-run.md` Part 1; that list is built from this sect
 here is a step to add there.
 
 Review two-tier: **pre-merge** — full scoped review of each branch's diff, against that task's own
-branch (the primary pass). **Post-merge** — an interaction-only smoke check per wave (lint/verify),
-catching what per-branch review can't: cross-task interaction.
+branch (the primary pass). **Post-merge** — after each merge, run the host gate's **cross-cutting legs** on the merged tree
+(typecheck · lint · the repo-wide checkers), never a hand-picked subset or only the task's own harness, catching what per-branch
+review can't: cross-task interaction. System verify then runs on the **final** integrated tree, never on a trial merge taken before
+the last fix (L-218 ×2: a `typecheck` red sat on `main` through a sprint because each merge re-ran only its own harness).
 
 Conflicts: **expected** (overlap map named this file) → re-dispatch that agent to rebase onto the
 new tip. **Surprise** (map missed it) → halt that task only, kick back to G2 — the map was
