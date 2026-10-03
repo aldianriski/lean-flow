@@ -234,3 +234,14 @@ workdoo T4 (TASK-050) on the v2 layout, then complete T2's pin check. SPRINT-009
 would tick SPRINT-009 Plan boxes that the migration already moved into TASK-050.
 **Impact:** T1's proof branch stays retained (merging keeps the ref). workdoo sessions must load the candidate (`--plugin-dir`), because
 1.66.1 against a v2 tree is the inconsistent case T3 recorded. No lean-flow DoD changes.
+
+### 2026-10-03 | progress | T2 design ruled: workers load the candidate via an env-driven plugin dir; workdoo targets a VPS
+**Gap found before T2:** the version probe reuses the workers' own CLI arguments and runs in the worker's checkout, so it reports whatever
+lean-flow *that directory* loads: the user-scope 1.66.1, or nothing under the local guard. Setting the pin to `2.0.0-rc.1` would then hold every
+dispatch. The workers themselves must load the candidate, not only interactive sessions.
+**Owner ruling (2026-10-03):** "workdoo that need to deploy in VPS, for leanflow follow your recommended". Hence an **env-driven plugin
+dir**: when `LEANFLOW_PLUGIN_DIR` is set, the worker args add `--plugin-dir <dir>` and disable the user-scope lean-flow for that process.
+The probe reuses those args, so the pin check observes exactly what workers load. That suits the VPS (set the variable and the pin in its
+environment) and works in any checkout. VPS deployment itself is gated on workdoo `TASK-010`; T2 verifies locally with
+`LEANFLOW_PLUGIN_DIR=D:/Project/lean-flow-rc1` and `LEANFLOW_PLUGIN_VERSION_PIN=2.0.0-rc.1`.
+**Sequencing:** that change lands after workdoo T4 merges, because it touches the same `buildArgs` T4 builds on.
