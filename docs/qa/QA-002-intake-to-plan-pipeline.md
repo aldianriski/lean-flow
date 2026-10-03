@@ -19,7 +19,7 @@ status: current
 3. `/lean-doc-generator promote` → render `docs/sprint/SPRINT-NNN` (`status: active`) listing each task under `## Members` by reference, with only sprint-scoped meta in each Plan `Tn`; each task's DoD stays in its own file's `## Done when`.
 
 ## Expected
-`docs/work/backlog/` gains well-formed task files; a sprint file exists with one `## Members` entry and one `Tn` per promoted task, member DoD `[ ]` in the task files; the sprint is found by `status: active`.
+after step 1 the new task files exist in `docs/work/backlog/`; after step 3 the promoted files sit in `docs/work/todo/` with `sprint: SPRINT-NNN` stamped (`git mv` in its own commit) and only unpromoted tasks remain in `backlog/`; the sprint file has one `## Members` entry and one `Tn` per promoted task, member DoD `[ ]` in the task files, and is found by `status: active`.
 
 ## Result
 pass — exercised on the real repo this session: TASK-009…017 decomposed → triaged (P1/P2/P3) → SPRINT-008 promoted (4 tasks, DoD rendered, pointer set).
