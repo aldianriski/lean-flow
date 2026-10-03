@@ -137,3 +137,12 @@ rc.1 `migrate` (loaded copy `D:\Project\lean-flow-rc1` 2.0.0-rc.1, from `system/
 it stood)` with a field-by-field diff and three owner choices; the plan pre-approval was not read as a choice. Coordinator re-check on
 `D:/t114/v2e`: store file `0c450ae3…` and `TODO.md` `54a4795f…` both equal their pre-run hashes, `git status` 0 on a 1-commit repo, and
 `docs/work/` holds the one original `TASK-901` file only. migration-map.md § Resume / conflict rule held as written. Headless runs: 25 of 30.
+
+### 2026-10-03 | progress | T3 (TASK-372): Codex round 2 -- r1's 4 FIXED; 4 new: 1 fixed (sent back), 3 census-zero → TD-218
+Codex re-review of `d3a1476` (all files inlined; 33 KB prompt): every round-1 finding FIXED with file:line evidence. Four new findings; the
+coordinator ran the confirming commands: F1 (empty frontmatter lets a body `id:` through) → `TASK-777`, confirmed · F3 (must-FAIL oracles
+assert counts, not identity, so `census-dup-xbox` passes on the wrong duplicate) → `passes: true, dups: ["TASK-001"]`, confirmed · F4 (BOM /
+trailing `# comment` → `NOID`) → both `null`, confirmed · F2 (symlinked store file skipped) not run (symlink privilege on this host).
+**Disposition (owner's bounded-review rule):** census of real store files, 73 across three trees: 0 BOM · 0 symlink · 0 commented id · 0 empty
+frontmatter, each detector seed-proven (1/1/1). F1, F2, F4 → **TD-218** (id derived: ledger max 217). **F3 is not a population shape**: it is
+the must-FAIL fixture's own oracle, so it is fixed (sent to the builder). Codex round 3 will be scoped to that one diff.

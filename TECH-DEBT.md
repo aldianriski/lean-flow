@@ -320,6 +320,17 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-218** severity: low | status: open | created: Sprint-114 (T3 Codex round 2, census-zero → TD per owner rule)
+  - Summary: **The layout harness's store census (`evals/run-layout-fixtures.ts`, `frontmatterId`/`census`) misreads three input shapes.**
+    (1) An empty frontmatter (`---` closing straight after the opening `---`) lets a later body `---` end the block, so a body `id:` is read as
+    the task's id: a false green, confirmed (`TASK-777` returned). (2) A symlinked store `*.md` is skipped (`isFile()` rejects the link), so a
+    duplicate behind a link is invisible; not run on this host (symlink creation needs a privilege). (3) A UTF-8 BOM before `---`, or a trailing
+    `# comment` after `id:`, gives `NOID`: a false FAIL, confirmed (both `null`).
+  - **Census 2026-10-03: 0 of 73** real store files (lean-flow `docs/work/` 52 · migrated workdoo copy 10 · `v2b` 11) carry any of the
+    three shapes; each detector was seed-proven to fire (1/1/1). Census-zero → TD, not a fix loop (owner rule).
+  - Mitigation (hypothesis): match the closing `---` at a line start including the immediate-close case, strip a leading BOM, allow a trailing
+    YAML comment, and follow symlinks via `statSync` — each with a must-FAIL fixture under the maintainer-only bar.
+
 - **TD-217** severity: medium | status: open | created: Sprint-114 (T3 real runs, owner ruling)
   - Summary: **`migrate`'s withhold rule is applied inconsistently across runs of the same procedure.** migration-map.md:194 says
     a task missing a field with no source is "withheld … never guessed, never defaulted". In SPRINT-114 T3, the rc.1 `migrate`
