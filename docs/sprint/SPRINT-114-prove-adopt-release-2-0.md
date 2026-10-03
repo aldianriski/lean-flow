@@ -145,5 +145,6 @@ entry is marked BREAKING and carries the upgrade section; nothing is pushed.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/run-layout-fixtures.ts` · `evals/fixtures/layout/` (6 new fixture trees) | T3 | 2.0's both-direction safety retained: stray-write (mixed) state, store census with exact-identity must-FAILs, Codex/Kimi manifest cases | Low | 41/0 fresh clone + autocrlf main · Codex r1→r3 CLEAR · tsc 0 |
 
 ## Retro

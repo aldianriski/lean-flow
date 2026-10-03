@@ -146,3 +146,15 @@ trailing `# comment` → `NOID`) → both `null`, confirmed · F2 (symlinked sto
 **Disposition (owner's bounded-review rule):** census of real store files, 73 across three trees: 0 BOM · 0 symlink · 0 commented id · 0 empty
 frontmatter, each detector seed-proven (1/1/1). F1, F2, F4 → **TD-218** (id derived: ledger max 217). **F3 is not a population shape**: it is
 the must-FAIL fixture's own oracle, so it is fixed (sent to the builder). Codex round 3 will be scoped to that one diff.
+
+### 2026-10-03 | progress | T3 (TASK-372): Codex r3 CLEAR; merged `3f4b66c`; post-merge typecheck red → fixed `19670ac`; (a) (b) (d) ticked, (c) open
+**Codex round 3** (scoped to `58ceec8`, the F3 fix: exact expected identity per census case, sorted comparison): `CODEX: CLEAR`. The wrapper
+flagged that its excerpt was capped at 160 lines; the coordinator checked coverage: the excerpt ran from line 283 to EOF (380), and every
+hunk sits at lines 325–343. Coordinator re-ran Codex's mutation: `identity [TASK-901] WRONG`, 40/1, unmutated 41/0.
+**Merged** `--no-ff` as `3f4b66c` (16 files, all `evals/`). **Post-merge cross-cutting legs (L-218):** the layout harness on main's autocrlf
+checkout reads 41/0; layers-completeness 18 PASS; by-reference 7/0; gen-index current; layers-observed only the foreign EPIC-016 WIP;
+**`tsc --noEmit`: 4 errors** (TS2532/TS2322, strict-null) in the new census, invisible to the builder because worktrees have no `tsc`
+(TD-194). That is L-218's own shape, caught by the post-merge leg it prescribes. Fixed inline by the coordinator (type-only, mechanical:
+`fm[1] ?? ""`, `?? null`, `m[1] ?? ""`); tsc 0, harness 41/0, mutation still caught. `19670ac`.
+**Ticked:** (a) · (b) (tombstone n/a per the scope-change; collision run included) · (d) (`--plugin-dir` stand-in, owner-accepted).
+**Open:** (c) Kimi live install (owner action); Codex is resolved at install/prompt level. TASK-372 stays in `in_progress/` until (c).
