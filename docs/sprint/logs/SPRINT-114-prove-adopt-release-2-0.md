@@ -303,3 +303,16 @@ the surprise entry above).
 signal) across park/permission/verification-check-dispatch/wiring/task-lifecycle-api/app/work-item-store/migrate. Reader against
 lean-flow's own store: TASK-385 `in_progress`, TASK-371 `done`. Throwaway containers removed; workdoo's own `workdoo-postgres` (stopped
 12 days) left untouched; it is why the main checkout's `.env` `DATABASE_URL` fails to connect.
+
+### 2026-10-03 | progress | T6 release committed (`5f62d0f`); full gate killed by host memory pressure, no verdict yet
+4 derived manifests + README footer at `2.0.0` (lockstep PASS); CHANGELOG `v2.0.0` BREAKING with upgrade steps and the measured
+effectiveness verdict; `v1.65.x` → `docs/changelog/CHANGELOG-1.65.1.md`, `v1.64.0` → `CHANGELOG-1.64.0.md` (§11). Rotation proven lossless
+on CRLF-normalised bytes: 453 + 106 + 56 + 2 separators = 617; a first raw `cmp` failed on line endings only (Git Bash `sed` writes LF on
+an autocrlf CRLF working copy). Release == candidate: `skills/`, `templates/`, `spec/` byte-identical to `v2.0.0-rc.1`.
+EPIC-017 Closed-when 6/7/9/10 ticked with qualifiers (7 measured / not demonstrated; 10 under owner ruling); #8 waits on T6.
+**The `QA_FULL=1` gate was stopped by Claude Code's low-memory reaper** (145 PASS / 0 FAIL partial, no verdict line). TASK-373 stays
+unticked in `in_progress/`; it is not re-run without the owner (memory).
+
+### 2026-10-03 | handoff | verify the 2.0.0 release (rerun QA_FULL), tick TASK-373, close SPRINT-114 + EPIC-017
+handoff-status: live
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-114-release.md
