@@ -2,6 +2,7 @@
 id: TASK-385
 title: "Point the EPIC-016 Work & Queue view at the store"
 epic: EPIC-017
+sprint: SPRINT-114
 priority: P1
 size: M
 risk: med

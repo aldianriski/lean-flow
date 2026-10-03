@@ -2,6 +2,7 @@
 id: TASK-365
 title: "Adopt the store in workdoo on a release candidate"
 epic: EPIC-017
+sprint: SPRINT-114
 priority: P1
 size: M
 risk: med

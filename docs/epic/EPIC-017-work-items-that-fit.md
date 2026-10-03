@@ -4,7 +4,7 @@ slug: work-items-that-fit
 owner: Maintainer
 last_updated: 2026-10-03
 status: active
-member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111, SPRINT-112, SPRINT-113]
+member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111, SPRINT-112, SPRINT-113, SPRINT-114]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -200,6 +200,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | [SPRINT-111](../sprint/archive/SPRINT-111-delete-todo-md.md) | Delete TODO.md | closed `47f0595` | **Met Closed-when 2**: migrate proven on a real copy and run by an agent on this repo, 15 legacy tasks moved onto the store, `TODO.md` deleted, and every reader retired. S11.TODOCAP was kept as a note (ADR-034); spec 0.13.0. `371` now waits on `378` · `379` · `384` |
 | [SPRINT-112](../sprint/archive/SPRINT-112-govern-lighter.md) | Govern lighter | closed `5fd8fa0` | **Met Closed-when 3 and 4**: soft caps closed by recorded dispositions (`.cap-dispositions`, Shell+TS parity), CLAUDE.md slimmed with actions kept (~16081 → ~13419 tokens). Also ADR-050 (the proof bar scales with consequence) from the guard audit (`396`, not an epic member) |
 | [SPRINT-113](../sprint/archive/SPRINT-113-ship-the-store-trim-the-guards.md) | Ship the store, trim the guards | closed `4ee8c80` | EPIC-017 step 1 done: the store ships in templates and init (`378`), the durable docs describe the v2 loop (`379`), and migrate states its rules with store-derived verification (`397`). That unblocks `371` (workdoo). Also SPRINT-112's audit cuts (`398`). No Closed-when newly met (5 of 10) |
+| [SPRINT-114](../sprint/SPRINT-114-prove-adopt-release-2-0.md) | Prove, adopt, release 2.0 | active | — (in progress: `371` → `365` / `372` → `385` / `386` → `373`; targets the remaining Closed-when 6–10, ending in the `2.0.0` release) |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·

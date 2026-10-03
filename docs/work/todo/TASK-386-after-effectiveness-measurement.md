@@ -2,6 +2,7 @@
 id: TASK-386
 title: "Take the \"after\" effectiveness measurement"
 epic: EPIC-017
+sprint: SPRINT-114
 priority: P1
 size: S
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-372
 title: "Prove both layout directions and the upgrade path"
 epic: EPIC-017
+sprint: SPRINT-114
 priority: P1
 size: M
 risk: high
