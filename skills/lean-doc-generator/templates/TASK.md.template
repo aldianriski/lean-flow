@@ -1,0 +1,43 @@
+---
+id: TASK-NNN
+title: "[verb-first title, full prose]"
+epic: EPIC-NNN            # only when the work advances an epic; omit the line otherwise
+priority: P2              # P0-P3 initial tier; /triage re-ranks later
+size: S | M | L
+risk: low | med | high
+autonomy: HITL | AFK
+class: decision | execution | mechanical-ingest   # advisory default
+tier: G | X | P           # guard · executable non-guard · prose (verification bar)
+authority: J0 | J1 | J2   # J2 = human-reserved; an unattended run parks on it
+origin: decomposer        # always, for /task-decomposer output
+state: ready | needs-info | blocked
+depends-on: []            # or [TASK-NNN, TASK-NNN]
+---
+
+<!-- One task = one file: docs/work/backlog/TASK-NNN-kebab-slug.md (new tasks land in backlog/ only;
+     the folder is the status, so no `status:` field, and `sprint:` is stamped when a sprint promotes it).
+     Pick one value per enum above and delete the others. WHY/WHERE, never HOW. -->
+
+# TASK-NNN — [title] [CUSTOMIZE]
+
+## Why
+
+[one to three lines on why this task exists — optional, delete the section if the title says it]
+
+## Done when
+
+- [ ] [one observable, human-verifiable outcome]
+
+## Touches
+
+[files / layers — omit for an AFK task and name types, interfaces or config shapes instead]
+
+## Assumes
+
+- [key assumption, or `none`]
+- **open:** [an unanswered question — one line each on a needs-info task]
+- **blocked-by:** [the condition, when the blocker is not a task]
+
+## Tracker
+
+[source: epic scope item · PRD user story · ticket URL, or "none — justification"]
