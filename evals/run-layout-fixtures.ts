@@ -283,8 +283,8 @@ for (const [skill, phrases] of Object.entries(STEP_WIRING)) {
 function frontmatterId(text: string): string | null {
   const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!fm) return null;
-  const m = fm[1].match(/^id:[ \t]*(?:"(TASK-\d+)"|'(TASK-\d+)'|(TASK-\d+))[ \t]*\r?$/m);
-  return m ? (m[1] ?? m[2] ?? m[3]) : null;
+  const m = (fm[1] ?? "").match(/^id:[ \t]*(?:"(TASK-\d+)"|'(TASK-\d+)'|(TASK-\d+))[ \t]*\r?$/m);
+  return m ? (m[1] ?? m[2] ?? m[3] ?? null) : null;
 }
 
 type Census = { todoIds: string[]; storeIds: string[]; noid: string[]; dups: string[] };
@@ -293,7 +293,7 @@ type Census = { todoIds: string[]; storeIds: string[]; noid: string[]; dups: str
 function census(root: string): Census {
   const todoPath = join(root, "TODO.md");
   const todoText = existsSync(todoPath) ? readFileSync(todoPath, "utf8") : "";
-  const todoIds = [...todoText.matchAll(/^- \[[ xX]\] (TASK-\d+)/gm)].map((m) => m[1]);
+  const todoIds = [...todoText.matchAll(/^- \[[ xX]\] (TASK-\d+)/gm)].map((m) => m[1] ?? "");
   const work = join(root, "docs", "work");
   const storeIds: string[] = [];
   const noid: string[] = [];
