@@ -85,3 +85,6 @@ harness that would have caught it (P7 `layers-completeness-differential.ts`) was
   0 FAIL · v1-to-v2 96/0. ~12 live comments and fixture READMEs outside T1's Layers still name the cut files → follow-up sweep task at close.
 - Review (D3): maintainer-only, so the ADR-050 bar (no runner reaches the cut + seeded proof + a full gate) plus a coordinator self-review of the
   diff and census. No Codex required.
+
+### 2026-10-03 | progress | All four accepted by the owner: TASK-398 (J2) · 378 · 379 · 397; DoD 11/11
+Each box carries ` ✓ <sha> — <evidence>`. Next: system-verify on the final tree, then close.

@@ -19,9 +19,9 @@ depends-on: [TASK-375, TASK-376, TASK-377]
 
 ## Done when
 
-- [ ] CONTEXT.md, CLAUDE.md and the architecture overview describe the v2 loop and directory map.
-- [ ] README carries the hard-cut upgrade guide: install 2.x → restart the session → `/lean-doc-generator migrate` → resume.
-- [ ] QA-001 and QA-002 test cases updated to v2 behaviour; council / refactor-advisor wording no longer says 'TODO tracker'.
+- [x] CONTEXT.md, CLAUDE.md and the architecture overview describe the v2 loop and directory map. ✓ `e6c21c97` — CONTEXT § Task entry shape → v2 file frontmatter; overview map gains `work/`; CLAUDE.md verified (no v1 residue)
+- [x] README carries the hard-cut upgrade guide: install 2.x → restart the session → `/lean-doc-generator migrate` → resume. ✓ `e6c21c97` — README § Upgrading to 2.x already states install 2.x → restart → migrate → resume, in order (verified unchanged)
+- [x] QA-001 and QA-002 test cases updated to v2 behaviour; council / refactor-advisor wording no longer says 'TODO tracker'. ✓ `ed1cfe6f` — QA-001/002 steps and Expected rewritten for v2 (Codex fixes: seeded fixture + post-promotion folders); council:52 → "a task file"; refactor-advisor clean
 
 ## Touches
 

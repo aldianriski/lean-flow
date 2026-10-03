@@ -24,8 +24,8 @@ the tree, and a guard ruled "freeze" leaves the gate lists with a header, as SPR
 
 ## Done when
 
-- [ ] Every guard TASK-396's audit rules **cut** is removed from `scripts/qa-check.sh`'s lists and from the tree, and every **freeze** is excluded by name with a `FROZEN` header; the gate's completeness leg stays green.
-- [ ] The full gate (default and opt-in) reads the same verdict before and after, apart from the removed guards, and the measured gate time is recorded against the audit's estimate.
+- [x] Every guard TASK-396's audit rules **cut** is removed from `scripts/qa-check.sh`'s lists and from the tree, and every **freeze** is excluded by name with a `FROZEN` header; the gate's completeness leg stays green. ✓ `9a0bfaad` — S10 (8 files), P4, P7 deleted; qa-check excluded list emptied (tombstone); census by two routes found 0 runners; seeded restore of a cut file named by the completeness leg
+- [x] The full gate (default and opt-in) reads the same verdict before and after, apart from the removed guards, and the measured gate time is recorded against the audit's estimate. ✓ `9a0bfaad` — full gate (QA_FULL) `304 pass, 5 fail`, none from T1 (worktree env ×3, TD-211, a Plan Cites false positive fixed `0466ba4`); gate-time delta ≈ 0 because every cut guard was already excluded or ungated
 
 ## Touches
 

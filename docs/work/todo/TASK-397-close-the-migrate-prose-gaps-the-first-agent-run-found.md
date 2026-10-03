@@ -37,8 +37,8 @@ The ten, in short:
 
 ## Done when
 
-- [ ] Each of the ten gaps has a stated rule in `migration-map.md` § v1 → v2. Each rule is the owner's SPRINT-111 ruling unless re-ruled, and none is left as an open question.
-- [ ] `evals/run-v1-to-v2-fixtures.ts` still passes, and a fixture covers each rule a script can check (enum normalisation · `none — but …` · lettered split).
+- [x] Each of the ten gaps has a stated rule in `migration-map.md` § v1 → v2. Each rule is the owner's SPRINT-111 ruling unless re-ruled, and none is left as an open question. ✓ `40df68b7` — all ten gaps stated as rules (owner accepted the builder's wording); Verification derives output from the store (output/kept/replaced/pending); Codex 3 rounds
+- [x] `evals/run-v1-to-v2-fixtures.ts` still passes, and a fixture covers each rule a script can check (enum normalisation · `none — but …` · lettered split). ✓ `50d99479` — `v1-to-v2-fixtures: 96 pass, 0 fail` incl. a full CRLF run; fixtures for enum normalisation, `none — but`, lettered split, each with must-FAIL trees
 
 ## Touches
 
