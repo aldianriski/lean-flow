@@ -225,3 +225,12 @@ Coordinator instrument errors caught before any figure was used: selector (b)'s 
 task's `Layers:`, so a fix commit would be UNATTRIBUTED in leg 15. **Impact:** T6's `Layers:` gains the harness (a declared correction,
 L-100); no DoD, task or criterion changes. The fix re-anchors the stale text-contract phrase on night-run.md's current wording.
 **Re-confirm G2:** owner directed the fix now ("keep continue", 2026-10-03, after the TD-211 option was offered).
+
+### 2026-10-03 | scope-change | T2 unblock: owner opens the workdoo-main window now; workdoo's D3 re-ruled ("pin first, merge early")
+**What broke:** T2 waited on (i) workdoo SPRINT-009 T4 (the version probe) and (ii) workdoo SPRINT-009's D3 ("this repository stays v1 this
+sprint"), which kept the migration branch unmerged until that sprint closed (O9). Neither was going to move inside this sprint.
+**Owner ruling (2026-10-03):** merge the migration into workdoo `main` now, which opens D2's window and re-rules workdoo D3, then build
+workdoo T4 (TASK-050) on the v2 layout, then complete T2's pin check. SPRINT-009 continues on v2. **Order is forced:** T4 built first on v1
+would tick SPRINT-009 Plan boxes that the migration already moved into TASK-050.
+**Impact:** T1's proof branch stays retained (merging keeps the ref). workdoo sessions must load the candidate (`--plugin-dir`), because
+1.66.1 against a v2 tree is the inconsistent case T3 recorded. No lean-flow DoD changes.
