@@ -40,3 +40,28 @@ preflight CLEAR, waves T1 = T2 = T4 = 0, T3 = 1). Owner ruling: `TODO.md.templat
 the cut + full gate default/opt-in) + coordinator self-review · T2 · behaviour: shipped templates + init procedure · governance: consumer-facing
 skill contract → Codex loop · T3 · behaviour: doc prose + one skill wording · governance: consumer-facing skill text → Codex loop · T4 · behaviour:
 shipped migrate reference + harness · governance: consumer-facing procedure → Codex loop.
+
+### 2026-10-03 | progress | T2 (TASK-378) built + Codex CLEAR; merged b3b8cef
+- `b3ca35d`: `templates/TASK.md.template` matches task-file.md field for field (frontmatter order, enums, sections; no lean-flow ids or paths).
+  `templates/TODO.md.template` deleted (owner ruling); TD-209 resolved. The one live template leak (QA-TESTCASE's "TODO gains…") fixed.
+- init (already store-first after SPRINT-111 T5) exercised on an empty OS-temp dir, following the base tier literally: 13 files, `docs/work/` left
+  lazy per §2, no TODO.md. Two small ambiguities in init.md noted (the substrate-condition count; the headless branch was not exercised).
+- A1 held: count-claims gives 33 core + 2 non-core = 35, unchanged. Codex static review: CLEAR. On main after the merge: typecheck 0 · count-claims
+  green · caps 0 FAIL · v1-to-v2 24/0 · freeze 5/0.
+
+### 2026-10-03 | progress | T4 (TASK-397) built, 3 Codex rounds; merged d80c207 + CRLF repair 80c380e
+- `8bc8b78`: migration-map.md § v1→v2 states the 10 rules; the owner accepted the builder's wording where the SPRINT-111 Log held only the substance.
+  Codex r1 (5 findings, all confirmed) → `16d2f0c`: the id-set Verification was wrong for mixed trees · a missing member contradicted itself · `none — but`
+  vs annotated ids · selection gaps (`tier:G(x)`, `(A)`, `a)`) · lossy checks. Codex r2 (2) → `f4f884a6`: `output` derived from the store (`output ⊆ meant`),
+  plus a `kept` category; the dead `TODO.md.template` pointer reworded. Codex r3 (1) → `40df68b7`: a `replaced` category ("apply the delta"),
+  `meant = output ∪ kept ∪ replaced ∪ pending`.
+- **Merged red:** on main's autocrlf checkout the harness read 52 pass, 10 fail. The builder's 62/0 ran on the LF files it had just written in its worktree.
+  Found within minutes by the post-merge legs (L-218, promoted at this promote). Repaired `50d99479`: one CRLF-normalising reader for all text reads,
+  plus a full Scenario-5 run on a CRLF copy. Main is now 96/0. The harness still checks hand-built trees, not an agent following the prose (stated).
+
+### 2026-10-03 | progress | T3 (TASK-379) built + Codex fixes; merged ec2a3d2
+- `e6c21c97`: CONTEXT § Task entry shape is now the v2 file frontmatter (CONTEXT at 150/150), the overview map gains `work/`, QA-001/002 have v2
+  steps, council:52 "TODO tracker" → "a task file". CLAUDE.md, README (§ Upgrading to 2.x already in the right order) and refactor-advisor
+  were verified unchanged. Codex r1: threats 1/3/4 clean; 2 QA findings (QA-001's fixture lacked the v2 structure its count needs; QA-002 expected
+  backlog growth after promotion) → `ed1cfe6f`, self-reviewed (repo QA docs, not shipped; D3).
+- On main after the merge: typecheck 0 · caps ~13482 tokens · v1-to-v2 96/0 · freeze 5/0 · count-claims green. The only red is prose-density on the foreign EPIC-016.
