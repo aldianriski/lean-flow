@@ -219,3 +219,9 @@ blind at 113 because of L-224's collapse at this promote. **Verdict: effectivene
 **Codex loop:** r1 FINDINGS 2 (retrieval not literal on either side → 9→5; an unsupported 109/110/112 attribution, the coordinator
 confirmed against L78/L101/L220) · r2 FINDINGS 1 (Round 3 overclaimed that the correction worsened the drop; literal drop 4 < 5) · r3 CLEAR.
 Coordinator instrument errors caught before any figure was used: selector (b)'s sprint-number extraction (fixed, re-run).
+
+### 2026-10-03 | scope-change | T6 `Layers:` correction: `evals/run-orchestrator-store-fixtures.ts` (TD-211, a T6 prerequisite)
+**What broke:** the owner ruled that TD-211 must be green before T6 (D4: the release gates on a clean gate), but its file belongs to no
+task's `Layers:`, so a fix commit would be UNATTRIBUTED in leg 15. **Impact:** T6's `Layers:` gains the harness (a declared correction,
+L-100); no DoD, task or criterion changes. The fix re-anchors the stale text-contract phrase on night-run.md's current wording.
+**Re-confirm G2:** owner directed the fix now ("keep continue", 2026-10-03, after the TD-211 option was offered).

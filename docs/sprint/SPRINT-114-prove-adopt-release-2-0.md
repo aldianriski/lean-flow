@@ -99,7 +99,7 @@ stated whichever way it falls.
 
 ### T6 — Release 2.0.0 `[size: S · risk: med · class: execution · HITL · J2]`
 Layers: `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` ·
-  `README.md` · `CHANGELOG.md` · `docs/changelog/`
+  `README.md` · `CHANGELOG.md` · `docs/changelog/` · `evals/run-orchestrator-store-fixtures.ts` (TD-211, added 2026-10-03 -- L-100)
 Depends-on: T2 T3 T4 T5
 Cites: `TASK-373` · EPIC-017 Closed-when 8 · EPIC-017 D7 (a hard cut, v2-only) · STANDARD §11 (CHANGELOG rotation at a new MINOR/MAJOR)
 
