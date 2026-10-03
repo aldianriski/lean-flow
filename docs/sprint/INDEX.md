@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-112 — Govern Lighter — closed 2026-10-03 · `5fd8fa0` · 6 of 6 DoD, both members in `done/` (unreleased; D3) · `epic: EPIC-017` — **met Closed-when 3 and 4**: soft caps closed by recorded dispositions (`.cap-dispositions`, Shell+TS parity), CLAUDE.md slimmed with actions kept (~16081 → ~13419 tokens); ADR-050 accepted (the proof bar scales with consequence) from a 60-guard audit (39 keep · 18 freeze · 3 cut) · TD-214 · TASK-399 · L-223, L-218 at count 2
 - SPRINT-111 — Delete TODO.md — closed 2026-10-02 · `47f0595` · 13 of 13 DoD, all five members in `done/` (unreleased; D3) · `epic: EPIC-017` — **met Closed-when 2**: `TODO.md` deleted and every reader retired (S11.TODOCAP kept as a note per ADR-034; spec 0.13.0); migrate handles by-reference sprints and was agent-run on this repo; §2 retired rows are not placed · TD-210…213 · TASK-397 · L-221/L-222, L-220 at count 2
 - SPRINT-110 — Retarget the Gate — closed 2026-09-30 · `370fd9f` · 8 of 8 DoD, all four members in `done/` (unreleased; D3) · `epic: EPIC-017` — the layers guards, qa-check's store legs, night-run's `reap()` and the conformance engine read member files; one shell-callable member lookup (`sprint-members-cli.ts`); a v2 tree requires `bun` (ADR-049) · TD-196…208 · TASK-393 · L-219/L-220
 - SPRINT-109 — Unlock the Critical Path — closed 2026-09-29 · `6761016` · 10 of 10 DoD, all four members in `done/` (unreleased; D2) · `epic: EPIC-017` — spec 0.12.0 describes the store, caps measure tokens (ADR-048, budget 16087), and the authority, task-origin, dod-delta and verify-reaches guards read member files · TD-188…195 · L-218
