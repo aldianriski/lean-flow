@@ -56,7 +56,7 @@
 // Also: classify() is run against THIS repo's own root and reported (not asserted -- the repo's
 // layout is a fact about today, not a fixture invariant) at the very end of the run.
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -276,7 +276,40 @@ for (const [skill, phrases] of Object.entries(STEP_WIRING)) {
 // Retained from a REAL run: 1.66.1 `/task-decomposer` on a v2 tree with no TODO.md created TODO.md with
 // a `- [ ] TASK-001` row (D:/t114/v2c, 2026-10-03). The tree is then MIXED, so every 2.x queue skill
 // refuses it and `migrate` re-ingests the row. A script can check the state and the id census that
-// "lossless" is measured against: store ids and stray ids are both present, and disjoint.
+// "lossless" is measured against: every task id in TODO.md and in the store, no duplicate, and no
+// store file whose frontmatter id cannot be read (NOID -- never silently skipped).
+
+// Frontmatter block only (leading `---` ... `---`), CRLF-safe; accepts id: TASK-N, "TASK-N", 'TASK-N'.
+function frontmatterId(text: string): string | null {
+  const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+  if (!fm) return null;
+  const m = fm[1].match(/^id:[ \t]*(?:"(TASK-\d+)"|'(TASK-\d+)'|(TASK-\d+))[ \t]*\r?$/m);
+  return m ? (m[1] ?? m[2] ?? m[3]) : null;
+}
+
+type Census = { todoIds: string[]; storeIds: string[]; noid: string[]; dups: string[] };
+
+// Every *.md under docs/work/ (README.md excluded) is a store file; stdlib only, no subprocess.
+function census(root: string): Census {
+  const todoPath = join(root, "TODO.md");
+  const todoText = existsSync(todoPath) ? readFileSync(todoPath, "utf8") : "";
+  const todoIds = [...todoText.matchAll(/^- \[[ xX]\] (TASK-\d+)/gm)].map((m) => m[1]);
+  const work = join(root, "docs", "work");
+  const storeIds: string[] = [];
+  const noid: string[] = [];
+  if (existsSync(work)) {
+    for (const e of readdirSync(work, { recursive: true, withFileTypes: true })) {
+      if (!e.isFile() || !e.name.endsWith(".md") || e.name === "README.md") continue;
+      const p = join((e as any).parentPath ?? (e as any).path, e.name);
+      const id = frontmatterId(readFileSync(p, "utf8"));
+      if (id) storeIds.push(id);
+      else noid.push(e.name);
+    }
+  }
+  const all = [...todoIds, ...storeIds];
+  return { todoIds, storeIds, noid, dups: [...new Set(all.filter((x, i) => all.indexOf(x) !== i))] };
+}
+
 {
   const root = join(FIXTURES, "mixed-stray-write");
   const actual = classify(root);
@@ -285,16 +318,26 @@ for (const [skill, phrases] of Object.entries(STEP_WIRING)) {
     actual === "mixed",
     `classify(fixtures/layout/mixed-stray-write) = ${actual}, expected mixed (v2 store + a recreated TODO.md)`,
   );
-  const todoIds = [...(existsSync(join(root, "TODO.md")) ? readFileSync(join(root, "TODO.md"), "utf8") : "").matchAll(/^- \[[ x]\] (TASK-\d+)/gm)].map((m) => m[1]);
-  const storeIds = Bun.spawnSync(["bash", "-c", `find '${join(root, "docs", "work")}' -name 'TASK-*.md'`]).stdout
-    .toString().split("\n").filter(Boolean)
-    .map((p) => readFileSync(p, "utf8").match(/^id:\s*(TASK-\d+)/m)?.[1] ?? "NOID");
-  const all = [...todoIds, ...storeIds];
-  const ok = todoIds.length === 1 && storeIds.length === 1 && new Set(all).size === all.length && !all.includes("NOID");
+}
+
+// Census cases. "ok" fixtures are controls; the others are must-FAIL fixtures -- the case PASSES only
+// when census() reports the named finding (a duplicate id, or a NOID store file).
+const CENSUS_CASES: Array<[string, "ok" | "duplicate" | "noid", number, number]> = [
+  // [fixture, expected verdict, todo ids, store ids]
+  ["mixed-stray-write", "ok", 1, 1],
+  ["census-ok-quoted-controls", "ok", 1, 3], // quoted/single-quoted ids, [X] box, README.md + .gitkeep present
+  ["census-dup-xbox", "duplicate", 2, 1], // `- [X] TASK-901` must still count
+  ["census-dup-quoted-id", "duplicate", 1, 1], // frontmatter "TASK-001", body `id: TASK-901`
+  ["census-noid-nontask-file", "noid", 1, 1], // non TASK-* store file with no frontmatter id
+];
+for (const [dir, expected, nTodo, nStore] of CENSUS_CASES) {
+  const c = census(join(FIXTURES, dir));
+  const actual = c.noid.length ? "noid" : c.dups.length ? "duplicate" : "ok";
+  const counts = c.todoIds.length === nTodo && c.storeIds.length === nStore;
   report(
-    "census-mixed-stray-write",
-    ok,
-    `stray TODO.md ids=[${todoIds}] store ids=[${storeIds}]; expected 1 + 1, no duplicate id -- the set \`migrate\` must re-ingest losslessly`,
+    dir.startsWith("census-") ? dir : `census-${dir}`,
+    actual === expected && counts,
+    `todo=[${c.todoIds}] store=[${c.storeIds}] noid=[${c.noid}] dups=[${c.dups}] -> ${actual} (expected ${expected}; counts ${nTodo}+${nStore} ${counts ? "ok" : "WRONG"})`,
   );
 }
 
