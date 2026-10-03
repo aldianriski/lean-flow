@@ -86,3 +86,14 @@ so the disposition path must land in both, in parity, under ADR-043's adopter co
 - **ADR-050 accepted (owner, 2026-10-03).** CLAUDE.md § spec-only now scopes the full bar (seeding + worktree-isolated review) to
   **consequential** G. Maintainer-only G takes a must-FAIL fixture + one run on its real artifact; frozen G and X keep their fixtures. Two Codex wording rounds,
   then CLEAR. CLAUDE.md is at 80/80 lines, ~13419 ≤ 16087 tokens. DoD 2/2.
+
+### 2026-10-03 | scope-change | system-verify: two gate reds traced; T1/T2 Layers amended; a SPRINT-111 typecheck regression repaired
+Full gate on main `d8dd35c` printed `QA-CHECK: 288 pass, 4 fail`, TRUNCATED at 568 s against 555 s with 3 harnesses unrun. The four:
+(1) prose-density on `docs/epic/EPIC-016-…`, the foreign uncommitted WIP that predates SPRINT-111 (not ours, left untouched) · (2) the budget ·
+(3) **typecheck: 6 strict-null errors in `evals/run-work-store-fixtures.ts`** (lines 512 · 603 · 727 · 731), introduced by SPRINT-111's T5
+follow-up (`18330a1`). That sprint's checks never ran the gate's typecheck leg after the merge. It is a SPRINT-111 escape, the L-221 shape again.
+(4) layers-observed: T1's capped companions (`guard-audit-legs/-rest/-runtime.md`) and the round-1 `logs/guard-audit-table.md` it later removed
+were undeclared (the builder reported them as outside-Layers edits and the coordinator did not amend at the time), and the typecheck repair needs a home.
+**Repair (coordinator, inline: type-only):** `?? ""` / `?? f` fallbacks where runtime already guarantees a value. `tsc --noEmit` 0 errors;
+`work-store-fixtures: 21 pass, 0 fail` unchanged. Attributed to T2 (gate hygiene). **Layers amended:** T1 gains the 3 companions + the removed
+table; T2 gains `evals/run-work-store-fixtures.ts`.
