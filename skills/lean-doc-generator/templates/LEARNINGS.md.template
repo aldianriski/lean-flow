@@ -40,5 +40,5 @@ fires inside that skill's flow alone (the placement test, STANDARD §10). Review
 ## L-000 [tags: process] [status: promoted]: Unconfirmed auth assumptions cause regressions — confirm the auth model at G1
 - seen: Sprint-003, Sprint-005
 - count: 2
-- promoted: yes → CLAUDE.md anti-pattern + task-decomposer assumption registry
+- promoted: yes → CLAUDE.md anti-pattern + task-decomposer assumption registry · disposition: retain (always-read: no existing rule covers G1's auth check)
 - related: L-001 (the intake grill that surfaces the assumption before it regresses)

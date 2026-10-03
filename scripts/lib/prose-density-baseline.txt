@@ -21,7 +21,7 @@
 # (L-186). Never hand-list this set again.
 #
 # format: <path> <count-at-adoption>
-.claude/CLAUDE.md 9
+.claude/CLAUDE.md 4
 .claude/CONTEXT.md 16
 docs/epic/EPIC-014-reference-engine.md 5
 docs/epic/EPIC-015-execution-autonomy.md 6
