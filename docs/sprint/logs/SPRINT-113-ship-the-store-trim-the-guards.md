@@ -72,3 +72,16 @@ T4's Layers carry the full path. The Shell `check-layers-completeness.sh` PASSes
 the Shell checker at plan lock, which is why it read 8/0. This is a parity divergence (TS stricter: a false positive on a declared file), and the
 harness that would have caught it (P7 `layers-completeness-differential.ts`) was never run by anything and is cut this sprint by owner ruling.
 **Fix (Plan, no DoD change):** T4's `Cites:` names the bare token, the route the finding itself recommends. The divergence goes to a TD row at close.
+
+### 2026-10-03 | progress | T1 (TASK-398) built + coordinator self-review (ADR-050 bar); merged abe269c
+- `9a0bfaad`: S10 (4 selftests + 4 asserts), P4 `run-layers-observed-differential.ts` and P7 `layers-completeness-differential.ts` deleted (2,442 lines),
+  plus the qa-check excluded block (left as a tombstone; the list is now empty), evals/README and the comments naming them.
+- Census by two routes: names/stems (~75 hits in 40 files, classified delete · edit · history) and source/exec/import (0 runners). The only machine reach
+  was qa-check's excluded list. Seed A (a deleted selftest restored on disk, unlisted) → the completeness leg names it. **Seed B (an excluded name with no
+  file) is NOT detected: qa-check has no listed-but-missing check for `eval_harnesses_excluded`** → TD at close (moot while the list is empty; census-zero → TD).
+- Full gate (QA_FULL, worktree): `304 pass, 5 fail`, none from T1. Typecheck ×2 (no node_modules in the worktree) · qa-budget (an inherited
+  QA_BUDGET_SECONDS, an L-067 shape; passes alone) · orchestrator-store (TD-211, pre-existing) · the T4 Cites false positive (fixed `0466ba4`).
+- On main after the merge: typecheck 0 · `sh -n` ok · layers-completeness TS + Shell 0 FAIL · its test 0 fail · fixtures PASS · count-claims · caps
+  0 FAIL · v1-to-v2 96/0. ~12 live comments and fixture READMEs outside T1's Layers still name the cut files → follow-up sweep task at close.
+- Review (D3): maintainer-only, so the ADR-050 bar (no runner reaches the cut + seeded proof + a full gate) plus a coordinator self-review of the
+  diff and census. No Codex required.
