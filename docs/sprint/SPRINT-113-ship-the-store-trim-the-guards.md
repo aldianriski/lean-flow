@@ -79,7 +79,7 @@ against the v2 loop.
 ### T4 — Close the migrate prose gaps the first agent-run found `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `skills/lean-doc-generator/references/migration-map.md` · `evals/run-v1-to-v2-fixtures.ts` · `evals/fixtures/v1-to-v2/`
 Depends-on: none
-Cites: `TASK-397` · SPRINT-111 T4 plan-step rulings (archived Log, 2026-10-02) · L-015
+Cites: `TASK-397` · `migration-map.md` (the member Done-when's bare name for the Layers path above) · SPRINT-111 T4 plan-step rulings (archived Log, 2026-10-02) · L-015
 
 Tier X (a shipped reference plus its harness). Shipped, so it gets the Codex loop. Each of the ten gaps becomes a stated rule, the owner's SPRINT-111 ruling unless re-ruled.
 

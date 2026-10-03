@@ -65,3 +65,10 @@ shipped migrate reference + harness · governance: consumer-facing procedure →
   were verified unchanged. Codex r1: threats 1/3/4 clean; 2 QA findings (QA-001's fixture lacked the v2 structure its count needs; QA-002 expected
   backlog growth after promotion) → `ed1cfe6f`, self-reviewed (repo QA docs, not shipped; D3).
 - On main after the merge: typecheck 0 · caps ~13482 tokens · v1-to-v2 96/0 · freeze 5/0 · count-claims green. The only red is prose-density on the foreign EPIC-016.
+
+### 2026-10-03 | scope-change | T4 Cites names the member's bare `migration-map.md`; the Shell and TS layers-completeness checkers disagree
+The gate's TS `check-layers-completeness.ts` FAILs `member-layers-incomplete` for T4/TASK-397: its Done-when names the bare `migration-map.md`, and
+T4's Layers carry the full path. The Shell `check-layers-completeness.sh` PASSes the same Plan (it matches by basename). The coordinator ran only
+the Shell checker at plan lock, which is why it read 8/0. This is a parity divergence (TS stricter: a false positive on a declared file), and the
+harness that would have caught it (P7 `layers-completeness-differential.ts`) was never run by anything and is cut this sprint by owner ruling.
+**Fix (Plan, no DoD change):** T4's `Cites:` names the bare token, the route the finding itself recommends. The divergence goes to a TD row at close.
