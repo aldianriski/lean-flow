@@ -272,6 +272,53 @@ for (const [skill, phrases] of Object.entries(STEP_WIRING)) {
   );
 }
 
+// --- (d) stray-write: an installed 1.x queue writer recreates TODO.md on a v2 tree (SPRINT-114 T3) ---
+// Retained from a REAL run: 1.66.1 `/task-decomposer` on a v2 tree with no TODO.md created TODO.md with
+// a `- [ ] TASK-001` row (D:/t114/v2c, 2026-10-03). The tree is then MIXED, so every 2.x queue skill
+// refuses it and `migrate` re-ingests the row. A script can check the state and the id census that
+// "lossless" is measured against: store ids and stray ids are both present, and disjoint.
+{
+  const root = join(FIXTURES, "mixed-stray-write");
+  const actual = classify(root);
+  report(
+    "classify-mixed-stray-write",
+    actual === "mixed",
+    `classify(fixtures/layout/mixed-stray-write) = ${actual}, expected mixed (v2 store + a recreated TODO.md)`,
+  );
+  const todoIds = [...(existsSync(join(root, "TODO.md")) ? readFileSync(join(root, "TODO.md"), "utf8") : "").matchAll(/^- \[[ x]\] (TASK-\d+)/gm)].map((m) => m[1]);
+  const storeIds = Bun.spawnSync(["bash", "-c", `find '${join(root, "docs", "work")}' -name 'TASK-*.md'`]).stdout
+    .toString().split("\n").filter(Boolean)
+    .map((p) => readFileSync(p, "utf8").match(/^id:\s*(TASK-\d+)/m)?.[1] ?? "NOID");
+  const all = [...todoIds, ...storeIds];
+  const ok = todoIds.length === 1 && storeIds.length === 1 && new Set(all).size === all.length && !all.includes("NOID");
+  report(
+    "census-mixed-stray-write",
+    ok,
+    `stray TODO.md ids=[${todoIds}] store ids=[${storeIds}]; expected 1 + 1, no duplicate id -- the set \`migrate\` must re-ingest losslessly`,
+  );
+}
+
+// --- (e) runtime manifests: Codex + Kimi resolve the plugin's skills (SPRINT-114 T3 (c)) ------------
+// Both runtimes read `<plugin_root>/.<runtime>-plugin/plugin.json` and follow its `skills` path.
+// Asserted: the manifest parses, `skills` resolves to a directory, and every one of the 14 skills
+// has a SKILL.md there. (Live runtime proof is retained in the sprint log, not re-run here.)
+for (const rt of ["codex", "kimi"]) {
+  const mpath = join(REPO_ROOT, `.${rt}-plugin`, "plugin.json");
+  let ok = false;
+  let detail = "";
+  try {
+    const m = JSON.parse(readFileSync(mpath, "utf8"));
+    const dir = join(REPO_ROOT, String(m.skills ?? ""));
+    const missing = SKILLS.concat(["council", "diagnose", "insights", "prototype", "refactor-advisor", "release-patch", "tdd"])
+      .filter((s) => !existsSync(join(dir, s, "SKILL.md")));
+    ok = m.name === "lean-flow" && typeof m.skills === "string" && missing.length === 0;
+    detail = `name=${m.name} skills=${m.skills} missing=[${missing}]`;
+  } catch (e) {
+    detail = `manifest unreadable: ${(e as Error).message}`;
+  }
+  report(`runtime-manifest-${rt}-resolves-skills`, ok, detail);
+}
+
 // --- summary --------------------------------------------------------------------------------
 
 console.log(`\nlayout-fixtures: ${pass} pass, ${fail} fail`);
