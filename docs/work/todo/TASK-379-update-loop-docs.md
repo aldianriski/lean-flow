@@ -2,6 +2,7 @@
 id: TASK-379
 title: "Update the durable docs that describe the loop"
 epic: EPIC-017
+sprint: SPRINT-113
 priority: P1
 size: M
 risk: low

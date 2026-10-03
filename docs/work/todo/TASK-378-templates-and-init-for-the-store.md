@@ -2,6 +2,7 @@
 id: TASK-378
 title: "Ship the store in templates and greenfield init"
 epic: EPIC-017
+sprint: SPRINT-113
 priority: P1
 size: M
 risk: med
