@@ -106,3 +106,17 @@ Manifests derived with `grep -l '"version"' .*-plugin/*.json` (4 files) plus the
 **Surprise:** `check-manifest-lockstep.sh` cannot read a pre-release version (`ver_of` matches only `X.Y.Z`), so on the rc branch it FAILs
 `no parseable version`. Lockstep for the candidate was verified by reading all five values. It is maintainer-only (no shipped skill calls it)
 and the final `2.0.0` parses. Retro TD candidate.
+
+### 2026-10-03 | progress | T3 (TASK-372): builder reported; Codex round 1 FINDINGS 4, all confirmed, sent back to the builder
+**Builder (Sonnet, worktree-isolated) reported** `25e6dde` (3 files, all inside T3's `Layers:`), 24 of 30 headless runs. (a) PASS: 7/7
+rc skills refuse a real v1 export of workdoo HEAD, with `git status` 0 before and after each run, and the loaded copy proven from `system/init`.
+(b) PASS with caveats: 1.66.1 writers wrote into the store on 2 of 3 v2 trees and recreated `TODO.md` on 1; the rc refused the mixed tree and
+`migrate` re-ingested {001, 002} beside {901} losslessly once owner input supplied the withheld fields. (c) Codex install/prompt-level PASS
+(isolated `CODEX_HOME`, all 14 skills resolved); Kimi STOPPED, because install needs an interactive session plus credentials. (d) PASS with
+`--plugin-dir` standing in for install. Coordinator re-ran the harness on the branch: `layout-fixtures: 37 pass, 0 fail`.
+**Codex round 1** (hybrid: the first dispatch could not read files and returned no verdict, which was not read as CLEAR; re-sent with every file
+inlined): `CODEX: FINDINGS 4`. The coordinator ran each confirming command: (1) `[X]` hides a duplicate → `true`; (2) a body `id:` wins over a
+quoted frontmatter id → `TASK-901`, passes; (3) a non-`TASK-*` store file is invisible to `find`; (4) no bash on PATH →
+`ENOENT uv_spawn 'bash'`. All four sent back for one bounded retry with a must-FAIL plus a sibling control per fix, proven against the old harness.
+**Open for the owner:** Kimi live install · the untested 1.x id collision (spec lines 254–282 cover it) · `migrate`'s withhold rule applied
+inconsistently across runs (spec line 194: "never guessed, never defaulted") · "install 2.x" exercised via `--plugin-dir`, not a marketplace install.
