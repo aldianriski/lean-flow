@@ -13,7 +13,7 @@
 2. [action]
 
 ## Expected
-[the observable artifact or outcome — e.g. "login locks after N failed attempts", "TODO gains TASK-NNN carrying `assumes:`"]
+[the observable artifact or outcome — e.g. "login locks after N failed attempts", "the backlog gains a task file carrying `## Assumes`"]
 
 ## Result
 [pass | fail + what actually happened; on fail, link the `BUG` report / `TASK` / finding it routed to]

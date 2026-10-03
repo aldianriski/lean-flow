@@ -355,7 +355,7 @@ status: current
     Census 2026-10-02: 0 quoted sprint statuses; all 18 Members entries across 4 by-reference sprints are plain paths.
   - Mitigation (hypothesis): settle the member syntax in prime § Resolution, then align both selectors with a fixture per shape.
 
-- **TD-209** severity: low | status: open | created: Sprint-111 (T5)
+- **TD-209** severity: low | status: resolved → TASK-378 | created: Sprint-111 (T5)
   - Summary: **`skills/lean-doc-generator/templates/TODO.md.template` is kept though nothing scaffolds it any more.** `init` now
     scaffolds the store, and no skill reads or writes `TODO.md` outside migrate's v1→v2 path. Census 2026-09-30: 0 skill callers.
   - Mitigation (hypothesis): delete it in the 2.0 cleanup. The delete ripples into the template counts in CLAUDE.md, CONTEXT.md and README.
