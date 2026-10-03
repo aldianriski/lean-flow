@@ -225,14 +225,18 @@ rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 
 - [x] A sprint's progress is **derived** from member files and matches a hand count. ✓ SPRINT-107:
       stamp-selected `## Done when` boxes gave 7 open / 5 ticked, equal to a hand count over the Members
       ids (TASK-360, `f6b3cf4`); close by reference then read 11/0 on the live sprint
-- [ ] `workdoo` runs the same store, and the EPIC-016 Work & Queue view reads it without a second
-      copy of status.
-- [ ] **Effectiveness is measured, not assumed** — a before/after comparison of decomposition
+- [x] `workdoo` runs the same store, and the EPIC-016 Work & Queue view reads it without a second
+      copy of status. ✓ SPRINT-114 T2+T4: workdoo main on the store on 2.0.0-rc.1, pin verified by the real probe;
+      the view reads `taskLifecycle` from `docs/work/` per request, never stored (workdoo `fa5f39a`, ADR-006)
+- [x] **Effectiveness is measured, not assumed** — a before/after comparison of decomposition
       completeness, retrieval success and recurring-failure rate. Fewer lines and fewer checkboxes
-      are explicitly **not** the success criterion.
+      are explicitly **not** the success criterion. ✓ SPRINT-114 T5, **measured, verdict NOT demonstrated**:
+      retrieval 9→5 literal; recurrence lower on both selectors; completeness not measurable (owner ruling, no post-store epic)
 - [ ] **Released as `2.0.0`** across all four manifests + the README footer, derived with
       `grep -l '"version"' .*-plugin/*.json` and never from a list.
-- [ ] **Both layout directions are safe** — v2 skills against a v1 tree and v1 skills against a v2
+- [x] **Both layout directions are safe** — v2 skills against a v1 tree and v1 skills against a v2
       tree, each exercised, each either working or refusing cleanly. Never corrupting. This is the
-      auto-update-off consumer, who is the normal case and not an edge case.
-- [ ] **`workdoo` migrated on a branch with its gate green**, branch retained as the proof (D8).
+      auto-update-off consumer, who is the normal case and not an edge case. ✓ SPRINT-114 T3: rc refuses v1 (7/7, 0 writes);
+      1.66.1 on v2 writes harmlessly or recreates TODO.md → refused → re-ingested losslessly; id collision reported, nothing overwritten
+- [x] **`workdoo` migrated on a branch with its gate green**, branch retained as the proof (D8). ✓ SPRINT-114 T1: retained
+      `lean-flow-2.0-migration` @ `629f91c`; gate 3/1 **under owner ruling**, the failure identical on the pre-migration base (workdoo TD-034)
