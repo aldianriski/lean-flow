@@ -58,9 +58,16 @@
 // Verbatim output + the stated method for both are in the SPRINT-106 T4 report, per the repo's
 // practice of keeping the proof out of the script itself.
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+
+// The one text reader: CRLF -> LF at read, so no parser ever sees `\r` (a Windows autocrlf checkout
+// stores every fixture CRLF). Byte-identity checks (preservation) still read raw bytes.
+function readText(path: string): string {
+  return readFileSync(path, "utf8").replace(/\r\n/g, "\n");
+}
 
 const FIXTURES = fileURLToPath(new URL("fixtures/v1-to-v2", import.meta.url));
 const INPUT = join(FIXTURES, "input");
@@ -111,7 +118,7 @@ function isByReference(sprintText: string): boolean {
 function v1BacklogIds(root: string): string[] {
   const todoPath = join(root, "TODO.md");
   if (!existsSync(todoPath)) return [];
-  const text = readFileSync(todoPath, "utf8");
+  const text = readText(todoPath);
   const ids: string[] = [];
   const re = /^-\s\[[ x]\]\s(TASK-\d+)\s/gm;
   let m: RegExpExecArray | null;
@@ -125,7 +132,7 @@ function v1PlanCitesIds(root: string): string[] {
   const ids: string[] = [];
   for (const entry of readdirSync(sprintDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-    const text = readFileSync(join(sprintDir, entry.name), "utf8");
+    const text = readText(join(sprintDir, entry.name));
     if (isByReference(text)) continue; // by-reference sprint: its Tn are NOT mapped (migration-map.md)
     // Only the Cites: line immediately following a ### Tn heading (a Plan task's own citation),
     // not any other TASK-NNN mention in the file.
@@ -146,7 +153,7 @@ function v1TickedBoxCount(root: string): number {
   let total = 0;
   for (const entry of readdirSync(sprintDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-    const text = readFileSync(join(sprintDir, entry.name), "utf8");
+    const text = readText(join(sprintDir, entry.name));
     if (isByReference(text)) continue; // by-reference sprint: its Tn are NOT mapped (migration-map.md)
     const blocks = text.split(/^### T\d+/m).slice(1);
     for (const block of blocks) {
@@ -165,7 +172,7 @@ function v1PlanDodById(root: string): Map<string, { ticked: number; total: numbe
   if (!existsSync(sprintDir)) return out;
   for (const entry of readdirSync(sprintDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-    const text = readFileSync(join(sprintDir, entry.name), "utf8");
+    const text = readText(join(sprintDir, entry.name));
     if (isByReference(text)) continue; // by-reference sprint: its Tn are NOT mapped (migration-map.md)
     const blocks = text.split(/^### T\d+/m).slice(1);
     for (const block of blocks) {
@@ -235,7 +242,7 @@ function v2TickedBoxCount(root: string, onlyIds?: ReadonlySet<string>): number {
   let total = 0;
   for (const f of findV2Files(root)) {
     if (onlyIds && !onlyIds.has(f.id)) continue;
-    const { body } = splitFrontmatter(readFileSync(f.path, "utf8"));
+    const { body } = splitFrontmatter(readText(f.path));
     const section = extractSection(body, "## Done when");
     if (section === null) continue;
     const ticked = section.match(/^- \[x\] /gm);
@@ -254,7 +261,7 @@ function detectUnresolvedConflicts(root: string): string[] {
   for (const [id, dod] of planById) {
     const existing = findV2Files(root).find((f) => f.id === id);
     if (!existing) continue; // no pre-existing file -> a fresh write, not a conflict
-    const { body } = splitFrontmatter(readFileSync(existing.path, "utf8"));
+    const { body } = splitFrontmatter(readText(existing.path));
     const section = extractSection(body, "## Done when");
     const actualTicked = section ? (section.match(/^- \[x\] /gm) ?? []).length : 0;
     if (actualTicked !== dod.ticked) unresolved.push(id);
@@ -488,7 +495,7 @@ const REQUIRED_SECTIONS = ["## Done when", "## Touches", "## Assumes", "## Track
   const problems: string[] = [];
   for (const f of files) {
     if (!FILENAME_RULE.test(f.filename)) problems.push(`${f.filename}: filename fails TASK-NNN-kebab-slug.md rule`);
-    const raw = readFileSync(f.path, "utf8");
+    const raw = readText(f.path);
     const { frontmatter, body } = splitFrontmatter(raw);
     for (const field of REQUIRED_FIELDS) {
       if (!new RegExp(`^${field}:`, "m").test(frontmatter)) problems.push(`${f.filename}: frontmatter missing '${field}:'`);
@@ -663,7 +670,7 @@ function parseReadmeSections(text: string): { required: string[]; optional: stri
 }
 
 {
-  const readmeText = readFileSync(readmePath(), "utf8");
+  const readmeText = readText(readmePath());
   const readmeFields = new Set(parseReadmeFrontmatterFields(readmeText));
   const harnessFields = new Set([...REQUIRED_FIELDS, ...KNOWN_OPTIONAL_FIELDS]);
   const readmeOnly = [...readmeFields].filter((f) => !harnessFields.has(f));
@@ -679,7 +686,7 @@ function parseReadmeSections(text: string): { required: string[]; optional: stri
 }
 
 {
-  const readmeText = readFileSync(readmePath(), "utf8");
+  const readmeText = readText(readmePath());
   const { required } = parseReadmeSections(readmeText);
   const readmeRequired = new Set(required);
   const harnessRequired = new Set(REQUIRED_SECTIONS);
@@ -696,7 +703,7 @@ function parseReadmeSections(text: string): { required: string[]; optional: stri
 }
 
 {
-  const readmeText = readFileSync(readmePath(), "utf8");
+  const readmeText = readText(readmePath());
   const section = readmeSection(readmeText, "## Filename rule");
   const hasPattern = section.includes("TASK-NNN-kebab-slug.md");
   const hasCharClass = section.includes("[a-z0-9-]");
@@ -778,7 +785,7 @@ runIdSetCase("id-set-byref", EXPECTED_BYREF, INPUT_BYREF);
 // both, so the cross-tree compare ignores CR. (preservationFindings stays raw: its before/after
 // are one copy, so a CRLF-only rewrite of a member IS a violation there.)
 function sameModuloEol(a: string, b: string): boolean {
-  return readFileSync(a, "utf8").replace(/\r\n/g, "\n") === readFileSync(b, "utf8").replace(/\r\n/g, "\n");
+  return readText(a) === readText(b);
 }
 
 function resumeFindings(partialRoot: string): string[] {
@@ -849,7 +856,7 @@ function v1Rows(root: string): V1Row[] {
   if (!existsSync(todoPath)) return [];
   const rows: V1Row[] = [];
   let cur: V1Row | null = null;
-  for (const line of readFileSync(todoPath, "utf8").split(/\r?\n/)) {
+  for (const line of readText(todoPath).split(/\r?\n/)) {
     const head = line.match(/^-\s\[[ x]\]\s(TASK-\d+)\s/);
     if (head) {
       cur = { id: head[1]!, fields: new Map() };
@@ -866,7 +873,7 @@ function v1Rows(root: string): V1Row[] {
 function v2FileFor(root: string, id: string): { fm: Map<string, string>; body: string } | null {
   const f = findV2Files(root).find((x) => x.id === id);
   if (!f) return null;
-  const { frontmatter, body } = splitFrontmatter(readFileSync(f.path, "utf8"));
+  const { frontmatter, body } = splitFrontmatter(readText(f.path));
   const fm = new Map<string, string>();
   for (const l of frontmatter.split(/\r?\n/)) {
     const m = l.match(/^([a-z-]+):\s*(.*)$/);
@@ -954,16 +961,11 @@ const NORM_CHECKS = [
   ["normalise-lettered-split", letteredFindings],
 ] as const;
 
-for (const [name, fn] of NORM_CHECKS) {
-  const findings = fn(INPUT_NORMALISE, EXPECTED_NORMALISED);
-  report(name, findings.length === 0, findings.length === 0 ? `expected-normalised/ satisfies ${name}` : findings.join("; "));
-}
-
 // must-FAIL siblings: one broken tree per defect; the culprit check reddens with its NAMED finding
 // while the other two checks stay green on the SAME tree (sibling control). The `selection-*` trees
 // vary which input rows the checks must REACH (no-space `tier:G(x)`, `(A)`, bare `a)`) rather than
 // the verdict (L-186); `annotated-ids-dropped` is the id-list-with-annotation branch of rule 6.
-for (const [suffix, culprit, named] of [
+const NORM_BROKEN = [
   ["comment-in-frontmatter", "normalise-enum-plain", "enum-not-plain: TASK-931 class=execution   # was \"spike\" before G2"],
   ["depends-prose", "normalise-depends-prose-to-assumes", "depends-prose-kept: TASK-932 depends-on=none — but the rollback script must exist first"],
   ["lettered-merged", "normalise-lettered-split", "lettered-box-count: TASK-933 want 3 got 1"],
@@ -974,17 +976,50 @@ for (const [suffix, culprit, named] of [
   ["selection-upper", "normalise-lettered-split", "lettered-box-count: TASK-934 want 2 got 1"],
   ["selection-bare-paren", "normalise-lettered-split", "lettered-box-count: TASK-935 want 2 got 1"],
   ["annotated-ids-dropped", "normalise-depends-prose-to-assumes", "depends-ids-lost: TASK-935 depends-on=(absent)"],
-] as const) {
-  const root = join(FIXTURES, `expected-normalised-${suffix}`);
+] as const;
+
+// Runs the whole Scenario-5 suite over the trees under `fixtures` (the real ones, or a CRLF copy).
+function runNormSuite(tag: string, fixtures: string) {
+  const input = join(fixtures, "input-normalise");
   for (const [name, fn] of NORM_CHECKS) {
-    const findings = fn(INPUT_NORMALISE, root);
-    if (name === culprit) {
-      const ok = findings.length === 1 && findings[0] === named;
-      report(`${name} on ${suffix} (must-FAIL sibling)`, ok, ok ? `reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`);
-    } else {
-      report(`${name} on ${suffix} (sibling control, must stay PASS)`, findings.length === 0, findings.length === 0 ? "still green on the tree that reddens the sibling check" : `also red: [${findings.join("; ")}]`);
+    const findings = fn(input, join(fixtures, "expected-normalised"));
+    report(`${name}${tag}`, findings.length === 0, findings.length === 0 ? `expected-normalised/ satisfies ${name}` : findings.join("; "));
+  }
+  for (const [suffix, culprit, named] of NORM_BROKEN) {
+    const root = join(fixtures, `expected-normalised-${suffix}`);
+    for (const [name, fn] of NORM_CHECKS) {
+      const findings = fn(input, root);
+      if (name === culprit) {
+        const ok = findings.length === 1 && findings[0] === named;
+        report(`${name} on ${suffix}${tag} (must-FAIL sibling)`, ok, ok ? `reddens with exactly '${named}'` : `findings = [${findings.join("; ")}], wanted exactly ['${named}'] -- the check cannot discriminate`);
+      } else {
+        report(`${name} on ${suffix}${tag} (sibling control, must stay PASS)`, findings.length === 0, findings.length === 0 ? "still green on the tree that reddens the sibling check" : `also red: [${findings.join("; ")}]`);
+      }
     }
   }
+}
+
+runNormSuite("", FIXTURES);
+
+// CRLF proof: a Windows autocrlf checkout stores every fixture CRLF. Copy the Scenario-5 trees into a
+// temp dir with every line ending rewritten to CRLF and demand the SAME verdicts (all pass; each
+// must-FAIL tree still fails with its named finding). Without readText() this was 52 pass / 10 fail.
+{
+  const tmp = mkdtempSync(join(tmpdir(), "v1v2-crlf-"));
+  function copyCrlf(from: string, to: string) {
+    mkdirSync(to, { recursive: true });
+    for (const entry of readdirSync(from, { withFileTypes: true })) {
+      if (entry.isDirectory()) copyCrlf(join(from, entry.name), join(to, entry.name));
+      else writeFileSync(join(to, entry.name), readFileSync(join(from, entry.name), "utf8").replace(/\r?\n/g, "\r\n"));
+    }
+  }
+  for (const entry of readdirSync(FIXTURES, { withFileTypes: true })) {
+    if (entry.isDirectory() && /^(input-normalise|expected-normalised)/.test(entry.name)) copyCrlf(join(FIXTURES, entry.name), join(tmp, entry.name));
+  }
+  const probe = readFileSync(join(tmp, "input-normalise", "TODO.md"), "utf8");
+  report("crlf-copy-really-crlf", probe.includes("\r\n") && !/[^\r]\n/.test(probe), "temp copy of input-normalise/TODO.md has CRLF on every line");
+  runNormSuite(" [CRLF]", tmp);
+  rmSync(tmp, { recursive: true, force: true });
 }
 
 // --- summary --------------------------------------------------------------------------------
