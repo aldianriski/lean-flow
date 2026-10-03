@@ -43,3 +43,41 @@ owner opens (D2).
 
 ### 2026-10-03 | progress | plan_commit recorded: cd8d355
 The `plan locked` commit is `cd8d355`; this entry and the frontmatter field land in the next commit.
+
+### 2026-10-03 | progress | G1/G2 signed (owner); RC = side branch + tag; T2 waits on workdoo SPRINT-009 T4
+**G1:** full checklist for T1 (amended at promote) and T2 (`origin: manual`); fast-path confirm (scope unchanged) for T3–T6, all
+`origin: decomposer`. None is L. Goals, files, out-of-scope and assumptions confirmed; recon recorded below.
+**G2:** preflight CLEAR on `f4f128a` (no shared file; waves T1 = 0 · T2 = T3 = 1 · T4 = T5 = 2 · T6 = 3). Rulings:
+- **A1 → ruled.** The candidate is cut on a side branch `release/2.0.0-rc.1`, tagged `v2.0.0-rc.1`, with every derived manifest at
+  `2.0.0-rc.1` **on that branch only**. It is checked out to a folder outside the repo and loaded in workdoo sessions with
+  `claude --plugin-dir <path>` (flag verified present, Claude Code 2.1.288), with the user-scope `lean-flow@lean-flow` disabled for that
+  project so two copies never load. Why: this machine installs lean-flow at user scope from GitHub with `autoUpdate: true`, so an rc on
+  `main` is one push away from every consumer. `main` stays 1.66.1 until T6. The rc commit never lands on `main`, so leg 15's
+  `plan_commit..HEAD` range never sees it.
+- **A2 → answered by recon, and it adds a dependency.** `readVersionPins`/`checkVersionPins` have no production caller and no real probe
+  exists in workdoo. workdoo SPRINT-009 **T4** ("Give the version pin a production caller", cites lean-flow TASK-365) builds it. Owner
+  ruling: **T2 is blocked on workdoo SPRINT-009 T4**, so "the running plugin verified to report it" uses the real probe. Unblock condition:
+  that task's DoD ticked on workdoo `main`.
+- **T3 tier:** other G per ADR-050 (no shipped skill names `run-layout-fixtures.ts`; it is a maintainer leg). Bar: a must-FAIL fixture per
+  check plus one run on real artifacts, certified from a fresh checkout (L-182), under D3's Codex loop. No mutation campaign.
+- **A3:** `codex-cli 0.158.0` and `kimi 0.27.0` are on PATH; T3(c) confirms they resolve the plugin.
+
+### 2026-10-03 | scope-change | T3 (TASK-372): Done-when (b)'s "tombstone" state is n/a
+**What broke:** the frozen criterion lists "tombstone, absent-TODO.md and stray-write states". The owner ruled on 2026-09-24 (amendment in
+TASK-372 itself) that `migrate` leaves no tombstone. A tombstone state therefore cannot occur on any tree 2.x produces.
+**Impact:** no fixture is built for it. The risk it stood for (a 1.x writer meeting a v2 tree) is covered by the stray-write case: a 1.x write
+recreates `TODO.md` → mixed → refused → `migrate` re-ingests it. The box is ticked with the tombstone clause marked n/a and this entry
+cited; the frozen text is not edited.
+**Re-confirm G2:** owner ruled at G2 sign-off (2026-10-03): rule it n/a.
+
+**Consequence lookups (TD-092):**
+consequence · T1 · behaviour:material · governance:low
+consequence · T2 · behaviour:material · governance:low
+consequence · T3 · behaviour:low · governance:high
+consequence · T4 · behaviour:material · governance:low
+consequence · T5 · behaviour:low · governance:low
+consequence · T6 · behaviour:material · governance:high
+T1 · data migration in a consumer repo · Codex loop (D3) · T2 · deployment on a candidate · Codex loop · T3 · gate composition the release
+rests on → other-G bar + Codex loop · T4 · consumer view reads a new source · Codex loop · T5 · research measurement, method unchanged ·
+Codex loop · T6 · versioned manifests are the consumer contract → Codex loop + lockstep derived by `grep -l`.
+**State at sign-off:** T1 is waiting on the owner action "commit workdoo's SPRINT-009 promote" (still uncommitted at 2026-10-03).
