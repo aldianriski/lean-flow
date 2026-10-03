@@ -322,22 +322,25 @@ function census(root: string): Census {
 
 // Census cases. "ok" fixtures are controls; the others are must-FAIL fixtures -- the case PASSES only
 // when census() reports the named finding (a duplicate id, or a NOID store file).
-const CENSUS_CASES: Array<[string, "ok" | "duplicate" | "noid", number, number]> = [
-  // [fixture, expected verdict, todo ids, store ids]
-  ["mixed-stray-write", "ok", 1, 1],
-  ["census-ok-quoted-controls", "ok", 1, 3], // quoted/single-quoted ids, [X] box, README.md + .gitkeep present
-  ["census-dup-xbox", "duplicate", 2, 1], // `- [X] TASK-901` must still count
-  ["census-dup-quoted-id", "duplicate", 1, 1], // frontmatter "TASK-001", body `id: TASK-901`
-  ["census-noid-nontask-file", "noid", 1, 1], // non TASK-* store file with no frontmatter id
+const CENSUS_CASES: Array<[string, "ok" | "duplicate" | "noid", number, number, string[]]> = [
+  // [fixture, expected verdict, todo ids, store ids, EXACT offending identity: dup ids or NOID file names]
+  ["mixed-stray-write", "ok", 1, 1, []],
+  ["census-ok-quoted-controls", "ok", 1, 3, []], // quoted/single-quoted ids, [X] box, README.md + .gitkeep present
+  ["census-dup-xbox", "duplicate", 2, 1, ["TASK-901"]], // `- [X] TASK-901` must still count
+  ["census-dup-quoted-id", "duplicate", 1, 1, ["TASK-001"]], // frontmatter "TASK-001", body `id: TASK-901`
+  ["census-noid-nontask-file", "noid", 1, 1, ["notes-no-id.md"]], // non TASK-* store file with no frontmatter id
 ];
-for (const [dir, expected, nTodo, nStore] of CENSUS_CASES) {
+for (const [dir, expected, nTodo, nStore, who] of CENSUS_CASES) {
   const c = census(join(FIXTURES, dir));
   const actual = c.noid.length ? "noid" : c.dups.length ? "duplicate" : "ok";
   const counts = c.todoIds.length === nTodo && c.storeIds.length === nStore;
+  // WHICH id / file: the exact set, not just "some duplicate" (a wrong collision must not pass).
+  const got = (actual === "noid" ? c.noid : c.dups).slice().sort();
+  const identity = JSON.stringify(got) === JSON.stringify(who.slice().sort());
   report(
     dir.startsWith("census-") ? dir : `census-${dir}`,
-    actual === expected && counts,
-    `todo=[${c.todoIds}] store=[${c.storeIds}] noid=[${c.noid}] dups=[${c.dups}] -> ${actual} (expected ${expected}; counts ${nTodo}+${nStore} ${counts ? "ok" : "WRONG"})`,
+    actual === expected && counts && identity,
+    `todo=[${c.todoIds}] store=[${c.storeIds}] noid=[${c.noid}] dups=[${c.dups}] -> ${actual} (expected ${expected}; counts ${nTodo}+${nStore} ${counts ? "ok" : "WRONG"}; identity [${who}] ${identity ? "ok" : "WRONG"})`,
   );
 }
 
