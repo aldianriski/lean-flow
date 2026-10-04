@@ -343,11 +343,11 @@ Retro written. Buckets: TD-219..222 (lean-flow) · TD-037/038 (workdoo `d3852b0`
 §11 retention approved by the owner: sprint + log → `archive/`, EPIC-017 → `docs/epic/archive/`.
 
 ### 2026-10-04 | handoff | reconciled at close -- steps 1–5 done; retro candidates → TD/L/TASK above; post-push actions → Owner-action checklist
+handoff-status: spent
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-114-release.md
 Routing of `handoff-sprint-114-release.md`: memory freed by the owner (Chrome) → gate re-run detached → T6 ticked → close (this entry).
 TD candidates → TD-219 (lockstep prerelease), TD-220 (`/prime` under `--plugin-dir`), TD-221 (dod-delta `fatal:` stderr), TD-222 (R1).
 Learnings (a)/(b)/(d) → L-226/L-227/L-228. **(c) is ruled as no learning:** the controls caught both instruments, which is the rule working,
 recorded under Retro › Worked. Follow-up → TASK-402. workdoo notes → workdoo TD-037/038. Post-release workdoo `.env`/settings actions →
 sprint Owner-action checklist. **Housekeeping dirs are ruled as having no durable home** (host-local leftovers, listed in the close report
 only). The STALE-plugin blocker clears with the reinstall after the owner's push.
-handoff-status: spent
-handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-114-release.md
