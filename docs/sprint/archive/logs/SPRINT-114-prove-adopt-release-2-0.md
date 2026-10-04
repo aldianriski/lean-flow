@@ -351,3 +351,8 @@ Learnings (a)/(b)/(d) → L-226/L-227/L-228. **(c) is ruled as no learning:** th
 recorded under Retro › Worked. Follow-up → TASK-402. workdoo notes → workdoo TD-037/038. Post-release workdoo `.env`/settings actions →
 sprint Owner-action checklist. **Housekeeping dirs are ruled as having no durable home** (host-local leftovers, listed in the close report
 only). The STALE-plugin blocker clears with the reinstall after the owner's push.
+
+### 2026-10-04 | progress | close gate (`QA_FULL=1`) killed by the host low-memory reaper: no verdict; re-run deferred to after the push (owner ruling)
+Partial: 237 lines, 202 PASS / 2 FAIL. Both FAILs were `handoff-state`, from the close's own spent record (fields not directly under the
+heading); fixed in `e66c11f`, and the checker re-run green. **Owner ruling:** re-run the full opt-in gate after the push, in a fresh
+session on the installed 2.0.0. Until then the close rests on the partial run plus per-check re-runs, not on a full verdict.
