@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-03
+last_updated: 2026-10-04
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-114 — Prove, Adopt, Release 2.0 — closed 2026-10-04 · `16b5a72` · 6 of 6 members in `done/` (**released `2.0.0`**, `5f62d0f`, BREAKING; push owner-reserved) · `epic: EPIC-017` — **closed EPIC-017** (10/10 Closed-when): workdoo migrated on a retained branch and adopted on main on `2.0.0-rc.1`, both layout directions + upgrade path proven, the EPIC-016 view reads the store, "after" effectiveness measured (verdict NOT demonstrated); release gate 313/7 → 7 review records resolved · TD-219..222 · TASK-401/402 · L-225..228 · workdoo TD-037/038
 - SPRINT-113 — Ship the Store, Trim the Guards — closed 2026-10-03 · `4ee8c80` · 11 of 11 DoD, all four members in `done/` (unreleased; D2) · `epic: EPIC-017` — EPIC-017 step 1 done: `TASK.md.template` ships and `TODO.md.template` is retired, init exercised on an empty dir, the durable docs describe the v2 loop, migrate states its 10 rules with store-derived verification (unblocks `371`); SPRINT-112's audit cuts landed (2,442 lines) · TD-215 · TD-216 · TASK-400 · L-224, L-182 at count 3
 - SPRINT-112 — Govern Lighter — closed 2026-10-03 · `5fd8fa0` · 6 of 6 DoD, both members in `done/` (unreleased; D3) · `epic: EPIC-017` — **met Closed-when 3 and 4**: soft caps closed by recorded dispositions (`.cap-dispositions`, Shell+TS parity), CLAUDE.md slimmed with actions kept (~16081 → ~13419 tokens); ADR-050 accepted (the proof bar scales with consequence) from a 60-guard audit (39 keep · 18 freeze · 3 cut) · TD-214 · TASK-399 · L-223, L-218 at count 2
 - SPRINT-111 — Delete TODO.md — closed 2026-10-02 · `47f0595` · 13 of 13 DoD, all five members in `done/` (unreleased; D3) · `epic: EPIC-017` — **met Closed-when 2**: `TODO.md` deleted and every reader retired (S11.TODOCAP kept as a note per ADR-034; spec 0.13.0); migrate handles by-reference sprints and was agent-run on this repo; §2 retired rows are not placed · TD-210…213 · TASK-397 · L-221/L-222, L-220 at count 2
