@@ -114,9 +114,9 @@ entry is marked BREAKING and carries the upgrade section; nothing is pushed.
 ## Owner-action checklist
 - [x] Commit workdoo's SPRINT-009 promote, so T1 can branch from a clean base (D2). ✓ done before T1 branched (Log: T1 migrated on `lean-flow-2.0-migration`).
 - [x] Open the workdoo-main window for T2 and T4's merges (D2). Until it opens, they park. ✓ opened by the owner (Log: scope-change "T2 unblock", 2026-10-03).
-- [ ] Push the release after T6 (owner-reserved).
+- [x] Push the release after T6 (owner-reserved). ✓ pushed on owner instruction 2026-10-04: lean-flow `8e64bbe..a3657c4`, workdoo `ead36e9..d3852b0`.
 - [~] ~~T3(c): run `/plugins install D:/Project/lean-flow-rc1` once in an interactive Kimi session and report whether the 14 lean-flow skills appear (owner ruling 2026-10-03).~~ — withdrawn: Kimi skipped by owner ruling (2026-10-03).
-- [ ] After pushing `2.0.0`: install from the marketplace once in a scratch profile and confirm it loads `2.0.0` (T3(d) was exercised via `--plugin-dir`; owner ruling 2026-10-03).
+- [x] After pushing `2.0.0`: install from the marketplace once in a scratch profile and confirm it loads `2.0.0` (T3(d) was exercised via `--plugin-dir`; owner ruling 2026-10-03).
 - [ ] workdoo after the push (routed at close from the handoff): delete `.claude/settings.local.json` (the 1.x guard); in `.env`, unset `LEANFLOW_PLUGIN_DIR` (or point it at a 2.0.0 tree) and set `LEANFLOW_PLUGIN_VERSION_PIN=2.0.0`. Start the stopped `workdoo-postgres` container if workdoo should use its DB.
 
 ## Decisions (pre-locked)

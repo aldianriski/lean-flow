@@ -356,3 +356,10 @@ only). The STALE-plugin blocker clears with the reinstall after the owner's push
 Partial: 237 lines, 202 PASS / 2 FAIL. Both FAILs were `handoff-state`, from the close's own spent record (fields not directly under the
 heading); fixed in `e66c11f`, and the checker re-run green. **Owner ruling:** re-run the full opt-in gate after the push, in a fresh
 session on the installed 2.0.0. Until then the close rests on the partial run plus per-check re-runs, not on a full verdict.
+
+### 2026-10-04 | progress | pushed (owner instruction); `2.0.0` installed from the marketplace in a scratch profile → loads 14 skills
+Pushed `main` in both repos: lean-flow `8e64bbe..a3657c4`, workdoo `ead36e9..d3852b0`. Scratch profile (`CLAUDE_CONFIG_DIR` scoped to the
+invocation): `plugin marketplace add aldianriski/lean-flow` → `plugin install lean-flow@lean-flow` → `Version: 2.0.0`, and `plugin details`
+lists Skills (14), Agents 0, Hooks 0, ~1,588 always-on tokens. **Surprise:** the first attempt, from a ~120-char scratch path, failed to
+clone with `Filename too long`. The longest tracked path is 141 chars, so a normal install base (66 chars) reaches ~207, under Windows' 260,
+but with a thin margin → TD-223. The owner's own install was then updated 1.66.1 → 2.0.0 (`plugin update`; takes effect on restart).

@@ -320,6 +320,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-223** severity: low | status: open | created: Sprint-114 (post-push scratch-profile install)
+  - Summary: **The plugin's longest tracked path leaves a thin margin under Windows' 260-char MAX_PATH.** The longest is 141 chars
+    (`docs/work/backlog/TASK-354-…`; v1→v2 eval fixtures run 137–139). A marketplace clone failed with `Filename too long` from a ~120-char
+    config dir. The default base (`%USERPROFILE%\.claude\plugins\cache\lean-flow\lean-flow\<ver>\`, 66 chars here) reaches ~207, so a
+    long username, a custom `CLAUDE_CONFIG_DIR`, or a longer task slug can break a Windows consumer's install with no `core.longpaths`. Nothing
+    caps a task-file slug's length, and the store makes long filenames the norm.
+  - done-when: a checked ceiling on tracked path length (or slug length), with headroom stated against MAX_PATH, plus a must-FAIL fixture;
+    or a documented `core.longpaths` prerequisite in the README install section.
+
 - **TD-222** severity: low | status: open | created: Sprint-114 (close retro, T5 effectiveness probe R1)
   - Summary: **No always-loaded doc says where a NEW task lands.** The "after" measurement's probe R1 ("where does a new TASK get written
     today?", key `docs/work/backlog/`) was a retrieval miss. `.claude/CONTEXT.md` § Task entry shape gives `docs/work/<status>/` and § roster
