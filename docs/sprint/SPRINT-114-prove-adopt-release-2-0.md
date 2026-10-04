@@ -3,8 +3,8 @@ sprint: 114
 slug: prove-adopt-release-2-0
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-10-03
-status: active
+last_updated: 2026-10-04
+status: closed
 gates_signed: G1,G2 @ f4f128a
 plan_commit: cd8d355
 update_trigger: sprint execute/close events
@@ -111,11 +111,12 @@ Tier X. A MAJOR bump made by hand, since `release-patch` is PATCH-only, and it s
 entry is marked BREAKING and carries the upgrade section; nothing is pushed.
 
 ## Owner-action checklist
-- [ ] Commit workdoo's SPRINT-009 promote, so T1 can branch from a clean base (D2).
-- [ ] Open the workdoo-main window for T2 and T4's merges (D2). Until it opens, they park.
+- [x] Commit workdoo's SPRINT-009 promote, so T1 can branch from a clean base (D2). ✓ done before T1 branched (Log: T1 migrated on `lean-flow-2.0-migration`).
+- [x] Open the workdoo-main window for T2 and T4's merges (D2). Until it opens, they park. ✓ opened by the owner (Log: scope-change "T2 unblock", 2026-10-03).
 - [ ] Push the release after T6 (owner-reserved).
 - [~] ~~T3(c): run `/plugins install D:/Project/lean-flow-rc1` once in an interactive Kimi session and report whether the 14 lean-flow skills appear (owner ruling 2026-10-03).~~ — withdrawn: Kimi skipped by owner ruling (2026-10-03).
 - [ ] After pushing `2.0.0`: install from the marketplace once in a scratch profile and confirm it loads `2.0.0` (T3(d) was exercised via `--plugin-dir`; owner ruling 2026-10-03).
+- [ ] workdoo after the push (routed at close from the handoff): delete `.claude/settings.local.json` (the 1.x guard); in `.env`, unset `LEANFLOW_PLUGIN_DIR` (or point it at a 2.0.0 tree) and set `LEANFLOW_PLUGIN_VERSION_PIN=2.0.0`. Start the stopped `workdoo-postgres` container if workdoo should use its DB.
 
 ## Decisions (pre-locked)
 - **D1** — No new `.sh` file; executable logic is TypeScript on Bun (owner rule 2026-09-09).
@@ -148,5 +149,40 @@ entry is marked BREAKING and carries the upgrade section; nothing is pushed.
 | lean-flow `release/2.0.0-rc.1` (tag `v2.0.0-rc.1`, never `main`) · workdoo `lean-flow-2.0-migration` @ `629f91c` (external, retained) | T1 | the candidate cut; workdoo's queue moved onto the store by it (15 ids) | High | id/box/field census with seeded controls · Codex CLEAR + content spot-check · verify 3/1 under owner ruling (workdoo TD-034) |
 | `docs/research/logs/epic-017-effectiveness.md` (new) | T5 | the "after" measurement: retrieval 9→5 literal (11→6 by convention), recurrence 22/19 → 13/16, completeness not measurable; effectiveness NOT demonstrated | Low | key committed before answers · Codex r1→r3 CLEAR |
 | `evals/run-layout-fixtures.ts` · `evals/fixtures/layout/` (6 new fixture trees) | T3 | 2.0's both-direction safety retained: stray-write (mixed) state, store census with exact-identity must-FAILs, Codex/Kimi manifest cases | Low | 41/0 fresh clone + autocrlf main · Codex r1→r3 CLEAR · tsc 0 |
+| workdoo `main`: migration fast-forward `629f91c` → pin gate `447e208` → `LEANFLOW_PLUGIN_DIR` for workers `2983b66` (external) | T2 | workdoo main on the store, running 2.0.0-rc.1 with the version pin verified by the real probe | High | Codex 4 + 3 rounds → CLEAR · real probe |
+| workdoo `main`: pin-gate test fix `0cb75b3` → task links `fa5f39a` (migration 0010) · `docs/epic/EPIC-016-agentic-governance-dashboard-pilot.md` | T4 | the Work & Queue view reads task status from the store's folders (`taskLifecycle`, never stored) | Med | DB suites 116/1 (TD-034 sibling → workdoo TD-037) · must-FAIL cache seed · Codex r1→r2 CLEAR |
+| `.claude-plugin/{plugin,marketplace}.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `README.md` · `CHANGELOG.md` · `docs/changelog/CHANGELOG-{1.65.1,1.64.0}.md` (new) · `evals/run-orchestrator-store-fixtures.ts` (TD-211) | T6 | `2.0.0`: the BREAKING hard cut, with an upgrade section; the previous two release blocks rotated out (§11) | Med | lockstep PASS · rotation lossless (CRLF-normalised sum) · `QA_FULL=1` 313/7 → the 7 resolved (`47037f1`) · Codex r1 → CLEAR |
 
 ## Retro
+
+**Retrieval check:** one miss and two hits. **Miss:** L-151 (a decision recorded where its reader cannot parse it is not a decision) was on
+file, and every Codex review this sprint was still logged as prose only. The release gate failed 7 `review-depth-*-absent` rows at the last
+step (→ L-225, TASK-401). **Hits:** L-224: the sprint checkers were re-run after every tick write, evidence suffix included, and stayed
+green. L-218: T3's post-merge typecheck red was found and fixed within the hour (`19670ac`).
+
+**Cost:** coordinator (Opus) across three sessions + Sonnet builder lines for T1–T4 + Codex loops (T1 ×1 · T2 ×4+3 on the workdoo chain ·
+T3 ×3 · T4 ×2 · T5 ×3 · T6 ×1, ≈22k tokens) + 3 full opt-in gate runs (1983 s promote · 1 killed by host memory pressure · 2830 s
+release). Per-session token totals for the first two sessions were not recorded, so total cost is **unavailable**, not zero. Delivered: 6 of 6
+members, EPIC-017 complete, `2.0.0` committed.
+
+**Worked**
+- Release == candidate: `git diff v2.0.0-rc.1 HEAD -- skills/ templates/ spec/` empty. What was proven on workdoo is byte-for-byte what ships.
+- Bisect over trust: T4's "pre-existing" failures were re-attributed to the coordinator's own gate merge before anyone built on the claim.
+- Controls caught two coordinator instruments before they misled (the store-check's leading-space values; selector-(b)'s sprint-number
+  extraction): the second-route cross-check doing its job.
+- Running the gate detached, as its own call, and reading its own verdict line got a clean verdict after the first run was reaped.
+
+**Friction**
+- Host memory: the release gate was killed once by the low-memory reaper (no verdict), and needs about 47 minutes of headroom.
+- Review records missing at release (7 FAILs), all from a loop the record procedure never names (L-225 → TASK-401).
+- Builder self-reports were wrong twice (L-227), a brief's file bound missed the adapter's constructor (L-228), and a DB suite skipped
+  silently while 6 tests were broken (L-226).
+- EPIC-017 Closed-when 7 is ticked as *measured, verdict NOT demonstrated*, and 10 as *gate green under owner ruling* (workdoo TD-034).
+  Both are honest, and both are weaker than a plain `[x]`.
+
+**Pattern candidate**
+- L-225 and L-227 are the ones likeliest to recur: every sprint runs a Codex loop, and every sprint takes builder reports. Watch for count 2
+  at the next close.
+
+**Routed:** Shipped → `CHANGELOG.md` v2.0.0 (`5f62d0f`, already written at T6) · Tech debt → TD-219 · TD-220 · TD-221 · TD-222 (lean-flow),
+TD-037 · TD-038 (workdoo `d3852b0`) · Follow-ups → TASK-401 · TASK-402 (TASK-400 filed earlier) · Learnings → L-225 · L-226 · L-227 · L-228.

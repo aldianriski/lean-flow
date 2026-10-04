@@ -337,3 +337,17 @@ Precedent agrees: `CHANGELOG-1.62.0.md` and `-1.64.0.md` also end without a trai
 footer at `2.0.0`, no load-bearing stale `1.66.x`, upgrade steps match the skills they name, no broken inbound anchors, and
 `git diff v2.0.0-rc.1 5f62d0f -- skills/ templates/ spec/` is empty. No push: `git branch -r --contains 5f62d0f` is empty (the remote was unreachable from the reviewer, so not re-checked live).
 review · T6 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-10-04 | close | SPRINT-114 closed: 6 of 6 members in `done/`, freeze holds; EPIC-017 Closed-when 8 ticked → epic closed
+Retro written. Buckets: TD-219..222 (lean-flow) · TD-037/038 (workdoo `d3852b0`, owner-approved) · TASK-401, TASK-402 · L-225..228.
+§11 retention approved by the owner: sprint + log → `archive/`, EPIC-017 → `docs/epic/archive/`.
+
+### 2026-10-04 | handoff | reconciled at close -- steps 1–5 done; retro candidates → TD/L/TASK above; post-push actions → Owner-action checklist
+Routing of `handoff-sprint-114-release.md`: memory freed by the owner (Chrome) → gate re-run detached → T6 ticked → close (this entry).
+TD candidates → TD-219 (lockstep prerelease), TD-220 (`/prime` under `--plugin-dir`), TD-221 (dod-delta `fatal:` stderr), TD-222 (R1).
+Learnings (a)/(b)/(d) → L-226/L-227/L-228. **(c) is ruled as no learning:** the controls caught both instruments, which is the rule working,
+recorded under Retro › Worked. Follow-up → TASK-402. workdoo notes → workdoo TD-037/038. Post-release workdoo `.env`/settings actions →
+sprint Owner-action checklist. **Housekeeping dirs are ruled as having no durable home** (host-local leftovers, listed in the close report
+only). The STALE-plugin blocker clears with the reinstall after the owner's push.
+handoff-status: spent
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-114-release.md

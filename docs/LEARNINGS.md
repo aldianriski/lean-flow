@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-03
+last_updated: 2026-10-04
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -70,6 +70,30 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ❌ Shipping a new capability **without wiring it into the jobs that trigger/chain it** — a behaviour written only in its own file is half-shipped. Wire every trigger point + downstream consumer (entry routing · dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT) and verify it *fires* end-to-end. Shipping ≠ wiring (SPRINT-022 audit: dispatch · review-split · fog-mode all shipped half-connected → L-020).
 
 ---
+
+## L-228 [tags: process] [status: active]: **A dispatch brief's file bound is a claim too: a builder that stops at it is right, and the bound is the defect.** SPRINT-114 T2's brief for wiring `LEANFLOW_PLUGIN_DIR` into workdoo's workers left out `apps/worker/src/main.ts`, the one file that constructs the adapter. The builder stopped at the bound and reported it, which was correct, and the coordinator wired `adapterFor` itself. The miss was the coordinator's: the bound was written from memory of the call path, not derived from it. **Durable form: derive a brief's file bound from a search for the consumers of the changed symbol (who constructs it, who reads it), and list that query's result in the brief, not a remembered list.**
+- seen: 2026-10-03 (SPRINT-114 T2, workdoo `2983b66`)
+- count: 1
+- promoted: no
+- related: L-222 · L-213
+
+## L-227 [tags: process] [status: active]: **A builder's self-report is a claim about the code, and twice in one sprint it was false, so the coordinator checks it against the code, not against the report.** SPRINT-114: T2's builder said the pin gate was exercised "live via the real taskkill path", but the run went through `makeProbe`, and Codex r3 caught it. T4's builder called 7 DB failures "pre-existing" against a baseline that already contained the coordinator's own gate merge, and a bisect re-attributed them (6 were the gate's). Both reports were confident and specific, and neither was malicious. **Durable form: for each load-bearing claim in a builder's report ("ran X live", "pre-existing", "unchanged"), run one independent check (a trace of the code path or a bisect against a baseline confirmed to predate the change) before acting on it.**
+- seen: 2026-10-03 (SPRINT-114 T2 Codex r3 · T4 bisect `05885a7` → `ed66734`)
+- count: 1
+- promoted: no
+- related: CLAUDE.md edit-safety (c) · L-213 · L-182
+
+## L-226 [tags: tooling] [status: active]: **A suite that skips on a missing environment variable is silent coverage loss: the gate reads green while the code it guards goes unrun.** workdoo's DB-backed suites skip without `DATABASE_URL`, and the main checkout's database was stopped. The pin-gate merge (`447e208`) broke 6 of those tests, and nothing showed it until TASK-385's builder ran them on a throwaway Postgres. **Durable form: count skips per merge, and read a skipped suite that touches the changed code as unverified, not as green. Prefer a throwaway dependency (a container on a spare port) over a skip.**
+- seen: 2026-10-03 (SPRINT-114 T4, workdoo surprise entry)
+- count: 1
+- promoted: no
+- related: L-221 · L-076
+
+## L-225 [tags: process] [status: active]: **A review run by a reviewer the record procedure does not name leaves no record, and the gate reads that silence as "review owed".** SPRINT-114 reviewed T1–T4 with Codex loops that each ended CLEAR, logged in prose. The step that appends `review · Tn · …` lists only `self-review | scoped-reviewer | code-review | security-review`, so no step that ran ever reached it. The release gate failed 7 `review-depth-*-absent` rows at the last moment. The rule was on file (L-151: a decision recorded where its reader cannot parse it is not a decision), and the retrieval missed. **Durable form: whatever ends a review loop appends the record line, whichever reviewer ran; a new reviewer joins the depth vocabulary before its first use.**
+- seen: 2026-10-04 (SPRINT-114 release gate, `QA-CHECK: 313 pass, 7 fail`)
+- count: 1
+- promoted: no
+- related: L-151 · TASK-401 · review-scoping.md · night-run.md Part 4
 
 ## L-224 [tags: tooling] [status: promoted]: **Check a frozen artifact with the checker the gate actually runs, and re-check it after every write to it, because a sibling implementation's PASS and a pre-write PASS say nothing about the gate's verdict.** SPRINT-113 hit this twice in one sprint. At plan lock the coordinator ran the Shell `check-layers-completeness.sh` (8/0); the gate runs the TS port, which FAILs a member's bare `migration-map.md` that the Shell matches by basename (a parity divergence whose differential harness P7 had never run and was being cut). Then at acceptance the coordinator appended ` ✓ <sha> — <evidence>` to a member's boxes, citing a partial path (`templates/TASK.md.template`), and the TS checker read that evidence as an undeclared file, a red found only by system-verify. **Durable form: name the gate's own checker binary when verifying a sprint file, and re-run it after any write to a file it reads, evidence suffixes included.**
 - **L-224 → promoted: `skills/orchestrator/references/dispatch.md` § Members by reference, rule 5 (Tick)** · disposition: merge — after a tick, re-run the checker the gate itself runs over every file written, evidence suffix included. count 2: SPRINT-113 plan lock (Shell 8/0 vs TS FAIL) · SPRINT-113 close (an evidence suffix tripped `member-layers-incomplete`); related TD-215. The durable rule is the record now (§11 collapse, SPRINT-114 promote).

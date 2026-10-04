@@ -2,8 +2,8 @@
 epic: 017
 slug: work-items-that-fit
 owner: Maintainer
-last_updated: 2026-10-03
-status: active
+last_updated: 2026-10-04
+status: closed
 member_sprints: [SPRINT-106, SPRINT-107, SPRINT-109, SPRINT-110, SPRINT-111, SPRINT-112, SPRINT-113, SPRINT-114]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -200,7 +200,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 | [SPRINT-111](../sprint/archive/SPRINT-111-delete-todo-md.md) | Delete TODO.md | closed `47f0595` | **Met Closed-when 2**: migrate proven on a real copy and run by an agent on this repo, 15 legacy tasks moved onto the store, `TODO.md` deleted, and every reader retired. S11.TODOCAP was kept as a note (ADR-034); spec 0.13.0. `371` now waits on `378` · `379` · `384` |
 | [SPRINT-112](../sprint/archive/SPRINT-112-govern-lighter.md) | Govern lighter | closed `5fd8fa0` | **Met Closed-when 3 and 4**: soft caps closed by recorded dispositions (`.cap-dispositions`, Shell+TS parity), CLAUDE.md slimmed with actions kept (~16081 → ~13419 tokens). Also ADR-050 (the proof bar scales with consequence) from the guard audit (`396`, not an epic member) |
 | [SPRINT-113](../sprint/archive/SPRINT-113-ship-the-store-trim-the-guards.md) | Ship the store, trim the guards | closed `4ee8c80` | EPIC-017 step 1 done: the store ships in templates and init (`378`), the durable docs describe the v2 loop (`379`), and migrate states its rules with store-derived verification (`397`). That unblocks `371` (workdoo). Also SPRINT-112's audit cuts (`398`). No Closed-when newly met (5 of 10) |
-| [SPRINT-114](../sprint/SPRINT-114-prove-adopt-release-2-0.md) | Prove, adopt, release 2.0 | active | — (in progress: `371` → `365` / `372` → `385` / `386` → `373`; targets the remaining Closed-when 6–10, ending in the `2.0.0` release) |
+| [SPRINT-114](../sprint/archive/SPRINT-114-prove-adopt-release-2-0.md) | Prove, adopt, release 2.0 | closed `CLOSE_SHA` | Closed-when 6–10 + 8: workdoo migrated on a retained branch (`371`) and adopted on main on `2.0.0-rc.1`, with the pin verified by the real probe (`365`); both layout directions + the upgrade path proven (`372`); the EPIC-016 view reads status from the store's folders (`385`); the "after" effectiveness measured, verdict NOT demonstrated (`386`); `2.0.0` released, release == candidate (`373`). Closed the epic. |
 
 **Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
 rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
@@ -232,8 +232,9 @@ rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 
       completeness, retrieval success and recurring-failure rate. Fewer lines and fewer checkboxes
       are explicitly **not** the success criterion. ✓ SPRINT-114 T5, **measured, verdict NOT demonstrated**:
       retrieval 9→5 literal; recurrence lower on both selectors; completeness not measurable (owner ruling, no post-store epic)
-- [ ] **Released as `2.0.0`** across all four manifests + the README footer, derived with
-      `grep -l '"version"' .*-plugin/*.json` and never from a list.
+- [x] **Released as `2.0.0`** across all four manifests + the README footer, derived with
+      `grep -l '"version"' .*-plugin/*.json` and never from a list. ✓ SPRINT-114 T6 `5f62d0f`: the grep derives 4 manifests, all
+      `2.0.0`, + README footer; CHANGELOG v2.0.0 BREAKING with an upgrade section; release gate resolved (`47037f1`); push owner-reserved.
 - [x] **Both layout directions are safe** — v2 skills against a v1 tree and v1 skills against a v2
       tree, each exercised, each either working or refusing cleanly. Never corrupting. This is the
       auto-update-off consumer, who is the normal case and not an edge case. ✓ SPRINT-114 T3: rc refuses v1 (7/7, 0 writes);

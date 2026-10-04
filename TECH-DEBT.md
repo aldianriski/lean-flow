@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-03
+last_updated: 2026-10-04
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -319,6 +319,35 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-222** severity: low | status: open | created: Sprint-114 (close retro, T5 effectiveness probe R1)
+  - Summary: **No always-loaded doc says where a NEW task lands.** The "after" measurement's probe R1 ("where does a new TASK get written
+    today?", key `docs/work/backlog/`) was a retrieval miss. `.claude/CONTEXT.md` § Task entry shape gives `docs/work/<status>/` and § roster
+    names `/triage`'s `docs/work/backlog/`, but nothing joins the two into "a new task is born in `backlog/`". The answer is reachable only by
+    inference (`docs/research/logs/epic-017-effectiveness.md`).
+  - done-when: one always-loaded line names `docs/work/backlog/` as the birth folder of a new task, and R1 scores a literal hit on a re-run.
+
+- **TD-221** severity: low | status: open | created: Sprint-114 (close retro, T6 acceptance)
+  - Summary: **`scripts/lib/check-dod-delta.ts` leaks `fatal:` git stderr on a `git mv` store-transition commit.** The verdicts are still
+    correct (`dod-delta … 0 unattributed ticks` at the release gate), but the noise lands in the gate log next to real output, where a reader
+    has to judge it harmless every time. That is the "warning read as furniture" shape (L-138).
+  - done-when: the git call that fails on a rename-only commit has its stderr captured and either handled or suppressed with a reason, and
+    a `git mv` commit in the checked range produces no `fatal:` line.
+
+- **TD-220** severity: low | status: open | created: Sprint-114 (close retro, T3(d) `--plugin-dir` run)
+  - Summary: **`/prime`'s `Skills:` row reads `n/a` under `claude --plugin-dir <repo>`** even though `plugin.json` sits in that base dir.
+    The skill compares the base-dir version with the host repo's manifest and treats "no version in the path" as "no local plugin repo". A
+    `--plugin-dir` session has no version segment in its path, so the row degrades to `n/a`, the very session where freshness is
+    guaranteed.
+  - done-when: under `--plugin-dir`, the row reads the base dir's own `.claude-plugin/plugin.json` and reports `fresh`; the cached-install
+    and no-manifest rows are unchanged.
+
+- **TD-219** severity: low | status: open | created: Sprint-114 (close retro, T1 RC cut)
+  - Summary: **`scripts/lib/check-manifest-lockstep.sh` cannot read a prerelease version.** `ver_of` matches `X.Y.Z` only (l.26), so
+    `2.0.0-rc.1` is read as `2.0.0`. The lockstep check would pass four manifests whose prerelease suffixes disagree, and it cannot report what
+    the RC actually carries.
+  - done-when: `ver_of` captures the full SemVer string, including prerelease and build, and a must-FAIL fixture with mismatched suffixes
+    (`-rc.1` vs `-rc.2`) reddens.
 
 - **TD-218** severity: low | status: open | created: Sprint-114 (T3 Codex round 2, census-zero → TD per owner rule)
   - Summary: **The layout harness's store census (`evals/run-layout-fixtures.ts`, `frontmatterId`/`census`) misreads three input shapes.**
