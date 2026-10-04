@@ -316,3 +316,24 @@ unticked in `in_progress/`; it is not re-run without the owner (memory).
 ### 2026-10-03 | handoff | verify the 2.0.0 release (rerun QA_FULL), tick TASK-373, close SPRINT-114 + EPIC-017
 handoff-status: live
 handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-114-release.md
+
+### 2026-10-04 | progress | release gate (`QA_FULL=1`, detached, own call) on `9af8163`: `QA-CHECK: 313 pass, 7 fail`, 2830 s
+All 7 FAILs are one leg, `review-depth-*-absent`: T1–T4 and T6 carry a `consequence` line naming `behaviour:material` /
+`governance:high`, and no `review ·` record line was ever appended. For T1–T4 (and T5) the review **did** happen. Each ended in a Codex
+loop CLEAR, logged as prose in the entries above (T1 l.191 · T2 l.249 · T3 l.150 · T4 l.287 · T5 l.213), but never in the record shape
+that `check-review-depth.sh` reads (night-run.md Part 4). Recorded now, as fact, not as a re-review. T6 had **no** review: a Codex pass
+on `5f62d0f` is running now, and its line is appended when it reports. Free RAM before the run was 3.8 GB, after the owner trimmed Chrome; no reaper kill.
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+review · T2 · scoped-reviewer · behaviour:material · governance:low
+review · T3 · scoped-reviewer · behaviour:low · governance:high
+review · T4 · scoped-reviewer · behaviour:material · governance:low
+review · T5 · scoped-reviewer · behaviour:low · governance:low
+
+### 2026-10-04 | progress | T6 (TASK-373): Codex r1 on `5f62d0f` FINDINGS 1, rejected by the coordinator as by-design → CLEAR
+**Finding:** the §11 rotation dropped two `---` lines, so it is not strictly verbatim. **Confirmed as fact, rejected as a defect.** Both are
+inter-block separators in the root CHANGELOG, and the file boundary now does their job. That is exactly the "+ 2 separators" in the earlier
+lossless sum (453 + 106 + 56 + 2 = 617). Codex's own diff shows only those two lines and all release prose preserved exactly once.
+Precedent agrees: `CHANGELOG-1.62.0.md` and `-1.64.0.md` also end without a trailing `---`. Codex also passed: 4 derived manifests + README
+footer at `2.0.0`, no load-bearing stale `1.66.x`, upgrade steps match the skills they name, no broken inbound anchors, and
+`git diff v2.0.0-rc.1 5f62d0f -- skills/ templates/ spec/` is empty. No push: `git branch -r --contains 5f62d0f` is empty (the remote was unreachable from the reviewer, so not re-checked live).
+review · T6 · scoped-reviewer · behaviour:material · governance:high
