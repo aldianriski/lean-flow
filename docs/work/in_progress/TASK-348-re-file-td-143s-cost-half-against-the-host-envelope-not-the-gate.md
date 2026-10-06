@@ -21,7 +21,7 @@ origin note: re-filed at the SPRINT-100 promote governance review; its predecess
 
 ## Done when
 
-- [ ] `TD-143`'s open half names a subject that exists. SPRINT-099 T1 measured the gate at **~9.5 MB, moving 320 kB across 547 s**, while system free memory swung **695 MB** around it — so there is no gate memory cost to reduce and the row's remaining half currently points at nothing. Either re-aim it at the host envelope it actually depends on (562 MB free of 14 078 MB, `vmmemWSL` 1 989 MB, three `claude` processes 1 178 MB, commit 41.3/56.7 GB), or rule the row closed on the grounds that the mechanism is now known and the cost is not ours to pay.
+- [x] `TD-143`'s open half names a subject that exists. SPRINT-099 T1 measured the gate at **~9.5 MB, moving 320 kB across 547 s**, while system free memory swung **695 MB** around it — so there is no gate memory cost to reduce and the row's remaining half currently points at nothing. Either re-aim it at the host envelope it actually depends on (562 MB free of 14 078 MB, `vmmemWSL` 1 989 MB, three `claude` processes 1 178 MB, commit 41.3/56.7 GB), or rule the row closed on the grounds that the mechanism is now known and the cost is not ours to pay. ✓ ruled closed by the owner (2026-10-06): TD-143 → resolved → TASK-348, with the reason written in the row (the gate holds ~9.5 MB; the kill is the host envelope; off-host mitigation 3/3 green in 105–109 s, `qa-gate-timing.md` Round 22)
 
 ## Touches
 

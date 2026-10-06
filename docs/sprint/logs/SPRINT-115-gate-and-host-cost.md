@@ -113,3 +113,8 @@ differentials cost 1 · 2 · 5–6 s on this host (Windows 2026-09-20: 21.2 · 3
 (`9a0bfaa`, ADR-050), cited in Round 22. `consequence · T2 · behaviour: none (measurement + research log) · governance: low (J2 ruling recorded
 as moot by the owner)` → self-review. TASK-357's tracker rows TD-090 · TD-117 · TD-128 · TD-168 are left for T3's ruling and the close: Round 22
 is the evidence they were waiting on, and re-aiming or closing them is an owner call, not this measurement's.
+
+### 2026-10-06 | progress | T3 (TASK-348) done: TD-143's cost half ruled closed by the owner; the reason is in the row
+Owner ruling (popup), chosen over "re-aim at the Windows host envelope": the gate holds ~9.5 MB, the kill is the host's memory, and the
+off-host route is a working mitigation (Round 22, 3/3 green in 105–109 s). Re-file fresh if a verdict-less run recurs with > 3 GB free.
+`consequence · T3 · behaviour: none · governance: low (J2 ruling recorded as the owner gave it)` → self-review.

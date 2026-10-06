@@ -1389,7 +1389,7 @@ status: current
   - **Re-file fresh if** either checker's extractor is rewritten, since the divergence is the subject
     and a one-sided change closes the row without closing the gap.
 
-- **TD-143** severity: **high** | status: open | created: Sprint-096
+- **TD-143** severity: **high** | status: resolved → TASK-348 (ruled closed, owner, 2026-10-06) | created: Sprint-096
   - Summary: **`qa-check.sh` can be killed by the HOST for memory and produce no verdict line, and
     the wall-clock budget guard passes on the way down — so the guard built to eliminate
     verdict-less runs does not watch the door this one comes through.** Distinct mechanism from
@@ -1430,6 +1430,11 @@ status: current
     this file's own consumption. **Cost half should now be re-filed against the HOST envelope**
     (562 MB free, WSL 1 989 MB, three `claude` processes 1 178 MB, commit 41.3/56.7 GB) rather than
     against the gate.
+  - **Ruled closed (owner, 2026-10-06, SPRINT-115 T3 / TASK-348).** The cost half named a subject that does not exist: the gate holds ~9.5 MB
+    (SPRINT-099 T1, `docs/research/qa-check-memory-profile.md`), and the kill is the **host's** memory envelope (WSL, concurrent Claude
+    sessions, paging), which is not this repository's cost to pay. The mechanism is known, and a working mitigation now exists: the documented off-host
+    route, an Ubuntu VPS where the complete `QA_FULL=1` gate finished **3/3 green in 105–109 s** (`qa-gate-timing.md` Round 22). **Re-file fresh
+    if** a verdict-less run recurs on a host with > 3 GB free, which would point back at the gate.
 
 - **TD-138** severity: medium | status: open | created: Sprint-095
   - Summary: **A `Layers:` declaration that wraps at column 0 is silently dropped by the dispatch
