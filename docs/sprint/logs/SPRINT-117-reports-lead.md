@@ -37,3 +37,12 @@ promote-check: `PASS -- 4 pass, 0 fail`.
   prime's header (`git grep 'PRIME HEALTH'`: only the SKILL.md itself).
 - **A1 confirmed (owner):** shape, not length; no cap added.
 - Built inline (three small doc edits; a dispatch would cost more than the edit), then a Codex review (shipped skills), then cold runs for the owner (J2).
+
+### 2026-10-06 | progress | T1 built inline (`118973e`): the three skills' boundary reports lead with the verdict
+- prime: step 5 says the report's first row is the verdict; the Output format block gains a `Verdict:` row first (`Next:` stays last).
+- orchestrator: one **Report shape** paragraph under § Review: gate verdicts, task completions, the sprint-bulk exit and confirmation popups.
+- lean-doc-generator: step 8 rewritten in place; popups lead with their decision the same way.
+- Caps: prime 132 · orchestrator 137 · lean-doc-generator 138 (all ≤ 140); prose-density `30 pass, 0 fail`.
+- **Coordinator fix (`ab2ce79`):** the promote-time L-229 merge had made CONTEXT.md line 108 490 chars (prose-density FAIL, found by this run);
+  rewritten at 340 chars with the same rule. CONTEXT stays at 150/150 lines, so splitting it was not an option.
+consequence · T1 · behaviour:low · governance:high
