@@ -60,3 +60,10 @@ consequence · T1 · behaviour:low · governance:high
   report's "what to do" half was the weakest (vague, then repeated by `Next:`).
 - **Owner ruling (J2): PASS.** Side-finding for close: prime's `Next:` rule names `sprint-bulk unattended` for any active sprint, even when
   every open task is HITL/J2, where a night run would only park → **close-retro TD candidate**.
+
+### 2026-10-06 | progress | T1 Codex loop closed: R3 (2: 1 adopted, 1 reconciled differently) · R4 CLEAR (`325a02a`)
+- R3 adopted: prime's report ends on its `Next:` row (the closing `====` rule after it is gone). R3 declined: appending `— Next:` to the
+  sprint-bulk rollup header, a parsed contract (the launcher writes it, ADR-016; retained fixtures carry `run · 2 of 2 DoD ticked`) and out of
+  G1 scope. Reconciled instead: the rollup keeps its machine-read shape, and the rule governs the prose around it.
+- R4: CLEAR, no residual rule/exception contradiction; keeping the header is sound.
+review · T1 · scoped-reviewer · behaviour:low · governance:high

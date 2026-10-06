@@ -17,7 +17,7 @@ sprint: SPRINT-117
 
 ## Done when
 
-- [ ] every summary a skill emits at a process boundary — `/prime`'s health report, an `/orchestrator` task/gate completion, a close rollup, and any confirmation prompt — opens with the VERDICT (what is true now / what was decided), then its evidence, and ends with exactly ONE explicit next-step line. Context the reader already has is not restated, and no summary buries its conclusion mid-prose. Verified by running each skill cold and reading its output as a stranger would: the first line must answer "what happened and what do I do next" without reading further
+- [x] every summary a skill emits at a process boundary — `/prime`'s health report, an `/orchestrator` task/gate completion, a close rollup, and any confirmation prompt — opens with the VERDICT (what is true now / what was decided), then its evidence, and ends with exactly ONE explicit next-step line. Context the reader already has is not restated, and no summary buries its conclusion mid-prose. Verified by running each skill cold and reading its output as a stranger would: the first line must answer "what happened and what do I do next" without reading further ✓ 118973e→325a02a: prime banner carries verdict + next step and the report ends on Next:; orchestrator Report shape rule (rollup keeps its machine-read shape); lean-doc-generator step 8; cold run 2 (fresh agent, repo text only): all three literal first lines carry verdict + next step, one Next: each; owner PASS (J2) 2026-10-06; Codex R4 CLEAR
 
 ## Touches
 
