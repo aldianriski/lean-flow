@@ -771,7 +771,7 @@ Part 0 blocks the close before a human is present to rule. **Morning-after case*
 reviews a parked FAIL the next morning and rules on it, the same `owner-ruling:` line is appended to
 the log at that point — the shape does not change with who's watching, only whether it exists yet.
 
-**A review pass adds one line per task**, beneath its task's state line — supplementary to the header
+**A review pass adds one line per task** (written when its review loop closes, whichever reviewer ran), beneath its task's state line — supplementary to the header
 count, never a new task state, same as the retry and system-verify lines:
 
 ```

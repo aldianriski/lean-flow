@@ -143,6 +143,16 @@ run_case_anywhere "drift-indentation-material-absent-fails" 1 "review-depth-mate
 run_case_anywhere "drift-prose-mention-passes" 0 "nothing to verify" -- \
   sh "$checker" "$fx/drift-prose-mention-passes/docs/sprint/logs/SPRINT-965-drift-prose-mention.md"
 
+# --- case 19: a Codex loop ended CLEAR in prose, no `review ·` line -> FAIL, named (TASK-401) -------
+# SPRINT-114's release gate failed 7x review-depth-*-absent: loops that closed CLEAR left no record line
+# because no procedure step said to write one. The reviewer's name is irrelevant to the checker; only
+# the line counts (L-151, L-225).
+run_case_anywhere "codex-clear-no-review-line-fails" 1 "review-depth-governance-absent" --   sh "$checker" "$fx/codex-clear-no-review-line-fails/docs/sprint/logs/SPRINT-966-codex-clear.md"
+
+# --- case 20: identical log plus `review · T1 · scoped-reviewer · ...` -> PASS (the control) --------
+# Differs from case 19 in exactly that one line; an external reviewer records as `scoped-reviewer`.
+run_case_anywhere "codex-clear-with-review-line-passes" 0 "examined and cleared on consequence" --   sh "$checker" "$fx/codex-clear-with-review-line-passes/docs/sprint/logs/SPRINT-966-codex-clear.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVIEW-DEPTH FIXTURES: all green"; else echo "REVIEW-DEPTH FIXTURES: at least one FAIL"; fi
 exit $fail
