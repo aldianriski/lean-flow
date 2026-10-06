@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -18,6 +18,7 @@ import {
   orderedSprintDocCandidates,
   parseDodSections,
   parseDoneWhenItems,
+  parseDodDeltaExemptions,
   parsePlanCites,
 } from "../scripts/lib/check-dod-delta.ts";
 
@@ -1050,5 +1051,93 @@ describe("end-to-end (real repo history) -- SPRINT-109's own ab03653/aceff73 (ow
     const result = realResult("aceff73");
     expect(result.ok).toBe(true);
     expect(result.findings).toEqual([]);
+  });
+});
+
+// --- ruled exemptions (SPRINT-115 T4, TASK-354; TD-166, L-205) -----------------------------------
+// .dod-delta-exempt: `<sha> -- <ruling> -- <reason>`. Declared cross-task tick = named EXEMPT line, an
+// undeclared sibling in the SAME run still FAILs, a malformed row exempts nothing and is reported.
+
+describe("parseDodDeltaExemptions -- ADR-031 shape: one reasoned entry per line", () => {
+  test("accepts a full row, skips comments/blanks, lowercases the sha", () => {
+    const r = parseDodDeltaExemptions("# header\n\nABCDEF1 -- owner ruling 2026-10-06 -- historical mis-tick\n");
+    expect(r.malformed).toEqual([]);
+    expect(r.entries).toEqual([{ sha: "abcdef1", ruling: "owner ruling 2026-10-06", reason: "historical mis-tick" }]);
+  });
+
+  test("a row with no reason, no ruling, or a non-sha first field exempts nothing and is reported", () => {
+    const r = parseDodDeltaExemptions("abcdef1 -- ruling only\nabcdef2\nnot-a-sha -- ruling -- reason\n");
+    expect(r.entries).toEqual([]);
+    expect(r.malformed).toHaveLength(3);
+    expect(r.malformed[0]).toMatch(/line 1 \(abcdef1\): reason missing/);
+    expect(r.malformed[1]).toMatch(/line 2 \(abcdef2\): ruling reference missing/);
+    expect(r.malformed[2]).toMatch(/line 3: first field "not-a-sha" is not a commit sha/);
+  });
+});
+
+describe("check-dod-delta CLI -- ruled exemption through a real plan_commit..HEAD run", () => {
+  const CHECKER = fileURLToPath(new URL("../scripts/lib/check-dod-delta.ts", import.meta.url));
+  const DOC = "docs/sprint/SPRINT-960-exempt.md";
+  const doc = (t2: boolean, t3: boolean, base: string) =>
+    [
+      "---", "sprint: 960", `plan_commit: ${base}`, "---", "",
+      "### T1 -- a", "**DoD:**", "- [ ] t1 box", "",
+      "### T2 -- b", "**DoD:**", `- [${t2 ? "x" : " "}] t2 box`, "",
+      "### T3 -- c", "**DoD:**", `- [${t3 ? "x" : " "}] t3 box`, "",
+    ].join("\n");
+
+  /** Real repo: sha A ticks T2's box under a T1 subject, sha B ticks T3's box under a T1 subject. */
+  function build(): { dir: string; a: string; b: string } {
+    const dir = initRepo();
+    const base = commitFile(dir, "README.md", "x\n", "base");
+    commitFile(dir, DOC, doc(false, false, base), "sprint(960): plan locked");
+    const a = commitFile(dir, DOC, doc(true, false, base), "sprint(960) T1: ticks a box it does not own (A)");
+    const b = commitFile(dir, DOC, doc(true, true, base), "sprint(960) T1: ticks another box it does not own (B)");
+    return { dir, a, b };
+  }
+  function run(dir: string) {
+    const r = spawnSync(process.execPath, [CHECKER, dir, DOC], { encoding: "utf8" });
+    return { code: r.status, out: String(r.stdout) };
+  }
+
+  test("declared commit reports a named EXEMPT line; the undeclared sibling in the SAME run still FAILs", () => {
+    const { dir, a, b } = build();
+    try {
+      writeFileSync(join(dir, ".dod-delta-exempt"), `${a.slice(0, 9)} -- owner ruling R-960 -- historical mis-attribution\n`, "utf8");
+      const { code, out } = run(dir);
+      expect(out).toMatch(new RegExp(`^PASS  dod-delta: EXEMPT ${a.slice(0, 12)} .*ruled by owner ruling R-960: historical mis-attribution`, "m"));
+      expect(out).toMatch(new RegExp(`^FAIL  dod-delta: commit claims T1 but ticked T3's DoD item.* \\(${b}\\)$`, "m"));
+      expect(out).not.toMatch(new RegExp(`^FAIL .*\\(${a}\\)`, "m"));
+      expect(code).toBe(1);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("no declaration file: both FAIL (absence = no exemptions)", () => {
+    const { dir, a, b } = build();
+    try {
+      const { code, out } = run(dir);
+      expect(out).toMatch(new RegExp(`^FAIL .*\\(${a}\\)$`, "m"));
+      expect(out).toMatch(new RegExp(`^FAIL .*\\(${b}\\)$`, "m"));
+      expect(out).not.toMatch(/EXEMPT/);
+      expect(code).toBe(1);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("malformed entry for A (no reason) exempts nothing: A still FAILs and the entry is reported", () => {
+    const { dir, a } = build();
+    try {
+      writeFileSync(join(dir, ".dod-delta-exempt"), `${a} -- owner ruling R-960\n`, "utf8");
+      const { code, out } = run(dir);
+      expect(out).toMatch(/^FAIL  dod-delta: \.dod-delta-exempt line 1 .*reason missing/m);
+      expect(out).toMatch(new RegExp(`^FAIL .*\\(${a}\\)$`, "m"));
+      expect(out).not.toMatch(/EXEMPT/);
+      expect(code).toBe(1);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

@@ -1,0 +1,10 @@
+# Ruled cross-task DoD ticks -- commits whose foreign tick the OWNER has ruled acceptable (TD-166, L-205).
+#
+# One row per line: <sha> -- <owner ruling reference> -- <reason>   (sha: 7-40 hex).
+# A row missing its ruling or reason exempts nothing and is reported as a FAIL: a bare sha is the
+# finding turned off, not a ruling. A declared commit is NAMED on the checker's output as
+# `PASS  dod-delta: EXEMPT <sha> ... ruled by <ruling>`, never silently dropped. Only
+# `unattributed-tick` findings are exemptable. Same ADR-031 shape as .conformance-exempt.
+#
+# A tick lives in a commit's diff, so no later commit un-ticks a historical mis-attribution; this file
+# is the owner-ruled alternative to a history rewrite. No entries are declared here by default.

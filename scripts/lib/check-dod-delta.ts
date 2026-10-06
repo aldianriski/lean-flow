@@ -536,6 +536,8 @@ export function checkDodDeltaWithMembers(
 // --- CLI: reads real commits via git, never a hand-passed string (L-166) -------------------------
 
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 function git(args: readonly string[], cwd: string): string {
   return execFileSync("git", args, { cwd, encoding: "utf8" });
@@ -692,7 +694,64 @@ export function loadMemberChanges(repoRoot: string, ref: string, changedFiles: r
   return out;
 }
 
-function checkOneCommit(repoRoot: string, ref: string): { line: string; ok: boolean } {
+// --- ruled exemptions (SPRINT-115 T4, TASK-354; TD-166, L-205) -----------------------------------
+// A tick lives in a commit's diff, so no later commit un-ticks a historical mis-attribution; without
+// a declaration the only remedies were a history rewrite or blocking the close forever (ADR-021).
+// `.dod-delta-exempt` at the repo root mirrors `.conformance-exempt`'s ADR-031 shape: one reasoned
+// entry per line, `<sha> -- <owner ruling ref> -- <reason>`. An entry missing its ruling or reason
+// exempts NOTHING and is reported as a FAIL (a bare sha is the finding turned off, not a ruling).
+// A declared commit is reported on its own `PASS  dod-delta: EXEMPT ...` line naming sha + ruling,
+// never a silent pass; only `unattributed-tick` findings are exemptable.
+
+export interface DodDeltaExemption {
+  readonly sha: string;
+  readonly ruling: string;
+  readonly reason: string;
+}
+
+export interface ParsedExemptions {
+  readonly entries: readonly DodDeltaExemption[];
+  /** One message per malformed entry (1-based line number); these exempt nothing. */
+  readonly malformed: readonly string[];
+}
+
+export function parseDodDeltaExemptions(text: string): ParsedExemptions {
+  const entries: DodDeltaExemption[] = [];
+  const malformed: string[] = [];
+  text.split(/\r?\n/).forEach((raw, i) => {
+    const line = raw.trim();
+    if (line === "" || line.startsWith("#")) return;
+    const parts = line.split(/\s+--\s+/);
+    const sha = (parts[0] ?? "").trim();
+    const ruling = (parts[1] ?? "").trim();
+    const reason = parts.slice(2).join(" -- ").trim();
+    if (!/^[0-9a-f]{7,40}$/i.test(sha)) {
+      malformed.push(`dod-delta: .dod-delta-exempt line ${i + 1}: first field "${sha}" is not a commit sha (7-40 hex) -- entry exempts nothing`);
+    } else if (ruling === "" || reason === "") {
+      malformed.push(
+        `dod-delta: .dod-delta-exempt line ${i + 1} (${sha}): ${ruling === "" ? "ruling reference" : "reason"} missing -- ` +
+          `format is "<sha> -- <ruling> -- <reason>"; entry exempts nothing`,
+      );
+    } else {
+      entries.push({ sha: sha.toLowerCase(), ruling, reason });
+    }
+  });
+  return { entries, malformed };
+}
+
+function loadExemptions(repoRoot: string): ParsedExemptions {
+  try {
+    return parseDodDeltaExemptions(readFileSync(join(repoRoot, ".dod-delta-exempt"), "utf8"));
+  } catch {
+    return { entries: [], malformed: [] }; // absence = no exemptions declared
+  }
+}
+
+export function checkOneCommit(
+  repoRoot: string,
+  ref: string,
+  exemptions: readonly DodDeltaExemption[] = [],
+): { line: string; ok: boolean } {
   let commit: LoadedCommit;
   try {
     commit = loadCommit(repoRoot, ref);
@@ -707,6 +766,18 @@ function checkOneCommit(repoRoot: string, ref: string): { line: string; ok: bool
   if (result.ok) {
     const msg = result.note ?? `dod-delta: ${commit.sprintDocPath} -- claim and ticks agree (${ref}: "${commit.subject}")`;
     return { line: `PASS  ${msg}`, ok: true };
+  }
+  const full = ref.toLowerCase();
+  const ex = result.findings.every((f) => f.kind === "unattributed-tick")
+    ? exemptions.find((e) => full.startsWith(e.sha))
+    : undefined;
+  if (ex) {
+    return {
+      line:
+        `PASS  dod-delta: EXEMPT ${ref.slice(0, 12)} -- ${result.findings.length} cross-task tick(s) ruled by ${ex.ruling}: ${ex.reason} ` +
+        `(declared in .dod-delta-exempt; "${commit.subject}")`,
+      ok: true,
+    };
   }
   return { line: result.findings.map((f) => `FAIL  ${f.message} (${ref})`).join("\n"), ok: false };
 }
@@ -760,8 +831,13 @@ if (import.meta.main) {
     for (const sha of commitsInRange(repoRoot, planCommit, "HEAD")) shas.add(sha);
   }
 
+  const exemptions = loadExemptions(repoRoot);
+  for (const m of exemptions.malformed) {
+    console.log(`FAIL  ${m}`);
+    anyFail = true;
+  }
   for (const sha of shas) {
-    const { line, ok } = checkOneCommit(repoRoot, sha);
+    const { line, ok } = checkOneCommit(repoRoot, sha, exemptions.entries);
     console.log(line);
     if (!ok) anyFail = true;
   }
