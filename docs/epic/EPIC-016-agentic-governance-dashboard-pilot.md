@@ -86,6 +86,8 @@ keeps its own § Closed-when.
 - **D5** — The pilot absorbs *operational subsets* of EPIC-006, 009, 010 and 012 and consumes
   EPIC-015's authority vocabulary. It closes **none** of them; each keeps its own § Closed-when, per
   roadmap §10.
+- **D6** — **Scope amendment, owner ruling 2026-10-06:** Codex is admitted **as a read-only reviewer only** (EPIC-020 D3).
+  The § Scope "Out" line still holds for Codex, Kimi, Hermes and OpenClaw as implementers or general runtimes.
 
 ## Open questions
 
