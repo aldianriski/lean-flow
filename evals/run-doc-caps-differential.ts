@@ -1,6 +1,6 @@
 // evals/run-doc-caps-differential.ts -- TS-vs-Shell DIFFERENTIAL parity for check-doc-caps (TASK-355).
 //
-// OPT-IN, mirroring evals/run-s4-differential-parity.sh's own shape and rationale: this is the ONE
+// OPT-IN, mirroring the shape and rationale of run-s4-differential-parity.sh (cut by ADR-051): this is the ONE
 // thing that compares the ported TS checker against the live Shell oracle row by row, which needs a
 // real `sh scripts/lib/check-doc-caps.sh` spawn per input -- exactly the subprocess cost the TS port
 // exists to take off the default gate profile. It is NOT wired into qa-check.sh (that edit is

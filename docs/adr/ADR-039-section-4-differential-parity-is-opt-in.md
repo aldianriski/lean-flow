@@ -2,13 +2,13 @@
 id: ADR-039
 tags: [tooling, process]
 domain: governance
-status: accepted
+status: superseded
 related: [ADR-035, ADR-034, ADR-029, ADR-021]
 ---
 
 # ADR-039 — §4 differential parity moves to the opt-in profile, and the drift window is named rather than argued away
 
-- **Status:** accepted (2026-08-31)
+- **Status:** accepted (2026-08-31) · superseded by ADR-051 (2026-10-06)
 - **Deciders:** Maintainer
 - **Context driver:** SPRINT-092 T2 took §4's always-on coverage off the Shell engine. The half that
   cannot follow it is the half whose whole purpose is to compare the two engines — that needs a live

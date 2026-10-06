@@ -1,6 +1,6 @@
 // evals/layers-completeness.test.ts -- SPRINT-103: the always-on TS-evaluator suite for
 // scripts/lib/check-layers-completeness.ts, run via `bun test` by evals/run-layers-completeness-
-// fixtures.sh. Mirrors run-s4-ts-evaluators.sh's role for §4 and evals/dod-delta.test.ts's role for
+// fixtures.sh. Mirrors evals/dod-delta.test.ts's role for
 // check-dod-delta.ts: the shell oracle (scripts/lib/check-layers-completeness.sh) stays authoritative
 // and was checked against separately by a differential harness (cut SPRINT-113 T1, ADR-050);
 // THIS file is what runs on every default gate, fork-free, calling the TS port in-process.

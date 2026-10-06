@@ -53,11 +53,11 @@ scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launch
                   checkers + conformance-engine.sh + read-spec-rules.sh)          (ADR-008 · ADR-027)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)
-                  compat/ — the frozen rule-ID snapshot the migration is measured against (ADR-034)
+                  fixtures/compat/ — the frozen rule-ID snapshot (ADR-034)
 
-  ── the TypeScript/Bun reference engine (EPIC-014, from SPRINT-083) ──────────────────
-package.json      root workspace manifest. ZERO dependencies: Bun runs TypeScript directly, so
-                  there is no install and no node_modules. Its `test` script invokes
+  ── TypeScript tooling on Bun (scripts/ and evals/ run on it; ADR-035 · ADR-051) ────
+package.json      root manifest. Bun runs TypeScript directly: the manifest has no dependencies
+                  beyond type-checking tools. Its `test` script invokes
                   `sh scripts/qa-check.sh` — REQUIRED, not stylistic: this manifest is the first
                   rung-1 hit in the repo's history and outranks `.gate-command` (rung 4), so a
                   script that skipped the gate would silently re-point System verify (ADR-033).
@@ -65,16 +65,14 @@ package.json      root workspace manifest. ZERO dependencies: Bun runs TypeScrip
                   manifests and a second number here would be a second SSOT (ADR-032)
 tsconfig.base.json  strict: true + noUncheckedIndexedAccess; tsconfig.json extends it
 bunfig.toml       test timeout only — no plugins, no preload, no framework
-apps/cli/         `leanflow` entry point. Outermost layer: may import packages/, nothing imports it
-packages/         domain + application. `standard/` is the first (SPRINT-083 T4)
-test/             architecture/ — dependency-direction fitness tests (T3) · gate-discovery/ —
-                  guards that a discovered gate still runs the declared one · fixtures/ (retained)
+test/             gate-discovery/ — guards ADR-033: a discovered gate still runs the declared one
+                  (fixtures/gate-discovery/ retained)
   ─────────────────────────────────────────────────────────────────────────────────────
 
 TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
 ```
 
-**The TS tree owes no `spec/STANDARD.md` §2 rows** — §2 is a *documentation* lifecycle standard
+**The TypeScript tooling owes no `spec/STANDARD.md` §2 rows** — §2 is a *documentation* lifecycle standard
 (ADR-012) covering Root files · `spec/` · `.claude/` · the `docs/` tree, and carries no code-tree rows
 at all; `scripts/`, `evals/` and `skills/` already sit outside it. Ruled at SPRINT-083 G2 (D4) by
 reading §2, not by defaulting. One constraint came with it: **no new directory may be named

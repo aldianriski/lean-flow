@@ -13,7 +13,7 @@
 # (SPRINT-113 T1 / ADR-050; it ran standalone, no runner, so it guarded nothing the gate reached).
 # What moved is THIS harness: it now asserts against scripts/lib/check-layers-completeness.ts, the
 # fork-free TS port, called in-process via evals/layers-completeness.test.ts -- the same "TS
-# evaluator leg" shape run-s4-ts-evaluators.sh already established for §4, and the same "thin bun test
+# evaluator leg" shape run-s4-ts-evaluators.sh (cut by ADR-051) established for §4, and the same "thin bun test
 # wrapper" shape run-dod-delta-fixtures.sh already uses for check-dod-delta.ts.
 #
 # COVERAGE UNCHANGED, NOT MERELY RELOCATED (DoD 4's own bar). Every named finding, every retained
@@ -51,7 +51,7 @@ test_file="evals/layers-completeness.test.ts"
 [ -f "$test_file" ] || { echo "FAIL harness: test file not found at $test_file"; exit 2; }
 
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests (a
-# renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh and
+# renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh (cut by ADR-051) and
 # run-dod-delta-fixtures.sh both guard against). RAISE THIS when adding cases to the test file, in the
 # same commit.
 min_tests=25

@@ -3,12 +3,14 @@ epic: 014
 slug: reference-engine
 owner: Maintainer
 last_updated: 2026-10-06
-status: active
+status: closed
 member_sprints: [SPRINT-083, SPRINT-085, SPRINT-087, SPRINT-091, SPRINT-092, SPRINT-116]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-014 — Reference Engine
+
+> **Retired 2026-10-06 by ADR-051** — the Shell engine is the only engine.
 
 > **Outcome:** lean-flow's conformance and QA semantics are evaluated by a typed TypeScript/Bun
 > reference implementation that holds authority, proven equal per rule family to the Shell engine it
@@ -131,15 +133,15 @@ migrated families → QA core → eval migration + binary → authority cutover 
       not a renderer's restraint**: `TraversalReport` carries no `globalLevel` field and is frozen, so a
       seeded attempt to attach one *throws* — and it holds even with a `hold` outcome present, the case
       that would have exercised the new render path
-- [ ] Every migrated rule family carries its **retained must-FAIL + sibling control**, differential
-      parity passes, and each family is named individually at cutover — never "most"
-- [ ] QA runs `fast` / `standard` / `full` with **WARN ≠ FAIL** and HOLD preventing a false close, and
-      every check reports `durationMs`
-- [ ] **TS/Bun holds authority** for QA and conformance, and the superseded Shell semantic engine is
-      **deleted** — not kept as `legacy` / `old` / `fallback` (V3 §45). Operational shell glue may remain
-- [ ] **One domain result feeds both text and JSON renderers** — no second evaluation path, and no
-      consumer parses CLI prose
-- [ ] A **before/after performance report** exists over the same workload, same environment and same
-      semantic coverage, with known intentional differences listed (V3 §57)
-- [ ] **The consumer install path still needs no Bun toolchain** — verified on the consumer path, not
-      inferred from this repo's dogfooding (L-015 · L-016)
+- ~~Every migrated rule family carries its **retained must-FAIL + sibling control**, differential
+      parity passes, and each family is named individually at cutover — never "most"~~ **dropped, not met** (ADR-051, SPRINT-116)
+- ~~QA runs `fast` / `standard` / `full` with **WARN ≠ FAIL** and HOLD preventing a false close, and
+      every check reports `durationMs`~~ **dropped, not met** (ADR-051, SPRINT-116)
+- ~~**TS/Bun holds authority** for QA and conformance, and the superseded Shell semantic engine is
+      **deleted** — not kept as `legacy` / `old` / `fallback` (V3 §45). Operational shell glue may remain~~ **dropped, not met** (ADR-051, SPRINT-116)
+- ~~**One domain result feeds both text and JSON renderers** — no second evaluation path, and no
+      consumer parses CLI prose~~ **dropped, not met** (ADR-051, SPRINT-116)
+- ~~A **before/after performance report** exists over the same workload, same environment and same
+      semantic coverage, with known intentional differences listed (V3 §57)~~ **dropped, not met** (ADR-051, SPRINT-116)
+- ~~**The consumer install path still needs no Bun toolchain** — verified on the consumer path, not
+      inferred from this repo's dogfooding (L-015 · L-016)~~ **dropped, not met** (ADR-051, SPRINT-116)

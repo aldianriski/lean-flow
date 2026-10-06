@@ -5,7 +5,7 @@
 // it asserts the TS port produces IDENTICAL stdout and IDENTICAL exit code to the live shell script,
 // for every input either engine will ever actually see. A divergence found here is a DEFECT IN THE
 // PORT (fix check-night-run-rollup.ts, never "improve" on the shell behaviour) -- mirrors
-// evals/run-s4-differential-parity.sh's own framing, which this harness follows as its shipped
+// run-s4-differential-parity.sh's framing (cut by ADR-051), which this harness followed as its shipped
 // convention (per this task's brief: "copy the shipped exemplar rather than inventing a pattern").
 //
 // POPULATION (CLAUDE.md Anti-Patterns (iv) -- fixtures discriminate branches, nothing above
@@ -26,7 +26,7 @@
 // Opt-in, not part of the default gate: NOT wired into evals/run-night-run-rollup-fixtures.sh or
 // qa-check.sh. Run directly: `bun evals/run-night-run-rollup-differential-parity.ts`. The whole point
 // is real subprocess-per-input cost on the shell side -- ~2.75s per shell spawn on this host, ~90
-// inputs -- so this is deliberately NOT cheap, the same tradeoff run-s4-differential-parity.sh makes.
+// inputs -- so this is deliberately NOT cheap, the same tradeoff run-s4-differential-parity.sh made.
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";

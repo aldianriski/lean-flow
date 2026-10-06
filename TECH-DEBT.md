@@ -813,6 +813,7 @@ status: current
     gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s, so on Linux the engine is not a bottleneck. It stays high because the engine is
     **consumer-facing**: an adopter on Windows pays the same fork cost, and the off-host route is not theirs.
   - **Owner (SPRINT-116 promote, owner-approved 2026-10-06):** TASK-357 is done, so the row had no live owner. SPRINT-116 T1 (TASK-399) assigns it with its ruling: *finish* → TASK-393 carries it at P1; *cut* → a new P1 task for the Shell engine's spawn cost.
+  - **Owner (SPRINT-116 T1, ADR-051):** TASK-404 (P1, needs-info) — the Shell engine is the only engine, so the spawn cost is fixed there.
 - **TD-167** severity: medium | status: open | created: Sprint-102
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
@@ -876,6 +877,7 @@ status: current
     leg 12's own loop-internal check inside `WINDOW` reddens correct code. So this row's fix
     direction should assume a **class** of clock-input assertions rather than one case, and the
     `WINDOW` lever trades directly against flakiness under load (a coverage decision, D6).
+  - **Narrowed (SPRINT-116 T1, ADR-051):** the TypeScript half is deleted; the Shell half stands.
 
 - **TD-166** severity: medium | status: open | created: Sprint-102
   - Summary: **The `dod-delta` leg can hold a sprint permanently un-closable on a finding that only
@@ -1590,7 +1592,7 @@ status: current
   - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
 
-- **TD-126** severity: medium | status: open | created: Sprint-092
+- **TD-126** severity: medium | status: resolved → accepted (no task) | created: Sprint-092
   - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in
     `evals/run-adr-family-fixtures.sh` (12 spawns, 23.4–28.2 s) and again inside
     `evals/run-s4-differential-parity.sh`, which spawns per row while also running the TS evaluators
@@ -1600,8 +1602,9 @@ status: current
     alone vs TS-vs-Shell). Consolidation is a real saving on the profile promote and close now run.
   - **Re-file fresh if** the two harnesses stop overlapping — e.g. the Shell harness gains cases the
     differential does not mirror, at which point they are no longer the same work twice.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
-- **TD-127** severity: minor | status: open | created: Sprint-092
+- **TD-127** severity: minor | status: resolved → accepted (no task) | created: Sprint-092
   - Summary: **`s4-append-shallow-reachability.test.ts` now sits in NEITHER profile.** It is a §4 test
     that spawns the engine, deliberately excluded from the opt-in differential harness because it clones
     this repo's real remote (L-166's reachability proof) and is therefore network-dependent.
@@ -1610,6 +1613,7 @@ status: current
   - Impact: a coverage hole with an owner-visible reason. The trade was deliberate — a harness that
     reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
   - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-134** severity: medium | status: open | created: Sprint-094
   - Summary: **`check-handoff-state.sh` is forward-looking only: it cannot see roughly half the archived
@@ -1689,7 +1693,7 @@ status: current
   - **Re-file fresh if** T3's detector is extended past the TS module graph, or a compat harness leg is
     added — the fix belongs with either.
 
-- **TD-133** severity: minor | status: open | created: Sprint-094
+- **TD-133** severity: minor | status: resolved → accepted (no task) | created: Sprint-094
   - Summary: **The T3 unwired-exports detector counts fewer *caller* shapes than ES and fewer test-file
     shapes than convention, so a genuinely wired symbol can be reported unwired.** Two gaps, one class,
     one remedy moment — both produce a **loud false positive**, never a silent pass, which is why they
@@ -1723,6 +1727,7 @@ status: current
   - **Re-file fresh if** `packages/` gains a barrel `index.ts`, a namespace import, a dynamic import, or
     a `__tests__/` directory — any one of those makes this live rather than latent. Related: L-108 ·
     L-058 · the sibling export-form finding fixed in T3's review pass.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-130** severity: medium | status: open | created: Sprint-094
   - Summary: **`check-epic-archive.sh`'s checkbox anchors miss `- [X]` (uppercase) and any indented
@@ -1798,7 +1803,7 @@ status: current
     row, so it is worth preferring wherever a number can be had from a name. It is **not** a fix —
     `fmv` is untouched and both remaining call sites still carry the defect.
   - **Re-file fresh if** it stops being latent: any CI runner or non-Windows contributor makes it live.
-- **TD-129** severity: medium | status: open | created: Sprint-094
+- **TD-129** severity: medium | status: resolved → accepted (no task) | created: Sprint-094
   - Summary: **`EPIC-014`'s "the Shell semantic engine is deleted" milestone will NOT end Shell rule
     enforcement, because six checkable Standard rules were never in that engine** — they live in
     standalone `scripts/lib/check-*.sh` legs. Deleting `conformance-engine.sh` retires 45 of the 51
@@ -1807,6 +1812,7 @@ status: current
     shell glue may remain") is what these six will be classified under — defensibly for the *glue*,
     but these are **Standard rule ids**, not glue.
   - Measured at the SPRINT-094 promote (2026-08-31), owner-requested, every figure cross-checked:
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** premise gone — the Shell engine is no longer being replaced, so its deletion milestone will not happen.
 
     | Quantity | Value | How derived |
     |---|---|---|
@@ -1966,7 +1972,7 @@ status: current
     (`DELIVERED`/`PARTIAL`/`FAILED`) is already being opened. Retain a must-FAIL fixture: a ledger entry
     with no corresponding log block must FAIL, and a sibling control where both exist must PASS.
 
-- **TD-121** severity: minor | status: open | created: Sprint-092
+- **TD-121** severity: minor | status: resolved → accepted (no task) | created: Sprint-092
   - Summary: **The fixture factories' input-side guardrail is defeated by an ordinary intermediate
     `const`, with no cast and no `any`.** TypeScript's excess-property check fires only on a fresh
     object literal passed directly as an argument, so `const state = { adrDirFiles: {},
@@ -1992,8 +1998,9 @@ status: current
     conversion, which is already rewriting how those cases are constructed. Retain a must-FAIL proving
     the `const` path is rejected, plus a sibling control proving legitimate state-only construction
     still compiles.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
-- **TD-120** severity: medium | status: open | created: Sprint-091
+- **TD-120** severity: medium | status: resolved → accepted (no task) | created: Sprint-091
   - Summary: **S4.APPEND spawns ~2 uncached git processes per ADR, so wiring §4 into the CLI (T12) cost
     a flagless full run ~6.3s on this repo's 38 ADRs — a ~10x wall-clock increase.** Measured by the
     T12 reviewer: `--section 4` 0.187s → 6.861s; flagless full run 0.689s → 6.948s. Root cause read
@@ -2021,6 +2028,7 @@ status: current
     the H24–H26 cutover, not after: once TS holds authority, this lands directly on the gate that
     TD-117 already puts at 86–91% of its ceiling. Retain a timing assertion so the regression cannot
     return silently — and per L-130, state the measurement's host load beside any figure it carries.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-119** severity: minor | status: open | created: Sprint-091
   - Summary: **`check-layers-completeness.sh` matches `Cites:` tokens against the `Layers:` line by
@@ -2053,8 +2061,9 @@ status: current
     what the rule accepts on real repositories and therefore needs a ruling under ADR-034's frozen
     surface, exactly as the `ADR-001-.md` empty-slug divergence did.
   - Route it whenever §4 semantics are next opened; do not fold it into a migration task.
+  - **Narrowed (SPRINT-116 T1, ADR-051):** the TypeScript half is deleted; the Shell half stands.
 
-- **TD-115** severity: medium | status: open | created: Sprint-091
+- **TD-115** severity: medium | status: resolved → accepted (no task) | created: Sprint-091
   - Summary: **`attachLevel(rules, report)` will happily attach a whole-spec conformance level to a
     PARTIAL run.** It checks only `rules.length === outcomes.length`; nothing establishes that
     `rules` is the whole Standard. `level.test.ts` itself calls it with a one-rule subset and gets
@@ -2072,6 +2081,7 @@ status: current
     closer. Fix direction (not a ruling): have the full-run entry point be the only thing that can
     produce the input `attachLevel` accepts, so a subset is unrepresentable rather than merely
     unattempted.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-116** severity: minor | status: open | created: Sprint-091
   - Summary: **Every F12 finding sub-line prints its own name twice** -- `- secret-committed:
@@ -2083,7 +2093,7 @@ status: current
     verification in this epic compares **reason text**, not just the verdict word, so a doubled
     prefix is noise inside the very signal later differentials read.
 
-- **TD-114** severity: medium | status: open | created: Sprint-091
+- **TD-114** severity: medium | status: resolved → accepted (no task) | created: Sprint-091
   - Summary: **`evals/run-foreign-repo-fixtures.sh` — the harness whose entire subject is "a repo that
     has never seen lean-flow" — never invokes the TypeScript engine at all.** It spawns only Shell.
   - Found by the SPRINT-091 T3 reviewer while testing whether that harness reached T3's
@@ -2096,6 +2106,7 @@ status: current
   - Consequence today is bounded: Shell holds authority (SPRINT-091 D3), so the harness is not *wrong*
     about the engine that currently answers. It becomes load-bearing the moment TS takes any authority
     — which is EPIC-014's whole direction. Route it before a cutover, not after.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 - **TD-106** severity: medium | status: resolved → accepted (no task) | created: Sprint-088
   - Summary: **`check-verify-reaches.sh` reports a script that exists as absent, because it tests the
     name it extracted as a literal path from the repo root.** Line 89 is `if [ ! -f "$scr" ]`, so a
@@ -2173,7 +2184,7 @@ status: current
     record, so supplying the record ends it.
   - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** superseded by the work-item store: `TODO.md` is deleted (`0ce093c2`) and TASK-299 has left the store. **Re-file fresh if:** a gate again reports commits attributable to no task.
 
-- **TD-104** severity: medium | status: open | created: Sprint-087
+- **TD-104** severity: medium | status: resolved → accepted (no task) | created: Sprint-087
   - Summary: **T3's oracle helper hard-codes a 15,000 ms timeout for an operation measured at ~18,800 ms
     — the limit is already smaller than the thing it bounds, at rest.** Every `runShellEngine` call in
     `s12-{secrets,backups,designsrc,generated}.test.ts` spawns the full
@@ -2199,8 +2210,9 @@ status: current
     per suite rather than per test — eight full-engine spawns for four rules is most of the runtime.
   - **Re-file fresh if** the engine gets materially faster or the parity tests stop spawning it whole —
     the arithmetic (measured cost vs chosen limit) is the entire finding.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
-- **TD-103** severity: minor | status: open | created: Sprint-087
+- **TD-103** severity: minor | status: resolved → accepted (no task) | created: Sprint-087
   - Summary: **Two domain capabilities shipped in SPRINT-087 have no consumer — `reconcile()` and
     `marksInStandard()` have zero production callers**, so neither is reachable from any CLI invocation
     and neither is exercised end-to-end. The CLI's invocation kinds are `version` · `help` · `rule` ·
@@ -2239,8 +2251,9 @@ status: current
     end-to-end ones arrive — they cover inputs the CLI cannot yet produce.
   - **Re-file fresh if** the CLI gains `--reconcile` or a marks path — the finding then inverts into
     "are the end-to-end assertions actually comparing against Shell", which is a different check.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
-- **TD-102** severity: minor | status: open | created: Sprint-087
+- **TD-102** severity: minor | status: resolved → accepted (no task) | created: Sprint-087
   - Summary: **TS and Shell emit the same findings in a different ORDER.** Shell's `assert_S9_LOGDIR`
     exhausts its first glob (`*-log.md`) before its second (`*Execution-Log*.md`); the TS evaluator
     sorts alphabetically. Same count, same membership, same finding name — reversed sequence.
@@ -2261,6 +2274,7 @@ status: current
     sequence — and assert that explicitly in the tests so the choice cannot be silently relied upon.
   - **Re-file fresh if** any consumer starts diffing rendered output positionally — the finding
     escalates from latent to active the moment ordering carries meaning.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-100** severity: medium | status: open | created: Sprint-087
   - Summary: **`conformance-engine.sh`'s `_repo_files()` walks agent worktrees, so the engine can emit a
@@ -2320,7 +2334,7 @@ status: current
   - **Re-file fresh if** the consequence-line grammar changes — the finding is that malformed and
     absent are indistinguishable to this reader, and any new grammar inherits that unless fixed.
 
-- **TD-098** severity: medium | status: open | created: Sprint-087
+- **TD-098** severity: medium | status: resolved → accepted (no task) | created: Sprint-087
   - Summary: **Two `spec-reader.test.ts` `reconcile` tests go red *under concurrent load*, not at rest
     — and the load they need is exactly the parallel worktree dispatch this repo prescribes.** Both
     spawn `scripts/lib/read-spec-rules.sh` and exceed **bun:test's 5000 ms default** when the host is
@@ -2363,6 +2377,7 @@ status: current
     parity test is the false-assurance shape ADR-036 and L-058 both warn about.
   - **Re-file fresh if** the oracle scripts get materially faster, or the runner default changes — the
     arithmetic (spawn cost × contention vs runner default) is the whole finding, and it is host-specific.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-096** severity: minor | status: resolved → accepted (no task) | created: Sprint-087
   - Summary: **SPRINT-087 attributes the six marks to ADR-036 in four places; they are `spec/STANDARD.md`
@@ -2603,7 +2618,7 @@ status: current
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
   - **Absorbs (SPRINT-116 promote, owner-approved 2026-10-06):** TD-050 · TD-066 · TD-071, the same cost mechanism.
 
-- **TD-083** severity: minor | status: open | created: Sprint-083
+- **TD-083** severity: minor | status: resolved → accepted (no task) | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
     own code — only on fixtures.** `checkLayers('.')` examines **4 files / 4 edges**. Five rules are
     asserted against six fixture trees and all of them pass against the live tree, but the live tree is
@@ -2625,6 +2640,7 @@ status: current
     and notice if the guard's reach is not growing with the tree.
   - **Re-file fresh if** the count is still in single digits when the first rule family migrates, or if
     a real violation is ever found by review rather than by the suite.
+  - **Resolved (SPRINT-116 T1, ADR-051, owner-approved 2026-10-06):** subject deleted with the TypeScript port. **Re-file fresh if:** a TypeScript engine is reintroduced.
 
 - **TD-082** severity: minor | status: resolved → TASK-384 | created: Sprint-083
   - Summary: **`docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` is 3,039 lines against
