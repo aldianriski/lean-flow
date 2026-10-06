@@ -363,3 +363,12 @@ invocation): `plugin marketplace add aldianriski/lean-flow` → `plugin install 
 lists Skills (14), Agents 0, Hooks 0, ~1,588 always-on tokens. **Surprise:** the first attempt, from a ~120-char scratch path, failed to
 clone with `Filename too long`. The longest tracked path is 141 chars, so a normal install base (66 chars) reaches ~207, under Windows' 260,
 but with a thin margin → TD-223. The owner's own install was then updated 1.66.1 → 2.0.0 (`plugin update`; takes effect on restart).
+
+### 2026-10-06 | progress | post-push full gate (`QA_FULL=1`, detached, own call) on `ef63e6c` on a Linux VPS: `QA-CHECK: 300 pass, 3 fail`; all 3 are host-environment, and each re-runs PASS on the Windows host
+Run off-host (owner ruling): the Windows host had only ~555 MB available. Ubuntu 24.04 x86_64, 2 vCPU, 7 GB, bun 1.3.14 (same as the local install), clean
+clone at `ef63e6c`, `bun install --frozen-lockfile`. Started 06:24Z, done in under 40 min, exit 1. The verdict line is the gate's own. The 3 FAILs:
+(1) **typecheck**: `tsc` exited 127 with `node: No such file` because the VPS had bun only. The leg itself says "NOT a verdict on the code". Local
+`tsc --noEmit` on `ef63e6c` exits 0. (2) **gen-index locale fixture**: it spawns `sh`, which is dash on Ubuntu, and dash's glob order ignores locale, so the host
+cannot discriminate → TD-224. Local run: `5 pass, 0 fail`. (3) **qa-budget-position fixture**: the fast host reached leg 12's own check in 3s,
+inside case 2's 60s "silent" window → TD-225. Local run: 4 PASS, exit 0. **Coverage caveat:** a Linux run cannot see Windows-only
+defects (TD-223 MAX_PATH). This closes the pending full-verdict item from the 2026-10-04 close-gate entry.

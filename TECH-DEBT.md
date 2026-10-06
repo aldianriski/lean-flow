@@ -320,6 +320,20 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-225** severity: low | status: open | created: Sprint-114 (post-push full gate on a Linux VPS)
+  - Summary: **`run-qa-budget-position-fixtures.sh` case 2 assumes a slow host.** It expects the checkpoint-stripped copy to stay silent for
+    60s, but leg 12's own loop-internal check still fires. On a 2-vCPU Ubuntu VPS that copy reached `run-layout-fixtures.ts` in 3s and printed
+    the budget finding, so the case FAILed. It PASSes on the maintainer's Windows host only because that host runs slower. The verdict depends on host speed, not on the seed.
+  - done-when: case 2 asserts on WHERE the first budget finding lands (leg 12, not an early checkpoint) instead of on silence within a
+    wall-clock window, and it passes on both the Windows host and a fast Linux host.
+
+- **TD-224** severity: low | status: open | created: Sprint-114 (post-push full gate on a Linux VPS)
+  - Summary: **`run-gen-index-locale-fixtures.ts` claims to probe bash's glob order but spawns `sh`.** On Debian/Ubuntu `sh` is dash, whose
+    globs ignore locale, so `locale-control` reports "host cannot discriminate" and scores a FAIL. That is correct by design (never a vacuous
+    pass), but it makes the always-on gate red on any dash host, even though `gen-index.sh` is also run by `sh` there and so has no locale exposure either.
+  - done-when: the control spawns `bash` (matching its stated claim), or a dash host reports the case as host-INVALID/skip with a named finding
+    rather than a gate FAIL, decided at G2. In either case the gate is green on Ubuntu with `en_US.utf8` installed.
+
 - **TD-223** severity: low | status: open | created: Sprint-114 (post-push scratch-profile install)
   - Summary: **The plugin's longest tracked path leaves a thin margin under Windows' 260-char MAX_PATH.** The longest is 141 chars
     (`docs/work/backlog/TASK-354-…`; v1→v2 eval fixtures run 137–139). A marketplace clone failed with `Filename too long` from a ~120-char
