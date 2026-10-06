@@ -87,7 +87,7 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-10-06 (SPRINT-115 T4/T5 merge-back → first VPS gate; fixed in `5d9335a`)
 - seen: 2026-10-06 (SPRINT-116 system verify run 1: T1/T2 `Layers:` declared as `packages/**` and `boundary-rows/*/README.md`, a spelling the checker's `covers()` does not read (exact path or trailing-`/` directory only), so 105 declared files read as undeclared; fixed in `efc3878`. Same reader, same Plan line, a different way to write past it.)
 - count: 2
-- promoted: no
+- promoted: yes → `.claude/CONTEXT.md` § Sprint model, the `Layers:` bullet (L-100) · disposition: merge — every flow that writes or widens `Layers:` reads it; SPRINT-117 promote (owner)
 - related: L-020 · L-172 · L-166
 
 ## L-228 [tags: process] [status: active]: **A dispatch brief's file bound is a claim too: a builder that stops at it is right, and the bound is the defect.** SPRINT-114 T2's brief for wiring `LEANFLOW_PLUGIN_DIR` into workdoo's workers left out `apps/worker/src/main.ts`, the one file that constructs the adapter. The builder stopped at the bound and reported it, which was correct, and the coordinator wired `adapterFor` itself. The miss was the coordinator's: the bound was written from memory of the call path, not derived from it. **Durable form: derive a brief's file bound from a search for the consumers of the changed symbol (who constructs it, who reads it), and list that query's result in the brief, not a remembered list.**

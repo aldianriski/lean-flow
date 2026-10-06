@@ -465,13 +465,6 @@ status: current
   - Mitigation (hypothesis): a gate leg (or the dispatch brief) that greps `evals/` and `**/*.test.ts` for the changed artifact's
     path or pinned values and runs every hit, opt-in included. Census first: how many past sprints changed a pinned artifact.
 
-- **TD-211** severity: low | status: resolved → TASK-373 (SPRINT-114 T6, `89bab1ca`) | created: Sprint-111 (T4 opt-in run)
-  - Summary: **`evals/run-orchestrator-store-fixtures.ts` has been red since SPRINT-110 T4 (`dccdca1`).** Its text-contract case
-    expects `night-run.md` to contain "retargeted onto member files under TASK-383". `dccdca1` rewrote that passage, and the harness
-    is opt-in, so no default gate saw it. Found by SPRINT-111's per-harness opt-in run: `41 pass, 1 fail`.
-  - Mitigation (hypothesis): re-anchor the contract on night-run.md's current by-reference wording, with a seeded break.
-  - **Resolved (SPRINT-114, `89bab1ca`):** the stale phrase is re-anchored on night-run.md's current sentence "**The script follows this contract (TASK-392).**", so the case still asserts the script/contract relationship. Real run 42/0; with the anchor removed from a scratch copy, exactly this case fails (41/1).
-
 - **TD-210** severity: low | status: open | created: Sprint-111 (T5 follow-up, Codex r2)
   - Summary: **The work-store harness's two membership selectors diverge on two shapes neither fixture varies.** (a) Member
     syntax: A's unanchored path regex admits `TASK-912-x.md.bak`, B's anchored basename rejects it, and prime never says whether a
