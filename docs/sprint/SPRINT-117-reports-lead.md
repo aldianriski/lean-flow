@@ -4,6 +4,7 @@ slug: reports-lead
 owner: Maintainer
 last_updated: 2026-10-06
 status: active
+plan_commit: 12361ed
 update_trigger: sprint execute/close events
 ---
 
