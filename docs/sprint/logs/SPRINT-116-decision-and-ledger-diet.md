@@ -143,3 +143,13 @@ boundary) is fixed in `TECH-DEBT.md`, already in T1's Layers. TASK-399's `## Don
   one-off seed, which the scope-change of 2026-10-06 recorded.
 consequence · T3 · behaviour:low · governance:low
 review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-10-06 | scope-change | T1 and T2 `Layers:` re-spelled in the token forms `check-layers-observed` reads (system-verify finding)
+**What broke:** system verify (`QA_FULL=1`, VPS, on `60d7ed5`, 106 s from the run's own clock) read `317 pass, 4 fail`. One FAIL was
+`layers observed`: 105 of T1's deleted paths and T2's seven fixture READMEs were "changed by a task that never declared it". The files
+*were* declared, but as `packages/**` · `apps/cli/**` · `test/**` and `evals/fixtures/boundary-rows/*/README.md`, and the checker
+matches only an exact path or a directory token ending in `/` (`covers()`, `check-layers-observed.ts:245`). `docs/work/cancel/TASK-393-…`
+(the cancel move's destination) was not declared at all. **Impact:** the tokens become `packages/` · `apps/` · `test/` and
+`evals/fixtures/boundary-rows/`, plus the cancel path. Same files, readable spelling, no scope change in substance. The other three FAILs:
+two `review-depth-*-absent` for T1 (its Codex loop has not closed, so its `review ·` line is owed, which is T4's new rule firing as designed)
+and `knowledge index STALE` (ADR-051 added without `gen-index.sh`; regenerated now). **Re-confirm G2:** none needed.
