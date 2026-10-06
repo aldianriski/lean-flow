@@ -120,7 +120,8 @@ governance:…` to the Execution Log the moment the table above is consulted, wh
 
 Full routing · skip table · the Standards-vs-Spec axes · the revise loop · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
 
-**Report shape** — every boundary report (a gate verdict, a task done, the sprint-bulk exit) and every confirmation popup opens with its verdict (what is true now, or what was decided), then the evidence, then exactly one `Next:` line; context the reader already has is not restated (TASK-321).
+**Report shape** — every boundary report (a gate verdict, a task done, the sprint-bulk exit) and every confirmation popup opens with its verdict (what is true now, or what was decided), then the evidence, then exactly one `Next:` line; context the reader already has is not restated.
+The sprint-bulk exit keeps `run · N of M DoD ticked` as its first line: that header *is* its verdict, so nothing goes above it (TASK-321).
 
 ## Red flags
 

@@ -98,7 +98,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 
 ```
 === PRIME HEALTH ===
-Verdict:  ready — fresh, 3 open tasks in the active sprint
+Verdict:  ready — context current; continue the active sprint with /orchestrator
 [OK]      CLAUDE.md
 [OK]      CONTEXT.md
 [OK]      README.md
