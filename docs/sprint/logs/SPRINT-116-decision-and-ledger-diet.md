@@ -67,3 +67,20 @@ TASK-346's `## Done when` is unchanged. **Re-confirm G2:** no design change, onl
 - Discrimination (builder): with the control's `review ·` line deleted, only case 20 reddened; restored, `git hash-object` ==
   `git rev-parse HEAD:<control>` (`dc46b148…`). Coordinator re-run on main after merge: `REVIEW-DEPTH FIXTURES: all green`.
 consequence · T4 · behaviour:low · governance:high
+
+### 2026-10-06 | progress | T4 reviewed: Codex round 1 CLEAR; accepted
+Codex made one static pass over `babf3791` against a five-item bounded threat model (contract conflict · the DoD's "not both" ·
+fixture discrimination · consumer-side leak · wrap format) and returned a bare `CLEAR` with no per-item reasoning. Accepted
+under the loop's stop rule; the coordinator's own re-run on main is the mechanical evidence. Both TASK-401 boxes ticked.
+review · T4 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-10-06 | progress | T2 built and merged: stale cut-guard references swept (c2d82fc → merge 22490f3; fix 111f343)
+- 12 files reworded or removed; the dead `/assert-` exclusion in `run-emitter-column-fixtures.ts` is gone (`git ls-files evals | grep assert-`: none).
+- Coordinator re-grep of the 10 basenames: what remains is history only (archives · research · changelogs · logs · LEARNINGS ·
+  ADR-050 · TECH-DEBT rows · TASK-381/400 · `evals/README.md` lines already marked "cut, SPRINT-113 T1" · `sprint-041-reconstructed.md` data).
+- Coordinator fix `111f343`: the builder's comment claimed `--no-members` "remains for compatibility"; nothing calls it but its own
+  test, so the comment now says that and cites TD-198. **Close-retro TD candidate:** TD-198's premise is stale (its only external
+  caller was cut), so `--no-members` is dead outside its test; delete the flag or record why it stays.
+- Harnesses: emitter-column 9/0 · layers-completeness 25/0 · layers-observed 13/0 (after the fix).
+consequence · T2 · behaviour:low · governance:low
+review · T2 · self-review · behaviour:low · governance:low

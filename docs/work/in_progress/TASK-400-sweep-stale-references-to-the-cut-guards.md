@@ -27,7 +27,7 @@ this"), a comment in `evals/fixtures/layers-completeness/synthetic.ts:9`, `evals
 
 ## Done when
 
-- [ ] Every live reference to a cut file is reworded to history ("cut at SPRINT-113, ADR-050") or removed; fixture data and archive text are unchanged; `git grep` of the 10 basenames returns only history.
+- [x] Every live reference to a cut file is reworded to history ("cut at SPRINT-113, ADR-050") or removed; fixture data and archive text are unchanged; `git grep` of the 10 basenames returns only history. ✓ c2d82fc + 111f343: 12 files reworded/removed; coordinator git grep of the 10 basenames (excl. archive · research · changelogs · logs · LEARNINGS) leaves only history lines, ADR-050, TECH-DEBT rows, TASK-381/400, and sprint-041-reconstructed.md fixture data; emitter-column 9/0 · layers-completeness 25/0 · layers-observed 13/0
 
 ## Assumes
 

@@ -26,12 +26,12 @@ prose, which `check-review-depth.sh` correctly refuses to match (L-151, L-225). 
 
 ## Done when
 
-- [ ] Wherever a review loop is said to end (review-scoping.md § the revise loop, and the dispatch brief's Codex step if one exists), the
+- [x] Wherever a review loop is said to end (review-scoping.md § the revise loop, and the dispatch brief's Codex step if one exists), the
       procedure says to append the `review · Tn · <depth> · behaviour:… · governance:…` line when the loop closes, whichever reviewer ran.
       Part 4's depth vocabulary names an external-reviewer depth, or the docs state that a Codex loop records as `scoped-reviewer`, but
-      not both.
-- [ ] `check-review-depth.sh`'s regex and the documented line still agree (L-058), proven by one must-FAIL fixture: a log with a Codex-CLEAR
-      prose entry and no record line reddens.
+      not both. ✓ babf3791 (merge f2585a5): review-scoping.md § The revise loop says a closing loop appends the review line whichever reviewer ran, and an external reviewer records as scoped-reviewer; night-run.md Part 4 points at it; no fifth depth word. Codex review round 1: CLEAR
+- [x] `check-review-depth.sh`'s regex and the documented line still agree (L-058), proven by one must-FAIL fixture: a log with a Codex-CLEAR
+      prose entry and no record line reddens. ✓ check-review-depth.sh unchanged; case 19 codex-clear-no-review-line-fails exits 1 with review-depth-governance-absent, case 20 control passes, the two differ in one line; control seeded-break reddened only case 20, restore hash dc46b148 == HEAD; coordinator re-run on main: REVIEW-DEPTH FIXTURES: all green
 
 ## Assumes
 
