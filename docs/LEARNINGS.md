@@ -71,6 +71,12 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-231 [tags: process] [status: active]: **A test suite's coverage is its assertions, not its fixtures: before deleting one, enumerate rule × fixture × verdict, and map each to a survivor.** SPRINT-116 retired the TypeScript port and named the Shell harness as the replacement because it ran "the same nine retained fixtures". Two Codex rounds then found what that claim hid: one fixture (`empty-slug`) no surviving case exercised at all, and on two others the deleted test asserted more per-rule verdicts (S4.INDEX on a duplicate number; each rule's own PASS on the clean tree, where exit 0 alone accepts a NOTE) than the harness did. Recon and the ADR both counted directories, so the gap passed G2 and the owner's acceptance.
+- seen: 2026-10-06 (SPRINT-116 T1: Codex R1 + R2 on `1a7361f`; fixed in `c6e41db` · `44c6741`)
+- count: 1
+- promoted: no
+- related: L-136 · L-198 · ADR-051
+
 ## L-230 [tags: process] [status: active]: **A duration is a query result: take it from the run's own clock, never from when you first looked.** SPRINT-115 reported the first off-host gate run as "about 40 minutes" to the owner and wrote "under 40 min" into a sprint log. The figure was the gap between launch and the coordinator's first check of the result. The run's own files (`gate.start` → `gate.rc` mtime) said **101 s**, which made the gate look 20× costlier than it was on the one host where it fits. Caught only when a second measurement (three profiled runs at ~107 s) disagreed. An upper bound is not a measurement, so state it as "≤ N" or read the artifact's timestamps.
 - seen: 2026-10-06 (SPRINT-115 T2: first VPS run 06:24:16 → 06:25:57; reported as ~40 min; corrected in the SPRINT-114 log)
 - count: 1
@@ -79,7 +85,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ## L-229 [tags: process] [status: active]: **A scope-change that widens `Layers:` in the Log is half a change: the checkers read the Plan's `Layers:` lines, never the Log.** SPRINT-115 logged two scope-change entries widening T4/T5's files and never edited the Plan's `Layers:` lines (`CONTEXT.md` calls them a live declaration, editable with a scope-change). The first system gate read `313 pass, 3 fail`: layers-observed (undeclared files), layers-completeness (a tick's evidence naming an undeclared file) and emitter-column (a new script outside every scope rule). The same sprint had already fixed one such gap by hand at promote. A widened scope is wired only when every reader of it is updated, and here the reader is the checker, not the Log.
 - seen: 2026-10-06 (SPRINT-115 T4/T5 merge-back → first VPS gate; fixed in `5d9335a`)
-- count: 1
+- seen: 2026-10-06 (SPRINT-116 system verify run 1: T1/T2 `Layers:` declared as `packages/**` and `boundary-rows/*/README.md`, a spelling the checker's `covers()` does not read (exact path or trailing-`/` directory only), so 105 declared files read as undeclared; fixed in `efc3878`. Same reader, same Plan line, a different way to write past it.)
+- count: 2
 - promoted: no
 - related: L-020 · L-172 · L-166
 

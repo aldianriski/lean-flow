@@ -4,7 +4,7 @@ slug: decision-and-ledger-diet
 epic: EPIC-014
 owner: Maintainer
 last_updated: 2026-10-06
-status: active
+status: closed
 plan_commit: d6bc35c
 gates_signed: G1,G2 @ 8e14bb4
 update_trigger: sprint execute/close events
@@ -113,6 +113,43 @@ depth is named (not two), and a Codex-CLEAR prose entry with no record line redd
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `packages/` · `apps/` · 31 `test/` files · `evals/run-s4-ts-evaluators.sh` · `evals/run-s4-differential-parity.sh` | T1 | deleted: the retired TypeScript port and its parity pair (ADR-051) | Med | system verify 320/0 |
+| `docs/adr/ADR-051-the-typescript-port-is-retired.md` · ADR-038 · ADR-039 status · `docs/DECISIONS.md` | T1 | the retirement decision; superseded ADRs marked | Low | owner acceptance |
+| `scripts/qa-check.sh` | T1 · T3 | §4 Shell harness always-on; parity pair removed (T1); leg 10b exempts only `archive-path.sh` (T3) | Med | 58 harnesses listed = `ls evals/run-*`; leg 10b seeded red |
+| `evals/run-adr-family-fixtures.sh` | T1 | `empty-slug` case + per-rule assertions the TS test held (Codex R1/R2) | Low | all green; two seeded breaks reddened one case each |
+| `package.json` · `tsconfig.json` · `bunfig.toml` · `evals/typecheck-population.test.ts` + 7 harness comments | T1 | workspaces and `apps`/`packages` globs dropped; references reworded | Low | tsc exit 0; typecheck-population 7/0 |
+| `README.md` · `docs/architecture/overview.md` · `.claude/CONTEXT.md` | T1 | no live claim about the port; README's install claim corrected | Low | Codex R2/R3 |
+| `docs/epic/EPIC-014-reference-engine.md` · `docs/epic/INDEX.md` | T1 | closed as retired; six conditions dropped, not met | Low | epic-archive check at close |
+| `TECH-DEBT.md` · `docs/work/backlog/TASK-404-…` · `docs/work/cancel/TASK-393-…` | promote · T1 | 25 rows resolved (12 + 13), TD-168 → TASK-404, the finish path cancelled | Low | census 146/116/30 |
+| `scripts/lib/check-handoff-state.sh` | T3 | Plan → log mapping through `lf_is_archived_path` | Low | output identical; fixtures green |
+| `skills/orchestrator/references/review-scoping.md` · `night-run.md` · `evals/fixtures/review-depth/codex-clear-*` · harness | T4 | a closing review loop records its `review ·` line; an external reviewer records as `scoped-reviewer` | Low | cases 19/20; control seeded red; Codex CLEAR |
+| 8 fixture READMEs · `run-emitter-column-fixtures.ts` · `check-layers-{completeness,observed}.ts` | T2 | stale references to SPRINT-113's cut guards reworded to history | Low | 9/0 · 25/0 · 13/0 |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check** — yes, once. L-229 (the checkers read the Plan's `Layers:`, never the Log) was loaded and followed for every widening, yet
+system verify still found 105 "undeclared" files: the Plan *did* carry them, spelled `packages/**`, which `covers()` does not read. A
+different route past the same reader → L-229 count 2. L-230 (take a duration from the run's own clock) and L-170 (derive ids with
+worktrees excluded; treat 9xx as fixture tokens) were applied and held.
+
+**Cost** — coordinator inline (gates, ADR, T3, close) plus 10 dispatched agents, ≈ 708k subagent tokens (as each agent reported it): TD-sweep reader (Sonnet) 161k ·
+T1 recon (Explore, Sonnet) 142k · T1 builder (Sonnet) 141k · T2 builder (Haiku) 86k · T4 builder (Sonnet) 72k · five Codex passes 19–24k each
+(≈ 106k). Delivered: 4 of 4 members, so ≈ 177k per member. Two VPS gate runs at 106 s each, by the runs' own clocks.
+
+**Worked**
+- Asking the cut-or-finish question first gave 14 ledger rows a direction; 13 resolved the moment the cut landed.
+- Recon before deletion paid off. It found §4's only default coverage inside the port, so the replacement was ruled before any file moved.
+- The Codex loop earned its rounds: R1 and R2 found real lost assertions that the recon, the ADR and the owner's acceptance had all passed.
+- T4's new rule fired on its own sprint: system verify flagged T1's missing `review ·` line until the loop closed.
+
+**Friction**
+- I proposed a CHANGELOG rotation that was not due (it needs the next MINOR). The owner approved it, and I caught it only when I read the
+  v2.0.0 rotation file before applying. I had read the trigger and not its last firing.
+- An ad-hoc age filter mis-parsed `Sprint-1NN` as ≤ 90. A second count with a different selector disagreed and caught it before the brief went out.
+- Codex's sandbox could not read files at all in R3 (not only spawns), so the review needed the diff pasted in.
+- The local gate poller was reaped for low host memory, so the verdict was read afterwards from the VPS's own `gate.rc`.
+- Tick evidence on a wrapped `## Done when` box tripped the freeze check (TD-229).
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- L-231: a test suite's coverage is its assertions, not its fixtures. Enumerate rule × fixture × verdict before deleting one.
+- L-229 now count 2, due for promotion at the next promote.

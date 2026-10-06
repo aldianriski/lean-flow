@@ -327,6 +327,26 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-229** severity: low | status: open | created: Sprint-116 (close)
+  - Summary: **A tick on a multi-line `## Done when` box must put its ` ✓ <evidence>` on the box's FIRST line, and nothing says so.**
+    `check-sprint-by-reference.ts` (`sameDoneWhen`) accepts a tick tail only on a box line, so evidence appended where the frozen text
+    actually ends (its last continuation line) reads as `FREEZE-EDIT`. `references/sprint-by-reference.md` says the tail comes "after the
+    frozen text", which for a wrapped box is the continuation line. SPRINT-116 close hit it on TASK-399 and TASK-401 (moved in `close`).
+  - Mitigation (hypothesis): accept the tail on a box's last continuation line, or state the first-line rule in the reference; one of the two.
+
+- **TD-228** severity: low | status: open | created: Sprint-116 (close, T1 Codex R1)
+  - Summary: **The Shell §4 rules disagree on an empty-slug ADR (`docs/adr/ADR-001-.md`).** S4.ONEFILE's glob needs one or more slug
+    characters and FAILs it; S4.INDEX · S4.SECTIONS · S4.NEGATIVE iterate `_adr_canonical`, whose glob admits an empty slug, and PASS the
+    same file. The deleted TS test documented this as an owner-ruled divergence; after ADR-051 nothing live does, and
+    `run-adr-family-fixtures.sh` asserts only ONEFILE's finding on the retained `empty-slug` fixture.
+  - Mitigation (hypothesis): make `_adr_canonical` use ONEFILE's stricter glob, so the other three see no canonical ADR there.
+
+- **TD-227** severity: low | status: open | created: Sprint-116 (close, T3)
+  - Summary: **Leg 10b (archive-predicate singularity) has no retained must-FAIL fixture.** The leg is inline in `scripts/qa-check.sh`;
+    SPRINT-116 T3 proved it by extracting its lines and re-seeding a raw `*/archive/*` site once, a proof that is not retained. A grep of
+    `evals/` for `archive-predicate` returns 0.
+  - Mitigation (hypothesis): extract the leg into `scripts/lib/` (TypeScript) taking a root, with a seeded-site fixture and a clean control.
+
 - **TD-226** severity: low | status: open | created: Sprint-115 (close retro, T4)
   - Summary: **`dod-delta`'s EXEMPT line is visible in the checker's own output but not in the gate summary.** `check-dod-delta.ts` prints
     `PASS  dod-delta: EXEMPT <sha> … ruled by <ruling>` for a commit declared in `.dod-delta-exempt`, but `scripts/qa-check.sh` folds the
@@ -523,6 +543,8 @@ status: current
     differential keeps v1 parity with the `.sh` oracle (D1), and its only caller is `evals/run-layers-observed-differential.ts`
     (not qa-check.sh, not night-run.sh). A future caller could bypass the member legs with no trace in the output.
   - Mitigation (hypothesis): print a NOTE naming the exclusion whenever the flag is on (the TD-042 rule: a skip must be visible).
+  - **Premise changed (SPRINT-116 close):** its only caller, `evals/run-layers-observed-differential.ts`, was cut at SPRINT-113, so the
+    flag is now reached only by its own test (`evals/layers-observed.test.ts`). Deleting the flag may be cheaper than the NOTE.
 
 - **TD-197** severity: low | status: open | created: Sprint-110 (T2 outside review)
   - Summary: **A backtick-wrapped `Task:` trailer value escapes member attribution.** A `Task:` value of TASK-901 wrapped in backticks, on a `sprint(N):`

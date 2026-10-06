@@ -13,6 +13,23 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## SPRINT-116 — Decision + Ledger Diet (2026-10-06)
+
+**Unreleased**: no version bump yet. `skills/orchestrator/references/` and `README.md` changed, so this reaches adopters at the next release.
+
+- **The TypeScript port of the conformance engine is retired (ADR-051).** The Shell engine (`conformance.sh`) is the only engine.
+  `packages/` · `apps/` · 31 port-only `test/` files and the two §4 TS harnesses are gone (103 files + 2). The Shell §4 harness
+  `run-adr-family-fixtures.sh` is back in the default gate, now asserting each rule's verdict per fixture, including the empty-slug case.
+  EPIC-014 closes as retired. ADR-038 and ADR-039 are superseded. The default gate is ~25 s slower; adopters need nothing new.
+- **A review loop that closes records its `review ·` line, whichever reviewer ran** (`review-scoping.md` § The revise loop). An external
+  reviewer, such as a Codex loop, records as `scoped-reviewer`, so the depth vocabulary stays four words. New must-FAIL fixture plus control.
+- **`check-handoff-state.sh` uses the shared archive predicate**, and leg 10b no longer exempts it (TASK-346).
+- **Stale references to SPRINT-113's cut guards are reworded to history** (TASK-400).
+- **Debt ledger:** 12 of the 42 oldest rows resolved at promote and 13 port-only rows at T1; close files 3. 116 open (was 138).
+  TD-168 (engine spawn cost) is now TASK-404, P1.
+
+---
+
 ## SPRINT-115 — Gate and Host Cost (2026-10-06)
 
 **Unreleased**: no version bump. Skills, templates, spec, manifests and README are untouched, so nothing reaches an adopter.
