@@ -170,3 +170,7 @@ re-run with the diff and `run_case_anywhere` pasted into the prompt, the hybrid 
 `exit` ends only the command-substitution subshell; `x=$(cmd); rc=$?` is reliable in dash with no `set -e`. Its one aside (`printf %sn`) was
 an escaping artifact of the pasted prompt; the file reads `printf '%s\n'` (checked with `cat -A`).
 review · T1 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-10-06 | progress | system verify GREEN: `QA_FULL=1` on the VPS at `d5ba41b`, `QA-CHECK: 320 pass, 0 fail` (rc 0, 106 s by the run's own clock)
+Second run, after the four fixes from run 1 (`317 pass, 4 fail`). The local poller was reaped for low host memory mid-run; the verdict was
+read afterwards from the VPS's own `gate.rc` / `gate.log`. TASK-399 ticked; all four members done.
