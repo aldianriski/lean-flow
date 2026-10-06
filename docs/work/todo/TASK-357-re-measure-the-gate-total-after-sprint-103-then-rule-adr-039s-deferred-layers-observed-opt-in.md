@@ -10,6 +10,7 @@ tier: P
 authority: J2
 origin: close-retro
 state: ready
+sprint: SPRINT-115
 ---
 
 # TASK-357 — Re-measure the gate total after SPRINT-103, then rule ADR-039's deferred `layers-observed` opt-in

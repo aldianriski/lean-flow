@@ -10,6 +10,7 @@ tier: G
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-115
 ---
 
 # TASK-354 — Give the `dod-delta` leg a ruled-exemption declaration, so a historical mis-attribution stops blocking every close

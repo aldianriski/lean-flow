@@ -10,6 +10,7 @@ tier: G
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-115
 ---
 
 # TASK-403 — Make the two host-dependent gate fixtures host-independent (TD-224 · TD-225)

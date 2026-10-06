@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-115
 ---
 
 # TASK-368 — Run the sprint file's own per-file checkers at promote, before `plan locked`
