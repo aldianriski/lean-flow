@@ -132,3 +132,14 @@ S4.INDEX/SECTIONS/NEGATIVE on the same file, the self-inconsistency the deleted 
 **Impact:** T1 adds one harness case asserting S4.ONEFILE's named finding on `empty-slug`. The INDEX/SECTIONS/NEGATIVE re-admission is the
 engine's own inconsistency, now documented nowhere live → **close-retro TD candidate**. Finding P3 (TD-165's narrowing names the wrong
 boundary) is fixed in `TECH-DEBT.md`, already in T1's Layers. TASK-399's `## Done when` is unchanged. **Re-confirm G2:** no design change.
+
+### 2026-10-06 | progress | T3 built (inline, a two-line conversion): the handoff check maps Plan → log through the shared predicate (b2f20a7)
+- `check-handoff-state.sh` sources `archive-path.sh` (fatal if missing, the house idiom) and calls `lf_is_archived_path "$planrel"`
+  instead of a raw `*/archive/*` case; leg 10b's `_ag_exempt` now names only `archive-path.sh`, and the comment says why the second went.
+- Proof (ADR-050, other G): leg 10b's real code extracted by line range (937–950) and run verbatim with stub `ok`/`bad`: PASS on the converted
+  tree; with the raw case re-seeded at line 149, `FAIL archive-predicate: 1 site(s) carry a raw archive exclusion …`; restored, `git hash-object`
+  == the pre-seed hash (`bfb0ed97`). The checker's output on this repo is byte-identical before and after; `HANDOFF-STATE FIXTURES: all green`.
+- **Close-retro TD candidate:** leg 10b still has **no retained** must-FAIL fixture (it is inline in `qa-check.sh`); today's proof was a
+  one-off seed, which the scope-change of 2026-10-06 recorded.
+consequence · T3 · behaviour:low · governance:low
+review · T3 · self-review · behaviour:low · governance:low

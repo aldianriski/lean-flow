@@ -17,7 +17,7 @@ sprint: SPRINT-116
 
 ## Done when
 
-- [ ] `scripts/lib/check-handoff-state.sh:145` either calls `lf_is_archived_path` like the other eleven sites, or its exemption stops living as a comment inside `qa-check.sh`'s leg 10b allow-list regex and becomes a declaration the guard reads. Today the reason is sound — it MAPS a Plan path to its log path rather than excluding, and self-enumerates via a literal archived-sprint glob, so it never tests a caller-supplied string of unknown casing (independently verified at SPRINT-099 T3 review) — but the exemption is hardcoded in a regex two files away, which is L-151's shape: a ruling recorded where its reader must be told about it.
+- [x] `scripts/lib/check-handoff-state.sh:145` either calls `lf_is_archived_path` like the other eleven sites, or its exemption stops living as a comment inside `qa-check.sh`'s leg 10b allow-list regex and becomes a declaration the guard reads. Today the reason is sound — it MAPS a Plan path to its log path rather than excluding, and self-enumerates via a literal archived-sprint glob, so it never tests a caller-supplied string of unknown casing (independently verified at SPRINT-099 T3 review) — but the exemption is hardcoded in a regex two files away, which is L-151's shape: a ruling recorded where its reader must be told about it. ✓ b2f20a7: line 145 (now 150) calls lf_is_archived_path, sourced from archive-path.sh like the other sites; leg 10b exempts only archive-path.sh. Real leg 10b code (qa-check.sh 937-950, run verbatim): PASS converted · FAIL "1 site(s) carry a raw archive exclusion" with the raw case re-seeded · restored hash == pre-seed (bfb0ed97). check-handoff-state.sh output on this repo identical before/after; HANDOFF-STATE FIXTURES: all green
 
 ## Touches
 
