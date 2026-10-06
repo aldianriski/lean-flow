@@ -81,6 +81,11 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   axis — each outcome names its evidence in the rollup's own vocabulary (`test | check | fixture |
   review | owner-ruling` — night-run.md Part 4): `fixed` names what proved it, `still-open` names
   what's still missing.
+- **Close the loop with its review line.** When a review loop closes — CLEAR, `fixed`, or `still-open`,
+  whichever reviewer ran — append `review · Tn · <depth> · behaviour:… · governance:…` to the Execution Log
+  (night-run.md Part 4). An external reviewer (e.g. a Codex review loop, or any reviewer outside Claude's
+  built-ins) records as `scoped-reviewer`. A review that lives only in prose is not a record, and the
+  absence check refuses it.
 
 Guarded by a retained must-FAIL fixture (`evals/fixtures/revise-loop/`, L-058 · TD-012): the planted
 violation must surface as the named worst finding on its axis, and an inadequate fix must end at the
