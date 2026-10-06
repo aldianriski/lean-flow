@@ -56,3 +56,9 @@ Done-when cannot reach a sprint file through the existing checker. **Change:** T
 no new `.sh`) · `scripts/lib/check-prose-density.ts` (a single-file mode) · `evals/` fixtures for both seeded findings · `.claude/CONTEXT.md`
 (the promote note naming the entry point). **Impact:** files only; TASK-368's `## Done when` text is unchanged. **G2 re-confirmed** by the
 owner's A2 ruling above.
+
+### 2026-10-06 | scope-change | T5 (TASK-368): Layers add `scripts/qa-check.sh` (register the new runner)
+**What broke:** `qa-check.sh`'s completeness loop fails every `evals/run-*` harness that is in none of its three lists. T5 shipped
+`evals/run-promote-check-fixtures.ts`, and `qa-check.sh` was outside T5's Layers. **Change:** the coordinator adds it to `eval_harnesses_always`
+(about 1–2 s, no git) with a one-line cost note. **Impact:** one list entry plus one comment line; TASK-368's `## Done when` is unchanged. D1 analogue: T2 also
+owns `scripts/qa-check.sh` (`eval_harnesses_optin`), so this edit lands before T2 starts.
