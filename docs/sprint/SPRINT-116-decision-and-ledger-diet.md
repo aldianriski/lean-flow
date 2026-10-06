@@ -48,6 +48,7 @@ Layers: `docs/epic/EPIC-014-reference-engine.md` · `TECH-DEBT.md` (TD-168 owner
   · `evals/run-s4-differential-parity.sh` · `evals/typecheck-population.test.ts`  · `evals/epic-archive-differential.test.ts`
   · `evals/layers-completeness.test.ts` · `evals/run-doc-caps-differential.ts` · `evals/run-dod-delta-fixtures.sh`
   · `evals/run-epic-archive-fixtures.sh`  · `evals/run-layers-completeness-fixtures.sh` · `evals/run-night-run-rollup-differential-parity.ts`
+  · `evals/run-adr-family-fixtures.sh` (scope-change: Codex R1, empty-slug case)
 Depends-on: none
 Cites: `TASK-399` · EPIC-014 D2 · ADR-039 · ADR-050 · `docs/research/guard-audit-rest.md` (K01) · TD-168 · the SPRINT-116 aging sweep
 
