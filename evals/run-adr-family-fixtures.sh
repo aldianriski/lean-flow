@@ -73,8 +73,17 @@ run_case_anywhere "no-negative-consequence-fires" 1 "adr-no-negative-consequence
 # "One file per ADR at docs/adr/ADR-NNN-<slug>.md" is three separate claims, and a rule that only
 # checks the filename pattern silently passes the two that actually corrupt an index.
 
+# Each fixture whose output carries more than one claim is run ONCE and replayed per claim (`replay`),
+# so a per-rule assertion costs no extra engine spawn. These per-rule checks were the TS evaluators'
+# until ADR-051 cut them (SPRINT-116 T1, Codex R2).
+replay() { printf '%s\n' "$1"; exit "$2"; }
+dup_out=$(sh "$engine" "$fx/duplicate-number" --spec "$adr_spec" 2>&1); dup_rc=$?
+
 run_case_anywhere "duplicate-number-fires" 1 "adr-path-noncanonical: docs/adr/ADR-001-the-same-number-again.md -- ADR-001 is already claimed by" -- \
-  sh "$engine" "$fx/duplicate-number" --spec "$adr_spec"
+  replay "$dup_out" "$dup_rc"
+# A second file under a claimed number is also an ADR the index never names: S4.INDEX must say so too.
+run_case_anywhere "duplicate-number-index-fires" 1 "decisions-index-missing-adr: docs/adr/ADR-001-the-same-number-again.md" -- \
+  replay "$dup_out" "$dup_rc"
 
 run_case_anywhere "adr-outside-dir-fires" 1 "adr-path-noncanonical: docs/ADR-002-in-the-wrong-place.md" -- \
   sh "$engine" "$fx/adr-outside-dir" --spec "$adr_spec"
@@ -94,8 +103,13 @@ run_case_anywhere "index-absent-fires" 1 "decisions-index-missing-adr: no decisi
 # A must-FAIL fixture proves a rule CAN fire. It cannot prove the rule does not fire on everything,
 # which is the failure mode that makes a checker unusable rather than merely wrong.
 
+clean_out=$(sh "$engine" "$fx/clean" --spec "$adr_spec" 2>&1); clean_rc=$?
 run_case_anywhere "clean-repo-passes" 0 "all 1 ADR(s) sit at a canonical one-file-per-ADR path" -- \
-  sh "$engine" "$fx/clean" --spec "$adr_spec"
+  replay "$clean_out" "$clean_rc"
+# Exit 0 alone would accept a NOTE; each rule's own PASS line is asserted (one engine run, replayed).
+run_case_anywhere "clean-index-passes" 0 "PASS  S4.INDEX" -- replay "$clean_out" "$clean_rc"
+run_case_anywhere "clean-sections-passes" 0 "PASS  S4.SECTIONS" -- replay "$clean_out" "$clean_rc"
+run_case_anywhere "clean-negative-passes" 0 "PASS  S4.NEGATIVE" -- replay "$clean_out" "$clean_rc"
 
 # --- S4.APPEND: history, not the tree -------------------------------------------------------------
 

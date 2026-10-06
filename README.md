@@ -467,8 +467,8 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
 docs/             architecture/ · development/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
 
   ── TypeScript tooling on Bun (maintainer-side; ADR-051 retired the engine port) ──
-package.json      root manifest — Bun runs TypeScript directly,
-tsconfig*.json    so there is no install step and no node_modules
+package.json      root manifest — Bun runs TypeScript directly; the maintainer gate's
+tsconfig*.json    typecheck leg needs `bun install` (dev-only `typescript`, ADR-037)
 bunfig.toml
 test/             gate-discovery guard and its fixtures
   ────────────────────────────────────────────────────────────────────────────────
