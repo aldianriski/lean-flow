@@ -72,9 +72,15 @@ function report(name: string, ok: boolean, detail: string) {
 // freshly-seeded, not-yet-generated repo, and that is diagnostic noise for THIS harness's own
 // PASS/FAIL accounting (which reads exit codes and file bytes, never the child's printed text),
 // not a second verdict to relay.
-function sh(args: string[], opts: { cwd: string; env?: NodeJS.ProcessEnv }): { stdout: string; code: number } {
+//
+// `shell` defaults to `sh` (qa-check's own invocation shape). The locale-SENSITIVE cases -- the glob-order
+// control and case (ii) incl. its sanity seed -- pass "bash": `sh` is dash on Debian/Ubuntu, whose globs
+// ignore locale, so a dash host can never discriminate (TD-224). bash is on every host that runs this
+// harness (Git-Bash on Windows, /usr/bin/bash on Ubuntu), so this keeps "never a vacuous pass" without a
+// second host-INVALID class.
+function sh(args: string[], opts: { cwd: string; env?: NodeJS.ProcessEnv }, shell = "sh"): { stdout: string; code: number } {
   try {
-    const stdout = execFileSync("sh", args, { cwd: opts.cwd, env: opts.env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    const stdout = execFileSync(shell, args, { cwd: opts.cwd, env: opts.env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
     return { stdout, code: 0 };
   } catch (e) {
     const err = e as { stdout?: string; status?: number };
@@ -104,8 +110,8 @@ function localeEnv(lc: string): NodeJS.ProcessEnv {
   const dir = buildTempRepo();
   try {
     const probe = 'for f in docs/research/*.md; do basename "$f"; done';
-    const underC = sh(["-c", probe], { cwd: dir, env: localeEnv("C") }).stdout.trim();
-    const underEnUs = sh(["-c", probe], { cwd: dir, env: localeEnv("en_US.UTF-8") }).stdout.trim();
+    const underC = sh(["-c", probe], { cwd: dir, env: localeEnv("C") }, "bash").stdout.trim();
+    const underEnUs = sh(["-c", probe], { cwd: dir, env: localeEnv("en_US.UTF-8") }, "bash").stdout.trim();
     const discriminates = underC !== underEnUs && underC.length > 0 && underEnUs.length > 0;
     if (!discriminates) {
       console.log("INVALID  locale-control: host cannot discriminate");
@@ -136,8 +142,8 @@ function localeEnv(lc: string): NodeJS.ProcessEnv {
   const dirC = buildTempRepo();
   const dirEnUs = buildTempRepo();
   try {
-    const runC = sh(["scripts/gen-index.sh"], { cwd: dirC, env: localeEnv("C") });
-    const runEnUs = sh(["scripts/gen-index.sh"], { cwd: dirEnUs, env: localeEnv("en_US.UTF-8") });
+    const runC = sh(["scripts/gen-index.sh"], { cwd: dirC, env: localeEnv("C") }, "bash");
+    const runEnUs = sh(["scripts/gen-index.sh"], { cwd: dirEnUs, env: localeEnv("en_US.UTF-8") }, "bash");
     const contentC = readFileSync(join(dirC, "docs", "knowledge-index.md"));
     const contentEnUs = readFileSync(join(dirEnUs, "docs", "knowledge-index.md"));
     const identical = runC.code === 0 && runEnUs.code === 0 && Buffer.compare(contentC, contentEnUs) === 0;
@@ -165,8 +171,8 @@ function localeEnv(lc: string): NodeJS.ProcessEnv {
       try {
         writeFileSync(join(seedDirC, "scripts", "gen-index.sh"), broken);
         writeFileSync(join(seedDirEnUs, "scripts", "gen-index.sh"), broken);
-        const brokenRunC = sh(["scripts/gen-index.sh"], { cwd: seedDirC, env: localeEnv("C") });
-        const brokenRunEnUs = sh(["scripts/gen-index.sh"], { cwd: seedDirEnUs, env: localeEnv("en_US.UTF-8") });
+        const brokenRunC = sh(["scripts/gen-index.sh"], { cwd: seedDirC, env: localeEnv("C") }, "bash");
+        const brokenRunEnUs = sh(["scripts/gen-index.sh"], { cwd: seedDirEnUs, env: localeEnv("en_US.UTF-8") }, "bash");
         const brokenContentC = readFileSync(join(seedDirC, "docs", "knowledge-index.md"));
         const brokenContentEnUs = readFileSync(join(seedDirEnUs, "docs", "knowledge-index.md"));
         const seededlyDiffer = Buffer.compare(brokenContentC, brokenContentEnUs) !== 0;
