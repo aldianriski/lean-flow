@@ -49,3 +49,12 @@ from Cites, two lines over 400 chars). Fixed before the lock; final run `PASS --
   accepts any depth except `self-review`, so no regex change. Shipped-skill change → Codex review loop.
 - **A1 confirmed:** the 10 basenames re-derived from `9a0bfaad` (`--diff-filter=D`) match TASK-400's census.
 - **Sequence:** T2 ∥ T4 (disjoint, worktree-isolated, `worktree.baseRef: head`); T1 inline; T3 after T1 (D1).
+
+### 2026-10-06 | scope-change | T3 Layers narrowed: drop `evals/fixtures/` (the declaration route was not taken)
+**What broke:** the pre-dispatch preflight HALTed: T3's directory token `evals/fixtures/` prefixes T2's three fixture paths and T4's
+`evals/fixtures/review-depth/`, with no Depends-on edge (4 × `shared-file-unowned`). The token was declared for the *declaration*
+route's must-FAIL case; G2 ruled *convert*. **Impact:** T3 touches `scripts/lib/check-handoff-state.sh` · `scripts/qa-check.sh` only.
+Leg 10b has **no retained fixture at all** (grep of `evals/` for `archive-predicate`: 0 hits). A retained one would mean extracting the
+inline leg into its own script, which is beyond the signed design. T3's proof stays what G2 signed: re-seed the raw `*/archive/*` case,
+observe leg 10b red once, restore, verify the restore with `git hash-object`. The missing retained fixture is a **TD candidate for close**.
+TASK-346's `## Done when` is unchanged. **Re-confirm G2:** no design change, only a narrower file set.

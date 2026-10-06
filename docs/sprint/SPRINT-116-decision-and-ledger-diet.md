@@ -64,7 +64,7 @@ names them as fixture data and must not change.
 **Acceptance:** `git grep` of the 10 deleted basenames returns only history (archive text, fixture data, or "cut at SPRINT-113").
 
 ### T3 — Rule `check-handoff-state.sh`'s archive exemption `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-handoff-state.sh` · `scripts/qa-check.sh` (the member names it `qa-check.sh`; leg 10b allow-list) · `evals/run-handoff-state-fixtures.sh` · `evals/fixtures/` (a must-FAIL case, if the declaration route is taken)
+Layers: `scripts/lib/check-handoff-state.sh` · `scripts/qa-check.sh` (the member names it `qa-check.sh`; leg 10b allow-list)
 Depends-on: T1 (both may touch `scripts/qa-check.sh`; D1)
 Cites: `TASK-346` · TD-145 · SPRINT-099 T3 · L-151
 
