@@ -98,3 +98,14 @@ moves back to the always-on set (+~23–28 s per default run); (2) EPIC-014 clos
 reproduce on the flagless run, so it is not proven port-only). **Side-finding for the ADR:** `test/architecture/unwired-exports.ts` is the
 mechanism behind CLAUDE.md's wiring-check DoD line and scans `packages/`·`apps/` only, so the cut leaves that line without a detector
 (recorded as an accepted cost in ADR-051). TASK-399's `## Done when` is unchanged. **Re-confirm G2:** ADR-051 goes to the owner before any file moves.
+
+### 2026-10-06 | progress | T1: ADR-051 accepted (owner); TASK-404 filed for TD-168; TASK-393 cancelled; cut dispatched
+- **ADR-051 accepted** (owner popup, `17d80f8`): the TypeScript port is retired and the Shell engine is the only engine. It supersedes ADR-038 and
+  ADR-039, supersedes ADR-035's engine decision only, and narrows ADR-050 clause 3 to zero pairs. Accepted costs: a slower default gate;
+  CLAUDE.md's wiring-check DoD loses its detector; a future port restarts from scratch.
+- **TASK-404 filed** (P1, `needs-info` by owner ruling): cut the Shell engine's per-file spawning. id derived from the store (max 403, by two
+  routes; mentions in fixtures up to 999 ignored as L-170 contamination).
+- **TASK-393 → `cancel/`** (`998eea4`): the *finish* path, superseded by ADR-051.
+- **EPIC-014's dropped conditions** are written `- ~~…~~ **dropped, not met**` rather than `- [ ]`/`- [x]`: `check-epic-archive.ts` counts
+  only those two shapes, so a retired epic can archive at close without a dropped condition reading as either met or open.
+- Cut dispatched to a Sonnet builder (worktree, base `998eea4`); system verify (`QA_FULL=1`) runs off-host after merge.
