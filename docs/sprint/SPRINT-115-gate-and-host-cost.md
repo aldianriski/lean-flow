@@ -4,6 +4,7 @@ slug: gate-and-host-cost
 owner: Maintainer
 last_updated: 2026-10-06
 status: active
+plan_commit: cede84c
 update_trigger: sprint execute/close events
 ---
 
