@@ -361,20 +361,6 @@ status: current
   - done-when: a declared exemption appears in the gate's own output (a named INFO/NOTE line, or the leg's summary naming the exempted sha),
     with a fixture where one declared row shows up in a `qa-check.sh` run and an empty file shows nothing.
 
-- **TD-225** severity: low | status: resolved → TASK-403 (SPRINT-115 T1, 6184fd23) | created: Sprint-114 (post-push full gate on a Linux VPS)
-  - Summary: **`run-qa-budget-position-fixtures.sh` case 2 assumes a slow host.** It expects the checkpoint-stripped copy to stay silent for
-    60s, but leg 12's own loop-internal check still fires. On a 2-vCPU Ubuntu VPS that copy reached `run-layout-fixtures.ts` in 3s and printed
-    the budget finding, so the case FAILed. It PASSes on the maintainer's Windows host only because that host runs slower. The verdict depends on host speed, not on the seed.
-  - done-when: case 2 asserts on WHERE the first budget finding lands (leg 12, not an early checkpoint) instead of on silence within a
-    wall-clock window, and it passes on both the Windows host and a fast Linux host.
-
-- **TD-224** severity: low | status: resolved → TASK-403 (SPRINT-115 T1, 6184fd23) | created: Sprint-114 (post-push full gate on a Linux VPS)
-  - Summary: **`run-gen-index-locale-fixtures.ts` claims to probe bash's glob order but spawns `sh`.** On Debian/Ubuntu `sh` is dash, whose
-    globs ignore locale, so `locale-control` reports "host cannot discriminate" and scores a FAIL. That is correct by design (never a vacuous
-    pass), but it makes the always-on gate red on any dash host, even though `gen-index.sh` is also run by `sh` there and so has no locale exposure either.
-  - done-when: the control spawns `bash` (matching its stated claim), or a dash host reports the case as host-INVALID/skip with a named finding
-    rather than a gate FAIL, decided at G2. In either case the gate is green on Ubuntu with `en_US.utf8` installed.
-
 - **TD-223** severity: low | status: open | created: Sprint-114 (post-push scratch-profile install)
   - Summary: **The plugin's longest tracked path leaves a thin margin under Windows' 260-char MAX_PATH.** The longest is 141 chars
     (`docs/work/backlog/TASK-354-…`; v1→v2 eval fixtures run 137–139). A marketplace clone failed with `Filename too long` from a ~120-char
@@ -1224,34 +1210,6 @@ status: current
   - Re-file fresh if: a fourth call site copies the formula before this is fixed — the copy count is
     the thing that makes it expensive, not the defect itself.
 
-- **TD-150** severity: **high** | status: resolved → TASK-365 (TASK-345 cancelled as superseded, 2026-10-06) | created: Sprint-097
-  - Tracker: none — found by the two-repo alignment check at the SPRINT-097 close, owner-requested.
-  - Summary: **ADR-041 rules that `workdoo` consumes lean-flow as a *pinned* plugin, and there is no
-    pin.** `workdoo/.claude/CLAUDE.md:21` states it in prose — *"lean-flow is consumed here as a
-    **pinned plugin** (ADR-041, in lean-flow) — never vendored, never forked"* — and nothing in that
-    repository implements it: no `.claude-plugin/`, no plugins block in `.claude/settings.json`, no
-    version reference anywhere. The ruling exists; the mechanism does not.
-  - Location: `workdoo` (no file to point at — that is the defect) · the ruling is
-    `docs/adr/ADR-041-platform-repo-service-boundary.md` § Decision, in this repository.
-  - Evidence: `grep -rn 'lean-flow' .claude/ .claude-plugin/ *.json` in `workdoo` returns five hits,
-    **all prose** in `CLAUDE.md`/`CONTEXT.md`; `ls -a` shows no `.claude-plugin/` at all.
-  - Why it matters, and why **high**: the pin is what makes the consumer contract meaningful. Without
-    it, `workdoo` runs whatever version happens to be in the shared plugin cache — which right now
-    holds `1.60.0`, `1.62.0` and `1.63.0` and **not** the `1.63.1` this close just released. A pilot
-    whose whole subject is *governed, reproducible agent work* is itself running its work-system at
-    an unrecorded version. Two named failures at once: **L-020** (shipped ≠ wired — a capability
-    written only in its own file, here an ADR nothing reads) and **L-151** (a decision recorded where
-    its reader cannot reach it — the reader is `workdoo`'s install, and it cannot read an ADR).
-  - Re-file fresh if: the pin lands but is not *checked* — a pin nothing verifies drifts the same way,
-    and this repository already has `check-skill-freshness` for exactly that question one level over.
-  - Tracked by `TASK-345` — escalated to Backlog P1 at the SPRINT-098 promote under the
-    `severity: high` rule, which had no consumer for this row because it had no Backlog entry at all.
-  - **Resolved (owner ruling 2026-10-06, SPRINT-115 session):** the pin landed **and is checked**, which is this row's re-file condition met in
-    the safe direction. workdoo `502d10b` (its SPRINT-009 T4) added `ClaudeCodeVersionProbe` plus a supervisor gate that holds every `claude-code`
-    dispatch whose loaded plugin differs from `LEANFLOW_PLUGIN_VERSION_PIN` (`VERSION-PIN-UNPROBED` when it is unset). lean-flow TASK-365 (SPRINT-114 T2)
-    verified it with the real probe on `2.0.0-rc.1`, and workdoo now pins `2.0.0`. The VALUE lives in workdoo's uncommitted `.env` by its own design
-    (`docs/architecture/overview.md`: "pinned by version, not checked in"); `docs/development/setup.md` lists it as required.
-
 - **TD-149** severity: medium | status: open | created: Sprint-097
   - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
   - Summary: **`conformance-engine.sh` scans `.claude/worktrees/`, so a repo copy created by an
@@ -1425,53 +1383,6 @@ status: current
     quiet its own gate is L-088's shape even though the declaration's content would not change.
   - **Re-file fresh if** either checker's extractor is rewritten, since the divergence is the subject
     and a one-sided change closes the row without closing the gap.
-
-- **TD-143** severity: **high** | status: resolved → TASK-348 (ruled closed, owner, 2026-10-06) | created: Sprint-096
-  - Summary: **`qa-check.sh` can be killed by the HOST for memory and produce no verdict line, and
-    the wall-clock budget guard passes on the way down — so the guard built to eliminate
-    verdict-less runs does not watch the door this one comes through.** Distinct mechanism from
-    TD-084 (wall-clock overrun), TD-117 (budget checkpoint under concurrent load) and TD-090 (leg 12
-    cost); the *artifact* is identical to all three, which is exactly why it has been read as them.
-  - Evidence (2026-09-09, SPRINT-096 system-verify, clean tree at `b031bda`): the run opened with
-    `PASS qa-budget-default: 520s < 600s command ceiling`, emitted **147 lines with 0 FAIL**, and was
-    then killed by the host for memory **before printing `QA-CHECK: N pass, M fail`**. It never
-    reached leg 12 (eval harnesses) or leg 15 (layers observed). Third recorded instance: this
-    sprint's own promote, ADR-040's cost table, and this run.
-  - Impact: **a close cannot be gated on a check that cannot speak.** SPRINT-096 closed on targeted
-    evidence under a recorded ADR-021 owner override. The failure is worse than a red gate because
-    0 FAILs from a partial run *looks* like a pass — L-120's shape, arriving through the memory door.
-  - **Why `qa-budget-check.sh` does not cover it:** that guard reports an over-budget run and names
-    its skipped harnesses, on a **wall-clock** trigger. A memory kill is not slow; this one was
-    comfortably inside budget when it died.
-  - Mitigation (**hypothesis, re-derive first** — §10): the cheap half is a *verdict-presence* check —
-    a wrapper that treats a missing `QA-CHECK:` line as FAIL rather than letting the caller infer
-    from 0 FAILs. That converts a silent inconclusive into a loud one without touching the memory
-    cost, and is independent of whatever fixes the cost itself (TD-090 · TD-117). → `TASK-334`, which
-    **shipped as SPRINT-097 T4** (`scripts/qa-verdict.ts` judges the printed `QA-CHECK:` line rather
-    than the child's exit code) and was pruned at that close. **The cheap half is done; this row stays
-    open on its cost half**, now tracked by `TASK-344` — escalated to Backlog P1 at the SPRINT-098
-    promote under the `severity: high` rule.
-  - **Re-file fresh if** the gate's memory profile is measured — the mechanism would then be known
-    rather than inferred from three kills.
-  - **MEASURED at SPRINT-099 T1 (2026-09-12) — the condition above is met, and the premise did not
-    survive it.** Record: [`docs/research/qa-check-memory-profile.md`](docs/research/qa-check-memory-profile.md)
-    (raw series: Round 14 of `docs/research/logs/qa-gate-timing.md`). Six serial runs, three
-    instrumented. **The gate holds ~9.5 MB and moves by 320 kB across a 547 s run**, while system
-    free memory swings 695 MB around it; the live process count oscillates 4–20 with no climb, so
-    `qa-check.sh:50`'s fork-exhaustion hypothesis does not accumulate either. **There is no gate
-    memory cost to reduce** — a fix aimed at this file's consumption would be aimed at 9.5 MB. The
-    artifact was reproduced on the PRISTINE file (R0: 129 lines, 0 FAIL, no verdict line), so it is
-    real and is not the instrumentation's doing. **A1 is NOT confirmed:** R0's kill came from the
-    session harness's low-memory watchdog, the four earlier kills were never instrumented, and
-    nothing here shows they share that door. What is settled is that whichever door it is, it is not
-    this file's own consumption. **Cost half should now be re-filed against the HOST envelope**
-    (562 MB free, WSL 1 989 MB, three `claude` processes 1 178 MB, commit 41.3/56.7 GB) rather than
-    against the gate.
-  - **Ruled closed (owner, 2026-10-06, SPRINT-115 T3 / TASK-348).** The cost half named a subject that does not exist: the gate holds ~9.5 MB
-    (SPRINT-099 T1, `docs/research/qa-check-memory-profile.md`), and the kill is the **host's** memory envelope (WSL, concurrent Claude
-    sessions, paging), which is not this repository's cost to pay. The mechanism is known, and a working mitigation now exists: the documented off-host
-    route, an Ubuntu VPS where the complete `QA_FULL=1` gate finished **3/3 green in 105–109 s** (`qa-gate-timing.md` Round 22). **Re-file fresh
-    if** a verdict-less run recurs on a host with > 3 GB free, which would point back at the gate.
 
 - **TD-138** severity: medium | status: open | created: Sprint-095
   - Summary: **A `Layers:` declaration that wraps at column 0 is silently dropped by the dispatch
