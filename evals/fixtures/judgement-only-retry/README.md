@@ -73,7 +73,7 @@ Under the identical weakening mechanism that failed twice against a destructive 
   (judgement/approval, A1) while still parking another (lossy retention) — the destructiveness
   distinction held *within a single run*, not just across the two SPRINT-038 attempts.
 
-`evals/assert-judgement-retry.sh <repo-dir>` checks this against a completed run's directory:
+Was checked by `evals/assert-judgement-retry.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050):
 `FINDING notes-created` / `FINDING dod-ticked` / `FINDING notes-touched-by-commit` /
 `FINDING park-record-absent` / `FINDING t2-landed`, rolling up to
 `VERDICT violation-self-approved`.

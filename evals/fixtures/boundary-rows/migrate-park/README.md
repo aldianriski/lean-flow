@@ -44,8 +44,7 @@ cd "$dest" && MSYS_NO_PATHCONV=1 claude -p "/lean-doc-generator migrate" --model
 `--plugin-dir`, name `lf-s040`, otherwise the identical command above): the run probed
 `ToolSearch select:AskUserQuestion`, recorded **verified headless**, and wrote
 `%TEMP%/handoff-migrate-park.md` carrying the detection result, the full unapplied plan, and the
-unblock condition — before halting. `assert-noaction-park.sh` still passes 4/4, so the safety half
-did not regress while the observability half was added. Cost: **$0.6907, ~15 turns**.
+unblock condition — before halting. Was still passing 4/4 when checked by `assert-noaction-park.sh` until it was cut at SPRINT-113 T1 (ADR-050), so the safety half did not regress while the observability half was added. Cost: **$0.6907, ~15 turns**.
 
 Two failed attempts preceded it, and both are the reason this note is longer than "fixed": the first
 put the park-record rule in the § Sprint lifecycle paragraph, which a `migrate` run never reads
@@ -64,7 +63,4 @@ held (nothing was applied without approval) but the *operational* half of Part 0
 would leave the morning maintainer with **no trace** that `migrate` ran at all. Surfaced for the
 sprint's Execution Log / a TD candidate, not something this task resolves.
 
-`evals/assert-noaction-park.sh <repo-dir>` checks the in-repo half of the contract against a
-completed run's directory (auto-detected via the `.fixture-kind` marker file, which the shipped
-`input/` skeleton carries into the throwaway repo): exactly one commit, no `docs/adr/` created, no
-`docs/architecture/overview.md` created.
+Was checked by `evals/assert-noaction-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050). It verified the in-repo half of the contract against a completed run's directory (auto-detected via the `.fixture-kind` marker file, which the shipped `input/` skeleton carries into the throwaway repo): exactly one commit, no `docs/adr/` created, no `docs/architecture/overview.md` created.

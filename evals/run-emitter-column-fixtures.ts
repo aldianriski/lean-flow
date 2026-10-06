@@ -250,11 +250,10 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
   { test: (f) => f.includes("/run-") || f.includes("/selftest-"), why: "harness self-report" },
   { test: (f) => f.endsWith(".test.ts"), why: "bun test file, not a gate checker" },
   // Surfaced by layer 3 on its first run, which is the point of layer 3. The night-run assertion
-  // scripts emit one-space findings and their selftests match on the FINDING NAME, never the column
-  // (see selftest-assert-boundary-park.sh). A differential harness compares two engines and emits no
-  // FAIL line of its own. Both were outside the census and nothing said so until now.
-  { test: (f) => f.includes("/assert-"), why: "night-run assertion script, selftests match the finding name" },
-  { test: (f) => f.endsWith("-differential.ts"), why: "differential harness, emits no FAIL findings" },
+  // scripts emitted one-space findings; their selftests matched on the FINDING NAME, never the column.
+  // Differential harnesses compared two engines and emitted no FAIL line of their own.
+  // Both classes were outside the census and nothing said so until SPRINT-113 T1 cut them (ADR-050).
+  { test: (f) => f.endsWith("-differential.ts"), why: "differential harness (cut SPRINT-113 T1), emitted no FAIL findings" },
   { test: (f) => f.includes("/fixtures/"), why: "fixture data, never run as a checker" },
   {
     test: (f) =>

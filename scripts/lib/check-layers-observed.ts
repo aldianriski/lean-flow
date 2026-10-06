@@ -9,9 +9,9 @@
 // spawn-shaped and portable.
 //
 // scripts/lib/check-layers-observed.sh REMAINS THE ORACLE (D5) and is RETAINED, unmodified. This
-// file is the migrated implementation being checked AGAINST it, never the other way -- see
-// evals/run-layers-observed-differential.ts for the row-by-row proof this port agrees with the
-// oracle. Any divergence is a defect in THIS file; the fix is here, never a "cleanup" of the shell.
+// file is the migrated implementation being checked AGAINST it, never the other way -- was verified
+// by evals/run-layers-observed-differential.ts (cut at SPRINT-113 T1, ADR-050) for the row-by-row
+// proof this port agrees with the oracle. Any divergence is a defect in THIS file; the fix is here, never a "cleanup" of the shell.
 //
 // PORTING PRINCIPLE, stated once: every `git` invocation below is a 1:1 copy of the oracle's own git
 // command line (same subcommand, same flags, same argument shape) -- git itself is not a spawn this
@@ -409,10 +409,10 @@ export interface RunResult {
 }
 
 export function runLayersObserved(argv: readonly string[]): RunResult {
-  // `--no-members` turns the member-aware legs OFF (v1 behaviour only). It exists for
-  // evals/run-layers-observed-differential.ts, which compares this port to the shell oracle -- and
-  // the oracle is a Plan-path oracle that was deliberately not taught members (D1). qa-check.sh
-  // never passes it.
+  // `--no-members` turns the member-aware legs OFF (v1 behaviour only). It existed for
+  // evals/run-layers-observed-differential.ts (cut at SPRINT-113 T1, ADR-050), which compared
+  // this port to the shell oracle -- and the oracle is a Plan-path oracle that was deliberately
+  // not taught members (D1). qa-check.sh never passes it, but the flag remains for compatibility.
   const noMembers = argv.includes("--no-members");
   const args = argv.filter((a) => a !== "--no-members");
   if (args.length === 0) {

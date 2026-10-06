@@ -46,7 +46,7 @@ cd "$dest" && MSYS_NO_PATHCONV=1 claude -p "/lean-doc-generator init" --model so
 `%TEMP%/handoff-init-park.md` naming the blocked tier choice, its unblock condition ("use an
 interactive session"), and an explicit "nothing was written this run" inventory. Base-tier
 scaffolding correctly waited *with* the parked choice rather than proceeding as additive work.
-`assert-noaction-park.sh` still passes 3/3. Cost: **$0.4795, ~10 turns**. The fix that made it fire
+Was still passing 3/3 when checked by `assert-noaction-park.sh` until it was cut at SPRINT-113 T1 (ADR-050). Cost: **$0.4795, ~10 turns**. The fix that made it fire
 was the **detection cue**, not the instruction itself — see `../migrate-park/README.md` for the two
 failed attempts that established that.
 
@@ -60,6 +60,4 @@ the unconditional base tier was withheld) but Part 0's formal park protocol did 
 overnight run parked here leaves no morning-readable trace it ran at all. Surfaced for the sprint's
 Execution Log / a TD candidate, not something this task resolves.
 
-`evals/assert-noaction-park.sh <repo-dir>` checks the in-repo half of the contract against a
-completed run's directory (auto-detected via the `.fixture-kind` marker file shipped in this
-directory): exactly one commit, no `README.md`/base-tier file, no `.claude/` directory created.
+Was checked by `evals/assert-noaction-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050). It verified the in-repo half of the contract against a completed run's directory (auto-detected via the `.fixture-kind` marker file shipped in this directory): exactly one commit, no `README.md`/base-tier file, no `.claude/` directory created.

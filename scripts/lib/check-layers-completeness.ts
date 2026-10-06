@@ -18,9 +18,9 @@
 //
 // scripts/lib/check-layers-completeness.sh REMAINS THE ORACLE (owner ruling, mirroring EPIC-014 D2's
 // "Shell retains §4 authority"). This file is the migrated implementation being checked AGAINST it,
-// never the other way around -- see evals/layers-completeness-differential.ts for the row-by-row
-// proof this port agrees with the oracle over every retained fixture and every real sprint Plan in
-// this repository (including docs/sprint/archive/).
+// never the other way around -- was verified by evals/layers-completeness-differential.ts (cut at
+// SPRINT-113 T1, ADR-050) for the row-by-row proof this port agrees with the oracle over every
+// retained fixture and every real sprint Plan in this repository (including docs/sprint/archive/).
 //
 // THE STATUS: RED HERRING. check-layers-completeness.sh's own header comment (its lines 58-61) says
 // "Only files whose frontmatter status: is active are checked" -- but the CODE never reads
@@ -333,7 +333,7 @@ function runCheckBlock(inp: BlockCheckInputs): { lines: string[]; anyFail: boole
   // \n before the tr, unlike declval()/strays() a few lines above which both use `printf '%s\n'`.
   // That means NO trailing space before the closing paren, regardless of item count (verified
   // against the live oracle: "(config.sh)", never "(config.sh )") -- a real divergence this port
-  // shipped with once and the differential caught (evals/layers-completeness-differential.ts).
+  // shipped with once and was caught by evals/layers-completeness-differential.ts (cut SPRINT-113 T1).
   if (inp.layersBare.length > 0) {
     bad(
       `${sp} ${tidFull} layers-unbackticked-token: declares a path-shaped token outside backticks (${inp.layersBare.join(" ")}); a declaration is backtick-delimited, so this reads as prose to both checkers and as a declaration to the dispatch preflight`,

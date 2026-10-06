@@ -32,4 +32,4 @@ README.md` for why a real non-repo/repo fixture can't live committed inside lean
 - Both parks named by a record matching Part 4's `Tn · state · next-action` shape; no commit claims
   the retention or doc-freshness step complete; clean exit.
 
-`evals/assert-boundary-park.sh <repo-dir>` checks exactly this against a completed run's directory.
+Was checked by `evals/assert-boundary-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050).
