@@ -46,3 +46,17 @@ promote-check: `PASS -- 4 pass, 0 fail`.
 - **Coordinator fix (`ab2ce79`):** the promote-time L-229 merge had made CONTEXT.md line 108 490 chars (prose-density FAIL, found by this run);
   rewritten at 340 chars with the same rule. CONTEXT stays at 150/150 lines, so splitting it was not an option.
 consequence · T1 · behaviour:low · governance:high
+
+### 2026-10-06 | progress | T1 reviewed and judged: Codex R1 (2: 1 adopted, 1 declined with reason) · R2 (1, adopted) · two cold runs · owner PASS (J2)
+- **Codex R1** (`118973e`): adopted, the sprint-bulk exit keeps `run · N of M DoD ticked` as its first line (that header is its verdict;
+  nothing goes above it). Declined, prime's generic example "ready — required context is current": the frozen done-when requires the
+  first line to say what to do next, so a verdict naming the next step is the requirement, not duplication. R2 agreed and asked step 5
+  to say so (`a7ebb7f` → `df487d8`).
+- **Cold run 1** (fresh agent, repo SKILL.md text only, since the installed 2.0.0 copy is stale): every report's opening line said what
+  happened; the orchestrator and close reports put the next step only on the last line, and prime's verdict sat below an empty banner.
+  That is a done-when miss review had not caught → `df487d8`: one opening line carries both verdict and next step, and prime's banner *is*
+  the verdict.
+- **Cold run 2** on `df487d8`: all three literal first lines carry verdict + next step; each ends with exactly one `Next:` line. The close
+  report's "what to do" half was the weakest (vague, then repeated by `Next:`).
+- **Owner ruling (J2): PASS.** Side-finding for close: prime's `Next:` rule names `sprint-bulk unattended` for any active sprint, even when
+  every open task is HITL/J2, where a night run would only park → **close-retro TD candidate**.
