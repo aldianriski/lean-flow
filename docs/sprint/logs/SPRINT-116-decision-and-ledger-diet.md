@@ -163,3 +163,10 @@ and `knowledge index STALE` (ADR-051 added without `gen-index.sh`; regenerated n
   pre-seed hash (`9af75ec7`). P3: README's "no install step and no node_modules" was false (pre-existing; the typecheck leg needs `bun install`)
   → reworded. P3: ADR-050's DECISIONS row now names ADR-051's narrowing (`44c6741`).
 - System verify run 1 (`60d7ed5`, VPS, 106 s): `317 pass, 4 fail`, all addressed (see the scope-change of this date); re-run after the Codex loop closes.
+
+### 2026-10-06 | progress | T1 Codex loop closed: round 3 CLEAR (`44c6741`)
+Round 3's first dispatch could not read the repo (the sandbox blocks every file read, not only spawns), so it reviewed nothing and was
+re-run with the diff and `run_case_anywhere` pasted into the prompt, the hybrid route the owner ruled for this host. Verdict CLEAR: `replay`'s
+`exit` ends only the command-substitution subshell; `x=$(cmd); rc=$?` is reliable in dash with no `set -e`. Its one aside (`printf %sn`) was
+an escaping artifact of the pasted prompt; the file reads `printf '%s\n'` (checked with `cat -A`).
+review · T1 · scoped-reviewer · behaviour:material · governance:high
