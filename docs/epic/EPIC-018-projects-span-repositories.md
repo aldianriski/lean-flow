@@ -47,6 +47,7 @@ decision · multi-tenant organisations · anything inside workdoo's SPRINT-009 (
 - **D5** — A Project has a **home repository** that holds its `docs/work` · `docs/sprint` · `docs/epic`; a task names other repositories'
   files as `<repo>:path`. Git keeps owning content (workdoo ADR-001). Owner.
 - **D6** — Sequenced **after workdoo SPRINT-009** (isolated clone per attempt, ADR-008), whose checkout design the provisioner builds on. Owner.
+- **D7** — Also after **EPIC-019** (the redesign), so the Projects screen and repository picker are built once, in the v0.2.0 design. Owner, 2026-10-06.
 
 ## Open questions
 
