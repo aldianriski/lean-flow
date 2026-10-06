@@ -31,7 +31,7 @@ fixes.
 
 ## Done when
 
-- [ ] A commit whose cross-task DoD tick has been **ruled** by the owner can be declared in a file the checker reads — `.conformance-exempt`'s ADR-031 shape (a reasoned exemption the tool parses), never a prose note in a sprint log — and `check-dod-delta.ts` reports it as a named, visible exemption rather than either a FAIL or a silent pass. Fixture: a declared commit reports the exemption and a sibling UNDECLARED cross-task tick still FAILs in the same run.
+- [x] A commit whose cross-task DoD tick has been **ruled** by the owner can be declared in a file the checker reads — `.conformance-exempt`'s ADR-031 shape (a reasoned exemption the tool parses), never a prose note in a sprint log — and `check-dod-delta.ts` reports it as a named, visible exemption rather than either a FAIL or a silent pass. Fixture: a declared commit reports the exemption and a sibling UNDECLARED cross-task tick still FAILs in the same run. ✓ 1c14cdc: `.dod-delta-exempt` (ADR-031 shape) read by check-dod-delta.ts; a declared tick prints a named `PASS  dod-delta: EXEMPT` line and an undeclared sibling still FAILs in one real-repo run; bun 89 pass; harness PASS (min_tests 84 → 89; coordinator re-ran on the merged tree)
 
 ## Touches
 

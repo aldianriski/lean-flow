@@ -27,8 +27,8 @@ host now depends on.
 
 ## Done when
 
-- [ ] TD-224: the locale control either spawns `bash` (its stated claim) or reports a dash host as a named host-INVALID finding outside the gate's FAIL count — ruled at G2 — and the gate is green on Ubuntu 24.04 with `en_US.utf8`. Verify: the harness run on the VPS and on the Windows host, both read from their own verdict lines.
-- [ ] TD-225: case 2 asserts WHERE the first budget finding lands (leg 12's loop-internal check, never an early checkpoint), not silence within a wall-clock window. Verify: PASS on both hosts, and the seeded design (checkpoints kept) still reddens case 2 with its named finding while case 1 stays green.
+- [x] TD-224: the locale control either spawns `bash` (its stated claim) or reports a dash host as a named host-INVALID finding outside the gate's FAIL count — ruled at G2 — and the gate is green on Ubuntu 24.04 with `en_US.utf8`. Verify: the harness run on the VPS and on the Windows host, both read from their own verdict lines. ✓ bash chosen (6184fd2): locale harness `5 pass, 0 fail` on Windows and on the Ubuntu 24.04 VPS, own verdict lines (coordinator re-ran Windows on the merged tree, 8b780fa); the sh-revert seed gives `3 pass, 2 fail` on dash
+- [x] TD-225: case 2 asserts WHERE the first budget finding lands (leg 12's loop-internal check, never an early checkpoint), not silence within a wall-clock window. Verify: PASS on both hosts, and the seeded design (checkpoints kept) still reddens case 2 with its named finding while case 1 stays green. ✓ case 2 PASS on Windows (2m02s) and VPS (4.4s) via `broken-copy-first-finding-at-leg-12`; the checkpoints-kept seed reddens case 2 with its named `-early` finding on both hosts while case 1 stays green; blobs restored (hash-object == HEAD) (6184fd2)
 
 ## Touches
 

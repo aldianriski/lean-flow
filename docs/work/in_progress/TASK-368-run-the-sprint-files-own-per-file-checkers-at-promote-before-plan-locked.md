@@ -28,7 +28,7 @@ amendment every time after it.
 
 ## Done when
 
-- [ ] Before `promote` commits `plan locked`, lean-flow runs layers-completeness and prose-density over the **new sprint file alone** and a FAIL blocks the commit. Verify: a sprint file with a bare-name prose token and a >400-char line is refused at promote with both named findings; a clean one passes.
+- [x] Before `promote` commits `plan locked`, lean-flow runs layers-completeness and prose-density over the **new sprint file alone** and a FAIL blocks the commit. Verify: a sprint file with a bare-name prose token and a >400-char line is refused at promote with both named findings; a clean one passes. ✓ aa2b35c: `bun scripts/promote-check.ts <sprint>`; `evals/run-promote-check-fixtures.ts` 8/8 (dirty.md refused with the layers-completeness and 400-char findings both named, exit 1; clean.md PASS); real SPRINT-115 file 16/0; registered always-on in qa-check (coordinator re-ran on the merged tree)
 
 ## Touches
 

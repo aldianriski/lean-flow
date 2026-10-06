@@ -62,3 +62,25 @@ owner's A2 ruling above.
 `evals/run-promote-check-fixtures.ts`, and `qa-check.sh` was outside T5's Layers. **Change:** the coordinator adds it to `eval_harnesses_always`
 (about 1–2 s, no git) with a one-line cost note. **Impact:** one list entry plus one comment line; TASK-368's `## Done when` is unchanged. D1 analogue: T2 also
 owns `scripts/qa-check.sh` (`eval_harnesses_optin`), so this edit lands before T2 starts.
+
+### 2026-10-06 | progress | wave 1 merged: T1 · T4 · T5 (three Sonnet worktree builders, base `77d1c0d`); coordinator re-verified each, then merged `--no-ff`
+T4's first spawn failed (`failed to read …/commondir`, a concurrent worktree-creation race); its orphan branch, which pointed at base, was deleted and the task re-dispatched.
+**Review depth (skip-table lookups):**
+- `consequence · T1 · behaviour: low (fixture assertions only) · governance: low (maintainer-only harnesses; other G)` → ADR-050 bar + coordinator self-review.
+- `consequence · T4 · behaviour: low-med (new exemption path in a frozen guard) · governance: low (maintainer gate only; frozen G)` → retained fixtures + coordinator self-review.
+- `consequence · T5 · behaviour: low (new maintainer entry point; prose-density root mode unchanged) · governance: low (Tier X; nothing in skills/)` → self-review.
+No Codex loop: none of the three is consequential G or a shipped skill/template change (SPRINT-113 re-ruling).
+- **T1 (TASK-403)** `6184fd2` + `a096397` → merge `8b780fa`. TD-224: the probe, case (ii) and its sanity seed spawn `bash`; the no-leak cases keep `sh`, which is
+  qa-check's real shape. TD-225: case 2 asserts that the first finding is leg 12's loop-internal check, never `-early`, with the hang bounded by `LEG12_BOUND=900`. Builder
+  proof: locale 5/0 and budget PASS on Windows and the VPS; both seeds redden on both hosts; blobs restored. **Coordinator:** locale 5/0 re-run on the merged tree;
+  the TD diff touches the two status fields only. **Cost note:** case 2 must now reach leg 12, about 2 min on the Windows host (opt-in set) — T2's Round
+  will include it.
+- **T4 (TASK-354)** `1c14cdc` → merge `274e41f`. New `.dod-delta-exempt` (header only; no real row; `b89d6f0` stays an owner ruling). Rows read
+  `<sha> -- <ruling> -- <reason>`. A declared tick → `PASS  dod-delta: EXEMPT …`; a malformed row → FAIL; an undeclared sibling → FAIL.
+  `min_tests` 84 → 89. **Coordinator:** bun 89/0 and harness PASS, both in the worktree and on the merged tree. **Surface limit:** `qa-check.sh` prints FAIL lines and a PASS count, so the EXEMPT line
+  shows in the checker's own output but not in the gate summary.
+- **T5 (TASK-368)** `aa2b35c` → merge `c0be807`; runner registered in `7cb548ed`. The builder corrected one G2 detail: the repo-root
+  prose-density run *does* reach the one active sprint file, but only through its baseline ratchet, so a new file still needs the single-file mode.
+  Root-mode output is byte-identical before and after. **Coordinator:** fixtures 8/8, seeded exit 1, real SPRINT-115 file 16/0.
+**Post-merge cross-cutting legs (merged tree):** tsc 0 · doc-caps 0 FAIL · prose-density 31/0 · freeze 6/0 · harness-list completeness clean · dod-delta harness PASS.
+The full gate runs as T2's three VPS runs, and as system-verify at close.
