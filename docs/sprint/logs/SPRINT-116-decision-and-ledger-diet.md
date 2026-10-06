@@ -109,3 +109,16 @@ mechanism behind CLAUDE.md's wiring-check DoD line and scans `packages/`·`apps/
 - **EPIC-014's dropped conditions** are written `- ~~…~~ **dropped, not met**` rather than `- [ ]`/`- [x]`: `check-epic-archive.ts` counts
   only those two shapes, so a retired epic can archive at close without a dropped condition reading as either met or open.
 - Cut dispatched to a Sonnet builder (worktree, base `998eea4`); system verify (`QA_FULL=1`) runs off-host after merge.
+
+### 2026-10-06 | progress | T1 built and merged: the TypeScript port retired per ADR-051 (1a7361f → merge 6c0c109)
+- 105 files deleted (`packages/` 68 · `apps/` 4 · `test/` 31 · the 2 §4 harnesses); 126 files changed, +102/−12,882. Nothing kept imports a deleted file.
+- `qa-check.sh`: 47 always-on + 11 opt-in = 58 = `ls evals/run-*` (0 duplicates, 0 missing). `run-adr-family-fixtures.sh` is always-on
+  and absent from opt-in; coordinator re-run on main: `ADR-FAMILY FIXTURES: all green`.
+- `tsc --noEmit` exit 0; `typecheck-population` 7/0 with the retained narrow must-FAIL fixture untouched (the builder did not re-seed it).
+- TD census: 143 rows, 113 open, 30 resolved (13 resolved here; TD-118 · TD-165 narrowed; TD-168 → TASK-404). EPIC-014 `status: closed`,
+  its 6 open conditions struck as dropped. ADR-038 · ADR-039 superseded; the DECISIONS rows marked.
+- **Pre-existing, not T1:** `test/gate-discovery/discovery-order.test.ts:57` fails on main before the merge too (9 pass, 1 fail). It is TD-154,
+  open since Sprint-099: `scripts.test` is wrapped by `bun scripts/qa-verdict.ts`. Out of scope.
+- **For the close rollup:** EPIC-014's SPRINT-116 member row still reads `active`, and `docs/epic/INDEX.md`'s EPIC-014 line keeps stale prose
+  ("2 of 8") beside the new status; both are the coordinator's at close.
+consequence · T1 · behaviour:material · governance:high
