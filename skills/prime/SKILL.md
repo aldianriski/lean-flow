@@ -108,7 +108,6 @@ Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open
 Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
 Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run)
-====================
 ```
 
 The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reachable (no active
