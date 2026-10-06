@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-03
+last_updated: 2026-10-06
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,20 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-115 — Gate and Host Cost (2026-10-06)
+
+**Unreleased**: no version bump. Skills, templates, spec, manifests and README are untouched, so nothing reaches an adopter.
+
+- **The gate's cost is measured, and it is the host's.** On an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green
+  (`qa-gate-timing.md` Round 22). TD-143's cost half is ruled closed (host memory, not the gate), and TD-090/117/128 are re-rated `medium`
+  as Windows-host-specific. TD-168 stays `high` (the engine is consumer-facing). ADR-039's deferred `layers-observed` ruling is moot: the harness was deleted at SPRINT-113.
+- **Two fixtures stop depending on the host.** The locale control spawns `bash` (dash made it vacuous), and the budget-position case asserts
+  where the first finding lands, not silence within 60 s (TD-224 · TD-225).
+- **`dod-delta` accepts a ruled exemption.** `.dod-delta-exempt` declares an owner-ruled cross-task tick by sha + ruling + reason; it prints
+  a named EXEMPT line, while an undeclared sibling still FAILs (TD-166).
+- **`scripts/promote-check.ts <sprint>`** runs layers-completeness and a new single-file prose-density mode on a sprint file before `plan locked`.
 
 ---
 ## v2.0.0 — The hard cut onto the work-item store (2026-10-03) — **BREAKING**

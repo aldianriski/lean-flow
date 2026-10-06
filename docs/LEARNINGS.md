@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-04
+last_updated: 2026-10-06
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -70,6 +70,18 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ❌ Shipping a new capability **without wiring it into the jobs that trigger/chain it** — a behaviour written only in its own file is half-shipped. Wire every trigger point + downstream consumer (entry routing · dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT) and verify it *fires* end-to-end. Shipping ≠ wiring (SPRINT-022 audit: dispatch · review-split · fog-mode all shipped half-connected → L-020).
 
 ---
+
+## L-230 [tags: process] [status: active]: **A duration is a query result: take it from the run's own clock, never from when you first looked.** SPRINT-115 reported the first off-host gate run as "about 40 minutes" to the owner and wrote "under 40 min" into a sprint log. The figure was the gap between launch and the coordinator's first check of the result. The run's own files (`gate.start` → `gate.rc` mtime) said **101 s**, which made the gate look 20× costlier than it was on the one host where it fits. Caught only when a second measurement (three profiled runs at ~107 s) disagreed. An upper bound is not a measurement, so state it as "≤ N" or read the artifact's timestamps.
+- seen: 2026-10-06 (SPRINT-115 T2: first VPS run 06:24:16 → 06:25:57; reported as ~40 min; corrected in the SPRINT-114 log)
+- count: 1
+- promoted: no
+- related: L-198 · L-227 · CLAUDE.md cross-check bullet
+
+## L-229 [tags: process] [status: active]: **A scope-change that widens `Layers:` in the Log is half a change: the checkers read the Plan's `Layers:` lines, never the Log.** SPRINT-115 logged two scope-change entries widening T4/T5's files and never edited the Plan's `Layers:` lines (`CONTEXT.md` calls them a live declaration, editable with a scope-change). The first system gate read `313 pass, 3 fail`: layers-observed (undeclared files), layers-completeness (a tick's evidence naming an undeclared file) and emitter-column (a new script outside every scope rule). The same sprint had already fixed one such gap by hand at promote. A widened scope is wired only when every reader of it is updated, and here the reader is the checker, not the Log.
+- seen: 2026-10-06 (SPRINT-115 T4/T5 merge-back → first VPS gate; fixed in `5d9335a`)
+- count: 1
+- promoted: no
+- related: L-020 · L-172 · L-166
 
 ## L-228 [tags: process] [status: active]: **A dispatch brief's file bound is a claim too: a builder that stops at it is right, and the bound is the defect.** SPRINT-114 T2's brief for wiring `LEANFLOW_PLUGIN_DIR` into workdoo's workers left out `apps/worker/src/main.ts`, the one file that constructs the adapter. The builder stopped at the bound and reported it, which was correct, and the coordinator wired `adapterFor` itself. The miss was the coordinator's: the bound was written from memory of the call path, not derived from it. **Durable form: derive a brief's file bound from a search for the consumers of the changed symbol (who constructs it, who reads it), and list that query's result in the brief, not a remembered list.**
 - seen: 2026-10-03 (SPRINT-114 T2, workdoo `2983b66`)

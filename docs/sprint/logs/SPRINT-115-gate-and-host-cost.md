@@ -3,7 +3,7 @@ sprint: 115
 slug: gate-and-host-cost
 owner: Maintainer
 last_updated: 2026-10-06
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -129,3 +129,14 @@ layers-observed then charged the member-file edits to T2/T3 as undeclared. Both 
 subject form (identical trees; now `6e7216b` and `89bbafe`); every other file in them is governance (`docs/research/` · `TECH-DEBT.md` · `docs/sprint/`).
 layers-completeness read TASK-348's tick evidence (`qa-gate-timing.md`) as implied-but-undeclared, and T3 *cites* it, so T3's `Cites:` line names it.
 Lesson for an inline task: commit the coordinator's tick separately, as wave 1 did.
+
+### 2026-10-06 | progress | system-verify on the final integrated tree: `QA-CHECK: 316 pass, 0 fail` (exit 0, 104 s, VPS, `de1e65f`)
+The discovered host gate (`QA_FULL=1 sh scripts/qa-check.sh`) ran once against the final tree after the last fix, as its own call, and its
+verdict line was read from the gate's output. This is the close-time full verdict SPRINT-114 could not get on the Windows host.
+
+### 2026-10-06 | close | SPRINT-115 closed: 5 of 5 members in `done/`, freeze holds (6/0); unreleased, no version bump
+Retro written. Buckets: TD-226 (dod-delta EXEMPT not visible in the gate summary) · L-229 (Layers widened in the Log only) · L-230 (a duration
+taken from when you looked) · no follow-up TASK · CHANGELOG `SPRINT-115` entry. Handoff ledger: no `handoff` entry in this sprint.
+Off-sprint work done in the same session and recorded where it belongs: TASK-345 → `cancel/` with TD-150 resolved (owner) · workdoo TD-039..041
+(workdoo `45799b5`) · four old agent worktrees removed (owner, group A). §11 retention and doc-freshness are proposed to the owner and not
+applied here.

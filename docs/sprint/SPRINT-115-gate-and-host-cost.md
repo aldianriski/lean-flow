@@ -3,7 +3,7 @@ sprint: 115
 slug: gate-and-host-cost
 owner: Maintainer
 last_updated: 2026-10-06
-status: active
+status: closed
 plan_commit: cede84c
 gates_signed: G1,G2 @ 9bbc8be
 update_trigger: sprint execute/close events
@@ -115,15 +115,37 @@ runner is the full gate.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/run-gen-index-locale-fixtures.ts` | T1 | glob-order probe + case (ii) spawn `bash`: dash made the control vacuous (TD-224) | Low | 5/0 Windows + VPS; sh-revert seed reddens |
+| `evals/run-qa-budget-position-fixtures.sh` | T1 | case 2 asserts WHERE the first budget finding lands, not wall-clock silence (TD-225) | Low | PASS both hosts; checkpoints-kept seed reddens |
+| `docs/research/logs/qa-gate-timing.md` | T2 | Round 22: 105–109 s ×3 green on the VPS; opt-in differentials 1/2/5–6 s | Low | 3 profiled runs, own verdict lines |
+| `TECH-DEBT.md` | T1 · T3 · coord | TD-224/225 resolved; TD-143 ruled closed; TD-090/117/128 → medium; TD-150 resolved; TD-174 deleted | Low | layers checks 0 FAIL |
+| `scripts/lib/check-dod-delta.ts` · `.dod-delta-exempt` | T4 | owner-ruled cross-task ticks declared and reported as a named EXEMPT (TD-166) | Low | bun 89/0; harness PASS |
+| `evals/dod-delta.test.ts` · `evals/run-dod-delta-fixtures.sh` | T4 | declared / undeclared / malformed cases; `min_tests` 84 → 89 | Low | same |
+| `scripts/promote-check.ts` · `scripts/lib/check-prose-density.ts` | T5 | per-file checks on a new sprint file before `plan locked`; prose-density single-file mode | Low | fixtures 8/8; root-mode output byte-identical |
+| `evals/run-promote-check-fixtures.ts` · `evals/fixtures/promote-check/` | T5 | retained seeded + clean sprint files | Low | 8/8 |
+| `.claude/CONTEXT.md` | T5 | promote note names `scripts/promote-check.ts` (no skill leak, L-015) | Low | doc-caps 150/150 |
+| `scripts/qa-check.sh` · `evals/run-emitter-column-fixtures.ts` | T5 (coord) | runner registered always-on; promote-check.ts joins emitter-column's tooling rule | Low | system-verify 316/0 |
 
 ## Retro
 
-**Retrieval check** —
+**Retrieval check** — Yes, twice, and both were caught by a gate rather than by recall. (1) The Plan froze a ruling on the `layers-observed`
+differential that SPRINT-113 T1 had already deleted (ADR-050); found at T2 start, ruled moot. (2) The coordinator widened `Layers:` in the
+Log's scope-change entries but not on the Plan's `Layers:` lines, which are what both layers checkers read: L-020 by the coordinator, found
+by the first VPS gate (`313 pass, 3 fail`) → L-229.
 
-**Cost** —
+**Cost** — Coordinator (Opus) inline for gates, merge-back, T2 and T3 · 3 Sonnet worktree builders for T1 · T4 · T5 (~83k · ~90k · ~90k tokens) · no
+Codex loop (nothing consequential or adopter-facing) · VPS gate runs: 3 + 3 + 1 system-verify at ~105 s each. 5 of 5 members delivered.
 
 **Worked**
+- An off-host gate on a Linux VPS. It completes in under two minutes, which turned a six-sprint-blocked measurement (TASK-357) into an afternoon.
+- The gate caught the coordinator's own wiring misses (undeclared Layers, an unregistered emitter file), which is the system gate doing its job.
+- Must-FAIL seeds on both hosts for T1. Each builder's proof re-run by the coordinator before merge, never trusted from the report.
 
 **Friction**
+- Concurrent `Agent(isolation: worktree)` spawns raced: T4's first spawn failed on `…/commondir` and left an orphan branch.
+- The coordinator reported the first VPS run as "about 40 minutes". The run's own timestamps said 101 s → L-230.
+- Inline tasks committed the coordinator's tick inside a `Tn` commit, so layers-observed charged the member file to the task. Re-issued, unpushed.
+- `dod-delta`'s EXEMPT line is visible in the checker's output but not in the gate summary → TD-226.
 
 **Pattern candidate**
+- L-229 (Layers widened in the Log only) · L-230 (a duration taken from when you looked, not from the run's own clock). Both count 1.

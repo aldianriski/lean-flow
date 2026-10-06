@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-04
+last_updated: 2026-10-06
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -319,6 +319,14 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-226** severity: low | status: open | created: Sprint-115 (close retro, T4)
+  - Summary: **`dod-delta`'s EXEMPT line is visible in the checker's own output but not in the gate summary.** `check-dod-delta.ts` prints
+    `PASS  dod-delta: EXEMPT <sha> … ruled by <ruling>` for a commit declared in `.dod-delta-exempt`, but `scripts/qa-check.sh` folds the
+    leg's PASS lines into a count and surfaces only FAIL lines, so an exemption, the thing TASK-354 exists to make visible, does not appear in
+    the verdict a reader actually reads. Latent today: `.dod-delta-exempt` declares no rows.
+  - done-when: a declared exemption appears in the gate's own output (a named INFO/NOTE line, or the leg's summary naming the exempted sha),
+    with a fixture where one declared row shows up in a `qa-check.sh` run and an empty file shows nothing.
 
 - **TD-225** severity: low | status: resolved → TASK-403 (SPRINT-115 T1, 6184fd23) | created: Sprint-114 (post-push full gate on a Linux VPS)
   - Summary: **`run-qa-budget-position-fixtures.sh` case 2 assumes a slow host.** It expects the checkpoint-stripped copy to stay silent for
