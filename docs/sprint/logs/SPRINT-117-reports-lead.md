@@ -28,3 +28,12 @@ backlog → todo in its own commit (`c09b037`) and was stamped in `12361ed`. The
 - **epic rollup currency:** EPIC-015 and EPIC-016 current; EPIC-014 archived at SPRINT-116.
 - **handoff ledger:** none.
 promote-check: `PASS -- 4 pass, 0 fail`.
+
+### 2026-10-06 | progress | G1 + G2 signed (owner) @ 8ab8d54; A1 confirmed
+- **G1** (full checklist; `origin: manual`): done when the three skills' boundary reports open with the verdict and end with exactly one
+  `Next:` line, with no SKILL.md over its cap. Size M. Out: the other 11 skills, length caps, night-run Part 4's machine-read lines.
+- **G2:** one shape rule applied in place. prime gets a `Verdict:` first row; orchestrator gets one "Report shape" line covering gate verdicts,
+  task completions, the sprint-bulk exit and confirmation popups; lean-doc-generator's step 8 is rewritten with no line added. No eval asserts
+  prime's header (`git grep 'PRIME HEALTH'`: only the SKILL.md itself).
+- **A1 confirmed (owner):** shape, not length; no cap added.
+- Built inline (three small doc edits; a dispatch would cost more than the edit), then a Codex review (shipped skills), then cold runs for the owner (J2).
