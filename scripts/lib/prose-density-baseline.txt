@@ -23,7 +23,6 @@
 # format: <path> <count-at-adoption>
 .claude/CLAUDE.md 4
 .claude/CONTEXT.md 16
-docs/epic/EPIC-014-reference-engine.md 5
 docs/epic/EPIC-015-execution-autonomy.md 6
 docs/epic/EPIC-016-agentic-governance-dashboard-pilot.md 8
 docs/research/adhd-adaptation.md 2
