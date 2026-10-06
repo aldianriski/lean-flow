@@ -1187,7 +1187,7 @@ status: current
   - Re-file fresh if: a fourth call site copies the formula before this is fixed — the copy count is
     the thing that makes it expensive, not the defect itself.
 
-- **TD-150** severity: **high** | status: open | created: Sprint-097
+- **TD-150** severity: **high** | status: resolved → TASK-365 (TASK-345 cancelled as superseded, 2026-10-06) | created: Sprint-097
   - Tracker: none — found by the two-repo alignment check at the SPRINT-097 close, owner-requested.
   - Summary: **ADR-041 rules that `workdoo` consumes lean-flow as a *pinned* plugin, and there is no
     pin.** `workdoo/.claude/CLAUDE.md:21` states it in prose — *"lean-flow is consumed here as a
@@ -1209,6 +1209,11 @@ status: current
     and this repository already has `check-skill-freshness` for exactly that question one level over.
   - Tracked by `TASK-345` — escalated to Backlog P1 at the SPRINT-098 promote under the
     `severity: high` rule, which had no consumer for this row because it had no Backlog entry at all.
+  - **Resolved (owner ruling 2026-10-06, SPRINT-115 session):** the pin landed **and is checked**, which is this row's re-file condition met in
+    the safe direction. workdoo `502d10b` (its SPRINT-009 T4) added `ClaudeCodeVersionProbe` plus a supervisor gate that holds every `claude-code`
+    dispatch whose loaded plugin differs from `LEANFLOW_PLUGIN_VERSION_PIN` (`VERSION-PIN-UNPROBED` when it is unset). lean-flow TASK-365 (SPRINT-114 T2)
+    verified it with the real probe on `2.0.0-rc.1`, and workdoo now pins `2.0.0`. The VALUE lives in workdoo's uncommitted `.env` by its own design
+    (`docs/architecture/overview.md`: "pinned by version, not checked in"); `docs/development/setup.md` lists it as required.
 
 - **TD-149** severity: medium | status: open | created: Sprint-097
   - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
