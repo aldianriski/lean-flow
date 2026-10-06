@@ -37,3 +37,15 @@ governance checklist:
 
 promote-check: first run FAIL (5 findings: a Cites/Layers contradiction, two basename-vs-path Layers misses, a cited fixture missing
 from Cites, two lines over 400 chars). Fixed before the lock; final run `PASS -- 13 pass, 0 fail`.
+
+### 2026-10-06 | progress | batch G1 + G2 signed (owner) @ 8e14bb4, with three design rulings
+- **T1 ruling (owner, J2): CUT the TypeScript port.** An ADR retires it; `packages/standard` · `apps/cli` · the port's tests go, P5's
+  parity goes with them, and EPIC-014 closes as retired. TD-168 gets a new P1 task for the Shell engine's per-file spawn cost. Per
+  the Plan, T1 is now **size M**. The deletion's full reach is re-derived by recon before any file moves; any file outside the
+  declared `Layers:` gets a `scope-change` entry here and a Plan `Layers:` edit (L-229).
+- **T3 design: convert.** `check-handoff-state.sh:145` calls `lf_is_archived_path` and leg 10b's exemption pattern is deleted. Other G
+  (no shipped skill names the script): must-FAIL fixture + one real run.
+- **T4 design: an external reviewer (Codex) records as `scoped-reviewer`.** The four-word depth vocabulary stays. `check-review-depth.sh`
+  accepts any depth except `self-review`, so no regex change. Shipped-skill change → Codex review loop.
+- **A1 confirmed:** the 10 basenames re-derived from `9a0bfaad` (`--diff-filter=D`) match TASK-400's census.
+- **Sequence:** T2 ∥ T4 (disjoint, worktree-isolated, `worktree.baseRef: head`); T1 inline; T3 after T1 (D1).
