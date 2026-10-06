@@ -153,3 +153,13 @@ matches only an exact path or a directory token ending in `/` (`covers()`, `chec
 `evals/fixtures/boundary-rows/`, plus the cancel path. Same files, readable spelling, no scope change in substance. The other three FAILs:
 two `review-depth-*-absent` for T1 (its Codex loop has not closed, so its `review ·` line is owed, which is T4's new rule firing as designed)
 and `knowledge index STALE` (ADR-051 added without `gen-index.sh`; regenerated now). **Re-confirm G2:** none needed.
+
+### 2026-10-06 | progress | T1 Codex loop: round 1 (2 findings) and round 2 (3 findings) fixed; round 3 dispatched
+- **R1** (`1a7361f`): P2 empty-slug lost its only assertion → `empty-slug-fires` case (`c6e41db`), seeded and restored. P3 TD-165's narrowing named
+  the wrong boundary → reworded. R1 gave no verdict on items 1/3/4/5, so R2 was briefed to give one per item.
+- **R2** (`c6e41db`): items B1 · B3 · B4 · B6 OK. P2: per-rule assertions lost (duplicate-number's INDEX finding; clean's INDEX/SECTIONS/NEGATIVE PASS
+  lines, which exit 0 alone would accept as NOTE) → a `replay` helper runs each multi-claim fixture once and replays it per assertion, so no
+  extra engine spawn. Seeded: stripping `PASS  S4.INDEX` from clean's captured output reddened exactly `clean-index-passes`; restored to the
+  pre-seed hash (`9af75ec7`). P3: README's "no install step and no node_modules" was false (pre-existing; the typecheck leg needs `bun install`)
+  → reworded. P3: ADR-050's DECISIONS row now names ADR-051's narrowing (`44c6741`).
+- System verify run 1 (`60d7ed5`, VPS, 106 s): `317 pass, 4 fail`, all addressed (see the scope-change of this date); re-run after the Codex loop closes.
