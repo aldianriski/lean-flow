@@ -48,6 +48,11 @@ set -u
 root=${1:?usage: check-handoff-state.sh <repo-root>}
 [ -d "$root" ] || { printf 'FAIL  %s\n' "handoff-state: repo root not found at $root"; exit 2; }
 
+# The shared archive predicate (TD-145, SPRINT-116 T3): "is this path archived" is one test, never a raw glob here.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { printf 'FAIL  %s\n' "handoff-state: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 fail=0
 checked=0
 ok()  { checked=$((checked + 1)); printf 'PASS  %s\n' "$1"; }
@@ -141,10 +146,11 @@ for plan in "$root"/docs/sprint/SPRINT-*.md "$root"/docs/sprint/archive/SPRINT-*
   [ -f "$plan" ] || continue
   case "$plan" in *SPRINT-NNN*) continue ;; esac
   planrel=${plan#"$root"/}
-  case "$plan" in
-    */archive/*) log="$root/docs/sprint/archive/logs/$(basename "$plan")" ;;
-    *)           log="$root/docs/sprint/logs/$(basename "$plan")" ;;
-  esac
+  if lf_is_archived_path "$planrel"; then
+    log="$root/docs/sprint/archive/logs/$(basename "$plan")"
+  else
+    log="$root/docs/sprint/logs/$(basename "$plan")"
+  fi
   [ -f "$log" ] || continue
   logrel=${log#"$root"/}
   st=$(fmv "$plan" status)

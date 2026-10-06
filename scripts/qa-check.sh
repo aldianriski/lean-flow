@@ -931,15 +931,10 @@ qb_checkpoint "leg 10b: archive-predicate singularity"
 #
 # The search token is assembled from fragments so this leg cannot match its own source line -- a
 # guard that reports itself is a guard nobody keeps.
-# Two files are deliberately outside this guard, each for a stated reason rather than because they
-# were noisy. archive-path.sh IS the predicate and documents the old form in its own comments.
-# check-handoff-state.sh:145 uses the glob to MAP a Plan path to its log path, not to exclude, and it
-# is immune by construction: it self-enumerates via the literal glob
-# the archived-sprint glob it builds itself, so the path it matches always carries the lowercase
-# spelling it produced itself -- it never tests a caller-supplied string of unknown casing.
-# Independently verified during the T3 review. It stays a filed follow-up: if that line ever becomes
-# an EXCLUSION, or ever tests a path it did not enumerate, it must move to the shared predicate.
-_ag_exempt='^scripts/lib/archive-path\.sh:|^scripts/lib/check-handoff-state\.sh:'
+# One file is deliberately outside this guard: archive-path.sh IS the predicate and documents the old
+# form in its own comments. check-handoff-state.sh was the second exemption until SPRINT-116 T3 moved
+# its Plan-to-log mapping onto the shared predicate (TASK-346), so no site keeps a ruling here.
+_ag_exempt='^scripts/lib/archive-path\.sh:'
 ag_tok='*/'"archive"'/*'
 ag_hits=$(grep -rn -F "$ag_tok" --include='*.sh' scripts evals 2>/dev/null \
   | grep -vE "$_ag_exempt" \
