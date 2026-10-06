@@ -799,6 +799,9 @@ status: current
   - Mitigated, partially and already: SPRINT-084 T1 made leg 2f-ter hand the engine a reduced spec on
     the DEFAULT profile, so this full sweep runs only under `QA_FULL=1` — promote, close, and any
     full-profile run (ADR-039). Real cost, but not on every gate run.
+  - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): stays `high`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1`
+    gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s, so on Linux the engine is not a bottleneck. It stays high because the engine is
+    **consumer-facing**: an adopter on Windows pays the same fork cost, and the off-host route is not theirs.
 - **TD-167** severity: medium | status: open | created: Sprint-102
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
@@ -1499,7 +1502,7 @@ status: current
     a finding rather than a debt.
   - All four files predate SPRINT-094's `plan_commit`, so none of this is this sprint's mess.
 
-- **TD-117** severity: **high** | status: open | created: Sprint-091
+- **TD-117** severity: medium | status: open | created: Sprint-091
   - Summary: **Under concurrent load the gate exceeds its own 450s budget, SKIPS six eval harnesses, and
     reports a FAIL — so the practice this repo mandates for Tier G review degrades the gate that
     validates it.** `scripts/qa-check.sh:27` sets `QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-450}` (600s
@@ -1573,6 +1576,8 @@ status: current
     something false about itself. Measurements → `docs/research/logs/qa-gate-timing.md` § Round 15.
   - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
     owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
+  - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
+    Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
 
 - **TD-126** severity: medium | status: open | created: Sprint-092
   - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in
@@ -1819,7 +1824,7 @@ status: current
   - Fix direction (not a ruling): either migrate the six with their families and reword § Closed-when 5
     to name them, or rule them **out** of the engine explicitly and say so in the ADR, so the milestone
     means what it says. Do not leave the reader to reconcile it.
-- **TD-128** severity: high | status: open | created: Sprint-092
+- **TD-128** severity: medium | status: open | created: Sprint-092
   - Summary: **`qa-budget-default` asserts the CONFIGURED budget against the command ceiling, never the
     ACTUAL runtime** — it prints `PASS qa-budget-default: 520s < 600s command ceiling` while real runs
     on this host exceed 600 s. A guard that stays green precisely when the thing it guards is failing.
@@ -1849,6 +1854,8 @@ status: current
   - **Re-reviewed at the SPRINT-106 promote (2026-09-23, owner-signed):** `TASK-329` is no longer in the Backlog, so this high row has **no live owner**. Its named gap looks closed: SPRINT-099 T2 added the ACTUAL-runtime reader (`CHANGELOG.md`, "the ACTUAL runtime is asserted against the 600 s command ceiling"), and SPRINT-102 (`ADR-042`) then re-ruled that assertion as an uncounted `INFO`. **Proposed: resolve** against those two commits once someone confirms the reader still fires. Not resolved here, because a re-review is not a verification.
   - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
     owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
+  - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
+    Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
 
 - **TD-125** severity: medium | status: open | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`
@@ -2442,7 +2449,7 @@ status: current
   - **Re-file fresh if** the freeze is lifted before this is wired: the reachability defect outlives the
     particular freeze.
 
-- **TD-090** severity: **high** | status: open | created: Sprint-084 | `high` (085 close) → `medium` (086 close) → **`high` again, same day, by its own re-raise condition**
+- **TD-090** severity: medium | status: open | created: Sprint-084 | `high` (085 close) → `medium` (086 close) → **`high` again, same day, by its own re-raise condition** → **`medium`** (2026-10-06, Round 22, owner)
   - Summary: **`qa-check.sh` leg 12 (eval harnesses) is now the gate's dominant cost** — 396.3s of a
     492s run, ~81%.
   - Evidence: `docs/research/logs/qa-gate-timing.md` § Round 4, measured post-fix. It was never the
@@ -2576,6 +2583,8 @@ status: current
     for three findings and a sibling control.
   - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
     owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
+  - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
+    Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
 
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's

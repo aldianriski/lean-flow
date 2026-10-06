@@ -118,3 +118,7 @@ is the evidence they were waiting on, and re-aiming or closing them is an owner 
 Owner ruling (popup), chosen over "re-aim at the Windows host envelope": the gate holds ~9.5 MB, the kill is the host's memory, and the
 off-host route is a working mitigation (Round 22, 3/3 green in 105–109 s). Re-file fresh if a verdict-less run recurs with > 3 GB free.
 `consequence · T3 · behaviour: none · governance: low (J2 ruling recorded as the owner gave it)` → self-review.
+
+### 2026-10-06 | progress | owner ruling on TASK-357's four tracker rows, from Round 22: TD-090 · 117 · 128 → `medium` (Windows-host-specific), TD-168 stays `high`
+Each row gets a Round 22 evidence bullet. The three gate-runtime rows are re-rated `medium` and stay open for the Windows host. TD-168 stays `high`
+because the conformance engine is consumer-facing (Windows adopters pay its fork cost). Chosen over "annotate only" and "close 090/117/128".
