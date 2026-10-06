@@ -58,3 +58,12 @@ Leg 10b has **no retained fixture at all** (grep of `evals/` for `archive-predic
 inline leg into its own script, which is beyond the signed design. T3's proof stays what G2 signed: re-seed the raw `*/archive/*` case,
 observe leg 10b red once, restore, verify the restore with `git hash-object`. The missing retained fixture is a **TD candidate for close**.
 TASK-346's `## Done when` is unchanged. **Re-confirm G2:** no design change, only a narrower file set.
+
+### 2026-10-06 | progress | T4 built: a closing review loop now records its `review ·` line; external reviewers record as `scoped-reviewer` (babf3791 → merge f2585a5)
+- Procedure: review-scoping.md § The revise loop carries the "append the review line when the loop closes" rule and the `scoped-reviewer`
+  rule for external reviewers; night-run.md Part 4 carries a pointer clause only. No fifth depth word; `check-review-depth.sh` unchanged.
+- Fixtures: case 19 `codex-clear-no-review-line-fails` (exit 1, `review-depth-governance-absent`) and case 20
+  `codex-clear-with-review-line-passes` (PASS), differing in exactly one line.
+- Discrimination (builder): with the control's `review ·` line deleted, only case 20 reddened; restored, `git hash-object` ==
+  `git rev-parse HEAD:<control>` (`dc46b148…`). Coordinator re-run on main after merge: `REVIEW-DEPTH FIXTURES: all green`.
+consequence · T4 · behaviour:low · governance:high
