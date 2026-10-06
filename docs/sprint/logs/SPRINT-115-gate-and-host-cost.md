@@ -84,3 +84,11 @@ No Codex loop: none of the three is consequential G or a shipped skill/template 
   Root-mode output is byte-identical before and after. **Coordinator:** fixtures 8/8, seeded exit 1, real SPRINT-115 file 16/0.
 **Post-merge cross-cutting legs (merged tree):** tsc 0 · doc-caps 0 FAIL · prose-density 31/0 · freeze 6/0 · harness-list completeness clean · dod-delta harness PASS.
 The full gate runs as T2's three VPS runs, and as system-verify at close.
+
+### 2026-10-06 | scope-change | T2 (TASK-357): the `layers-observed` ruling is moot — its subject was deleted at SPRINT-113 T1
+**What broke:** TASK-357's Done-when asks for a ruling on whether `layers-observed`'s differential (189.3 s) joins `eval_harnesses_optin` or stays
+excluded and named. That differential and its twin were **deleted** at SPRINT-113 T1 (`9a0bfaa`, ADR-050; `qa-check.sh` now reads "deleted, not
+excluded", and `eval_harnesses_excluded` is empty), so neither branch of the ruling exists. **Owner ruling (popup, 2026-10-06):** record it as moot. The
+box is ticked once the Round lands, and the tick names `9a0bfaa` + ADR-050 as what resolved the ruling half. The Done-when text stays frozen. **Impact:** the measurement half is
+unchanged: 3 completed `QA_FULL=1` runs on the VPS (A1) at `2297345`, profiled (`QA_PROFILE=1`), launched 08:30Z, to give the total as a range
+plus the current cost of the three opt-in differentials (authority · doc-caps · night-run-rollup). The VPS got `nodejs` 18.19 so the typecheck leg runs.
