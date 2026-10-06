@@ -82,7 +82,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 2. From the active task list, count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check).
 3. Compare the invocation header's base-dir version against the plugin manifest (above).
 4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
-5. Emit the health report (below) — health check ONLY, no inline file summaries. Its first row is the **verdict** (ready · stale · blocked, and why in one clause), so the reader knows the state before reading a row.
+5. Emit the health report (below) — health check ONLY, no inline file summaries. Its first line — the banner itself — carries the **verdict** (ready · stale · blocked, why in one clause) and the next step, so the reader has both before reading a row.
 6. Emit one `Next:` line:
    - open tasks exist → `/orchestrator` to continue — and when those tasks sit in an **active
      sprint**, name the unattended option too (`/orchestrator sprint-bulk unattended` — a night run
@@ -97,8 +97,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 ## Output format
 
 ```
-=== PRIME HEALTH ===
-Verdict:  ready — context current; continue the active sprint with /orchestrator
+=== PRIME HEALTH: ready — context current; continue the active sprint with /orchestrator ===
 [OK]      CLAUDE.md
 [OK]      CONTEXT.md
 [OK]      README.md

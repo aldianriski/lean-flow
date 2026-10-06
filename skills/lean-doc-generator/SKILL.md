@@ -72,7 +72,7 @@ parks to `/handoff`.** Procedure · tier table · allowlist → `${CLAUDE_SKILL_
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `STANDARD.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
 7. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first — see § Bundled + cited assets); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
-8. **Close** — open with the verdict (what was delivered or decided), then docs delivered + headers to verify, then exactly one `Next:` line; every confirmation popup this skill raises leads with its decision the same way.
+8. **Close** — open with one line carrying the verdict (what was delivered or decided) and the next step, then docs delivered + headers to verify, then exactly one `Next:` line; every confirmation popup this skill raises leads with its decision the same way.
 
 ## Creates vs consumes (the boundary)
 
