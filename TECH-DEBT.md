@@ -877,7 +877,7 @@ status: current
     leg 12's own loop-internal check inside `WINDOW` reddens correct code. So this row's fix
     direction should assume a **class** of clock-input assertions rather than one case, and the
     `WINDOW` lever trades directly against flakiness under load (a coverage decision, D6).
-  - **Narrowed (SPRINT-116 T1, ADR-051):** the TypeScript half is deleted; the Shell half stands.
+  - **Narrowed (SPRINT-116 T1, ADR-051):** two of the three wrappers it names (`run-s4-ts-evaluators.sh` · `run-s4-differential-parity.sh`) are deleted; the debt stands for the surviving `run-dod-delta-fixtures.sh`, whose pass-count parser still has no retained must-FAIL fixture.
 
 - **TD-166** severity: medium | status: open | created: Sprint-102
   - Summary: **The `dod-delta` leg can hold a sprint permanently un-closable on a finding that only

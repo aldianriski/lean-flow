@@ -79,6 +79,13 @@ run_case_anywhere "duplicate-number-fires" 1 "adr-path-noncanonical: docs/adr/AD
 run_case_anywhere "adr-outside-dir-fires" 1 "adr-path-noncanonical: docs/ADR-002-in-the-wrong-place.md" -- \
   sh "$engine" "$fx/adr-outside-dir" --spec "$adr_spec"
 
+# An EMPTY slug (`ADR-001-.md`): S4.ONEFILE's glob needs one or more slug characters, so it rejects the file.
+# The TS evaluators asserted this until ADR-051 cut them (SPRINT-116 T1, Codex R1); this case keeps it.
+# S4.INDEX/SECTIONS/NEGATIVE still PASS on the same file (their glob admits an empty slug) -- the engine's
+# own inconsistency, recorded as debt rather than asserted here.
+run_case_anywhere "empty-slug-fires" 1 "adr-path-noncanonical: docs/adr/ADR-001-.md -- " -- \
+  sh "$engine" "$fx/empty-slug" --spec "$adr_spec"
+
 # A MISSING index is a different sub-case from an index with a gap, and the finding must name which.
 run_case_anywhere "index-absent-fires" 1 "decisions-index-missing-adr: no decision index found" -- \
   sh "$engine" "$fx/index-absent" --spec "$adr_spec"
