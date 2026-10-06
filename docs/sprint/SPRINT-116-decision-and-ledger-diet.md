@@ -42,6 +42,12 @@ run outside this sprint) · any `git push` (owner-reserved).
 Layers: `docs/epic/EPIC-014-reference-engine.md` · `TECH-DEBT.md` (TD-168 owner · the DEPENDS-399 rows) · `docs/work/backlog/` (TASK-393's priority, or a new P1 task for TD-168)
   · if *cut*: `docs/adr/ADR-NNN-<slug>.md` · `docs/DECISIONS.md` · `packages/**` · `apps/cli/**` · `test/**` · `package.json` · `tsconfig.json`
   · `tsconfig.base.json` · `bunfig.toml` · `scripts/qa-check.sh` · `docs/architecture/overview.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md`
+  · scope-change 2026-10-06: `docs/adr/ADR-051-the-typescript-port-is-retired.md` · `docs/adr/ADR-038-composed-multi-family-rule-dispatch.md`
+  · `docs/adr/ADR-039-section-4-differential-parity-is-opt-in.md` · `docs/epic/INDEX.md` 
+  · `docs/work/backlog/TASK-393-port-the-conformance-engine-to-typescript.md` · `evals/run-s4-ts-evaluators.sh`
+  · `evals/run-s4-differential-parity.sh` · `evals/typecheck-population.test.ts`  · `evals/epic-archive-differential.test.ts`
+  · `evals/layers-completeness.test.ts` · `evals/run-doc-caps-differential.ts` · `evals/run-dod-delta-fixtures.sh`
+  · `evals/run-epic-archive-fixtures.sh`  · `evals/run-layers-completeness-fixtures.sh` · `evals/run-night-run-rollup-differential-parity.ts`
 Depends-on: none
 Cites: `TASK-399` · EPIC-014 D2 · ADR-039 · ADR-050 · `docs/research/guard-audit-rest.md` (K01) · TD-168 · the SPRINT-116 aging sweep
 

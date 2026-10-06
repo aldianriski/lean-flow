@@ -84,3 +84,17 @@ review · T4 · scoped-reviewer · behaviour:low · governance:high
 - Harnesses: emitter-column 9/0 · layers-completeness 25/0 · layers-observed 13/0 (after the fix).
 consequence · T2 · behaviour:low · governance:low
 review · T2 · self-review · behaviour:low · governance:low
+
+### 2026-10-06 | scope-change | T1 Layers widened to the cut's measured reach (recon + coordinator re-grep), and three owner rulings
+**What broke:** the Plan's T1 `Layers:` was written before the cut's reach was measured. Read-only recon plus a coordinator re-grep found
+live files outside it: the two harnesses the cut deletes (`evals/run-s4-ts-evaluators.sh` (E04) · `evals/run-s4-differential-parity.sh` (P5)),
+`evals/typecheck-population.test.ts` (it asserts `apps|packages|test` files are in the tsc program), seven `evals/` harness comments that
+cross-reference the deleted pair, the ADRs the cut supersedes (038 · 039), `docs/epic/INDEX.md`, and `TASK-393` (retired to `cancel/`).
+**Impact:** T1 stays M. File count measured by `git ls-files`: 103 files deleted (`packages/` 68 · `apps/` 4 · `test/` 31 of 40, where
+`test/gate-discovery/` and its fixtures stay) plus the 2 harnesses. **Owner rulings (popup):** (1) §4 coverage: `run-adr-family-fixtures.sh`
+moves back to the always-on set (+~23–28 s per default run); (2) EPIC-014 closes with its six open conditions marked *dropped by ADR-051*;
+(3) the port-only TD rows resolve in T1. The coordinator checked 16 candidates by Summary: 13 fully moot (TD-083 · 098 · 102 · 103 · 104 ·
+114 · 115 · 120 · 121 · 126 · 127 · 129 · 133); TD-118 · TD-165 keep only their Shell half; **TD-116 stays open** (its reviewer saw it
+reproduce on the flagless run, so it is not proven port-only). **Side-finding for the ADR:** `test/architecture/unwired-exports.ts` is the
+mechanism behind CLAUDE.md's wiring-check DoD line and scans `packages/`·`apps/` only, so the cut leaves that line without a detector
+(recorded as an accepted cost in ADR-051). TASK-399's `## Done when` is unchanged. **Re-confirm G2:** ADR-051 goes to the owner before any file moves.
