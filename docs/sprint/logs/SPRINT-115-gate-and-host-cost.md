@@ -92,3 +92,17 @@ excluded", and `eval_harnesses_excluded` is empty), so neither branch of the rul
 box is ticked once the Round lands, and the tick names `9a0bfaa` + ADR-050 as what resolved the ruling half. The Done-when text stays frozen. **Impact:** the measurement half is
 unchanged: 3 completed `QA_FULL=1` runs on the VPS (A1) at `2297345`, profiled (`QA_PROFILE=1`), launched 08:30Z, to give the total as a range
 plus the current cost of the three opt-in differentials (authority · doc-caps · night-run-rollup). The VPS got `nodejs` 18.19 so the typecheck leg runs.
+
+### 2026-10-06 | scope-change | T4 (TASK-354) and T5 (TASK-368): `Layers:` corrected to what was built; the gate found the gap
+**What broke:** the first profiled `QA_FULL=1` runs on the VPS (`2297345`) each read **`313 pass, 3 fail`**, and all three FAILs were this sprint's own
+wiring, not a host artifact: (1) `emitter-column(POPULATION-scope)`: the new `scripts/promote-check.ts` was neither scanned nor out of scope.
+(2) layers-completeness: T5's Plan `Layers:` still read "lean-flow's own promote procedure", so the evidence the coordinator wrote into the
+TASK-368 tick (`evals/run-promote-check-fixtures.ts`) was "implied, absent". (3) layers-observed: T4's `.dod-delta-exempt` and T5's
+files were undeclared. The scope-change entries above had widened Layers **in the Log only**, never on the Plan's `Layers:` lines,
+which is what both checkers read. That is L-020 by the coordinator, caught by the system gate as designed. **Change:** T4's Layers add
+`.dod-delta-exempt`. T5's Layers become the built list (`promote-check.ts` · `check-prose-density.ts` · its runner + fixtures ·
+`.claude/CONTEXT.md` · `scripts/qa-check.sh` · `evals/run-emitter-column-fixtures.ts`). `scripts/promote-check.ts` joins the emitter-column rule
+"the gate and its tooling", beside `qa-verdict.ts`: it relays findings, and nothing column-keyed reads it (emitter-column 9/0). Two unpushed
+TASK-345 commits outside any task's subject form were re-issued with `sprint(115):` subjects (identical trees, `0d8e5d9` · `2027f8b`), so
+layers-observed attributes them as coordinator work. **Impact:** members' `## Done when` are unchanged; both layers checkers read 0 FAIL.
+**Measurement note:** the full gate on this VPS completes in **~105–110 s**, not tens of minutes. T2's Round re-runs on the fixed tree.

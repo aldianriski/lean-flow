@@ -372,3 +372,8 @@ clone at `ef63e6c`, `bun install --frozen-lockfile`. Started 06:24Z, done in und
 cannot discriminate → TD-224. Local run: `5 pass, 0 fail`. (3) **qa-budget-position fixture**: the fast host reached leg 12's own check in 3s,
 inside case 2's 60s "silent" window → TD-225. Local run: 4 PASS, exit 0. **Coverage caveat:** a Linux run cannot see Windows-only
 defects (TD-223 MAX_PATH). This closes the pending full-verdict item from the 2026-10-04 close-gate entry.
+
+### 2026-10-06 | progress | correction to the 2026-10-06 post-push gate entry: the VPS run took **101 s**, not "under 40 min"
+The entry above said the run finished "in under 40 min". That was an upper bound read off the first check of its result at 07:04Z, not a
+measurement. The run's own files say `~/gate.start` 06:24:16Z → `~/gate.log` / `~/gate.rc` last written 06:25:57Z = **101 s**. The verdict
+(`300 pass, 3 fail`) and its attribution stand. SPRINT-115's profiled runs on the same host read 105–110 s, which agrees.

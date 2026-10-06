@@ -71,7 +71,7 @@ This settles whether the cost is ours to pay at all.
 **Acceptance:** TD-143's open half names a subject that exists, or the row is ruled closed, with the reason written in the row.
 
 ### T4 — Give the `dod-delta` leg a ruled-exemption declaration `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-dod-delta.ts` (the member names it `check-dod-delta.ts`) · `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/` · `evals/run-dod-delta-fixtures.sh`
+Layers: `scripts/lib/check-dod-delta.ts` (the member names it `check-dod-delta.ts`) · `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/` · `evals/run-dod-delta-fixtures.sh` · `.dod-delta-exempt` (new; scope-change 2026-10-06)
 Depends-on: none
 Cites: `TASK-354` · TD-166 · L-205 · ADR-031 · ADR-021
 
@@ -81,7 +81,7 @@ Today a historical mis-attribution can only be cleared by rewriting history or b
 **Acceptance:** a declared, ruled commit is reported as a named exemption; an undeclared sibling still FAILs in the same run.
 
 ### T5 — Run the sprint file's own per-file checkers at promote `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: lean-flow's own promote procedure (where it lives is a G2 question, A2); never the generic `lean-doc-generator` skill
+Layers: `scripts/promote-check.ts` · `scripts/lib/check-prose-density.ts` · `evals/run-promote-check-fixtures.ts` · `evals/fixtures/promote-check/` · `.claude/CONTEXT.md` · `scripts/qa-check.sh` · `evals/run-emitter-column-fixtures.ts` (scope-changes 2026-10-06; never the generic `lean-doc-generator` skill)
 Depends-on: none
 Cites: `TASK-368` · TD-177 · TD-178 · L-212 · L-166 · L-015
 
