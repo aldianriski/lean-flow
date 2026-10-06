@@ -10,6 +10,7 @@ tier: P
 authority: J2
 origin: manual
 state: ready
+sprint: SPRINT-117
 ---
 
 # TASK-321 — Make skill-produced summaries lead with the conclusion
