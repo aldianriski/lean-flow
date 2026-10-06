@@ -63,7 +63,7 @@ Measuring on the VPS is what A1 asks G2 to rule. The ruling is owner-reserved (J
 ### T3 — Re-file TD-143's cost half against the host envelope `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `TECH-DEBT.md` (TD-143 row) · an ADR only if the ruling is hard to reverse
 Depends-on: T2 (its Round is the evidence on off-host cost)
-Cites: `TASK-348` · TD-143 · `docs/research/qa-check-memory-profile.md`
+Cites: `TASK-348` · TD-143 · `docs/research/qa-check-memory-profile.md` · `qa-gate-timing.md` (Round 22, the evidence the ruling cites)
 
 The gate holds ~9.5 MB, while the host loses its free memory to other processes. A row aimed at the gate points at nothing.
 This settles whether the cost is ours to pay at all.

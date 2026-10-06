@@ -122,3 +122,10 @@ off-host route is a working mitigation (Round 22, 3/3 green in 105–109 s). Re-
 ### 2026-10-06 | progress | owner ruling on TASK-357's four tracker rows, from Round 22: TD-090 · 117 · 128 → `medium` (Windows-host-specific), TD-168 stays `high`
 Each row gets a Round 22 evidence bullet. The three gate-runtime rows are re-rated `medium` and stay open for the Windows host. TD-168 stays `high`
 because the conformance engine is consumer-facing (Windows adopters pay its fork cost). Chosen over "annotate only" and "close 090/117/128".
+
+### 2026-10-06 | progress | coordinator bookkeeping fixes the layers checkers found after T2/T3 (inline tasks)
+T2 and T3 were run inline by the coordinator, so their commits carried both the deliverable and the coordinator's own tick of the member file.
+layers-observed then charged the member-file edits to T2/T3 as undeclared. Both commits were unpushed and were re-issued with the coordinator
+subject form (identical trees; now `6e7216b` and `89bbafe`); every other file in them is governance (`docs/research/` · `TECH-DEBT.md` · `docs/sprint/`).
+layers-completeness read TASK-348's tick evidence (`qa-gate-timing.md`) as implied-but-undeclared, and T3 *cites* it, so T3's `Cites:` line names it.
+Lesson for an inline task: commit the coordinator's tick separately, as wave 1 did.
