@@ -122,3 +122,13 @@ mechanism behind CLAUDE.md's wiring-check DoD line and scans `packages/`·`apps/
 - **For the close rollup:** EPIC-014's SPRINT-116 member row still reads `active`, and `docs/epic/INDEX.md`'s EPIC-014 line keeps stale prose
   ("2 of 8") beside the new status; both are the coordinator's at close.
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-10-06 | scope-change | T1 Layers add `evals/run-adr-family-fixtures.sh`: Codex round 1 found a §4 case the cut dropped
+**What broke:** Codex round 1 on `1a7361f` (finding P2): the deleted `packages/standard/src/rules/adr-family-fixtures.test.ts` was the only
+assertion over the retained `evals/fixtures/adr-family/empty-slug` fixture (`docs/adr/ADR-001-.md`). The Shell harness ADR-051 names as the
+replacement runs 8 of the 9 fixture dirs, not `empty-slug` (`grep -c empty-slug`: 0), so ADR-051's "the same nine retained cases" was false.
+Coordinator confirmed: the Shell engine on that fixture prints `FAIL adr-path-noncanonical: docs/adr/ADR-001-.md` (S4.ONEFILE) and PASSes
+S4.INDEX/SECTIONS/NEGATIVE on the same file, the self-inconsistency the deleted test documented as an owner-ruled TS/Shell divergence.
+**Impact:** T1 adds one harness case asserting S4.ONEFILE's named finding on `empty-slug`. The INDEX/SECTIONS/NEGATIVE re-admission is the
+engine's own inconsistency, now documented nowhere live → **close-retro TD candidate**. Finding P3 (TD-165's narrowing names the wrong
+boundary) is fixed in `TECH-DEBT.md`, already in T1's Layers. TASK-399's `## Done when` is unchanged. **Re-confirm G2:** no design change.
