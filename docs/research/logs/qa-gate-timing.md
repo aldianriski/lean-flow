@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-16
+last_updated: 2026-10-06
 update_trigger: a measurement round is appended
 status: active
 id: qa-gate-timing-log
@@ -2177,3 +2177,33 @@ every task is required to do — is disqualified from governance and reported. 5
 commits on this sprint. Pre-existing, invisible until now because leg 15 only walks
 `plan_commit..HEAD` and research commits normally land outside that window. Details and the two
 non-equivalent fix options → `TECH-DEBT.md` **TD-170**.
+
+## Round 22 — the completed `QA_FULL=1` total, as a range over three runs on a second host (2026-10-06)
+
+SPRINT-115 T2 (`TASK-357`). **Host:** Ubuntu 24.04 VPS, x86_64, 2 vCPU, 7.5 GB (≈ 4.7 GB free throughout), bun 1.3.14, node 18.19.
+This is **not** the Windows maintainer host whose Rounds 19–21 are above. A Linux figure cannot speak for that host. It is measured here because
+the Windows host has not held > 3 GB free for 90 min in six sprints (A1, owner-ruled). **Tree:** `5d9335a` (main, after wave 1 and its
+gate-found fixes). **Profile:** `QA_PROFILE=1`, one sample per leg boundary and per eval harness, 1 s resolution.
+
+| run | wall | verdict | eval-harness leg (sum of per-harness spans) |
+|---|---:|---|---:|
+| 1 | 109 s | `QA-CHECK: 316 pass, 0 fail` (exit 0) | 84 s |
+| 2 | 107 s | `QA-CHECK: 316 pass, 0 fail` (exit 0) | 83 s |
+| 3 | 105 s | `QA-CHECK: 316 pass, 0 fail` (exit 0) | 81 s |
+| **range** | **105 – 109 s** | 3/3 complete, green | **81 – 84 s** |
+
+**The three opt-in differentials (ADR-039's split), current cost on this host:** `run-authority-differential.ts` **1 s** ·
+`run-doc-caps-differential.ts` **2 s** · `run-night-run-rollup-differential-parity.ts` **5–6 s**. That is ~8–9 s together, against
+21.2 / 38.8 / 44.0 s (~104 s) on the Windows host on 2026-09-20. The heaviest harnesses here are `run-by-reference-fixtures.ts` (19 s),
+`run-sprint-family-fixtures.sh` (16 s) and `run-qa-budget-position-fixtures.sh` (6–7 s; TASK-403 made case 2 run through to leg 12 on purpose).
+
+**The deferred ruling is moot.** ADR-039 left `layers-observed`'s differential (189.3 s) excluded-and-named, pending a measured total.
+That harness and its twin were **deleted** at SPRINT-113 T1 (`9a0bfaa`, ADR-050), and `eval_harnesses_excluded` is empty, so there is no
+"joins opt-in or stays excluded" left to decide (owner ruling, SPRINT-115 Log, 2026-10-06 scope-change).
+
+**What the number says.** On a host that is not starved of memory, the complete opt-in gate takes under two minutes, three times out of three, with ~4 s spread.
+The 1863 s Windows observation in TASK-357's tracker was taken under paging (min 311 MB free), so it measured the host, not the gate. This is
+the evidence TASK-348 (TD-143's cost half) asks for: the gate's runtime cost is not where the 30-minute figures came from.
+
+**Retained:** run logs and `prof{1,2,3}.tsv` on the VPS (`~/r115/`). An earlier set on `2297345` (`~/r115/first/`, 101–110 s, `313 pass, 3 fail`)
+is kept, and its three FAILs were this sprint's own unwired Layers (SPRINT-115 Log, scope-change entry), not timing.

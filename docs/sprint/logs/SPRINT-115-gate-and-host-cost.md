@@ -106,3 +106,10 @@ which is what both checkers read. That is L-020 by the coordinator, caught by th
 TASK-345 commits outside any task's subject form were re-issued with `sprint(115):` subjects (identical trees, `0d8e5d9` · `2027f8b`), so
 layers-observed attributes them as coordinator work. **Impact:** members' `## Done when` are unchanged; both layers checkers read 0 FAIL.
 **Measurement note:** the full gate on this VPS completes in **~105–110 s**, not tens of minutes. T2's Round re-runs on the fixed tree.
+
+### 2026-10-06 | progress | T2 (TASK-357) done: Round 22 — 105–109 s over three green `QA_FULL=1` runs on the VPS; the opt-in ruling is moot
+Re-run on the fixed tree `5d9335a`: `316 pass, 0 fail` ×3 (exit 0), wall 109 · 107 · 105 s, eval-harness leg 81–84 s. The three opt-in
+differentials cost 1 · 2 · 5–6 s on this host (Windows 2026-09-20: 21.2 · 38.8 · 44.0 s). The ruling half is moot per the owner's scope-change
+(`9a0bfaa`, ADR-050), cited in Round 22. `consequence · T2 · behaviour: none (measurement + research log) · governance: low (J2 ruling recorded
+as moot by the owner)` → self-review. TASK-357's tracker rows TD-090 · TD-117 · TD-128 · TD-168 are left for T3's ruling and the close: Round 22
+is the evidence they were waiting on, and re-aiming or closing them is an owner call, not this measurement's.

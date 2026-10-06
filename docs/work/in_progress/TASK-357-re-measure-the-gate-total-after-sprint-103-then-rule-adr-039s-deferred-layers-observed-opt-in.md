@@ -34,7 +34,7 @@ SPRINT-103 existed to stop.
 
 ## Done when
 
-- [ ] A new Round in `docs/research/logs/qa-gate-timing.md` records the **completed** `QA_FULL=1` gate total post-SPRINT-103, taken on a host with healthy free memory and stated as a range over ≥3 runs (this host shows >3x run-to-run variance — a point estimate is not a measurement here). **Then** the deferred ruling: `layers-observed`'s differential (**189.3 s**) either joins `eval_harnesses_optin` or stays excluded-and-named, decided against the measured total rather than against an estimate. Verify: the Round names the total and the three `optin` harnesses' current cost, and the ruling cites that Round by number.
+- [x] A new Round in `docs/research/logs/qa-gate-timing.md` records the **completed** `QA_FULL=1` gate total post-SPRINT-103, taken on a host with healthy free memory and stated as a range over ≥3 runs (this host shows >3x run-to-run variance — a point estimate is not a measurement here). **Then** the deferred ruling: `layers-observed`'s differential (**189.3 s**) either joins `eval_harnesses_optin` or stays excluded-and-named, decided against the measured total rather than against an estimate. Verify: the Round names the total and the three `optin` harnesses' current cost, and the ruling cites that Round by number. ✓ Round 22 (`docs/research/logs/qa-gate-timing.md`): 105–109 s over 3 completed `QA_FULL=1` runs, all `316 pass, 0 fail`, on the Ubuntu VPS (A1, host named) at `5d9335a`; the three opt-in differentials are 1 · 2 · 5–6 s; the `layers-observed` ruling is moot, since the harness was deleted at `9a0bfaa` (ADR-050), owner-ruled scope-change 2026-10-06, cited by Round 22
 
 ## Assumes
 
