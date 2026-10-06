@@ -44,6 +44,8 @@
 // closes the hole.
 //
 // Usage: bun scripts/lib/check-prose-density.ts <repo-root>
+//    or: bun scripts/lib/check-prose-density.ts <file>   (single-file mode, TASK-368: no baseline, any
+//        line over DENSE_LINE_CHARS is a FAIL -- a NEW file has no adopted drift to ratchet against)
 // Prints one PASS/FAIL/INFO/SKIP line per finding; exits 1 if any FAIL line was printed.
 
 import { existsSync, readFileSync, statSync } from "node:fs";
@@ -242,13 +244,32 @@ export function run(root: string): Finding[] {
   return findings;
 }
 
+/**
+ * Single-file mode (TASK-368). A file examined alone is a NEW one (a sprint file at promote), so
+ * there is no baseline row to ratchet against: every dense line is a named FAIL.
+ */
+export function runSingleFile(path: string): Finding[] {
+  const res = denseLines(readFileSync(path, "utf8"));
+  const findings: Finding[] = [];
+  if (res.unbalancedFence) {
+    findings.push({ level: "FAIL", text: `prose-density: ${path} has an ODD number of fence markers -- everything after the last one is skipped silently, so this file's count cannot be trusted` });
+  }
+  if (res.lines.length > 0) {
+    findings.push({ level: "FAIL", text: `prose-density: ${path} has ${res.lines.length} line(s) over ${DENSE_LINE_CHARS} chars [STANDARD 157: split, never squeeze] -- lines ${res.lines.slice(0, 5).join(", ")}${res.lines.length > 5 ? ", ..." : ""}` });
+  } else {
+    findings.push({ level: "PASS", text: `prose-density: ${path} (0 lines > ${DENSE_LINE_CHARS} chars)` });
+  }
+  return findings;
+}
+
 if (import.meta.main) {
   const root = process.argv[2];
   if (!root) {
-    console.error("usage: check-prose-density.ts <repo-root>");
+    console.error("usage: check-prose-density.ts <repo-root | file>");
     process.exit(1);
   }
-  const findings = run(root);
+  const isFile = existsSync(root) && statSync(root).isFile();
+  const findings = isFile ? runSingleFile(root) : run(root);
   for (const f of findings) console.log(`${f.level.padEnd(5)} ${f.text}`);
   // Count the levels actually emitted. The first version printed `findings.length - fails`, which
   // counted its own INFO line as a pass -- so the number it PRINTED (15) disagreed with the rows it
