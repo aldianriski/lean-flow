@@ -35,6 +35,13 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-116 promote (2026-10-06).** **130 of 138 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 116. Second route: 138 open − 8 filed at 114/115 = 130. The 42 oldest (filed ≤ Sprint-090) were re-checked against the
+> current repo and **12 resolved** (owner-approved): TD-082 → TASK-384 · TD-063 · TD-106 (fixed; commit cited) · TD-051 · TD-069 ·
+> TD-096 · TD-107 (no longer occur) · TD-050 · TD-066 · TD-071 → merged into TD-090 · TD-053 · TD-095 → merged into TD-100. The other
+> 30 stay open; 14 of them turn on TASK-399's cut-or-finish ruling. The one `high` row, TD-168, lost its owner (TASK-357 done) and is
+> re-routed through SPRINT-116 T1. **§11 deletion:** TD-209 (resolved at SPRINT-113); its id stays retired.
+>
 > **Aging sweep — SPRINT-111 promote (2026-09-30).** **106 of 128 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 111: the 105 named in earlier sweeps plus **1** newly aged, TD-186 (low, Sprint-108), as a re-review prompt. Second route:
 > 128 open − 22 filed at 109/110 = 106. All 7 `high` rows are owned (TD-143 → 348 · TD-150 → 345 · TD-090/117/128/168 → 357 ·
@@ -452,11 +459,6 @@ status: current
     Census 2026-10-02: 0 quoted sprint statuses; all 18 Members entries across 4 by-reference sprints are plain paths.
   - Mitigation (hypothesis): settle the member syntax in prime § Resolution, then align both selectors with a fixture per shape.
 
-- **TD-209** severity: low | status: resolved → TASK-378 | created: Sprint-111 (T5)
-  - Summary: **`skills/lean-doc-generator/templates/TODO.md.template` is kept though nothing scaffolds it any more.** `init` now
-    scaffolds the store, and no skill reads or writes `TODO.md` outside migrate's v1→v2 path. Census 2026-09-30: 0 skill callers.
-  - Mitigation (hypothesis): delete it in the 2.0 cleanup. The delete ripples into the template counts in CLAUDE.md, CONTEXT.md and README.
-
 - **TD-208** severity: low | status: open | created: Sprint-110 (T3 outside review)
   - Summary: **S9.VERIFYCLAUSE checks a partial member read-back only at zero.** It FAILs when no ticked line could be read back
     while the CLI counts more than zero. A 3-counted, 2-read case leaves the third unexamined. Census 2026-09-30: 0.
@@ -810,6 +812,7 @@ status: current
   - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): stays `high`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1`
     gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s, so on Linux the engine is not a bottleneck. It stays high because the engine is
     **consumer-facing**: an adopter on Windows pays the same fork cost, and the off-host route is not theirs.
+  - **Owner (SPRINT-116 promote, owner-approved 2026-10-06):** TASK-357 is done, so the row had no live owner. SPRINT-116 T1 (TASK-399) assigns it with its ruling: *finish* → TASK-393 carries it at P1; *cut* → a new P1 task for the Shell engine's spawn cost.
 - **TD-167** severity: medium | status: open | created: Sprint-102
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
@@ -2093,7 +2096,7 @@ status: current
   - Consequence today is bounded: Shell holds authority (SPRINT-091 D3), so the harness is not *wrong*
     about the engine that currently answers. It becomes load-bearing the moment TS takes any authority
     — which is EPIC-014's whole direction. Route it before a cutover, not after.
-- **TD-106** severity: medium | status: open | created: Sprint-088
+- **TD-106** severity: medium | status: resolved → accepted (no task) | created: Sprint-088
   - Summary: **`check-verify-reaches.sh` reports a script that exists as absent, because it tests the
     name it extracted as a literal path from the repo root.** Line 89 is `if [ ! -f "$scr" ]`, so a
     `Verify:` clause naming a script *bare* — without a directory — resolves against `./`, misses
@@ -2121,6 +2124,7 @@ status: current
     decomposition ruling rather than fixing it standalone.
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** fixed by SPRINT-100 T1 (`bc0a2e8e`, via TD-097): `check-verify-reaches.ts` resolves a bare basename against `scripts/` · `scripts/lib/` · `evals/` and emits a distinct `verify-method-unresolvable` when none matches. A v1 Plan sprint, so no task id exists. **Re-file fresh if:** a `Verify:` naming an existing script by basename is reported absent.
 
 - **TD-108** severity: minor | status: open | created: Sprint-088
   - Summary: **`night-run.sh`'s mode-signal pre-flight is an unanchored substring scan over the whole
@@ -2143,7 +2147,7 @@ status: current
   - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
     stops being load-bearing.
 
-- **TD-107** severity: medium | status: open | created: Sprint-088
+- **TD-107** severity: medium | status: resolved → accepted (no task) | created: Sprint-088
   - Summary: **TASK-299's implementation landed on `main` inside SPRINT-087's window without being a
     task in any Plan, so `check-layers-observed.sh` correctly reports commits attributable to no task
     — and the Backlog still lists the work as unstarted.** Unlike TD-106, **the checker is right**;
@@ -2167,6 +2171,7 @@ status: current
     failure this row exists to record.
   - **Re-file fresh if** TASK-299 is closed with its commits attributed — the row is about a missing
     record, so supplying the record ends it.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** superseded by the work-item store: `TODO.md` is deleted (`0ce093c2`) and TASK-299 has left the store. **Re-file fresh if:** a gate again reports commits attributable to no task.
 
 - **TD-104** severity: medium | status: open | created: Sprint-087
   - Summary: **T3's oracle helper hard-codes a 15,000 ms timeout for an operation measured at ~18,800 ms
@@ -2284,6 +2289,7 @@ status: current
     tasks do not spawn the engine as an oracle.
   - **Re-file fresh if** worktrees move out of `.claude/` — the prune entry would name a stale path,
     the same condition TD-095 carries.
+  - **Absorbs (SPRINT-116 promote, owner-approved 2026-10-06):** TD-053 · TD-095's surviving cost half.
 
 - **TD-099** severity: medium | status: open | created: Sprint-087
   - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
@@ -2358,7 +2364,7 @@ status: current
   - **Re-file fresh if** the oracle scripts get materially faster, or the runner default changes — the
     arithmetic (spawn cost × contention vs runner default) is the whole finding, and it is host-specific.
 
-- **TD-096** severity: minor | status: open | created: Sprint-087
+- **TD-096** severity: minor | status: resolved → accepted (no task) | created: Sprint-087
   - Summary: **SPRINT-087 attributes the six marks to ADR-036 in four places; they are `spec/STANDARD.md`
     §14's.** ADR-036 freezes the *verdict vocabulary* — `PASS` · `FAIL` · `GAP` — and rules severity out
     as new behaviour arriving at H15. It names no marks at all.
@@ -2377,8 +2383,9 @@ status: current
     a citation defect, not a scope change, because no criterion becomes unreachable.
   - **Re-file fresh if** the mark set changes arity — the "six" is load-bearing in T2's DoD, which
     asserts *a seventh mark cannot appear silently*.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** the misattribution sits only in archived, append-only `SPRINT-087`; `spec/STANDARD.md` §14 carries the real marks. **Re-file fresh if:** a live doc cites ADR-036 for the six marks.
 
-- **TD-095** severity: medium | status: open | created: Sprint-086
+- **TD-095** severity: medium | status: resolved → accepted (no task) | created: Sprint-086
   - Summary: **`qa-check.sh` scans agent worktrees under `.claude/worktrees/`**, treating each as repo
     content. Six live worktrees meant six full repo copies walked — enough to emit false FAILs *and*
     to push the run over its own budget.
@@ -2412,6 +2419,7 @@ status: current
     - Severity left at `medium`: the surviving half is a cost, not a false verdict, and it degrades
       visibly. But note the interaction — with the gate ~19–29% over budget on the reference host
       (TD-090), 82–94s of worktree scanning is the difference between finishing and truncating.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** **merged into TD-100**: the worktree false-FAIL half is fixed (`47e2f2b9`; `check-ephemeral-intake.sh:41` drops `.claude/worktrees/`), and the surviving cost is the engine's `_repo_files` walk, which TD-100 tracks. **Re-file fresh if:** TD-100 closes and a checker other than the engine still walks `.claude/worktrees/`.
 
 - **TD-093** severity: minor | status: open | created: Sprint-085
   - Summary: **`/release-patch` has no step that bumps the README footer version the gate lints**, so
@@ -2593,6 +2601,7 @@ status: current
     owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
   - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
+  - **Absorbs (SPRINT-116 promote, owner-approved 2026-10-06):** TD-050 · TD-066 · TD-071, the same cost mechanism.
 
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
@@ -2617,7 +2626,7 @@ status: current
   - **Re-file fresh if** the count is still in single digits when the first rule family migrates, or if
     a real violation is ever found by review rather than by the suite.
 
-- **TD-082** severity: minor | status: open | created: Sprint-083
+- **TD-082** severity: minor | status: resolved → TASK-384 | created: Sprint-083
   - Summary: **`docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` is 3,039 lines against
     §2's 130 soft cap — a 23× breach with no exemption route, by design.** It is the authoritative
     development handoff EPIC-014, EPIC-015 and SPRINT-083 are all sliced from, so it is not drift:
@@ -2644,6 +2653,7 @@ status: current
   - **Re-file fresh if** the doc outlives EPIC-014 and EPIC-015 with H-rows still unsliced, or if a
     second handoff doc of this size arrives — at which point the absence of a soft-cap exemption
     route is the row's subject, not this one file.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** `.cap-dispositions:18` now retains the 3,050-line doc with its reasoning and a revisit condition (`7eda91d4` · `ea180d1e`).
 
 - **TD-081** severity: medium | status: open | created: Sprint-082
   - Summary: **`qa-check.sh` prints two verdicts and only one is the tally, so `0 fail` does not mean
@@ -2832,7 +2842,7 @@ status: current
   - Sibling: **TD-067** (the gate-token check being looser than its message). Unrelated cause; both are
     "a tool's report and its behaviour disagree, and the disagreement is silent".
 
-- **TD-069** severity: minor | status: open | created: Sprint-077 | updated: Sprint-079
+- **TD-069** severity: minor | status: resolved → accepted (no task) | created: Sprint-077 | updated: Sprint-079
   - **SPRINT-079: the register half stayed fixed and a new file joined the watch.** The split held —
     `conformance-dispositions.md` is **120 / 130** after §9's and §10's rows migrated out — but its
     sibling `conformance-coverage.md` is **126 / 130** and gains a line per rule covered, so it
@@ -2894,7 +2904,8 @@ status: current
   - Severity held at `minor`: nothing is wrong, nothing is lost, and both files are read by humans who
     are not stopped by the length. What the row is actually tracking is that **the decision keeps being
     deferrable** — five sprints now. It is worth one promote's attention before a sixth.
-- **TD-071** severity: minor | status: open | created: Sprint-078 | updated: Sprint-079
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** no longer occurs: the epic half is archived (`docs/epic/archive/EPIC-004-conformance.md`) and the register split held (`conformance-dispositions.md` 124 lines; `conformance-coverage.md` 130, at its cap, not over). **Re-file fresh if:** `conformance-coverage.md` exceeds 130 lines.
+- **TD-071** severity: minor | status: resolved → accepted (no task) | created: Sprint-078 | updated: Sprint-079
   - **SPRINT-079 added a fifth eval harness** (`run-sprint-family-fixtures.sh`), and it is the most
     expensive in the set at ~5 min — see **TD-073**, which prices it and names why. It is opt-in, so
     the default gate does not pay it today; the close run still took ~13 minutes without it.
@@ -2924,6 +2935,7 @@ status: current
     Distinct subject: TD-066/L-144 are about a *single run* being slow; this is about the *number* of
     runs and the breadth each one sweeps. Fixing either moves the other, neither cures it. Related:
     **L-147** (nothing measures a new assertion's cost) · **L-150** (the routing-around).
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** **merged into TD-090**: the same gate-cost mechanism, which Round 22 (owner, 2026-10-06) ruled Windows-host-specific; TD-090 carries it from here. **Re-file fresh if:** TD-090 closes while this sub-cost is still measured on a host that pays it.
 
 - **TD-072** severity: trivial | status: open | created: Sprint-078
   - Summary: **The §3 ownership footer is now read two ways, and only one of them is spec-derived.**
@@ -2995,7 +3007,7 @@ status: current
   - Severity held at `minor` rather than escalated: nothing here is wrong today, and the extraction
     still wants its own task rather than a rider on a coverage sprint. But the count is now five and
     the growth is not slowing — each new rule family that needs a §2 column adds one.
-- **TD-066** severity: minor | status: open | created: Sprint-075
+- **TD-066** severity: minor | status: resolved → accepted (no task) | created: Sprint-075
   - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
     The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per
     doc, which is already a ~12× improvement over the first version (~2,800 processes, a walk per rule
@@ -3028,8 +3040,9 @@ status: current
     needs a row-count reconciliation (rows emitted == files walked) as a named finding, not a comment.
     The reasoning is written into `conformance-engine.sh` so the next person meets the argument before
     the temptation.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** **merged into TD-090**: the same gate-cost mechanism, which Round 22 (owner, 2026-10-06) ruled Windows-host-specific; TD-090 carries it from here. **Re-file fresh if:** TD-090 closes while this sub-cost is still measured on a host that pays it.
 
-- **TD-063** severity: minor | status: open | created: Sprint-074
+- **TD-063** severity: minor | status: resolved → accepted (no task) | created: Sprint-074
   - Summary: **`gen-index.sh --check` decides staleness with a byte compare that includes a field
     guaranteed to drift.** The check is `cmp -s "$tmp" "$OUT"` — a freshly generated index against the
     committed one — and the generator stamps `last_updated:` with **today's** date. So the gate reports
@@ -3061,6 +3074,7 @@ status: current
     scheduling, not uncertainty — SPRINT-074 D4's reasoning applies (T3 already changed one
     `Layers:`-adjacent matcher, and two matcher changes in one sprint make either regression hard to
     attribute). **Ready to schedule; no unblock condition.**
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** fixed by SPRINT-093 T2 (`cfa81b77`, via TD-111): `gen-index.sh` compares the body under the existing `last_updated`, so a date rollover leaves the index byte-identical. A v1 Plan sprint, so no task id exists. **Re-file fresh if:** a run with no content change rewrites `docs/knowledge-index.md`.
 
 - **TD-062** severity: medium | status: open | created: Sprint-073
   - Summary: **`check-doc-caps.sh` takes the first digit run anywhere in a §2 `Cap` cell as the cap
@@ -3185,7 +3199,7 @@ status: current
     touches no harness, so it is not a vehicle either. Search recorded so the next reviewer does not
     repeat it.
 
-- **TD-053** severity: minor | status: open | created: Sprint-063
+- **TD-053** severity: minor | status: resolved → accepted (no task) | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
     the repo, and `find`-based checkers walk into it.** `check-ephemeral-intake.sh` excludes fixture
     trees with `grep -v '^evals/fixtures/'` — correctly position-anchored per L-108 — but the nested
@@ -3257,6 +3271,7 @@ status: current
   - **Re-reviewed 2026-08-18 (SPRINT-075 promote) — held, trigger unfired.** SPRINT-074 dispatched no
     worktrees (both tasks ran inline, coordinator-only), so no repo copy was placed inside the repo and
     the exclusion path was never exercised. Age is not the trigger; recorded rather than skipped.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** **merged into TD-100**: the worktree false-FAIL half is fixed (`47e2f2b9`; `check-ephemeral-intake.sh:41` drops `.claude/worktrees/`), and the surviving cost is the engine's `_repo_files` walk, which TD-100 tracks. **Re-file fresh if:** TD-100 closes and a checker other than the engine still walks `.claude/worktrees/`.
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -3330,7 +3345,7 @@ status: current
     EPIC-004's engine. SPRINT-073 edits `spec/STANDARD.md`, not skill prose, so it neither vehicles
     this row nor widens it.
 
-- **TD-051** severity: medium | status: open | created: Sprint-061
+- **TD-051** severity: medium | status: resolved → accepted (no task) | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close
     commit is also the archival commit.** The `lf_is_archived_path` predicate skips any archived sprint
     file, and its comment states the precondition that makes that safe: *"A closed sprint leaves
@@ -3410,7 +3425,8 @@ status: current
     `docs/sprint/archive/` in the same commit that closed the sprint, making this the fourth
     consecutive close to confirm the precondition in the checker's own comment is false. Recorded as a
     fresh observation rather than a restatement. Still unvehicled: SPRINT-073 changes no checker.
-- **TD-050** severity: minor | status: open | created: Sprint-060
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** no longer occurs: closes now archive in a separate, later commit, so the checker's precondition holds (close commits `dbcfc0d9` · `16b5a726` carry 0 `archive/` renames; the archives are `d3a5241c` · `31526938`). **Re-file fresh if:** a close commit again carries an `archive/` rename.
+- **TD-050** severity: minor | status: resolved → accepted (no task) | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
     frontmatter completeness, ADR-009) is 45–49% of the entire gate on its own** — 75–76 s of a
     154–169 s run, larger than all fifteen eval harnesses combined. Measured directly, two samples,
@@ -3481,6 +3497,7 @@ status: current
     thirds — so there is still no cure that does not cheapen a whole-corpus read ADR-009 wired
     deliberately. See **TD-063**, filed at SPRINT-074 close against the same subsystem for a different
     defect; price the two together.
+  - **Resolved (SPRINT-116 promote, owner-approved 2026-10-06):** **merged into TD-090**: the same gate-cost mechanism, which Round 22 (owner, 2026-10-06) ruled Windows-host-specific; TD-090 carries it from here. **Re-file fresh if:** TD-090 closes while this sub-cost is still measured on a host that pays it.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
