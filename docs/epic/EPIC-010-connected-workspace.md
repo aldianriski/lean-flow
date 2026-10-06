@@ -2,13 +2,15 @@
 epic: 010
 slug: connected-workspace
 owner: Maintainer
-last_updated: 2026-08-25
-status: proposed
+last_updated: 2026-10-07
+status: closed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-010 — Connected Workspace
+
+> **Merged 2026-10-07 into EPIC-016 (workdoo pilot) and EPIC-019 (its redesign)** — the dashboard half (create/run from the dashboard, approvals, run detail) is delivered there; the remainder is an open question in EPIC-016.
 
 > **Outcome:** work flows **both ways** — a Work Item created or assigned in the dashboard reaches the
 > local plugin, the plugin syncs its state back, and a Human Inbox collects every decision owed to a
@@ -81,12 +83,12 @@ _None promoted, and none promotable_ — see § Admission above.
 
 ## Closed when
 
-- [ ] A Work Item created **and** assigned in the dashboard reaches the local plugin, and its state
-      syncs back — proven by a real round trip, not a mock
-- [ ] **≥2 real users or workspaces** ran connected (`06 § 9`)
-- [ ] A **Human Inbox** collects every decision owed to a person, and a **Run Inspector** shows what a
-      run did, from evidence rather than prose
-- [ ] **Authority conflicts are explicitly handled** — retained must-FAIL fixture, sibling control
-- [ ] **Gateway loss does not block local mode** — retained must-FAIL fixture, sibling control
-- [ ] Run ids and Work Item ids are **stable** across the boundary
-- [ ] The **minimal identity/authority ADR** is written and linked
+- ~~A Work Item created **and** assigned in the dashboard reaches the local plugin, and its state
+      syncs back — proven by a real round trip, not a mock~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**≥2 real users or workspaces** ran connected (`06 § 9`)~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~A **Human Inbox** collects every decision owed to a person, and a **Run Inspector** shows what a
+      run did, from evidence rather than prose~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**Authority conflicts are explicitly handled** — retained must-FAIL fixture, sibling control~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**Gateway loss does not block local mode** — retained must-FAIL fixture, sibling control~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~Run ids and Work Item ids are **stable** across the boundary~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~The **minimal identity/authority ADR** is written and linked~~ **merged, not met** (EPIC-016, 2026-10-07)

@@ -2,7 +2,7 @@
 epic: 012
 slug: runtime-adapters-gateway
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-10-07
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -33,8 +33,8 @@ machine"* does. `00 § 6`'s ten admission questions are answered in the first sp
 start — in particular *what new failure mode does it introduce* and *how is it removed or migrated*.
 
 It spans sprints because the adapter contract has to survive a **second** adapter to be a contract at
-all: one implementation is a wrapper, and lean-flow already knows the difference — the same seam-not-a-
-wrapper test EPIC-014 applies to its repository ports.
+all: one implementation is a wrapper, and lean-flow already knows the difference — the seam-not-a-
+wrapper test, which stands on its own (EPIC-014 first applied it to repository ports; ADR-051 retired it).
 
 ## Scope
 
@@ -43,7 +43,7 @@ wrapper test EPIC-014 applies to its repository ports.
 owner · integration with the local plugin · the gateway MVP of `09 § 15` measured against `09 § 16`'s
 success criteria.
 
-**Out (explicitly not):** scheduling as a product surface (that is EPIC-013's managed execution) ·
+**Out (explicitly not):** scheduling as a product surface (that is EPIC-013's (merged into EPIC-016, 2026-10-07) managed execution) ·
 budgets and capability *policy*, which **EPIC-011 defines** and this epic merely enforces · replacing
 local execution · a queue service beyond the gateway MVP · Hermes/OpenClaw adoption as a dependency —
 `09 § 13` positions them, and a position is not a commitment.
@@ -58,7 +58,7 @@ _None promoted, and none promotable_ — see § Admission above.
 
 - **D1** — **The contract is proven by a second adapter, not by the first.** One adapter demonstrates
   nothing about the seam. The second is the test.
-- **D2** — **Gateway loss never blocks local mode.** Inherited from `06 § 9` and EPIC-010 D3; re-stated
+- **D2** — **Gateway loss never blocks local mode.** Inherited from `06 § 9` and EPIC-010 D3 (merged into EPIC-016, 2026-10-07); re-stated
   because this is the epic that could break it. Retained must-FAIL fixture.
 - **D3** — **This epic enforces policy, it does not author it.** Capability and budget definitions come
   from EPIC-011. Authoring them here creates the second SSOT LAW 4 forbids.

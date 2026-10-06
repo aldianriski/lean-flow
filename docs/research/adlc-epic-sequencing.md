@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-10-07
 update_trigger: A roadmap phase closes, an epic is opened or gated, or a measurement changes a lane assignment
 status: current
 id: adlc-epic-sequencing
@@ -94,10 +94,10 @@ condition is the trigger that converts it into one; until then it is a plan, not
 | Future epic | Phase / stage | Admitted when | Blocked by |
 |---|---|---|---|
 | EPIC-009 — **Local** Shadow Observability | M1 · **MVP0** · **pre-gate** | EPIC-006 produces records a reader consumes, and two real sprints of them exist. **Read-only local projection: no central DB, no sync, no assignment, no control authority.** Its first G2 owes an ADR on the **platform repository boundary** (§ below) | EPIC-006 |
-| EPIC-010 — Connected Workspace | M2 · **MVP1** | **Platform Decision Gate PASSED** + EPIC-008 stable + EPIC-009 shadow proof + a **minimal identity/authority contract** (first-sprint ADR, not its own epic — a dashboard cannot *assign to Aldi* or *approve G2* without knowing actor and authority) | gate · 008 · 009 |
+| EPIC-010 — Connected Workspace — **merged into EPIC-016 (2026-10-07)** | M2 · **MVP1** | **Platform Decision Gate PASSED** + EPIC-008 stable + EPIC-009 shadow proof + a **minimal identity/authority contract** (first-sprint ADR, not its own epic — a dashboard cannot *assign to Aldi* or *approve G2* without knowing actor and authority) | gate · 008 · 009 |
 | EPIC-011 — Context & Cost **Policy** | `07` | **Policy is defined; enforcement ships only for what current runtimes expose.** Controls with no runtime seam (max output · model routing · reasoning level · memory retrieval · tool search · context compression · subagent limits) become **stated requirements for EPIC-012's adapters**, never faked here | gate · 006 · 008 |
 | EPIC-012 — Runtime Adapters + Gateway | F · M4 | **Platform Decision Gate PASSED** + EPIC-008 stable + **one concrete second-runtime use case exists** (a named workflow a second worker must execute). *A protocol existing is not a gateway being needed* — graduated infrastructure, `00 § 5.4` | gate · 008 · a real need |
-| EPIC-013 — Managed ADLC | M5 · **MVP2** | all nine of `06 § 9`'s exit criteria are `[x]` | 010 · 011 · 012 |
+| EPIC-013 — Managed ADLC — **merged into EPIC-016 (2026-10-07)** | M5 · **MVP2** | all nine of `06 § 9`'s exit criteria are `[x]` | 010 · 011 · 012 |
 | — Beyond Software | H · **MVP3** | *demand-gated by design* — `03` says the candidate order comes from repeated use, not product imagination. **No id reserved** | real demand |
 | — Outcome Feedback | — | **≥2 real workflow families produce measurable post-delivery outcome data.** The domain model separates *delivery* (what was produced) from *outcome* (what changed because of it) and nothing owns the second: a proposal delivered is not a proposal approved, an automation deployed is not manual hours reduced. Registered now so ADLC does not quietly become an activity-management system. **No id reserved** | real outcome data |
 
@@ -127,6 +127,13 @@ dogfoods pass** (V3 §58): not after SPRINT-082, and not at EPIC-015's promote. 
 final § Closed-when condition, so that epic cannot close leaving the execution architecture unfrozen.
 Recorded **here** rather than only in EPIC-015 or a commit message, because this is the file consulted
 when an epic is proposed — a ruling its reader cannot reach governs nothing (L-151).
+
+**Amended 2026-10-07 — roadmap grooming (owner).** Recorded here because this is the file read when an epic is proposed (L-151).
+- **EPIC-014 retired** (ADR-051, 2026-10-06): the Shell engine is the only engine.
+- **EPIC-010 and EPIC-013 merged into EPIC-016** (owner, 2026-10-07); their unowned remainders are open questions there.
+- **EPIC-005 now admits on EPIC-015 closed** alone (EPIC-014's clause dropped).
+- **Live order, from the epics themselves:** EPIC-016 (P0, workdoo) → workdoo SPRINT-009 → EPIC-019 → EPIC-020 → EPIC-018 (EPIC-020 D6). EPIC-015 runs alongside; Lanes 1–2 (005 · 006→007→008 · 009) wait behind it.
+- **Freeze opened for EPIC-020's scope:** its D5 states the core execution architecture is "opened for exactly this scope"; recorded here per that decision.
 
 ## Out of scope / open questions
 

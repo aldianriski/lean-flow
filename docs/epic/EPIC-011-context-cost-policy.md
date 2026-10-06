@@ -2,7 +2,7 @@
 epic: 011
 slug: context-cost-policy
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-10-07
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -47,7 +47,7 @@ requirements list handed to EPIC-012's adapter contract.
 
 **Out (explicitly not):** building the adapters that would provide the missing seams (EPIC-012) ·
 organisation knowledge as a hosted store (L3 stays git-resident until MVP3 demands otherwise) · the
-dashboard's Memory and Context Inspectors, which are `07 § 18` surfaces and belong to EPIC-010's
+dashboard's Memory and Context Inspectors, which are `07 § 18` surfaces and belong to EPIC-010's (merged into EPIC-016, 2026-10-07)
 workspace · re-deciding the repair budget, which EPIC-015 leaves as a measurement.
 
 ## Member sprints
