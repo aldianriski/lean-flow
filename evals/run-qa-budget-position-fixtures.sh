@@ -18,8 +18,9 @@
 #       harness" line, i.e. never reaches leg 12 -- case 1 below.
 #   (b) with the checkpoints seeded away (the ORIGINAL bug, reproduced by removing every
 #       `qb_checkpoint` call line and leaving leg 12's own loop-internal check as the only one):
-#       within the SAME bounded window the fixed copy needed, prints NO budget verdict at all -- the
-#       exact silent-until-the-ceiling shape TD-084 was shipped to stop. Case 2 below.
+#       the FIRST budget finding is leg 12's own loop-internal one, never an "-early" checkpoint
+#       finding -- the exact lateness TD-084 was shipped to stop. Position, not wall-clock (TD-225).
+#       Case 2 below.
 #   (c) a sibling control (case 3): a GENEROUS budget on the shipped script reports neither finding
 #       and completes leg 1 normally, proving the checkpoints don't fire on an in-budget run.
 #
@@ -38,6 +39,8 @@ real_qc="$repo_root/scripts/qa-check.sh"
 # host's OWN load, legs 1-2f-bis), yet a tiny fraction of what legs 1-11 alone cost when there is no
 # checkpoint to stop them (measured live at several minutes of a 9m12s full run in this repo).
 WINDOW=60
+# Case 2 must REACH leg 12 (minutes on a slow host), so its hang bound is far above WINDOW (TD-225).
+LEG12_BOUND=900
 
 [ -f "$real_qc" ] || { echo "FAIL harness: scripts/qa-check.sh not found at $real_qc"; exit 2; }
 command -v timeout >/dev/null 2>&1 || { echo "FAIL harness: 'timeout' not found on PATH -- required to bound this suite"; exit 2; }
@@ -80,16 +83,21 @@ broken_qc="$tmpdir/qa-check-no-checkpoints.sh"
 sed '/^qb_checkpoint /d' "$real_qc" > "$broken_qc"
 if ! cmp -s "$broken_qc" "$real_qc"; then
   removed=$(( $(grep -c '^qb_checkpoint ' "$real_qc") ))
-  out2=$(cd "$repo_root" && timeout "$WINDOW" env -u QA_FULL QA_BUDGET_SECONDS=1 sh "$broken_qc" 2>&1)
-  if ! printf '%s\n' "$out2" | grep -q 'qa-check-budget-exceeded'; then
-    echo "PASS fixture(broken-copy-silent-within-${WINDOW}s): $removed checkpoint call(s) removed, no budget verdict printed -- TD-084's silent shape reproduced"
+  # TD-225: assert WHERE the first budget finding lands, not silence in a wall-clock window (a fast host
+  # reaches leg 12 in seconds). With the checkpoints gone the ONLY budget finding possible is leg 12's
+  # loop-internal one ("qa-check-budget-exceeded:" naming an eval harness); an "-early" finding means a
+  # checkpoint survived the seed. LEG12_BOUND only ends a hang -- it is generous, never the verdict.
+  out2=$(cd "$repo_root" && timeout "$LEG12_BOUND" env -u QA_FULL QA_BUDGET_SECONDS=1 sh "$broken_qc" 2>&1)
+  if printf '%s\n' "$out2" | grep -qE "^FAIL  qa-check-budget-exceeded: .*reached at eval harness '" \
+     && ! printf '%s\n' "$out2" | grep -q 'qa-check-budget-exceeded-early'; then
+    echo "PASS fixture(broken-copy-first-finding-at-leg-12): $removed checkpoint call(s) removed, first budget finding is leg 12's loop-internal check, no -early checkpoint finding -- TD-084's late shape reproduced"
   else
-    echo "FAIL fixture(broken-copy-silent-within-${WINDOW}s): expected NO budget finding within ${WINDOW}s -- got:"
-    printf '%s\n' "$out2" | grep 'qa-check-budget-exceeded'
+    echo "FAIL fixture(broken-copy-first-finding-at-leg-12): expected leg 12's loop-internal finding and NO -early finding -- got:"
+    printf '%s\n' "$out2" | grep -o 'qa-check-budget-exceeded[-a-z]*:[^.]*' | head -3
     fail=1
   fi
 else
-  echo "FAIL fixture(broken-copy-silent-within-${WINDOW}s): seed did not change the file (cmp saw no diff) -- nothing was actually tested"
+  echo "FAIL fixture(broken-copy-first-finding-at-leg-12): seed did not change the file (cmp saw no diff) -- nothing was actually tested"
   fail=1
 fi
 
@@ -105,5 +113,5 @@ else
   fail=1
 fi
 
-[ "$fail" -eq 0 ] && echo "PASS harness: qa-budget-position discriminates (case 1 fires early on the fix; case 2 stays silent -- reproducing the original bug -- when the checkpoints are seeded away; case 3 stays quiet in-budget)"
+[ "$fail" -eq 0 ] && echo "PASS harness: qa-budget-position discriminates (case 1 fires early on the fix; case 2 first lands at leg 12's own check, never an -early checkpoint, when the checkpoints are seeded away; case 3 stays quiet in-budget)"
 exit $fail
