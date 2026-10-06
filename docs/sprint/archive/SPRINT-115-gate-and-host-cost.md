@@ -6,6 +6,7 @@ last_updated: 2026-10-06
 status: closed
 plan_commit: cede84c
 gates_signed: G1,G2 @ 9bbc8be
+close_commit: dbcfc0d
 update_trigger: sprint execute/close events
 ---
 

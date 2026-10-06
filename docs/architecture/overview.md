@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-28
+last_updated: 2026-10-06
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -49,7 +49,7 @@ docs/             architecture/ · development/ · deployment/ · adr/ · DECISI
                     generated index, marked (§11)
 conformance.sh    the CONSUMER entry point — `sh conformance.sh <repo-dir>` reports any repo's
                   conformance level + named findings (ADR-027; delegates to scripts/lib/)
-scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted
+scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · promote-check.ts (pre-`plan locked`) · lib/ (extracted
                   checkers + conformance-engine.sh + read-spec-rules.sh)          (ADR-008 · ADR-027)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)
