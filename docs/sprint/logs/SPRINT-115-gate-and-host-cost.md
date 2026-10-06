@@ -37,3 +37,22 @@ NO-PLAN-COMMIT before the commit existed, which is expected.
 
 ### 2026-10-06 | progress | plan_commit recorded: cede84c
 The `plan locked` commit is `cede84c`; this entry and the frontmatter field land in the next commit.
+
+### 2026-10-06 | progress | batch G1 + G2 signed by the owner at `9bbc8be`; A1 and A2 ruled; tiers declared; wave plan set
+**G1** ran the full checklist on all five members (none is `origin: decomposer`, so no fast-path). Goals, sizes and out-of-scope are as in
+§ Plan; no L. **G2 rulings (owner, popup):** A1: T2's Round is measured on the VPS (Ubuntu 24.04, 2 vCPU, 7 GB), naming the host and stating
+that a Linux total cannot speak for the Windows host. A2: T5's home is a new `scripts/promote-check.ts <sprint>`, named in `.claude/CONTEXT.md`,
+never in the shipped skill. Tiers: T1 is *other* G (ADR-050: maintainer-only; `qa-check.sh` is the sole consumer of both harnesses). T4 is
+**frozen** G (`guard-audit-legs.md` G20: R4 → freeze; sole consumer `qa-check.sh`). Neither is consequential, so the Codex gauntlet does not
+apply (SPRINT-113 re-ruling) and review is the ADR-050 bar plus coordinator self-review. **G2 reachability finding:** `check-prose-density.ts`
+never examines `docs/sprint/`. Over the repo root it covers `.claude`, `docs/epic`, `docs/research`, `skills/` and `spec/`, and against one
+sprint file it prints `SKIP … nothing examined`, so TASK-368's 400-char half was unreachable as planned. The fix is the scope change below.
+**Waves:** wave 1 runs in parallel, worktree-isolated: T1 · T4 · T5 (disjoint `Layers:`, every `Depends-on: none` or satisfied). Then T2
+(3 VPS runs, after T1 merges), then T3 (after T2). D1 holds for `TECH-DEBT.md` (T1 before T3).
+
+### 2026-10-06 | scope-change | T5 (TASK-368): Layers widened to reach the sprint file
+**What broke:** at G2, the Plan's `Layers:` ("lean-flow's own promote procedure") named no file, and the prose-density half of TASK-368's
+Done-when cannot reach a sprint file through the existing checker. **Change:** T5's Layers become `scripts/promote-check.ts` (new, TypeScript —
+no new `.sh`) · `scripts/lib/check-prose-density.ts` (a single-file mode) · `evals/` fixtures for both seeded findings · `.claude/CONTEXT.md`
+(the promote note naming the entry point). **Impact:** files only; TASK-368's `## Done when` text is unchanged. **G2 re-confirmed** by the
+owner's A2 ruling above.
