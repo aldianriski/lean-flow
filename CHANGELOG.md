@@ -13,6 +13,17 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## SPRINT-117 — Reports Lead (2026-10-06)
+
+**Unreleased**: no version bump yet. Three `skills/*/SKILL.md` files changed, so this reaches adopters at the next release.
+
+- **Skill reports lead with the conclusion.** `/prime`'s banner line carries its verdict and the next step, and the report ends on `Next:`.
+  `/orchestrator`'s gate verdicts, task completions and confirmation popups open with one line carrying the verdict and the next step,
+  then the evidence, then exactly one `Next:` line (the sprint-bulk rollup keeps its machine-read shape). `/lean-doc-generator`'s close
+  report and popups follow the same shape. It is a shape rule, not a length cap (TASK-321).
+
+---
+
 ## SPRINT-116 — Decision + Ledger Diet (2026-10-06)
 
 **Unreleased**: no version bump yet. `skills/orchestrator/references/` and `README.md` changed, so this reaches adopters at the next release.

@@ -3,7 +3,7 @@ sprint: 117
 slug: reports-lead
 owner: Maintainer
 last_updated: 2026-10-06
-status: active
+status: closed
 plan_commit: 12361ed
 gates_signed: G1,G2 @ 8ab8d54
 update_trigger: sprint execute/close events
@@ -59,6 +59,29 @@ ends with exactly one next-step line, and no SKILL.md exceeds its cap.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/prime/SKILL.md` | T1 | the banner carries the verdict + next step; the report ends on `Next:` | Low | two cold runs; Codex R1–R4 |
+| `skills/orchestrator/SKILL.md` | T1 | a Report shape rule; the sprint-bulk rollup keeps its machine-read shape | Low | cold runs; Codex R4 CLEAR |
+| `skills/lean-doc-generator/SKILL.md` | T1 | step 8: one opening line with the verdict + next step; popups the same | Low | cold runs |
+| `.claude/CONTEXT.md` | promote | L-229 merged into the `Layers:` bullet, rewritten under 400 chars | Low | prose-density 30/0 |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check** — no miss. L-229 was promoted at this promote (its first promotion). L-007 (exercised on real input) is the rule
+the cold run applied, and it held: two Codex rounds passed a text that the first cold run showed missing the done-when.
+
+**Cost** — coordinator inline (gates, build, close) plus 6 dispatched agents, ≈ 240k subagent tokens as each reported it: four Codex
+rounds 18–20k each (≈ 75k) and two Sonnet cold runs (82k · 84k). Delivered: 1 of 1 member, so ≈ 240k per member. One VPS gate run.
+
+**Worked**
+- The cold run was the check that counted. Review read the rule, and only running it as a stranger showed the next step missing from
+  two opening lines, which is exactly what the done-when tests.
+- Declining a review finding with the frozen done-when as the reason (R1 finding 2) held up: R2 agreed.
+
+**Friction**
+- The L-229 merge at promote broke prose-density (a 490-char line) on a file sitting at its line cap, so it could not be split; caught by
+  this sprint's own run and rewritten shorter.
+- Codex proposed changing a parsed contract (the rollup header) twice in different forms; the G1 out-of-scope line was what settled it.
+- A scripted multi-replace failed silently on one of four edits; caught by re-reading the file, not by the script's report.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- none new: the cold-run catch is L-007's rule working; the silent script miss is the edit-safety rule (c), report vs artifact.

@@ -67,3 +67,7 @@ consequence · T1 · behaviour:low · governance:high
   G1 scope. Reconciled instead: the rollup keeps its machine-read shape, and the rule governs the prose around it.
 - R4: CLEAR, no residual rule/exception contradiction; keeping the header is sound.
 review · T1 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-10-07 | progress | system verify GREEN: `QA_FULL=1` on the VPS at `dfb9b76`, `QA-CHECK: 315 pass, 0 fail` (rc 0)
+The Monitor poller never emitted (it expired silent after 12 min); the verdict was read afterwards from the VPS's own `gate.rc` / `gate.log`.
+315 vs SPRINT-116's 320: the sprint-schema leg emits one PASS per Plan task (4 → 1), which accounts for 3 of the 5; the other 2 were not traced.

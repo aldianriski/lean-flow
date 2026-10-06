@@ -327,6 +327,12 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-230** severity: low | status: open | created: Sprint-117 (close, T1 cold run)
+  - Summary: **`/prime`'s `Next:` names `sprint-bulk unattended` for any active sprint, even when every open task is HITL or J2.** The
+    rule (`skills/prime/SKILL.md` step 6) offers the night run whenever open tasks sit in an active sprint; an unattended run parks every
+    J2 task, so for a sprint like SPRINT-117 (one J2 member) the suggestion would end at `AUTHORITY_BOUNDARY` having done nothing.
+  - Mitigation (hypothesis): name the unattended option only when at least one open member is AFK and J0/J1.
+
 - **TD-229** severity: low | status: open | created: Sprint-116 (close)
   - Summary: **A tick on a multi-line `## Done when` box must put its ` ✓ <evidence>` on the box's FIRST line, and nothing says so.**
     `check-sprint-by-reference.ts` (`sameDoneWhen`) accepts a tick tail only on a box line, so evidence appended where the frozen text
