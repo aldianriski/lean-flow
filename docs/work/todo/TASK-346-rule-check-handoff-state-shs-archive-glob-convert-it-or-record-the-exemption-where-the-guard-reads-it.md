@@ -10,6 +10,7 @@ tier: G
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-116
 ---
 
 # TASK-346 — Rule `check-handoff-state.sh`'s archive glob: convert it, or record the exemption where the guard reads it

@@ -11,6 +11,7 @@ authority: J1
 origin: close-retro
 state: ready
 depends-on: []
+sprint: SPRINT-116
 ---
 
 # TASK-400 — Sweep stale references to the cut guards
