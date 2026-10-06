@@ -2,7 +2,7 @@
 epic: 016
 slug: agentic-governance-dashboard-pilot
 owner: Maintainer
-last_updated: 2026-10-03
+last_updated: 2026-10-07
 status: active
 member_sprints: [workdoo SPRINT-001 (closed), workdoo SPRINT-002 (closed), workdoo SPRINT-003 (closed), workdoo SPRINT-004 (closed), workdoo SPRINT-005 (closed), workdoo SPRINT-006 (closed), workdoo SPRINT-007 (closed), workdoo SPRINT-008 (closed), workdoo SPRINT-009 (active)]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -48,7 +48,7 @@ budget limits · a two-repository pilot exercising success, revision, escalation
 *after* the pilot, and the adapter contract exists to keep that space open, not to fill it ·
 multi-tenant organisations · platform memory · cross-domain workflows · automatic production
 deployment · a scheduler or queue *service* as a separable product · the reference-engine cutover
-(**EPIC-014**, explicitly off the pilot's critical path) · formal closure of any existing epic, which
+(**EPIC-014**, retired by ADR-051; it was explicitly off the pilot's critical path) · formal closure of any existing epic, which
 keeps its own § Closed-when.
 
 ## Member sprints
@@ -110,6 +110,13 @@ keeps its own § Closed-when.
 - **Is Postgres provisioned on the shared VPS?** The reference platform runs SQLite WAL, so this is
   new host state, not an inherited one. → a measurement, resolved in the first member sprint's
   environment validation, not by ruling (L-094).
+- **Which connected-workspace items has no workdoo epic yet claimed?** Absorbed from EPIC-010 (merged
+  here 2026-10-07): plugin↔dashboard two-way state sync · two or more workspaces · an explicit
+  authority-conflict rule between Git content and store operational state, with a retained fixture.
+  → ruled by the owner when EPIC-016 plans its next phase.
+- **What of managed execution is a later phase here?** Absorbed from EPIC-013 (merged here 2026-10-07):
+  scheduling/queue · budgets and retry · multi-tenancy · who operates the control plane. EPIC-013's
+  `06 § 9` exit-criteria table is the reference. → ruled by the owner when EPIC-016 plans its next phase.
 
 ## Closed when
 <!-- Sourced from roadmap §9. Each is observable on the pilot deployment, not on a fixture. -->

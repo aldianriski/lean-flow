@@ -2,7 +2,7 @@
 epic: 008
 slug: run-protocol
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-10-07
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -83,7 +83,7 @@ carries its guardrail; a protocol that quietly enables it would defeat that guar
   already has a Worker, a gate signer, an evidence producer, an owner and an authority — but no unified
   way for an event to say **who or what produced this**. `ActorRef` is that, at the smallest useful size
   (`{type: human|worker|service|automation|external, id}`), and nothing more: a full identity model is
-  EPIC-010's, where a dashboard actually needs to assign and approve. `ArtifactRef` exists because ADLC
+  EPIC-010's (merged into EPIC-016, 2026-10-07), where a dashboard actually needs to assign and approve. `ArtifactRef` exists because ADLC
   output is not always code — `git://` · `drive://` · `figma://` · `s3://` · `crm://` · `custom://` —
   and the domain model already distinguishes Artifact from Evidence, so the protocol needs the reference
   primitive or it will grow a software-shaped one by default.
@@ -95,8 +95,8 @@ carries its guardrail; a protocol that quietly enables it would defeat that guar
 - **D4** — Depends on EPIC-006 (event shapes), **EPIC-007 (the workflow contract)**, EPIC-005 (a
   `ConformanceResult` that has crossed more than one repo), and Phase C's `harness-delta.md` research,
   whose four candidates — reconstructible dispatch, independent replay, reversible effects, mechanical
-  batching — are this epic's input, not its scope. Phase C is **unstarted and unblocked**, so it is the
-  long pole nobody has started. **The EPIC-007 dependency is not optional bookkeeping:** § Closed-when
+  batching — are this epic's input, not its scope. Phase C's research now exists (`docs/research/harness-delta.md`, 2026-08-25), and the EPIC-005
+  dependency now waits on EPIC-015 (admission ruling 2026-10-07). **The EPIC-007 dependency is not optional bookkeeping:** § Closed-when
   says *"same workflow contract"*, so without it this epic would mint a second representation of a
   workflow beside EPIC-007's and the two would diverge on first contact. The protocol carries a
   `workflow_ref` into EPIC-007's contract; it does not restate its schema.

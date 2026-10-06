@@ -2,13 +2,15 @@
 epic: 013
 slug: managed-adlc
 owner: Maintainer
-last_updated: 2026-08-25
-status: proposed
+last_updated: 2026-10-07
+status: closed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-013 — Managed ADLC
+
+> **Merged 2026-10-07 into EPIC-016** — an org-operated control plane (scheduling, budgets, capability policy, multi-tenancy) is a later phase of workdoo's pilot, not a separate lean-flow epic.
 
 > **Outcome:** execution is **managed** — Runs are dispatched to registered workers on a schedule,
 > inside declared budgets and capability policy, from a control plane an organisation operates — while
@@ -71,7 +73,7 @@ _None promoted, and none promotable_ — see § Admission above.
   pressure: every managed capability must leave the unmanaged path working. A managed mode that quietly
   becomes required has broken the promise the whole roadmap rests on.
 - **D2** — **The nine criteria are checked at *this* epic's admission, individually and by name.** Never
-  "most", never in aggregate — the same discipline EPIC-014 applies to rule families at cutover.
+  "most", never in aggregate — the same discipline EPIC-014 applied to rule families (EPIC-014 was retired by ADR-051).
 - **D3** — **Dispatch respects policy it did not author.** Budgets and capability come from EPIC-011,
   workers from EPIC-012, work items from EPIC-010. This epic composes; it does not re-define. Three
   competing definitions of "budget" is the failure this decision exists to prevent (LAW 4).
@@ -94,12 +96,12 @@ _None promoted, and none promotable_ — see § Admission above.
 
 ## Closed when
 
-- [ ] **All nine `06 § 9` criteria are `[x]`**, each named individually with what proved it (D2)
-- [ ] A Run is **dispatched to a registered worker** and completes, with its evidence readable in the
-      workspace
-- [ ] **Scheduling** runs work without a human present, and a scheduled run obeys the fresh-run
-      principle
-- [ ] **Budgets and capability policy are enforced at dispatch** — retained must-FAIL fixtures for an
-      over-budget run and an over-granted capability, each with a sibling control
-- [ ] **HITL parking works end-to-end** across the dispatch boundary, proven by a *seeded* J2 (D5)
-- [ ] **Local mode is provably unaffected** — the full local loop runs with the control plane absent
+- ~~**All nine `06 § 9` criteria are `[x]`**, each named individually with what proved it (D2)~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~A Run is **dispatched to a registered worker** and completes, with its evidence readable in the
+      workspace~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**Scheduling** runs work without a human present, and a scheduled run obeys the fresh-run
+      principle~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**Budgets and capability policy are enforced at dispatch** — retained must-FAIL fixtures for an
+      over-budget run and an over-granted capability, each with a sibling control~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**HITL parking works end-to-end** across the dispatch boundary, proven by a *seeded* J2 (D5)~~ **merged, not met** (EPIC-016, 2026-10-07)
+- ~~**Local mode is provably unaffected** — the full local loop runs with the control plane absent~~ **merged, not met** (EPIC-016, 2026-10-07)

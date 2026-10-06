@@ -2,7 +2,7 @@
 epic: 009
 slug: local-shadow-observability
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-10-07
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -43,7 +43,7 @@ owes.
 
 **Out (explicitly not):** any write path — create, assign, approve or dispatch · a central database or
 any state living outside git · sync of any direction · identity or authority modelling (that is
-EPIC-010's minimal contract) · a hosted service · control over a run · the gateway (EPIC-012). **If it
+EPIC-010's (merged into EPIC-016, 2026-10-07) minimal contract) · a hosted service · control over a run · the gateway (EPIC-012). **If it
 writes, it is not this epic.**
 
 ## Member sprints
@@ -64,7 +64,7 @@ _None promoted, and none promotable_ — see § Admission above.
   growing `dashboard/ gateway/ database/ worker-runtime/` is the fastest route to dev-flow 2.0; the
   candidate split is **lean-flow** (Standard · plugin · conformance · protocol) vs **lean-platform**
   (gateway · control plane · dashboard · adapters · persistence). It is hard-to-reverse, surprising and
-  a real trade-off — STANDARD §4's three conditions — so it is ADR-grade by construction.
+  a real trade-off — STANDARD §4's three conditions — so it is ADR-grade by construction. **Answered by ADR-041** (2026-09-09): workdoo is its own repository.
 - **D4** — **The shadow proof is an input to the Platform Decision Gate, not a bypass of it.** This
   epic produces the evidence the gate reads; it never asserts the gate passed.
 
@@ -75,7 +75,7 @@ _None promoted, and none promotable_ — see § Admission above.
   projection reads, not a sprint count. Do not gate on a measurable signal that never arrives.
 - **Does the conformance summary re-run the engine or read its last result?** → ruled at the first G2;
   re-running makes the projection slow and authoritative, reading makes it stale — a real trade-off,
-  and it touches EPIC-014's authority boundary, so it coordinates there rather than forking.
+  and its EPIC-014 coordination is **moot** — the Shell engine is the only engine (ADR-051).
 - **Platform repository boundary** → **ADR at first G2** (D3). Owed before EPIC-010 either way.
 
 ## Closed when
@@ -86,4 +86,4 @@ _None promoted, and none promotable_ — see § Admission above.
 - [ ] It has **no write path** — proven by a retained must-FAIL fixture in which an attempted write
       fails with its named finding, while a read sibling still passes
 - [ ] It survived **two real sprints** of records without a schema rewrite
-- [ ] The **platform repository boundary ADR** is written and linked from `docs/architecture/`
+- [ ] The **platform repository boundary ADR** is written and linked from `docs/architecture/` — ruled by ADR-041; the docs/architecture link is still owed

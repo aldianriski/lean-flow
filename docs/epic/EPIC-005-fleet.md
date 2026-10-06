@@ -2,7 +2,7 @@
 epic: 005
 slug: fleet
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-10-07
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -27,6 +27,8 @@ conformance answer). Building fleet mechanics before either exists would mean in
 inside the harder problem. *(Reworded 2026-08-24 — "it runs last" was written when Fleet was the final
 epic on the board; EPIC-006 · 007 · 008 and the platform register now follow it. Foundation-last, not
 roadmap-last.)*
+
+> **Admission (owner ruling 2026-10-07):** EPIC-015 must be closed — every § Closed-when `[x]`, including its re-armed freeze. EPIC-014's clause is dropped: ADR-051 retired it and the Shell engine is never deleted.
 
 ## Scope
 

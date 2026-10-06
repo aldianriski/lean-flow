@@ -2,7 +2,7 @@
 epic: 015
 slug: execution-autonomy
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-10-07
 status: active
 member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -56,7 +56,7 @@ reachability). This epic *exercises* them in dogfood and re-implements none of t
 agent definition, hook or reviewer role · a critic swarm · turning the bounded revise into an unbounded
 loop · push/deploy/external destructive authorization · a scheduler or queue service · run-state resume
 (ADR-013 (b) was deferred, and EPIC-006 carries its guardrail) · the reference-engine migration
-(**EPIC-014**).
+(**EPIC-014**, retired by ADR-051).
 
 ## Member sprints
 <!-- Contribution rows live in docs/epic/logs/EPIC-015-execution-autonomy.md per ADR-030, created
@@ -75,7 +75,7 @@ _First member sprint promoted 2026-08-26._ The freeze amendment that blocked it
 **closed 2026-08-25** (§ Open questions), so this epic is admissible. Its other condition — sequenced
 after **SPRINT-083** so the two epics do not contend for `skills/orchestrator/**` and `scripts/` in the
 same window — is also met: SPRINT-083 closed 2026-08-24. The gate was set at that sprint, **not** at
-EPIC-014's close, so running as a **second stream alongside EPIC-014 is admitted**. The one genuinely
+EPIC-014's close, so running as a **second stream alongside EPIC-014 is admitted** (EPIC-014 was later retired by ADR-051; no cutover occurs). The one genuinely
 shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattended; EPIC-014 touches
 § Sprint model at cutover) — it takes a single owner and a commit order at G2, never a parallel build.
 
@@ -99,9 +99,10 @@ shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattend
 - **D5** — **The seeded J2 control is required, not a fallback.** V3 §56 Dogfood 2 asks for one J2 park
   *or* a seeded control; a natural park cannot be scheduled, and TASK-188 is the standing evidence that
   waiting for one to occur foreclosed the criterion once already (L-111). Seed it.
-- **D6** — **Coordinates with EPIC-014 at the QA-profile boundary.** V3 §23 routes final integration to
-  a `STANDARD` System Verify — a profile EPIC-014 H17 defines. Until it exists, this epic's System
-  Verify step names today's `sh scripts/qa-check.sh` and is re-pointed at cutover, never forked.
+- **D6** — **Final integration runs the Shell gate's own `QA_FULL=1` profile.** V3 §23 routes final integration to
+  a `STANDARD` System Verify. The reference-engine profile once planned for it (EPIC-014 H17) will never
+  exist — ADR-051 retired EPIC-014 and superseded ADR-039 — so this epic's System Verify step names that
+  profile, the only one, and never forks it.
 
 ## Open questions
 
