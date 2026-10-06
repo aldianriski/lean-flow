@@ -49,7 +49,8 @@ budget limits · a two-repository pilot exercising success, revision, escalation
 multi-tenant organisations · platform memory · cross-domain workflows · automatic production
 deployment · a scheduler or queue *service* as a separable product · the reference-engine cutover
 (**EPIC-014**, retired by ADR-051; it was explicitly off the pilot's critical path) · formal closure of any existing epic, which
-keeps its own § Closed-when.
+keeps its own § Closed-when, except EPIC-010 and EPIC-013, merged here by owner ruling 2026-10-07. Multi-tenancy and the
+scheduler stay out of the *pilot*; they are that merged later phase (§ Open questions).
 
 ## Member sprints
 <!-- Rows are appended at promote. NOTE: member sprints live in the `workdoo` repository (ADR-041),

@@ -76,7 +76,7 @@ _None promoted, and none promotable_ — see § Admission above.
 - **Does the conformance summary re-run the engine or read its last result?** → ruled at the first G2;
   re-running makes the projection slow and authoritative, reading makes it stale — a real trade-off,
   and its EPIC-014 coordination is **moot** — the Shell engine is the only engine (ADR-051).
-- **Platform repository boundary** → **ADR at first G2** (D3). Owed before EPIC-010 either way.
+- **Platform repository boundary** → **ADR at first G2** (D3). Ruled by ADR-041; EPIC-010 has since merged into EPIC-016 (2026-10-07).
 
 ## Closed when
 
