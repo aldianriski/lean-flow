@@ -27,4 +27,4 @@ README.md` for why a real non-repo/repo fixture can't live committed inside lean
 - T1 (`notes.md`, FIX-101) **parked-hitl**: DoD stays `[ ]`, `notes.md` never created, a park record
   matching Part 4's `Tn · state · next-action` shape names T1, no commit claims FIX-101/T1 complete.
 
-`evals/assert-boundary-park.sh <repo-dir>` checks exactly this against a completed run's directory.
+Was checked by `evals/assert-boundary-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050).

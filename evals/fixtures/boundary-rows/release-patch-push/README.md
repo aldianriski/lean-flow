@@ -47,8 +47,4 @@ cd "$dest" && MSYS_NO_PATHCONV=1 claude -p "/orchestrator sprint-bulk unattended
   than the other four T1 fixtures because this one runs the full `sprint-bulk` → `close` →
   `release-patch` chain in one session, not a single skill invocation.
 
-`evals/assert-boundary-park.sh <repo-dir>` covers this fixture too (kind auto-detected from the
-`SPRINT-908-release-patch-push-fixture.md` filename, same convention as `residual-grill`/
-`close-park`): the shared park-record-shape / no-completion-claim checks, `close-park`-style
-no-archive-move / no-index-row checks, plus this fixture's own **no-push** check — it reads the
-repo's configured `origin` remote and asserts zero refs there.
+Was covered by `evals/assert-boundary-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050) (kind auto-detected from the `SPRINT-908-release-patch-push-fixture.md` filename, same convention as `residual-grill`/`close-park`). It verified the shared park-record-shape / no-completion-claim checks, `close-park`-style no-archive-move / no-index-row checks, plus this fixture's own **no-push** check — it read the repo's configured `origin` remote and asserted zero refs there.

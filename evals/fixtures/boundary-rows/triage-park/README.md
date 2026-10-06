@@ -44,6 +44,4 @@ this per invocation.
 - Cost (successful run only, excluding the wasted mangled-path attempt): **$0.5633, ~139s API time,
   13 turns** (pinned `sonnet`, `--output-format json`).
 
-`evals/assert-noaction-park.sh <repo-dir>` checks the in-repo half of this against a completed run's
-directory (auto-detected via the `.fixture-kind` marker file shipped in this directory): the Backlog
-stays in its original tiers and exactly one commit exists.
+Was checked by `evals/assert-noaction-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050). It verified the in-repo half of this against a completed run's directory (auto-detected via the `.fixture-kind` marker file shipped in this directory): the Backlog stays in its original tiers and exactly one commit exists.

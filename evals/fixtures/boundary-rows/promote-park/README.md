@@ -44,9 +44,7 @@ entirely — confirmed as the fix during this task's `/triage` repro (see `../tr
 - The park record itself landed in a `/handoff` doc at
   `%TEMP%\handoff-promote-park-fixture.md` (Part 0 step 2: "No sprint file to write into ... the
   record goes in the `/handoff` doc instead") — outside the repo, at a machine/run-specific path, so
-  it is reported here rather than asserted by script; `evals/assert-noaction-park.sh` only checks the
-  in-repo, deterministic half of the contract (no sprint rendered, no unauthorized commit).
+  it is reported here rather than asserted by script. Was checked by `evals/assert-noaction-park.sh` until it was cut at SPRINT-113 T1 (ADR-050), which verified only the in-repo, deterministic half of the contract (no sprint rendered, no unauthorized commit).
 - Cost: **$0.5605, ~132s API time, 11 turns** (pinned `sonnet`, `--output-format json`).
 
-`evals/assert-noaction-park.sh <repo-dir>` checks the in-repo half of this against a completed run's
-directory (auto-detected via the `.fixture-kind` marker file shipped in this directory).
+Was checked by `evals/assert-noaction-park.sh <repo-dir>` until it was cut at SPRINT-113 T1 (ADR-050). It verified the in-repo half of this against a completed run's directory (auto-detected via the `.fixture-kind` marker file shipped in this directory).

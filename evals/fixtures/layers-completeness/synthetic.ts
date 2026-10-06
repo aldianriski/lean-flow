@@ -6,9 +6,9 @@
 // check-layers-observed.sh).
 //
 // SHARED between evals/layers-completeness.test.ts (the always-on TS-evaluator suite) and
-// evals/layers-completeness-differential.ts (the Shell-oracle differential proof) so the two never
-// carry two independently-drifting copies of the same fixture text -- exactly the class of duplication
-// TD-142 itself was filed about, one level up.
+// the removed evals/layers-completeness-differential.ts (cut at SPRINT-113 T1, ADR-050) so the two
+// never carried two independently-drifting copies of the same fixture text -- exactly the class of
+// duplication TD-142 itself was filed about, one level up.
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { posix } from "node:path";
