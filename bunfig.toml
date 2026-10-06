@@ -1,4 +1,4 @@
-# Bun configuration for the lean-flow reference engine (EPIC-014).
+# Bun configuration for the lean-flow TypeScript tooling (scripts/ and evals/ run on Bun; ADR-035/ADR-051).
 #
 # Deliberately minimal: no plugins, no preload, no framework. V3 §2 asks for the smallest
 # foundation that runs `bun test` and one command -- anything more is a dependency this

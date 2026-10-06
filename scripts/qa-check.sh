@@ -14,7 +14,7 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 # QA_SELF -- this script's own ABSOLUTE path, resolved BEFORE the `cd` below (SPRINT-099 T2, found by
 # adversarial review). qb_all_legs derives the ordered leg list by reading this file; it used `$0`,
 # which is resolved AFTER `cd "$ROOT"` and so breaks for a relative invocation from a subdirectory
-# (`cd apps/cli && sh ../../scripts/qa-check.sh`). The leg list then came back EMPTY and a real
+# (`cd scripts && sh ./qa-check.sh`). The leg list then came back EMPTY and a real
 # truncation reported that it could not name what it skipped. Resolved here, before the cd, and NOT
 # hardcoded as "$ROOT/scripts/qa-check.sh" -- a hardcoded name would go silently wrong if this file
 # were ever renamed, which is the same class of defect one rung down.
@@ -1073,26 +1073,14 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # It is the only harness here whose target is built from nothing -- no lean-flow file is copied in --
 # and it asserts that property mechanically, because a future edit that copies a template in would
 # make the run measure our own shape wearing a stranger's name without failing anything (L-015 · L-016).
-# run-s4-ts-evaluators.sh (SPRINT-092 T2) REPLACES run-adr-family-fixtures.sh in this set, and the
-# swap is the point rather than a tidy-up. That harness (SPRINT-076 T2) BUILT GIT REPOSITORIES and
-# spawned the Shell engine twelve times for 23.4-28.2s (T4 Round 13) -- the property that put the 34s
-# run-attestation-fixtures.sh in the opt-in set below -- and was carried always-on anyway, by owner
-# ruling, because §4 was the engine's first coverage this repo could check against ITSELF: 27 real
-# ADRs, two of them (ADR-008 · ADR-027) carrying legitimate post-decision markers a wrong S4.APPEND
-# would redden. That reasoning still holds; what changed is the price of honouring it.
-# §4 now has TS evaluators (SPRINT-091 T12), so the self-check no longer needs a subprocess.
-# run-s4-ts-evaluators.sh runs the ORACLE-FREE half -- rule semantics against the in-memory fakes,
-# plus the nine RETAINED fixture directories read straight through the evaluators -- at 0.37-0.98s
-# against 23.4-28.2s. Only the DIFFERENTIAL against Shell still needs a live oracle, and that moves to
-# the opt-in set below (T3, EPIC-014 D2).
-# The trap this swap walks past, recorded because it nearly shipped: dropping the old harness ALONE
-# would not have RELOCATED §4 coverage, it would have DELETED it from every default run. This script
-# reduces its own spec on a bare run to S9+S13 (0 of §4's 7 rows survive) and never invokes
-# `bun test` -- so "the TS evaluators still run on every run" was true of `bun test` and false of the
-# gate, and the always-on set was §4's ONLY default-profile coverage. Verified three independent ways
-# before the swap rather than inherited from the ruling that authorised it (L-130 · L-136, at
-# owner-ruling grain). test/adr-family-harness-parity.test.ts diffs the two case lists as lists so the
-# equivalence keeps being checked, not merely have been checked once.
+# run-adr-family-fixtures.sh (SPRINT-076 T2) is always-on by owner ruling (ADR-051). It BUILDS GIT
+# REPOSITORIES and spawns the Shell engine twelve times for ~23-28s -- the property that put the 34s
+# run-attestation-fixtures.sh in the opt-in set below -- and is carried always-on anyway because §4 is
+# checked here against this repo's own 27 real ADRs, two of them (ADR-008 · ADR-027) carrying
+# legitimate post-decision markers a wrong S4.APPEND would redden. This script reduces its own spec on
+# a bare run to S9+S13 (0 of §4's 7 rows survive), so this harness is §4's ONLY default-profile
+# coverage. SPRINT-092 had swapped it for TypeScript evaluators to save the 23-28s; ADR-051 retired
+# that port and moved the Shell harness back.
 # run-s2-placement-fixtures.sh (SPRINT-076 T3) joins the always-on set by the ORIGINAL cost rule, not
 # by T2's exception: no git, mktemp -d fixture repos built with printf, one awk-derived spec copy. It
 # guards §2's placement pair, whose required set is derived from the spec's own `Create ←` cells --
@@ -1134,8 +1122,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # (an inited-but-empty repo already answers `rev-parse --git-dir`, which is the whole probe).
 # run-dod-delta-fixtures.sh (SPRINT-101 T3, TASK-326) joins the always-on set by the cheap-and-
 # git-free rule: it is a `bun test` wrapper over in-memory fixtures (see evals/dod-delta.test.ts), no
-# git, no mktemp, no repos built -- measured well under 1s on this host, the same shape
-# run-s4-ts-evaluators.sh already takes for a TS-evaluator leg.
+# git, no mktemp, no repos built -- measured well under 1s on this host.
 # run-gen-index-locale-fixtures.ts (SPRINT-108 T2, TASK-389) joins the always-on set by the SAME
 # deliberate exception run-git-availability-fixtures.sh takes above, not the plain cheap-and-git-free
 # rule: it guards gen-index.sh's ADR/research enumeration order against locale-dependent bash glob
@@ -1154,7 +1141,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # ── ORDERED CHEAPEST-FIRST, AND THAT IS LOAD-BEARING (SPRINT-105 T3) ───────────────────────────
 # The list was previously in order-of-addition, which meant truncation dropped whichever harnesses
 # happened to be newest. Measured 2026-09-21 that was actively perverse: the gate spent **162.2s**
-# on run-conformance-engine-fixtures.sh and then skipped run-s4-ts-evaluators.sh at **0.75s**.
+# on run-conformance-engine-fixtures.sh and then skipped a harness costing **0.75s**.
 # Sorting by measured cost means that if a run ever does exceed its budget, truncation costs the
 # FEWEST guards possible instead of an arbitrary tail.
 #
@@ -1171,8 +1158,8 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts"
-eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-s4-differential-parity.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts"
+eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
 # the git mv round trip (~2.5s) -- opt-in by the git-repo rule below (SPRINT-043 T1).
@@ -1181,12 +1168,6 @@ eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-
 # SPRINT-107 T3: run-store-readers-fixtures.ts builds temp-dir trees, no git (<1s) -- always-on.
 # SPRINT-115 T5: run-promote-check-fixtures.ts spawns promote-check.ts over two fixture sprint files, no git (~1-2s) -- always-on.
 # SPRINT-107 T2: run-store-writers-fixtures.ts builds temp-dir trees, no git (~1s) -- always-on.
-# run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
-# OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
-# which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.
-# ADR-039 records the §4 DRIFT WINDOW this opens and names when parity is MANDATORY -- promote, close,
-# and any full-profile run. Shell RETAINS §4 authority throughout (EPIC-014 D2): this is not a
-# cutover, and a green default gate says nothing about TS/Shell agreement.
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
 # `timeout`) to prove where the budget checkpoint is actually reached, which this repo's own
@@ -1239,11 +1220,11 @@ eval_harnesses_optin="run-work-store-fixtures.ts run-adr-family-fixtures.sh run-
 # Harnesses deliberately NOT gated at all (neither always-on nor opt-in). Empty is a valid state --
 # but a paid/non-deterministic harness is excluded by being NAMED here with a reason, never by being
 # left out of the lists above.
-# Differential-parity harnesses compare a ported TS checker against its retained .sh oracle row by
-# row, so each needs BOTH implementations and a real spawn per input. ADR-039 makes parity mandatory
-# at promote and close -- the opt-in profile -- so three of the four now live in
-# eval_harnesses_optin above. Measured 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s,
-# night-run-rollup 44.0s (~104s together, the cost of honouring ADR-039 for those three ports).
+# The three remaining differential-parity harnesses (authority, doc-caps, night-run-rollup) compare a
+# ported TS checker against its retained .sh oracle row by row, so each needs BOTH implementations and
+# a real spawn per input; they live in eval_harnesses_optin above and are frozen under ADR-050 clause 3.
+# Measured 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s, night-run-rollup 44.0s (~104s).
+# ADR-051 retired the fourth pair (the §4 TypeScript port against Shell); ADR-039 is superseded.
 #
 # S10 selftests + P4/P7 cut, SPRINT-113 T1 / ADR-050 (the frozen selftest-assert-* set, the layers-observed
 # differential and its twin were deleted, not excluded).

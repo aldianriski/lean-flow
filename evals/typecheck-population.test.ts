@@ -66,10 +66,10 @@ describe("gate typecheck population -- the LIVE root tsconfig", () => {
     expect(inTree(files, "evals")).toBeGreaterThan(0);
   });
 
-  // The sibling control: the trees that were ALWAYS in the program must still be there. A "fix" that
+  // The sibling control: the tree that was ALWAYS in the program (test/) must still be there. A "fix" that
   // swapped one population for another would pass every assertion above and be a regression.
-  test("the original three trees are still present (control)", () => {
-    const original = files.filter((f) => /\/(apps|packages|test)\//.test(f)).length;
+  test("the test/ tree that was always in the program is still present (control)", () => {
+    const original = files.filter((f) => /\/test\//.test(f)).length;
     expect(original).toBeGreaterThan(0);
   });
 });
@@ -94,6 +94,6 @@ describe("gate typecheck population -- MUST FAIL against the pre-fix config", ()
   // broken -- it was POPULATED WITH THE WRONG SET, which is why `clean (0 errors)` was true and
   // useless at the same time. A guard that only checked "did tsc succeed" could never see this.
   test("...yet is a perfectly healthy program -- which is why the blindness was silent", () => {
-    expect(files.filter((f) => /\/(apps|packages|test)\//.test(f)).length).toBeGreaterThan(0);
+    expect(files.filter((f) => /\/test\//.test(f)).length).toBeGreaterThan(0);
   });
 });

@@ -3,7 +3,7 @@
 # scripts/lib/check-dod-delta.ts (SPRINT-101 T3, TASK-326).
 #
 # check-dod-delta.ts is TypeScript run by Bun (owner ruling, SPRINT-101 T3), not POSIX sh, so this
-# harness is a thin `bun test` wrapper -- the same shape run-s4-ts-evaluators.sh already uses for a
+# harness is a thin `bun test` wrapper -- the shape run-s4-ts-evaluators.sh used for a
 # TS-evaluator leg in this gate. A missing runtime FAILs rather than skips (TD-101/ADR-037's rule:
 # a skip is indistinguishable from a pass, which is the exact false assurance this repo refuses
 # elsewhere).
@@ -34,7 +34,7 @@ test_file="evals/dod-delta.test.ts"
 [ -f "$test_file" ] || { echo "FAIL harness: test file not found at $test_file"; exit 2; }
 
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
-# (a renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh
+# (a renamed test, a dropped describe) while still reporting PASS (the shape run-s4-ts-evaluators.sh, until ADR-051 cut it,
 # guards against). RAISE THIS when adding cases to evals/dod-delta.test.ts, in the same commit.
 # 89 as of SPRINT-115 T4 (TASK-354): +5 (.dod-delta-exempt: 2 parser + 3 real-run CLI). Before: 84 as of SPRINT-109 T4 (TASK-387): +23 for member-file DoD (checkDodDeltaWithMembers), including
 # the 6-folder selection sweep and the ab03653/aceff73 real-history motivating-artifact check.

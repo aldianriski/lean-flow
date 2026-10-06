@@ -2,13 +2,13 @@
 id: ADR-038
 tags: [tooling, process]
 domain: governance
-status: accepted
+status: superseded
 related: [ADR-035, ADR-034, ADR-023]
 ---
 
 # ADR-038 — Composed multi-family rule dispatch: a bound-dispatcher seam, not a switch
 
-- **Status:** accepted (2026-08-27)
+- **Status:** accepted (2026-08-27) · superseded by ADR-051 (2026-10-06)
 - **Deciders:** Maintainer
 - **Context driver:** a whole-spec traversal (EPIC-014 H12) must dispatch rules that live behind
   *different* port shapes in one pass, and the codebase's own registry seam is single-port by design —

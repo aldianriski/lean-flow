@@ -37,7 +37,7 @@ test_file="evals/epic-archive.test.ts"
 [ -f "$test_file" ] || { echo "FAIL harness: test file not found at $test_file"; exit 2; }
 
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests (a
-# renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh and
+# renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh (cut by ADR-051) and
 # run-dod-delta-fixtures.sh guard against). RAISE THIS when adding cases to evals/epic-archive.test.ts,
 # in the same commit.
 min_tests=38

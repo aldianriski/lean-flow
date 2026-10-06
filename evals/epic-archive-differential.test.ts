@@ -1,12 +1,12 @@
 // evals/epic-archive-differential.test.ts -- TS-vs-Shell DIFFERENTIAL parity for
 // scripts/lib/check-epic-archive.ts against its live oracle, scripts/lib/check-epic-archive.sh
-// (TASK-355). Follows the shape of evals/run-s4-differential-parity.sh: the shell checker REMAINS
+// (TASK-355). Follows the shape run-s4-differential-parity.sh used, until ADR-051 cut it: the shell checker REMAINS
 // the authority; this file asserts the TS port agrees with it EXACTLY (same exit code, same stdout)
 // over every retained fixture root AND over this repository's own real docs/epic/ tree.
 //
 // Written in TypeScript (bun:test), not a new .sh file -- CLAUDE.md's "no new .sh files" rule
 // (executable logic is TypeScript run by Bun). Run standalone: `bun test evals/epic-archive-differential.test.ts`.
-// Not wired into qa-check.sh's always-on set, mirroring run-s4-differential-parity.sh's own
+// Not wired into qa-check.sh's always-on set, mirroring the opt-in status run-s4-differential-parity.sh had (cut by ADR-051), its own
 // opt-in status: this is acceptance evidence for the port, not a per-gate-run cost.
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
