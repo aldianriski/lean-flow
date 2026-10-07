@@ -31,3 +31,10 @@ TASK-319's prerequisite TASK-352 shipped at SPRINT-102 T3. The owner signed the 
 - **handoff ledger:** none.
 promote-check: first run 3 findings (a T2 mention in T1 prose; two basename-vs-path forms), fixed; final `PASS -- 13 pass, 0 fail`.
 Pre-dispatch preflight: CLEAR (waves T1=0 · T2=1 · T3/T4=2; `night-run.sh` owned T1 → T2 → T3).
+
+### 2026-10-07 | progress | owner action (D1), part 1: CLI + plugin installed for `ubuntu` on the VPS; login pending (owner)
+The owner believed the VPS was already logged in. A read-only check found the login belongs to the `workdoo` service user (CLI +
+credentials present); `ubuntu` had no `claude` on any PATH and no `~/.claude/.credentials.json`. Owner ruling: keep D1 (run as `ubuntu`).
+Installed user-local, no sudo: Claude CLI **2.1.291** (the version workdoo pins) at `~/.local/bin/claude`, plus the lean-flow marketplace
+and plugin **2.1.0** (user scope, `~/.claude/plugins/cache/lean-flow/lean-flow/2.1.0`). Remaining: `claude login` as `ubuntu`, which needs
+an interactive TTY, so the owner runs it from their own terminal, then a one-line `claude -p` smoke run (A1).
