@@ -10,6 +10,7 @@ tier: G
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-118
 ---
 
 # TASK-327 — Exercise `check-handoff-state.sh` on the first real handoff

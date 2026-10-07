@@ -10,6 +10,7 @@ tier: G
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-118
 ---
 
 # TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together

@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-118
 ---
 
 # TASK-188 — Exercise the reaper on a genuinely partial Plan
