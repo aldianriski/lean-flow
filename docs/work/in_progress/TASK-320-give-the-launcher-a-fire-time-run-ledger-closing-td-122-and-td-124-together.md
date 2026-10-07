@@ -17,7 +17,7 @@ sprint: SPRINT-118
 
 ## Done when
 
-- [ ] the launcher records that a run FIRED at the moment it fires, independent of `reap()`'s later decision to append — so (a) a run that fires but never reaches the reaper is distinguishable from one that never happened (**TD-122**), and (b) `check-authority.sh` can read attendedness from a written fact instead of inferring it from two defeatable signals (**TD-124**). Retained must-FAIL: a fired-but-unreaped run must be detectable as such; sibling control: a never-fired tree stays green. Seeded-break discrimination proof under ONE hash convention (L-142 · L-169)
+- [x] the launcher records that a run FIRED at the moment it fires, independent of `reap()`'s later decision to append — so (a) a run that fires but never reaches the reaper is distinguishable from one that never happened (**TD-122**), and (b) `check-authority.sh` can read attendedness from a written fact instead of inferring it from two defeatable signals (**TD-124**). Retained must-FAIL: a fired-but-unreaped run must be detectable as such; sibling control: a never-fired tree stays green. Seeded-break discrimination proof under ONE hash convention (L-142 · L-169) ✓ `fired ·` line written by night-run.sh before the command (case 13 asserts it from inside the command); check-authority.ts reads it (must-FAIL `fired-unattended`, control `fired-fenced-attended`); close-time `CLOSE-FIRED-UNREAPED` (must-FAIL + controls); 5 seeds + reviewer seed, hashes restored; reviews CLEAR (isolated Sonnet + Codex ×2); system verify `QA-CHECK: 317 pass, 0 fail` at a75f3f2 (VPS, QA_FULL)
 
 ## Touches
 

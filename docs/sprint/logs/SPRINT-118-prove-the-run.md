@@ -122,3 +122,8 @@ chars) and `member-layers-incomplete` (TASK-320's Done when names `check-authori
 Layers is split onto continuation lines in T2's style, and `check-authority.sh` moves to T1's `Cites:`, since T1 cites the frozen oracle
 and does not edit it (the checker's own suggestion). Local re-run: layers-completeness 12 PASS / 0 FAIL (4 blocks × 2 + 4 members = 12),
 prose-density PASS, layers-observed PASS, by-reference `5 pass, 0 fail`. Full gate re-run follows.
+
+### 2026-10-07 | progress | T1 done: system verify GREEN `QA-CHECK: 317 pass, 0 fail` (rc 0) at `a75f3f2`, VPS `QA_FULL=1`; TASK-320 → done
+TASK-320's one Done-when box is ticked with evidence, and the member moved in_progress → done. TD-122 and TD-124 are closed by this task.
+Their ledger rows are marked resolved at close (§11), not here. Sub-agent spend for T1: ~358k. Next: T2–T4 G2 (vehicle shape, the VPS
+working directory and its trust grant), then the owner fires T2 (J2).
