@@ -80,7 +80,7 @@ Opportunistic: the clean-halt `/handoff` of T2's run is the vehicle. Tier G, nev
 
 ## Owner-action checklist
 - [x] Install the Claude CLI for the `ubuntu` user on the VPS, log in (`claude login`), and install lean-flow 2.1.0 there (D1). ✓ 2026-10-07: CLI 2.1.291 + plugin 2.1.0; logged in (claude.ai); smoke run SMOKE-OK
-- [ ] Fire T2's run and read its result (J2).
+- [x] Fire T2's run and read its result (J2). ✓ 2026-10-07: the owner delegated the fire explicitly ("execute by you, i give you authorization"); fired 03:09:34Z, `ALIVE`, `PLAN_EXHAUSTED` · `DELIVERED`, $0.83
 
 ## Decisions (pre-locked)
 - **D1** — The run executes on the VPS as `ubuntu`, kept apart from workdoo's service user and quota (owner, promote 2026-10-07).
