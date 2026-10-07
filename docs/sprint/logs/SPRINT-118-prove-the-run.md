@@ -49,3 +49,26 @@ off for `ubuntu` (`env.DISABLE_AUTOUPDATER=1` merged into `~/.claude/settings.js
 `permissions.allow` entries are ignored ("this workspace has not been trusted"). A `dontAsk` headless run there would be denied
 the tools its allow-list grants. G2 rules the run's working directory and grants trust for exactly that path (`hasTrustDialogAccepted`
 in `~/.claude.json`) at pre-flight, not before.
+
+### 2026-10-07 | scope-change | T1 Layers corrected before build: the live checkers are TypeScript, and the TD-122 finding fires at close
+**What broke:** § Plan T1 names `scripts/lib/check-authority.sh`, but the gate leg runs `scripts/lib/check-authority.ts` (`qa-check.sh:1392`,
+TASK-355 port). The `.sh` is now a frozen differential oracle that ADR-050 §3 says must not grow. A fired-but-unreaped finding wired into an
+always-on leg would also go red during every live run, including the run's own mid-run system-verify, because `terminal ·` is written
+only after the run exits. **Impact:** T1 edits `check-authority.ts` and not the `.sh`. The TD-122 finding lives in the close gate
+`scripts/lib/check-sprint-by-reference.ts --close`, where no run can still be in flight, with fixtures under `evals/fixtures/by-reference/`.
+**Re-confirm G2:** owner-ruled in the entry below.
+
+### 2026-10-07 | g2 | T1 design signed (owner): fired line in the Execution Log, close-time check, consequential G
+G1 ran the full checklist for all four members (`origin: close-retro`). TASK-320's `assumes:` was re-derived from both rows rather than
+inherited, and it holds. TD-122 ("a ledger `night-run.sh` writes unconditionally at fire time … not gated on `reap()`") and TD-124
+("a signal the *launcher* writes at fire time, independent of `reap()`'s decision to append") name the same mechanism. Owner rulings:
+- **Ledger:** `night-run.sh` appends one `fired · <ts> · <mode>` line to the resolved sprint's Execution Log before the wrapped command
+  runs. If no sprint resolves, the launcher refuses to fire (DOA). No new file, which keeps it clear of the rejected run-event stream.
+  ADR-013's guardrail is carried over: this line is never the input to a resume path.
+- **TD-122 check:** close-time only (`check-sprint-by-reference.ts --close`). A `fired ·` line with no later `terminal ·` line FAILs.
+- **TD-124:** `check-authority.ts` treats a `fired ·` line as the written fact of an unattended run. The two older signals stay as a
+  backstop for logs written before the ledger existed.
+- **Tier:** consequential G (ADR-050: `night-run.md` names `night-run.sh` as the mechanism of the adopter's run). Full bar: must-FAIL
+  fixture plus control per check, seeded-break proof under one hash convention, worktree-isolated outside review, Codex gauntlet.
+- **Residual named, not closed:** a run fired outside `night-run.sh` leaves no `fired ·` line. Pre-flight already forbids that path.
+T2–T4 G2 is deferred until T1 lands (T2 is J2; its vehicle shape and the VPS working directory and trust grant are ruled then).
