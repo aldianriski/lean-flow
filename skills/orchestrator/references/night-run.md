@@ -716,8 +716,9 @@ thing that does it*. A run can be `12 of 12` and still have stopped for a reason
 
 **The launcher's `fired ·` line is the other half of that pair.** `terminal ·` says how a run ended;
 the `fired · <ISO-8601 UTC> · <mode>` line (written at launch, above the rollup) says it began. At
-**close**, `check-sprint-by-reference.ts --close` FAILs `CLOSE-FIRED-UNREAPED` when a `fired ·` line has no
-`terminal ·` line after it — a run was launched and never reached the reaper. Close only: a live run
+**close**, `check-sprint-by-reference.ts --close` FAILs `CLOSE-FIRED-UNREAPED` when the last `fired ·` line has no
+`terminal ·` line after it — a run was launched and never reached the reaper. A fenced `terminal ·`
+counts only inside a `run-complete` entry, which is where the reaper writes it; a quoted rollup elsewhere does not. Close only: a live run
 legitimately has the first and not yet the second.
 
 **Why the header line exists.** The `sprint-bulk` loop is run by the *model*, and nothing outside it
