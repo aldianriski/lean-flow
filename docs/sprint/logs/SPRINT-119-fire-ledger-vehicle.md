@@ -46,3 +46,9 @@ The envelope as approved by the owner, one dimension per item:
 `check-approval-envelope.sh`: `PASS … (all 10 dimensions covered, pinned @ 85b3ffc)`. `check-authority.ts`: T1 J0 and TASK-405 J0 declared.
 
 fired · 2026-10-07T03:09:34Z · overnight
+
+### 2026-10-07 | progress | T1 (TASK-405) ticked — fired line and checker verdict transcribed by the run
+consequence · T1 · behaviour: none (verification, no source change) · governance: none → self-review only.
+Fired line (one column-1 match; the second query, bare `fired`, hits only line 39's envelope prose): `fired · 2026-10-07T03:09:34Z · overnight`,
+present uncommitted at run start and committed as the run's first commit (48345dbd6). `bun scripts/lib/check-authority.ts` on this sprint:
+exit 0, both rows `PASS` (T1 J0 · TASK-405 J0). No confirmation asked; no source file touched; no push.
