@@ -30,7 +30,7 @@ state note: corrected blocked → ready at the SPRINT-098 promote, owner-ruled 2
 
 ## Done when
 
-- [ ] The reaper handles a genuinely partial Plan from a real run that stops mid-Plan; closing this `unattempted` per D5 is a valid outcome.
+- [x] The reaper handles a genuinely partial Plan from a real run that stops mid-Plan; closing this `unattempted` per D5 is a valid outcome. ✓ **unattempted** (SPRINT-118 D2, owner-ruled 2026-10-07): the vehicle run (SPRINT-119, fired 03:09:34Z) did not stop mid-Plan, ending `PLAN_EXHAUSTED` · `run · 1 of 1 DoD ticked`, so no partial Plan reached the reaper
 
 ## Assumes
 
