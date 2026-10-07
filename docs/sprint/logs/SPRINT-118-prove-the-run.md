@@ -38,3 +38,14 @@ credentials present); `ubuntu` had no `claude` on any PATH and no `~/.claude/.cr
 Installed user-local, no sudo: Claude CLI **2.1.291** (the version workdoo pins) at `~/.local/bin/claude`, plus the lean-flow marketplace
 and plugin **2.1.0** (user scope, `~/.claude/plugins/cache/lean-flow/lean-flow/2.1.0`). Remaining: `claude login` as `ubuntu`, which needs
 an interactive TTY, so the owner runs it from their own terminal, then a one-line `claude -p` smoke run (A1).
+
+### 2026-10-07 | progress | owner action (D1) complete: `ubuntu` logged in on the VPS; A1 confirmed
+Login ran in a detached tmux session (`claude auth login --claudeai`). The owner opened the URL and returned the one-time code, which
+was typed into the session: `Login successful.` `claude auth status` reads `loggedIn: true`, `authMethod: claude.ai`. **A1 smoke
+run:** `claude -p "Reply with exactly: SMOKE-OK"` in `~/lf-gate` → `SMOKE-OK`, rc 0; `lean-flow@lean-flow` is listed. Auto-update is
+off for `ubuntu` (`env.DISABLE_AUTOUPDATER=1` merged into `~/.claude/settings.json`, backup `.bak-20261007`), so the CLI stays at
+2.1.291 like workdoo's.
+**Pre-flight item for T2 (found by the smoke run):** `~/lf-gate` is not a trusted workspace, so its `.claude/settings.json` 68
+`permissions.allow` entries are ignored ("this workspace has not been trusted"). A `dontAsk` headless run there would be denied
+the tools its allow-list grants. G2 rules the run's working directory and grants trust for exactly that path (`hasTrustDialogAccepted`
+in `~/.claude.json`) at pre-flight, not before.
