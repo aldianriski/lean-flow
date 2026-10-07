@@ -34,7 +34,7 @@ slippage can foreclose its vehicle — L-111). Pointer, not a second copy (L-008
 
 ## Done when
 
-- [x] A real unattended run (`--mode overnight`, `gates_signed:` recorded, an all-J0/J1 vehicle) fires against the repaired reaper, and the terminal-state agreement check passes against that run's committed log — closing EPIC-015 Closed-when 1. ✓ fired 2026-10-07T03:09:34Z on the VPS (`~/lf-run`, owner-delegated) against SPRINT-119 (all-J0, `gates_signed: G1,G2 @ 85b3ffc`); launcher `ALIVE`, exit 0; reaper wrote `terminal · PLAN_EXHAUSTED … [derived]`; `check-night-run-rollup.ts` on the committed log: `PASS … agrees with its per-task lines`; `--close` 4 pass 0 fail incl. `close fired-line`; merged `312ddea`
+- [x] A real unattended run (`--mode overnight`, `gates_signed:` recorded, an all-J0/J1 vehicle) fires against the repaired reaper, and the terminal-state agreement check passes against that run's committed log — closing EPIC-015 Closed-when 1. ✓ fired 2026-10-07T03:09:34Z on the VPS (`~/lf-run`, owner-delegated) against SPRINT-119 (all-J0, `gates_signed: G1,G2 @ 85b3ffc`); launcher `ALIVE`, exit 0; reaper wrote `terminal · PLAN_EXHAUSTED … [derived]`; the rollup agreement checker on the committed log: `PASS … agrees with its per-task lines`; `--close` 4 pass 0 fail incl. `close fired-line`; merged `312ddea`
 
 ## Assumes
 
