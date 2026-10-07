@@ -37,6 +37,8 @@ TASK-404 (engine spawn cost) · workdoo (another session) · any `git push` (own
 Layers: `scripts/night-run.sh` · `scripts/lib/check-authority.ts` · `scripts/lib/check-sprint-by-reference.ts` · `evals/run-authority-fixtures.sh` · `evals/authority.test.ts` · `evals/run-by-reference-fixtures.ts`
   · `evals/run-night-run-gate-exception-fixtures.sh` · `evals/run-authority-differential.ts` · `evals/fixtures/`
   · `skills/orchestrator/references/night-run.md` (corrected by scope-change, see Execution Log)
+  · `docs/work/in_progress/TASK-320-give-the-launcher-a-fire-time-run-ledger-closing-td-122-and-td-124-together.md`
+  · `docs/work/done/TASK-320-give-the-launcher-a-fire-time-run-ledger-closing-td-122-and-td-124-together.md` (its own tick + move)
 Depends-on: none
 Cites: `TASK-320` · TD-122 · TD-124 · ADR-016 · `check-authority.sh` (the member names it; the frozen oracle, not edited, ADR-050 §3)
 

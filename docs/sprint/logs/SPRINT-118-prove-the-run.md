@@ -127,3 +127,37 @@ prose-density PASS, layers-observed PASS, by-reference `5 pass, 0 fail`. Full ga
 TASK-320's one Done-when box is ticked with evidence, and the member moved in_progress → done. TD-122 and TD-124 are closed by this task.
 Their ledger rows are marked resolved at close (§11), not here. Sub-agent spend for T1: ~358k. Next: T2–T4 G2 (vehicle shape, the VPS
 working directory and its trust grant), then the owner fires T2 (J2).
+
+### 2026-10-07 | g2 | T2 design signed (owner); vehicle SPRINT-119 promoted; T3/T4 stay opportunistic
+consequence · T2 · behaviour:material · governance:high
+Owner rulings: the vehicle member is a seeded J0 task that live-verifies T1's ledger (TASK-405, SPRINT-119). The run executes in a fresh
+clone, `~/lf-run` on the VPS as `ubuntu`, trusted for exactly that path, with results returned by git bundle and nothing pushed. Budget
+$10 / 60 min. T3 rides the run and, with a one-task Plan, will most likely close `unattempted` (D2/D5). T4 rides the run's `/handoff`,
+if it takes one. SPRINT-119: governance signed, `plan locked` at `85b3ffc`, `gates_signed` and the ten-dimension envelope pinned
+`@ 85b3ffc` (`19273b1`).
+**Pre-flight (Part 1) on the VPS:**
+- **Clone:** `~/lf-run` was cloned from `~/lf-gate` and is on branch `run-119` at `19273b1`. Its `origin` remote is removed, so a push has
+  nowhere to go. Tree clean.
+- **Allowlist:** the tracked `.claude/settings.json` plus three exact-file `bun scripts/lib/check-*.ts` rules in the gitignored
+  `.claude/settings.local.json` (`.gitignore:8`).
+- **Trust:** `~/.claude.json` had no `projects` record. Backed up to `~/.claude.json.bak-20261007-lfrun`, then
+  `projects["/home/ubuntu/lf-run"].hasTrustDialogAccepted = true` (31 keys, parses).
+- **Probe 1 ($0.21):** all 7 items ALLOWED, including `bun scripts/lib/check-authority.ts`, which only the local rule permits, and
+  `git commit --dry-run`. **Its must-deny control was invalid.** `uname -a` ran because Claude Code auto-approves read-only commands, so a
+  read-only command cannot be a negative control (→ worth an L-NNN at close).
+- **Probe 2 ($0.18):** the one variable changed: `touch /tmp/lf-must-deny` → `DENIED … don't ask mode`, the file is absent, and
+  `git status` is ALLOWED. Verdict: **the allowlist is live and scoped.** Probe spend $0.40, about 4% of the cap.
+- **DoD commands run once on host:** the fired-line `grep -c` and `bun scripts/lib/check-authority.ts` both ran in probe 1.
+- **Budget flag:** `claude --max-budget-usd` exists on CLI 2.1.291. The 60 min ceiling is `timeout 3600` around the command.
+- **Tracked-allowlist debt:** it still names the `.sh` oracles, and it carries two directory-prefix rules (`Bash(sh evals/:*)`,
+  `Bash(sh scripts/:*)`) that night-run.md measured as non-functional. To be filed at close.
+
+### 2026-10-07 | scope-change | T1 Layers gains TASK-320's own member file; `~/lf-run` pre-flight gate `308 pass, 3 fail`, all three now fixed
+The `~/lf-run` pre-flight gate (`QA_BUDGET_SECONDS=1200`) returned three FAILs:
+- **`typecheck` and `typecheck-population`:** the fresh clone had no `node_modules`. Environment only; fixed with `bun install`.
+- **`layers observed`:** the coordinator's tick and move commits for TASK-320 (`ecc5406`, `3c45a11`) carry `sprint(118) T1:`, so rule 2
+  attributes them to T1. The precedent (SPRINT-116/117) is a bare `sprint(NNN):` subject, which rule 5 exempts as bookkeeping.
+  Re-wording them now would rewrite four later commits, including SPRINT-119's `85b3ffc` pins, so instead T1 `Layers:` declares the
+  member file at both locations. That is accurate: those commits did touch it.
+**Re-confirm G2:** none needed, as no behaviour changed. Local re-run: layers-observed PASS, promote-check `13 pass, 0 fail`,
+by-reference `5 pass, 0 fail`. Coordinator rule from here: member tick and move commits use a bare `sprint(NNN):` subject.
