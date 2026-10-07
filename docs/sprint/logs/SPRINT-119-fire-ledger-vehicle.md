@@ -52,3 +52,21 @@ consequence · T1 · behaviour: none (verification, no source change) · governa
 Fired line (one column-1 match; the second query, bare `fired`, hits only line 39's envelope prose): `fired · 2026-10-07T03:09:34Z · overnight`,
 present uncommitted at run start and committed as the run's first commit (48345dbd6). `bun scripts/lib/check-authority.ts` on this sprint:
 exit 0, both rows `PASS` (T1 J0 · TASK-405 J0). No confirmation asked; no source file touched; no push.
+
+### 2026-10-07 | rollup | run exit — Plan exhausted, 1 of 1 DoD ticked, no confirmation asked
+Written by the run itself on a clean finish (Part 4). Close and system-verify are out of this envelope's scope (writes: TASK-405's tick
+and `git mv` plus this log only); they belong to SPRINT-118 T2's interactive post-run checks, so `verification` is honestly none.
+`check-sprint-by-reference.ts --close` before this entry: 3 pass, 1 fail — `CLOSE-FIRED-UNREAPED`, the expected pre-rollup state this
+entry's `terminal ·` line resolves.
+
+run · 1 of 1 DoD ticked
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED
+terminal · PLAN_EXHAUSTED · T1 (TASK-405) done; the only Plan task, J0, no park, no denial
+tasks · 1 attempted / 1 completed / 1 total
+parks · 0
+repair-cycles · 0
+verification · none logged
+warnings · none
+review · T1 · self-review · behaviour:none · governance:none
+
+run · ~$0.57 (harness budget meter, read mid-turn before this entry) · ~12 turns · ~1 min (fired 03:09:34Z → last task commit 03:10:05Z) · 1 of 1 units · inline
