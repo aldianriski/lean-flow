@@ -12,6 +12,7 @@ authority: J0
 origin: manual
 state: ready
 depends-on: []
+sprint: SPRINT-119
 ---
 
 # TASK-405 — Verify the fire-time ledger on the live run that carries it
