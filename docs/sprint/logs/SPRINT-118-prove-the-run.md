@@ -115,3 +115,10 @@ precedent). On owner ruling, the three unpushed commits gained a `Task: T1` trai
 `05cfcbe` was undone (`reset --keep`, local only; origin/main is `0823764` and contains none of these commits) and is redone below.
 Entries above that cite the old shas stand as written; this entry is the correction. **Re-confirm G2:** none needed, as no behaviour
 changed.
+
+### 2026-10-07 | progress | system verify at `9f42c01`: `QA-CHECK: 316 pass, 2 fail`, both from the Layers correction itself
+`layers observed` now PASSes. Two new FAILs came from how the correction was written: `prose-density` (the one-line Layers was over 400
+chars) and `member-layers-incomplete` (TASK-320's Done when names `check-authority.sh`, and the checker matches tokens exactly). Fixed:
+Layers is split onto continuation lines in T2's style, and `check-authority.sh` moves to T1's `Cites:`, since T1 cites the frozen oracle
+and does not edit it (the checker's own suggestion). Local re-run: layers-completeness 12 PASS / 0 FAIL (4 blocks × 2 + 4 members = 12),
+prose-density PASS, layers-observed PASS, by-reference `5 pass, 0 fail`. Full gate re-run follows.
