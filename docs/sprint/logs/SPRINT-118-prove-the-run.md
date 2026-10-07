@@ -161,3 +161,26 @@ The `~/lf-run` pre-flight gate (`QA_BUDGET_SECONDS=1200`) returned three FAILs:
   member file at both locations. That is accurate: those commits did touch it.
 **Re-confirm G2:** none needed, as no behaviour changed. Local re-run: layers-observed PASS, promote-check `13 pass, 0 fail`,
 by-reference `5 pass, 0 fail`. Coordinator rule from here: member tick and move commits use a bare `sprint(NNN):` subject.
+
+### 2026-10-07 | progress | T2 pre-run review: one fix before fire (commit-subject form), applied to the trigger text
+Pre-flight gate in `~/lf-run` at `16505e1`: `QA-CHECK: 310 pass, 2 fail`. `bun install` cleared both typecheck legs and layers-observed
+PASSes. The two FAILs were `review-depth-{governance,material}-absent` for T2: the coordinator logged T2's skip-table lookup at G2, before
+any review existed. Owner ruling: review what exists now, rather than deleting the line.
+**Isolated Sonnet reviewer, read-only, 7 items:** `REVIEW: 1 findings (1 → fix before fire)`. CLEAR on six:
+- pre-flight item 3 (J0 only, box open);
+- `gates_signed` and the envelope (`check-approval-envelope.sh` PASS; the dimension text matches what the Plan allows);
+- every `night-run.sh` refusal, traced (`--permission-mode` is found past the `timeout` prefix; `--sprint` resolves; log present);
+- the reaper's target;
+- DoD achievability, simulated in scratch with a fired line present: `check-authority.ts` exit 0;
+- budget and stop mapping.
+**Finding (item 5):** nothing the run reads names its commit-subject form. A `sprint(119) T1:` subject attributes the tick and move of
+TASK-405's file to T1, whose Layers is verification-only, so layers-observed FAILs. That is the same shape as `ecc5406`/`3c45a11`
+above. **Fix:** the fire prompt carries `commit every change with the exact subject form "sprint(119): <what>" (no task id)`. That is
+trigger text, so the frozen Plan and the pinned envelope are untouched. Known weakness (night-run.md Part 2): an instruction about
+bookkeeping is the first thing a run drops. If it does, the post-run fix is the SPRINT-118 Layers route.
+**TD notes for close:**
+- **(a)** A budget or `timeout` stop exits non-zero, so the reaper derives `HARD_FAILURE`, not the `BUDGET_STOP` that SPRINT-119 D2 states.
+- **(b)** The VPS plugin cache (2.1.0) predates T1's `night-run.md` paragraph. Immaterial to the run.
+- **(c)** sprint-bulk step 0 and `/handoff` step 1 say "more than one active → ask", with no rule that a named target resolves it, so a
+  headless run depends on the trigger naming its sprint.
+review · T2 · scoped-reviewer · behaviour:material · governance:high
