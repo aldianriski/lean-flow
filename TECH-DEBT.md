@@ -327,6 +327,16 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-231** severity: low | status: open | created: Sprint-118 (T1 build)
+  - Summary: **`check-authority.ts`'s `terminal ·` unattended signal has never matched real reaper output.** `reap()` writes its
+    rollup, `terminal ·` line included, inside a ``` fence (`scripts/night-run.sh` `reap()` printf block). The checker strips fenced
+    lines before matching `TERMINAL_RE`, so on a real reaped log the signal is always absent. The T1 builder reproduced it with a real
+    `--reap` into a log with an executed J2 task: `PASS authority-j2-honoured … no terminal · line anywhere`.
+  - Why it is low now: SPRINT-118 T1's `fired ·` line, written by the launcher at fire time, is the primary signal and is read correctly.
+    The dead backstop matters only for logs written before the ledger existed. Owner ruled "file, don't fix" at T1 (2026-10-07).
+  - Mitigation (hypothesis): read a fenced `terminal ·` line inside a `### … | run-complete |` entry, the same carve-out
+    `check-sprint-by-reference.ts --close` uses, or retire the signal once no pre-ledger log is in scope.
+
 - **TD-230** severity: low | status: open | created: Sprint-117 (close, T1 cold run)
   - Summary: **`/prime`'s `Next:` names `sprint-bulk unattended` for any active sprint, even when every open task is HITL or J2.** The
     rule (`skills/prime/SKILL.md` step 6) offers the night run whenever open tasks sit in an active sprint; an unattended run parks every

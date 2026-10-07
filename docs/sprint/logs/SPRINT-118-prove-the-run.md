@@ -72,3 +72,18 @@ inherited, and it holds. TD-122 ("a ledger `night-run.sh` writes unconditionally
   fixture plus control per check, seeded-break proof under one hash convention, worktree-isolated outside review, Codex gauntlet.
 - **Residual named, not closed:** a run fired outside `night-run.sh` leaves no `fired ·` line. Pre-flight already forbids that path.
 T2–T4 G2 is deferred until T1 lands (T2 is J2; its vehicle shape and the VPS working directory and trust grant are ruled then).
+
+### 2026-10-07 | scope-change | T1 build surfaced three rulings; owner accepted all three recommendations
+The builder (worktree, `bf93c92`) reported three points; the coordinator checked each against the tree before asking.
+- **Close rule, deviation from the G2 ruling (accepted):** a strictly de-fenced close check would flag every properly reaped run,
+  because `reap()` writes `terminal ·` inside a fence (`night-run.sh:414–416`). The rule is now: a terminal line after the last `fired ·`
+  line counts if it is unfenced, or fenced under a `### … | run-complete |` entry. That matches how `check-night-run-rollup.ts` already
+  windows the last run-complete block, which it does without stripping fences. A rollup quoted under any other entry does not count.
+- **Frozen differential (exclude):** the opt-in `run-authority-differential.ts` went `14/15 identical`, because the frozen `.sh` oracle
+  cannot read `fired ·`. `fired-*` fixture dirs are now excluded and named in their own printed EXCLUDED line (ADR-050 §3), in `7f3728e`
+  (coordinator, inline: one mechanical edit). After it: `REAL-LOGIC 13/13 identical`, `TRIVIAL-PATH 118/118`. Second route: 11 non-fired
+  fixture files + 1 live sprint + 1 combined = 13, and before the change 13 + 1 + 1 = 15.
+- **Dead backstop (file, don't fix):** `check-authority.ts`'s `terminal ·` signal never matched real reaper output, for the same fence
+  reason. Filed as **TD-231**. Id derived: max row TD-230, 142-row census matching the promote entry.
+Review dispatched in parallel on `7acc79f..7f3728e`: one worktree-isolated Sonnet reviewer and one Codex static gauntlet round, each
+bounded to 8 threat-model items with a stop rule (zero-occurrence shapes → TD).
