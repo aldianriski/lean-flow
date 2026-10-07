@@ -87,3 +87,31 @@ The builder (worktree, `bf93c92`) reported three points; the coordinator checked
   reason. Filed as **TD-231**. Id derived: max row TD-230, 142-row census matching the promote entry.
 Review dispatched in parallel on `7acc79f..7f3728e`: one worktree-isolated Sonnet reviewer and one Codex static gauntlet round, each
 bounded to 8 threat-model items with a stop rule (zero-occurrence shapes → TD).
+
+### 2026-10-07 | progress | T1 reviewed CLEAR on both routes (isolated Sonnet + 2 Codex rounds), merged as `05cfcbe`
+consequence · T1 · behaviour:material · governance:high
+Skip table: a launcher an adopter fires, plus two gate checkers. Material behaviour and consequential G (ADR-050), so the depth is a
+worktree-isolated outside reviewer plus the Codex gauntlet. Both were bounded to 8 threat-model items with a stop rule.
+- **Sonnet, isolated** (detached at `7f3728e`): `REVIEW: CLEAR`, 8 of 8 items. Its own seed deleted the last-fired reset in
+  `firedUnreaped`. Only `close-earlier-run-reaped-later-run-not` reddened; the six sibling fired fixtures stayed PASS. Restored hash
+  `045ec8c` == HEAD. Full `run-by-reference-fixtures.ts`: `134 pass, 0 fail`. One wording gap (item 7) was fixed in `217019f`.
+- **Codex round 1:** `CODEX: 1 findings`. Item 6: case 13 counted fired lines only after the launcher returned, so a write-after-command
+  regression would pass. Fixed in `44e7ddf`: the wrapped command writes the log's fired-line count into the marker as it runs.
+  The coordinator's seed moved the write to after the command, inside the wrapper. Case 13 went red (`seen-by-the-command='0' before=0
+  after=1`) while the other 15 stayed PASS, including `fired-precedes-rollup`, the case that had missed it. Restored hash `c4a1fdb` == HEAD.
+- **Codex round 2** (`7f3728e..217019f`, 2 items): `CODEX: CLEAR`.
+review · T1 · scoped-reviewer · behaviour:material · governance:high
+Seed census across the build and review: 5 claims seeded (A fired write · B authority OR · C close finding · D fence carve-out ·
+E write-after-command), plus the reviewer's last-fired seed. Each reddened only its claim-bearing cases. Sub-agent spend: builder 236k ·
+Sonnet review 82k · Codex 21k + 19k = **~358k**, under the 1–1.5M estimate. System verify: `QA_FULL=1` started on the VPS at `05cfcbe`.
+
+### 2026-10-07 | scope-change | T1 Layers corrected to the files actually changed; three review commits re-worded with `Task: T1`
+**What broke:** system verify on the VPS at `05cfcbe` returned `QA-CHECK: 315 pass, 1 fail`. The FAIL was `layers observed`, with two parts.
+(a) T1 changed six paths its frozen `Layers:` never named: the `.ts` checkers and harnesses that the first scope-change entry above moved
+the work to, plus `skills/orchestrator/references/night-run.md`, which the G2 brief assigned but no entry recorded. (b) The three
+coordinator review-fix commits carried no T1 attribution. **Impact:** § Plan T1 `Layers:` now lists the real file set (the SPRINT-116
+precedent). On owner ruling, the three unpushed commits gained a `Task: T1` trailer by a message-only rebase. Tree hash unchanged,
+`d53cea5` both before and after. Old → new: `7f3728e` → `046067c` · `44e7ddf` → `4d6846e` · `217019f` → `70d6f0f`. The old merge
+`05cfcbe` was undone (`reset --keep`, local only; origin/main is `0823764` and contains none of these commits) and is redone below.
+Entries above that cite the old shas stand as written; this entry is the correction. **Re-confirm G2:** none needed, as no behaviour
+changed.

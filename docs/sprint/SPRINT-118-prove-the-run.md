@@ -34,7 +34,7 @@ TASK-404 (engine spawn cost) · workdoo (another session) · any `git push` (own
 ## Plan
 
 ### T1 — Give the launcher a fire-time run ledger `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/night-run.sh` · `scripts/lib/check-authority.sh` (the member names it `check-authority.sh`) · `evals/run-authority-fixtures.sh` · `evals/fixtures/`
+Layers: `scripts/night-run.sh` · `scripts/lib/check-authority.ts` · `scripts/lib/check-sprint-by-reference.ts` · `evals/run-authority-fixtures.sh` · `evals/authority.test.ts` · `evals/run-by-reference-fixtures.ts` · `evals/run-night-run-gate-exception-fixtures.sh` · `evals/run-authority-differential.ts` · `evals/fixtures/` · `skills/orchestrator/references/night-run.md` (corrected by scope-change, see Execution Log)
 Depends-on: none
 Cites: `TASK-320` · TD-122 · TD-124 · ADR-016
 
