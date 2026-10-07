@@ -96,6 +96,33 @@ describe("check-authority.ts -- retained fixtures", () => {
     expect(r.text).not.toMatch(/^FAIL/m);
   });
 
+  test("case 3i (TD-124, must-FAIL): a launcher-written `fired · ` line alone marks the run unattended, with no terminal line and no envelope", () => {
+    const r = run("fired-unattended/SPRINT-912-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).toContain("authority-j2-not-parked:");
+  });
+
+  test("case 3j: the J1 sibling in that same file stays green, and the reason names the fired line", () => {
+    const r = run("fired-unattended/SPRINT-912-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).toMatch(/^FAIL {2}authority-j2-not-parked: .* T2 .*`fired · `/m);
+    expect(r.text).toMatch(/^PASS {2}authority-declared: .* T1 J1$/m);
+  });
+
+  test("case 3k (TD-124, control): a bare-fence-quoted example fired line is NOT read as a live launch", () => {
+    const r = run("fired-fenced-attended/SPRINT-913-fx.md");
+    expect(r.exitCode).toBe(0);
+    expect(r.text).toContain("authority-j2-honoured:");
+  });
+
+  test("case 3l: the fenced fired quote is ignored, T2 and its J1 sibling both stay green, no FAIL", () => {
+    const r = run("fired-fenced-attended/SPRINT-913-fx.md");
+    expect(r.exitCode).toBe(0);
+    expect(r.text).toMatch(/^PASS {2}authority-j2-honoured: .* T2 executed with no park record/m);
+    expect(r.text).toMatch(/^PASS {2}authority-declared: .* T1 J1$/m);
+    expect(r.text).not.toMatch(/^FAIL/m);
+  });
+
   test("case 4 (control): a J2 task that HELD is accepted", () => {
     const r = run("control-j2-parked/SPRINT-904-fx.md");
     expect(r.exitCode).toBe(0);

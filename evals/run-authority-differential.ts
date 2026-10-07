@@ -92,11 +92,19 @@ let trivialCompared = 0;
 let trivialIdentical = 0;
 const divergences: string[] = [];
 
+// FIRED-LINE FIXTURES ARE EXCLUDED (SPRINT-118 T1, owner ruling). They exercise the launcher's
+// `fired · ` signal (TD-122 · TD-124), which only check-authority.ts reads. ADR-050 §3 froze this
+// oracle, so it does not grow to read it; comparing would report a manufactured divergence, not a
+// port defect. Selected by the `fired-` directory prefix, named in the printed EXCLUDED line below.
+const FIRED_FIXTURE = /^fired-/;
+const firedExcluded: string[] = [];
+
 // Every retained fixture, single-file (as the always-on harness invokes it) -- REAL-LOGIC weight:
 // each one exercises DECLARED, and most exercise HONOURED/BYPASSED too.
 const fixtureDirs = readdirSync(FX, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map((d) => d.name)
+  .filter((n) => (FIRED_FIXTURE.test(n) ? (firedExcluded.push(n), false) : true))
   .sort();
 for (const dir of fixtureDirs) {
   const files = readdirSync(`${FX}${dir}`).filter((f) => f.endsWith(".md"));
@@ -157,6 +165,7 @@ else divergences.push("zero-args");
 
 console.log("----------------------------------------");
 console.log("EXCLUDED FROM COMPARISON (TASK-382, owner ruling B): member-file authority findings -- authority-undeclared naming a member, authority-plan-member-mismatch, authority-member-declared. check-authority.sh reads only the Plan header and never emits these; check-authority.ts's output is filtered to Plan-header-shaped lines before diffing.");
+console.log(`EXCLUDED FROM COMPARISON (SPRINT-118 T1, ADR-050 §3): ${firedExcluded.length} fired-line fixture dir(s) -- ${firedExcluded.join(", ") || "none"}. The frozen oracle cannot read the launcher's \`fired · \` signal.`);
 console.log(`AUTHORITY DIFFERENTIAL, REAL-LOGIC inputs (fixtures + any active sprint): ${realIdentical}/${realCompared} identical`);
 console.log(`AUTHORITY DIFFERENTIAL, CONFIRMED-TRIVIAL-PATH inputs (archived sprints + zero-args): ${trivialIdentical}/${trivialCompared} identical`);
 console.log(`Combined, for reference only -- NOT the headline: ${realIdentical + trivialIdentical}/${realCompared + trivialCompared}`);
