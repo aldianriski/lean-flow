@@ -184,3 +184,27 @@ bookkeeping is the first thing a run drops. If it does, the post-run fix is the 
 - **(c)** sprint-bulk step 0 and `/handoff` step 1 say "more than one active → ask", with no rule that a named target resolves it, so a
   headless run depends on the trigger naming its sprint.
 review · T2 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-10-07 | progress | T2 done: the first real unattended run since the reaper repair fired, `PLAN_EXHAUSTED` / `DELIVERED`; TASK-319 → done
+**Fire (J2, owner-delegated):** the owner wrote "execute by you, i give you authorization", so the coordinator fired the agreed command
+on the VPS from `~/lf-run` at `4c88e3c`. Launcher: `run mode: overnight` · `fired detached: pid=3528490` · `ALIVE` · rc 0 (gate re-run
+inside it, 03:09:09Z → 03:11:14Z). Run: exit 0 · `subtype=success` · **$0.83** · 23 turns · **0 permission denials** · about 2 min.
+Every run commit uses the bare `sprint(119):` form (the review fix held).
+**Live evidence:**
+- **Fired line:** `fired · 2026-10-07T03:09:34Z · overnight`, exactly one column-1 match, committed as the run's first commit (`48345db`).
+- **Close finding, first live firing:** before writing its rollup, the run's own `--close` printed `CLOSE-FIRED-UNREAPED`.
+- **Reaper:** it appended its fenced `run-complete` block after exit (`terminal · PLAN_EXHAUSTED · … [derived]`). The coordinator committed
+  it in `32c4214`, bundled the run back, and merged it as `312ddea`.
+- **Commit window:** the 6 run commits fall inside it (11:09:53 → 11:11:00 +08). Touched: the SPRINT-119 log and TASK-405 only.
+**TASK-319 checks on the committed log:** `check-night-run-rollup.ts` → `PASS … agrees with its per-task lines`, reading the last
+`run-complete` block, which is the reaper's · `check-sprint-by-reference.ts SPRINT-119 --close` → `4 pass, 0 fail`, including
+`close fired-line` · `check-authority.ts` → J0 PASS. Ticked; the member moves to done.
+**Findings for close:**
+- **(1) TD-122 residual.** The run wrote its own rollup under a `run-complete` header with an unfenced `terminal ·` line, after a first
+  attempt under a `rollup` header that the checker could not read. That unfenced, model-written line alone satisfied `--close` before the
+  reaper ran. A run that writes its rollup and then dies before the reaper would therefore pass the close check. Only the reaper's lines
+  carry the `[derived]` / `[mechanical]` tags, so requiring them is a candidate fix.
+- **(2)** The run's `consequence ·` line is free-form (`behaviour: none (verification…) · governance: none → self-review only.`), not the
+  `behaviour:<v> · governance:<v>` schema; the gate will say whether review-depth accepts it.
+- **(3)** The run's calibration row read the budget meter mid-turn ($0.57/$0.69). The reaper's row, taken from the harness result event,
+  is authoritative: $0.83.
