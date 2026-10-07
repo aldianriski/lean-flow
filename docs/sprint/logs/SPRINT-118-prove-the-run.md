@@ -236,3 +236,7 @@ condensed under 400 chars (`659c473`), keeping every fact workdoo supplied.
 - **System-verify:** the ADR-021 override above; everything else must be green.
 **T4 (TASK-327):** the owner ruled to take a real `/handoff` at the end of this session (close is genuine open work). TASK-327 moves to
 in_progress. The next session's `/prime` must report the record, and close must reconcile it to `spent`.
+
+### 2026-10-07 | handoff | SPRINT-118 + SPRINT-119 close (T4 TASK-327 vehicle)
+handoff-status: live
+handoff-path: C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md
