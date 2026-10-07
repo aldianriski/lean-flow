@@ -240,3 +240,19 @@ in_progress. The next session's `/prime` must report the record, and close must 
 ### 2026-10-07 | handoff | SPRINT-118 + SPRINT-119 close (T4 TASK-327 vehicle)
 handoff-status: live
 handoff-path: C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md
+
+### 2026-10-07 | progress | close-sweep debt filed early (owner ruling): TD-232–236, L-232, L-229 bumped to count 3
+The owner chose to file the sweep's debt in this session and leave close to the next one, so T4's handoff keeps its next-session proof.
+Ids were derived two ways with worktrees excluded. TD: max row 231 (`TD-961` repo-wide is a fixture token). L: 231 by heading and
+repo-wide. Census after: 148 TD rows = 143 + 5.
+- **TD-232** (medium): a model-written, unfenced `terminal ·` satisfies `CLOSE-FIRED-UNREAPED` (sweep item a, the TD-122 residual).
+- **TD-233** (medium): the headless run's bookkeeping drifted from schemas it never reads: review classes (`none`) and the `run-complete`
+  header (sweep items b + f, merged as one mechanism).
+- **TD-234** (low): a budget or `timeout` stop is reaped as `HARD_FAILURE`, not `BUDGET_STOP` (item c).
+- **TD-235** (low): with several sprints active, there is no named-target rule in sprint-bulk step 0 or `/handoff` step 1 (item d).
+- **TD-236** (low): the tracked allowlist trails the engine (`.sh` rules, dead directory-prefix rules) (item e).
+- **L-232** (new): a probe's must-deny control must be non-auto-approvable, because a read-only command proves nothing.
+- **L-229** → count 3: a third sighting **after** its promotion, three gate runs this sprint, and the promoted bullet reached none of
+  them. Due a disposition re-check at the next promote.
+Still owed at close: resolve TD-122/TD-124, tick EPIC-015 Closed-when 1, archive SPRINT-118 + SPRINT-119, the ADR-021 override, and
+TASK-327's three live observations.

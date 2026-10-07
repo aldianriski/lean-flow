@@ -71,6 +71,12 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-232 [tags: process] [status: active]: **A probe's must-deny control must be an action the host cannot auto-approve: a read-only command proves nothing.** SPRINT-118 T2's first allowlist probe chose `uname -a` as the command it had deliberately not allowed. It ran, which by night-run.md's probe table reads as "rules not enforced at all". The cause was that Claude Code auto-approves read-only commands whatever the allowlist says, so the control could never have been denied. A second probe with a writing command (`touch /tmp/lf-must-deny`) was denied and the file stayed absent, which is the verdict that counts. Pick the control from the class the matcher actually gates (a write, or network), and judge it by its side effect on disk rather than by the model's report.
+- seen: 2026-10-07 (SPRINT-118 T2 pre-flight, probe 1 → probe 2 on the VPS, `~/lf-run`)
+- count: 1
+- promoted: no
+- related: night-run.md Part 1 (the probe item) · L-166 · L-198
+
 ## L-231 [tags: process] [status: active]: **A test suite's coverage is its assertions, not its fixtures: before deleting one, enumerate rule × fixture × verdict, and map each to a survivor.** SPRINT-116 retired the TypeScript port and named the Shell harness as the replacement because it ran "the same nine retained fixtures". Two Codex rounds then found what that claim hid: one fixture (`empty-slug`) no surviving case exercised at all, and on two others the deleted test asserted more per-rule verdicts (S4.INDEX on a duplicate number; each rule's own PASS on the clean tree, where exit 0 alone accepts a NOTE) than the harness did. Recon and the ADR both counted directories, so the gap passed G2 and the owner's acceptance.
 - seen: 2026-10-06 (SPRINT-116 T1: Codex R1 + R2 on `1a7361f`; fixed in `c6e41db` · `44c6741`)
 - count: 1
@@ -86,7 +92,12 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ## L-229 [tags: process] [status: active]: **A scope-change that widens `Layers:` in the Log is half a change: the checkers read the Plan's `Layers:` lines, never the Log.** SPRINT-115 logged two scope-change entries widening T4/T5's files and never edited the Plan's `Layers:` lines (`CONTEXT.md` calls them a live declaration, editable with a scope-change). The first system gate read `313 pass, 3 fail`: layers-observed (undeclared files), layers-completeness (a tick's evidence naming an undeclared file) and emitter-column (a new script outside every scope rule). The same sprint had already fixed one such gap by hand at promote. A widened scope is wired only when every reader of it is updated, and here the reader is the checker, not the Log.
 - seen: 2026-10-06 (SPRINT-115 T4/T5 merge-back → first VPS gate; fixed in `5d9335a`)
 - seen: 2026-10-06 (SPRINT-116 system verify run 1: T1/T2 `Layers:` declared as `packages/**` and `boundary-rows/*/README.md`, a spelling the checker's `covers()` does not read (exact path or trailing-`/` directory only), so 105 declared files read as undeclared; fixed in `efc3878`. Same reader, same Plan line, a different way to write past it.)
-- count: 2
+- seen: 2026-10-07 (SPRINT-118 system verify, three runs, **after this entry's promotion**. First, T1's scope-change entry moved the work
+  to `.ts` files and the Plan's `Layers:` still named the `.sh` ones. Second, the one-line correction tripped prose-density, and the
+  member's `check-authority.sh` token had to move to `Cites:`. Third, a tick's evidence named `check-night-run-rollup.ts` and read as
+  an undeclared file (`f8eaef71`). The promoted CONTEXT.md bullet was loaded and reached none of the three; each was caught by a gate
+  run.)
+- count: 3
 - promoted: yes → `.claude/CONTEXT.md` § Sprint model, the `Layers:` bullet (L-100) · disposition: merge — every flow that writes or widens `Layers:` reads it; SPRINT-117 promote (owner)
 - related: L-020 · L-172 · L-166
 

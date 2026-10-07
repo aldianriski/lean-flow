@@ -327,6 +327,43 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-236** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
+  - Summary: **The tracked `.claude/settings.json` allowlist trails the engine it permits.** It names the `.sh` oracles
+    (`sh scripts/lib/check-authority.sh` and siblings), while the gate runs their TypeScript ports (TASK-355). It also carries two
+    directory-prefix rules (`Bash(sh evals/:*)`, `Bash(sh scripts/:*)`), a form night-run.md Part 1 measured as non-functional.
+    SPRINT-119's run needed three exact-file `bun scripts/lib/check-*.ts` rules added in a gitignored local file to work at all.
+  - Mitigation (hypothesis): replace the `.sh` checker rules with their `.ts` forms, and the directory-prefix rules with exact-file ones.
+
+- **TD-235** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
+  - Summary: **With more than one sprint active, sprint-bulk step 0 and `/handoff` step 1 both say "ask", and neither has a rule that a
+    named target resolves it.** A headless run has no ask channel, so with SPRINT-118 and SPRINT-119 both active the run worked only
+    because the trigger text named its sprint and said the other was not its own. That is a convention nothing checks.
+  - Mitigation (hypothesis): state in both steps that a sprint path named by the trigger (or `--sprint`) resolves the choice.
+
+- **TD-234** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
+  - Summary: **A budget or wall-clock stop is reaped as `HARD_FAILURE`, while SPRINT-119 D2 and the envelope said `BUDGET_STOP`.**
+    `--max-budget-usd` and a `timeout` kill both exit non-zero, and `reap()` derives `HARD_FAILURE` from a non-zero exit first.
+    `BUDGET_STOP` is reachable only at exit 0 with tasks unattempted. The envelope's stop-condition wording overstates what the launcher
+    distinguishes.
+  - Mitigation (hypothesis): have the reaper map exit 124 and the harness's budget-exceeded result to `BUDGET_STOP`, or reword the
+    template's stop-condition guidance.
+
+- **TD-233** severity: medium | status: open | created: Sprint-118 (T2 run)
+  - Summary: **The unattended run's bookkeeping drifted from two schemas, because nothing the run reads names them.** (1) It logged
+    `review · T1 · self-review · behaviour:none · governance:none`, and `none` is not a class, so the gate reports
+    `review-depth-unclassified` ×2 (kept verbatim by owner ruling, ADR-021 at close). (2) Its first rollup sat under a `rollup` header that
+    `check-night-run-rollup.ts` cannot read, so it had to restate the block under `run-complete`. Both vocabularies live in checker code
+    and night-run.md Part 4, and neither is in the procedure the run follows.
+  - Mitigation (hypothesis): name the class values and the `run-complete` event where the run reads them (the orchestrator's review
+    step and night-run.md Part 4's entry template), not only in the checkers.
+
+- **TD-232** severity: medium | status: open | created: Sprint-118 (T2 run)
+  - Summary: **A model-written, unfenced `terminal ·` line satisfies `CLOSE-FIRED-UNREAPED`, so the TD-122 guarantee holds only while the
+    run does not write its own rollup.** SPRINT-119's run wrote its own rollup under a `run-complete` header with an unfenced
+    `terminal ·` line, and `--close` passed before the reaper ran. A run that writes its rollup and then dies before `reap()` would
+    still pass the close check.
+  - Mitigation (hypothesis): count only a terminal line carrying the reaper's `[derived]` tag. Only `reap()` writes the provenance tags.
+
 - **TD-231** severity: low | status: open | created: Sprint-118 (T1 build)
   - Summary: **`check-authority.ts`'s `terminal ·` unattended signal has never matched real reaper output.** `reap()` writes its
     rollup, `terminal ·` line included, inside a ``` fence (`scripts/night-run.sh` `reap()` printf block). The checker strips fenced
