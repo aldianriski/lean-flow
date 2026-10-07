@@ -241,16 +241,20 @@ count_fired() { grep -c '^fired · ' "$1" 2>/dev/null || true; }
 d=$(make_case_tree "fired-line-written" "qa-check-clean.sh" "reap-mode-canonical")
 r13_log="$d/docs/sprint/logs/SPRINT-990-fx.md"
 r13_before=$(count_fired "$r13_log")
+# Unlike the other cases, this command writes the log's fired-line count INTO the marker, at the moment
+# it runs. Counting after the launcher returns cannot tell write-before-command from write-after-command
+# (Codex review, T1 round 1); the marker's content can. $0 = the log, $1 = the marker.
 r13_out=$(run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
-  --wait-seconds 2 --poll-seconds 1 --no-reap -- sh -c 'touch "$0"' "$d/marker" --permission-mode dontAsk --allowedTools Bash 2>&1)
+  --wait-seconds 2 --poll-seconds 1 --no-reap -- sh -c 'grep -c "^fired · " "$0" >"$1"' "$r13_log" "$d/marker" --permission-mode dontAsk --allowedTools Bash 2>&1)
 r13_rc=$?
 r13_after=$(count_fired "$r13_log")
+r13_seen=$(cat "$d/marker" 2>/dev/null | tr -d '\r\n ')
 r13_line=$(grep '^fired · ' "$r13_log" 2>/dev/null | head -n1)
-if [ "$r13_rc" -eq 0 ] && [ -f "$d/marker" ] && [ "$r13_before" -eq 0 ] && [ "$r13_after" -eq 1 ] &&
+if [ "$r13_rc" -eq 0 ] && [ "$r13_seen" = "1" ] && [ "$r13_before" -eq 0 ] && [ "$r13_after" -eq 1 ] &&
    printf '%s\n' "$r13_line" | grep -qE '^fired · [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z · overnight$'; then
   echo "PASS fixture(fired-line-written-once): exactly one well-formed fired line, run fired, --no-reap did not gate it"
 else
-  echo "FAIL fixture(fired-line-written-once): rc=$r13_rc marker=$([ -f "$d/marker" ] && echo yes || echo no) fired-lines before=$r13_before after=$r13_after line='$r13_line' -- the launcher must record a run FIRED at fire time, not only when the reaper later decides to append -- output: $r13_out"
+  echo "FAIL fixture(fired-line-written-once): rc=$r13_rc fired-lines seen-by-the-command='${r13_seen:-<no marker>}' before=$r13_before after=$r13_after line='$r13_line' -- the launcher must record a run FIRED at fire time, not only when the reaper later decides to append -- output: $r13_out"
   fail=1
 fi
 
