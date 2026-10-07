@@ -75,7 +75,7 @@ Opportunistic: the clean-halt `/handoff` of T2's run is the vehicle. Tier G, nev
 **Acceptance:** a real handoff record is written, `/prime` reports it, and close reconciles it to `spent`, all on live input.
 
 ## Owner-action checklist
-- [ ] Install the Claude CLI for the `ubuntu` user on the VPS, log in (`claude login`), and install lean-flow 2.1.0 there (D1).
+- [x] Install the Claude CLI for the `ubuntu` user on the VPS, log in (`claude login`), and install lean-flow 2.1.0 there (D1). ✓ 2026-10-07: CLI 2.1.291 + plugin 2.1.0; logged in (claude.ai); smoke run SMOKE-OK
 - [ ] Fire T2's run and read its result (J2).
 
 ## Decisions (pre-locked)
