@@ -2,9 +2,9 @@
 epic: 019
 slug: workdoo-works-like-a-work-management-tool
 owner: Maintainer
-last_updated: 2026-10-06
-status: proposed
-member_sprints: []
+last_updated: 2026-10-07
+status: active
+member_sprints: [workdoo SPRINT-010 (active)]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -32,6 +32,7 @@ menu · the operator-copy pass. **Out (explicitly not):** the Projects registry 
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
+| [workdoo SPRINT-010](https://github.com/aldianriski/workdoo/blob/main/docs/sprint/SPRINT-010-the-operator-reads-one-board.md) | The Operator Reads One Board | active (plan_commit 9439671) | — |
 
 ## Decisions
 
