@@ -25,7 +25,7 @@ exercise on live input (L-007). It is verification, not a re-declared HITL task 
 
 ## Done when
 
-- [ ] Inside the unattended run, this sprint's Execution Log carries exactly one column-1 `fired · <ISO-8601 UTC> · overnight` line,
+- [x] Inside the unattended run, this sprint's Execution Log carries exactly one column-1 `fired · <ISO-8601 UTC> · overnight` line, ✓ fired line (log line 48, the only column-1 match; uncommitted launcher write, committed by the run in 48345dbd6, its first commit): `fired · 2026-10-07T03:09:34Z · overnight` · `bun scripts/lib/check-authority.ts docs/sprint/SPRINT-119-fire-ledger-vehicle.md` exit=0, last output line: `PASS  authority-member-declared: docs/sprint/SPRINT-119-fire-ledger-vehicle.md TASK-405 (docs/work/in_progress/TASK-405-verify-the-fire-time-ledger-on-the-live-run-that-carries-it.md) authority: J0`
   written by the launcher before the run's first commit, and `bun scripts/lib/check-authority.ts` on this sprint exits 0 with it present.
   The run transcribes both verbatim (the fired line and the checker's last output line) into this box's evidence and commits it;
   evidence added by hand afterwards proves nothing (L-007 · L-120)
