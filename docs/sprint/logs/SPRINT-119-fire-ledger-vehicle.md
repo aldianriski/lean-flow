@@ -30,3 +30,17 @@ The owner signed the checklist:
 - **handoff ledger:** none.
 promote-check: `PASS -- 4 pass, 0 fail`. TASK-405 prose-density: `1 pass, 0 fail` after splitting its Done-when box (467 → 4 lines).
 G1+G2 signed and the ten-dimension envelope approved by the owner, both pinned to this commit in the follow-up entry.
+
+### 2026-10-07 | progress | pins recorded: `plan_commit`, `gates_signed: G1,G2` and the ten-dimension `approval_envelope:` all @ `85b3ffc`
+The envelope as approved by the owner, one dimension per item:
+- **goal · acceptance:** TASK-405 `## Done when`.
+- **scope:** writes only TASK-405's tick and its `git mv`, plus this log; no source file, no push.
+- **design:** transcription only (Plan T1).
+- **verification:** the verbatim fired line and `check-authority.ts` output line.
+- **j1-delegation:** none (J0 only).
+- **capabilities:** the tracked `.claude/settings.json` plus three exact-file `bun scripts/lib/check-*.ts` rules in the clone's gitignored
+  `settings.local.json`; `dontAsk`; never `bypassPermissions`.
+- **repair-policy:** none. Any FAIL parks or halts, and guards are never edited.
+- **budget:** $10 / 60 min.
+- **stop-conditions:** the five terminal states. A denial of a required command means `HARD_FAILURE` with a clean halt.
+`check-approval-envelope.sh`: `PASS … (all 10 dimensions covered, pinned @ 85b3ffc)`. `check-authority.ts`: T1 J0 and TASK-405 J0 declared.

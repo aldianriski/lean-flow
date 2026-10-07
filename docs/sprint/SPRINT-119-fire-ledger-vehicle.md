@@ -5,7 +5,9 @@ epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-10-07
 status: active
-plan_commit: PENDING
+gates_signed: G1,G2 @ 85b3ffc
+approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 85b3ffc
+plan_commit: 85b3ffc
 update_trigger: sprint execute/close events
 ---
 
