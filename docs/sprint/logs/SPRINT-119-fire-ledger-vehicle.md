@@ -70,3 +70,27 @@ warnings · none
 review · T1 · self-review · behaviour:none · governance:none
 
 run · ~$0.57 (harness budget meter, read mid-turn before this entry) · ~12 turns · ~1 min (fired 03:09:34Z → last task commit 03:10:05Z) · 1 of 1 units · inline
+
+### 2026-10-07 | run-complete | corrects the entry above: its header said `rollup`, so `check-night-run-rollup.ts` never read the block
+The block is the same. The only change is this header's `run-complete` event (`RUN_COMPLETE_HEADER_RE`). The checker read the entry above
+and printed `has no completed-run entry yet -- nothing to verify`, which is the not-reached signal and not a PASS. The block is restated
+here and the entry above is left as written (append-only).
+
+run · 1 of 1 DoD ticked
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED
+terminal · PLAN_EXHAUSTED · T1 (TASK-405) done; the only Plan task, J0, no park, no denial
+tasks · 1 attempted / 1 completed / 1 total
+parks · 0
+repair-cycles · 0
+verification · none logged
+warnings · none
+review · T1 · self-review · behaviour:none · governance:none
+
+run · ~$0.69 (harness budget meter, read mid-turn before this entry) · ~17 turns · ~2 min (fired 03:09:34Z → this entry) · 1 of 1 units · inline
+
+### 2026-10-07 | progress | rollup checker reached: it takes the Execution Log path, not the sprint file
+Both runs above passed the sprint file, so the checker read a file with no `run-complete` header. The entry above is still needed: with the
+log path and only the `rollup`-headed entry, the window would be empty for the same reason.
+`bun scripts/lib/check-night-run-rollup.ts docs/sprint/logs/SPRINT-119-fire-ledger-vehicle.md` exited 0 and printed
+`PASS  night-run rollup docs/sprint/logs/SPRINT-119-fire-ledger-vehicle.md (DoD header + terminal state + calibration row present, and agrees with its per-task lines)`.
+`check-sprint-by-reference.ts --close` printed `4 pass, 0 fail`. Sprint close and `/lean-doc-generator close` are left to SPRINT-118 T2, which is outside this envelope.
