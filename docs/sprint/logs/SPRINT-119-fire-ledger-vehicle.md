@@ -94,3 +94,24 @@ log path and only the `rollup`-headed entry, the window would be empty for the s
 `bun scripts/lib/check-night-run-rollup.ts docs/sprint/logs/SPRINT-119-fire-ledger-vehicle.md` exited 0 and printed
 `PASS  night-run rollup docs/sprint/logs/SPRINT-119-fire-ledger-vehicle.md (DoD header + terminal state + calibration row present, and agrees with its per-task lines)`.
 `check-sprint-by-reference.ts --close` printed `4 pass, 0 fail`. Sprint close and `/lean-doc-generator close` are left to SPRINT-118 T2, which is outside this envelope.
+
+### 2026-10-07 | run-complete | run exited — rollup emitted by the launcher
+
+Evidence provenance: mechanical = counted directly from the Plan/log text; model-reported = written by the run, trusted like any other Part 4 state line (TD-152); derived = a function of the fields below it, never more certain than what it reads.
+
+```
+run · 1 of 1 DoD ticked  [mechanical]
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED  [derived]
+terminal · PLAN_EXHAUSTED · every task reached a resolved state  [derived]
+tasks · 1 attempted / 1 completed / 1 total  [mechanical]
+parks · 0  [model-reported]
+repair-cycles · 0  [model-reported]
+verification · none logged  [model-reported]
+warnings · none  [mechanical]
+```
+
+Calibration row (Part 4), transcribed from the harness result event:
+
+```
+run · $0.8329009999999998 · 23 turns · 2 min · 1 of 1 units · inline
+```
