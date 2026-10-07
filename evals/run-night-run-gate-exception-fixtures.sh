@@ -46,6 +46,11 @@
 # both the old vulnerability is closed (`collision-prefix-only-refuses`) and the new mechanism still
 # discriminates named-vs-unnamed within it (`collision-partial-refuses` / `collision-all-covered`).
 #
+# --- the fire-time ledger line (SPRINT-118 T1, TD-122 + TD-124) -----------------------------------
+# Cases 13-16 at the bottom ride this harness because it is the one that already drives the REAL launcher
+# end to end through a throwaway repo. Every case that reaches the fire step needs a log to write the
+# `fired · ` line into, so make_case seeds a minimal one.
+#
 # --- why a throwaway git-inited repo per case ----------------------------------------------------
 # night-run.sh's gate block resolves `repo_root` via `git rev-parse --show-toplevel` and only runs
 # the gate at all when `$repo_root/scripts/qa-check.sh` exists -- so exercising it needs a real
@@ -93,6 +98,12 @@ make_case() {
   ( cd "$d" && git init -q ) || { echo "FAIL harness: git init failed in $d"; exit 2; }
   cp "$fx/scripts/$stub" "$d/scripts/qa-check.sh"
   cp "$fx/sprints/$spr" "$d/docs/sprint/SPRINT-990-fx.md"
+  # A promoted Plan always has an Execution Log (its promote entry creates it), and the launcher now
+  # refuses to fire without one (SPRINT-118 T1, TD-122): every case here that reaches -- or is meant to be
+  # refused AT -- the qa-check gate needs it present, or the earlier no-log refusal would shadow the finding
+  # under test. Case 14 removes it again on purpose.
+  mkdir -p "$d/docs/sprint/logs"
+  printf '# SPRINT-990 fx -- Execution Log\n' > "$d/docs/sprint/logs/SPRINT-990-fx.md"
   printf '%s' "$d"
 }
 
@@ -212,6 +223,91 @@ d=$(make_case "collision-prefix-only" "qa-check-headless-cue-collision.sh" "coll
 run_case_anywhere "collision-prefix-only-refuses" 1 "NOT on the pre-approved exception list" -- \
   run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
     --wait-seconds 2 --poll-seconds 1 --no-reap -- true --permission-mode dontAsk --allowedTools Bash
+
+# --- cases 13-17 (SPRINT-118 T1, TD-122 + TD-124): the FIRED line -------------------------------------
+# night-run.sh appends `fired · <ISO-8601 UTC> · <mode>` at column 1 to the target sprint's Execution
+# Log BEFORE the wrapped command runs, independent of reap(). Before this, a run that fired and died
+# before the reaper left a log byte-identical to "no run happened" (TD-122), and check-authority.ts
+# could only INFER attendedness (TD-124). The fired command is `touch <marker>` so "did it actually
+# fire" is read off the filesystem, never off the launcher's own verdict (L-058): a refusal that still
+# fired would pass an exit-code-only assertion.
+#
+# count_fired <logdoc> -- column-1 fired lines, 0 if the file is absent
+count_fired() { grep -c '^fired · ' "$1" 2>/dev/null || true; }
+# The fired command is `sh -c 'touch "$0"' <marker> ...`: <marker> becomes $0, so no path is ever spliced
+# into script text, and every positional stays its own argument.
+
+# case 13 (must-FIRE): the line lands once, ahead of the run, well-formed -----------------------------
+d=$(make_case_tree "fired-line-written" "qa-check-clean.sh" "reap-mode-canonical")
+r13_log="$d/docs/sprint/logs/SPRINT-990-fx.md"
+r13_before=$(count_fired "$r13_log")
+r13_out=$(run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+  --wait-seconds 2 --poll-seconds 1 --no-reap -- sh -c 'touch "$0"' "$d/marker" --permission-mode dontAsk --allowedTools Bash 2>&1)
+r13_rc=$?
+r13_after=$(count_fired "$r13_log")
+r13_line=$(grep '^fired · ' "$r13_log" 2>/dev/null | head -n1)
+if [ "$r13_rc" -eq 0 ] && [ -f "$d/marker" ] && [ "$r13_before" -eq 0 ] && [ "$r13_after" -eq 1 ] &&
+   printf '%s\n' "$r13_line" | grep -qE '^fired · [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z · overnight$'; then
+  echo "PASS fixture(fired-line-written-once): exactly one well-formed fired line, run fired, --no-reap did not gate it"
+else
+  echo "FAIL fixture(fired-line-written-once): rc=$r13_rc marker=$([ -f "$d/marker" ] && echo yes || echo no) fired-lines before=$r13_before after=$r13_after line='$r13_line' -- the launcher must record a run FIRED at fire time, not only when the reaper later decides to append -- output: $r13_out"
+  fail=1
+fi
+
+# case 14 (must-REFUSE, sibling of 13): the sprint resolves but its log does not exist ----------------
+# Same tree as 13 minus the log. The launcher must not create one (reap() refuses to invent a record
+# for the same reason) and must not fire.
+d=$(make_case "fired-no-log" "qa-check-clean.sh" "clean.md")
+rm -rf "$d/docs/sprint/logs"
+r14_out=$(run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+  --wait-seconds 2 --poll-seconds 1 --no-reap -- sh -c 'touch "$0"' "$d/marker" --permission-mode dontAsk --allowedTools Bash 2>&1)
+r14_rc=$?
+if [ "$r14_rc" -eq 1 ] && printf '%s\n' "$r14_out" | grep -q 'DEAD-ON-ARRIVAL' && printf '%s\n' "$r14_out" | grep -q 'TD-122' &&
+   [ ! -f "$d/marker" ] && [ ! -e "$d/docs/sprint/logs" ]; then
+  echo "PASS fixture(fired-no-log-refuses): DOA naming TD-122, nothing fired, no log invented"
+else
+  echo "FAIL fixture(fired-no-log-refuses): rc=$r14_rc marker=$([ -f "$d/marker" ] && echo FIRED || echo none) logs-dir=$([ -e "$d/docs/sprint/logs" ] && echo CREATED || echo none) -- output: $r14_out"
+  fail=1
+fi
+
+# case 15 (must-REFUSE): no sprint resolves at all (no --sprint, no active Plan) ----------------------
+d="$work/fired-no-sprint"
+mkdir -p "$d"
+( cd "$d" && git init -q ) || { echo "FAIL harness: git init failed in $d"; exit 2; }
+r15_out=$(run_launcher "$d" --mode overnight \
+  --wait-seconds 2 --poll-seconds 1 --no-reap -- sh -c 'touch "$0"' "$d/marker" --permission-mode dontAsk --allowedTools Bash 2>&1)
+r15_rc=$?
+if [ "$r15_rc" -eq 1 ] && printf '%s\n' "$r15_out" | grep -q 'TD-122' && [ ! -f "$d/marker" ]; then
+  echo "PASS fixture(fired-no-sprint-refuses): DOA naming TD-122, nothing fired"
+else
+  echo "FAIL fixture(fired-no-sprint-refuses): rc=$r15_rc marker=$([ -f "$d/marker" ] && echo FIRED || echo none) -- output: $r15_out"
+  fail=1
+fi
+
+# case 16 (must-PASS): with the reaper ON, the fired line sits AHEAD of the rollup and the rollup still reads clean
+# The reaper's own window is "lines appended since logdoc_base"; the fired line is written before that mark is
+# measured so it is never part of what the run is judged on. Polls like case 9: reap() is asynchronous.
+d=$(make_case_tree "fired-then-reaped" "qa-check-clean.sh" "reap-mode-canonical")
+r16_log="$d/docs/sprint/logs/SPRINT-990-fx.md"
+r16_out=$(run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+  --wait-seconds 2 --poll-seconds 1 -- true --permission-mode dontAsk --allowedTools Bash 2>&1)
+r16_rc=$?
+r16_found=0
+r16_i=0
+while [ "$r16_i" -lt 20 ]; do
+  grep -q '^terminal · ' "$r16_log" 2>/dev/null && { r16_found=1; break; }
+  r16_i=$((r16_i + 1))
+  sleep 1
+done
+r16_fired_at=$(grep -n '^fired · ' "$r16_log" 2>/dev/null | head -n1 | cut -d: -f1)
+r16_rollup_at=$(grep -n '| run-complete |' "$r16_log" 2>/dev/null | head -n1 | cut -d: -f1)
+if [ "$r16_rc" -eq 0 ] && [ "$r16_found" -eq 1 ] && [ "$(count_fired "$r16_log")" -eq 1 ] &&
+   [ -n "$r16_fired_at" ] && [ -n "$r16_rollup_at" ] && [ "$r16_fired_at" -lt "$r16_rollup_at" ]; then
+  echo "PASS fixture(fired-precedes-rollup): one fired line, then the reaper's run-complete block"
+else
+  echo "FAIL fixture(fired-precedes-rollup): rc=$r16_rc terminal-found=$r16_found fired-at=${r16_fired_at:-none} rollup-at=${r16_rollup_at:-none} fired-count=$(count_fired "$r16_log") -- output: $r16_out"
+  fail=1
+fi
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then

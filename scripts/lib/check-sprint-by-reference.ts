@@ -32,6 +32,7 @@
 //                     MEMBER-DROPPED <id>    planned member left both indices with no scope-change
 //                     MEMBER-UNPLANNED <id>  member added after plan_commit with no scope-change
 //   close (--close):  CLOSE-OPEN <id>        member not in done/ or cancel/
+//                     CLOSE-FIRED-UNREAPED   the log's last `fired · ` line has no `terminal · ` line after it (TD-122)
 //   both:             MEMBER-MISSING <id>    member absent (or ambiguous) at its baseline or now
 //   freeze point:     NO-PLAN-COMMIT · PLAN-COMMIT-NOT-ANCESTOR · PLAN-COMMIT-NO-PLAN ·
 //                     PLAN-COMMIT-UNRECORDED · PLAN-COMMIT-LATE
@@ -160,6 +161,42 @@ function scopeChangeEntries(log: string, from = 0): string[] {
   }
   flush();
   return entries;
+}
+
+// SPRINT-118 T1 (TD-122). night-run.sh appends `fired · <ts> · <mode>` at column 1 BEFORE the wrapped
+// command runs; reap()'s rollup is the only thing that ends a run. Same `<word> · ` column-1 vocabulary as
+// the `terminal · ` line, and the same shape check-authority.ts anchors on.
+const FIRED_RE = /^fired · \S+ · \S/;
+const TERMINAL_RE = /^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · /;
+
+/**
+ * True when the LAST `fired · ` line (fenced / commented regions hidden) has no `terminal · ` line after
+ * it. A fired line quoted in a fence is an example, not a launch.
+ *
+ * The terminal line needs one carve-out the fired line does not: reap() writes its rollup INSIDE a bare
+ * fence (`run · … / terminal · …` between ``` lines, under a `### date | run-complete | …` heading), so
+ * stripping fences alone would read every properly reaped run as unreaped. A fenced `terminal · ` line
+ * therefore counts only while the current entry's own heading is `run-complete` -- a heading is never
+ * hidden by a fence, so a worked example quoted under a `progress` entry still cannot stand in for one.
+ */
+function firedUnreaped(log: string): boolean {
+  let fired = false;
+  let reaped = false;
+  let inRollup = false;
+  for (const { line, hidden } of scanBlocks(log)) {
+    if (!hidden && /^#{1,3} /.test(line)) {
+      const f = stripComments(line).split("|");
+      inRollup = /^### /.test(line) && f.length >= 2 && f[1]!.trim().toLowerCase() === "run-complete";
+      continue;
+    }
+    if (!hidden && FIRED_RE.test(line)) {
+      fired = true;
+      reaped = false; // only a terminal line AFTER the latest launch answers it
+      continue;
+    }
+    if (fired && TERMINAL_RE.test(line) && (!hidden || inRollup)) reaped = true;
+  }
+  return fired && !reaped;
 }
 
 function commitTree(root: string, commit: string): Tree {
@@ -452,6 +489,19 @@ function main(argv: string[]) {
       const folder = nowP[0]!.split("/")[2]!;
       if (CLOSED.has(folder)) ok(`close ${id}`, `in ${folder}/`);
       else bad(`CLOSE-OPEN ${id}`, `in ${folder}/, not done/ or cancel/`);
+    }
+  }
+
+  // TD-122: a launch with no rollup after it. Close-only -- a live run legitimately has a fired line and
+  // no terminal line yet. Once per sprint, not per member, so it sits outside the member loop.
+  if (closeMode) {
+    if (firedUnreaped(liveSources[0]![1])) {
+      bad(
+        "CLOSE-FIRED-UNREAPED",
+        "the Execution Log has a `fired · ` line with no `terminal · ` line after it -- a run was launched and never reached the reaper, so its outcome was never recorded (TD-122)",
+      );
+    } else {
+      ok("close fired-line", "no launch is left without a rollup after it");
     }
   }
 }

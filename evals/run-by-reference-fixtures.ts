@@ -142,6 +142,17 @@ const INLINE = (d: string, body: string) => edit(d, SPRINT, "## Files Changed", 
 const EDIT_901 = (dir: string, rel: string) =>
   edit(dir, rel, "- [ ] a retained fixture covers the empty input", "- [ ] a retained fixture covers the empty input\n- [ ] a benchmark stays under 5ms");
 
+// Every member closed (done/ and cancel/), so a close-mode case exercises ONLY the log-side finding.
+const CLOSE_ALL = (d: string) => {
+  mv(d, W("todo", T901), W("done", T901));
+  mv(d, W("todo", T902), W("done", T902));
+};
+// Appends a retained log fragment (evals/fixtures/by-reference/) to the sprint's Execution Log, committed.
+const logFragment = (d: string, name: string) => {
+  appendFileSync(join(d, LOG), fix(name));
+  commit(d, `log fragment ${name}`);
+};
+
 const CASES: Case[] = [
   // --- freeze: must-PASS controls -----------------------------------------------------------
   { name: "clean", mutate: () => {}, expect: [] },
@@ -1513,6 +1524,70 @@ const CASES: Case[] = [
       mv(d, W("todo", T902), W("done", T902));
     },
     expect: ["CLOSE-OPEN TASK-901"],
+  },
+  // --- close: a run that fired and never reached the reaper (SPRINT-118 T1 -- TD-122) -------------
+  // night-run.sh writes a column-1 `fired · ` line into the Execution Log before the run starts; the
+  // reaper's rollup is the only thing that ends it. Close-only: a LIVE run has a fired line and no
+  // rollup yet, legitimately. Every member is done so CLOSE-OPEN stays out of the finding set.
+  {
+    name: "close-fired-no-terminal (must-FAIL: CLOSE-FIRED-UNREAPED)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-fired-unreaped.md");
+    },
+    expect: ["CLOSE-FIRED-UNREAPED"],
+  },
+  {
+    name: "close-fired-then-reaped (control: the fired line is followed by the reaper's REAL rollup block, whose terminal line is fenced)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-fired-reaped.md");
+    },
+    expect: [],
+  },
+  {
+    name: "close-never-fired (control: a log with no fired line owes no rollup)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+    },
+    expect: [],
+  },
+  {
+    name: "close-fired-only-in-a-fence (control: a quoted example is not a launch)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-fired-fenced.md");
+    },
+    expect: [],
+  },
+  {
+    name: "close-earlier-run-reaped-later-run-not (must-FAIL: the terminal line must come AFTER the fired line)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-reaped-then-refired.md");
+    },
+    expect: ["CLOSE-FIRED-UNREAPED"],
+  },
+  {
+    name: "close-fired-then-quoted-terminal (must-FAIL: a rollup quoted under a non-rollup heading is not a rollup)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-fired-unreaped-quoted-terminal.md");
+    },
+    expect: ["CLOSE-FIRED-UNREAPED"],
+  },
+  {
+    name: "open-fired-no-terminal (control: NOT --close, a live run has a fired line and no rollup yet)",
+    mutate: (d) => {
+      logFragment(d, "log-fired-unreaped.md");
+    },
+    expect: [],
   },
 ];
 

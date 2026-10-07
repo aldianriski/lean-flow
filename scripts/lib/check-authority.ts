@@ -9,6 +9,18 @@
 // See check-authority.sh's own header comment for the FULL rationale (TD-123/TD-124 mode signal,
 // the de-fenced-copy fix, the two assertions' different kinds) -- not re-derived here, only ported.
 //
+// THE MODE SIGNAL IS NOW PARTLY A RECORDED FACT, AND THAT PART IS TS-ONLY (SPRINT-118 T1, TD-124).
+// check-authority.sh could only INFER attendedness from two defeatable signals (a `terminal · ` line the
+// reaper may never write, a pinned envelope that proves a grant and not a run). night-run.sh now appends
+// one `fired · <ts> · <mode>` line to the sprint's Execution Log before the wrapped command runs, not
+// gated on reap(), and this file reads it as a third signal, OR-ed with the other two (kept for logs
+// written before that line existed). check-authority.sh is NOT updated: ADR-050 §3 froze it as the
+// differential oracle, so evals/run-authority-differential.ts diverges from it on the fired-unattended
+// fixture by construction, the same way member-file findings are excluded -- a named consequence of the
+// freeze, not a port defect. RESIDUAL, stated honestly: a run fired OUTSIDE night-run.sh leaves no
+// `fired · ` line, and night-run.md's pre-flight forbids that path. A log written before this line
+// existed still rests on the two older signals and keeps their gap.
+//
 // MEMBER-FILE READING IS TS-ONLY (TASK-382, owner ruling B). check-authority.sh keeps reading ONLY
 // the Plan header meta -- it stays the differential oracle for that half, unchanged. This file
 // additionally resolves the sprint's CURRENT docs/work/ members (scripts/lib/sprint-members.ts,
@@ -125,15 +137,27 @@ export interface ModeSignal {
 }
 
 const TERMINAL_RE = /^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · /m;
+// SPRINT-118 T1 (TD-124): the launcher's own fire-time line. Anchored exactly like TERMINAL_RE (column 1,
+// run over the de-fenced log) but it carries NO state vocabulary -- it records only that a run fired.
+const FIRED_RE = /^fired · \S+ · \S/m;
 const ENVELOPE_SHA_RE = /.* @ ([0-9a-fA-F]{7,})[ \t]*$/;
 
 /**
- * TD-123/TD-124: two independent, neither-airtight signals that an UNATTENDED run touched this
- * sprint -- see check-authority.sh's header for the full caveat on what this does and does not
- * prove. `logExists` and `defenced` are the de-fenced log content (empty string if the log is
+ * TD-123/TD-124: three signals that an UNATTENDED run touched this sprint. The `fired · ` line is
+ * written by night-run.sh BEFORE the wrapped command runs and independent of reap()'s decision to
+ * append, so it is a recorded fact rather than an inference. The `terminal · ` line and the pinned
+ * envelope stay as an OR backstop for logs written before that line existed. See the header's
+ * residual paragraph for what the OR still does not prove. `logExists` and `defenced` are the de-fenced log content (empty string if the log is
  * absent or empty); `spContent` is the sprint doc's own frontmatter source.
  */
 export function computeModeSignal(logExists: boolean, defenced: string, spContent: string): ModeSignal {
+  if (logExists && FIRED_RE.test(defenced)) {
+    return {
+      touch: true,
+      reason:
+        "this log's own `fired · ` line, written by night-run.sh before the run started, records that an unattended run was launched against it",
+    };
+  }
   if (logExists && TERMINAL_RE.test(defenced)) {
     return {
       touch: true,

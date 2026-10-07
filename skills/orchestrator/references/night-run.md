@@ -536,6 +536,16 @@ wrote a false rollup into the wrong one's log. `--sprint` must name a file that 
 `status: active`, checked before anything launches, the same discipline an unrecognised `--mode`
 already gets.
 
+**The launcher also records that the run *fired*, before it runs (TD-122 · TD-124).** One line,
+`fired · <ISO-8601 UTC> · <mode>`, is appended at column 1 to the target sprint's Execution Log
+(`docs/sprint/logs/<the Plan's basename>`) ahead of the wrapped command — with or without
+`--no-reap`, because the opt-out is of the rollup, never of the record that a run happened. So a run
+that fires and dies before the reaper no longer leaves a log identical to no run at all, and
+`check-authority` reads attendedness from that written line instead of inferring it. **It needs a
+target:** no resolvable sprint, or a sprint with no Execution Log yet (a promoted Plan always has one),
+is a `DEAD-ON-ARRIVAL` naming TD-122, before anything fires or the gate runs. The line is a ledger
+entry for two checks, never an event stream or a resume input — one line per fire, nothing else.
+
 Two properties worth knowing, because they bound what the rollup can tell you:
 
 - **It states facts and never guesses.** A task is marked `unattempted` only when the run wrote *no
@@ -703,6 +713,12 @@ archived-sprint population one task up.
 claim that the run ended cleanly — it is the same silence the DoD count exists to break, one level up:
 the count says how much of the Plan is done, the terminal state says *why the run stopped being the
 thing that does it*. A run can be `12 of 12` and still have stopped for a reason worth reading.
+
+**The launcher's `fired ·` line is the other half of that pair.** `terminal ·` says how a run ended;
+the `fired · <ISO-8601 UTC> · <mode>` line (written at launch, above the rollup) says it began. At
+**close**, `check-sprint-by-reference.ts --close` FAILs `CLOSE-FIRED-UNREAPED` when a `fired ·` line has no
+`terminal ·` line after it — a run was launched and never reached the reaper. Close only: a live run
+legitimately has the first and not yet the second.
 
 **Why the header line exists.** The `sprint-bulk` loop is run by the *model*, and nothing outside it
 checks that the Plan was exhausted. When the model ends a turn after finishing a task, the headless

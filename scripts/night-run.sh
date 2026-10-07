@@ -28,13 +28,18 @@
 #                       nothing) if it finds zero or more than one, rather than guessing (TD-112:
 #                       SPRINT-089's reaper once guessed and wrote a false rollup into the wrong
 #                       sprint's log). Must name a file that exists and carries `status: active`.
+#                       The run NEEDS a resolvable sprint AND its Execution Log
+#                       (docs/sprint/logs/<same basename>): before the command runs, one
+#                       `fired · <UTC timestamp> · <mode>` line is appended there, with or without
+#                       --no-reap (TD-122/TD-124). No sprint, or no log yet, is a DEAD-ON-ARRIVAL.
 #
 # Everything after `--` is executed verbatim, detached, exactly as given -- this script
 # does not build the command for you; see night-run.md Part 2 for how to build it.
 #
 # Verdicts (exactly one, to stdout):
 #   ALIVE               process is up and making progress (or already finished cleanly)
-#   DEAD-ON-ARRIVAL: <reason>   names what failed -- never a bare non-zero
+#   DEAD-ON-ARRIVAL: <reason>   names what failed -- never a bare non-zero (includes: no sprint
+#                       or log to record the run as fired in, which refuses BEFORE firing)
 #   UNKNOWN: <reason>   process is up but nothing observable happened in the window --
 #                       indeterminate, NOT dead (TD-029). A silent-but-working run looks
 #                       identical to a stalled one from outside, and with a buffering output
@@ -593,6 +598,24 @@ else
   resolved_sprint=$(find_sprint "$repo_root" || printf '')
 fi
 
+# The fire-time ledger needs somewhere to be written (SPRINT-118 T1, TD-122 + TD-124): the run records
+# that it FIRED in the target sprint's Execution Log before the wrapped command starts, and a run with
+# nowhere to record that is exactly the "fired but invisible" shape this exists to remove. So no resolvable
+# sprint, or no log yet for it, is refused HERE -- before the qa-check gate, which costs minutes -- rather
+# than fired unrecorded. A promoted Plan always has a log (its promote entry creates it), so this only ever
+# refuses a run that was never going to be accountable. Not creating the log is deliberate, for the reason
+# reap() gives: inventing the record is not completing one.
+fired_doc=""
+[ -n "$resolved_sprint" ] && [ -n "$repo_root" ] && fired_doc="$repo_root/docs/sprint/logs/$(basename "$resolved_sprint")"
+if [ -z "$fired_doc" ] || [ ! -f "$fired_doc" ]; then
+  if [ -z "$resolved_sprint" ]; then
+    fired_why="no sprint resolved (pass --sprint, or ensure exactly one sprint carries status: active)"
+  else
+    fired_why="$resolved_sprint resolved, but its Execution Log does not exist at docs/sprint/logs/$(basename "$resolved_sprint")"
+  fi
+  die_doa "cannot record that this run fired: $fired_why. A run that dies before the reaper is indistinguishable from one that never happened unless it was recorded as fired first (TD-122), and its attendedness could only be inferred (TD-124); refusing rather than firing it unrecorded"
+fi
+
 if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   # Run the gate with MSYS_NO_PATHCONV cleared. On Git-Bash/MSYS hosts that variable is
   # commonly exported to stop a leading-slash argument (a `/skill` prompt) being rewritten
@@ -800,6 +823,23 @@ started=$(date +%s 2>/dev/null || printf '')
 # target -- the whole point of TD-112's fix (SPRINT-089's reaper disagreed with itself about
 # nothing; it simply never had a target signal at all and re-scanned into ambiguity). Nothing to
 # recompute here; the reaper below only consults it, guarded by `reap`, same as always.
+
+# THE FIRE-TIME LEDGER (SPRINT-118 T1 -- closes TD-122 and TD-124). One line, written NOW: after every
+# pre-flight refusal above has passed and before the wrapped command can run, and NOT gated on `reap` --
+# `--no-reap` opts out of the rollup, never out of the record that a run happened. The reaper appends only
+# at the END of a run that reaches it; a run that dies first used to leave a log byte-identical to no run
+# at all, and check-authority.ts had only a `terminal ·` line and a pinned envelope to infer attendedness
+# from. This line is the written fact both were missing.
+#
+# It is written BEFORE logdoc_base is measured below so the reaper's "lines appended by the run" window
+# never contains it -- the ledger is the launcher's own line, not something the run is judged on.
+#
+# GUARDRAIL (.out-of-scope/run-event-log.md, ADR-013 pre-mortem 1): this line must never become the input
+# to a run-state RESUME path, and must not grow into an event stream. One line per fire, nothing else; it
+# is read only by two CHECKS (check-authority.ts, check-sprint-by-reference.ts --close), never by a
+# resumer. The only mode this script can fire in is `overnight` -- every alias resolves to it.
+printf '\nfired · %s · %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${run_mode_canonical:-overnight}" >> "$fired_doc" \
+  || die_doa "cannot append the fired line to $fired_doc -- refusing rather than firing unrecorded (TD-122)"
 
 # How long the Execution Log already is. The reaper compares only what the run APPENDS
 # past this mark against its own rollup lines -- see the note in reap().
