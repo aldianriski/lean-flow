@@ -44,3 +44,5 @@ The envelope as approved by the owner, one dimension per item:
 - **budget:** $10 / 60 min.
 - **stop-conditions:** the five terminal states. A denial of a required command means `HARD_FAILURE` with a clean halt.
 `check-approval-envelope.sh`: `PASS … (all 10 dimensions covered, pinned @ 85b3ffc)`. `check-authority.ts`: T1 J0 and TASK-405 J0 declared.
+
+fired · 2026-10-07T03:09:34Z · overnight
