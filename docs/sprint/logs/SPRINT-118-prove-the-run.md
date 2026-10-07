@@ -208,3 +208,31 @@ Every run commit uses the bare `sprint(119):` form (the review fix held).
   `behaviour:<v> · governance:<v>` schema; the gate will say whether review-depth accepts it.
 - **(3)** The run's calibration row read the budget meter mid-turn ($0.57/$0.69). The reaper's row, taken from the harness result event,
   is authoritative: $0.83.
+
+### 2026-10-07 | progress | integrated-tree gate `322 pass, 4 fail` at `ba123b0`; two fixed, two kept under an owner ruling; T3 closed, T4 rides this session's `/handoff`
+**T3 (TASK-188):** closed `unattempted` (owner ruling, D2). The run did not stop mid-Plan (`PLAN_EXHAUSTED`, 1 of 1), so it moved to done
+(`0646d8c`). **workdoo epic edits** (owner-approved, deferred until after the run): `ba123b0`. The EPIC-016 contribution cell was then
+condensed under 400 chars (`659c473`), keeping every fact workdoo supplied.
+**Full gate on the VPS** (`QA_FULL=1`) at `ba123b0`: `322 pass, 4 fail`.
+- `prose-density` EPIC-016 (9 dense vs baseline 8, caused by the new cell): **fixed**, `659c473`; the file is back at 8, which is its baseline.
+- `member-layers-incomplete` T2 (TASK-319's tick evidence named `check-night-run-rollup.ts` as a file token): **fixed** in `f8eaef71` by
+  rewording the evidence in prose. Locally: layers-completeness 0 FAIL, by-reference `5 pass, 0 fail`.
+- `review-depth-unclassified` ×2 on SPRINT-119's log: the run wrote `behaviour:none · governance:none`, and `none` is not a class. An
+  appended, schema-correct pair does not clear it (verified on a temp copy). **Owner ruling: keep the run's lines verbatim.** The FAIL is
+  itself evidence that the headless run's bookkeeping drifted from the schema. File a TD, and close under a recorded ADR-021 override for
+  exactly these two lines (precedent: SPRINT-098). They leave the gate when SPRINT-119 is archived at close.
+**Owed at close (sweep these, owner-approved routing):**
+- **TDs:**
+  - (a) model-written unfenced `terminal ·` satisfies `--close`, so require the reaper's `[derived]` tag (TD-122 residual);
+  - (b) the headless run's review vocabulary drifted (`none`), since nothing it reads names the classes;
+  - (c) a budget or `timeout` stop is reaped as `HARD_FAILURE`, while SPRINT-119 D2 says `BUDGET_STOP`;
+  - (d) sprint-bulk step 0 and `/handoff` step 1 have no named-target rule when more than one sprint is active;
+  - (e) the tracked `.claude/settings.json` names the `.sh` oracles and carries dead directory-prefix rules;
+  - (f) the run's first rollup used a `rollup` header that the checker cannot read.
+- **L-candidate:** a read-only command (`uname`) is auto-approved, so it can never be a probe's must-deny control.
+- **Resolve:** TD-122 and TD-124 (T1).
+- **EPIC-015:** Closed-when 1 is now satisfiable, so tick it at the rollup with the run's evidence.
+- **SPRINT-119:** close and archive it alongside SPRINT-118 (one run, one vehicle).
+- **System-verify:** the ADR-021 override above; everything else must be green.
+**T4 (TASK-327):** the owner ruled to take a real `/handoff` at the end of this session (close is genuine open work). TASK-327 moves to
+in_progress. The next session's `/prime` must report the record, and close must reconcile it to `spent`.
