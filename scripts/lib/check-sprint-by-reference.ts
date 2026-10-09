@@ -26,7 +26,7 @@
 //            MEMBER-UNPLANNED); its baseline is the first commit after plan_commit that stamps or
 //            lists it (owner ruling, SPRINT-107 G2).
 //
-// Usage: bun scripts/lib/check-sprint-by-reference.ts <sprint-file> [--close]
+// Usage: bun scripts/lib/check-sprint-by-reference.ts <sprint-file> [--close] [--scope-change]
 //   freeze (always):  FREEZE-EDIT <id>       unlogged change to a member's `## Done when` since its baseline
 //                     NO-DONE-WHEN <id>      no `## Done when` at the baseline or now -- nothing to compare
 //                     MEMBER-DROPPED <id>    planned member left both indices with no scope-change
@@ -36,6 +36,7 @@
 //   both:             MEMBER-MISSING <id>    member absent (or ambiguous) at its baseline or now
 //   freeze point:     NO-PLAN-COMMIT · PLAN-COMMIT-NOT-ANCESTOR · PLAN-COMMIT-NO-PLAN ·
 //                     PLAN-COMMIT-UNRECORDED · PLAN-COMMIT-LATE
+//   L-229 (--scope-change only): scope-change-outside-layers <Tn> <path>  a scope-change entry names a repo path in none of its Tn's Layers:/Cites:
 //   guards:           NO-MEMBERS -- a check with nothing to check is not a pass
 // Prints one PASS/FAIL line per assertion, then `check-sprint-by-reference: N pass, M fail`.
 // Exits 1 if M > 0.
@@ -199,6 +200,49 @@ function firedUnreaped(log: string): boolean {
   return fired && !reaped;
 }
 
+// SPRINT-120 T6 (TASK-411 · L-229). A scope-change entry that widens a task's files is half a change
+// unless the Plan's `Layers:` is edited too -- the layers checkers read the Plan, never the Log.
+// A "repo path" is a backticked span shaped as the layers checkers shape one (a `name.ext` file or a
+// `dir/` token); a trailing `:123` / `:12-30` line ref resolves to its file.
+function repoPath(span: string): string | null {
+  const p = span.replace(/:\d+(?:-\d+)?$/, "");
+  if (!/^[A-Za-z0-9_./-]+$/.test(p)) return null;
+  if (/[A-Za-z0-9_-]\/$/.test(p) || /[A-Za-z0-9_-]\.[A-Za-z][A-Za-z0-9]*$/.test(p)) return p;
+  // a dotfile (`.dod-delta-exempt`, `dir/.env`): leading-dot name, no extension. Alone, a short bare
+  // `.sh` / `.ts` is an extension named in prose, not a file, so it needs a `-`/`_` or 5+ chars.
+  const dot = p.match(/(^|\/)(\.[A-Za-z0-9_-]*[A-Za-z0-9_][A-Za-z0-9_-]*)$/);
+  return dot && (dot[1] === "/" || /[-_]/.test(dot[2]!) || dot[2]!.length > 5) ? p : null;
+}
+function pathsIn(text: string): string[] {
+  // a span may hold a command (`bun x.ts --close`): each word is tried, so the file in it still counts
+  return [...text.matchAll(/`([^`]+)`/g)].flatMap((m) => m[1]!.split(/\s+/).map(repoPath)).filter((p): p is string => p !== null);
+}
+/** `Tn` -> its declared paths (`Layers:` ∪ `Cites:`, continuation lines included) and the TASK ids it Cites. */
+function planDecls(sprintText: string): Map<string, { paths: Set<string>; ids: Set<string> }> {
+  const out = new Map<string, { paths: Set<string>; ids: Set<string> }>();
+  let cur: { paths: Set<string>; ids: Set<string> } | null = null;
+  let key = ""; // the Layers:/Cites: declaration being read, indented continuation lines included
+  for (const { line, hidden } of scanBlocks(section(sprintText, "Plan") ?? "")) {
+    if (hidden) continue;
+    const h = line.match(/^### (T\d+)\b/);
+    if (h || /^#{1,3} /.test(line)) {
+      cur = h ? { paths: new Set(), ids: new Set() } : null;
+      if (h) out.set(h[1]!, cur!);
+      key = "";
+      continue;
+    }
+    const d = line.match(/^(Layers|Cites):/);
+    key = d ? d[1]! : /^[ \t]+\S/.test(line) ? key : "";
+    if (cur && key) {
+      for (const p of pathsIn(line)) cur.paths.add(p);
+      if (key === "Cites") for (const id of taskIds(line)) cur.ids.add(id);
+    }
+  }
+  return out;
+}
+const declares = (decl: Set<string>, p: string): boolean =>
+  [...decl].some((d) => d === p || (d.endsWith("/") && p.startsWith(d)) || (!p.includes("/") && d.split("/").pop() === p));
+
 function commitTree(root: string, commit: string): Tree {
   const paths = git(root, ["ls-tree", "-r", "-z", "--name-only", commit, "--", WORK])
     .split("\0")
@@ -218,8 +262,9 @@ function commitTree(root: string, commit: string): Tree {
 }
 
 function main(argv: string[]) {
-  const args = argv.filter((a) => a !== "--close");
+  const args = argv.filter((a) => a !== "--close" && a !== "--scope-change");
   const closeMode = argv.includes("--close");
+  const scopeChange = argv.includes("--scope-change");
   if (args.length !== 1) {
     bad("USAGE", "check-sprint-by-reference.ts <sprint-file> [--close]");
     return;
@@ -419,6 +464,42 @@ function main(argv: string[]) {
       // a `Tn` counts only in the heading: in a body it is as often sequencing prose as a subject
       (e) => idRe(id).test(e) || [...e.split("\n")[0]!.matchAll(/\b(T\d+)(?![0-9])/g)].some((t) => tCites.get(t[1]!)?.has(id) ?? false),
     );
+
+  // --- L-229: every path a scope-change entry names must be in its Tn's Layers:/Cites: -----------
+  // The entry's tasks are the `Tn` in its HEADING (as `names` above) plus any Tn whose live Cites: holds
+  // a TASK id in the heading; several tasks check against the union. Read against today's Plan, so the
+  // FAIL clears once Layers: is edited. OPT-IN (--scope-change): the conformance engine maps ANY FAIL line
+  // here to plan-edited-after-freeze, so an adopter must never see this finding under that label. A path the task already declared AT plan_commit is a removal
+  // (a narrowing entry names what it drops), not a widening. An entry naming no Tn in the Plan cannot be
+  // attributed and is not checked -- it is counted in the PASS line, never silently dropped.
+  if (scopeChange) {
+    const live = planDecls(sprintText);
+    const frozen = planDecls(frozenSprint);
+    let checked = 0;
+    let unattributed = 0;
+    const failedBefore = fail;
+    for (const [, text] of liveSources) {
+      for (const entry of scopeChangeEntries(body(text))) {
+        const head = entry.split("\n")[0]!;
+        const tns = [...live.keys()].filter(
+          (t) => new RegExp(`\\b${t}(?![0-9])`).test(head) || [...live.get(t)!.ids].some((id) => idRe(id).test(head)),
+        );
+        if (tns.length === 0) {
+          unattributed++;
+          continue;
+        }
+        checked++;
+        const decl = new Set(tns.flatMap((t) => [...live.get(t)!.paths]));
+        const was = new Set(tns.flatMap((t) => [...(frozen.get(t)?.paths ?? [])]));
+        for (const p of new Set(pathsIn(entry))) {
+          if (!declares(decl, p) && !declares(was, p)) {
+            bad(`scope-change-outside-layers ${tns.join("+")} ${p}`, `"${head.slice(4, 100)}" names ${p}, absent from ${tns.join("/")} Layers:/Cites: in the Plan -- edit Layers: (or Cites: if it is only read)`);
+          }
+        }
+      }
+    }
+    if (fail === failedBefore) ok("scope-change layers", `${checked} scope-change entr${checked === 1 ? "y" : "ies"} checked against the Plan's Layers:/Cites:; ${unattributed} name no Tn in the Plan`);
+  }
 
   // --- population: Members ids ∪ sprint: stamps, at plan_commit and now --------------------------
   // stampedIn/nowTree moved to sprint-members.ts (TASK-382 owner ruling A); sprintNo may be null

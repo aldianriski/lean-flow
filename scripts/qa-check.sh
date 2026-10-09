@@ -1380,6 +1380,33 @@ else
   fi
 fi
 
+# --- 14-a. A scope-change entry's paths are in its Tn's Layers:/Cites: (L-229, SPRINT-120 T6) -----
+# A scope-change that widens a task's files in the Log but not the Plan's Layers: is half a change: the
+# layers checkers read the Plan. Opt-in (--scope-change) and run here only, never by the conformance
+# engine, which maps any FAIL of this checker to plan-edited-after-freeze (an adopter would see a wrong label).
+sc_script="scripts/lib/check-sprint-by-reference.ts"
+if ! command -v bun >/dev/null 2>&1; then
+  bad "scope-change layers: bun not found on PATH -- cannot run $sc_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+elif [ ! -f "$sc_script" ]; then
+  bad "scope-change layers: checker not found at $sc_script"
+else
+  sc_files=$(grep -lE '^status: *active' docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$sc_files" ]; then
+    note "scope-change layers: skip (no active sprint in docs/sprint/SPRINT-*.md)"
+  else
+    for sc_f in $sc_files; do
+      sc_out=$(bun "$sc_script" "$sc_f" --scope-change 2>&1); sc_code=$?
+      if [ "$sc_code" -eq 0 ]; then
+        ok "scope-change layers $sc_f ($(printf '%s\n' "$sc_out" | grep -cE '^PASS') check(s) PASS)"
+      else
+        sc_find=$(printf '%s\n' "$sc_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
+        [ -n "$sc_find" ] || sc_find="no FAIL line in output -- checker exited $sc_code without reporting one"
+        bad "scope-change layers $sc_f: $sc_find"
+      fi
+    done
+  fi
+fi
+
 # --- 14-bis. Authority class declared per task, and a J2 task not executed (SPRINT-088 T1) --------
 # night-run.md Part 0 § Authority classes defines J0/J1/J2. The classes describe behaviour the loop
 # already had; what was missing was any place a run could READ them and any check they were written
