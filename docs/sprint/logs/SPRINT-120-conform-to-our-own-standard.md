@@ -110,3 +110,36 @@ backticks SPRINT-115's dotfile as an example, and T6 does not cite it.
 **Impact (owner ruling):** the check fires only behind an opt-in flag. lean-flow's own gate script passes that flag for active sprints, so
 T6 `Layers:` gains `scripts/qa-check.sh`. The adopter engine's output stays unchanged, and T6 stays Other G. T6 `Cites:` gains the dotfile
 example, since it is cited, not touched. **Re-confirm G2:** this entry is the ruling.
+
+### 2026-10-09 | progress | T4 done: the engine skips worktrees (bracket-safe); main reaches conformance level Structural
+consequence · T4 · behaviour:material · governance:high
+Builder (worktree, Sonnet; about 120k tokens):
+- `eea6a67a`: the `_repo_files` prune plus the `_s12_tracked` filter. Engine harness 65 → 69 PASS. Seed 1 reddened only the placement
+  case and seed 2 only the S12 case; controls stayed green.
+- `fdc6f23c`: the three handoff-state ledgers are generated at test time and the tracked copies deleted. Harness 25 → 25 PASS, same verdicts.
+- `31b88f09`: a review retry. The walk now runs from inside the root, so glob characters in the root path cannot defeat the prune or the
+  prefix strip. Engine harness 71 PASS; a seed of the old walk reddened both bracketed-root cases.
+Review (consequential G):
+- Isolated Sonnet `REVIEW: CLEAR`, 8 of 8 items, including old vs new engine byte-identical on a tree with no worktrees.
+- Codex round 1, 2 findings: (a) a bracketed root (fixed in `31b88f09`); (b) Git-quoted paths under worktrees escape the filter, which
+  has 0 occurrences and no adopter path, so it goes to a TD.
+- Codex re-review: (a) closed and no cwd leak. One low remains, a newline in a directory name; 0 occurrences, so TD.
+review · T4 · scoped-reviewer · behaviour:material · governance:high
+Merged `8e227bba`. Full `conformance.sh .` on main with **17 agent worktrees present**: `S2.R-PLACEMENT` PASS, **level: Structural**.
+The remaining findings are Gated: 2 ADR edits and 7 retention.
+
+### 2026-10-09 | progress | T6 done: the scope-change check is behind an opt-in flag and wired into lean-flow's gate
+consequence · T6 · behaviour:material · governance:low
+Builder (worktree, Sonnet; about 195k tokens): `fa69a1ba` (the check, 134 → 144/0); `a41813af` (dotfile tokens, 146/0); `e353cbb7` (behind
+`--scope-change`, qa-check leg 14-a, 147/0). Without the flag, the checker's output is byte-identical to the pre-T6 checker on the live
+sprint and on a fixture with findings.
+Real-artifact run, Plans as promoted:
+- fired: SPRINT-115 T4+T5 (including its dotfile), SPRINT-116 T1 and T1+T2, SPRINT-118 T1;
+- not fired: the unbackticked SPRINT-118 member-file mention (out of reach by ruling).
+Corrected final Plans still FAIL on read-only mentions until those are cited.
+Scoped Sonnet review: 1 med finding. This sprint's own log tripped the check (an uncited dotfile example), and the shipped engine's freeze
+leg would have relabelled the finding for adopters. Fixed by owner ruling (the opt-in flag, plus the dotfile cited on T6).
+Re-check after merge `8feb0f39`: with the flag, `9 pass, 0 fail`; without it, `8 pass, 0 fail` (the pre-T6 shape).
+review · T6 · scoped-reviewer · behaviour:material · governance:low
+TD candidates for close: Git-quoted worktree paths · a newline in a directory name (T4) · scope-change path tokens with trailing
+punctuation are dropped (T6) · the flag-on gate leg also reddens on freeze FAILs (overlaps S9, by design for now).

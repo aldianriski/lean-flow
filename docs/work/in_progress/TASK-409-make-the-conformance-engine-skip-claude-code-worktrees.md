@@ -27,10 +27,10 @@ fixture and a control per check, seeded breaks under one hash convention, and a 
 
 ## Done when
 
-- [ ] A retained fixture with a canonical-named file present only inside `.claude/worktrees/` produces no placement finding, while the
+- [x] A retained fixture with a canonical-named file present only inside `.claude/worktrees/` produces no placement finding, while the ✓ engine harness cases worktree-placement-ignored (and a bracketed-root variant) with outside-dir controls; the pre-change engine reports the worktree-sourced finding and seeds of each exclusion redden only their own case; 71 PASS at `31b88f09`
       pre-change engine reports one on the same fixture. A sibling control with the same file at a wrong path outside the worktrees
       directory still FAILs `S2.R-PLACEMENT`.
-- [ ] `sh conformance.sh .` on this repo, with agent worktrees present, reports 0 `S2.R-PLACEMENT` findings. No other rule's verdict
+- [x] `sh conformance.sh .` on this repo, with agent worktrees present, reports 0 `S2.R-PLACEMENT` findings. No other rule's verdict ✓ full conformance on main at `8e227bba` with 17 agent worktrees present: S2.R-PLACEMENT PASS, level Structural; no other verdict changed (isolated review: old vs new engine byte-identical without worktrees)
       changes, except findings that were sourced from inside the worktrees directory.
 
 ## Touches

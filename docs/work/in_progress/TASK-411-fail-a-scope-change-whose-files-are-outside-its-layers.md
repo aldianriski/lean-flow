@@ -24,11 +24,11 @@ the act, so the owner ruled `automate-into-check` (SPRINT-120 promote).
 
 ## Done when
 
-- [ ] A scope-change entry that names a repo path outside the `Layers:` of the task it names FAILs with a named finding, until `Layers:`
+- [x] A scope-change entry that names a repo path outside the `Layers:` of the task it names FAILs with a named finding, until `Layers:` ✓ `e353cbb7`: `scope-change-outside-layers` behind `--scope-change`; seed reddened the 5 must-FAIL cases, the dotfile arm 1; harness 147/0; gate leg wired
       covers the path.
-- [ ] A retained must-FAIL fixture is built from SPRINT-118 T1's real scope-change entry (the work moved to the TypeScript checkers while
+- [x] A retained must-FAIL fixture is built from SPRINT-118 T1's real scope-change entry (the work moved to the TypeScript checkers while ✓ the SPRINT-118 T1 must-FAIL case FAILs with 4 findings and its edited-Layers control PASSes; a no-flag control reports nothing
       `Layers:` still named the shell oracles), and a sibling control whose `Layers:` was edited PASSes.
-- [ ] One run over the real archived SPRINT-115, 116 and 118 logs reports each recorded sighting, and its output is kept in the Execution Log.
+- [x] One run over the real archived SPRINT-115, 116 and 118 logs reports each recorded sighting, and its output is kept in the Execution Log. ✓ the real-artifact run fired for SPRINT-115 T4+T5, SPRINT-116 T1 and T1+T2, SPRINT-118 T1; the unbackticked SPRINT-118 mention is out of reach by ruling; output kept in the Execution Log
 
 ## Touches
 
