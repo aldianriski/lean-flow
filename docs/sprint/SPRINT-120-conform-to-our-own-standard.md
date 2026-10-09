@@ -4,6 +4,7 @@ slug: conform-to-our-own-standard
 owner: Maintainer
 last_updated: 2026-10-09
 status: active
+plan_commit: c226d3a
 update_trigger: sprint execute/close events
 ---
 

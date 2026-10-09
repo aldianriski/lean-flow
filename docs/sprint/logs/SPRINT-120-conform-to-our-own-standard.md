@@ -32,3 +32,8 @@ examples. The owner signed the checklist:
 - **epic rollup currency:** current (`check-epic-archive` 0 FAIL; workdoo NOTEs only).
 - **handoff ledger:** none.
 Size check at pull: 4 S + 3 M, no L. Shared engine file: T4 → T5 (D1).
+
+### 2026-10-09 | progress | pins recorded: `plan_commit` @ `c226d3a`
+The freeze point is the `plan locked` commit, the first in which the Plan and the seven stamped members both exist. `gates_signed:` is
+omitted until G1+G2 are signed at `/orchestrator sprint-bulk` (absence means NOT signed). No `approval_envelope:`, because this sprint is
+attended (T5 is J2).
