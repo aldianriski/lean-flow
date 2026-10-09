@@ -2692,14 +2692,29 @@ assert_S11_BACKLOG() {
 # "Nothing live cites it" (TD-206, spec 0.14.0): no open task's `depends-on:` (backlog/todo/in_progress/review),
 # no active sprint's members -- the latter through the shared lookup (ADR-049), so this rule too needs `bun` --
 # and no whole-word `TASK-<n>` in a tracked `.md` file that is not history (_s11_task_citations).
-_s11_task_citations() {   # <repo> -> one task number per line (leading zeros stripped), ONE pass over the non-history set
-  _tc_files=$(git -C "$1" ls-files -- '*.md' 2>/dev/null | grep -v '^\.claude/worktrees/')
-  [ -n "$_tc_files" ] || _tc_files=$(_repo_files "$1" | grep '\.md$')
-  # History (spec §11): closed task files, every archive/ directory, changelogs, ADRs, LEARNINGS, TECH-DEBT.
-  printf '%s\n' "$_tc_files" |
-    grep -vE '^docs/work/(done|cancel)/|(^|/)archive/|^docs/changelog/|^CHANGELOG\.md$|^docs/adr/|^docs/LEARNINGS\.md$|^TECH-DEBT\.md$' |
-    tr '\n' '\0' | (cd "$1" && xargs -0 cat 2>/dev/null) |
-    grep -owE 'TASK-[0-9]+' | sed 's/TASK-0*//' | sort -u
+_s11_task_citations() {   # <repo> -> sets $cited (task numbers, one per line); rc 1 + $_TC_WHY when the scan could not complete
+  # Every stage goes to a temp file and its status is read: dash has no pipefail, and a scan that dies
+  # half way would hand the caller an empty set and flag every retention-due task (TASK-410 review).
+  _TC_WHY=""; cited=""
+  _tcd=$(mktemp -d 2>/dev/null) || { _TC_WHY="mktemp failed"; return 1; }
+  if git -C "$1" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git -c core.quotePath=false -C "$1" ls-files -- '*.md' > "$_tcd/all" 2>/dev/null || { _TC_WHY="git ls-files failed"; rm -rf "$_tcd"; return 1; }
+  else
+    _repo_files "$1" | grep '\.md$' > "$_tcd/all"
+  fi
+  # History (spec §11), case-insensitive: closed task files, every archive/ directory, archive indexes, changelogs,
+  # ADRs, LEARNINGS, TECH-DEBT; and a worktree copy is not the repository.
+  grep -viE '^\.claude/worktrees/|^docs/work/(done|cancel)/|(^|/)archive/|^docs/sprint/INDEX\.md$|^docs/epic/INDEX\.md$|^docs/knowledge-index\.md$|^docs/changelog/|^CHANGELOG\.md$|^docs/adr/|^docs/LEARNINGS\.md$|^TECH-DEBT\.md$' "$_tcd/all" > "$_tcd/live"
+  [ $? -le 1 ] || { _TC_WHY="grep failed on the file list"; rm -rf "$_tcd"; return 1; }
+  : > "$_tcd/read"
+  while IFS= read -r _tcf; do [ -f "$1/$_tcf" ] && printf '%s\n' "$_tcf" >> "$_tcd/read"; done < "$_tcd/live"
+  tr '\n' '\0' < "$_tcd/read" > "$_tcd/read0"
+  (cd "$1" && xargs -0 cat < "$_tcd/read0") > "$_tcd/body" 2>/dev/null || { _TC_WHY="reading the tracked .md files failed"; rm -rf "$_tcd"; return 1; }
+  grep -owE 'TASK-[0-9]+' "$_tcd/body" > "$_tcd/ids"
+  [ $? -le 1 ] || { _TC_WHY="grep failed on the file bodies"; rm -rf "$_tcd"; return 1; }
+  cited=$(sed 's/TASK-0*//' "$_tcd/ids" | sort -u)
+  rm -rf "$_tcd"
+  return 0
 }
 _s11_backlog_store() {
   repo=$1
@@ -2723,7 +2738,7 @@ _s11_backlog_store() {
     _sr_blocked "S11.BACKLOG" "$_p" && return
     [ "$_SR_STATE" = v2 ] && live="$live $(printf '%s\n' "$_SR_OUT" | sed -n 's/^member TASK-0*\([0-9][0-9]*\) .*/\1/p' | tr '\n' ' ')"
   done
-  cited=$(_s11_task_citations "$repo")
+  _s11_task_citations "$repo" || { note "S11.BACKLOG         -- citation scan unavailable ($_TC_WHY) -- retention not judged; nothing proposed"; return; }
   n_over=0; n_unjudged=0
   for _f in "$repo"/docs/work/done/TASK-*.md "$repo"/docs/work/cancel/TASK-*.md; do
     [ -f "$_f" ] || continue

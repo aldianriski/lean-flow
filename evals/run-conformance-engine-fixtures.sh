@@ -1272,6 +1272,24 @@ if command -v git >/dev/null 2>&1 && command -v bun >/dev/null 2>&1; then
   s11_check "s11-control-whole-word-only-TASK-3570-does-not-keep-357" "$d" present
   d="$work/s11-worktree-copy"; s11_tree "$d"; s11_put "$d" .claude/worktrees/agent-x/docs/note.md "TASK-357"; s11_commit "$d"
   s11_check "s11-control-worktree-copy-citation-ignored" "$d" present
+  # archive indexes + the generated index are history (owner ruling B); a case-variant history dir is too
+  for h in docs/sprint/INDEX.md docs/epic/INDEX.md docs/knowledge-index.md docs/sprint/Archive/SPRINT-800-old.md docs/ADR/ADR-002-y.md; do
+    d="$work/s11-history2-$(printf '%s' "$h" | tr '/.' '--')"; s11_tree "$d"; s11_put "$d" "$h" "cites TASK-357"; s11_commit "$d"
+    s11_check "s11-control-history-$h-does-not-keep-it" "$d" present
+  done
+  # a non-ASCII path is read raw (core.quotePath=false), so its citation keeps the task
+  d="$work/s11-unicode"; s11_tree "$d"; s11_put "$d" "docs/café.md" "see TASK-357"; s11_commit "$d"
+  s11_check "s11-live-citation-in-non-ascii-path-keeps-it" "$d" absent
+  # FAIL-SAFE: a scan that cannot complete proposes NOTHING and says so (the uncited tree is flagged without the shim)
+  for bad_tool in xargs cat; do
+    shim="$work/shim-$bad_tool"; mkdir -p "$shim"; printf '#!/bin/sh\nexit 1\n' > "$shim/$bad_tool"; chmod +x "$shim/$bad_tool"
+    d="$work/s11-failsafe-$bad_tool"; s11_tree "$d"; s11_commit "$d"
+    _o=$(PATH="$shim:$PATH" sh "$engine" "$d" --spec "$spec" 2>&1)
+    if printf '%s\n' "$_o" | grep -qE 'S11\.BACKLOG +-- citation scan unavailable \(.*\) -- retention not judged; nothing proposed'; then echo "PASS fixture(s11-failsafe-$bad_tool-note): the unavailable-scan note is printed"
+    else echo "FAIL fixture(s11-failsafe-$bad_tool-note): no 'citation scan unavailable' note"; fail=1; fi
+    if printf '%s\n' "$_o" | grep -qE "^FAIL +closed-task-past-retention"; then echo "FAIL fixture(s11-failsafe-$bad_tool-proposes-nothing): a retention finding was raised on a failed scan"; fail=1
+    else echo "PASS fixture(s11-failsafe-$bad_tool-proposes-nothing): no closed-task-past-retention on a failed scan"; fi
+  done
 else
   echo "FAIL fixture(s11-live-citations): git and bun are both required -- the live-citation set is unproven"; fail=1
 fi

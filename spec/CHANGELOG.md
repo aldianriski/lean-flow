@@ -21,14 +21,15 @@ three fields it used to. Owner ruling (G2, SPRINT-120; TD-206).
 - **§11** `docs/work/done/` · `docs/work/cancel/` row: a **live citation** is an open task's `depends-on:`,
   an active sprint's `## Members`, or the task id as a **whole word** (`TASK-357`, never the prefix of
   `TASK-3570`; zero-padded ids count by number) in any tracked `.md` file that is not **history**. History
-  is `done/` and `cancel/` task files, every `archive/` directory, `docs/changelog/`, root `CHANGELOG.md`,
-  `docs/adr/`, `docs/LEARNINGS.md` and `TECH-DEBT.md`. The store's highest id still stays.
-- **§11** `docs/research/` row and `S11.RESEARCH`: "live" is the same set, so §11 has one meaning of the
-  word. `S11.RESEARCH` stays an unimplemented GAP; its id, level and mark are unchanged, and no engine
-  check reads it. Counts stay **100 classified · 51 checkable**.
+  is `done/` and `cancel/` task files, every `archive/` directory, the archive indexes
+  `docs/sprint/INDEX.md` and `docs/epic/INDEX.md`, the generated `docs/knowledge-index.md`,
+  `docs/changelog/`, root `CHANGELOG.md`, `docs/adr/`, `docs/LEARNINGS.md` and `TECH-DEBT.md`, matched
+  case-insensitively. The store's highest id still stays.
+- **§11** `docs/research/` row and `S11.RESEARCH`: **unchanged** — their own reading of "live" stands
+  (ADR-020), and the new definition is for task files only. Counts stay **100 classified · 51 checkable**.
 - **Engine, same release:** `_s11_backlog_store` keeps a closed task that any non-history `.md` file cites,
   in one pass over the tracked set; the finding id, severity and exit meaning are unchanged, and its
-  message names what was checked.
+  message names what was checked. A scan that cannot complete prints a note and proposes nothing.
 
 **Verdict movement.** Only fail → pass: a retention-due task cited from an open task, `CONTEXT.md`, a
 skill reference or any other non-history doc stops reading `closed-task-past-retention`. A task cited only
