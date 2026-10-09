@@ -108,9 +108,10 @@ function build(o: Opts = {}): string {
   return dir;
 }
 
-function run(dir: string, close: boolean, sprint = SPRINT): { findings: string[]; verdict: string; exit: number } {
+function run(dir: string, close: boolean, sprint = SPRINT, scope = false): { findings: string[]; verdict: string; exit: number } {
   const args = [CHECKER, join(dir, sprint)];
   if (close) args.push("--close");
+  if (scope) args.push("--scope-change");
   const r = spawnSync("bun", args, { encoding: "utf8" });
   const lines = (r.stdout ?? "").split(/\r?\n/);
   const findings = lines.filter((l) => l.startsWith("FAIL  ")).map((l) => l.slice(6).split(" -- ")[0]!.trim());
@@ -123,6 +124,7 @@ interface Case {
   opts?: Opts;
   close?: boolean;
   sprint?: string; // where the sprint file is at check time, when a case moves it
+  scope?: boolean; // pass --scope-change (L-229, opt-in); default: the T6 cases (from scope-change-sh-to-ts on) do
   mutate: (dir: string) => void;
   expect: string[];
 }
@@ -1675,19 +1677,26 @@ const CASES: Case[] = [
     expect: [],
   },
   {
+    name: "scope-change-check-is-opt-in (control: the undeclared-path must-FAIL input WITHOUT --scope-change reports nothing)",
+    scope: false,
+    mutate: (d) => logEntry(d, "scope-change", "T1 also touches the helper", "**Impact:** T1 edits `src/alpha.ts` and `src/helper.ts`."),
+    expect: [],
+  },
+  {
     name: "scope-change-names-no-Tn-in-its-heading (not attributable, so not checked; a Tn in the body does not count)",
     mutate: (d) => logEntry(d, "scope-change", "a member is dropped", "T1 would have touched `src/zzz.ts`."),
     expect: [],
   },
 ];
 
+const T6_FROM = CASES.findIndex((c) => c.name.startsWith("scope-change-sh-to-ts ("));
 for (const c of CASES) {
   if (process.env.BYREF_ONLY && !c.name.includes(process.env.BYREF_ONLY)) continue; // dev filter: a full run is ~14 min on Windows
   let dir = "";
   try {
     dir = build(c.opts); // inside the try: a build error fails its case, never the whole run's verdict line
     c.mutate(dir);
-    const r = run(dir, c.close ?? false, c.sprint);
+    const r = run(dir, c.close ?? false, c.sprint, c.scope ?? CASES.indexOf(c) >= T6_FROM);
     const expect = [...c.expect].sort();
     const setOk = JSON.stringify(r.findings) === JSON.stringify(expect);
     const m = r.verdict.match(/: (\d+) pass, (\d+) fail$/);

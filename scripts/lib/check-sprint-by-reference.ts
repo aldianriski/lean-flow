@@ -26,7 +26,7 @@
 //            MEMBER-UNPLANNED); its baseline is the first commit after plan_commit that stamps or
 //            lists it (owner ruling, SPRINT-107 G2).
 //
-// Usage: bun scripts/lib/check-sprint-by-reference.ts <sprint-file> [--close]
+// Usage: bun scripts/lib/check-sprint-by-reference.ts <sprint-file> [--close] [--scope-change]
 //   freeze (always):  FREEZE-EDIT <id>       unlogged change to a member's `## Done when` since its baseline
 //                     NO-DONE-WHEN <id>      no `## Done when` at the baseline or now -- nothing to compare
 //                     MEMBER-DROPPED <id>    planned member left both indices with no scope-change
@@ -36,7 +36,7 @@
 //   both:             MEMBER-MISSING <id>    member absent (or ambiguous) at its baseline or now
 //   freeze point:     NO-PLAN-COMMIT · PLAN-COMMIT-NOT-ANCESTOR · PLAN-COMMIT-NO-PLAN ·
 //                     PLAN-COMMIT-UNRECORDED · PLAN-COMMIT-LATE
-//   L-229 (always):   scope-change-outside-layers <Tn> <path>  a scope-change entry names a repo path in none of its Tn's Layers:/Cites:
+//   L-229 (--scope-change only): scope-change-outside-layers <Tn> <path>  a scope-change entry names a repo path in none of its Tn's Layers:/Cites:
 //   guards:           NO-MEMBERS -- a check with nothing to check is not a pass
 // Prints one PASS/FAIL line per assertion, then `check-sprint-by-reference: N pass, M fail`.
 // Exits 1 if M > 0.
@@ -262,8 +262,9 @@ function commitTree(root: string, commit: string): Tree {
 }
 
 function main(argv: string[]) {
-  const args = argv.filter((a) => a !== "--close");
+  const args = argv.filter((a) => a !== "--close" && a !== "--scope-change");
   const closeMode = argv.includes("--close");
+  const scopeChange = argv.includes("--scope-change");
   if (args.length !== 1) {
     bad("USAGE", "check-sprint-by-reference.ts <sprint-file> [--close]");
     return;
@@ -467,10 +468,11 @@ function main(argv: string[]) {
   // --- L-229: every path a scope-change entry names must be in its Tn's Layers:/Cites: -----------
   // The entry's tasks are the `Tn` in its HEADING (as `names` above) plus any Tn whose live Cites: holds
   // a TASK id in the heading; several tasks check against the union. Read against today's Plan, so the
-  // FAIL clears once Layers: is edited. A path the task already declared AT plan_commit is a removal
+  // FAIL clears once Layers: is edited. OPT-IN (--scope-change): the conformance engine maps ANY FAIL line
+  // here to plan-edited-after-freeze, so an adopter must never see this finding under that label. A path the task already declared AT plan_commit is a removal
   // (a narrowing entry names what it drops), not a widening. An entry naming no Tn in the Plan cannot be
   // attributed and is not checked -- it is counted in the PASS line, never silently dropped.
-  {
+  if (scopeChange) {
     const live = planDecls(sprintText);
     const frozen = planDecls(frozenSprint);
     let checked = 0;
