@@ -148,3 +148,14 @@ to prevent:
   that quote it (`ADR-016`, `ADR-027`, `ADR-033`, and `ADR-011` itself) keep their historical text —
   they are append-only records of what was true when written, and this row is what a reader follows
   forward.
+
+## Alternatives considered
+
+*(Added SPRINT-120 for §4 conformance. These are the options § Context already weighs, gathered here; no new decision.)*
+
+| Option | Verdict | Why |
+|---|---|---|
+| Keep the blanket "ships no hooks" line | rejected | It was a proxy for `ADR-001`'s curation bar and had started being enforced in its place; the same family carried the false "no scaffold" claim |
+| Write `L-002` a fifth time, in prose | rejected | The rule's trigger is the end of a turn, where no skill step exists, so every written placement is read by an agent that has already stopped |
+| Ship the `ask-dont-tell` Stop hook now | rejected | About 60% false positives on 48 real transcripts, and mandatory for every consumer because there is no per-hook disable; withdrawn and re-filed as `TASK-366` |
+| Supersede `ADR-011` in full | rejected | Its surviving rulings still hold: G1/G2 stay advisory and unenforced, and no hook may block a gate |
