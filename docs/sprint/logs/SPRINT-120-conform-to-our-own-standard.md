@@ -164,3 +164,43 @@ punctuation are dropped (T6) · the flag-on gate leg also reddens on freeze FAIL
 - **Retry fixes:** the scan fails safe (it skips judging, loudly, and never widens what it flags), Unicode-safe listing, case-insensitive
   history matching. The rest goes to TDs.
 **Re-confirm G2:** this entry is the ruling.
+
+### 2026-10-09 | progress | T5 done: §11 live-citation set widened for task files (spec 0.14.0, J2 signed); TD-206 resolved
+consequence · T5 · behaviour:material · governance:high
+Builder (worktree, Sonnet; about 184k tokens):
+- `506207e7`: spec, engine, 17 cases; harness 71 → 88.
+- `bcb283f7` (retry): the owner's history additions, research rows reverted, plus the fail-safe, Unicode and case fixes; harness 88 → 97
+  locally, 98 on the VPS (the count differs by host; not chased).
+Seeds:
+- Builder: keep-set → 3 red; archive → 3; substring → 1; Unicode → 1; case → 2.
+- Coordinator on the VPS (the builder's runs were killed for low memory): fail-safe neutered → exactly the 4 fail-safe assertions red;
+  INDEX entries removed → exactly the 3 INDEX controls red. Restore hash `51db7f5a` equals HEAD both times.
+Review (consequential G):
+- Isolated Sonnet: 1 med + 2 low. Codex round 1: 4 P2. All fixed in the retry or routed to TDs.
+- Re-review: the Codex re-run hung for about 50 minutes with no verdict and was stopped. The **coordinator** re-checked (a)–(e) by
+  reading the 24-line helper:
+  - every failing stage returns the note and cleans its temp dir;
+  - a dirty tree is skipped, not tripped;
+  - the research rows are byte-equal to 0.13.0 (`md5` of both rows).
+  This was not a fresh-context review, which is recorded here as a gap.
+review · T5 · scoped-reviewer · behaviour:material · governance:high
+VPS `conformance.sh .` at `bcb283f7`: **level Structural**. S11.BACKLOG PASS: no closed task is proposed, including the six live-cited
+ones. Merged `ef95dfd1`.
+TD candidates: quoted paths under worktrees · a newline in a directory or file name (T4 and T5) · scope-change tokens with trailing
+punctuation (T6) · the T6 gate leg also reddens on freeze FAILs · in a sparse checkout, files missing from disk lose their citations
+silently · cat fusing a file with no trailing newline · untracked `.md` citations are ignored inside a git repo · the harness's
+old-engine read fails in a shallow clone (loudly).
+
+### 2026-10-09 | scope-change | T5 cites the history examples its re-ruling entry quoted; §11's definition moves out of the table row
+**What broke:** two of the coordinator's own post-merge checks went red.
+- **T6's scope-change check** (with its flag) caught the T5 re-ruling entry quoting the sprint archive index and a case-variant archive
+  directory as backticked paths that T5 neither declares nor cites. The check did its job on its own sprint.
+- **prose-density on the spec:** 7 dense lines against a baseline of 6. T5 had grown the §11 store row from 641 to 1,462 characters,
+  which is a squeeze (§157).
+**Impact:**
+- T5 `Cites:` gains those two examples (cited, not touched).
+- The signed live-citation definition moves VERBATIM from the table cell into a "Live citation (task files only)" paragraph under the
+  §11 table. The row keeps its prune trigger (the engine reads its sprint-count figure) and points to the paragraph. No word of the
+  definition changes, so the J2 signature stands.
+- prose-density is back to 6 ≤ 6.
+**Re-confirm G2:** none needed, as the meaning is unchanged.

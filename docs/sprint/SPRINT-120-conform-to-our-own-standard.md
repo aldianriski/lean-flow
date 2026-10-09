@@ -79,7 +79,7 @@ Consequential G: `conformance.sh` runs this engine for adopters. The scope of th
 Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh`
   · `evals/fixtures/conformance-engine/` · `TECH-DEBT.md`
 Depends-on: T4
-Cites: `TASK-410` · TD-206 · STANDARD §11 · `S11.BACKLOG` · `S11.RESEARCH` · ADR-050 · ADR-034 · `conformance.sh`
+Cites: `TASK-410` · TD-206 · STANDARD §11 · `S11.BACKLOG` · `S11.RESEARCH` · ADR-050 · ADR-034 · `conformance.sh` · `docs/sprint/INDEX.md` · `Archive/` (history examples quoted in the Execution Log)
 
 J2: the owner signs the new definition of a live citation. Consequential G plus a spec version bump.
 
@@ -105,7 +105,7 @@ Runs both locally and on a clean VPS clone, so host contamination cannot hide a 
 
 ## Owner-action checklist
 - [x] Sign G1 + G2 (`/orchestrator sprint-bulk`) and record `gates_signed:`. ✓ 2026-10-09, see the g2 entry
-- [ ] Sign T5's new §11 definition (J2).
+- [x] Sign T5's new §11 definition (J2). ✓ 2026-10-09: signed; history set re-ruled with data (see the Execution Log)
 
 ## Decisions (pre-locked)
 - **D1** — `scripts/lib/conformance-engine.sh` is shared by T4 and T5. Owner: T4 lands first, and T5 builds on the merged T4. Both are

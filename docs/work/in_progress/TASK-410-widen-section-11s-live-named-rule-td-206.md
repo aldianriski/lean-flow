@@ -27,11 +27,11 @@ in the spec and the engine together, rather than only rewording the message (SPR
 
 ## Done when
 
-- [ ] §11's store row defines the live-citation set: open task files, active sprint and epic files, and the non-archived docs G2 pins.
+- [x] §11's store row defines the live-citation set: open task files, active sprint and epic files, and the non-archived docs G2 pins. ✓ `bcb283f7`: the §11 store row defines the live-citation set (the owner signed it, J2); the research rows are unchanged from 0.13.0 by ruling; spec 0.14.0 with its CHANGELOG entry
       The row is consistent with `S11.RESEARCH`'s "nothing live cites it", and the spec version is bumped in `spec/CHANGELOG.md`.
-- [ ] A retained fixture with a closed task cited only in an open task's body is not flagged, while the pre-change engine flags it. A
+- [x] A retained fixture with a closed task cited only in an open task's body is not flagged, while the pre-change engine flags it. A ✓ engine harness: the open-task citation is kept by the new engine and flagged by the `eef67ee8` engine; the archive and INDEX controls are still flagged; seeds proven (VPS + builder)
       sibling control cited only under `docs/sprint/archive/` is still flagged.
-- [ ] On this repo, `sh conformance.sh .` flags none of TASK-357 · 360 · 368 · 374 · 386 · 392, and TD-206 is resolved to this task.
+- [x] On this repo, `sh conformance.sh .` flags none of TASK-357 · 360 · 368 · 374 · 386 · 392, and TD-206 is resolved to this task. ✓ VPS `conformance.sh .` at `bcb283f7`: S11.BACKLOG PASS, none of the six proposed; TD-206 resolved to TASK-410
 
 ## Touches
 
