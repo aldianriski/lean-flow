@@ -1166,6 +1166,55 @@ else
   want_line "adr49-cli-exit0-no-dod-line-is-a-fail" "$out" '^FAIL  SPRINT-MEMBERS-CLI-UNPARSED: '
 fi
 
+# --- SPRINT-120 T4 (TASK-409, ADR-050 consequential G): every file walk skips .claude/worktrees ----
+# Claude Code keeps whole repo copies under .claude/worktrees/ for isolated agents; a file found
+# there is not the repository's. Owner ruling at G2 (an ADR-034 behaviour change): EVERY walk skips it,
+# so findings SOURCED inside it vanish and nothing else moves. Two walk sites, each with a must-FAIL
+# (the file lives ONLY in the worktree dir: the pre-change engine reports it, the new one must not)
+# and a sibling control (the same file outside it must still be reported -- else "skips" could be a
+# rule that went blind). Retained deliberately: the pair is what makes the exclusion a claim.
+wt_mk() {   # <dir> -- a conformant tree
+  mkdir -p "$1"; write_core_set "$1"; write_base_tier "$1"
+}
+wt_out() {  # <dir> -- the engine's report
+  sh "$engine" "$1" --spec "$spec" 2>&1
+}
+# site 1: _repo_files (S2.R-PLACEMENT's walk)
+d="$work/wt-place-only-in-worktree"; wt_mk "$d"
+mkdir -p "$d/.claude/worktrees/agent-x"; printf '# copy\n' > "$d/.claude/worktrees/agent-x/HANDOFF-LEDGER.md"
+[ -f "$d/.claude/worktrees/agent-x/HANDOFF-LEDGER.md" ] || { echo "FAIL fixture(worktree-seed): the worktree-only file was not written"; fail=1; }
+out=$(wt_out "$d")
+no_line_wt() {   # <name> <output> <regex> -- absent, with the matching lines shown on failure
+  if printf '%s\n' "$2" | grep -qE "$3"; then echo "FAIL fixture($1): /$3/ matched:"; printf '%s\n' "$2" | grep -E "$3" | sed 's/^/    /'; fail=1
+  else echo "PASS fixture($1): /$3/ correctly absent"; fi
+}
+yes_line_wt() {  # <name> <output> <regex>
+  if printf '%s\n' "$2" | grep -qE "$3"; then echo "PASS fixture($1): matched /$3/"
+  else echo "FAIL fixture($1): no line matched /$3/"; fail=1; fi
+}
+no_line_wt "worktree-placement-ignored" "$out" '^FAIL +file-outside-canonical-placement: HANDOFF-LEDGER\.md'
+d="$work/wt-place-control"; wt_mk "$d"
+mkdir -p "$d/notes"; printf '# stray\n' > "$d/notes/HANDOFF-LEDGER.md"
+out=$(wt_out "$d")
+yes_line_wt "worktree-placement-control-outside-still-fails" "$out" '^FAIL +file-outside-canonical-placement: HANDOFF-LEDGER\.md.* notes/HANDOFF-LEDGER\.md'
+# site 2: _s12_tracked (S12.SECRETS' git ls-files walk)
+if command -v git >/dev/null 2>&1; then
+  d="$work/wt-s12-only-in-worktree"; wt_mk "$d"
+  mkdir -p "$d/.claude/worktrees/agent-x"; printf 'API_KEY=sk_live_9f8e7d6c5b4a3f2e1d0c\n' > "$d/.claude/worktrees/agent-x/.env"
+  git -C "$d" init -q 2>/dev/null; git -C "$d" add -f -A 2>/dev/null; git -C "$d" -c user.name=t -c user.email=t@t -c commit.gpgsign=false commit -q -m seed 2>/dev/null
+  if [ -n "$(git -C "$d" ls-files -- .claude/worktrees/agent-x/.env 2>/dev/null)" ]; then
+    out=$(wt_out "$d")
+    no_line_wt "worktree-s12-ignored" "$out" '^FAIL +secret-committed: \.claude/worktrees/'
+  else echo "FAIL fixture(worktree-s12-seed): the worktree-only .env is not tracked, so the case proves nothing"; fail=1; fi
+  d="$work/wt-s12-control"; wt_mk "$d"
+  printf 'API_KEY=sk_live_9f8e7d6c5b4a3f2e1d0c\n' > "$d/.env"
+  git -C "$d" init -q 2>/dev/null; git -C "$d" add -f -A 2>/dev/null; git -C "$d" -c user.name=t -c user.email=t@t -c commit.gpgsign=false commit -q -m seed 2>/dev/null
+  out=$(wt_out "$d")
+  yes_line_wt "worktree-s12-control-outside-still-fails" "$out" '^FAIL +secret-committed: \.env '
+else
+  echo "FAIL fixture(worktree-s12): git is not available -- the second walk site is unproven"; fail=1
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "CONFORMANCE ENGINE FIXTURES: all green"
