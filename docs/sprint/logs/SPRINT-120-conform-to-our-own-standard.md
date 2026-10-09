@@ -61,3 +61,21 @@ G1 fast-path (all seven members `origin: decomposer`): scope unchanged since app
 directory, so it could not see D2's disjoint subdirectories. **Impact:** T4 and T5 declare `evals/fixtures/conformance-engine/` (the
 engine harness builds most fixtures in a temp dir; retained trees go here). T6 declares `evals/fixtures/by-reference/`. T3 already
 declared `evals/fixtures/night-run-reaper/`. No work moves. **Re-confirm G2:** none needed, as the D2 ownership is unchanged.
+
+### 2026-10-09 | progress | wave 1 inline: T1, T2 and T3 committed; a promote miss corrected (aged TD rows named)
+- **T1** `96621dfe`: the five wiring-diff scaffolds were deleted. The only citation was between two of the deleted files. Index current.
+- **T2** `1be24cc9`: ADR-043 gains a dated Negative and ADR-044 a dated Alternatives table, drawn from its own § Context. Neither
+  § Decision was touched.
+- **T3** `739872b3`: `run.log`/`.exit` → `run.jsonl`/`.exit` in two fixture trees, plus the rollup harness path. Rollup 11 → 11 PASS,
+  reap-terminal 12 → 12 PASS, and no tracked `*.log` remains.
+- **conformance.sh, first run: cut off.** My `timeout 400` killed it at §10 with no level line, so it is not proof for the §11/§12 rules.
+  Up to the cut: 0 `S1.LAW3`, 0 `S3.SCHEMA`, 0 `S4.NEGATIVE`, 0 `S4.SECTIONS`; `S4.APPEND` unchanged (ADR-044/048 only).
+- **Promote miss, corrected:** `S10.TDAGING` reads its "now" from the active sprint. At the prune run there was none (118/119 archived,
+  120 not yet rendered), so it skipped with a note. Now it flags **37** aged rows that no sweep names. The SPRINT-120 sweep gave the
+  count (115) but not the names. They are now named in the sweep. Second route: 115 − 37 = 78, named by earlier sweeps.
+consequence · T1 · behaviour:low · governance:low
+consequence · T2 · behaviour:low · governance:low
+consequence · T3 · behaviour:low · governance:low
+review · T1 · self-review · behaviour:low · governance:low
+review · T2 · self-review · behaviour:low · governance:low
+review · T3 · self-review · behaviour:low · governance:low
