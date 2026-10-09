@@ -25,7 +25,7 @@ tier note: (ADR-029 — the guard is proven on fixtures and has never seen live 
 
 ## Done when
 
-- [ ] a real `/handoff` is taken, its two-field record is written by `handoff/SKILL.md` to the sprint's Execution Log (or to `HANDOFF-LEDGER.md` when no sprint pointer exists), `prime` reports it on the next session, and the close-side reconciliation flips it to `spent` — each step observed on the live artifact, not a fixture. The DoD is met when `check-handoff-state.sh .` has printed a verdict about a record **it did not ship with**; today it prints `skip (no handoff records)`
+- [x] a real `/handoff` is taken, its two-field record is written by `handoff/SKILL.md` to the sprint's Execution Log (or to `HANDOFF-LEDGER.md` when no sprint pointer exists), `prime` reports it on the next session, and the close-side reconciliation flips it to `spent` — each step observed on the live artifact, not a fixture. The DoD is met when `check-handoff-state.sh .` has printed a verdict about a record **it did not ship with**; today it prints `skip (no handoff records)` ✓ live, 2026-10-07→09: written (SPRINT-118 log, `live`) · `/prime` row `Handoff:  live -- …SPRINT-118-prove-the-run.md (not yet resumed)` · `consumed` → checker `PASS … consumed`, rc 0 · close `spent` → checker `PASS … spent`, rc 0
 
 ## Touches
 

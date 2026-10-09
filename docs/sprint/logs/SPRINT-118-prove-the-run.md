@@ -269,3 +269,22 @@ handoff-path: C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md
 - **Checker after `consumed`:** `sh scripts/lib/check-handoff-state.sh .` exited 0 and printed 2 lines, both PASS (no `skip`). The verdict line
   on the live record: `PASS  handoff-state: docs/sprint/logs/SPRINT-118-prove-the-run.md handoff 'consumed' at C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md -- not yet reconciled, sprint still active`.
   So the checker read the newest entry, not the first. The `spent` flip (observation 3) happens at close.
+
+### 2026-10-09 | progress | system verify at `e67be803` (VPS, `QA_FULL=1`): `QA-CHECK: 324 pass, 3 fail`, one fixed, two under the ADR-021 ruling
+- **`knowledge index STALE`:** a real finding, not host-only. `b5662cff` filed L-232 without regenerating the index. Fixed in `9d2b88eb`, and
+  `gen-index.sh --check` was run both ways: rc 1 on the old tree, rc 0 on the fix.
+- **`review-depth-unclassified` ×2 on SPRINT-119's log:** exactly the two lines the owner ruled to keep verbatim under a recorded ADR-021
+  override (entry of 2026-10-07). They leave the gate when SPRINT-119 is archived in this close.
+- The other 324 PASS. The full gate is re-run at the final archive commit.
+
+### 2026-10-09 | handoff | reconciled at close -- every item already durable or ruled; TASK-327 observation 3
+handoff-status: spent
+handoff-path: C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md
+Routing of the temp doc's items:
+- **Next steps 1–5** are durable in this log's entries and this close's commits.
+- **Close-sweep debt** was already filed (TD-232–236, L-232, L-229 at count 3) and is not filed again.
+- **VPS:** `~/lf-run` and its trust record are **kept** (owner ruling 2026-10-09). `~/lf-gate` is now detached at the close tree.
+- **Stale plugin cache:** superseded. This session ran on a 2.1.0 cache, the same version as the repo.
+- **Empty leftover `.claude/worktrees/agent-a561ab0a82e0bdfc3/`:** removed after checking it was empty, unregistered and branchless.
+  Ruled no action for the other worktrees from earlier sessions (5 still registered, plus unregistered directories); mentioned, not deleted.
+- **workdoo session and owner preferences:** no action needed. The preferences are already in memory.
