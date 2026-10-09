@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-01
+last_updated: 2026-10-09
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.13.0
+version: 0.14.0
 status: current
 ---
 
@@ -732,7 +732,7 @@ them**. Append-only is preserved *inside* each archive file.
 
 | Ledger | Trigger | Action |
 |---|---|---|
-| `docs/work/done/` · `docs/work/cancel/` task files | closed ≥ 3 sprints ago — its `sprint:` closed then, or, never scheduled, it moved to `cancel/` then — **and** nothing live names it: no open task's `depends-on:`, no active sprint's `## Members` — **and** it is not the store's highest-numbered task file (the next id is derived from the store, so ids stay monotonic) | **delete the file** (propose→approve). History's durable homes are root `CHANGELOG.md`, `docs/sprint/archive/` and git. An ADR, CHANGELOG or archived sprint may still cite the id; the citation resolves through git history — the file was a breadcrumb, not the record |
+| `docs/work/done/` · `docs/work/cancel/` task files | closed ≥ 3 sprints ago — its `sprint:` closed then, or, never scheduled, it moved to `cancel/` then — **and** nothing live cites it — a **live citation** is an open task's `depends-on:`, an active sprint's `## Members`, or the task id as a whole word (`TASK-357`, never the prefix of `TASK-3570`; a zero-padded id counts by number) in any tracked `.md` file that is not **history**. History is the closed task files themselves (`docs/work/done/`, `docs/work/cancel/`), every `archive/` directory (`docs/sprint/archive/`, `docs/epic/archive/`, `docs/research/archive/`), `docs/changelog/`, root `CHANGELOG.md`, `docs/adr/`, `docs/LEARNINGS.md`, `TECH-DEBT.md`, the archive indexes `docs/sprint/INDEX.md` and `docs/epic/INDEX.md`, and the generated `docs/knowledge-index.md` (matched case-insensitively); a worktree copy under `.claude/worktrees/` is not the repository. This defines "live" for task files only; the `docs/research/` row below keeps its own reading — **and** it is not the store's highest-numbered task file (the next id is derived from the store, so ids stay monotonic) | **delete the file** (propose→approve). History's durable homes are root `CHANGELOG.md`, `docs/sprint/archive/` and git. An ADR, CHANGELOG, LEARNINGS or TECH-DEBT row or archived sprint may still cite the id without keeping the file; the citation resolves through git history — the file was a breadcrumb, not the record |
 | `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | **delete the row.** The substance already lives in `CHANGELOG.md`, the sprint archive and git, so a permanent in-file pointer is a breadcrumb rather than a record — and a ledger that only ever grows stops being read. **Ids stay monotonic: deleting a row never frees its id for reuse.** The 3-sprint delay is deliberate — a just-resolved debt is still context at the next promote |
 | `TODO.md` whole file — **v1 layout, retired at 0.12.0** | a v1 or mixed tree is found | `/lean-doc-generator migrate` converts it into `docs/work/`, then deletes it — the only prune a retired file gets. Nothing measures its §2 cap any more — `S11.TODOCAP` is kept as a retired no-op at 0.13.0 |
 | `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |

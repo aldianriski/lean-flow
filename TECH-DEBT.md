@@ -532,7 +532,7 @@ status: current
     `docs/work/anything/TASK-1.md` from the ownership-header check. Census 2026-09-30: 0 non-status folders.
   - Mitigation (hypothesis): enumerate the six status folders (backlog · todo · in_progress · review · done · cancel), as ADR-045 names them.
 
-- **TD-206** severity: medium | status: open | created: Sprint-110 (T3 outside review)
+- **TD-206** severity: medium | status: resolved → TASK-410 (SPRINT-120 T5, §11 live-citation set widened in spec 0.14.0 and the engine) | created: Sprint-110 (T3 outside review)
   - Summary: **The store prune reads §11's "not live-named" as only `depends-on:`, active Members and the highest id.** On this
     repo it flags TASK-359, TASK-360 and TASK-374 as `closed-task-past-retention`. Open backlog tasks still cite two of them in their
     `## Done when` (TASK-378 → 359, TASK-386 → 374), and EPIC-017's Task map names all three. The message says "nothing live names it",
