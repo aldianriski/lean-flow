@@ -1197,6 +1197,15 @@ d="$work/wt-place-control"; wt_mk "$d"
 mkdir -p "$d/notes"; printf '# stray\n' > "$d/notes/HANDOFF-LEDGER.md"
 out=$(wt_out "$d")
 yes_line_wt "worktree-placement-control-outside-still-fails" "$out" '^FAIL +file-outside-canonical-placement: HANDOFF-LEDGER\.md.* notes/HANDOFF-LEDGER\.md'
+# a root path holding glob characters must not defeat the prune (outside review: `-path` read `[x]` as a class)
+d="$work/wt-[x]-root/repo"; wt_mk "$d"
+mkdir -p "$d/.claude/worktrees/agent-x"; printf '# copy\n' > "$d/.claude/worktrees/agent-x/HANDOFF-LEDGER.md"
+out=$(wt_out "$d")
+no_line_wt "worktree-placement-ignored-bracketed-root" "$out" '^FAIL +file-outside-canonical-placement: HANDOFF-LEDGER\.md'
+d="$work/wt-[x]-root-control/repo"; wt_mk "$d"
+mkdir -p "$d/notes"; printf '# stray\n' > "$d/notes/HANDOFF-LEDGER.md"
+out=$(wt_out "$d")
+yes_line_wt "worktree-placement-bracketed-root-control-still-fails" "$out" '^FAIL +file-outside-canonical-placement: HANDOFF-LEDGER\.md.* notes/HANDOFF-LEDGER\.md'
 # site 2: _s12_tracked (S12.SECRETS' git ls-files walk)
 if command -v git >/dev/null 2>&1; then
   d="$work/wt-s12-only-in-worktree"; wt_mk "$d"

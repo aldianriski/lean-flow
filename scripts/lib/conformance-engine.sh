@@ -1795,9 +1795,11 @@ _repo_files() {
   # `.claude/worktrees` is Claude Code's store of whole repo copies for isolated agents (TASK-409,
   # SPRINT-120 T4): not part of the repository, so a file found there is never a finding about it.
   # Every file walk in this engine excludes it -- here by prune, in _s12_tracked by a grep -v.
-  _REPO_FILES=$(find "$1" \
-      \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build -o -path "$1/.claude/worktrees" \) -prune -o \
-      -type f -print 2>/dev/null | sed "s|^$1/||")
+  # Walked from INSIDE the root with a relative prune: `-path` and the `sed` strip both read the root
+  # as a pattern, so a root like `/tmp/[client]/repo` defeated them (outside review, SPRINT-120 T4).
+  _REPO_FILES=$(cd "$1" 2>/dev/null && find . \
+      \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build -o -path ./.claude/worktrees \) -prune -o \
+      -type f -print 2>/dev/null | sed 's|^\./||')
   _REPO_FILES_DONE=1
   printf '%s' "$_REPO_FILES"
 }
