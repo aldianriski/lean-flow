@@ -4,6 +4,7 @@ slug: conform-to-our-own-standard
 owner: Maintainer
 last_updated: 2026-10-09
 status: active
+gates_signed: G1,G2 @ 583848b
 plan_commit: c226d3a
 update_trigger: sprint execute/close events
 ---
@@ -84,12 +85,11 @@ J2: the owner signs the new definition of a live citation. Consequential G plus 
 **Acceptance:** a closed task cited in prose by a live file is kept, while one cited only from the archive is still proposed for deletion.
 
 ### T6 — Fail a scope-change whose files are outside its `Layers:` (L-229) `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-layers-completeness.ts` · `scripts/lib/check-sprint-by-reference.ts` · `evals/run-layers-completeness-fixtures.sh`
-  · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/`
+Layers: `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/`
 Depends-on: none
 Cites: `TASK-411` · L-229 · `.claude/CONTEXT.md` § Sprint model
 
-G2 picks one of the two checkers; the other's paths are dropped from this block by scope-change. Other G (maintainer-only leg).
+G2 placed it in the by-reference checker (see the Execution Log). Other G (maintainer-only leg).
 
 **Acceptance:** SPRINT-118's real `.sh` → `.ts` scope-change entry FAILs with a named finding, and the edited-`Layers:` control passes.
 
@@ -103,7 +103,7 @@ Runs both locally and on a clean VPS clone, so host contamination cannot hide a 
 **Acceptance:** `conformance.sh` prints level Structural or higher on both.
 
 ## Owner-action checklist
-- [ ] Sign G1 + G2 (`/orchestrator sprint-bulk`) and record `gates_signed:`.
+- [x] Sign G1 + G2 (`/orchestrator sprint-bulk`) and record `gates_signed:`. ✓ 2026-10-09, see the g2 entry
 - [ ] Sign T5's new §11 definition (J2).
 
 ## Decisions (pre-locked)

@@ -37,3 +37,21 @@ Size check at pull: 4 S + 3 M, no L. Shared engine file: T4 → T5 (D1).
 The freeze point is the `plan locked` commit, the first in which the Plan and the seven stamped members both exist. `gates_signed:` is
 omitted until G1+G2 are signed at `/orchestrator sprint-bulk` (absence means NOT signed). No `approval_envelope:`, because this sprint is
 attended (T5 is J2).
+
+### 2026-10-09 | g2 | G1 + G2 signed (owner); four rulings, two of them ADR-034 behaviour-change rulings
+G1 fast-path (all seven members `origin: decomposer`): scope unchanged since approval. Owner rulings:
+- **Waves:** wave 1 has T1, T2 and T3 inline as coordinator (a mechanical delete, two short ADR sections the owner reads, and a fixture
+  rename), plus T4 and T6 dispatched in parallel to worktree-isolated Sonnet builders. Wave 2 is T5 on the merged T4 (D1). Wave 3 is T7.
+- **T4 (ADR-034 behaviour-change ruling):** every engine file walk skips `.claude/worktrees/`. Findings sourced inside a worktree
+  disappear; nothing outside changes.
+- **T5 (ADR-034 behaviour-change + §11 spec ruling, J2):** a live citation is a whole-word id match in any tracked `.md` that is not
+  history. History means done/cancel task files, every `archive/`, `docs/changelog/`, `CHANGELOG.md`, ADRs, `LEARNINGS.md` and `TECH-DEBT.md`.
+- **T6:** the check lives in `check-sprint-by-reference.ts`. A path named in a scope-change entry must appear in that Tn's `Layers:`
+  or `Cites:`. The layers-completeness paths leave T6's `Layers:` (scope-change below).
+- **Review depth:** T4 and T5 are consequential G (seeded breaks, a worktree-isolated Sonnet reviewer, a Codex gauntlet). T6 is other G
+  (fixture plus a real-artifact run, and one scoped reviewer). T1–T3 get self-review.
+
+### 2026-10-09 | scope-change | T6 Layers narrowed to the by-reference checker (G2 ruling)
+**What broke:** § Plan T6 named both candidate checkers pending G2. **Impact:** `scripts/lib/check-layers-completeness.ts` and
+`evals/run-layers-completeness-fixtures.sh` leave T6's `Layers:`; the by-reference checker, its harness and `evals/fixtures/` stay.
+**Re-confirm G2:** this entry is the G2 ruling itself.
