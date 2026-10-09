@@ -79,3 +79,15 @@ consequence · T3 · behaviour:low · governance:low
 review · T1 · self-review · behaviour:low · governance:low
 review · T2 · self-review · behaviour:low · governance:low
 review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-10-09 | scope-change | TASK-411 Done-when 3: an unbackticked mention is out of reach by design (owner ruling); T6 builder retry for dotfile tokens
+**What broke:** T6's real-artifact run (builder `fa69a1ba`) fired for SPRINT-115 T4/T5, SPRINT-116 T1 and T1+T2, and SPRINT-118 T1. Two
+recorded sightings did not fire:
+- SPRINT-115's `.dod-delta-exempt` is a dotfile with no extension, which the token shape does not recognise.
+- SPRINT-118's fourth entry named TASK-320's member file without backticks, so it named no path at all.
+**Impact (owner ruling):** one builder retry so backticked dotfile paths count as tokens, which must make 115's sighting fire. The
+unbackticked case is ruled out of reach, because prose is not a path claim. Done-when 3 is read as "each recorded sighting whose path the
+entry names as a token", and this entry records that reading before any tick (L-088).
+**Also ruled:** keep the builder's `plan_commit` allowance (a path the Tn declared at `plan_commit` passes, so a narrowing entry can name
+what it drops). Known blind spot: a path declared and later dropped is never re-flagged.
+**Re-confirm G2:** this entry is the ruling.
