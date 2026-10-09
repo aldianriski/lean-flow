@@ -152,6 +152,11 @@ const logFragment = (d: string, name: string) => {
   appendFileSync(join(d, LOG), fix(name));
   commit(d, `log fragment ${name}`);
 };
+// SPRINT-118 T1 (901e7d6), verbatim: the frozen Layers: line, and a75f3f2's corrected one (the .ts checkers).
+const L118_FROZEN =
+  "`scripts/night-run.sh` · `scripts/lib/check-authority.sh` (the member names it `check-authority.sh`) · `evals/run-authority-fixtures.sh` · `evals/fixtures/`";
+const L118_FIXED =
+  "`scripts/night-run.sh` · `scripts/lib/check-authority.ts` · `scripts/lib/check-sprint-by-reference.ts` · `evals/run-authority-fixtures.sh` · `evals/fixtures/`";
 
 const CASES: Case[] = [
   // --- freeze: must-PASS controls -----------------------------------------------------------
@@ -1589,9 +1594,81 @@ const CASES: Case[] = [
     },
     expect: [],
   },
+  // --- L-229 (SPRINT-120 T6): a scope-change entry's repo paths must be in its Tn's Layers:/Cites: ---
+  {
+    // SPRINT-118 T1, verbatim: the Plan (901e7d6) named the .sh checkers; the entry moved the work to the .ts ones.
+    // `evals/fixtures/by-reference/` is covered by the declared `evals/fixtures/`.
+    name: "scope-change-sh-to-ts (SPRINT-118 T1's real entry; Layers: still names the .sh oracles -- must-FAIL)",
+    opts: { pre: (d) => edit(d, SPRINT, "Layers: `src/alpha.ts`", `Layers: ${L118_FROZEN}`) },
+    mutate: (d) => logFragment(d, "log-scope-change-sh-to-ts.md"),
+    expect: [
+      "scope-change-outside-layers T1 check-authority.ts",
+      "scope-change-outside-layers T1 qa-check.sh",
+      "scope-change-outside-layers T1 scripts/lib/check-authority.ts",
+      "scope-change-outside-layers T1 scripts/lib/check-sprint-by-reference.ts",
+    ],
+  },
+  {
+    name: "scope-change-sh-to-ts-layers-edited (control: same entry, Layers: edited to the built set, the read-only qa-check.sh moved to Cites:)",
+    opts: { pre: (d) => edit(d, SPRINT, "Layers: `src/alpha.ts`", `Layers: ${L118_FROZEN}`) },
+    mutate: (d) => {
+      edit(d, SPRINT, `Layers: ${L118_FROZEN}`, `Layers: ${L118_FIXED}`);
+      edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-901` · `scripts/qa-check.sh` (read, not edited)");
+      logFragment(d, "log-scope-change-sh-to-ts.md");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-names-an-undeclared-path (must-FAIL: the entry widens, Layers: is untouched)",
+    mutate: (d) => logEntry(d, "scope-change", "T1 also touches the helper", "**Impact:** T1 edits `src/alpha.ts` and `src/helper.ts`."),
+    expect: ["scope-change-outside-layers T1 src/helper.ts"],
+  },
+  {
+    name: "scope-change-names-only-declared-paths (control)",
+    mutate: (d) => logEntry(d, "scope-change", "T1 stays in its files", "**Impact:** T1 edits `src/alpha.ts`; no other file moves."),
+    expect: [],
+  },
+  {
+    name: "scope-change-line-ref-resolves-to-its-file (`src/alpha.ts:12-30` is declared; `src/delta.ts:9` is not)",
+    mutate: (d) => logEntry(d, "scope-change", "T1 re-reads two files", "See `src/alpha.ts:12-30` and `src/delta.ts:9`."),
+    expect: ["scope-change-outside-layers T1 src/delta.ts"],
+  },
+  {
+    name: "scope-change-several-tasks-check-against-the-union (T1 and T2 naming each other's file passes; a third file fails)",
+    mutate: (d) => logEntry(d, "scope-change", "T1 and T2 swap a seam", "T1 and T2 share `src/alpha.ts` and `src/beta.ts`, and `src/gamma.ts`."),
+    expect: ["scope-change-outside-layers T1+T2 src/gamma.ts"],
+  },
+  {
+    name: "scope-change-path-only-cited (control: declared on Cites:, not Layers:)",
+    mutate: (d) => {
+      edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-901` · `docs/oracle.md` (read only)");
+      logEntry(d, "scope-change", "T1 reads the oracle", "T1 reads `docs/oracle.md`.");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-task-named-by-id-maps-to-its-Tn (TASK-901 in the heading is T1 via Cites:; src/helper.ts undeclared)",
+    mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
+    expect: ["scope-change-outside-layers T1 src/helper.ts"],
+  },
+  {
+    name: "scope-change-narrowing-names-a-path-it-drops (control: src/old.ts was in Layers: at plan_commit, since removed)",
+    opts: { pre: (d) => edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `src/old.ts`") },
+    mutate: (d) => {
+      edit(d, SPRINT, "Layers: `src/alpha.ts` · `src/old.ts`", "Layers: `src/alpha.ts`");
+      logEntry(d, "scope-change", "T1 Layers narrowed", "`src/old.ts` leaves T1's Layers.");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-names-no-Tn-in-its-heading (not attributable, so not checked; a Tn in the body does not count)",
+    mutate: (d) => logEntry(d, "scope-change", "a member is dropped", "T1 would have touched `src/zzz.ts`."),
+    expect: [],
+  },
 ];
 
 for (const c of CASES) {
+  if (process.env.BYREF_ONLY && !c.name.includes(process.env.BYREF_ONLY)) continue; // dev filter: a full run is ~14 min on Windows
   let dir = "";
   try {
     dir = build(c.opts); // inside the try: a build error fails its case, never the whole run's verdict line
