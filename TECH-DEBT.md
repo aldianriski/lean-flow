@@ -338,6 +338,38 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-242** severity: minor | status: open | created: Sprint-120 (T5 build)
+  - Summary: **The conformance-engine harness counts differently by host: 97 PASS on Windows, 98 on Linux, at the same commit (`bcb283f7`).** Both are
+    all green, so no verdict is wrong, but one case is skipped or merged on one host, and nobody has said which.
+  - Mitigation (hypothesis): diff the two hosts' PASS lines at one commit and name the case; make the skip explicit if it is host-gated.
+
+- **TD-241** severity: low | status: open | created: Sprint-120 (T5 review)
+  - Summary: **The engine harness reads the pre-change engine through `git show eef67ee8:…`.** In a shallow clone or a release tarball the object
+    is missing, so that case FAILs loudly and the harness goes permanently red there. It is loud, not silent, so it is debt and not a defect.
+  - Mitigation (hypothesis): keep the old engine as a fixture file, or emit a labelled SKIP when the object is unavailable.
+
+- **TD-240** severity: low | status: open | created: Sprint-120 (T5 reviews)
+  - Summary: **The §11 citation scan has three silent narrowings.** Files a sparse checkout leaves off disk are skipped, so their citations are lost;
+    untracked `.md` citations are ignored inside a git repo; and `cat` can fuse a file with no trailing newline to the next file's first line.
+    Each one can only make the prune propose MORE, which a human then approves. There are 0 occurrences in this repo.
+  - Mitigation (hypothesis): count the files read against the files listed, and note any shortfall, as the fail-safe already does for a failed stage.
+
+- **TD-239** severity: low | status: open | created: Sprint-120 (T6 build)
+  - Summary: **Gate leg 14-a runs the whole by-reference checker with `--scope-change`, so a freeze FAIL on an active sprint reddens it too.** That
+    duplicates the engine's S9 freeze leg under a scope-change label. Accepted for now; one root cause shows up twice.
+  - Mitigation (hypothesis): give the checker a mode that emits only the scope-change finding, or have leg 14-a filter its own finding id.
+
+- **TD-238** severity: low | status: open | created: Sprint-120 (T6 review)
+  - Summary: **The scope-change check splits backticked spans on whitespace and silently drops a token with trailing punctuation** (`,` `;` `)` `#`).
+    About 1 real span in the logs has that shape, and it is a bare name. A widened path written that way is not checked.
+  - Mitigation (hypothesis): strip trailing punctuation before matching the token shape.
+
+- **TD-237** severity: low | status: open | created: Sprint-120 (T4/T5 reviews)
+  - Summary: **The engine's line-based path lists mishandle exotic names.** `git ls-files` still quotes a path containing `"`, `\` or a control
+    character even with `core.quotePath=false`, and a newline in a directory or file name splits one path into two. Under `.claude/worktrees/`
+    this can leak a worktree path past the filter; in the §11 scan it loses a citation. There are 0 occurrences here and no plausible adopter path.
+  - Mitigation (hypothesis): move the walks to `-z` / NUL-separated lists end to end, once a NUL-aware POSIX filter is chosen.
+
 - **TD-236** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
   - Summary: **The tracked `.claude/settings.json` allowlist trails the engine it permits.** It names the `.sh` oracles
     (`sh scripts/lib/check-authority.sh` and siblings), while the gate runs their TypeScript ports (TASK-355). It also carries two

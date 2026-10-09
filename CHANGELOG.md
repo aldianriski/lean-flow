@@ -14,6 +14,19 @@ status: current
 
 ---
 
+## SPRINT-120 — Conform to Our Own Standard (2026-10-09)
+
+**Unreleased**: `scripts/lib/conformance-engine.sh` and `spec/STANDARD.md` changed (spec 0.14.0), so this reaches adopters at the next release.
+
+- **`conformance.sh` no longer reads Claude Code's worktree copies.** Every file walk skips `.claude/worktrees/`, so a repo that uses
+  isolated agents stops getting findings sourced from those copies. A repo root containing glob characters is handled too (TASK-409).
+- **§11's closed-task prune keeps a task that a live doc still cites** (spec 0.14.0, MINOR: only fail → pass). A live citation is the
+  task id as a whole word in any tracked `.md` that is not history: closed task files, archives, archive indexes, changelogs, ADRs,
+  LEARNINGS and TECH-DEBT. A citation scan that cannot complete now proposes nothing, rather than proposing everything (TASK-410).
+- **lean-flow passes its own conformance check at level Structural**, up from `level: none`.
+
+---
+
 ## v2.2.0 — The night-run launcher keeps a fire-time ledger (2026-10-09)
 
 **MINOR** — ships SPRINT-118 · SPRINT-119 (entries below). No upgrade step beyond installing `2.2.x` and restarting the session

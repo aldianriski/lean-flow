@@ -3,7 +3,7 @@ sprint: 120
 slug: conform-to-our-own-standard
 owner: Maintainer
 last_updated: 2026-10-09
-status: active
+status: closed
 gates_signed: G1,G2 @ 583848b
 plan_commit: c226d3a
 update_trigger: sprint execute/close events
@@ -125,6 +125,53 @@ Runs both locally and on a clean VPS clone, so host contamination cannot hide a 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/conformance-engine.sh` | T4 · T5 | skips `.claude/worktrees/` on every walk (bracket-safe); §11 store prune keeps a task cited by any non-history doc; a failed scan proposes nothing | High (adopter engine) | engine harness 65 → 98; seeds; Sonnet + Codex |
+| `spec/STANDARD.md` · `spec/CHANGELOG.md` | T5 | §11 live-citation definition for task files (J2 signed), spec 0.14.0 MINOR; research rows unchanged | Med | §15 test; rows byte-checked |
+| `scripts/lib/check-sprint-by-reference.ts` · `scripts/qa-check.sh` | T6 | `scope-change-outside-layers` behind `--scope-change`; gate leg 14-a | Med | by-reference harness 134 → 147; real-artifact run |
+| `evals/` (engine, handoff-state, by-reference harnesses + fixtures; reaper fixtures renamed) | T3 · T4 · T5 · T6 | must-FAIL cases + controls; ledgers generated at test time | Low | each seed reddens only its claim cases |
+| `docs/adr/ADR-043…` · `docs/adr/ADR-044…` | T2 | dated Negative / Alternatives appended; Decision untouched | Low | S4.NEGATIVE / S4.SECTIONS 0 |
+| `docs/research/logs/` (5 wiring diffs) | T1 | spent SPRINT-103 scaffolds deleted | Low | LAW3 / SCHEMA 0 |
+| `TECH-DEBT.md` · `docs/LEARNINGS.md` · `docs/work/` | promote · close | §11 prune (25 TDs, 36 task files); TD-206 resolved; TD-237–242; L-233; L-198 → 4; TASK-413 | Low | census reconciled |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check:** three misses, each caught by a gate or a reviewer, never by recalling the rule.
+- **L-198** (count 4, after promotion): I read a capped output (the engine's first 3 "found at" hits, all worktree copies) as the whole
+  population and called a real finding a false positive.
+- **L-151** (a decision recorded where its reader cannot parse it): the promote aging sweep gave a count, and the check reads names.
+- **L-229** did NOT recur. The new check (T6) caught my own two scope-change entries at once, which is the point of `automate-into-check`.
+
+**Cost:** about 850k subagent tokens.
+- Builders: T4 ≈ 120k · T6 ≈ 195k · T5 ≈ 184k.
+- Reviews: Sonnet ≈ 273k · Codex ≈ 78k.
+- T1–T3 and T7 ran inline. About 10 VPS runs.
+- Delivered 7 of 7 members, so ≈ 120k per member.
+
+**Worked**
+- **The outcome holds on two hosts.** lean-flow went from `level: none` (57 findings) to Structural on its own `conformance.sh`, both on a
+  fresh VPS clone and on this host with 17 worktrees present.
+- **Outside reviews earned their cost.** Every consequential slice had a finding a green harness hid: a bracketed root, Unicode paths, a
+  scan that failed toward flagging, and a checker the adopter engine already called.
+- **Asking with data changed a signed ruling for the better.** The INDEX-history re-rule came from a census, after J2 had been signed
+  on a definition nobody had measured.
+
+**Friction**
+- **Host memory:** three local conformance runs were killed for low memory, and two seeds had to move to the VPS. The full engine
+  harness takes over 10 minutes on this host.
+- **A hung review:** the Codex re-review hung, and the T5 re-review fell back to the coordinator, which is not a fresh context.
+- **Scope-change entries:** eight. Four came from G2/preflight; the rest record wrong decompose-time facts (my tiering of T6, the
+  "worktree" claim) or are ruling records.
+
+**ADR-034 behaviour-change rulings (recorded):**
+- T4: findings sourced inside worktrees disappear.
+- T5: the §11 task-file live-citation set. Spec 0.14.0 MINOR.
+- T6: kept OFF the adopter engine by an opt-in flag, so no adopter-visible change.
+
+**Buckets (routed):**
+- **Shipped:** `CHANGELOG.md` § SPRINT-120.
+- **Tech debt:** TD-237–242 filed; TD-206 resolved → TASK-410; the 25 SPRINT-116 rows deleted at promote.
+- **Follow-up:** TASK-413 (`origin: close-retro`), the ADR-044/048 Decision ruling that stands between Structural and Gated.
+- **Learnings:** L-233 is new (a checker's tier is set by its callers). L-198 → count 4, a post-promotion recurrence that is due a
+  disposition re-check at the next promote.
+
+**Pattern candidate:** L-233, above.

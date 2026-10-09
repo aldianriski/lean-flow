@@ -71,6 +71,14 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-233 [tags: process] [status: active]: **A checker's verification tier is set by who CALLS it, not by what its author meant it for.** SPRINT-120 T6 was ruled "maintainer-only, Other G" at decompose because the new check was written for lean-flow's own gate. Its scoped reviewer found that the shipped conformance engine already runs that same checker on every active sprint and relabels ANY FAIL as a frozen freeze finding, so the new finding would have reached adopters under a wrong id. The fix (an opt-in flag) was cheap; the miss was in the tiering question, which asked about the author's intent instead of grepping the callers. Before ruling a guard's tier, list every caller of the file it lives in (`grep -rn <file> scripts/ conformance.sh skills/`); if any shipped path calls it, it is consequential.
+- seen: 2026-10-09 (SPRINT-120 T6 scoped review, `_s9_freeze_v2` → `check-sprint-by-reference.ts`)
+- count: 1
+- promoted: no
+- related: L-172 (zero-caller symbols, the inverse) · ADR-050 (consequential G) · ADR-034
+
+---
+
 ## L-232 [tags: process] [status: active]: **A probe's must-deny control must be an action the host cannot auto-approve: a read-only command proves nothing.** SPRINT-118 T2's first allowlist probe chose `uname -a` as the command it had deliberately not allowed. It ran, which by night-run.md's probe table reads as "rules not enforced at all". The cause was that Claude Code auto-approves read-only commands whatever the allowlist says, so the control could never have been denied. A second probe with a writing command (`touch /tmp/lf-must-deny`) was denied and the file stayed absent, which is the verdict that counts. Pick the control from the class the matcher actually gates (a write, or network), and judge it by its side effect on disk rather than by the model's report.
 - seen: 2026-10-07 (SPRINT-118 T2 pre-flight, probe 1 → probe 2 on the VPS, `~/lf-run`)
 - count: 1
@@ -273,7 +281,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-09-11 (SPRINT-098 A2: `37 + 60 = 97` agreed with itself against a real figure of 5; corrected only by an independently-derived second number)
 - seen: 2026-09-13 (SPRINT-099 T3: ten archive-exclusion sites derived by grepping the case-glob SHAPE; the eleventh used `grep -v` and was structurally unreachable to that query — the cross-check re-ran the same shape and agreed with itself. Found by outside review, on a live gate leg, failing in the silent direction)
 - seen: 2026-09-28 (SPRINT-109 promote: the signed checklist counted 4 soft OVER-CAP files from a cap run cut by `tail -15`; the real figure was 5. The first query truncated its own population, and it was caught only by re-running the check on the rendered file, a second route)
-- count: 3
+- seen: 2026-10-09 (SPRINT-120 decompose, **after promotion**: the coordinator called the last placement finding a worktree false positive. The engine prints only the first 3 "found at" hits, all worktree copies, and they hid 3 tracked fixtures. A capped output was read as the population; a builder's run found it)
+- count: 4
 - promoted: yes → `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check bullet — placed beside L-108/L-130/L-143/L-170 because that is where a reader meets the act of deriving a number, and every flow that derives one reads it. Both sightings were derivations acted on immediately, with no review between query and conclusion.
 - related: L-186 (the population sibling, one level up) · L-108 · L-130 · L-165
 
