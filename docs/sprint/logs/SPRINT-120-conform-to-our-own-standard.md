@@ -204,3 +204,12 @@ old-engine read fails in a shallow clone (loudly).
   definition changes, so the J2 signature stands.
 - prose-density is back to 6 ≤ 6.
 **Re-confirm G2:** none needed, as the meaning is unchanged.
+
+### 2026-10-09 | progress | T7 done: lean-flow passes its own conformance check at level Structural, on both hosts; system verify green
+consequence · T7 · behaviour:low · governance:low
+- **VPS, fresh clone of the integrated tree `6a8094f4`:** `level: Structural`; the only FAILs are 2 `adr-edited-after-decision` (Gated).
+- **This host, same tree, 17 agent worktrees present** (run by the owner after Claude Code killed two background attempts for low memory):
+  `level: Structural`, with the same 2 Gated FAILs.
+- **System verify:** `QA_FULL=1` on the fresh VPS clone at `6a8094f4` gave `QA-CHECK: 296 pass, 0 fail`, rc 0. Leg 14-a ran and passed.
+  The pass count is lower than SPRINT-118's 324 (one active sprint, not two, and a pruned store/ledger); it is not reconciled further.
+review · T7 · self-review · behaviour:low · governance:low

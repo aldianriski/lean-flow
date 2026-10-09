@@ -23,7 +23,7 @@ tree once, on a clean clone as well as the working host, so contamination on one
 
 ## Done when
 
-- [ ] `sh conformance.sh .` prints a level of Structural or higher on the integrated tree, both on this host and on a clean clone on the
+- [x] `sh conformance.sh .` prints a level of Structural or higher on the integrated tree, both on this host and on a clean clone on the ✓ integrated tree `6a8094f4`: `level: Structural` on this host (17 worktrees present) and on a fresh VPS clone; both verdict lines are in the Execution Log
       VPS, with both verdict lines recorded.
 
 ## Touches
