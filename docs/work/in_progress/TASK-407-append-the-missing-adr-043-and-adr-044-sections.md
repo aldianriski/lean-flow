@@ -24,9 +24,9 @@ Alternatives). Both are Structural. The owner ruled (SPRINT-120 decompose) to ap
 
 ## Done when
 
-- [ ] ADR-043's Consequences gains at least one Negative, and ADR-044 gains an Alternatives section. Each is marked as added at SPRINT-120
+- [x] ADR-043's Consequences gains at least one Negative, and ADR-044 gains an Alternatives section. Each is marked as added at SPRINT-120 ✓ `1be24cc9`: Negative and Alternatives appended, each marked added at SPRINT-120
       for conformance and states what was true when the decision was taken, not a new decision.
-- [ ] `sh conformance.sh .` reports 0 `S4.NEGATIVE` and 0 `S4.SECTIONS` findings, and its `S4.APPEND` findings are unchanged (exactly
+- [x] `sh conformance.sh .` reports 0 `S4.NEGATIVE` and 0 `S4.SECTIONS` findings, and its `S4.APPEND` findings are unchanged (exactly ✓ full `conformance.sh .` at `d64f13ac`: no `S4.NEGATIVE`/`S4.SECTIONS` FAIL; `S4.APPEND` = ADR-044 + ADR-048 only
       ADR-044 and ADR-048), so neither § Decision was edited.
 
 ## Touches
