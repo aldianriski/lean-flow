@@ -91,3 +91,12 @@ entry names as a token", and this entry records that reading before any tick (L-
 **Also ruled:** keep the builder's `plan_commit` allowance (a path the Tn declared at `plan_commit` passes, so a narrowing entry can name
 what it drops). Known blind spot: a path declared and later dropped is never re-flagged.
 **Re-confirm G2:** this entry is the ruling.
+
+### 2026-10-09 | scope-change | T4 gains the handoff-state ledger fixtures: the last placement finding is real, not a worktree artifact (owner ruling)
+**What broke:** T4's builder (`eea6a67a`, harness 65 → 69 PASS; seed 1 reddened only `worktree-placement-ignored`, seed 2 only
+`worktree-s12-ignored`) removed the worktree-sourced hits, but one `S2.R-PLACEMENT` FAIL remains. Its source is three TRACKED fixtures,
+`evals/fixtures/handoff-state/ledger-*/HANDOFF-LEDGER.md`. The coordinator called this finding "a worktree false positive" at decompose.
+That was wrong: the engine prints only the first 3 hits, all worktree copies, and they hid the real source. A sample was read as the
+population (L-198's family). **Impact (owner ruling):** `run-handoff-state-fixtures.sh` writes those three ledgers into a temp dir at
+run time, and the tracked files are deleted, with no engine change and the same case count. T4 `Layers:` gains the harness and that
+fixture directory. **Re-confirm G2:** this entry is the ruling.
