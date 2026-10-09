@@ -55,3 +55,9 @@ G1 fast-path (all seven members `origin: decomposer`): scope unchanged since app
 **What broke:** § Plan T6 named both candidate checkers pending G2. **Impact:** `scripts/lib/check-layers-completeness.ts` and
 `evals/run-layers-completeness-fixtures.sh` leave T6's `Layers:`; the by-reference checker, its harness and `evals/fixtures/` stay.
 **Re-confirm G2:** this entry is the G2 ruling itself.
+
+### 2026-10-09 | scope-change | T4, T5 and T6 `evals/fixtures/` narrowed to the subdirectory each writes (pre-dispatch preflight)
+**What broke:** the pre-dispatch preflight HALTed with 5 `shared-file-unowned` findings. T3–T6 each declared the bare `evals/fixtures/`
+directory, so it could not see D2's disjoint subdirectories. **Impact:** T4 and T5 declare `evals/fixtures/conformance-engine/` (the
+engine harness builds most fixtures in a temp dir; retained trees go here). T6 declares `evals/fixtures/by-reference/`. T3 already
+declared `evals/fixtures/night-run-reaper/`. No work moves. **Re-confirm G2:** none needed, as the D2 ownership is unchanged.

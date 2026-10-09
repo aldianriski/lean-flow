@@ -66,7 +66,7 @@ They are inputs, not generated output; the reaper takes any path.
 **Acceptance:** 0 `S12.GENERATED` findings, with both reaper harnesses at their prior counts.
 
 ### T4 — The conformance engine skips Claude Code worktrees `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/conformance-engine/`
 Depends-on: none
 Cites: `TASK-409` · ADR-050 · ADR-034 · L-170 · `S2.R-PLACEMENT` · `conformance.sh`
 
@@ -76,7 +76,7 @@ Consequential G: `conformance.sh` runs this engine for adopters. The scope of th
 
 ### T5 — Widen §11's live-named rule in spec and engine (TD-206) `[size: M · risk: high · class: decision · HITL · J2]`
 Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh`
-  · `evals/fixtures/` · `TECH-DEBT.md`
+  · `evals/fixtures/conformance-engine/` · `TECH-DEBT.md`
 Depends-on: T4
 Cites: `TASK-410` · TD-206 · STANDARD §11 · `S11.BACKLOG` · `S11.RESEARCH` · ADR-050 · ADR-034 · `conformance.sh`
 
@@ -85,7 +85,7 @@ J2: the owner signs the new definition of a live citation. Consequential G plus 
 **Acceptance:** a closed task cited in prose by a live file is kept, while one cited only from the archive is still proposed for deletion.
 
 ### T6 — Fail a scope-change whose files are outside its `Layers:` (L-229) `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/`
+Layers: `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/`
 Depends-on: none
 Cites: `TASK-411` · L-229 · `.claude/CONTEXT.md` § Sprint model
 
@@ -109,8 +109,8 @@ Runs both locally and on a clean VPS clone, so host contamination cannot hide a 
 ## Decisions (pre-locked)
 - **D1** — `scripts/lib/conformance-engine.sh` is shared by T4 and T5. Owner: T4 lands first, and T5 builds on the merged T4. Both are
   sequenced behind any TASK-404 work, which stays in the backlog this sprint.
-- **D2** — `evals/fixtures/` is shared by T3, T4, T5 and T6 at directory level, but each writes a disjoint subdirectory. Stage per-hunk at
-  each commit.
+- **D2** — `evals/fixtures/` is shared by T3, T4, T5 and T6 at directory level, but each writes a disjoint subdirectory (declared in
+  each `Layers:`). Stage per-hunk at each commit.
 
 ## Assumptions
 - **A1** — Reaching Structural needs zero FAILs on Structural rules; GAP lines do not block. *Confirm: the engine's own level line, at T7.*
