@@ -13,6 +13,29 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+
+## SPRINT-119 — Fire-Ledger Vehicle (2026-10-07)
+
+**Unreleased**: no consumer-facing file changed (it is the seeded vehicle for SPRINT-118 T2).
+
+- **The first real unattended run since the reaper repair** fired against this all-J0 Plan on the VPS: `PLAN_EXHAUSTED` · `DELIVERED`,
+  $0.83, no confirmation asked, 0 permission denials. It transcribed its own `fired ·` line and the authority verdict (TASK-405).
+
+---
+
+## SPRINT-118 — Prove the Run (2026-10-09)
+
+**Unreleased**: `scripts/night-run.sh` and `skills/orchestrator/references/night-run.md` changed, so this reaches adopters at the next release.
+
+- **The night-run launcher writes a fire-time ledger.** `night-run.sh` appends `fired · <ts> · <mode>` to the sprint's Execution Log
+  before the wrapped command runs, and refuses to fire when no sprint resolves. A run that fires and dies before the reaper is now on
+  record, and the sprint close check FAILs it as `CLOSE-FIRED-UNREAPED` (TD-122). The authority check reads the same line as the
+  written fact of an unattended run (TD-124).
+- **EPIC-015 Closed-when 1 is met on live input:** one real `--mode overnight` run ended at a named terminal state, and every check read
+  the committed log. The first real `/handoff` record went `live` → `consumed` → `spent` through `check-handoff-state.sh` (TASK-327).
+
+---
+
 ## v2.1.0 — Reports lead with the conclusion; one conformance engine (2026-10-07)
 
 **MINOR** — ships SPRINT-115 · SPRINT-116 · SPRINT-117 (entries below). No upgrade step beyond installing `2.1.x` and restarting

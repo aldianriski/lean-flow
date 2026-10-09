@@ -3,8 +3,8 @@ sprint: 119
 slug: fire-ledger-vehicle
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-10-07
-status: active
+last_updated: 2026-10-09
+status: closed
 gates_signed: G1,G2 @ 85b3ffc
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 85b3ffc
 plan_commit: 85b3ffc
@@ -43,9 +43,9 @@ first line (TD-229).
 with no confirmation asked at any point.
 
 ## Owner-action checklist
-- [ ] Sign G1 + G2 and record `gates_signed:` in this file's frontmatter.
-- [ ] Record the `approval_envelope:` covering all ten dimensions, pinned to a sha.
-- [ ] Fire the run on the VPS from `~/lf-run` (SPRINT-118 T2, J2).
+- [x] Sign G1 + G2 and record `gates_signed:` in this file's frontmatter. ✓ 2026-10-07: `gates_signed: G1,G2 @ 85b3ffc` (`19273b1`)
+- [x] Record the `approval_envelope:` covering all ten dimensions, pinned to a sha. ✓ 2026-10-07: pinned `@ 85b3ffc`; `check-approval-envelope.sh` all 10 covered
+- [x] Fire the run on the VPS from `~/lf-run` (SPRINT-118 T2, J2). ✓ 2026-10-07 03:09:34Z, owner-delegated; `PLAN_EXHAUSTED` · `DELIVERED`, merged `312ddea`
 
 ## Decisions (pre-locked)
 - **D1** — Runs on the VPS as `ubuntu` in a dedicated clone `~/lf-run`, trusted for exactly that path. Results return to local main
@@ -68,6 +68,24 @@ with no confirmation asked at any point.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/work/done/TASK-405-verify-the-fire-time-ledger-on-the-live-run-that-carries-it.md` | T1 | the run transcribed its own `fired ·` line and the authority checker's verdict, then moved the member | Low | by-reference `--close` 4/0 |
+| `docs/sprint/logs/SPRINT-119-fire-ledger-vehicle.md` | T1 · reaper | the fired line, the run's rollup, and the reaper's fenced `run-complete` block | Low | `check-night-run-rollup.ts` PASS |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check:** no miss inside the envelope. The run kept the bare `sprint(119):` commit form that the pre-run review added to the
+trigger text.
+
+**Cost:** $0.83 (harness result event), 23 turns, about 2 min, 0 permission denials. No subagents.
+
+**Worked:** a vehicle made of honest verification work fired under a strict pre-flight (all J0), wrote only inside its envelope (TASK-405 and
+this log), and ended at a named terminal state, `PLAN_EXHAUSTED`. The owner-action boxes were ticked at close, using facts recorded in SPRINT-118's log.
+
+**Friction:**
+- A first rollup went under a `rollup` header, so the checker could not read it. The run corrected it with an appended `run-complete` entry.
+- The model-written unfenced `terminal ·` line satisfied `--close` before the reaper ran (TD-232).
+- `behaviour:none` is not a review class, giving 2 `review-depth-unclassified` FAILs. These are kept verbatim under the ADR-021 override
+  recorded in SPRINT-118's Retro (TD-233).
+
+**Buckets:** routed with SPRINT-118's (one run, one vehicle). Shipped → `CHANGELOG.md` § SPRINT-119. Debt → TD-232 · TD-233 · TD-234. No
+follow-ups. Learnings → none new.

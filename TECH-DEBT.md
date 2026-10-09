@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-06
+last_updated: 2026-10-09
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -1904,7 +1904,7 @@ status: current
     sharing its `plan_commit` has also closed.** §11's trigger is "sprint closed" and says nothing
     about when the move must happen.
 
-- **TD-124** severity: medium | status: open | created: Sprint-093
+- **TD-124** severity: medium | status: resolved → TASK-320 (SPRINT-118 T1, `fired ·` line read as the written fact of an unattended run) | created: Sprint-093
   - Summary: **`check-authority.sh` infers whether a run was attended, and no signal available from
     inside that file can make the inference airtight.** The leg now ORs two independent signals — a
     `terminal ·` line written by the launcher's reaper, and a non-placeholder `approval_envelope: … @
@@ -1929,7 +1929,7 @@ status: current
     append — the same missing mechanism **TD-122** is filed against. Route the two together: neither is
     closable by better parsing of an artifact that does not record the fact.
 
-- **TD-122** severity: medium | status: open | created: Sprint-092
+- **TD-122** severity: medium | status: resolved → TASK-320 (SPRINT-118 T1, fire-time ledger + `CLOSE-FIRED-UNREAPED`; residual → TD-232) | created: Sprint-092
   - Summary: **A run that fires but never reaches the reaper leaves a log byte-identical to "no run
     happened", so nothing can detect it.** `check-night-run-rollup.sh` and `reap()` both read only the
     Execution Log, and a run fired outside `night-run.sh`, or one that dies before `reap()` appends,

@@ -3,8 +3,8 @@ sprint: 118
 slug: prove-the-run
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-10-07
-status: active
+last_updated: 2026-10-09
+status: closed
 plan_commit: 901e7d6
 update_trigger: sprint execute/close events
 ---
@@ -99,6 +99,48 @@ Opportunistic: the clean-halt `/handoff` of T2's run is the vehicle. Tier G, nev
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/night-run.sh` | T1 | writes a `fired · <ts> · <mode>` line to the resolved sprint's log before the command runs; refuses to fire with no sprint (TD-122) | Med | gate-exception fixtures case 13 + seeded breaks |
+| `scripts/lib/check-sprint-by-reference.ts` | T1 | `--close` FAILs `CLOSE-FIRED-UNREAPED` on a `fired ·` line with no later reaped `terminal ·` line | Med | by-reference fixtures `134/0` |
+| `scripts/lib/check-authority.ts` | T1 | reads a `fired ·` line as the written fact of an unattended run (TD-124); the old signals stay as a backstop | Med | `authority.test.ts`; differential 13/13 |
+| `skills/orchestrator/references/night-run.md` | T1 | names the fire-time ledger and its close check where the adopter's run reads it | Low | Sonnet + Codex review CLEAR |
+| `evals/` (5 harnesses + `fixtures/authority/fired-*` · `fixtures/by-reference/log-*fired*`) | T1 | must-FAIL fixture plus control per new check; `fired-*` excluded from the frozen `.sh` differential (ADR-050 §3) | Low | each seeded break reddens only its own claim-bearing cases |
+| `docs/epic/EPIC-015-execution-autonomy.md` | T2 · close | rollup rows for 118/119; Closed-when 1 ticked | Low | `check-epic-archive` |
+| `docs/work/{todo→done}/TASK-188 · 319 · 320 · 327` | T1–T4 | ticks with evidence, and the moves | Low | by-reference `--close` 10/0 |
+| `docs/knowledge-index.md` | close | regenerated (L-232 was filed without it) | Low | `gen-index.sh --check` rc 1 → 0 |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check:** one miss. L-218 (run the gate's cross-cutting legs after a merge, not just the task's own harness) did not reach the
+close-sweep filing commit `b5662cff`. That commit added L-232 without regenerating the index, so system verify went red on
+`knowledge index STALE`. L-229 (count 3, recorded at the sweep) is the other standing miss.
+
+**Cost:** about 620k subagent tokens across the sprint (T1 ≈ 358k: builder 236k · Sonnet 82k · Codex 40k; the rest was the T2 pre-run
+review and probes). The run itself cost $0.83, plus $0.40 of probes. The close session ran inline with no subagents and three VPS gate runs at
+the sprint's integration points. Delivered: 4 of 4 members.
+
+**Worked**
+- **EPIC-015 Closed-when 1 is met on live input.** It had foreclosed three times (L-111): the vehicle was in the Plan this time, and the run
+  fired on the VPS and reached `PLAN_EXHAUSTED` / `DELIVERED` with 0 permission denials. Every check was read from the committed log.
+- **T1's ledger caught its own run.** `CLOSE-FIRED-UNREAPED` fired live, before the run's rollup existed, and was resolved by the reaper's block.
+- **T4 closed on a real handoff** across two sessions: `live` → `/prime` reported it → `consumed` → `spent`, each read back by the checker.
+- **Probe 2 changed one variable.** That turned probe 1's invalid must-deny control into a scoped proof (L-232).
+
+**Friction**
+- Three Layers corrections in one sprint (`.sh` → `.ts`; then prose-density and member-layers from the correction itself; then the tick
+  commit subjects). Each was found by the gate, never by the scope-change entry that caused it (L-229, count 3).
+- The headless run drifted from schemas it never reads: a `rollup` header, then free-form `consequence ·` lines, which produced two
+  `review-depth-unclassified` FAILs (TD-233).
+- TD-235 fired live this session: with two sprints active, sprint-bulk step 0 had to ask which one to run.
+
+**ADR-021 override (recorded):** system verify at `e67be803` returned `324 pass, 3 fail`. `knowledge index STALE` was fixed (`9d2b88eb`). The two
+`review-depth-unclassified` lines on SPRINT-119's log are kept verbatim by owner ruling (2026-10-07) as evidence of the run's drift. They are
+closed under this override, which covers exactly those two lines (precedent SPRINT-098), and they leave the gate when SPRINT-119 is archived.
+
+**Buckets (routed):**
+- **Shipped:** `CHANGELOG.md` § SPRINT-118.
+- **Tech debt:** TD-232–236, filed early at the sweep (`b5662cff`). TD-122 and TD-124 are resolved → TASK-320.
+- **Follow-ups:** none new; the TDs carry them.
+- **Learnings:** L-232 is new and L-229 is at count 3 (due a disposition re-check at the next promote). The L-218 miss above gets no
+  new L, because it is the promoted rule not reaching a bookkeeping commit, the same family as L-229.
+
+**Pattern candidate:** none new beyond the above.
