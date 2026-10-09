@@ -256,3 +256,16 @@ repo-wide. Census after: 148 TD rows = 143 + 5.
   them. Due a disposition re-check at the next promote.
 Still owed at close: resolve TD-122/TD-124, tick EPIC-015 Closed-when 1, archive SPRINT-118 + SPRINT-119, the ADR-021 override, and
 TASK-327's three live observations.
+
+### 2026-10-09 | handoff | SPRINT-118 + SPRINT-119 close resumed (T4 TASK-327 step 2)
+handoff-status: consumed
+handoff-path: C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md
+
+### 2026-10-09 | progress | T4 observations 1–2 (live input)
+- **Prime:** `/prime` on the plugin cache at 2.1.0, the same version as the repo, printed this row verbatim:
+  `Handoff:  live -- docs/sprint/logs/SPRINT-118-prove-the-run.md (not yet resumed)`.
+- **Owner rulings (popup):** run 118 then 119; T4 G1 confirmed (origin `close-retro`, full checklist, run inline as coordinator); VPS `~/lf-run`
+  and its trust record are **kept**. Sprint-bulk step 0 hit TD-235 live: with two sprints active, the target had to be asked.
+- **Checker after `consumed`:** `sh scripts/lib/check-handoff-state.sh .` exited 0 and printed 2 lines, both PASS (no `skip`). The verdict line
+  on the live record: `PASS  handoff-state: docs/sprint/logs/SPRINT-118-prove-the-run.md handoff 'consumed' at C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint-118-close.md -- not yet reconciled, sprint still active`.
+  So the checker read the newest entry, not the first. The `spent` flip (observation 3) happens at close.
