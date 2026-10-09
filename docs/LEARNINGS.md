@@ -99,6 +99,7 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
   run.)
 - count: 3
 - promoted: yes → `.claude/CONTEXT.md` § Sprint model, the `Layers:` bullet (L-100) · disposition: merge — every flow that writes or widens `Layers:` reads it; SPRINT-117 promote (owner)
+- disposition re-check: SPRINT-120 promote → `automate-into-check` (owner): the prose rule recurred 3× after promotion and reached none; TASK-411 makes a scope-change outside `Layers:` FAIL
 - related: L-020 · L-172 · L-166
 
 ## L-228 [tags: process] [status: active]: **A dispatch brief's file bound is a claim too: a builder that stops at it is right, and the bound is the defect.** SPRINT-114 T2's brief for wiring `LEANFLOW_PLUGIN_DIR` into workdoo's workers left out `apps/worker/src/main.ts`, the one file that constructs the adapter. The builder stopped at the bound and reported it, which was correct, and the coordinator wired `adapterFor` itself. The miss was the coordinator's: the bound was written from memory of the call path, not derived from it. **Durable form: derive a brief's file bound from a search for the consumers of the changed symbol (who constructs it, who reads it), and list that query's result in the brief, not a remembered list.**
