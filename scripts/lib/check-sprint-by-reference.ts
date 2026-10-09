@@ -206,7 +206,12 @@ function firedUnreaped(log: string): boolean {
 // `dir/` token); a trailing `:123` / `:12-30` line ref resolves to its file.
 function repoPath(span: string): string | null {
   const p = span.replace(/:\d+(?:-\d+)?$/, "");
-  return /^[A-Za-z0-9_./-]+$/.test(p) && (/[A-Za-z0-9_-]\/$/.test(p) || /[A-Za-z0-9_-]\.[A-Za-z][A-Za-z0-9]*$/.test(p)) ? p : null;
+  if (!/^[A-Za-z0-9_./-]+$/.test(p)) return null;
+  if (/[A-Za-z0-9_-]\/$/.test(p) || /[A-Za-z0-9_-]\.[A-Za-z][A-Za-z0-9]*$/.test(p)) return p;
+  // a dotfile (`.dod-delta-exempt`, `dir/.env`): leading-dot name, no extension. Alone, a short bare
+  // `.sh` / `.ts` is an extension named in prose, not a file, so it needs a `-`/`_` or 5+ chars.
+  const dot = p.match(/(^|\/)(\.[A-Za-z0-9_-]*[A-Za-z0-9_][A-Za-z0-9_-]*)$/);
+  return dot && (dot[1] === "/" || /[-_]/.test(dot[2]!) || dot[2]!.length > 5) ? p : null;
 }
 function pathsIn(text: string): string[] {
   // a span may hold a command (`bun x.ts --close`): each word is tried, so the file in it still counts

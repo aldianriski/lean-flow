@@ -1661,6 +1661,20 @@ const CASES: Case[] = [
     expect: [],
   },
   {
+    // SPRINT-115 T4: the entry added `.dod-delta-exempt` to Layers in the Log only. `.sh` alone is an extension, not a file.
+    name: "scope-change-names-an-undeclared-dotfile (must-FAIL: `.dod-delta-exempt`; the bare `.sh` is not a path)",
+    mutate: (d) => logEntry(d, "scope-change", "T1 also edits a dotfile", "T1 adds `.dod-delta-exempt` (a `.sh` oracle is untouched)."),
+    expect: ["scope-change-outside-layers T1 .dod-delta-exempt"],
+  },
+  {
+    name: "scope-change-dotfile-declared-in-layers (control)",
+    mutate: (d) => {
+      edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `.dod-delta-exempt`");
+      logEntry(d, "scope-change", "T1 also edits a dotfile", "T1 adds `.dod-delta-exempt` (a `.sh` oracle is untouched).");
+    },
+    expect: [],
+  },
+  {
     name: "scope-change-names-no-Tn-in-its-heading (not attributable, so not checked; a Tn in the body does not count)",
     mutate: (d) => logEntry(d, "scope-change", "a member is dropped", "T1 would have touched `src/zzz.ts`."),
     expect: [],
