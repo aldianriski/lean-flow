@@ -67,6 +67,7 @@ They are inputs, not generated output; the reaper takes any path.
 
 ### T4 — The conformance engine skips Claude Code worktrees `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/conformance-engine/`
+  · `evals/run-handoff-state-fixtures.sh` · `evals/fixtures/handoff-state/`
 Depends-on: none
 Cites: `TASK-409` · ADR-050 · ADR-034 · L-170 · `S2.R-PLACEMENT` · `conformance.sh`
 
