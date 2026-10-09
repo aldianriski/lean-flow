@@ -100,3 +100,13 @@ That was wrong: the engine prints only the first 3 hits, all worktree copies, an
 population (L-198's family). **Impact (owner ruling):** `run-handoff-state-fixtures.sh` writes those three ledgers into a temp dir at
 run time, and the tracked files are deleted, with no engine change and the same case count. T4 `Layers:` gains the harness and that
 fixture directory. **Re-confirm G2:** this entry is the ruling.
+
+### 2026-10-09 | scope-change | T6 check made opt-in for lean-flow's own gate; T6 gains the gate script (owner ruling after its scoped review)
+**What broke:** T6's scoped reviewer found that the shipped conformance engine's S9.PLANFROZEN leg runs the by-reference checker on every
+active sprint and reports ANY FAIL line as `plan-edited-after-freeze`, which ADR-034 freezes as a finding id. The new
+`scope-change-outside-layers` finding would therefore reach adopters under a wrong label. T6 was classified maintainer-only (Other G) at
+decompose, and that was wrong. The reviewer also found that this sprint's own log trips the new check: the entry recording the DoD 3 ruling
+backticks SPRINT-115's dotfile as an example, and T6 does not cite it.
+**Impact (owner ruling):** the check fires only behind an opt-in flag. lean-flow's own gate script passes that flag for active sprints, so
+T6 `Layers:` gains `scripts/qa-check.sh`. The adopter engine's output stays unchanged, and T6 stays Other G. T6 `Cites:` gains the dotfile
+example, since it is cited, not touched. **Re-confirm G2:** this entry is the ruling.
