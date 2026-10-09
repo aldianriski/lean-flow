@@ -143,3 +143,24 @@ Re-check after merge `8feb0f39`: with the flag, `9 pass, 0 fail`; without it, `8
 review · T6 · scoped-reviewer · behaviour:material · governance:low
 TD candidates for close: Git-quoted worktree paths · a newline in a directory name (T4) · scope-change path tokens with trailing
 punctuation are dropped (T6) · the flag-on gate leg also reddens on freeze FAILs (overlaps S9, by design for now).
+
+### 2026-10-09 | scope-change | T5's history set is re-ruled with data; the research row keeps its 0.13.0 meaning; one bounded builder retry (owner rulings)
+**What broke:** T5 builder `506207e7` (spec 0.14.0; engine harness 71 → 88 PASS; each of 3 seeds reddened only its claim cases).
+- **VPS conformance on the branch:** level Structural, and S11.BACKLOG flags nothing.
+- **Census by a second route:** 16 of the 20 closed task files are kept. `docs/sprint/INDEX.md` alone cites 41 task ids. It is an
+  append-only index of closed sprints, so under the signed rule every task named in a close line would be kept forever.
+- **Reviews:** Codex found 4 P2 issues and the isolated Sonnet reviewer 1 med + 2 low:
+  - a failed citation scan silently flags MORE tasks;
+  - non-ASCII paths lose their citations;
+  - a case-variant `Archive/` escapes the history filter on case-insensitive filesystems;
+  - the generated index is not excluded;
+  - the research-row wording;
+  - the shallow-clone fragility of the harness's old-engine read.
+**Owner rulings:**
+- **J2:** the §11 task-file definition is **signed**.
+- **History set:** gains the archive indexes (the sprint and epic INDEX files) and the generated knowledge index.
+- **Research row and S11.RESEARCH:** revert to their 0.13.0 wording. The one-meaning change applies to task files only, so ADR-020's
+  premise (an ADR or LEARNINGS citation blocks archiving a research doc) stands.
+- **Retry fixes:** the scan fails safe (it skips judging, loudly, and never widens what it flags), Unicode-safe listing, case-insensitive
+  history matching. The rest goes to TDs.
+**Re-confirm G2:** this entry is the ruling.
