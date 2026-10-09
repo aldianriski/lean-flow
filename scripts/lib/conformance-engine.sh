@@ -2689,8 +2689,18 @@ assert_S11_BACKLOG() {
 # >= N sprints behind the newest SPRINT-NNN file (the scale S11.TDDELETE uses). A cancelled task that was
 # never scheduled has no `sprint:` to age -- its age is the sprint of the commit that moved it, which is
 # history and judged, so it is reported as unjudged rather than passed silently.
-# "Nothing live names it": no open task's `depends-on:` (backlog/todo/in_progress/review) and no active
-# sprint's members -- the latter through the shared lookup (ADR-049), so this rule too needs `bun`.
+# "Nothing live cites it" (TD-206, spec 0.14.0): no open task's `depends-on:` (backlog/todo/in_progress/review),
+# no active sprint's members -- the latter through the shared lookup (ADR-049), so this rule too needs `bun` --
+# and no whole-word `TASK-<n>` in a tracked `.md` file that is not history (_s11_task_citations).
+_s11_task_citations() {   # <repo> -> one task number per line (leading zeros stripped), ONE pass over the non-history set
+  _tc_files=$(git -C "$1" ls-files -- '*.md' 2>/dev/null | grep -v '^\.claude/worktrees/')
+  [ -n "$_tc_files" ] || _tc_files=$(_repo_files "$1" | grep '\.md$')
+  # History (spec §11): closed task files, every archive/ directory, changelogs, ADRs, LEARNINGS, TECH-DEBT.
+  printf '%s\n' "$_tc_files" |
+    grep -vE '^docs/work/(done|cancel)/|(^|/)archive/|^docs/changelog/|^CHANGELOG\.md$|^docs/adr/|^docs/LEARNINGS\.md$|^TECH-DEBT\.md$' |
+    tr '\n' '\0' | (cd "$1" && xargs -0 cat 2>/dev/null) |
+    grep -owE 'TASK-[0-9]+' | sed 's/TASK-0*//' | sort -u
+}
 _s11_backlog_store() {
   repo=$1
   if ! command -v bun >/dev/null 2>&1; then
@@ -2713,6 +2723,7 @@ _s11_backlog_store() {
     _sr_blocked "S11.BACKLOG" "$_p" && return
     [ "$_SR_STATE" = v2 ] && live="$live $(printf '%s\n' "$_SR_OUT" | sed -n 's/^member TASK-0*\([0-9][0-9]*\) .*/\1/p' | tr '\n' ' ')"
   done
+  cited=$(_s11_task_citations "$repo")
   n_over=0; n_unjudged=0
   for _f in "$repo"/docs/work/done/TASK-*.md "$repo"/docs/work/cancel/TASK-*.md; do
     [ -f "$_f" ] || continue
@@ -2725,7 +2736,8 @@ _s11_backlog_store() {
     [ "$tid" = "$hi" ] && continue
     case " $live " in *" $tid "*) continue ;; esac
     printf '%s\n' "$deps" | grep -qx "$tid" && continue
-    bad "closed-task-past-retention: docs/work/${_f#"$repo"/docs/work/} closed at SPRINT-$sn, $((cur - sn)) sprints before the current SPRINT-$cur, and nothing live names it -- §11 deletes a done/ or cancel/ task file once it is $thr sprints old (propose->approve). Its record lives in CHANGELOG.md, docs/sprint/archive/ and git; the id is never reused because the next id is derived from the store's highest"
+    printf '%s\n' "$cited" | grep -qx "$tid" && continue
+    bad "closed-task-past-retention: docs/work/${_f#"$repo"/docs/work/} closed at SPRINT-$sn, $((cur - sn)) sprints before the current SPRINT-$cur, and no live source names it (checked: open tasks' depends-on, active sprints' Members, and a whole-word TASK-$tid in any tracked non-history .md file) -- §11 deletes a done/ or cancel/ task file once it is $thr sprints old (propose->approve). Its record lives in CHANGELOG.md, docs/sprint/archive/ and git; the id is never reused because the next id is derived from the store's highest"
     n_over=$((n_over + 1))
   done
   [ "$n_over" -eq 0 ] && ok "S11.BACKLOG         -- no done/ or cancel/ task file has reached §11's $thr-sprint prune trigger (current SPRINT-$cur)$([ "$n_unjudged" -gt 0 ] && printf '; %s carry no sprint: stamp, so their age is judged from history and not here' "$n_unjudged")"

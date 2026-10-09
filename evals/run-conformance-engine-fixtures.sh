@@ -1224,6 +1224,58 @@ else
   echo "FAIL fixture(worktree-s12): git is not available -- the second walk site is unproven"; fail=1
 fi
 
+
+# ---- S11.BACKLOG's live-citation set (TASK-410 / TD-206, spec 0.14.0) -----------------------------------------
+# A closed task cited in prose by a non-history .md file is KEPT; one cited only from history is still proposed
+# for deletion. Consequential Tier G: every case greps the engine's own finding for the one file under test.
+# Trees are git repos (the keep-set reads the tracked .md set). SPRINT-901 is current, so a done/ stamp of 880
+# is 21 sprints old; TASK-950 is the store's highest id, so TASK-357 is never excused by being the highest.
+s11_tree() {  # <dir> -- a v2 store: closed TASK-357 + an uncited open TASK-950; no git yet
+  mkdir -p "$1/docs/work/done" "$1/docs/work/backlog" "$1/docs/sprint"
+  printf -- '---\nid: SPRINT-901\nstatus: closed\n---\n\n# s\n' > "$1/docs/sprint/SPRINT-901-x.md"
+  printf -- '---\nid: TASK-357\ntitle: "old"\nsprint: SPRINT-880\n---\n\n## Done when\n\n- [x] done\n' > "$1/docs/work/done/TASK-357-old.md"
+  printf -- '---\nid: TASK-950\ntitle: "open"\ndepends-on: []\n---\n\n## Done when\n\n- [ ] x\n' > "$1/docs/work/backlog/TASK-950-open.md"
+}
+s11_commit() { git -C "$1" init -q 2>/dev/null; git -C "$1" add -f -A 2>/dev/null; git -C "$1" -c user.name=t -c user.email=t@t -c commit.gpgsign=false commit -q -m seed 2>/dev/null; }
+s11_put() {  # <dir> <relpath> <text> -- a file whose body carries <text>
+  mkdir -p "$1/$(dirname "$2")"; printf '# doc\n\n%s\n' "$3" > "$1/$2"
+}
+S11_FIND='closed-task-past-retention: docs/work/done/TASK-357-old\.md'
+s11_check() {  # <name> <dir> <present|absent> [engine]
+  _e=${4:-$engine}; _o=$(sh "$_e" "$2" --spec "$spec" 2>&1)
+  if printf '%s\n' "$_o" | grep -qE "^FAIL +$S11_FIND"; then _got=present; else _got=absent; fi
+  if [ "$_got" = "$3" ]; then echo "PASS fixture($1): TASK-357 retention finding $_got as required"
+  else echo "FAIL fixture($1): TASK-357 retention finding is $_got, wanted $3"; fail=1; fi
+}
+if command -v git >/dev/null 2>&1 && command -v bun >/dev/null 2>&1; then
+  # the pre-change engine: the commit before TASK-410 (T4 merged), beside a full copy of its lib
+  old_sha=eef67ee8da4492cdd4b33367c4c720b5a52a0f7b
+  oldlib="$work/oldlib"; mkdir -p "$oldlib"; cp -R "$repo_root/scripts/lib/." "$oldlib/"
+  if git -C "$repo_root" show "$old_sha:scripts/lib/conformance-engine.sh" > "$oldlib/conformance-engine.sh" 2>/dev/null && [ -s "$oldlib/conformance-engine.sh" ]; then old_engine="$oldlib/conformance-engine.sh"; else old_engine=""; echo "FAIL fixture(s11-old-engine): cannot read the pre-change engine at $old_sha -- the must-FAIL-on-old case proves nothing"; fail=1; fi
+
+  d="$work/s11-open-cites"; s11_tree "$d"; s11_put "$d" docs/work/backlog/TASK-951-cites.md "Done when TASK-357 is referenced here in prose."; s11_commit "$d"
+  s11_check "s11-live-citation-in-open-task-keeps-it" "$d" absent
+  [ -n "$old_engine" ] && s11_check "s11-MUST-FAIL-ON-OLD-pre-change-engine-flags-it" "$d" present "$old_engine"
+  d="$work/s11-control-uncited"; s11_tree "$d"; s11_commit "$d"
+  s11_check "s11-control-uncited-still-flagged" "$d" present
+  d="$work/s11-ctx-cites"; s11_tree "$d"; s11_put "$d" .claude/CONTEXT.md "see TASK-357"; s11_commit "$d"
+  s11_check "s11-live-citation-in-context-md-keeps-it" "$d" absent
+  d="$work/s11-padded"; s11_tree "$d"; s11_put "$d" docs/guide.md "see TASK-0357."; s11_commit "$d"
+  s11_check "s11-zero-padded-citation-counts-by-number" "$d" absent
+  d="$work/s11-archive-only"; s11_tree "$d"; s11_put "$d" docs/sprint/archive/SPRINT-800-old.md "built TASK-357"; s11_commit "$d"
+  s11_check "s11-control-archive-citation-does-not-keep-it" "$d" present
+  for h in docs/LEARNINGS.md docs/adr/ADR-001-x.md CHANGELOG.md TECH-DEBT.md docs/changelog/CHANGELOG-1.0.md docs/epic/archive/EPIC-001-x.md docs/research/archive/r.md docs/work/done/TASK-300-other.md docs/work/cancel/TASK-301-other.md; do
+    d="$work/s11-history-$(printf '%s' "$h" | tr '/.' '--')"; s11_tree "$d"; s11_put "$d" "$h" "cites TASK-357"; s11_commit "$d"
+    s11_check "s11-control-history-$h-does-not-keep-it" "$d" present
+  done
+  d="$work/s11-wholeword"; s11_tree "$d"; s11_put "$d" docs/work/backlog/TASK-951-cites.md "only TASK-3570 and TASK-35 and SUBTASK-357 and TASK-357x are named"; s11_commit "$d"
+  s11_check "s11-control-whole-word-only-TASK-3570-does-not-keep-357" "$d" present
+  d="$work/s11-worktree-copy"; s11_tree "$d"; s11_put "$d" .claude/worktrees/agent-x/docs/note.md "TASK-357"; s11_commit "$d"
+  s11_check "s11-control-worktree-copy-citation-ignored" "$d" present
+else
+  echo "FAIL fixture(s11-live-citations): git and bun are both required -- the live-citation set is unproven"; fail=1
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "CONFORMANCE ENGINE FIXTURES: all green"
