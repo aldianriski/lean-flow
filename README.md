@@ -259,7 +259,8 @@ rollup therefore opens with `run · N of M DoD ticked` at *every* exit, and `una
 alongside blocked, parked, denied and stalled. Asking the run to write that was tried and measured: it
 completed all its work and wrote none of its bookkeeping. So the bundled launcher
 [`scripts/night-run.sh`](scripts/night-run.sh) emits the rollup and the cost row itself, from the wrapper
-that outlives the model — and the QA gate fails a recorded run that is missing one. Fire `claude -p`
+that outlives the model — and the QA gate fails a recorded run that is missing one. It also writes a `fired ·` line to the
+sprint's log before the run starts, so a run that dies before reporting is still on record and the sprint cannot close past it. Fire `claude -p`
 directly instead and the format still applies; you just have no guarantee it was written (ADR-016).
 Pre-flight + contract → [`skills/orchestrator/references/night-run.md`](skills/orchestrator/references/night-run.md).
 
@@ -525,7 +526,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-10-06 · status: current · v2.1.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-10-09 · status: current · v2.2.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge
