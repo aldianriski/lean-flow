@@ -19,6 +19,39 @@ fx="$here/fixtures/handoff-state"
 
 fail=0
 
+# The three ledger-* cases are built in a temp dir at run time, not tracked: a tracked file named
+# HANDOFF-LEDGER.md outside the repo root is itself an S2.R-PLACEMENT finding when the conformance
+# engine walks this repo (SPRINT-120 T4, owner ruling). Content is the former tracked bytes, verbatim.
+work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
+trap 'rm -rf "$work"' EXIT INT TERM
+mk_ledger() {   # <dir-name> <entry-heading> [<entry-field> ...] -- one no-sprint fallback ledger under $work
+  mkdir -p "$work/$1"; _l="$work/$1/HANDOFF-LEDGER.md"; _h=$2; shift 2
+  cat > "$_l" <<'EOF'
+---
+owner: Maintainer
+last_updated: 2026-09-01
+update_trigger: a /handoff is taken with no active sprint to log into, or reconciled at promote
+status: current
+---
+
+# lean-flow — Handoff Ledger (no-sprint fallback)
+
+> Fallback for `/handoff` when no sprint file exists to log into (governance work, a `/triage`
+> pass, a research session) -- carries the same three-state status as the sprint-side Execution
+> Log `handoff` event (SPRINT-094 T2, owner ruling). Reconciled at the next promote's governance
+> review.
+
+EOF
+  printf '%s\n' "$_h" >> "$_l"
+  for _f in "$@"; do printf '%s\n' "$_f" >> "$_l"; done
+}
+mk_ledger ledger-unknown-status "### 2026-08-30 | handoff | triage pass, mid-session stop" \
+  "handoff-path: /tmp/handoff-triage-x.md"
+mk_ledger ledger-unknown-missing-path "### 2026-08-30 | handoff | research session, path never recorded" \
+  "handoff-status: consumed"
+mk_ledger ledger-live-reported "### 2026-08-30 | handoff | research session, mid-session stop" \
+  "handoff-status: live" "handoff-path: /tmp/handoff-research-x.md"
+
 # --- DoD 3's must-FAIL case, verbatim: a sprint closing with a `live` handoff outstanding ---------
 run_case_anywhere "closed-live-outstanding" 1 \
   "closed with a 'live' handoff outstanding (/tmp/handoff-930-x.md)" -- \
@@ -69,7 +102,7 @@ run_case_anywhere "closed-live-path-not-archived" 1 \
 # --- the no-sprint fallback ledger: UNKNOWN status is gated exactly like the sprint case -----------
 run_case_anywhere "ledger-unknown-status" 1 \
   "(/tmp/handoff-triage-x.md) carries UNKNOWN status ('<missing>')" -- \
-  sh "$checker" "$fx/ledger-unknown-status"
+  sh "$checker" "$work/ledger-unknown-status"
 
 # --- the ledger's OWN empty-path branch, which no fixture reached ---------------------------------
 # The sprint-side loop and the ledger loop are separate `read` loops over the same record shape, so a
@@ -79,12 +112,12 @@ run_case_anywhere "ledger-unknown-status" 1 \
 # by the sprint-side one above.
 run_case_anywhere "ledger-unknown-missing-path" 1 \
   "(<no handoff-path recorded>) carries UNKNOWN status ('consumed')" -- \
-  sh "$checker" "$fx/ledger-unknown-missing-path"
+  sh "$checker" "$work/ledger-unknown-missing-path"
 
 # --- the no-sprint fallback ledger: `live` is reported, not gated (no close event to hook onto) ---
 run_case_anywhere "ledger-live-reported" 0 \
   "entry 'live' at /tmp/handoff-research-x.md -- reconciled at the next promote governance review" -- \
-  sh "$checker" "$fx/ledger-live-reported"
+  sh "$checker" "$work/ledger-live-reported"
 
 # --- L-166: pointed at the REAL motivating case, not fixtures alone -------------------------------
 # The vocabulary this checker reads is new -- no historical commit literally carries a

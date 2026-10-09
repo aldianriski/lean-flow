@@ -1792,9 +1792,14 @@ _REPO_FILES=""
 _REPO_FILES_DONE=0
 _repo_files() {
   if [ "$_REPO_FILES_DONE" -eq 1 ]; then printf '%s' "$_REPO_FILES"; return; fi
-  _REPO_FILES=$(find "$1" \
-      \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build \) -prune -o \
-      -type f -print 2>/dev/null | sed "s|^$1/||")
+  # `.claude/worktrees` is Claude Code's store of whole repo copies for isolated agents (TASK-409,
+  # SPRINT-120 T4): not part of the repository, so a file found there is never a finding about it.
+  # Every file walk in this engine excludes it -- here by prune, in _s12_tracked by a grep -v.
+  # Walked from INSIDE the root with a relative prune: `-path` and the `sed` strip both read the root
+  # as a pattern, so a root like `/tmp/[client]/repo` defeated them (outside review, SPRINT-120 T4).
+  _REPO_FILES=$(cd "$1" 2>/dev/null && find . \
+      \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build -o -path ./.claude/worktrees \) -prune -o \
+      -type f -print 2>/dev/null | sed 's|^\./||')
   _REPO_FILES_DONE=1
   printf '%s' "$_REPO_FILES"
 }
@@ -2981,7 +2986,7 @@ assert_S11_WHENITRUNS() {
 # _s12_tracked <repo> -- tracked paths only. §12 constrains what is COMMITTED, not what happens to sit
 # in a working tree, so an ignored build directory is not a finding and a tracked one is.
 _s12_tracked() {
-  git -C "$1" ls-files 2>/dev/null
+  git -C "$1" ls-files 2>/dev/null | grep -v '^\.claude/worktrees/'
 }
 
 # _s12_generated_classes <spec> -- the §12c .gitignore classes, read from the spec's own sentence.
