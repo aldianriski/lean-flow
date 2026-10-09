@@ -61,3 +61,52 @@ G1 fast-path (all seven members `origin: decomposer`): scope unchanged since app
 directory, so it could not see D2's disjoint subdirectories. **Impact:** T4 and T5 declare `evals/fixtures/conformance-engine/` (the
 engine harness builds most fixtures in a temp dir; retained trees go here). T6 declares `evals/fixtures/by-reference/`. T3 already
 declared `evals/fixtures/night-run-reaper/`. No work moves. **Re-confirm G2:** none needed, as the D2 ownership is unchanged.
+
+### 2026-10-09 | progress | wave 1 inline: T1, T2 and T3 committed; a promote miss corrected (aged TD rows named)
+- **T1** `96621dfe`: the five wiring-diff scaffolds were deleted. The only citation was between two of the deleted files. Index current.
+- **T2** `1be24cc9`: ADR-043 gains a dated Negative and ADR-044 a dated Alternatives table, drawn from its own § Context. Neither
+  § Decision was touched.
+- **T3** `739872b3`: `run.log`/`.exit` → `run.jsonl`/`.exit` in two fixture trees, plus the rollup harness path. Rollup 11 → 11 PASS,
+  reap-terminal 12 → 12 PASS, and no tracked `*.log` remains.
+- **conformance.sh, first run: cut off.** My `timeout 400` killed it at §10 with no level line, so it is not proof for the §11/§12 rules.
+  Up to the cut: 0 `S1.LAW3`, 0 `S3.SCHEMA`, 0 `S4.NEGATIVE`, 0 `S4.SECTIONS`; `S4.APPEND` unchanged (ADR-044/048 only).
+- **Promote miss, corrected:** `S10.TDAGING` reads its "now" from the active sprint. At the prune run there was none (118/119 archived,
+  120 not yet rendered), so it skipped with a note. Now it flags **37** aged rows that no sweep names. The SPRINT-120 sweep gave the
+  count (115) but not the names. They are now named in the sweep. Second route: 115 − 37 = 78, named by earlier sweeps.
+consequence · T1 · behaviour:low · governance:low
+consequence · T2 · behaviour:low · governance:low
+consequence · T3 · behaviour:low · governance:low
+review · T1 · self-review · behaviour:low · governance:low
+review · T2 · self-review · behaviour:low · governance:low
+review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-10-09 | scope-change | TASK-411 Done-when 3: an unbackticked mention is out of reach by design (owner ruling); T6 builder retry for dotfile tokens
+**What broke:** T6's real-artifact run (builder `fa69a1ba`) fired for SPRINT-115 T4/T5, SPRINT-116 T1 and T1+T2, and SPRINT-118 T1. Two
+recorded sightings did not fire:
+- SPRINT-115's `.dod-delta-exempt` is a dotfile with no extension, which the token shape does not recognise.
+- SPRINT-118's fourth entry named TASK-320's member file without backticks, so it named no path at all.
+**Impact (owner ruling):** one builder retry so backticked dotfile paths count as tokens, which must make 115's sighting fire. The
+unbackticked case is ruled out of reach, because prose is not a path claim. Done-when 3 is read as "each recorded sighting whose path the
+entry names as a token", and this entry records that reading before any tick (L-088).
+**Also ruled:** keep the builder's `plan_commit` allowance (a path the Tn declared at `plan_commit` passes, so a narrowing entry can name
+what it drops). Known blind spot: a path declared and later dropped is never re-flagged.
+**Re-confirm G2:** this entry is the ruling.
+
+### 2026-10-09 | scope-change | T4 gains the handoff-state ledger fixtures: the last placement finding is real, not a worktree artifact (owner ruling)
+**What broke:** T4's builder (`eea6a67a`, harness 65 → 69 PASS; seed 1 reddened only `worktree-placement-ignored`, seed 2 only
+`worktree-s12-ignored`) removed the worktree-sourced hits, but one `S2.R-PLACEMENT` FAIL remains. Its source is three TRACKED fixtures,
+`evals/fixtures/handoff-state/ledger-*/HANDOFF-LEDGER.md`. The coordinator called this finding "a worktree false positive" at decompose.
+That was wrong: the engine prints only the first 3 hits, all worktree copies, and they hid the real source. A sample was read as the
+population (L-198's family). **Impact (owner ruling):** `run-handoff-state-fixtures.sh` writes those three ledgers into a temp dir at
+run time, and the tracked files are deleted, with no engine change and the same case count. T4 `Layers:` gains the harness and that
+fixture directory. **Re-confirm G2:** this entry is the ruling.
+
+### 2026-10-09 | scope-change | T6 check made opt-in for lean-flow's own gate; T6 gains the gate script (owner ruling after its scoped review)
+**What broke:** T6's scoped reviewer found that the shipped conformance engine's S9.PLANFROZEN leg runs the by-reference checker on every
+active sprint and reports ANY FAIL line as `plan-edited-after-freeze`, which ADR-034 freezes as a finding id. The new
+`scope-change-outside-layers` finding would therefore reach adopters under a wrong label. T6 was classified maintainer-only (Other G) at
+decompose, and that was wrong. The reviewer also found that this sprint's own log trips the new check: the entry recording the DoD 3 ruling
+backticks SPRINT-115's dotfile as an example, and T6 does not cite it.
+**Impact (owner ruling):** the check fires only behind an opt-in flag. lean-flow's own gate script passes that flag for active sprints, so
+T6 `Layers:` gains `scripts/qa-check.sh`. The adopter engine's output stays unchanged, and T6 stays Other G. T6 `Cites:` gains the dotfile
+example, since it is cited, not touched. **Re-confirm G2:** this entry is the ruling.

@@ -40,6 +40,11 @@ status: current
 > (owner-approved): the 25 rows resolved at SPRINT-116 (12 at its promote sweep, 13 accepted at its close). Census: 27 resolved = 25
 > + TD-122/124 (resolved at 118, not yet due). Their ids stay retired. The store prune at the same promote confirmed **TD-206**: 6 of 42
 > retention-due task files are still cited by live files, which the engine reports as "nothing live names it".
+> **Named for re-review** (corrected the same day: the sweep first gave only the count, and `S10.TDAGING` reads names, not counts):
+> the 37 aged rows no earlier sweep names: TD-188 · TD-189 · TD-190 · TD-191 · TD-192 · TD-193 · TD-194 · TD-195 · TD-196 ·
+> TD-197 · TD-198 · TD-199 · TD-200 · TD-201 · TD-202 · TD-204 · TD-205 · TD-207 · TD-208 · TD-210 · TD-212 · TD-213 · TD-214 ·
+> TD-215 · TD-216 · TD-217 · TD-218 · TD-219 · TD-220 · TD-221 · TD-222 · TD-223 · TD-226 · TD-227 · TD-228 · TD-229 · TD-230.
+> The other 78 aged rows (115 − 37) are named in the sweeps below.
 >
 > **Aging sweep — SPRINT-116 promote (2026-10-06).** **130 of 138 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 116. Second route: 138 open − 8 filed at 114/115 = 130. The 42 oldest (filed ≤ Sprint-090) were re-checked against the

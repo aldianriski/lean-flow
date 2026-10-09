@@ -109,7 +109,7 @@ reaper_scratch() {
 rs=$(reaper_scratch two-active-refuses)
 logA_before=$(cat "$rs/docs/sprint/logs/SPRINT-950-a.md")
 logB_before=$(cat "$rs/docs/sprint/logs/SPRINT-951-b.md")
-sh "$night_run" --reap "$rs/run.log" "$rs" "1700000000" "0" "" >/dev/null 2>&1
+sh "$night_run" --reap "$rs/run.jsonl" "$rs" "1700000000" "0" "" >/dev/null 2>&1
 logA_after=$(cat "$rs/docs/sprint/logs/SPRINT-950-a.md")
 logB_after=$(cat "$rs/docs/sprint/logs/SPRINT-951-b.md")
 if [ "$logA_before" = "$logA_after" ] && [ "$logB_before" = "$logB_after" ]; then
@@ -127,7 +127,7 @@ rm -rf "$rs" 2>/dev/null
 # sprint B's log."
 rs=$(reaper_scratch two-active-refuses)
 logA_before=$(cat "$rs/docs/sprint/logs/SPRINT-950-a.md")
-sh "$night_run" --reap "$rs/run.log" "$rs" "1700000000" "0" "$rs/docs/sprint/SPRINT-951-b.md" >/dev/null 2>&1
+sh "$night_run" --reap "$rs/run.jsonl" "$rs" "1700000000" "0" "$rs/docs/sprint/SPRINT-951-b.md" >/dev/null 2>&1
 logA_after=$(cat "$rs/docs/sprint/logs/SPRINT-950-a.md")
 if [ "$logA_before" != "$logA_after" ]; then
   echo "FAIL fixture(two-active-declared-targets-correctly): SPRINT-950's (undeclared) log changed when the run was pointed at SPRINT-951"
@@ -144,7 +144,7 @@ rm -rf "$rs" 2>/dev/null
 # mainline shape. Must still resolve and write, proving the ambiguity refusal did not also disable
 # the ordinary (unambiguous) case.
 rs=$(reaper_scratch single-active-baseline)
-sh "$night_run" --reap "$rs/run.log" "$rs" "1700000000" "0" "" >/dev/null 2>&1
+sh "$night_run" --reap "$rs/run.jsonl" "$rs" "1700000000" "0" "" >/dev/null 2>&1
 out=$(sh "$checker" "$rs/docs/sprint/logs/SPRINT-960-solo.md" 2>&1); ec=$?
 if [ "$ec" -eq 0 ] && printf '%s\n' "$out" | grep -q 'agrees with its per-task lines'; then
   echo "PASS fixture(single-active-baseline-unaffected): the sole-active-sprint case still resolves and writes a well-formed rollup"

@@ -67,6 +67,7 @@ They are inputs, not generated output; the reaper takes any path.
 
 ### T4 — The conformance engine skips Claude Code worktrees `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/conformance-engine/`
+  · `evals/run-handoff-state-fixtures.sh` · `evals/fixtures/handoff-state/`
 Depends-on: none
 Cites: `TASK-409` · ADR-050 · ADR-034 · L-170 · `S2.R-PLACEMENT` · `conformance.sh`
 
@@ -85,9 +86,9 @@ J2: the owner signs the new definition of a live citation. Consequential G plus 
 **Acceptance:** a closed task cited in prose by a live file is kept, while one cited only from the archive is still proposed for deletion.
 
 ### T6 — Fail a scope-change whose files are outside its `Layers:` (L-229) `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/`
+Layers: `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/` · `scripts/qa-check.sh`
 Depends-on: none
-Cites: `TASK-411` · L-229 · `.claude/CONTEXT.md` § Sprint model
+Cites: `TASK-411` · L-229 · `.claude/CONTEXT.md` § Sprint model · `.dod-delta-exempt` (an example quoted in the Execution Log)
 
 G2 placed it in the by-reference checker (see the Execution Log). Other G (maintainer-only leg).
 

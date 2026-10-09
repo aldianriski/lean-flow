@@ -73,6 +73,10 @@ against it, withdrawing it breaks them, so the trade-off is taken once and is ha
   close, and any full-profile run (ADR-039). The cost is real but it is not on every gate run.
 - **What is not decided:** whether an in-process implementation actually recovers the 81 s of `sys`.
   That is a prototype's question. Nothing here should be read as a promise of the size of the win.
+- **Negative** *(added SPRINT-120 for §4 conformance; it records what was true when this was decided)*: the engine stays the gate's
+  slowest leg, with no fix in this sprint. The 139–173 s full sweep keeps landing on every `QA_FULL=1` run, and an adopter on Windows
+  keeps paying the per-file spawn cost through `conformance.sh` until TD-168 is done. Freezing the engine read-only also blocks
+  opportunistic engine fixes for the rest of SPRINT-103.
 
 ## Alternatives considered
 

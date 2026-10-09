@@ -24,8 +24,8 @@ cites them. Four of them fail `conformance.sh` on LAW 3 and §3 (no ownership he
 
 ## Done when
 
-- [ ] The five wiring-diff logs are deleted, and no non-archived file cites any of them (archived sprints resolve through git).
-- [ ] `sh conformance.sh .` reports 0 `S1.LAW3` and 0 `S3.SCHEMA` findings.
+- [x] The five wiring-diff logs are deleted, and no non-archived file cites any of them (archived sprints resolve through git). ✓ `96621dfe`: all five deleted; the only citation was between two of the deleted files
+- [x] `sh conformance.sh .` reports 0 `S1.LAW3` and 0 `S3.SCHEMA` findings. ✓ full `conformance.sh .` at `d64f13ac`: no `S1.LAW3` or `S3.SCHEMA` FAIL
 
 ## Touches
 
