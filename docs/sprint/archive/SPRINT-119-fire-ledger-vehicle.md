@@ -5,6 +5,7 @@ epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-10-09
 status: closed
+close_commit: 5bb2dd3
 gates_signed: G1,G2 @ 85b3ffc
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 85b3ffc
 plan_commit: 85b3ffc

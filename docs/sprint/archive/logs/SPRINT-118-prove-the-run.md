@@ -2,7 +2,7 @@
 sprint: 118
 slug: prove-the-run
 owner: Maintainer
-last_updated: 2026-10-07
+last_updated: 2026-10-09
 status: active
 update_trigger: an Execution Log entry is appended
 ---

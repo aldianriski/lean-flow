@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-06
+last_updated: 2026-10-09
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,8 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-119 — Fire-Ledger Vehicle — closed 2026-10-09 · `5bb2dd3` · 1 of 1 member in `done/` (the run itself: `PLAN_EXHAUSTED` · `DELIVERED`, $0.83; no consumer-facing file) · `epic: EPIC-015` — the seeded all-J0 vehicle SPRINT-118 T2's run fired against
+- SPRINT-118 — Prove the Run — closed 2026-10-09 · `5bb2dd3` · 4 of 4 members in `done/` (released in `2.2.0`; `scripts/night-run.sh` + `night-run.md` changed; ADR-021 override for 2 lines on 119's log) · `epic: EPIC-015` — fire-time run ledger, then the first real unattended run since the reaper repair: **§ Closed-when 1 met**
 - SPRINT-117 — Reports Lead — closed 2026-10-07 · `2c32d95` · 1 of 1 member in `done/` (owner PASS, J2; unreleased at close; three `skills/*/SKILL.md` changed) — skill reports lead with the verdict and the next step
 - SPRINT-116 — Decision + Ledger Diet — closed 2026-10-06 · `9fa6356` · 4 of 4 members in `done/` (unreleased; `skills/orchestrator/references/` and README changed, so it reaches adopters at the next release) · `epic: EPIC-014` — **closed EPIC-014 as retired** (ADR-051: the TypeScript port cut, the Shell engine the only engine) · ledger 138 → 116 open
 - SPRINT-115 — Gate and Host Cost — closed 2026-10-06 · `dbcfc0d` · 5 of 5 members in `done/` (unreleased; **no version bump** — `skills/`, `templates/`, `spec/`, the four manifests and README untouched, derived from `git diff --name-only cede84c..`) · standalone — the gate measured off-host for the first time: `QA_FULL=1` **105–109 s ×3 green** on an Ubuntu VPS (Round 22); TD-143 ruled closed, TD-090/117/128 → medium; two host-dependent fixtures fixed (TD-224/225); `.dod-delta-exempt` (TD-166); `scripts/promote-check.ts`; system-verify 316/0
