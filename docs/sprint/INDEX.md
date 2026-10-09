@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-120 — Conform to Our Own Standard — closed 2026-10-09 · `79ce173` · 7 of 7 members in `done/` (released in `2.3.0`; conformance engine + spec 0.14.0 changed) · **standalone, no `epic:` stamp** — lean-flow passes its own `conformance.sh` at level Structural (from `level: none`)
 - SPRINT-119 — Fire-Ledger Vehicle — closed 2026-10-09 · `5bb2dd3` · 1 of 1 member in `done/` (the run itself: `PLAN_EXHAUSTED` · `DELIVERED`, $0.83; no consumer-facing file) · `epic: EPIC-015` — the seeded all-J0 vehicle SPRINT-118 T2's run fired against
 - SPRINT-118 — Prove the Run — closed 2026-10-09 · `5bb2dd3` · 4 of 4 members in `done/` (released in `2.2.0`; `scripts/night-run.sh` + `night-run.md` changed; ADR-021 override for 2 lines on 119's log) · `epic: EPIC-015` — fire-time run ledger, then the first real unattended run since the reaper repair: **§ Closed-when 1 met**
 - SPRINT-117 — Reports Lead — closed 2026-10-07 · `2c32d95` · 1 of 1 member in `done/` (owner PASS, J2; unreleased at close; three `skills/*/SKILL.md` changed) — skill reports lead with the verdict and the next step
