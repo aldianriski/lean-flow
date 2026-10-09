@@ -24,7 +24,7 @@ reaper takes any log path, so the name is incidental. Owner ruling (SPRINT-120 d
 
 ## Done when
 
-- [x] Both fixture logs and their `.exit` companions carry a name outside every §12c class, and each harness that stages them reads the ✓ `739872b3`: `run.log` → `run.jsonl` (+ `.exit`) in both trees; rollup harness reads the new name
+- [x] Both fixture logs and their `.exit` companions carry a name outside every §12c class, and each harness that stages them reads the ✓ `739872b3`: both fixture logs and their exit companions renamed to the JSON-lines extension; the rollup harness reads the new name
       new name.
 - [x] `sh conformance.sh .` reports 0 `S12.GENERATED` findings, and the night-run rollup and reap-terminal harnesses report the same ✓ `S12.GENERATED` PASS (full run, `d64f13ac`); rollup 11 → 11 PASS, reap-terminal 12 → 12 PASS
       pass and fail counts as before the rename.
