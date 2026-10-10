@@ -190,6 +190,11 @@ check_revise_ceiling() {
 # from the per-task lines -- reap()'s own priority order already resolved rp_term once, and deriving
 # outcome from anything else risks the two silently disagreeing. An unrecognised terminal token fails
 # CLOSED to FAILED, never defaults to the clean-looking DELIVERED (do not fail open).
+# The reaper's OWN entry title, shared by the printf that writes it and the awk that cuts it back out of
+# a later window, so the two cannot drift. Runs and coordinators write their own `run-complete` entries
+# (a model's park line may live only in one); only an entry carrying THIS title is the reaper's.
+rp_entry_title='run-complete | run exited — rollup emitted by the launcher'
+
 outcome_for_terminal() {
   case "$1" in
     PLAN_EXHAUSTED) printf 'DELIVERED' ;;
@@ -316,18 +321,26 @@ reap() {
   # which still read HARD_FAILURE (SPRINT-122 owner ruling). No marker: the order above is unchanged.
   rp_ec=$(cat "$rp_log.exit" 2>/dev/null || printf '')
   rp_stop=""; [ -f "$rp_log.stop" ] && rp_stop=$(cat "$rp_log.stop" 2>/dev/null)
+  # This run's window, MINUS any earlier reaper entry inside it (a `### … | run-complete | run exited — …` entry, up to the next
+  # `### `). The block below copies the run's non-green lines into a fenced region at column 0, so a
+  # re-reap whose window still holds an earlier block would otherwise count every copy a second time.
+  # Reaper entries are cut by header, NOT by fence: a model-written rollup block is fenced too, and its
+  # park lines are the evidence (SPRINT-122 T2).
+  rp_win_run=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | awk -v t="| $rp_entry_title" '
+    /^### / { skip = (index($0, t) > 0) }
+    !skip')
   rp_unatt=0
   for tn in $rp_unit_list; do
-    tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " || rp_unatt=$((rp_unatt + 1))
+    printf '%s\n' "$rp_win_run" | grep -q "^$tn · " || rp_unatt=$((rp_unatt + 1))
   done
   # `grep -c` already PRINTS 0 when it matches nothing -- it just exits 1 while doing so. An
   # `|| printf '0'` here therefore appends a SECOND zero and yields "0\n0", which blows up the numeric
   # test below with `integer expression expected`. Caught by running this reaper against a real
   # sprint, not by any fixture: the erroring test simply evaluated false, so the rollup still came out
   # correct and the defect would have shipped behind a right answer.
-  rp_parked=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -cE '^T[0-9]+ · (parked-hitl|blocked) · ')
+  rp_parked=$(printf '%s\n' "$rp_win_run" | grep -cE '^T[0-9]+ · (parked-hitl|blocked) · ')
   case "$rp_parked" in ''|*[!0-9]*) rp_parked=0 ;; esac
-  rp_hard=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -cE '^T[0-9]+ · (stalled|denied-tool) · ')
+  rp_hard=$(printf '%s\n' "$rp_win_run" | grep -cE '^T[0-9]+ · (stalled|denied-tool) · ')
   case "$rp_hard" in ''|*[!0-9]*) rp_hard=0 ;; esac
 
   # T2 (SPRINT-098): the revise-loop ceiling, checked against what the run actually wrote --
@@ -382,7 +395,7 @@ reap() {
   # documentation example quoting `Tn · retry ·` or `system-verify ·` text inside a ``` block must
   # not be read as this run's own output. Recomputed here (not shared with check_revise_ceiling(),
   # which keeps its own local copy) because that function returns only PASS/FAIL text, not counts.
-  rp_window_fs=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | awk '
+  rp_window_fs=$(printf '%s\n' "$rp_win_run" | awk '
     /^[[:space:]]*```/ { fence = !fence; next }
     !fence
   ')
@@ -418,7 +431,7 @@ reap() {
   [ -n "$rp_warn" ] || rp_warn="none"
 
   {
-    printf '\n### %s | run-complete | run exited — rollup emitted by the launcher\n\n' "$(date +%Y-%m-%d)"
+    printf '\n### %s | %s\n\n' "$(date +%Y-%m-%d)" "$rp_entry_title"
     printf 'Evidence provenance: mechanical = counted directly from the Plan/log text; model-reported = written by the run, trusted like any other Part 4 state line (TD-152); derived = a function of the fields below it, never more certain than what it reads.\n\n'
     printf '```\nrun · %s of %s DoD ticked  [mechanical]\n' "$rp_done" "$rp_total"
     printf 'outcome · %s · derived from terminal %s  [derived]\n' "$rp_outcome" "$rp_term"
@@ -428,10 +441,15 @@ reap() {
     printf 'repair-cycles · %s  [model-reported]\n' "$rp_retries"
     printf 'verification · %s  [model-reported]\n' "$rp_verify_state"
     printf 'warnings · %s  [mechanical]\n' "$rp_warn"
+    # One line per non-green task INSIDE this block (ADR-016; Part 4: "a park is one line inside the
+    # rollup block"), because the rollup guard reads only the LAST run-complete block. The run's own
+    # `Tn · (parked-hitl|blocked|stalled|denied-tool) · …` lines are copied verbatim, from the same
+    # fence-stripped window the retry count uses (L-108: a quoted example is not this run's output).
+    # `retry` lines are supplementary and stay out.
+    printf '%s\n' "$rp_window_fs" | grep -E '^T[0-9]+ · (parked-hitl|blocked|stalled|denied-tool) · '
     # A task with an open DoD that the run wrote no rollup line for was never spoken about
     # at all. That is `unattempted` -- stated as the fact it is (no line exists), never
-    # guessed at: a task the run DID report as blocked/parked/denied already has its line
-    # and is left alone.
+    # guessed at: a task the run DID report as blocked/parked/denied has its line copied above.
     #
     # Scoped to what THIS run appended (everything past $rp_base), never the whole file.
     # The Execution Log is append-only, so it accumulates earlier runs' rollups -- and, as
@@ -442,7 +460,7 @@ reap() {
     # absent, which is the failure family this whole protocol is about.
     printf '%s\n' "$rp_unit_list" | while read -r tn; do
       [ -n "$tn" ] || continue
-      tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " && continue
+      printf '%s\n' "$rp_win_run" | grep -q "^$tn · " && continue
       printf '%s · unattempted · run ended before this task was started — re-fire; the Plan is unchanged\n' "$tn"
     done
     printf '```\n\nCalibration row (Part 4), transcribed from the harness result event:\n\n'

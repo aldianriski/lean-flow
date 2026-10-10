@@ -255,6 +255,71 @@ else
   echo "FAIL fixture(fire-site-wrapper-catches-term): pid='${fs_pid:-<none>}' stop marker='$(cat "$d/run.log.stop" 2>/dev/null)' -- output: $fs_out"; fail=1
 fi
 
+# --- the rollup block carries the run's non-green lines (SPRINT-122 T2 scope-change) --------------
+# check-night-run-rollup.ts reads ONLY the last run-complete block, and for AUTHORITY_BOUNDARY demands
+# a `Tn · parked-hitl|blocked ·` line INSIDE it (ADR-016: a park is one line inside the rollup block).
+# reap() used to copy only `unattempted`, so every reaped AUTHORITY_BOUNDARY run failed its own guard.
+# blk <label> <t1-box> <t2-box> <log-body> [<base>] -- builds a v1 two-task tree, reaps it, sets $bdoc
+blk() {
+  bl=$1; b1=$2; b2=$3; bbody=$4; bbase=${5:-0}
+  d="$work/$bl"; mkdir -p "$d/docs/sprint/logs"
+  printf -- '---\nsprint: 960\nstatus: active\n---\n\n## Plan\n\n### T1 — x\n- [%s] a\n\n### T2 — y\n- [%s] b\n' "$b1" "$b2" > "$d/docs/sprint/SPRINT-960-fx.md"
+  bdoc="$d/docs/sprint/logs/SPRINT-960-fx.md"
+  printf '%s\n' "$bbody" > "$bdoc"; : > "$d/run.log"
+  sh "$launcher" --reap "$d/run.log" "$d" "" "$bbase" "" >/dev/null 2>&1
+}
+# the LAST run-complete entry only (what the guard reads)
+lastblock() { # awk is fed on stdin: on this Windows host gawk itself intermittently fails to open a just-written /tmp file (seen even with retries); cat does not
+  cat "$1" | awk '/^### .*\| run-complete \| run exited/{b=""} {b=b $0 "\n"} END{printf "%s", b}'
+}
+chk() { # <label> <ok-condition-rc> <detail>
+  if [ "$2" -eq 0 ]; then echo "PASS fixture($1): $3"; else echo "FAIL fixture($1): $3"; fail=1; fi
+}
+# M1 (must-FAIL on the old reaper): a parked task is copied into the block, and the real guard PASSes
+blk "block-copies-park" "x" " " "# log
+T1 · done · a
+T2 · parked-hitl · needs the owner's decision"
+lastblock "$bdoc" | grep -qF 'T2 · parked-hitl · needs the owner'; r1=$?
+gv=$(bun "$repo_root/scripts/lib/check-night-run-rollup.ts" "$bdoc" 2>&1); echo "$gv" | grep -q '^PASS'; r2=$?
+chk "block-copies-park-guard-passes" $((r1 + r2)) "park in block rc=$r1; guard: $(echo "$gv" | head -1 | cut -c1-110)"
+# C1 control: a clean ending copies nothing
+blk "block-clean-copies-nothing" "x" "x" "# log
+T1 · done · a
+T2 · done · b"
+n=$(lastblock "$bdoc" | grep -cE '^T[0-9]+ · '); lastblock "$bdoc" | grep -q '^terminal · PLAN_EXHAUSTED'
+chk "block-clean-copies-nothing" $((n + $?)) "task lines in block: $n"
+# C2 controls: a park BEFORE the base (an earlier run), and one inside a fence, are not this run's
+blk "block-ignores-earlier-run" "x" " " "# log
+T2 · parked-hitl · from an earlier run
+T1 · done · a" 2
+n=$(lastblock "$bdoc" | grep -c 'parked-hitl'); lastblock "$bdoc" | grep -q '^T2 · unattempted'
+chk "block-ignores-earlier-run" $((n + $?)) "parked lines copied: $n (want 0), T2 unattempted"
+blk "block-ignores-fenced-example" "x" " " "# log
+T1 · done · a
+\`\`\`
+T2 · parked-hitl · a quoted example
+\`\`\`"
+n=$(lastblock "$bdoc" | grep -c 'a quoted example'); chk "block-ignores-fenced-example" "$n" "fenced lines copied: $n (want 0)"
+# C3: re-reaping a window that already holds a block with a copied (fenced) park line must not recount it
+blk "block-recount" "x" " " "# log
+T1 · done · a
+T2 · parked-hitl · needs the owner"
+sh "$launcher" --reap "$work/block-recount/run.log" "$work/block-recount" "" 0 "" >/dev/null 2>&1
+lastblock "$bdoc" | grep -q '^parks · 1  '; chk "block-recount" $? "second reap over its own earlier block: $(lastblock "$bdoc" | grep '^parks ·')"
+# M2 (must-FAIL if the reaper's cut is too broad): a MODEL-written `run-complete` entry is evidence, not
+# the reaper's block. Its park line is the run's only T2 line, so it must still count and still be copied.
+blk "block-keeps-model-runcomplete" "x" " " "# log
+T1 · done · a
+
+### 2026-10-10 | run-complete | T2 parked (rollup below)
+
+T2 · parked-hitl · needs the owner's decision"
+lastblock "$bdoc" | grep -q '^terminal · AUTHORITY_BOUNDARY'; m1=$?
+lastblock "$bdoc" | grep -q '^parks · 1  '; m2=$?
+lastblock "$bdoc" | grep -qF 'T2 · parked-hitl · needs the owner'; m3=$?
+gv=$(bun "$repo_root/scripts/lib/check-night-run-rollup.ts" "$bdoc" 2>&1); echo "$gv" | grep -q '^PASS'; m4=$?
+chk "block-keeps-model-runcomplete" $((m1 + m2 + m3 + m4)) "AUTHORITY_BOUNDARY=$m1 parks1=$m2 copied=$m3 guard=$m4 (0 = ok)"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REAP-TERMINAL FIXTURES: all green"; else echo "REAP-TERMINAL FIXTURES: FAILURES above"; fi
 exit $fail
