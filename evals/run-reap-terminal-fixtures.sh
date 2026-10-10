@@ -294,12 +294,46 @@ T2 · parked-hitl · from an earlier run
 T1 · done · a" 2
 n=$(lastblock "$bdoc" | grep -c 'parked-hitl'); lastblock "$bdoc" | grep -q '^T2 · unattempted'
 chk "block-ignores-earlier-run" $((n + $?)) "parked lines copied: $n (want 0), T2 unattempted"
-blk "block-ignores-fenced-example" "x" " " "# log
+# K1: the block mirrors what the counters counted. A park written ONLY inside the run's own fenced rollup is
+# counted by rp_parked (that reading predates this change), so it must be copied too -- else the terminal says
+# AUTHORITY_BOUNDARY and the block carries no park line for the guard to find. Copied once.
+blk "block-copies-counted-fenced-park" "x" " " "# log
 T1 · done · a
+
+### 2026-10-10 | progress | rollup
 \`\`\`
-T2 · parked-hitl · a quoted example
+T2 · parked-hitl · only inside a fence
 \`\`\`"
-n=$(lastblock "$bdoc" | grep -c 'a quoted example'); chk "block-ignores-fenced-example" "$n" "fenced lines copied: $n (want 0)"
+lastblock "$bdoc" | grep -q '^terminal · AUTHORITY_BOUNDARY'; k1=$?
+k2=$(lastblock "$bdoc" | grep -c 'T2 · parked-hitl · only inside a fence'); [ "$k2" -eq 1 ]; k2=$?
+gv=$(bun "$repo_root/scripts/lib/check-night-run-rollup.ts" "$bdoc" 2>&1); echo "$gv" | grep -q '^PASS'; k3=$?
+chk "block-copies-counted-fenced-park" $((k1 + k2 + k3)) "AUTHORITY_BOUNDARY=$k1 copied-once=$k2 guard=$k3 (0 = ok)"
+# K2: the cut is anchored to the END of the header; a model header that merely CONTAINS the reaper's title
+# and adds a suffix is not the reaper's, so its park line still counts
+blk "block-header-suffix-not-cut" "x" " " "# log
+T1 · done · a
+
+### 2026-10-10 | run-complete | run exited — rollup emitted by the launcher (corrected)
+
+T2 · parked-hitl · kept despite the look-alike header"
+lastblock "$bdoc" | grep -q '^terminal · AUTHORITY_BOUNDARY'; s1=$?
+lastblock "$bdoc" | grep -q '^parks · 1  '; s2=$?
+chk "block-header-suffix-not-cut" $((s1 + s2)) "AUTHORITY_BOUNDARY=$s1 parks1=$s2 (0 = ok)"
+# S6: every alternative of the copy regex is exercised
+blk "block-copies-blocked" "x" " " "# log
+T1 · done · a
+T2 · blocked · waiting on an external credential"
+lastblock "$bdoc" | grep -q '^terminal · AUTHORITY_BOUNDARY'; b1=$?
+lastblock "$bdoc" | grep -qF 'T2 · blocked · waiting on an external credential'; b2=$?
+gv=$(bun "$repo_root/scripts/lib/check-night-run-rollup.ts" "$bdoc" 2>&1); echo "$gv" | grep -q '^PASS'; b3=$?
+chk "block-copies-blocked" $((b1 + b2 + b3)) "AUTHORITY_BOUNDARY=$b1 copied=$b2 guard=$b3 (0 = ok)"
+blk "block-copies-stalled-and-denied" " " " " "# log
+T1 · stalled · watchdog fired
+T2 · denied-tool · dontAsk refused a call"
+lastblock "$bdoc" | grep -q '^terminal · HARD_FAILURE'; h1=$?
+lastblock "$bdoc" | grep -qF 'T1 · stalled · watchdog fired'; h2=$?
+lastblock "$bdoc" | grep -qF 'T2 · denied-tool · dontAsk refused a call'; h3=$?
+chk "block-copies-stalled-and-denied" $((h1 + h2 + h3)) "HARD_FAILURE=$h1 stalled=$h2 denied=$h3 (0 = ok)"
 # C3: re-reaping a window that already holds a block with a copied (fenced) park line must not recount it
 blk "block-recount" "x" " " "# log
 T1 · done · a

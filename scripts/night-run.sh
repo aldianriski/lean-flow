@@ -327,7 +327,7 @@ reap() {
   # Reaper entries are cut by header, NOT by fence: a model-written rollup block is fenced too, and its
   # park lines are the evidence (SPRINT-122 T2).
   rp_win_run=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | awk -v t="| $rp_entry_title" '
-    /^### / { skip = (index($0, t) > 0) }
+    /^### / { skip = (length($0) >= length(t) && substr($0, length($0) - length(t) + 1) == t) }
     !skip')
   rp_unatt=0
   for tn in $rp_unit_list; do
@@ -443,10 +443,12 @@ reap() {
     printf 'warnings · %s  [mechanical]\n' "$rp_warn"
     # One line per non-green task INSIDE this block (ADR-016; Part 4: "a park is one line inside the
     # rollup block"), because the rollup guard reads only the LAST run-complete block. The run's own
-    # `Tn · (parked-hitl|blocked|stalled|denied-tool) · …` lines are copied verbatim, from the same
-    # fence-stripped window the retry count uses (L-108: a quoted example is not this run's output).
+    # `Tn · (parked-hitl|blocked|stalled|denied-tool) · …` lines are copied verbatim, from `rp_win_run` --
+    # the SAME window rp_parked/rp_hard count, so the block holds exactly the evidence the terminal was
+    # derived from and the two cannot disagree. (The counters reading fenced lines predates this change and
+    # is out of scope here; the copy mirrors it.) Identical lines are kept once, first-seen order.
     # `retry` lines are supplementary and stay out.
-    printf '%s\n' "$rp_window_fs" | grep -E '^T[0-9]+ · (parked-hitl|blocked|stalled|denied-tool) · '
+    printf '%s\n' "$rp_win_run" | grep -E '^T[0-9]+ · (parked-hitl|blocked|stalled|denied-tool) · ' | awk '!seen[$0]++'
     # A task with an open DoD that the run wrote no rollup line for was never spoken about
     # at all. That is `unattempted` -- stated as the fact it is (no line exists), never
     # guessed at: a task the run DID report as blocked/parked/denied has its line copied above.
