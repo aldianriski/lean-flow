@@ -27,7 +27,7 @@ only lean-flow's backlog, so the four epics' 21 open conditions were invisible t
 workdoo's 23-task backlog, the work that could cover them, was in another repository. The owner ruled the move (2026-10-10). Before
 the option was offered, ADR-041 was read and named as the decision being reversed (L-220).
 
-Measured blast radius: four epic files (336 lines). workdoo cites them by bare id in 88 lines, with 0 links into lean-flow, and has
+Measured blast radius: four epic files (336 lines). workdoo cites them by bare id in 88 lines, with 0 links to the epic files (its README links only the lean-flow repo root), and has
 no `docs/epic/` and no id of its own in that range, so it has no collision to resolve. In lean-flow, the live references are the epic
 INDEX, the sequencing register, `prose-density-baseline.txt`, ADR-041, ADR-045 and DECISIONS; archived sprints and logs are history.
 
