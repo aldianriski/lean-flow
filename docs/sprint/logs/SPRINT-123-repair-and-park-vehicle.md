@@ -126,3 +126,25 @@ Calibration row (Part 4), transcribed from the harness result event:
 ```
 run · $1.3245145 · 26 turns · 3 min · 1 of 2 units · inline
 ```
+
+### 2026-10-10 | run-complete | run exited — rollup emitted by the launcher
+
+Evidence provenance: mechanical = counted directly from the Plan/log text; model-reported = written by the run, trusted like any other Part 4 state line (TD-152); derived = a function of the fields below it, never more certain than what it reads.
+
+```
+run · 3 of 4 DoD ticked  [mechanical]
+outcome · PARTIAL · derived from terminal AUTHORITY_BOUNDARY  [derived]
+terminal · AUTHORITY_BOUNDARY · 1 task(s) parked or blocked for a human; the rest completed around them  [derived]
+tasks · 2 attempted / 1 completed / 2 total  [mechanical]
+parks · 1  [model-reported]
+repair-cycles · 1  [model-reported]
+verification · none logged  [model-reported]
+warnings · none  [mechanical]
+T2 · parked-hitl · reviewer FINDING "the draft must name the option lean-flow adopts" is a judgment (ADR-022, no retry) · unblock: the owner rules on the finding and picks A or B for TD-247 (the seed requires the draft not to)
+```
+
+Calibration row (Part 4), transcribed from the harness result event:
+
+```
+run · $1.3245145 · 26 turns · 67 min · 1 of 2 units · inline
+```
