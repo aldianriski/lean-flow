@@ -14,6 +14,21 @@ status: current
 
 ---
 
+## Unreleased — an active epic's open conditions must each be covered (spec 0.15.0)
+
+**MINOR (not yet released)** — SPRINT-121 T5 (TASK-420). Installing the next release is enough; no upgrade step. The standard moves to
+**spec 0.15.0** (MINOR: prose rule, no conformance rule added, no verdict changes).
+
+- **The rule (STANDARD § 2):** while an epic is `status: active`, every open `- [ ]` Closed-when condition ends with
+  `→ TASK-NNN[, TASK-MMM]` or `→ next slice: <name>`. A named task that is done, cancelled or missing does not cover it.
+  `proposed` epics are exempt.
+- **`/lean-doc-generator`** lists uncovered conditions when an epic is activated and at promote (new `☐ epic coverage` line),
+  and promote refuses to form a sprint while an epic it touches has one, unless the owner records an override.
+- **`/triage`** reads active epics alongside the backlog and lists each uncovered condition with its epic;
+  **`/prime`** reports a `Coverage:` count.
+
+---
+
 ## v2.3.0 — conformance.sh skips worktrees; §11 keeps a task a live doc cites; spec 0.14.0 (2026-10-09)
 
 **MINOR** — ships SPRINT-120 (entry below). No upgrade step beyond installing `2.3.x` and restarting the session (a live session keeps
