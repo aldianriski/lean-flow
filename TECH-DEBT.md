@@ -345,6 +345,14 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-247** severity: low | status: open | created: Sprint-122 (T1 review, Codex C3 + C6)
+  - Summary: **A USER_STOP is not bound to the run that produced it.** The `<log>.stop` marker the wrapper leaves carries only a
+    signal name, so a standalone `night-run.sh --reap` over an old log can read a stale marker (the wrapper clears it only at its own
+    start). `check-night-run-rollup.ts` accepts `terminal · USER_STOP` with no wrapper evidence, so a model-written claim passes the
+    guard. Census: zero real occurrences (no run has reported USER_STOP yet; manual `--reap` is testing only).
+  - Mitigation (hypothesis): write a run identity (the `fired ·` timestamp) into the marker, have reap() cite it in the terminal
+    reason, and have the guard require it on a USER_STOP block.
+
 - **TD-246** severity: low | status: open | created: Sprint-121 (dispatch)
   - Summary: **Agent worktrees accumulate: 14 under `.claude/worktrees/` at SPRINT-121 close, several `locked`.** dispatch.md says
     `git worktree list` should show none before a dispatch (stale-branch reuse on an agent-id collision, harness issue #51596). Nothing

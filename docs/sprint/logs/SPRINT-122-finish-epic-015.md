@@ -67,3 +67,24 @@ G2 is re-confirmed by the same popup.
 consequence · T1 · behaviour: changes how the launcher derives the terminal state (a new USER_STOP path) · governance: workflow
 contract (night-run.md Part 3/4, read by every adopter firing a run) → material, Consequential Tier G: scoped Sonnet review, then a
 worktree-isolated Codex review that seeds breaks. Preflight: one task in the wave, no cycle, no shared file (D1 orders the epic file).
+
+### 2026-10-10 | progress | T1 built (`eae1c1b0`); coordinator re-ran the reaper fixtures green; two isolated reviews dispatched
+Builder (Sonnet): the inline wrapper became `night-run.sh --wrap` (`wrap()` :450-488, fire site :903-905). reap() reads `<log>.stop`
+(:317) and ranks it (:343-348). The `die_doa` comment is corrected (:312-316), and night-run.md's USER_STOP row and Part 3 say which
+pid to stop. Red before: against the old wrapper body, wrapper-term-is-user-stop and ceiling-breach-outranks-stop FAILed while both
+controls PASSed. Green after, re-run by the coordinator as its own call: `REAP-TERMINAL FIXTURES: all green`, all four new cases PASS.
+**Empirical finding (Windows Git Bash, launched the way the fire site launches it):** TERM is caught; INT, HUP and QUIT are ignored on
+entry (nohup plus an async start) and never reach the trap, so the wrapper stays alive. Only TERM is a working user stop.
+Reviews: (1) a worktree-isolated Sonnet seeding campaign, six seeds including S6, the fire-site wiring; (2) a static Codex review,
+items C1-C7. Round 1 of at most 2.
+
+### 2026-10-10 | review | T1 round 1: seeding found three untested claims; both reviewers found the race and the exit-status overclaim
+Seeding (worktree-isolated, every seed restored to `6b1312eb` by `git hash-object` == `git rev-parse HEAD:`): S1 trap removed, S2
+marker ignored, S3 rank swapped, S5 forward removed: each reddens its claim-bearing case while the controls stay green. **Nothing
+reddens** under S4 (re-wait loop removed), S6 (fire site reverted to the old trap-free inline wrapper, a wiring gap: the one
+full-launcher harness fires `true`) or S7 (member-count rank removed). Codex (static, per-item): C4 fire-site args, C5 rank order and
+C7 night-run.md wording OK; C1 race FINDING (a TERM before `wr_child=$!` forwards nothing); C2 FINDING (the exit file can hold the
+interrupted wait's 143); C3 stale marker and C6 guard accepts an unbacked USER_STOP → **TD-247** (zero census, outside T1's Layers).
+Fix round 1 to the same builder: F1 race, F2 exit status, plus fixtures G1 (S4), G2 (S6, real launcher), G3 (S7). Stop rule: one
+re-review (re-seed S4/S6/S7, Codex round 2 on the fix diff), then the owner.
+Spend so far on T1: build ~103k, seeding ~80k, Codex ~20k subagent tokens.
