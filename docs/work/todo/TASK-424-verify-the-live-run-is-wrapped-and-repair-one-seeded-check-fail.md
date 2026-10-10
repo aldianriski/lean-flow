@@ -26,8 +26,9 @@ retry. The seed is declared here openly. It is a control, not real work re-decla
 
 ## Done when
 
-- [ ] The run walks its own process ancestry upward from its shell's `$PPID` (`ps -o pid=,ppid=,args= -p <pid>`) and
-      transcribes, verbatim into this box's evidence, the ancestor line whose args contain `night-run.sh --wrap`.
+- [ ] The run lists the process table with the literal command `ps -eo pid=,ppid=,args=` (a `$`-expanding form is denied under
+      `dontAsk`), traces its own chain upward by ppid from its `claude -p` process, and transcribes, verbatim into this box's
+      evidence, the ancestor line whose args contain `night-run.sh --wrap`.
 - [ ] This sprint's § Files Changed carries a row for TASK-424, and `bun scripts/lib/check-prose-density.ts .` prints
       `prose-density: N pass, 0 fail`. *Verify: that check.* The row is first written exactly as § Seeded draft gives it. Its
       Change (WHY) cell is over 400 characters, so the first check FAILs. Repair it under ADR-022 (one retry, logged as a `T1 · retry ·` line),

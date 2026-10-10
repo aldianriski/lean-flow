@@ -56,3 +56,11 @@ The envelope as approved by the owner, one dimension per item:
   `HARD_FAILURE` with a clean halt.
 `check-approval-envelope.sh`: `PASS … (all 10 dimensions covered, pinned @ 838e714)`. `check-authority.ts`: T1, T2, TASK-424 and
 TASK-425 all J1 declared.
+
+### 2026-10-10 | scope-change | TASK-424 DoD1: the ancestry command becomes the literal `ps -eo pid=,ppid=,args=`
+What broke: the VPS allowlist probe (headless, `dontAsk`, `~/lf-run` at `07c8762d`; $0.06) DENIED `ps -o pid=,ppid=,args= -p $$` despite
+`Bash(ps:*)`, because a `$`-expanding command does not match under `dontAsk`. The must-deny control `touch /tmp/lf-must-deny-123` was also
+DENIED (file absent). `bun scripts/lib/check-prose-density.ts .`, `check-authority.ts` and `git commit --dry-run` were ALLOWED. A second
+probe ($0.22) ALLOWED the literal `ps -eo pid=,ppid=,args=` (160 lines, 0 denials). Impact: DoD1 lists the process table literally and
+traces the chain by ppid. The envelope is unchanged: its verification dimension already reads "the `ps` ancestry line verbatim". G2 is
+unaffected.
