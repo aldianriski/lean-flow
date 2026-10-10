@@ -102,3 +102,16 @@ reaps the child leaves 128+n) → comment narrowed (`663d9a5c`); the terminal is
 FINDING refuted by reading: G1's comparison is quoted (:200), and G2 runs in a fresh mktemp case directory where only the trap writes
 the marker (:238-252). Stop rule reached: no third round.
 Spend on T1: build ~103k + fix ~139k, seeding ~80k, Codex ~38k ≈ 360k subagent tokens.
+
+### 2026-10-10 | scope-change | T1 DoD1 narrowed again: only TERM is a user stop (owner ruling, popup)
+What broke: DoD1 named INT/TERM/HUP received by the wrapper. Measured at build: INT and HUP are ignored on entry to a shell started
+under nohup and as an async command, so they never reach the trap and the run continues (POSIX; same on Linux). Nothing is
+misreported, because an ignored signal stops nothing. Impact: DoD1 reads "a TERM received by the launcher's wrapper"; night-run.md
+already tells operators to use TERM. Rejected: keeping INT/HUP with a TD, or building a launch helper that resets ignored signals
+(new Tier G machinery, ~200k tokens). G2 is unaffected.
+
+### 2026-10-10 | progress | T1 (TASK-423) 4 of 4 ticked; EPIC-015 CW6 ticked
+DoD1 ✓ `wrapper-term-is-user-stop` + the real-launcher `fire-site-wrapper-catches-term`. DoD2 ✓ the must-FAIL against the old wrapper,
+two controls, and seeds S1-S7 each reddening their own case. DoD3 ✓ `night-run.sh:312-316`. DoD4 ✓ CW6 ticked with terminals
+:344-368 and fields :424-430. TD-247 is named on the tick and does not block it: CW6 is about emission, and TD-247 is about trusting
+a USER_STOP claim. Next: T2 (TASK-415), whose vehicle sprint and envelope come to the owner first.
