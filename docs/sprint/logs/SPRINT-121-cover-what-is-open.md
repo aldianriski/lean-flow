@@ -82,3 +82,14 @@ logic is TypeScript run by Bun, owner rule 2026-09-09), and the gate already wir
 `Layers:` names `evals/run-learnings-metadata-fixtures.ts`, the same role in a different file. Dispatch shape: T3 measures wall
 clock, so it runs alone after T4 and T5 rather than beside them, and the host load it states is uncontaminated by sibling builders.
 Wave ranks are unchanged and G2 is unaffected. Declared base for wave 0 is the commit that carries this entry.
+
+### 2026-10-10 | progress | T1 done: CW6 stays OPEN under the pre-delegated rule; USER_STOP is produced by no code path (TASK-423 filed)
+consequence · T1 · behaviour:low · governance:med
+review · T1 · self-review · behaviour:low · governance:med
+Field map: every CW6 field has a line in SPRINT-119's committed rollup (archived log :103–110). The emitter check, which the owner
+made a condition at G2 (Codex: one run proves one run), failed on one path. `reap()` derives four terminal states (`night-run.sh`
+:340–359) and prints all eight fields (:414–421), but **USER_STOP is produced by no path**. The comment at :312 hands it to
+`die_doa()`, every `die_doa()` call site (:485–516) is a pre-launch error, and it prints only `DEAD-ON-ARRIVAL` (:461). A user
+interrupt therefore reads as HARD_FAILURE, or as no rollup at all. CW6 is not ticked. The gap is filed as **TASK-423** (backlog,
+P1, Consequential G, epic EPIC-015), which also gives CW6 a covering task under the new active-epic coverage rule (TASK-420).
+Line numbers were re-derived by a second grep before this entry (the first draft cited :329–345, which was wrong).
