@@ -488,6 +488,11 @@ pre-decided shape (BYO opt-in + AGENTS.md brief carrier) is parked, not built.
 Guardrail: stale-branch reuse on agent-id collision is an open harness issue (#51596). Before
 dispatch, `git worktree list` should show no leftover agent worktrees — clean any first.
 
+**Never move the session into a worktree, and never load the host while a task is timing** (L-219). Inspect a dispatched worktree
+with `git -C <path>` and absolute paths: a `cd` can make the harness adopt that worktree as the session's checkout, and the next
+isolated dispatch then branches from its tip. Run nothing host-heavy (a gate, a typecheck, a test suite) while a task measures
+wall-clock on the same host. A measurement taken under load you added is discarded, not adjusted.
+
 **Declared-base rule** (ADR-013 · L-055): every worktree/agent branches from the current wave's
 declared base commit — stated up front, then verified against live HEAD at spawn, never assumed.
 Mismatch halts dispatch for the wave. Re-run the check at every wave boundary, not just once at the
