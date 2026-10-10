@@ -9,6 +9,7 @@ related: [ADR-015, ADR-017, ADR-019, ADR-006, ADR-032, ADR-033]
 # ADR-048 — The always-loaded read set is budgeted in tokens, not lines
 
 - **Status:** accepted (2026-09-28)
+- **Corrected:** 2026-10-10 — § Decision is restored to the text accepted at `3e725ef4`; the decision **in force** is § Correction 2026-10-10 at the end of this file (TASK-413 · STANDARD §4 S4.APPEND).
 - **Deciders:** Maintainer
 - **Context driver:** TASK-364 / EPIC-017 D3 — `check-doc-caps` counts newlines; SPRINT-105's
   `check-prose-density.ts` proved that is gameable for exactly the pair this repo reads on every
@@ -40,10 +41,9 @@ inventing a real count.
 `.claude/CONTEXT.md`, the existing `ALWAYS_LOADED` population from `check-prose-density.ts`, imported
 rather than redefined — and reports PASS/FAIL against `scripts/lib/token-budget.txt`.
 
-- **Tokenizer: Claude's own**, sampled via the Messages `count_tokens` API (model `claude-opus-5-5` —
-  the tokenizer is sampled from the model that actually reads the always-loaded set in this repo's
-  sessions) — never a third-party tokenizer such as `tiktoken`, which undercounts Claude text. The gate
-  itself stays **offline and zero-dependency**
+- **Tokenizer: Claude's own**, sampled via the Messages `count_tokens` API (model `claude-opus-5`, the
+  current flagship per the `claude-api` skill's own defaults) — never a third-party tokenizer such as
+  `tiktoken`, which undercounts Claude text. The gate itself stays **offline and zero-dependency**
   (ADR-032/033): it *estimates* tokens as `bytes ÷ ratio`, where `ratio` (bytes/token) is measured
   **once** by an opt-in `bun scripts/lib/check-doc-caps.ts --calibrate` run against the real API,
   using the built-in `fetch` (no SDK). Calibration writes nothing to disk; the owner adopts a ratio by
@@ -180,3 +180,49 @@ named exclusion of the same kind as `.conformance-exempt`. The engine does not c
 (`qa-check.sh` leg 1 does), so ADR-043's adopter contract is untouched: no file, no change. Phase 1's
 "no disposition mechanism exists yet" now reads as scoped to the always-loaded budget; the line caps
 as a secondary signal stand.
+
+## Correction 2026-10-10 (TASK-413 — the decision in force)
+
+**Why corrected:** SPRINT-109 T2 changed the calibration model from `claude-opus-5` to `claude-opus-5-5`, the model that actually reads the always-loaded set in this repo's sessions. The decision was edited in place on 2026-09-28 (`22bb0c45`).
+
+Section 4 is append-only, so the edit was undone and its text moved here: § Decision above is again exactly what was accepted at `3e725ef4`. The decision **in force** is the corrected text below, verbatim as it stood in § Decision from `22bb0c45` to 2026-10-10:
+
+> **`check-doc-caps` computes a token budget over the always-loaded read set** — `.claude/CLAUDE.md` +
+> `.claude/CONTEXT.md`, the existing `ALWAYS_LOADED` population from `check-prose-density.ts`, imported
+> rather than redefined — and reports PASS/FAIL against `scripts/lib/token-budget.txt`.
+>
+> - **Tokenizer: Claude's own**, sampled via the Messages `count_tokens` API (model `claude-opus-5-5` —
+>   the tokenizer is sampled from the model that actually reads the always-loaded set in this repo's
+>   sessions) — never a third-party tokenizer such as `tiktoken`, which undercounts Claude text. The gate
+>   itself stays **offline and zero-dependency**
+>   (ADR-032/033): it *estimates* tokens as `bytes ÷ ratio`, where `ratio` (bytes/token) is measured
+>   **once** by an opt-in `bun scripts/lib/check-doc-caps.ts --calibrate` run against the real API,
+>   using the built-in `fetch` (no SDK). Calibration writes nothing to disk; the owner adopts a ratio by
+>   pasting it into `token-budget.txt` themselves.
+> - **Ratchet, not a live call.** `token-budget.txt` records `<budget-tokens> <ratio> <adopted-at>
+>   <reason>` — the ratio and budget move only when the owner re-calibrates and re-adopts, the same
+>   pattern `scripts/lib/doc-caps-grandfathered.txt` already uses (ADR-015). No API call happens on an
+>   ordinary gate run.
+> - **Line caps are retained as a secondary signal.** `CLAUDE.md` (80) and `CONTEXT.md` (150, ADR-017)
+>   keep their line caps: a token budget catches density-gaming within a line cap; a line cap still
+>   catches unbounded growth via short lines. The two compose; neither supersedes the other's
+>   *mechanism* — the token budget supersedes ADR-015/017/019's *claim that a line count is the exact,
+>   sufficient measure* for this pair.
+> - **No disposition on breach, yet.** `TASK-384` is expected to add a disposition mechanism (replace ·
+>   merge · move to an on-demand reference · automate into a check · retain with justification) for a
+>   promoted-rule breach; it has not shipped. Until it does, an over-budget always-loaded read set is a
+>   **FAIL with no escape route** — stated as such in the finding itself, not left implicit.
+> - **Phase 1 (this sprint) ships the mechanism uncalibrated.** `token-budget.txt` carries a `PENDING`
+>   sentinel in all three of budget/ratio/adopted-at; `check-doc-caps` reports that as a named
+>   not-yet-calibrated finding — never a silent PASS, and never a FAIL either, since there is nothing yet
+>   to enforce. Phase 2 (a follow-up dispatch) runs `--calibrate` and adopts real numbers.
+>
+> **Supersedes ADR-015, ADR-017 and ADR-019** (EPIC-017 D3's ruling). ADR-015's rule 1 (a stated cap is
+> a real number, checked to the line) and ADR-017's specific 150-line figure are superseded exactly
+> where they apply to this pair: the number that now governs the pair's reading cost is a token budget
+> with a stated ratio and error band, not an integer line count. ADR-019's subject, `TODO.md`, is a
+> different file — retired as the v1 layout at 0.12.0 — and is superseded here as part of D3's blanket
+> ruling over the cap-precision family this ADR revises, not because a token budget now applies to it
+> directly. ADR-015's rule 2 (the grandfather file records hard-cap breaches only) is untouched in
+> substance; `token-budget.txt` deliberately mirrors its ratchet shape rather than replacing it.
+>

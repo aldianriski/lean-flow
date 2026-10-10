@@ -10,6 +10,7 @@ supersedes_in_part: [ADR-011]
 # ADR-044 — Hooks and agent definitions are admissible, held to the curation bar
 
 - **Status:** accepted (2026-09-21)
+- **Corrected:** 2026-10-10 — § Decision is restored to the text accepted at `f1efa36b`; the decision **in force** is § Correction 2026-10-10 at the end of this file (TASK-413 · STANDARD §4 S4.APPEND).
 - **Deciders:** Maintainer
 - **Context driver:** `L-002` — a blocking question must be surfaced as an `AskUserQuestion` popup,
   never left in prose — is written in `.claude/CLAUDE.md`, `.claude/CONTEXT.md`, `docs/LEARNINGS.md`
@@ -90,18 +91,14 @@ nothing about the bar.
 **Hooks are admissible components, held to exactly the curation bar `ADR-001` sets — no more, no
 less. The blanket "ships no hooks" claim is retired as inaccurate.**
 
-- **`ADR-002` is untouched.** An earlier draft of this ADR said "only its hook clause is lifted"
-  and listed it under `supersedes_in_part`. That was **factually wrong** and an outside review
-  caught it: `grep -ci hook` over `ADR-002` returns **0**. It rules on *agent definitions* and says
-  nothing about hooks. There was no clause to lift. The blanket "no hooks" reading was `ADR-011`'s
-  gloss on `ADR-002`'s lineage, never `ADR-002`'s own ruling — and this ADR briefly repeated the
-  same mis-citation it exists to correct.
-- **`ADR-011` is superseded in part**, honestly and not softened — see § Context for the reason it
-  actually gave. What survives untouched: G1/G2 remain advisory, human-approved and unenforced, and
-  **no hook may block a gate**. A hook that turned a gate into a blocker needs its own ADR and
-  should expect refusal.
-- **No hook ships today.** The stance changes; the roster does not. The first candidate was
-  withdrawn at review (§ Context), so this ADR opens a door rather than walking through it.
+- `ADR-002` is **amended, not superseded**: lean-flow still ships **no agent definitions of its
+  own**, and still dispatches Claude's built-ins. Only its hook clause is lifted.
+- `ADR-011` is **amended, not superseded**: G1/G2 remain advisory, human-approved, and unenforced.
+  **No hook may block a gate.** A hook that turned a gate into a blocker would need its own ADR and
+  should expect to be refused.
+- **The first hook ships:** `hooks/ask-dont-tell.ts`, registered on `Stop` via `hooks/hooks.json`.
+  It blocks the stop when a turn ends on a decision point with no `AskUserQuestion` call in that
+  turn, and hands back an instruction to re-surface it properly.
 - **Agent definitions are admissible on the same terms.** None ship today and none are added here;
   the change is that "we ship none" stops being a *promise* and becomes a *fact about the current
   roster*, revisited when a candidate clears the bar. `ADR-010`'s dispatch discipline already
@@ -119,14 +116,10 @@ to prevent:
 1. **Fails open.** Every unexpected condition — unreadable transcript, malformed JSON, missing
    field — allows the action. A hook that wedges a session is worse than the miss it prevents.
 2. **Cannot block a gate**, a commit, or a tool call. Advisory correction only.
-2b. **Worth being mandatory.** There is no per-hook disable, so shipping one imposes it on every
-   consumer. The bar is not "useful" but "a consumer would not want to switch this off" -- and it
-   is measured against REAL input before shipping, never argued.
 3. **Bounded.** It must respect `stop_hook_active` (or its per-event equivalent) so it cannot loop.
 4. **Retained fixtures, proven to discriminate.** Tier G: a must-FAIL case per branch with its
    named finding, must-NOT-catch controls, and a seeded break showing exactly the carrying cases
-   redden -- AND the fixtures must be drawn from REAL input, not invented. The withdrawn candidate
-   passed 7 of 7 hand-written fixtures while being wrong on 60% of real turns.
+   redden. `evals/run-ask-dont-tell-fixtures.ts` is the retained proof.
 5. **Clears the curation bar** — genuinely useful **and** important **and** actually used — argued
    in the ADR that adds it, not asserted.
 
@@ -159,3 +152,55 @@ to prevent:
 | Write `L-002` a fifth time, in prose | rejected | The rule's trigger is the end of a turn, where no skill step exists, so every written placement is read by an agent that has already stopped |
 | Ship the `ask-dont-tell` Stop hook now | rejected | About 60% false positives on 48 real transcripts, and mandatory for every consumer because there is no per-hook disable; withdrawn and re-filed as `TASK-366` |
 | Supersede `ADR-011` in full | rejected | Its surviving rulings still hold: G1/G2 stay advisory and unenforced, and no hook may block a gate |
+
+## Correction 2026-10-10 (TASK-413 — the decision in force)
+
+**Why corrected:** SPRINT-105 T1's outside review found two false claims in the accepted text. ADR-002 has no hook clause to lift (`grep -ci hook` over it returns 0).
+ADR-011 is superseded in part, not merely amended.
+The first hook candidate (`ask-dont-tell`) was also withdrawn at that review (60% false positives on real transcripts), so **no hook ships**. The decision was rewritten in place on 2026-09-21 (`bdb2300e`).
+
+Section 4 is append-only, so the edit was undone and its text moved here: § Decision above is again exactly what was accepted at `f1efa36b`. The decision **in force** is the corrected text below, verbatim as it stood in § Decision from `bdb2300e` to 2026-10-10:
+
+> **Hooks are admissible components, held to exactly the curation bar `ADR-001` sets — no more, no
+> less. The blanket "ships no hooks" claim is retired as inaccurate.**
+>
+> - **`ADR-002` is untouched.** An earlier draft of this ADR said "only its hook clause is lifted"
+>   and listed it under `supersedes_in_part`. That was **factually wrong** and an outside review
+>   caught it: `grep -ci hook` over `ADR-002` returns **0**. It rules on *agent definitions* and says
+>   nothing about hooks. There was no clause to lift. The blanket "no hooks" reading was `ADR-011`'s
+>   gloss on `ADR-002`'s lineage, never `ADR-002`'s own ruling — and this ADR briefly repeated the
+>   same mis-citation it exists to correct.
+> - **`ADR-011` is superseded in part**, honestly and not softened — see § Context for the reason it
+>   actually gave. What survives untouched: G1/G2 remain advisory, human-approved and unenforced, and
+>   **no hook may block a gate**. A hook that turned a gate into a blocker needs its own ADR and
+>   should expect refusal.
+> - **No hook ships today.** The stance changes; the roster does not. The first candidate was
+>   withdrawn at review (§ Context), so this ADR opens a door rather than walking through it.
+> - **Agent definitions are admissible on the same terms.** None ship today and none are added here;
+>   the change is that "we ship none" stops being a *promise* and becomes a *fact about the current
+>   roster*, revisited when a candidate clears the bar. `ADR-010`'s dispatch discipline already
+>   governs how one would be used.
+> - **The "no scaffold" claim is deleted as false**, not softened. `/lean-doc-generator init`
+>   scaffolds, and the front door now says so.
+>
+> **Describe the roster, never promise its absence.** Every remaining component claim states what is
+> *in* the plugin today. A negative claim is unfalsifiable by ordinary review — no diff makes "we
+> still don't have X" look wrong — which is how the scaffold line survived the shipping of `init`.
+>
+> **Standing constraints on any hook here**, so this does not become the bulk-import `ADR-001` exists
+> to prevent:
+>
+> 1. **Fails open.** Every unexpected condition — unreadable transcript, malformed JSON, missing
+>    field — allows the action. A hook that wedges a session is worse than the miss it prevents.
+> 2. **Cannot block a gate**, a commit, or a tool call. Advisory correction only.
+> 2b. **Worth being mandatory.** There is no per-hook disable, so shipping one imposes it on every
+>    consumer. The bar is not "useful" but "a consumer would not want to switch this off" -- and it
+>    is measured against REAL input before shipping, never argued.
+> 3. **Bounded.** It must respect `stop_hook_active` (or its per-event equivalent) so it cannot loop.
+> 4. **Retained fixtures, proven to discriminate.** Tier G: a must-FAIL case per branch with its
+>    named finding, must-NOT-catch controls, and a seeded break showing exactly the carrying cases
+>    redden -- AND the fixtures must be drawn from REAL input, not invented. The withdrawn candidate
+>    passed 7 of 7 hand-written fixtures while being wrong on 60% of real turns.
+> 5. **Clears the curation bar** — genuinely useful **and** important **and** actually used — argued
+>    in the ADR that adds it, not asserted.
+>
