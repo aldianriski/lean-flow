@@ -88,3 +88,17 @@ interrupted wait's 143); C3 stale marker and C6 guard accepts an unbacked USER_S
 Fix round 1 to the same builder: F1 race, F2 exit status, plus fixtures G1 (S4), G2 (S6, real launcher), G3 (S7). Stop rule: one
 re-review (re-seed S4/S6/S7, Codex round 2 on the fix diff), then the owner.
 Spend so far on T1: build ~103k, seeding ~80k, Codex ~20k subagent tokens.
+
+### 2026-10-10 | review | T1 round 2 (final): the three uncaught seeds now redden; Codex R2 comment narrowed, R4 refuted by reading
+Fix round (`9f70412e`): F1 forwards a stop caught before `wr_child=$!`; F2 recovers the child's status after a stop; new cases G1
+`stop-keeps-child-exit-status`, G2 `fire-site-wrapper-catches-term` (the real launcher, its printed pid TERMed), G3
+`stop-plus-unresolved-member-is-hard-failure`. Coordinator's own run: `REAP-TERMINAL FIXTURES: all green`.
+Re-seed, done by the coordinator in a scratch worktree at `9f70412e`, one seed at a time: S4 (loop and F2 recovery both removed, -2
+lines) reddens only G1 (`exit file holds '143', wanted 7`); S6 (fire site reverted to a trap-free `nohup sh -c`) reddens only G2
+(`stop marker=''`); S7 (member-count branch → `if false`) reddens only G3 (got USER_STOP). Every other case stays green. Restore:
+`git hash-object` == `git rev-parse HEAD:` (`2b524f7a`), and the worktree was removed.
+Codex round 2: R1 race closed OK; R3 no-stop path unchanged OK; R2 FINDING, a residual window remains (a TERM landing as `wait`
+reaps the child leaves 128+n) → comment narrowed (`663d9a5c`); the terminal is unaffected, because the marker decides it. R4
+FINDING refuted by reading: G1's comparison is quoted (:200), and G2 runs in a fresh mktemp case directory where only the trap writes
+the marker (:238-252). Stop rule reached: no third round.
+Spend on T1: build ~103k + fix ~139k, seeding ~80k, Codex ~38k ≈ 360k subagent tokens.
