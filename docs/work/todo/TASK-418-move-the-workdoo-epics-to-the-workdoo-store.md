@@ -10,6 +10,7 @@ tier: P
 authority: J2
 origin: manual
 state: ready
+sprint: SPRINT-121
 depends-on: []
 ---
 
@@ -31,7 +32,7 @@ EPIC-013 stay as closed history.
       listed unless an explicit mapping is recorded).
 - [ ] lean-flow no longer carries the four files. Its epic INDEX, the sequencing register and any live doc that needs the
       relation carry a one-line pointer to the workdoo path; archived sprints and logs stay unedited as history; the
-      `prose-density-baseline.txt` row for EPIC-016 is removed.
+      `scripts/lib/prose-density-baseline.txt` row for EPIC-016 is removed.
 - [ ] Both repositories' gates are green after the move: lean-flow `sh conformance.sh .` reports no new finding and its gate passes.
       workdoo's commit-attribution rule is checked **before** committing there, because workdoo's SPRINT-012 is active, and the
       workdoo commit is shaped to satisfy it.

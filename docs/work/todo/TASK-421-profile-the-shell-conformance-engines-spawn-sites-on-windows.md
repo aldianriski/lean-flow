@@ -10,6 +10,7 @@ tier: X
 authority: J2
 origin: manual
 state: ready
+sprint: SPRINT-121
 depends-on: []
 ---
 
@@ -24,7 +25,7 @@ basis for the fix. The task is a measurement only and changes no engine code, so
 ## Done when
 
 - [ ] A fresh profile on the Windows host names the engine's hottest spawn sites, with counts and wall-clock per site, recorded as
-      a new `qa-gate-timing.md` Round with host load stated. The per-site figures reconcile to the measured total by a second
+      a new `docs/research/logs/qa-gate-timing.md` Round with host load stated. The per-site figures reconcile to the measured total by a second
       route (the per-site sum against the whole-run wall clock, within a stated tolerance).
 - [ ] TASK-404's target fraction is proposed to the owner from that profile and recorded in TASK-404 once ruled.
 
