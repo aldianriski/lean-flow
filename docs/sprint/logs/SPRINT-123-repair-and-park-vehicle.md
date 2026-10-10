@@ -36,3 +36,23 @@ Promote governance (same day as SPRINT-122's promote):
 promote-check: `PASS -- 7 pass, 0 fail` (after naming `check-prose-density.ts` and `night-run.sh` on the Cites: lines; neither is touched).
 G1+G2 signed and the ten-part envelope approved by the owner (one popup, 2026-10-10); both are pinned to this commit in the
 follow-up entry.
+
+### 2026-10-10 | progress | pins recorded: `plan_commit`, `gates_signed: G1,G2` and the ten-part `approval_envelope:` all @ `838e714`
+The envelope as approved by the owner, one dimension per item:
+- **goal · acceptance:** TASK-424 and TASK-425 `## Done when`.
+- **scope:** writes only TASK-424/425's ticks, evidence and `git mv`, one § Files Changed row in this sprint file, and this log. No
+  source file, no guard, no push.
+- **design:** Plan T1 (ancestry; the seeded row; the check; one retry) · T2 (two options; one scoped reviewer; act per ADR-022).
+- **verification:** `scripts/lib/check-prose-density.ts` (T1's named check) · the `ps` ancestry line verbatim · the reviewer's verdict
+  verbatim · the reaper's rollup.
+- **j1-delegation:** TASK-424's one ADR-022 retry (shorten the seeded row) and TASK-425's drafting. Nothing else.
+- **capabilities:** the tracked `.claude/settings.json` plus clone-local exact-file rules for `check-prose-density.ts`,
+  `check-authority.ts`, `check-sprint-by-reference.ts`, `check-night-run-rollup.ts` and `ps`; Agent for one reviewer; `dontAsk`;
+  never `bypassPermissions`.
+- **repair-policy:** ADR-022's mechanical carve-out only: one retry on a done-when-named check FAIL. Judgment findings park. No
+  second retry.
+- **budget:** $10 / 60 min.
+- **stop-conditions:** the five terminal states; expected `AUTHORITY_BOUNDARY` (T2 parks). A denial of a required command means
+  `HARD_FAILURE` with a clean halt.
+`check-approval-envelope.sh`: `PASS … (all 10 dimensions covered, pinned @ 838e714)`. `check-authority.ts`: T1, T2, TASK-424 and
+TASK-425 all J1 declared.
