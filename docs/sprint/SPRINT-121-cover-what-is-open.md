@@ -38,6 +38,7 @@ next EPIC-015 steps) · bulk TD disposition · parking EPIC-007/011/012 · TASK-
 
 ### T1 — Rule EPIC-015 CW6 on the SPRINT-119 rollup `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/epic/EPIC-015-execution-autonomy.md`
+  · `docs/work/todo/TASK-414-rule-epic-015-closed-when-6-met-on-sprint-119s-rollup.md` · `docs/work/in_progress/TASK-414-rule-epic-015-closed-when-6-met-on-sprint-119s-rollup.md` · `docs/work/done/TASK-414-rule-epic-015-closed-when-6-met-on-sprint-119s-rollup.md`
 Depends-on: none
 Cites: `TASK-414` · EPIC-015 CW6 · `scripts/night-run.sh` (read, not touched) · TD-152 · TD-153
 
@@ -47,6 +48,7 @@ A ruling on evidence that already exists: map every field, then check the emitte
 
 ### T2 — Rule the ADR-044 and ADR-048 Decision edits `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/adr/` · `docs/DECISIONS.md`
+  · `docs/work/todo/TASK-413-rule-the-adr-044-and-adr-048-decision-edits-for-the-gated-level.md` · `docs/work/in_progress/TASK-413-rule-the-adr-044-and-adr-048-decision-edits-for-the-gated-level.md` · `docs/work/done/TASK-413-rule-the-adr-044-and-adr-048-decision-edits-for-the-gated-level.md`
 Depends-on: none
 Cites: `TASK-413` · STANDARD §4 · `S4.APPEND` · `conformance.sh`
 
@@ -66,6 +68,7 @@ A measurement only, with no engine code changed. It is the data TASK-404's targe
 ### T4 — Clean up the learnings ledger `[size: M · risk: low · class: execution · HITL · J1]`
 Layers: `docs/LEARNINGS.md` · `scripts/qa-check.sh` · `evals/fixtures/learnings-metadata/` · `evals/run-learnings-metadata-fixtures.ts`
   · `docs/knowledge-index.md`
+  · `docs/work/todo/TASK-419-clean-up-the-learnings-ledger.md` · `docs/work/in_progress/TASK-419-clean-up-the-learnings-ledger.md`
 Depends-on: none
 Cites: `TASK-419` · LEARNINGS § disposition (TASK-384) · L-198
 
@@ -77,6 +80,7 @@ membership.
 ### T5 — Active-epic coverage standard `[size: M · risk: med · class: decision · HITL · J1]`
 Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `skills/lean-doc-generator/` · `skills/triage/` · `skills/prime/`
   · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md` · `evals/fixtures/epic-coverage/`
+  · `docs/work/todo/TASK-420-an-active-epics-open-conditions-must-each-map-to-a-task.md` · `docs/work/in_progress/TASK-420-an-active-epics-open-conditions-must-each-map-to-a-task.md`
 Depends-on: none
 Cites: `TASK-420` · L-151 · L-015 · L-020 · ADR-006
 
@@ -88,6 +92,7 @@ condition.
 ### T6 — Move the workdoo-built epics to workdoo `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `docs/epic/` · `docs/adr/` · `docs/research/adlc-epic-sequencing.md` · `scripts/lib/prose-density-baseline.txt`
   · `docs/adr/ADR-041-platform-repo-service-boundary.md` · `docs/adr/ADR-045-the-work-item-store.md` · `docs/DECISIONS.md`
+  · `docs/work/todo/TASK-418-move-the-workdoo-epics-to-the-workdoo-store.md` · `docs/work/in_progress/TASK-418-move-the-workdoo-epics-to-the-workdoo-store.md`
 Depends-on: T1 (shares `docs/epic/`) · T2 (shares `docs/adr/` and `docs/DECISIONS.md`, D2)
 Cites: `TASK-418` · ADR-041 · EPIC-016 · EPIC-018 · EPIC-019 · EPIC-020 · workdoo `.claude/CLAUDE.md` · workdoo `AGENTS.md` (other repo)
 

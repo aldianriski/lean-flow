@@ -7,7 +7,7 @@ risk: med
 autonomy: HITL
 class: decision
 tier: X
-authority: J2
+authority: J1
 origin: decomposer
 state: ready
 sprint: SPRINT-121

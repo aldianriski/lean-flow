@@ -8,7 +8,7 @@ risk: low
 autonomy: HITL
 class: decision
 tier: P
-authority: J2
+authority: J1
 origin: decomposer
 state: ready
 sprint: SPRINT-121

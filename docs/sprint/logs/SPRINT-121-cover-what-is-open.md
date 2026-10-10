@@ -152,3 +152,22 @@ coordinator-inline, with the spec, the reference and /triage aligned. Round 2: F
 Box 4 (real input) is held for an owner ruling. Its text names "TASK-414–417", but T1 closed TASK-414 with CW6 still open, so
 the live run reports EPIC-015 fully covered by 415, 416, 417 and **423**: the stale-coverage rule doing its job. Ticking it as
 written would be re-reading the criterion to fit (L-088), so it waits for a recorded ruling.
+
+### 2026-10-10 | scope-change | T1, T2, T4, T5, T6 `Layers:` gain their own member-file paths; members re-declared J1 to match the Plan (system-verify findings)
+What broke: VPS `QA_FULL=1` at `b306e52a` read `293 pass, 5 fail`. Three of the five were my own coordination errors.
+(1) `layers observed`: I committed member-file moves and ticks under `sprint(121) Tn:` subjects. Member files are
+coordinator-owned and belong under bare `sprint(121):` (the SPRINT-120 convention), so leg 15 charged them to tasks that never
+declared them. The commits stand (the Log cites their shas), so each task's `Layers:` now names its own member paths
+(L-229: a widened scope is wired only when the Plan line says so). From here on, member moves and ticks go under bare
+`sprint(121):`. (2) `authority-plan-member-mismatch`: G2 re-declared the Plan rows J1 but left the seven member files at J2.
+They are now J1, as G2 ruled. (3) The knowledge index was stale after ADR-052 and the LEARNINGS changes, and is regenerated in
+the next commit. The other two findings are review-depth: T6's owed review (dispatched) and T1's unclassifiable self-review
+line, which is held for an owner ruling (see the next entry). G2 is unaffected.
+
+### 2026-10-10 | progress | consequence lines re-recorded with the checker's vocabulary (low|material · low|high)
+consequence · T1 · behaviour:low · governance:low
+consequence · T2 · behaviour:low · governance:high
+consequence · T5 · behaviour:material · governance:high
+The earlier T1, T2 and T5 consequence lines used `med`, which is not a value the checker recognises, so those lines were
+unreadable as records. T1's earlier `review · T1 · self-review · … · governance:med` line is graded unclassified, and an
+append-only log cannot retract it. That is put to the owner rather than edited in place.

@@ -7,7 +7,7 @@ risk: low
 autonomy: HITL
 class: execution
 tier: X
-authority: J2
+authority: J1
 origin: manual
 state: ready
 sprint: SPRINT-121
