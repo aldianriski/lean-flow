@@ -33,7 +33,7 @@ only if the miss recurs. Admissible under the interim governance restriction as 
       to form a sprint while an active epic it touches has an uncovered condition, unless the owner records an override.
 - [x] `/triage` reads the active epics alongside the backlog and lists each uncovered condition with its epic. `/prime` reports a ✓ triage SKILL.md Load + Output (cross-folder read allowed for coverage marks, Codex r1 F1 → r2 RESOLVED); prime SKILL.md `Coverage:` row
       count of uncovered conditions.
-- [ ] Exercised on real input: run against this repo, the procedure reports EPIC-015 as fully covered by TASK-414–417. A seeded
+- [x] Exercised on real input: run against this repo, the procedure reports EPIC-015 as fully covered by TASK-414–417. A seeded ✓ `e735c590`: live EPIC-015 fully covered (4 open, 4 mapped) by 415 · 416 · 417 · 423 — the set changed from 414–417 because T1 closed TASK-414 with CW6 open (owner ruling, logged); seeded removal = fixture b-one-missing → exactly CW6 uncovered
       copy with one of those tasks removed reports exactly that condition as uncovered.
 - [x] The consumer surface is checked: the changed skills stay within the SKILL.md cap (procedure detail moves to `references/`; ✓ SKILL.md lines 138 / 132 / 139 (detail in references/); no repo-only path; degrades with no docs/epic/; README + CHANGELOG `## Unreleased` + CONTEXT updated; Codex r1 items 5–6 PASS
       `lean-doc-generator` is already at 138 lines) and stay self-contained, and README + CHANGELOG describe the change.

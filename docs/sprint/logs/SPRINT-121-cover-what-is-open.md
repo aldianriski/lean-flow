@@ -85,7 +85,7 @@ Wave ranks are unchanged and G2 is unaffected. Declared base for wave 0 is the c
 
 ### 2026-10-10 | progress | T1 done: CW6 stays OPEN under the pre-delegated rule; USER_STOP is produced by no code path (TASK-423 filed)
 consequence · T1 · behaviour:low · governance:med
-review · T1 · self-review · behaviour:low · governance:med
+review · T1 · self-review · behaviour:low · governance:low
 Field map: every CW6 field has a line in SPRINT-119's committed rollup (archived log :103–110). The emitter check, which the owner
 made a condition at G2 (Codex: one run proves one run), failed on one path. `reap()` derives four terminal states (`night-run.sh`
 :340–359) and prints all eight fields (:414–421), but **USER_STOP is produced by no path**. The comment at :312 hands it to
@@ -171,3 +171,19 @@ consequence · T5 · behaviour:material · governance:high
 The earlier T1, T2 and T5 consequence lines used `med`, which is not a value the checker recognises, so those lines were
 unreadable as records. T1's earlier `review · T1 · self-review · … · governance:med` line is graded unclassified, and an
 append-only log cannot retract it. That is put to the owner rather than edited in place.
+
+### 2026-10-10 | scope-change | owner rulings: T1 log token fixed in place; TASK-420 box 4 met with a changed covering set; TASK-419 box 2 met as active-only; promotions deferred to the next promote
+- **T1 log line, corrected in place (owner):** the line `review · T1 · self-review · behaviour:low · governance:med` (the T1 entry
+  above) now reads `governance:low`. `med` is not a value the review-depth checker accepts, the gate grades every self-review line,
+  and an append-only log could not otherwise retract it. T1 changed no spec, skill or ADR (governance:low). This is the only
+  in-place edit to this log, and it is named here.
+- **TASK-420 box 4 (owner):** the criterion names "TASK-414–417". The live run reports EPIC-015 fully covered by 415, 416, 417 and
+  **423**, because T1 closed TASK-414 with CW6 still open, so CW6 was re-pointed to TASK-423. The substance holds: the epic is
+  fully covered, and a seeded removal (fixture `b-one-missing`) reports exactly that condition. Ticked as met with the changed set
+  named.
+- **TASK-419 box 2 (owner):** "FAILs … on any entry" collided with §11's collapse rule. About 150 promoted entries are collapsed
+  to pointers and legitimately carry no body metadata. The lint covers `[status: active]` entries, and the
+  `promoted-pointer-exempt` fixture pins that scope. Ticked as met.
+- **Promotions (owner):** the three survivors at count ≥ 2 (F L-185 ×6, G L-219 ×4, H L-217 ×4) are proposed at the next
+  promote's checkpoint, as TASK-419 box 4 states. H feeds TASK-417's stop rule. Conformance keeps three Gated S10.PROMOTION
+  findings until then.
