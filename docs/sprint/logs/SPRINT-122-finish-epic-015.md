@@ -184,3 +184,14 @@ requires. Impact: T2 `Layers:` gain `scripts/night-run.sh` · `evals/run-reap-te
 Consequential Tier G (D4): a must-FAIL fixture plus a sibling control, seeded breaks, and a worktree-isolated outside review (Codex).
 After the fix, SPRINT-123's log is re-reaped ONCE with the fixed launcher, using the run's own `--reap` arguments (from the transcribed
 wrapper line). It is appended, not edited, and logged as a re-reap; DoD3's guard verdict is read on that. G2 is re-confirmed by the popup.
+
+### 2026-10-10 | progress | T2 reaper fix built (`27d75a78`) after one coordinator-caught regression; two isolated reviews dispatched
+Builder (Sonnet), round 1: the block copies the run's own non-green lines; counters read a window that cuts earlier reaper entries.
+**Coordinator catch before review:** the cut matched ANY `| run-complete |` header, but a census of docs/sprint gives 10 run-complete
+headers, 8 of them model- or coordinator-written (e.g. SPRINT-090 l.249 "T1 executed, T2 parked"). A run whose only park line sits in
+its own run-complete entry would have read BUDGET_STOP. Round 2: the cut matches only the reaper's exact header, now one shared variable
+for writer and cut (`night-run.sh:196`, :329, :434). New must-FAIL M2 (`block-keeps-model-runcomplete`) is red under the broad cut and
+green after. C3 (`block-recount`) is red with the cut removed (`parks · 2`) and green with it. Dry run on a temp copy of SPRINT-123 (base
+79): the block carries `T2 · parked-hitl · …`, and the guard prints `PASS … agrees with its per-task lines`. Coordinator re-run as its own
+call: `REAP-TERMINAL FIXTURES: all green`, all six new cases PASS. Reviews: a worktree seeding campaign (S1-S6) and a static Codex pass
+(K1-K5, round 1 of at most 2). Spend on the fix so far: builder ~192k subagent tokens.
