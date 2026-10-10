@@ -30,11 +30,12 @@ interim governance restriction. Consequential Tier G: the launcher decides what 
 
 ## Done when
 
-- [ ] A user interrupt of a run (the launcher receiving INT/TERM, or the wrapped run being stopped by the user) ends with a rollup
-      whose terminal state is `USER_STOP` and outcome `PARTIAL`, carrying every CW6 field, written into the run's own Execution Log.
+- [ ] A user interrupt of a run (INT/TERM/HUP received by the launcher's wrapper, the process it prints as `pid=`) ends with a
+      rollup whose terminal state is `USER_STOP` and outcome `PARTIAL`, carrying every CW6 field, written into the run's own
+      Execution Log. *(Narrowed at G2: a bare child exit of 130/143 is not a user stop, because the watchdog's stall-kill exits 143.)*
 - [ ] A retained must-FAIL fixture shows the pre-change launcher reporting a user stop as `HARD_FAILURE` or emitting no rollup,
-      and the post-change launcher emitting `USER_STOP`. A sibling control shows an ordinary non-zero exit still reads
-      `HARD_FAILURE`.
+      and the post-change launcher emitting `USER_STOP`. Sibling controls show an ordinary non-zero exit and a direct TERM to the
+      child (the watchdog's way of stopping) still read `HARD_FAILURE`.
 - [ ] The comment in `reap()` that assigns USER_STOP to `die_doa()` is corrected to match the code.
 - [ ] EPIC-015 CW6 is re-checked against the emitter on all five paths and ticked with file:line evidence.
 
@@ -45,7 +46,8 @@ interim governance restriction. Consequential Tier G: the launcher decides what 
 ## Assumes
 
 - A user stop can be distinguished from a crash by signal: INT/TERM received by the launcher, or a wrapped exit status 130/143.
-  Confirm at G2 by recon of how the harness stops a run.
+  Confirm at G2 by recon of how the harness stops a run. *G2 (2026-10-10): half-refuted. Only a signal caught by the wrapper
+  counts; an exit status of 143 is also the watchdog's (night-run.md Part 3). Owner ruling in the SPRINT-122 Execution Log.*
 
 ## Tracker
 

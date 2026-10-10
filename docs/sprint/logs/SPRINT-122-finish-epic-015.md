@@ -31,3 +31,34 @@ Promote governance checklist, signed by the owner by popup, and written here at 
 - ☑ epic rollup currency: EPIC-015 is current (the SPRINT-121 row is closed). ☑ handoff ledger: none.
 Size check: both members are M. TASK-417 was in the owner-approved list but is `state: blocked` on 415 and 423, and promote takes
 only `ready` tasks, so it is deferred to the promote after both land.
+
+### 2026-10-10 | g2 | G1 + G2 signed (owner); T1 stop signal and rank ruled, T2 reads CW5's finding as a named-check FAIL
+Recon before G2. A2 (Read of `scripts/night-run.sh`) is **half-refuted**: the watchdog stall-kill (night-run.md Part 3) SIGTERMs
+`claude -p`, which exits 143, so an exit status cannot mark a human stop. The wrapper the launcher prints as `pid=` (`night-run.sh:853`,
+an inline `sh -c`) has no trap: killing it orphans the run with no exit file and no rollup. A1 (Explore) is **partial**: the overnight
+path reviews and continues, but ADR-022:35-41 admits an unattended retry only on a done-when-named check FAIL under a granting
+`repair-policy`, and a critic-judgment finding always parks. No unattended run has a repair cycle on record (SPRINT-119 `repair-cycles · 0`).
+G1: T1 got the full checklist (`origin: manual`); T2's fast-path does not apply because A1 changed its scope. Rulings (one popup):
+- **T1 stop signal: wrapper trap only.** INT/TERM/HUP caught by the wrapper → USER_STOP. A bare child exit of 130/143 stays HARD_FAILURE.
+- **T1 rank: below the integrity fails.** A member-count error or a revise-ceiling breach still reports HARD_FAILURE; USER_STOP outranks
+  a non-zero exit, stalled/denied-tool, unattempted and parks.
+- **T1 design:** the inline wrapper becomes an internal `--wrap` subcommand (as `--reap` is), so a fixture drives the real code. The trap
+  records a stop marker, forwards the signal, waits for the child, then reaps. Verify: DoD1 by new `--wrap` cases in
+  `evals/run-reap-terminal-fixtures.sh` plus `check-night-run-rollup` on the produced log; DoD2 by seeded breaks (trap removed → the
+  case reddens; exit-3 and a direct child TERM stay HARD_FAILURE as controls); DoD3 and DoD4 are judgment ticks with file:line.
+  Consequential Tier G, so a worktree-isolated Codex review.
+- **T2: seed a named-check FAIL.** The J1 task's done-when names a check that FAILs on its first build, and `repair-policy` grants
+  ADR-022's carve-out. The vehicle's details and its ten-dimension envelope come to the owner after T1 lands.
+
+### 2026-10-10 | scope-change | T1 DoD1 narrowed to a wrapper-caught signal; T1 Layers gain night-run.md
+What broke: TASK-423 DoD1 counts "the wrapped run being stopped by the user" as USER_STOP, and its Assumes names exit 130/143. The
+watchdog's stall-kill produces the same 143, so that half cannot be told apart from a stall (owner ruling above). Impact: DoD1 now
+reads a signal received by the launcher's wrapper; a direct kill of the child stays HARD_FAILURE and becomes DoD2's second control.
+T1 `Layers:` gain `skills/orchestrator/references/night-run.md`, because adopters need Part 3/4 to say which pid to stop for a
+USER_STOP (consumer side, L-015). G2 is re-confirmed by the same popup.
+
+### 2026-10-10 | scope-change | T2 CW5 "critic finding" is proven as a done-when-named check FAIL (ADR-022)
+What broke: TASK-415 DoD1 seeds "a review ... to return one concrete finding". Under ADR-022:35-36 a judgment finding always parks,
+so that seed could prove only the park path, never a repair. Impact: DoD1 and DoD2 now seed a done-when-named check FAIL under a
+`repair-policy` that grants the carve-out. CW5's text is unchanged, and its tick will name this reading. ADR-022 is unchanged.
+G2 is re-confirmed by the same popup.

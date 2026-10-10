@@ -25,9 +25,10 @@ vehicle run proves both.
 
 ## Done when
 
-- [ ] A vehicle sprint is promoted with a signed, pinned `approval_envelope:` and a Plan holding one honest J1 task whose review is
-      seeded to return one concrete finding, and one seeded J2 task (EPIC-015 D5).
-- [ ] One real `--mode overnight` run on this repository: the seeded finding is repaired and re-reviewed (≥1 repair cycle, never
+- [ ] A vehicle sprint is promoted with a signed, pinned `approval_envelope:` whose `repair-policy` grants ADR-022's carve-out, and
+      a Plan holding one honest J1 task whose done-when names a check seeded to FAIL on its first build, plus one seeded J2 task
+      (EPIC-015 D5). *(Re-scoped at G2: a judgment finding always parks under ADR-022:35-36, so the seed is a named-check FAIL.)*
+- [ ] One real `--mode overnight` run on this repository: the seeded FAIL is repaired and re-checked (≥1 repair cycle, never
       exceeding ADR-022's ceiling), the run continues past it, and the J2 task parks with its unblock condition.
 - [ ] Each claim is verified against artifacts, not the run's report: the finding, the repair commit, the re-review record and the
       park are each cited by commit or log line; the rollup guard PASSes on the committed log; the outcome line shows

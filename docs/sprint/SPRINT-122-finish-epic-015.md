@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-10-10
 status: active
 plan_commit: d399167
+gates_signed: G1,G2 @ d1341c4
 update_trigger: sprint execute/close events
 ---
 
@@ -30,7 +31,7 @@ update_trigger: sprint execute/close events
 
 ### T1 — A user-stopped run emits its rollup as USER_STOP `[size: M · risk: med · class: execution · HITL · J2]`
 Layers: `scripts/night-run.sh` · `evals/fixtures/night-run-reaper/` · `evals/run-reap-terminal-fixtures.sh`
-  · `docs/epic/EPIC-015-execution-autonomy.md`
+  · `docs/epic/EPIC-015-execution-autonomy.md` · `skills/orchestrator/references/night-run.md`
 Depends-on: none
 Cites: `TASK-423` · EPIC-015 CW6 · ADR-050 (Consequential G) · ADR-034 · TD-152 · TD-153
 
