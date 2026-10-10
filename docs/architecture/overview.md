@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-06
+last_updated: 2026-10-10
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -19,7 +19,7 @@ status: current
 ## Directory structure
 
 ```
-spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.12.0) · CHANGELOG.md
+spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.15.0) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 skills/           14 skills (auto-discovered at root)
@@ -108,7 +108,7 @@ human-approved) and **§10 governance** (Sprint-Close Retro routes to CHANGELOG 
 |---|---|---|
 | **Claude built-in agents** | dispatched in an **isolated pass** (no shipped agent files) — recon→`Explore` · review→`/code-review` · verify→`/verify` · security→`/security-review` | `CONTEXT.md` § Built-in leverage · `orchestrator` (ADR-002) |
 | **Claude built-in commands** | wired at loop points — `/goal` · `/plan` · `/batch` · `/loop` · `/run` · `/simplify` | `orchestrator` · `flow` |
-| **Hooks** | none — deliberately (the loop is suggestion + gates, not enforcement) | — |
+| **Hooks** | admissible under ADR-044's curation bar; none ships today (the first candidate was withdrawn, TASK-366) | ADR-044 |
 | **Cloud / fan-out tools** | **out of lean scope** — `/workflows` · `/ultracode` · `/ultraplan` · `/ultrareview` are user-triggered and billed; lean-flow never launches one | — |
 | **`/council` sub-agents** | the one skill that orchestrates sub-agents *internally* (opt-in, high-stakes only) | `council` (ADR-004) |
 
