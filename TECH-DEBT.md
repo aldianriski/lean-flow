@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -35,6 +35,13 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-121 promote (2026-10-10).** **120 of 126 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 121. Second route: 126 open − 6 filed at 120 (TD-237..242) = 120; nothing was filed at 119. **Newly aged since the
+> SPRINT-120 sweep, named for re-review:** TD-231 · TD-232 · TD-233 · TD-234 · TD-235 · TD-236 (filed at 118). The other 114
+> aged rows are named in the sweeps below. The one `high` row, TD-168, stays routed to TASK-404, now split so its profile runs
+> first as TASK-421. Bulk disposition of aged rows is ranked work (Codex review 2026-10-10, capped), not part of this sweep.
+> **§11 deletion** (owner-approved): TD-122 and TD-124, resolved at SPRINT-118 and now 3 sprints on. Their ids stay retired.
+>
 > **Aging sweep — SPRINT-120 promote (2026-10-09).** **115 of 121 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 120. Second route: 121 open − 6 filed at 118 = 115. The one `high` row, TD-168, stays routed to TASK-404. **§11 deletion**
 > (owner-approved): the 25 rows resolved at SPRINT-116 (12 at its promote sweep, 13 accepted at its close). Census: 27 resolved = 25
@@ -1849,53 +1856,6 @@ status: current
   - Workaround until fixed, and it costs nothing: **archive a closed sprint only once every sibling
     sharing its `plan_commit` has also closed.** §11's trigger is "sprint closed" and says nothing
     about when the move must happen.
-
-- **TD-124** severity: medium | status: resolved → TASK-320 (SPRINT-118 T1, `fired ·` line read as the written fact of an unattended run) | created: Sprint-093
-  - Summary: **`check-authority.sh` infers whether a run was attended, and no signal available from
-    inside that file can make the inference airtight.** The leg now ORs two independent signals — a
-    `terminal ·` line written by the launcher's reaper, and a non-placeholder `approval_envelope: … @
-    <sha>` pinned in the sprint's own frontmatter, written on a pre-flight path the reap-gate defect
-    never touched. Either alone is defeatable; the OR narrows the residual and does not close it. **A
-    run that skips both** — no envelope pinned and no reaper append — reads as attended and the `J2`
-    park requirement is not applied to it.
-  - **Filed because the row was cited before it existed, which is its own finding.** `TD-124` is named
-    in the T5 commit subject (`494ca82`) and in two shipped retained fixtures
-    (`attended-fenced-example/SPRINT-910-fx.md`, `envelope-backstop-unattended/SPRINT-909-fx.md`) as
-    though it were a filed row. It was not: the id was incremented from memory rather than derived, so
-    three artifacts shipped pointing at a ledger entry that did not exist. That is **L-143's third
-    grain** (an identifier for a new row is a query result) landing on a `TD-NNN`, and it went
-    unnoticed because a reference to a plausible id looks exactly like a reference to a real one.
-  - **Why it is filed rather than fixed.** The honest boundary was drawn by T5's own retry: asked for a
-    fail-safe that does not depend on the wrapper having written a line, it added the envelope signal
-    **and corrected the header comment to state that neither signal is airtight and the OR of both is
-    still not proof of attendedness** — replacing a prior claim that absence was "the strongest evidence
-    available", which the reviewer had just disproved. A guard overstating its own guarantee is the
-    defect; a guard naming its residual is the correct shipped state.
-  - Closing it needs a signal the *launcher* writes at fire time, independent of `reap()`'s decision to
-    append — the same missing mechanism **TD-122** is filed against. Route the two together: neither is
-    closable by better parsing of an artifact that does not record the fact.
-
-- **TD-122** severity: medium | status: resolved → TASK-320 (SPRINT-118 T1, fire-time ledger + `CLOSE-FIRED-UNREAPED`; residual → TD-232) | created: Sprint-092
-  - Summary: **A run that fires but never reaches the reaper leaves a log byte-identical to "no run
-    happened", so nothing can detect it.** `check-night-run-rollup.sh` and `reap()` both read only the
-    Execution Log, and a run fired outside `night-run.sh`, or one that dies before `reap()` appends,
-    writes no marker at all. "The run produced no rollup" and "no run was attempted" are the same file.
-  - Found while closing SPRINT-093 T1's windowing defect: an adversarial probe appended a second
-    `run-complete` block that wrote *nothing*, and the checker PASSed. The windowing fix (`4611f8e`)
-    correctly closes the case where a later block exists and contradicts — it cannot close this one,
-    and the builder reported that rather than folding a half-solution into the same pass.
-  - **This is the SPRINT-059 "4 of 7 silent" shape and it is the last surviving member of the family**
-    TD-112 opened: a rollup that lies is now caught (agreement matrix), a rollup written into the wrong
-    Plan is now caught (`find_sprint()` refuses ambiguity, `--sprint` declares a target), a rollup in a
-    later block is now caught (`win()`). A rollup that was never written is still invisible.
-  - **No amount of smarter parsing closes it** — the evidence does not exist inside the artifact being
-    parsed. It needs a record independent of the log's own content: a ledger `night-run.sh` writes
-    unconditionally at fire time, *before* the wrapped command runs and not gated on `reap()`'s own
-    decision to append, which a companion check cross-references against the log's last entry. That is
-    a new mechanism and a new file, outside SPRINT-093 T1's Layers.
-  - Route it into EPIC-015's remaining § Closed-when work, where the rollup vocabulary
-    (`DELIVERED`/`PARTIAL`/`FAILED`) is already being opened. Retain a must-FAIL fixture: a ledger entry
-    with no corresponding log block must FAIL, and a sibling control where both exist must PASS.
 
 - **TD-119** severity: minor | status: open | created: Sprint-091
   - Summary: **`check-layers-completeness.sh` matches `Cites:` tokens against the `Layers:` line by
