@@ -196,3 +196,15 @@ the epic files") was applied (`c2f48fef`, Context only). workdoo's gate (`verify
 the moved files: `biome check` on them reports "No files were processed", and no `.ts` file reads `docs/epic/`. The full
 `verify` run is still owed. One attempt was started during T3's timing window by coordinator error, stopped within ~2 min, and
 its orphaned `tsc` was killed. T3's builder was told to re-run or disclose any overlapping measurement.
+
+### 2026-10-10 | progress | T3 done: engine profiled on Windows (Round 23, `0917563b` → `2135845d`), TASK-404 target recorded
+consequence · T3 · behaviour:low · governance:low
+review · T3 · self-review · behaviour:low · governance:low
+Tree `b306e52a`. Whole run 433.1 s uninstrumented, 391.4 s on a clock-instrumented copy (sys 54–60% of CPU: Round 18's
+kernel-bound shape at about 2.5× its time on a memory-starved host). The per-rule sum of 390.3 s matches the whole run's 391.0 s
+(0.2%). As a second route, a spawn model of 4,135 spawns × ~100 ms (r = 0.965 over 45 rules) is within 6%. The top 3 rules
+(S10.TDAGING 28.5%, S11.WHENITRUNS 14.6%, S1.LAW2 13.8%) hold 56.9%, and the top 5 hold 70.9%. The cost is per-row spawn loops,
+not rule computation. TASK-404 target (G2 rule, applied mechanically): a 50% cut, 433.1 s → ≤ 216.5 s. Host load is stated in the
+Round (436 MB free at the clean runs; a workdoo API server ran throughout). The first baseline overlapped the coordinator's
+mistaken workdoo `verify` and was discarded, and an orphaned engine `sh` was killed. No engine code changed
+(`git diff --stat -- scripts/` empty).
