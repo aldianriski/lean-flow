@@ -44,7 +44,7 @@ interim governance restriction. Consequential Tier G: the launcher decides what 
 - [x] The comment in `reap()` that assigns USER_STOP to `die_doa()` is corrected to match the code.
       ✓ `scripts/night-run.sh:312-316` now names the wrapper marker and the owner's rank ruling (`eae1c1b0`).
 - [x] EPIC-015 CW6 is re-checked against the emitter on all five paths and ticked with file:line evidence.
-      ✓ CW6 ticked in `docs/epic/EPIC-015-execution-autonomy.md` with `night-run.sh` :344-368 (terminals) and :424-430 (fields).
+      ✓ CW6 ticked in `docs/epic/EPIC-015-execution-autonomy.md` with `scripts/night-run.sh` :344-368 (terminals) and :424-430 (fields).
 
 ## Touches
 

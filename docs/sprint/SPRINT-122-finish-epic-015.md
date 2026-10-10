@@ -32,6 +32,8 @@ update_trigger: sprint execute/close events
 ### T1 — A user-stopped run emits its rollup as USER_STOP `[size: M · risk: med · class: execution · HITL · J2]`
 Layers: `scripts/night-run.sh` · `evals/fixtures/night-run-reaper/` · `evals/run-reap-terminal-fixtures.sh`
   · `docs/epic/EPIC-015-execution-autonomy.md` · `skills/orchestrator/references/night-run.md`
+  · `docs/work/todo/TASK-423-emit-the-run-outcome-rollup-on-a-user-stopped-run.md`
+  · `docs/work/in_progress/TASK-423-emit-the-run-outcome-rollup-on-a-user-stopped-run.md`
 Depends-on: none
 Cites: `TASK-423` · EPIC-015 CW6 · ADR-050 (Consequential G) · ADR-034 · TD-152 · TD-153
 
@@ -43,6 +45,8 @@ HARD_FAILURE.
 
 ### T2 — Prove bounded unattended repair and Dogfood 2 in one overnight run `[size: M · risk: med · class: execution · HITL · J2]`
 Layers: `docs/epic/EPIC-015-execution-autonomy.md`
+  · `docs/work/todo/TASK-415-prove-bounded-unattended-repair-and-dogfood-2-in-one-overnight-run.md`
+  · `docs/work/in_progress/TASK-415-prove-bounded-unattended-repair-and-dogfood-2-in-one-overnight-run.md`
 Depends-on: T1
 Cites: `TASK-415` · EPIC-015 CW5 · CW7 · D5 · ADR-022
 

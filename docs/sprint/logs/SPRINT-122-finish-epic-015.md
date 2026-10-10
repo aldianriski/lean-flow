@@ -133,3 +133,16 @@ criteria) → scoped review of the vehicle before the envelope is signed; claims
 What broke: a declared J2 task makes the vehicle unlaunchable (pre-flight item 3, STRICT). Impact: DoD1 seeds a second J1 task whose
 review returns a judgment finding; DoD2 reads "the seeded judgment finding parks". CW7's "J2 park or seeded control" and D5's "seed
 it" are both still met. G2 is re-confirmed by the popup above.
+
+### 2026-10-10 | scope-change | T1 and T2 Layers gain their member files at both locations (layers-observed, the SPRINT-118 route)
+What broke: `check-layers-observed.ts` FAILed on SPRINT-122. The coordinator's move commits `d6206ba1` (`sprint(122) T1:`) and
+`4c005190` (`sprint(122) T2:`) touch TASK-423 and TASK-415's member files, which neither block declared. Rewording them would rewrite
+every later commit, including SPRINT-123's `838e714` pins, so each block now declares its member file at `todo/` and `in_progress/`.
+That is accurate: those commits did touch them. Also, TASK-423's DoD4 evidence now names `scripts/night-run.sh` by full path
+(promote-check's member-layers rule matched the bare basename). Re-run: layers-observed PASS (base d399167), promote-check
+`7 pass, 0 fail`. Coordinator rule from here: member tick and move commits use the bare `sprint(122):` subject. G2 is unaffected.
+
+### 2026-10-10 | progress | vehicle SPRINT-123 promoted and pinned (`838e714`, pins `3ccc41d6`); VPS pre-flight next
+Two J1 members (TASK-424 seeded named-check FAIL · TASK-425 seeded judgment park). Seed reachability was proven both ways before
+promote (see SPRINT-123's log). Envelope `PASS (all 10 dimensions covered, pinned @ 838e714)`. Next: the `~/lf-run` clone at the
+local tip, the allowlist probe with a must-deny control, the pre-flight gate, a pre-run review of the trigger, then the fire.
