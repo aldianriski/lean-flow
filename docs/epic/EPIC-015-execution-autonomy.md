@@ -4,7 +4,7 @@ slug: execution-autonomy
 owner: Maintainer
 last_updated: 2026-10-10
 status: active
-member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101, SPRINT-118, SPRINT-119, SPRINT-121, SPRINT-122]
+member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101, SPRINT-118, SPRINT-119, SPRINT-121, SPRINT-122, SPRINT-123]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -74,6 +74,7 @@ loop · push/deploy/external destructive authorization · a scheduler or queue s
 | [SPRINT-119](../sprint/archive/SPRINT-119-fire-ledger-vehicle.md) | Fire-Ledger Vehicle | **closed** 2026-10-09 · `5bb2dd3` — 1 of 1 member | **Contributed the vehicle the condition was met on.** One honest all-J0 verification task under strict pre-flight item 3, with `gates_signed:` and the envelope pinned `@ 85b3ffc`; the run stayed inside it. |
 | [SPRINT-121](../sprint/archive/SPRINT-121-cover-what-is-open.md) | Cover What Is Open | **closed** 2026-10-10 · `d9c6466` — 7 of 7 members | **Dogfood 1 PROVEN** (CW7 first half, TASK-416): continuous attended `sprint-bulk`, no per-task confirmation, four pauses each named with its cause (Execution Log, T7 entry). **CW6 not met:** USER_STOP is emitted by no code path, so TASK-423 was filed and covers it. Also rules **CW6** on SPRINT-119's real-run rollup (TASK-414). CW5, Dogfood 2 and CW8 follow as TASK-415 and TASK-417. |
 | [SPRINT-122](../sprint/SPRINT-122-finish-epic-015.md) | Finish EPIC-015 | **active** (promoted 2026-10-10) | Targets **CW6** (TASK-423: USER_STOP emits the rollup) and **CW5 + CW7's Dogfood-2 half** (TASK-415: one overnight vehicle run). CW8 (TASK-417) follows once both land. |
+| [SPRINT-123](../sprint/SPRINT-123-repair-and-park-vehicle.md) | Repair-and-Park Vehicle | **active** (drafted 2026-10-10) | The seeded vehicle for SPRINT-122 T2: one J1 task meets a named-check FAIL (CW5), and a second meets a judgment finding and parks (D5). One real overnight run. |
 
 _First member sprint promoted 2026-08-26._ The freeze amendment that blocked it
 **closed 2026-08-25** (§ Open questions), so this epic is admissible. Its other condition — sequenced
