@@ -208,3 +208,19 @@ not rule computation. TASK-404 target (G2 rule, applied mechanically): a 50% cut
 Round (436 MB free at the clean runs; a workdoo API server ran throughout). The first baseline overlapped the coordinator's
 mistaken workdoo `verify` and was discarded, and an orphaned engine `sh` was killed. No engine code changed
 (`git diff --stat -- scripts/` empty).
+
+### 2026-10-10 | progress | T7 done: Dogfood 1 proven on this sprint, with every pause named with its cause
+consequence · T7 · behaviour:low · governance:low
+review · T7 · self-review · behaviour:low · governance:low
+This sprint ran in attended `sprint-bulk` after G2 settled every J2 ruling it knew of and re-declared all seven tasks J1 (the g2
+entry above). **No confirmation was asked between already-authorized tasks.** Transitions T1 → T2 → (T4 ∥ T5) → T6 → T3 → T7 ran
+straight through, each logged above. Four pauses occurred. None was a "may I proceed" between authorized tasks, and each was
+forced by a fact found mid-run:
+1. **§11 store prune (TASK-327):** caused by a promote doc-aging miss surfaced by conformance. Logged at the time.
+2. **workdoo concurrent session (T6):** caused by an outside condition. Another session was committing to workdoo, and the owner
+   ruled a path-scoped commit. **Not logged at the time; recorded here.**
+3. **Ruling round (T1 log token · TASK-420 box 4 · promotions):** caused by system-verify findings and by a criterion that T1's
+   outcome invalidated (L-088 forbids re-reading it to fit). Logged as a scope-change.
+4. **TASK-419 box 2:** caused by a criterion whose premise ("any entry") collided with §11's collapse rule (L-088). Logged with 3.
+Verdict for EPIC-015 CW7, Dogfood-1 half: **proven**. Continuous attended sprint-bulk asked no per-task confirmation, and every
+pause is named with its cause in this log. Dogfood 2 (TASK-415) remains, so CW7 stays `[ ]` until both halves are proven.

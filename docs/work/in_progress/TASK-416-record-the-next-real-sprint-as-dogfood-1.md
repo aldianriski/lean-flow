@@ -24,12 +24,12 @@ real sprint is that vehicle, so it costs no separate run. This task rides that s
 
 ## Done when
 
-- [ ] The next promoted sprint with ≥3 members runs in attended `sprint-bulk` with every J2 ruling its members need settled before
+- [x] The next promoted sprint with ≥3 members runs in attended `sprint-bulk` with every J2 ruling its members need settled before ✓ SPRINT-121 (7 members) ran attended sprint-bulk after G2 settled the J2 rulings and re-declared J1; no confirmation between authorized tasks; terminal PLAN_EXHAUSTED (run-complete entry, Execution Log)
       the continuous sequence starts, and no confirmation asked between already-authorized (J0/J1) tasks; it ends at a named
       terminal state.
-- [ ] Its Execution Log shows each task transition with no confirm or pause entry between authorized tasks, and any pause that did
+- [x] Its Execution Log shows each task transition with no confirm or pause entry between authorized tasks, and any pause that did ✓ the SPRINT-121 Execution Log carries every Tn transition; the four pauses are named with their causes in the T7 entry (one recorded late, and said so)
       occur is named with its cause.
-- [ ] EPIC-015 CW7's Dogfood-1 half is recorded as proven, citing that log.
+- [x] EPIC-015 CW7's Dogfood-1 half is recorded as proven, citing that log. ✓ EPIC-015 § Member sprints, SPRINT-121 row: "Dogfood 1 PROVEN", citing the Log's T7 entry; CW7 stays `[ ]` until Dogfood 2 (TASK-415)
 
 ## Touches
 
