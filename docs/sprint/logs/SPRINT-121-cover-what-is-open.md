@@ -114,3 +114,9 @@ ADR-044 and ADR-048 each have their accepted § Decision body restored (hash-ide
 `Corrected:` marker, and an appended `## Correction 2026-10-10` that quotes the formerly in-force text verbatim (`1aaf8085`). The
 scoped reviewer was CLEAR on 6/6 bounded checks. VPS conformance at `1aaf8085`: `PASS S4.APPEND -- 51 ADR(s) unedited`. That run
 also surfaced two Gated findings outside T2: the promote checklist (recorded in the entry above) and TASK-327's retention (proposed).
+
+### 2026-10-10 | progress | §11 store prune: TASK-327 deleted (owner-approved); named pause, cause: a promote miss, not a gap between tasks
+The one pause in this run so far: the owner was asked by popup to approve §11 deletion of `docs/work/done/TASK-327-*` (closed at
+SPRINT-118, nothing live names it). It became due when the current sprint reached 121, and the promote doc-aging line missed it.
+Approved, and the file was removed in its own commit. Its record stays in CHANGELOG, the sprint archive and git, and the id is
+retired. For Dogfood 1 (TASK-416) this is a named pause with its cause, not a confirmation between authorized tasks.
