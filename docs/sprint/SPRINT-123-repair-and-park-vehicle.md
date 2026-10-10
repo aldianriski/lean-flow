@@ -37,6 +37,7 @@ choosing TD-247's option (the owner's) · the post-run artifact checks, which SP
 Layers: `docs/work/` · `docs/sprint/SPRINT-123-repair-and-park-vehicle.md`
 Depends-on: none
 Cites: `TASK-424` · SPRINT-122 T1 · ADR-022 · EPIC-015 CW5 · `scripts/lib/check-prose-density.ts` (run, not edited)
+  · `scripts/lib/check-authority.ts` (run, not edited)
 
 The run transcribes its wrapper ancestry. It then writes the seeded Files Changed row verbatim, runs the named check (which FAILs),
 takes one ADR-022 retry that shortens the row, and re-runs the check. The retry is logged as a `T1 · retry ·` line.

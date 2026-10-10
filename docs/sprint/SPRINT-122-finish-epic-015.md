@@ -36,6 +36,7 @@ Layers: `scripts/night-run.sh` · `evals/fixtures/night-run-reaper/` · `evals/r
   · `docs/work/in_progress/TASK-423-emit-the-run-outcome-rollup-on-a-user-stopped-run.md`
 Depends-on: none
 Cites: `TASK-423` · EPIC-015 CW6 · ADR-050 (Consequential G) · ADR-034 · TD-152 · TD-153
+  · `scripts/lib/check-layers-observed.ts` (run, not edited) · `todo/` · `in_progress/` (member folders a scope-change names)
 
 The launcher decides what an unattended run reports, so this is Consequential Tier G: the full bar, seeded breaks and a
 worktree-isolated outside review. G2 rules how a user stop is told apart from a crash.

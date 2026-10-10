@@ -146,3 +146,12 @@ That is accurate: those commits did touch them. Also, TASK-423's DoD4 evidence n
 Two J1 members (TASK-424 seeded named-check FAIL · TASK-425 seeded judgment park). Seed reachability was proven both ways before
 promote (see SPRINT-123's log). Envelope `PASS (all 10 dimensions covered, pinned @ 838e714)`. Next: the `~/lf-run` clone at the
 local tip, the allowlist probe with a must-deny control, the pre-flight gate, a pre-run review of the trigger, then the fire.
+
+### 2026-10-10 | progress | VPS pre-flight: probe allowed the run's commands and denied the control; gate `286 pass, 2 fail`, both mine, fixed
+`~/lf-run` was fetched to `9e7ef270` by bundle (no remote; tree clean; `bun install` no changes). The clone-local allowlist gains
+`check-prose-density.ts` and `ps` (backup `~/settings.local.json.bak-run123`). Probe: see SPRINT-123's scope-change (the literal
+`ps -eo` form is ALLOWED, `touch` is DENIED). Gate `QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh`: `QA-CHECK: 286 pass, 2 fail`. Both are
+`scope-change-outside-layers` FAILs from this session's own log entries: they name `check-layers-observed.ts`, `todo/` and `in_progress/`
+(SPRINT-122) and `check-authority.ts` (SPRINT-123), none of which was on its task's Layers or Cites. Each is now on a `Cites:` line,
+because each is read and not edited (log entries stay append-only). Local re-run: `check-sprint-by-reference --scope-change` 4/0 on both
+sprints, and promote-check 7/0 on both.
