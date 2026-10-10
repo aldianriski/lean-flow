@@ -178,6 +178,9 @@ EOF
   cpid=""
   if [ "$how" = exit3 ]; then
     sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'exit 3' &
+  elif [ "$how" = term-wrapper-slowchild ]; then
+    # the child catches TERM itself, lingers ~1 s, then exits 7
+    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'echo $$ >"$0"; trap "sleep 1; exit 7" TERM; sleep 30 & wait' "$d/child.pid" &
   else
     sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'echo $$ >"$0"; exec sleep 30' "$d/child.pid" &
   fi
@@ -186,7 +189,7 @@ EOF
     wait_for "$d/child.pid" || echo "note($label): child never recorded its pid"
     cpid=$(cat "$d/child.pid" 2>/dev/null)
     sleep 0.3
-    if [ "$how" = term-wrapper ]; then kill -TERM "$wpid" 2>/dev/null; else kill -TERM "$cpid" 2>/dev/null; fi
+    if [ "$how" != term-child ]; then kill -TERM "$wpid" 2>/dev/null; else kill -TERM "$cpid" 2>/dev/null; fi
   fi
   n=0; while kill -0 "$wpid" 2>/dev/null && [ "$n" -lt 100 ]; do sleep 0.1; n=$((n + 1)); done
   if kill -0 "$wpid" 2>/dev/null; then kill -KILL "$wpid" 2>/dev/null; echo "note($label): wrapper hung, killed"; fi
@@ -194,6 +197,9 @@ EOF
   got=$(grep -oE '^terminal · [A-Z_]+' "$doc" 2>/dev/null | sed 's/^terminal · //')
   miss=""
   for pat in "$@"; do grep -qF -- "$pat" "$doc" || miss="$miss [$pat]"; done
+  if [ -n "${want_ec:-}" ] && [ "$(cat "$d/run.log.exit" 2>/dev/null)" != "$want_ec" ]; then
+    miss="$miss [exit file holds '$(cat "$d/run.log.exit" 2>/dev/null)', wanted $want_ec]"
+  fi
   if [ "$got" = "$want" ] && [ -z "$miss" ]; then
     echo "PASS fixture($label): terminal · $got"
   else
@@ -216,6 +222,38 @@ case_wrap "term-to-child-is-hard-failure" "HARD_FAILURE" term-child "" "outcome 
 case_wrap "ceiling-breach-outranks-stop" "HARD_FAILURE" term-wrapper "T1 · retry · Spec: a → fixed
 T1 · retry · Spec: b → fixed
 T1 · done" "revise-loop-ceiling-exceeded"
+# the exit file holds the CHILD's status (7), not the interrupted wait's 143, and the stop still reads USER_STOP
+want_ec=7 case_wrap "stop-keeps-child-exit-status" "USER_STOP" term-wrapper-slowchild "" "terminal · USER_STOP · "
+# rank: an unresolvable by-reference member outranks a stop marker, with its own named reason
+d="$work/stop-unresolved-member"; mkdir -p "$d" && cp -R "$fxdir/v2-unresolved-member/." "$d/" && mkdir -p "$d/docs/sprint/logs"
+printf '# log\nT1 · done · a\n' > "$d/docs/sprint/logs/SPRINT-961-v2.md"; : > "$d/run.log"; printf TERM > "$d/run.log.stop"; printf 143 > "$d/run.log.exit"
+sh "$launcher" --reap "$d/run.log" "$d" "" 0 "" >/dev/null 2>&1
+if grep -q '^terminal · HARD_FAILURE · member DoD unreadable: SPRINT-MEMBER-UNRESOLVED' "$d/docs/sprint/logs/SPRINT-961-v2.md"; then
+  echo "PASS fixture(stop-plus-unresolved-member-is-hard-failure): terminal · HARD_FAILURE, member reason named"
+else
+  echo "FAIL fixture(stop-plus-unresolved-member-is-hard-failure): $(grep '^terminal ·' "$d/docs/sprint/logs/SPRINT-961-v2.md")"; fail=1
+fi
+
+# the wiring: the REAL launcher's fire site must hand the wrapper pid it prints a TERM-catching wrapper.
+# Throwaway git repo + the gate-exception harness's clean qa stub; the command is a long sleep.
+d="$work/fire-site"; gfx="$here/fixtures/night-run-gate-exceptions"
+mkdir -p "$d/scripts" "$d/docs/sprint/logs"; ( cd "$d" && git init -q ) || { echo "FAIL harness: git init"; exit 2; }
+cp "$gfx/scripts/qa-check-clean.sh" "$d/scripts/qa-check.sh"; cp "$gfx/sprints/clean.md" "$d/docs/sprint/SPRINT-990-fx.md"
+printf '# SPRINT-990 fx -- Execution Log\n' >"$d/docs/sprint/logs/SPRINT-990-fx.md"
+# output goes to a FILE: the wrapper inherits the launcher's stdout, so a $(...) capture would block until it exits
+( cd "$d" && sh "$launcher" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" --log "$d/run.log" \
+  --wait-seconds 1 --poll-seconds 1 --no-reap -- sh -c 'echo $$ >"$0"; exec sleep 30' "$d/child.pid" --permission-mode dontAsk --allowedTools Bash ) >"$d/launcher.out" 2>&1
+fs_out=$(cat "$d/launcher.out")
+fs_pid=$(printf '%s\n' "$fs_out" | sed -n 's/.*fired detached: pid=\([0-9]*\).*/\1/p')
+wait_for "$d/child.pid" >/dev/null; fs_cpid=$(cat "$d/child.pid" 2>/dev/null)
+[ -n "$fs_pid" ] && kill -TERM "$fs_pid" 2>/dev/null
+n=0; while [ ! -e "$d/run.log.exit" ] && [ "$n" -lt 100 ]; do sleep 0.1; n=$((n + 1)); done
+[ -n "$fs_pid" ] && kill -KILL "$fs_pid" 2>/dev/null; [ -n "$fs_cpid" ] && kill -KILL "$fs_cpid" 2>/dev/null
+if [ "$(cat "$d/run.log.stop" 2>/dev/null)" = "TERM" ]; then
+  echo "PASS fixture(fire-site-wrapper-catches-term): pid=$fs_pid left run.log.stop = TERM"
+else
+  echo "FAIL fixture(fire-site-wrapper-catches-term): pid='${fs_pid:-<none>}' stop marker='$(cat "$d/run.log.stop" 2>/dev/null)' -- output: $fs_out"; fail=1
+fi
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REAP-TERMINAL FIXTURES: all green"; else echo "REAP-TERMINAL FIXTURES: FAILURES above"; fi

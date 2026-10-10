@@ -474,10 +474,15 @@ wrap() {
   trap 'wr_on_signal HUP' HUP
   "$@" >"$wr_log" 2>&1 </dev/null &
   wr_child=$!
+  # A TERM that landed between the fork and the line above found no child to forward to: do it now.
+  [ -f "$wr_log.stop" ] && kill -TERM "$wr_child" 2>/dev/null
   wait "$wr_child"; wr_rc=$?
   # A trapped signal interrupts `wait` with 128+n while the child may still be running: wait again
   # until it is gone, so the exit file holds the CHILD's status, never the interruption's.
   while kill -0 "$wr_child" 2>/dev/null; do wait "$wr_child"; wr_rc=$?; done
+  # The child may also have exited between the interrupted `wait` and the check above; one more
+  # `wait` then returns its real status. 127 means it was already reaped by the loop: keep that one.
+  if [ -f "$wr_log.stop" ]; then wait "$wr_child" 2>/dev/null; wr_r2=$?; [ "$wr_r2" -ne 127 ] && wr_rc=$wr_r2; fi
   printf '%s' "$wr_rc" >"$wr_ec"
   # Emitted after the exit code is recorded, so it runs on EVERY exit -- clean finish, early
   # end-of-turn, non-zero, or a stop. The failure guarded against is a run that ends mid-Plan and
