@@ -69,3 +69,9 @@ epic's outcome record lives with its execution), adds a `Scope amended by:` head
 `.claude/CLAUDE.md` and `AGENTS.md`. TASK-418 gains one Done-when box for it, and T6's `Layers:` gains `docs/adr/`. Recon:
 workdoo has no attribution gate, no `docs/epic/` and no conformance run, and its 88 citations are bare ids, so there is no id
 collision. G2 re-confirmed: owner signed, same popup round.
+
+### 2026-10-10 | scope-change | T6 Depends-on gains T2 (pre-dispatch preflight: shared `docs/adr/` and `docs/DECISIONS.md`)
+What broke: the preflight HALTed with `shared-file-unowned` on `docs/adr/` and `docs/DECISIONS.md`, which T2 and T6 share with no
+Depends-on edge. § Decisions D2 already orders T2 first, but the Plan never declared the edge, and the edge is what the preflight
+reads (L-151). Impact: T6 `Depends-on: T1 · T2`. Scope is unchanged and the wave ranks are unchanged (T6 is already wave 1).
+G2 is unaffected.

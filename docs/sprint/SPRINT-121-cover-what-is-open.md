@@ -88,7 +88,7 @@ condition.
 ### T6 — Move the workdoo-built epics to workdoo `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `docs/epic/` · `docs/adr/` · `docs/research/adlc-epic-sequencing.md` · `scripts/lib/prose-density-baseline.txt`
   · `docs/adr/ADR-041-platform-repo-service-boundary.md` · `docs/adr/ADR-045-the-work-item-store.md` · `docs/DECISIONS.md`
-Depends-on: T1 (shares `docs/epic/`)
+Depends-on: T1 (shares `docs/epic/`) · T2 (shares `docs/adr/` and `docs/DECISIONS.md`, D2)
 Cites: `TASK-418` · ADR-041 · EPIC-016 · EPIC-018 · EPIC-019 · EPIC-020 · workdoo `.claude/CLAUDE.md` · workdoo `AGENTS.md` (other repo)
 
 Same ids in workdoo's `docs/epic/`, with relation pointers here. workdoo's attribution rule is checked before its commit, because
