@@ -9,8 +9,8 @@ class: execution
 tier: G
 authority: J2
 origin: manual
-state: ready
-depends-on: []
+state: blocked
+depends-on: [TASK-421]
 ---
 
 # TASK-404 — Cut the Shell conformance engine's per-file process spawning (TD-168)
@@ -27,8 +27,6 @@ whole `QA_FULL=1` gate runs in 105–109 s (Round 22), so the cost is Windows-sh
 
 ## Done when
 
-- [ ] A fresh profile on the Windows host names the engine's hottest spawn sites, with counts and wall-clock per site, recorded as a new
-      `qa-gate-timing.md` Round. TD-168's Mitigation is a hypothesis (L-091), so this replaces it as the basis for the fix.
 - [ ] The engine's run against this repo on the Windows host drops by a stated, measured fraction, with the before and after taken on
       the same host and tree, and no rule's verdict, finding id, or exit meaning changes (ADR-034's compatibility contract), proven by the
       retained engine fixtures plus a seeded break per changed evaluator.
@@ -36,6 +34,12 @@ whole `QA_FULL=1` gate runs in 105–109 s (Round 22), so the cost is Windows-sh
 ## Assumes
 
 - needs-info: the target fraction, set by the owner once the profile exists. Unblock: the first Done-when box ticked.
+- **blocked-by:** TASK-421 (the profile, and the owner's target proposed from it).
+
+## Amended 2026-10-10
+
+Split by owner ruling at the SPRINT-121 promote (Codex review H1): the profiling box moved to **TASK-421**,
+so this task keeps only the optimization and waits on that profile. The `needs-info` line above is now discharged by TASK-421.
 
 ## Tracker
 
