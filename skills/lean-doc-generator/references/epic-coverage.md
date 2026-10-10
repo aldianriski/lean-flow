@@ -22,7 +22,7 @@ its indented continuation lines).
 ## Check (per active epic)
 
 1. Glob `docs/epic/EPIC-*.md` (not `archive/`). None, or no `docs/epic/` → report `no epics` and stop;
-   never an error. Keep only files whose frontmatter has `status: active`.
+   never an error. Keep only files whose frontmatter has `status: active` — **plus, at promote, any epic this promote would activate** (judge it as active now, never as still-proposed).
 2. Take every `- [ ]` item under `## Closed when`. Skip `[x]` items.
 3. Read the item's mark and classify it:
 
@@ -39,7 +39,7 @@ its indented continuation lines).
 ## Where each caller uses it
 
 - **Epic activation** (setting `status: active` — at creation or at the first member-sprint promote): run the
-  check and list the uncovered conditions. Activation is not blocked, but the next promote is.
+  check and list the uncovered conditions. Activation at creation is not blocked, but the next promote is; activation **by** a promote is judged in that same promote (step 1), so it is blocked there.
 - **Promote** — emit `☐ epic coverage (every active epic): <findings|none>` in the Governance checklist.
   - An active epic **this sprint touches** (the sprint's `epic:` frontmatter, or any chosen member's `epic:`
     stamp) with an uncovered condition → **refuse to render the sprint**. Resolve by annotating the epic

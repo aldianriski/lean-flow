@@ -45,7 +45,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 ## Flow
 
 1. **Scan `.out-of-scope/` first** — if a backlog task resembles a prior rejection, surface it and ask before keeping it.
-2. **Load** — after the layout check above (v1/mixed stops here): read every `docs/work/backlog/TASK-*.md` — frontmatter + `## Done when` + `## Assumes` (+ root `TECH-DEBT.md`). Read other folders only to resolve a `depends-on:` id; never groom them.
+2. **Load** — after the layout check above (v1/mixed stops here): read every `docs/work/backlog/TASK-*.md` — frontmatter + `## Done when` + `## Assumes` (+ root `TECH-DEBT.md`). Read other folders only to resolve a `depends-on:` id or an active epic's `→ TASK-…` coverage mark; never groom them.
    **Also read every `status: active` epic** (`docs/epic/EPIC-*.md`, not `archive/`; none → skip) — read-only, to run
    the coverage check (STANDARD § 2, *Epic coverage*): each open `- [ ]` § Closed-when item must **end** with
    `→ TASK-NNN[, TASK-MMM]` (≥1 id with a file in `backlog/` · `todo/` · `in_progress/` · `review/`) or

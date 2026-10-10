@@ -163,7 +163,7 @@ Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`; tree docs use a flatte
 condition under its `## Closed when` must be **covered**: it maps to at least one open task (any `docs/work/`
 folder except `done/` and `cancel/`) or to a named next slice. The epic file alone records the mapping: each
 open line **ends** with `→ TASK-NNN[, TASK-MMM]` or `→ next slice: <name>`. A ticked `[x]` condition needs
-nothing, and a `status: proposed` epic is exempt (a plan, not admitted scope). A named task that is in `done/`
+nothing, and a `status: proposed` epic is exempt (a plan, not admitted scope) — except at the promote that activates it, which judges it as active. A named task that is in `done/`
 or `cancel/` while its condition is still `[ ]`, or whose file does not exist, does **not** cover it (stale
 coverage). The rule is enforced by the lifecycle skills (`promote` refuses to form a sprint over an uncovered
 condition unless the owner records an override; `/triage` and `/prime` report them), not by a conformance rule:
