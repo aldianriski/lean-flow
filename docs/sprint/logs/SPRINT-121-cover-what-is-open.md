@@ -75,3 +75,10 @@ What broke: the preflight HALTed with `shared-file-unowned` on `docs/adr/` and `
 Depends-on edge. § Decisions D2 already orders T2 first, but the Plan never declared the edge, and the edge is what the preflight
 reads (L-151). Impact: T6 `Depends-on: T1 · T2`. Scope is unchanged and the wave ranks are unchanged (T6 is already wave 1).
 G2 is unaffected.
+
+### 2026-10-10 | scope-change | T4 fixture runner is `.ts`, not `.sh`; T3 runs alone after T4 and T5 (dispatch shape)
+What broke: T4's `Layers:` named `evals/run-learnings-metadata-fixtures.sh`, but this repo writes no new shell scripts (executable
+logic is TypeScript run by Bun, owner rule 2026-09-09), and the gate already wires `run-*-fixtures.ts` harnesses. Impact: T4
+`Layers:` names `evals/run-learnings-metadata-fixtures.ts`, the same role in a different file. Dispatch shape: T3 measures wall
+clock, so it runs alone after T4 and T5 rather than beside them, and the host load it states is uncontaminated by sibling builders.
+Wave ranks are unchanged and G2 is unaffected. Declared base for wave 0 is the commit that carries this entry.

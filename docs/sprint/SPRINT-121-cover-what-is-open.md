@@ -64,7 +64,7 @@ A measurement only, with no engine code changed. It is the data TASK-404's targe
 **Acceptance:** a new timing Round names the hottest spawn sites, and their figures reconcile to the whole-run wall clock.
 
 ### T4 — Clean up the learnings ledger `[size: M · risk: low · class: execution · HITL · J1]`
-Layers: `docs/LEARNINGS.md` · `scripts/qa-check.sh` · `evals/fixtures/learnings-metadata/` · `evals/run-learnings-metadata-fixtures.sh`
+Layers: `docs/LEARNINGS.md` · `scripts/qa-check.sh` · `evals/fixtures/learnings-metadata/` · `evals/run-learnings-metadata-fixtures.ts`
   · `docs/knowledge-index.md`
 Depends-on: none
 Cites: `TASK-419` · LEARNINGS § disposition (TASK-384) · L-198
