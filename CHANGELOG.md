@@ -14,9 +14,9 @@ status: current
 
 ---
 
-## Unreleased — an active epic's open conditions must each be covered (spec 0.15.0)
+## v2.4.0 — an active epic's open conditions must each be covered; workdoo epics move to workdoo; spec 0.15.0 (2026-10-10)
 
-**MINOR (not yet released)** — SPRINT-121 T5 (TASK-420). Installing the next release is enough; no upgrade step. The standard moves to
+**MINOR** — ships SPRINT-121 (T5 · TASK-420 is the consumer-facing change). Installing the next release is enough; no upgrade step. The standard moves to
 **spec 0.15.0** (MINOR: prose rule, no conformance rule added, no verdict changes).
 
 - **The rule (STANDARD § 2):** while an epic is `status: active`, every open `- [ ]` Closed-when condition ends with
@@ -62,39 +62,6 @@ the plugin copy it started with). The standard moves to **spec 0.14.0** (MINOR: 
   task id as a whole word in any tracked `.md` that is not history: closed task files, archives, archive indexes, changelogs, ADRs,
   LEARNINGS and TECH-DEBT. A citation scan that cannot complete now proposes nothing, rather than proposing everything (TASK-410).
 - **lean-flow passes its own conformance check at level Structural**, up from `level: none`.
-
----
-
-## v2.2.0 — The night-run launcher keeps a fire-time ledger (2026-10-09)
-
-**MINOR** — ships SPRINT-118 · SPRINT-119 (entries below). No upgrade step beyond installing `2.2.x` and restarting the session
-(a live session keeps the plugin copy it started with).
-
-- **`scripts/night-run.sh` writes `fired · <ts> · <mode>` to the sprint's Execution Log before the run starts**, and refuses to fire when
-  no sprint resolves. A run that dies before the reaper is now on record, and the sprint cannot close past it (`CLOSE-FIRED-UNREAPED`).
-- **First real unattended run since the reaper repair:** `PLAN_EXHAUSTED` · `DELIVERED`, checked on the committed log (EPIC-015).
-
----
-
-## SPRINT-119 — Fire-Ledger Vehicle (2026-10-07)
-
-**Unreleased**: no consumer-facing file changed (it is the seeded vehicle for SPRINT-118 T2).
-
-- **The first real unattended run since the reaper repair** fired against this all-J0 Plan on the VPS: `PLAN_EXHAUSTED` · `DELIVERED`,
-  $0.83, no confirmation asked, 0 permission denials. It transcribed its own `fired ·` line and the authority verdict (TASK-405).
-
----
-
-## SPRINT-118 — Prove the Run (2026-10-09)
-
-**Unreleased**: `scripts/night-run.sh` and `skills/orchestrator/references/night-run.md` changed, so this reaches adopters at the next release.
-
-- **The night-run launcher writes a fire-time ledger.** `night-run.sh` appends `fired · <ts> · <mode>` to the sprint's Execution Log
-  before the wrapped command runs, and refuses to fire when no sprint resolves. A run that fires and dies before the reaper is now on
-  record, and the sprint close check FAILs it as `CLOSE-FIRED-UNREAPED` (TD-122). The authority check reads the same line as the
-  written fact of an unattended run (TD-124).
-- **EPIC-015 Closed-when 1 is met on live input:** one real `--mode overnight` run ended at a named terminal state, and every check read
-  the committed log. The first real `/handoff` record went `live` → `consumed` → `spent` through `check-handoff-state.sh` (TASK-327).
 
 ---
 
