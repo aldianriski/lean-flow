@@ -195,3 +195,18 @@ green after. C3 (`block-recount`) is red with the cut removed (`parks · 2`) and
 79): the block carries `T2 · parked-hitl · …`, and the guard prints `PASS … agrees with its per-task lines`. Coordinator re-run as its own
 call: `REAP-TERMINAL FIXTURES: all green`, all six new cases PASS. Reviews: a worktree seeding campaign (S1-S6) and a static Codex pass
 (K1-K5, round 1 of at most 2). Spend on the fix so far: builder ~192k subagent tokens.
+
+### 2026-10-10 | review | T2 reaper fix round 1: seeding finds the copy's other states uncovered; Codex K1 a real window mismatch; one fix round
+Seeding (worktree-isolated at `27d75a78`; every seed restored to `98920c96` by hash): S1 (copy removed) reddens M1 and M2; S2 (copy from the
+unstripped window) reddens C2b; S3 (whole file) reddens C2a and C2b; S4 (cut any run-complete) reddens M2; S5 (no cut) reddens C3 (`parks · 2`).
+**S6 (drop `blocked` from the copy regex) reddens nothing**: only `parked-hitl` has a copy fixture. Siblings rollup, outcome and ceiling
+are all green.
+Codex (static, per-item): **K1 FINDING, confirmed**: the counters read fenced lines and the copy strips them, so a park written only inside
+a run's own fenced rollup is counted but not copied, and the guard FAILs again. The second half (a copied line contradicting the terminal)
+is refuted by reading: the guard's matrix rules only PLAN_EXHAUSTED, AUTHORITY_BOUNDARY and BUDGET_STOP, and reap()'s order keeps them
+consistent. **K2 FINDING**: the header cut is a substring match → anchor it to the end. **K3 refuted**: `check_revise_ceiling` strips fences
+(`night-run.sh:153-155`), and retry lines are never copied. **K4 refuted**: on a re-reap the old code read its own earlier `unattempted`
+copies as "reached"; excluding them corrects it. K5 OK.
+Fix round 2 (final): copy exactly what was counted (dedupe); C2b inverts to `block-copies-counted-fenced-park`; anchor the header; new
+fixtures for `blocked` and `stalled`/`denied-tool`. Stop rule: then Codex round 2 on that diff only, and the owner.
+Spend: seeding ~68k, Codex ~20k.
