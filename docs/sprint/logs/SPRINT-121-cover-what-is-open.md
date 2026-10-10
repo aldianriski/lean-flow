@@ -187,3 +187,12 @@ append-only log cannot retract it. That is put to the owner rather than edited i
 - **Promotions (owner):** the three survivors at count ≥ 2 (F L-185 ×6, G L-219 ×4, H L-217 ×4) are proposed at the next
   promote's checkpoint, as TASK-419 box 4 states. H feeds TASK-417's stop rule. Conformance keeps three Gated S10.PROMOTION
   findings until then.
+
+### 2026-10-10 | progress | T6 reviewed CLEAR (7/7); 3 of 4 boxes ticked, the gates box waits for the final verify on both repositories
+review · T6 · scoped-reviewer · behaviour:low · governance:high
+The bounded scoped review covered content preservation, link resolution, id qualification, ADR-041's Decision hash, ADR-052's
+figures, no dangling local links, and the workdoo pointer lines: all 7 PASS. Its one note ("0 links into lean-flow" → "0 links to
+the epic files") was applied (`c2f48fef`, Context only). workdoo's gate (`verify` = typecheck · biome · bun test) reaches none of
+the moved files: `biome check` on them reports "No files were processed", and no `.ts` file reads `docs/epic/`. The full
+`verify` run is still owed. One attempt was started during T3's timing window by coordinator error, stopped within ~2 min, and
+its orphaned `tsc` was killed. T3's builder was told to re-run or disclose any overlapping measurement.

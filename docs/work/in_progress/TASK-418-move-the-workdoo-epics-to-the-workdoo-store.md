@@ -26,17 +26,17 @@ EPIC-013 stay as closed history.
 
 ## Done when
 
-- [ ] workdoo holds the four epics under its own `docs/epic/` with **the same ids**, so its existing citations (≈142 across its
+- [x] workdoo holds the four epics under its own `docs/epic/` with **the same ids**, so its existing citations (≈142 across its ✓ workdoo `16252b2`: docs/epic/ 4 epics + INDEX, ids unchanged; 10 relative sprint links resolve; EPIC-019 row = SPRINT-010 closed `5770c6d`, 011/012 unlisted (no stamp); scoped review CLEAR items 1–3
       docs and sprint `epic:` stamps) resolve unchanged, plus an INDEX. Relative links inside the moved files resolve in workdoo.
       EPIC-019's member list states only verified linkage (SPRINT-010 closed; SPRINT-011/012 carry no epic stamp, so they are not
       listed unless an explicit mapping is recorded).
-- [ ] lean-flow no longer carries the four files. Its epic INDEX, the sequencing register and any live doc that needs the
+- [x] lean-flow no longer carries the four files. Its epic INDEX, the sequencing register and any live doc that needs the ✓ lean-flow `4a634592`: 4 files removed; INDEX rows → relation pointers; sequencing register amended; archives untouched; prose-density baseline row dropped; scoped review item 6: no live local link remains
       relation carry a one-line pointer to the workdoo path; archived sprints and logs stay unedited as history; the
       `scripts/lib/prose-density-baseline.txt` row for EPIC-016 is removed.
 - [ ] Both repositories' gates are green after the move: lean-flow `sh conformance.sh .` reports no new finding and its gate passes.
       workdoo's commit-attribution rule is checked **before** committing there, because workdoo's SPRINT-012 is active, and the
       workdoo commit is shaped to satisfy it.
-- [ ] A new ADR amends ADR-041's governance split (an epic's outcome record lives with its execution): ADR-041 carries a
+- [x] A new ADR amends ADR-041's governance split (an epic's outcome record lives with its execution): ADR-041 carries a ✓ ADR-052 (`4a634592`, Context precision `c2f48fef`); ADR-041 `Scope amended by:` marker, § Decision hash-identical to `9ecd81bb`; workdoo .claude/CLAUDE.md + AGENTS.md point to docs/epic/; scoped review items 4, 5, 7 PASS
       `Scope amended by:` header marker with its § Decision untouched, and workdoo's `.claude/CLAUDE.md` and `AGENTS.md` point to the
       new home.
 
