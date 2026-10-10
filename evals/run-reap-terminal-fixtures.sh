@@ -340,6 +340,14 @@ T1 · done · a
 T2 · parked-hitl · needs the owner"
 sh "$launcher" --reap "$work/block-recount/run.log" "$work/block-recount" "" 0 "" >/dev/null 2>&1
 lastblock "$bdoc" | grep -q '^parks · 1  '; chk "block-recount" $? "second reap over its own earlier block: $(lastblock "$bdoc" | grep '^parks ·')"
+# R2 (Codex round 2): the same re-reap after the log went CRLF (a Windows checkout with core.autocrlf).
+# The reaper's earlier header then ends in `\r`, which must not defeat the end-anchored cut.
+blk "block-recount-crlf" "x" " " "# log
+T1 · done · a
+T2 · parked-hitl · needs the owner"
+sed -i 's/$/\r/' "$bdoc"
+sh "$launcher" --reap "$work/block-recount-crlf/run.log" "$work/block-recount-crlf" "" 0 "" >/dev/null 2>&1
+lastblock "$bdoc" | grep -q '^parks · 1  '; chk "block-recount-crlf" $? "second reap over its own earlier CRLF block: $(lastblock "$bdoc" | grep '^parks ·')"
 # M2 (must-FAIL if the reaper's cut is too broad): a MODEL-written `run-complete` entry is evidence, not
 # the reaper's block. Its park line is the run's only T2 line, so it must still count and still be copied.
 blk "block-keeps-model-runcomplete" "x" " " "# log

@@ -327,7 +327,8 @@ reap() {
   # Reaper entries are cut by header, NOT by fence: a model-written rollup block is fenced too, and its
   # park lines are the evidence (SPRINT-122 T2).
   rp_win_run=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | awk -v t="| $rp_entry_title" '
-    /^### / { skip = (length($0) >= length(t) && substr($0, length($0) - length(t) + 1) == t) }
+    /^### / { h = $0; sub(/[ \t\r]+$/, "", h)   # a CRLF checkout or trailing spaces must not defeat the anchor
+              skip = (length(h) >= length(t) && substr(h, length(h) - length(t) + 1) == t) }
     !skip')
   rp_unatt=0
   for tn in $rp_unit_list; do
