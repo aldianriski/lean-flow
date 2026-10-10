@@ -478,7 +478,9 @@ wrap() {
   [ -f "$wr_log.stop" ] && kill -TERM "$wr_child" 2>/dev/null
   wait "$wr_child"; wr_rc=$?
   # A trapped signal interrupts `wait` with 128+n while the child may still be running: wait again
-  # until it is gone, so the exit file holds the CHILD's status, never the interruption's.
+  # until it is gone, so the exit file holds the CHILD's status. One window remains: a TERM landing as
+  # `wait` reaps the child leaves 128+n (the recovery `wait` below then gets 127). The terminal state is
+  # unaffected -- the stop marker, not this status, makes it USER_STOP.
   while kill -0 "$wr_child" 2>/dev/null; do wait "$wr_child"; wr_rc=$?; done
   # The child may also have exited between the interrupted `wait` and the check above; one more
   # `wait` then returns its real status. 127 means it was already reaped by the loop: keep that one.
