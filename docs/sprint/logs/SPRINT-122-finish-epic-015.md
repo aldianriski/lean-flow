@@ -233,3 +233,9 @@ EPIC-015 has one open condition left: CW8, the freeze re-arm (TASK-417, which wa
 **TD-248** (id derived: ledger max 247; nothing cites 248 or 249): `check-layers-observed.ts` attributes `sprint(NNN) Tn:` to Tn for any
 NNN, so SPRINT-122 T2's reaper commits FAIL SPRINT-123's leg. It leaves the gate when SPRINT-123 is archived at close; the owner
 rules on the close-time override.
+
+### 2026-10-10 | system-verify | QA_FULL on the VPS at `cc965c3b`: `QA-CHECK: 301 pass, 0 fail`; TD-248 narrowed
+`QA_FULL=1 QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh` in `~/lf-gate` (detached at the local tip): `QA-CHECK: 301 pass, 0 fail`, rc 0.
+The rollup leg PASSes on SPRINT-123. Cross-check of TD-248 (a direct single-file run FAILs, the gate leg PASSes): the gate calls the
+checker with every sprint file at once, and it skips sibling sprints' commits (`check-layers-observed.ts:538`). Reproduced locally in
+both orders: PASS/PASS. TD-248 is narrowed to the single-file direct run, severity low.

@@ -345,13 +345,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-248** severity: minor | status: open | created: Sprint-122 (T2, the vehicle's layers-observed)
+- **TD-248** severity: low | status: open | created: Sprint-122 (T2, the vehicle's layers-observed)
   - Summary: **`check-layers-observed.ts` attributes `sprint(NNN) Tn:` commits to Tn whatever NNN is.** Its subject rules match
     `sprint([0-9]+)` (`check-layers-observed.ts:302-309`). When two sprints are active and their commit ranges overlap, one
     sprint's `Tn` commits are charged to the other sprint's `Tn`. SPRINT-122 T2's reaper commits (`27d75a78` · `39787db8` ·
     `dc490880`) fall in SPRINT-123's range and FAIL its leg as "changed by a task that never declared it: T2:scripts/night-run.sh".
     Census: first sighting (SPRINT-118/119 overlapped with no `Tn` commits in the vehicle's range). The FAIL leaves the gate when
     SPRINT-123 is archived at close.
+  - Narrowed same day: the gate passes every sprint in ONE call, and the checker then skips sibling sprints' commits
+    (`check-layers-observed.ts:538`), so the gate PASSes (system-verify `301 pass, 0 fail`). Only a single-file direct run misattributes.
   - Mitigation (hypothesis): a `sprint(NNN)` subject attributes only when NNN is the checked sprint's number; any other NNN is
     another sprint's commit, so it is excluded, never UNATTRIBUTED.
 
