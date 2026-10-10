@@ -4,7 +4,7 @@ slug: cover-what-is-open
 epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-10-10
-status: active
+status: closed
 plan_commit: 4d82a8f
 gates_signed: G1,G2 @ fe339ee
 update_trigger: sprint execute/close events
@@ -136,5 +136,37 @@ The other six run in attended `sprint-bulk` with no confirmation between authori
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/adr/ADR-044-…` · `ADR-048-…` | T2 | accepted § Decision restored; corrections moved to appended § Correction (S4.APPEND) | Low | VPS conformance `PASS S4.APPEND`; scoped review 6/6 |
+| `docs/research/logs/qa-gate-timing.md` · `TASK-404` | T3 | Round 23 profile; TASK-404 target recorded | Low | per-rule sum vs whole 0.2%; spawn model within 6% |
+| `docs/LEARNINGS.md` · `scripts/qa-check.sh` · `evals/run-learnings-metadata-fixtures.ts` · `evals/fixtures/learnings-metadata/` | T4 | body-metadata lint (active entries); L-209/210/211 repaired; 58 entries folded into 10 families | Low | 5 fixtures 5/0; real ledger red→green; `PASS S11.LEARNINGS` |
+| `spec/STANDARD.md` (0.15.0) · `spec/CHANGELOG.md` · `skills/{lean-doc-generator,triage,prime}/` · `references/epic-coverage.md` · CONTEXT · README · CHANGELOG · `evals/fixtures/epic-coverage/` | T5 | active-epic coverage rule (consumer-facing) | Med | fixtures 5/5; live EPIC-015 fully covered; Codex r1 7/7 + 2 fixed, r2 RESOLVED |
+| `docs/epic/` (4 removed, INDEX) · `docs/adr/ADR-052-…` (new) · ADR-041 marker · DECISIONS · sequencing register · prose-density baseline; workdoo `docs/epic/` · `.claude/CLAUDE.md` · `AGENTS.md` | T6 | workdoo-built epics moved; ADR-052 amends ADR-041 | Med | scoped review 7/7; lean-flow 297/0; workdoo 3/4 (known Windows TD) |
+| `docs/epic/EPIC-015-execution-autonomy.md` | T5/T7 · coord | coverage marks on open lines; SPRINT-121 row | Low | coverage walk 4 = 4 + 0 |
 
 ## Retro
+
+**Retrieval check** — yes, three times. **L-151** (a record its reader can't reach) recurred in three forms while promoted and
+loaded: the promote checklist lived only in chat, coordinator-owned member moves went under `Tn:` subjects, and consequence lines used
+`med`, a token the checker can't read. **L-130** recurred too: the doc-aging census was asserted from memory and missed the
+TASK-327 prune. All four are logged as sightings on the family heads, not as new entries, which is the consolidation T4 built,
+working on its first day. One retrieval **worked**: ADR-041 was read before the workdoo move was offered (L-220), and it turned a
+silent reversal into ADR-052.
+
+**Cost** — inline coordinator plus 9 sub-agent runs (2 G2 recon, 3 builders, 2 scoped reviewers, 2 Codex rounds): **~622k
+sub-agent tokens**, against the G2 estimate of 1.5–2.5M. Wall clock 88 min from gate sign-off to the rollup. 7 of 7 units delivered,
+~89k tokens per unit. One bounded repair cycle (T5).
+
+**Worked**
+- Settling every J2 ruling at G2 and re-declaring J1 made the run continuous (Dogfood 1). The mid-run pauses were all new facts,
+  never permission between tasks.
+- The pre-delegated tick rule on T1 produced an honest "not met" (USER_STOP), not a tick on one run's evidence.
+- Packet-fed Codex review: two real findings in round 1, both resolved in one bounded round 2.
+
+**Friction**
+- My own bookkeeping produced most of the system-verify reds: no log at promote, `Tn:` subjects on member moves, an invalid
+  vocabulary, a stale member J-class. Each is cheap alone, and together they cost two verify rounds.
+- The Windows host can't finish the bare gate (truncated at ~520 s in both builders). Every real verdict came from the VPS.
+- I ran a heavy command on the host during T3's timing window. The run was discarded and redone.
+
+**Pattern candidate** — none new. Every friction above is a sighting of an existing family (E · A · F · G). The three survivors at
+count ≥ 2 (L-185 now ×8, L-219 ×5, L-217 ×4) go to the next promote's checkpoint, as the owner ruled.

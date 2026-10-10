@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -26,6 +26,19 @@ status: current
   and promote refuses to form a sprint while an epic it touches has one, unless the owner records an override.
 - **`/triage`** reads active epics alongside the backlog and lists each uncovered condition with its epic;
   **`/prime`** reports a `Coverage:` count.
+- An epic that a promote **activates** is judged as active in that same promote (Codex review fix), and `/triage` may read beyond
+  `backlog/` to resolve a coverage mark.
+
+**Also in SPRINT-121 (Cover What Is Open), maintainer-side:**
+- **The workdoo-built epics moved to workdoo** (EPIC-016 · 018 · 019 · 020, ids unchanged). **ADR-052** amends ADR-041: an epic's
+  outcome record lives with its execution. lean-flow keeps relation pointers in `docs/epic/INDEX.md`.
+- **ADR-044 and ADR-048** have their accepted § Decision text restored, and their later corrections are kept as appended, dated
+  § Correction sections. The S4.APPEND findings are cleared.
+- **Learnings ledger:** a new gate leg FAILs an active entry with no body `count:` or `promoted:` line (5 retained fixtures). 58
+  repeat entries are folded into their family heads (`disposition: merge`), so the ledger carries 4 active entries, not 62.
+- **The engine's Windows cost is measured** (`qa-gate-timing.md` Round 23): five rules' per-row spawn loops, at about 100 ms per
+  spawn. TASK-404's target is a 50% cut.
+- **EPIC-015:** Dogfood 1 is proven on this sprint. CW6 is still open because no code path emits `USER_STOP` (TASK-423).
 
 ---
 

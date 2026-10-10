@@ -345,6 +345,31 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-246** severity: low | status: open | created: Sprint-121 (dispatch)
+  - Summary: **Agent worktrees accumulate: 14 under `.claude/worktrees/` at SPRINT-121 close, several `locked`.** dispatch.md says
+    `git worktree list` should show none before a dispatch (stale-branch reuse on an agent-id collision, harness issue #51596). Nothing
+    removes them, and a locked one may belong to a live session, so the coordinator cannot safely sweep them unasked.
+  - Mitigation (hypothesis): a close-time step that lists merged, unlocked agent worktrees and proposes their removal (propose→approve).
+
+- **TD-245** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
+  - Summary: **Epic ids now span two repositories and nothing derives the next one across both.** EPIC-016 to 020 live in workdoo
+    (ADR-052), and lean-flow continues its own sequence. `/lean-doc-generator epic` derives the maximum from this repository only, so the
+    next id can collide with a workdoo epic, and nothing rejects a duplicate EPIC id (L-143 shape).
+  - Mitigation (hypothesis): name the sibling repository in the epic INDEX and make id derivation read both; or reserve a range per repo.
+
+- **TD-244** severity: medium | status: open | created: Sprint-121 (system verify)
+  - Summary: **The review-depth check silently ignores a `consequence ·` line with an out-of-vocabulary class, so the review-owed check
+    cannot fire on it.** SPRINT-121 wrote `governance:med` and `behaviour:med` (valid: `low|material` · `low|high`). The strict regex
+    skipped those lines without a finding. Only a malformed `self-review` line was caught (`review-depth-unclassified`). A governance-high
+    task whose consequence line is misspelled reads as having no review owed.
+  - Mitigation (hypothesis): FAIL any `^consequence · ` line that does not match the vocabulary, naming the bad token.
+
+- **TD-243** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
+  - Summary: **workdoo now holds four epics but runs no conformance check, so the epic standard (Closed-when, rollup currency, the new
+    active-epic coverage rule) has no gate behind it there.** This is ADR-052's accepted negative consequence. workdoo's `verify` is
+    typecheck · biome · bun test, and none of them reads `docs/epic/`.
+  - Mitigation (hypothesis): run lean-flow's `conformance.sh` against workdoo at its sprint close, or add an epic-rule step to its verify.
+
 - **TD-242** severity: minor | status: open | created: Sprint-120 (T5 build)
   - Summary: **The conformance-engine harness counts differently by host: 97 PASS on Windows, 98 on Linux, at the same commit (`bcb283f7`).** Both are
     all green, so no verdict is wrong, but one case is skipped or merged on one host, and nobody has said which.

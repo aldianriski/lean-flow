@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-216**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-233**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -177,7 +177,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-216: SPRINT-107)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-215: SPRINT-107)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-171: SPRINT-087)
-- count: 4
+- seen: 2026-10-10 (SPRINT-121 close: the coordinator ran workdoo verify on the host while T3 was timing the engine; first baseline discarded)
+- count: 5
 - promoted: no
 - related: L-055 (declared base) · L-216 (a background job owns the tree it rewrites) · L-067 (a result across an environment boundary) · TD-054
 
@@ -419,7 +420,9 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-173: SPRINT-088)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-162: SPRINT-083)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-160: SPRINT-082)
-- count: 6
+- seen: 2026-10-10 (SPRINT-121 close: TASK-420 box 4 named a covering set that T1's outcome changed (414 -> 423); owner ruling, logged)
+- seen: 2026-10-10 (SPRINT-121 close: TASK-419 box 2 said "any entry" where §11 collapses promoted entries to pointers; owner ruling, logged)
+- count: 8
 - promoted: no
 - related: L-136 (reachability — the sibling question) · L-130 (a value written into a frozen artifact is a query result) · L-111 (a criterion is reachable only after the decisions it rests on are taken) · L-088 (a DoD execution invalidated)
 
@@ -645,7 +648,10 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-197: SPRINT-098)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-229: SPRINT-115, SPRINT-116, SPRINT-118; its count 3)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-205: SPRINT-102)
-- count: +12 (SPRINT-121 T4 consolidation of family E: 10 entries folded; base count is narrated above)
+- seen: 2026-10-10 (SPRINT-121 close: the promote governance checklist was shown in chat but written to no promote record (S10.PROMOTEREVIEW))
+- seen: 2026-10-10 (SPRINT-121 close: coordinator-owned member moves committed under `Tn:` subjects, so leg 15 charged them to tasks)
+- seen: 2026-10-10 (SPRINT-121 close: consequence lines written with `med`, a class the checker cannot read (TD-244))
+- count: +15 (SPRINT-121 T4 fold of family E +12; SPRINT-121 close +3 sightings; base count is narrated above)
 ## L-150 [tags: process] [status: promoted]: **An expensive verification loop does not just cost its runtime — it deforms the work around it, and the detour costs more than the check.** `qa-check.sh` reached ~11 minutes this sprint. To avoid one cycle, SPRINT-078 committed T2 and T3 as a single `sprint(078) T2+T3` commit; `check-layers-observed.sh` attributes a commit to **exactly one** task and correctly reported it as attributable to none. Un-picking that — reconstructing the post-T2 state of six files from snapshots, hand-reverting the T3 doc edits, re-deriving the register to 29+22+11=62 rather than editing it to that — cost roughly **twice** the cycle it saved, plus two further full gate runs. **The cheap path existed the entire time and went unused.** Every leg of that 11-minute gate is a standalone script: `check-layers-observed.sh` answers the exact question in **4 seconds**. The aggregate gate was treated as the only way to verify anything, so the unit of verification became the slowest thing available, and the response to a slow unit was to batch — which is what made the failure expensive rather than cheap. **Two rules follow.** Iterate against the *specific* check and run the aggregate once, at the end; and when a verification step gets slow enough that you start routing around it, treat the routing itself as the signal — the batching impulse is a measurement of the check's cost, arriving before anyone thinks to time it.
 - **L-150 → promoted: `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check bullet's id-derivation grain — placed beside L-143 because that is where a reader meets the question (deriving an id), not where the failure is named (a census). Both sightings were id-derivations, not censuses.** — the durable rule is the record now (§11 collapse, SPRINT-096 promote). Body: git. Seen Sprint-078. Count 1. Related: L-147 (nothing measures the assertion that made the gate slow) · TD-071 (the standing row for the gate's cost) · L-120 (read the verdict the gate prints — which is what the standalone leg gives you in 4s)
 
@@ -755,7 +761,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-198: SPRINT-098, SPRINT-099, SPRINT-109, SPRINT-120; its count 4)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-195: SPRINT-098)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-206: SPRINT-103)
-- count: +9 (SPRINT-121 T4 consolidation of family A: 6 entries folded; base count is narrated above)
+- seen: 2026-10-10 (SPRINT-121 close: the promote doc-aging line was asserted from memory and missed the TASK-327 store prune; S11.BACKLOG found it)
+- count: +10 (SPRINT-121 T4 fold of family A +9; SPRINT-121 close +1 sighting; base count is narrated above)
 
 ## L-129 [tags: docs] [status: promoted]: **A cross-reference is an assertion about content you do not own, and it reads as correct until someone opens the target.** SPRINT-070 added `spec/STANDARD.md` §13 and, describing how the attestation trailer relates to the existing sprint-level record, wrote that `gates_signed:` lives "in the sprint file — **§9**". §9's frontmatter list read `status · plan_commit · close_commit`. The field was never defined there, or anywhere else in the spec — both of its occurrences were inside §13 itself, one of them being the dangling pointer. It survived authoring, review, a green gate and a full sprint, and was found only when SPRINT-071 T3 audited the spec **as a reader with no `skills/` access**: every other reading path finds `gates_signed:` documented in `lean-doc-generator/SKILL.md` or `night-run.md` and never notices the spec is silent. The mechanism is that a reference is written from the *source* side, where the author knows what they mean, and its correctness lives entirely on the *target* side, which nobody opens because the reference reads fluently. This is L-020's shape (shipping a capability without wiring it) applied to prose, and L-057's (the report is not the artifact) applied to a pointer: the citation is not the content. The rule: **when you write a reference to a section, file or field, open the target and confirm it contains what the reference claims — at the moment you write it, not at review.** A `see §N` is a claim, and an unverified claim about your own document is the one nobody thinks to doubt. → **TD-060** (nothing mechanically checks that a spec-internal cross-reference resolves).
 - **L-129 → promoted: `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check bullet's id-derivation grain — placed beside L-143 because that is where a reader meets the question (deriving an id), not where the failure is named (a census). Both sightings were id-derivations, not censuses.** — the durable rule is the record now (§11 collapse, SPRINT-096 promote). Body: git. Seen Sprint-071. Count 1. Related: L-020 (shipped-not-wired) · L-057 (the report is not the artifact) · L-016 (verify on the consumer path) · TD-060
