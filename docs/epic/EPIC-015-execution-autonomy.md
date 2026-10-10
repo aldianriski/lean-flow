@@ -147,8 +147,14 @@ shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattend
       recorded in frontmatter, pinned, and consumed with no repeated J0/J1 confirmation
 - [ ] **Bounded unattended repair runs**: a concrete J1 critic finding → repair → re-review → continue,
       with the retry ceiling still exactly what ADR-022 admits → TASK-415
-- [ ] Every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD, tasks attempted/completed, parks,
-      repair cycles, verification state, warnings and terminal reason → TASK-423
+- [x] Every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD, tasks attempted/completed, parks,
+      repair cycles, verification state, warnings and terminal reason
+      — **SPRINT-122** T1 (TASK-423): the fifth path now exists. A TERM to the wrapper's printed pid leaves a marker that
+      `reap()` turns into `USER_STOP` (`scripts/night-run.sh:348`), beside HARD_FAILURE :344-362, BUDGET_STOP :364,
+      AUTHORITY_BOUNDARY :366 and PLAN_EXHAUSTED :368. Each feeds the same block: outcome :424 (mapped at :193), DoD, terminal
+      reason :425, tasks :426, parks :427, repair cycles :428, verification :429, warnings :430. Proven by
+      `wrapper-term-is-user-stop` and the real-launcher `fire-site-wrapper-catches-term` (`663d9a5c`). A USER_STOP is not yet
+      bound to its run (TD-247)
 - [ ] **Dogfood 1** (continuous attended `sprint-bulk`, no per-task confirmation) and **Dogfood 2**
       (overnight with ≥1 J1 decision, ≥1 repair, and a J2 park or seeded control) both ran on this
       repository, each naming what proved it → TASK-415, TASK-416
