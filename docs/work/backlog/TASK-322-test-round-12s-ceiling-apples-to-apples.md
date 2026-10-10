@@ -1,7 +1,7 @@
 ---
 id: TASK-322
 title: "Test Round 12's ceiling apples-to-apples"
-priority: P2
+priority: P3
 size: M
 risk: low
 autonomy: AFK

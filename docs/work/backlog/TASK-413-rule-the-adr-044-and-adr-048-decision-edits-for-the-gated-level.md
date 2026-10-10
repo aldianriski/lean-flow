@@ -9,7 +9,7 @@ class: decision
 tier: P
 authority: J2
 origin: close-retro
-state: needs-info
+state: ready
 depends-on: []
 ---
 

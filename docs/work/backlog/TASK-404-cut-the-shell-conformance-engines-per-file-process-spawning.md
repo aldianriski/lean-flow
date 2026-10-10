@@ -9,7 +9,7 @@ class: execution
 tier: G
 authority: J2
 origin: manual
-state: needs-info
+state: ready
 depends-on: []
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: TASK-366
 title: "Rebuild the `ask-dont-tell` Stop hook against the real transcript corpus"
-priority: P1
+priority: P2
 size: M
 risk: high
 autonomy: HITL
