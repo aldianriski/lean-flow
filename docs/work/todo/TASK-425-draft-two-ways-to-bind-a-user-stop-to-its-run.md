@@ -28,8 +28,9 @@ which the run meets mid-run. The seed is declared here openly.
 
 - [ ] § Options holds exactly two ways to bind a USER_STOP to the run that produced it, each naming what it binds, what it costs and
       which file it touches, drawn from TD-247 and `scripts/night-run.sh` (`wrap()`, `reap()`). The draft does NOT pick one.
-- [ ] One scoped reviewer pass judges the draft against § Review seed, its verdict is recorded verbatim in this file, and the run
-      acts on that verdict exactly as the revise loop's rules require.
+- [ ] One scoped reviewer pass judges § Options against the § Review seed criterion alone (the reviewer is not shown this
+      `## Done when`), its verdict is recorded verbatim in this file, and the run acts on that verdict exactly as the revise loop's
+      rules require. Any rollup line goes in this sprint's Execution Log on its own line at column 0, not fenced and not bulleted.
 
 ## Review seed
 

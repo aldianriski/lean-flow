@@ -64,3 +64,14 @@ DENIED (file absent). `bun scripts/lib/check-prose-density.ts .`, `check-authori
 probe ($0.22) ALLOWED the literal `ps -eo pid=,ppid=,args=` (160 lines, 0 denials). Impact: DoD1 lists the process table literally and
 traces the chain by ppid. The envelope is unchanged: its verification dimension already reads "the `ps` ancestry line verbatim". G2 is
 unaffected.
+
+### 2026-10-10 | scope-change | pre-run review: TASK-424 DoD2 names the retry line's shape; TASK-425 DoD2 briefs the reviewer with the seed alone; T1 Cites gains check-authority.ts
+Isolated Sonnet pre-run review, read-only, 7 items: `REVIEW: 1 finding (soft)`. CLEAR on envelope/authority, every launcher refusal
+traced for the exact command, bare `sprint(123):` attribution, the park path's line shape and the two-active wording.
+What broke: (4) the reaper counts only a `T1 · retry ·` line at column 0 outside a fence (`night-run.sh:162-164`, :396), and Part 4's
+examples sit inside fences, so a copied, fenced retry would read `repair-cycles · 0`. (5, a note) a reviewer shown TASK-425's "do NOT
+pick" may return CLEAR, and the D5 control would never park. Impact: TASK-424 DoD2 gives the literal retry line and its placement;
+TASK-425 DoD2 briefs the reviewer with § Review seed alone and states the rollup-line placement. Both are openly seeded controls, and
+no criterion changes what it proves. Also logged here (it was logged only in SPRINT-122's log): T1's `Cites:` gained
+`scripts/lib/check-authority.ts`, which the DoD1 scope-change above names (the gate's `scope-change-outside-layers`). Known, not a
+blocker: `timeout 3600` and `--max-budget-usd` end as HARD_FAILURE, not BUDGET_STOP (SPRINT-118's TD note (a)). G2 is unaffected.

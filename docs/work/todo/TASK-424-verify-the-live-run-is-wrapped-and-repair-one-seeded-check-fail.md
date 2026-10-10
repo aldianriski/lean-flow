@@ -31,8 +31,9 @@ retry. The seed is declared here openly. It is a control, not real work re-decla
       evidence, the ancestor line whose args contain `night-run.sh --wrap`.
 - [ ] This sprint's § Files Changed carries a row for TASK-424, and `bun scripts/lib/check-prose-density.ts .` prints
       `prose-density: N pass, 0 fail`. *Verify: that check.* The row is first written exactly as § Seeded draft gives it. Its
-      Change (WHY) cell is over 400 characters, so the first check FAILs. Repair it under ADR-022 (one retry, logged as a `T1 · retry ·` line),
-      then re-run the check.
+      Change (WHY) cell is over 400 characters, so the first check FAILs. Repair it under ADR-022 (one retry), then re-run the check.
+      Log the retry in this sprint's Execution Log as its own line at column 0, not fenced and not bulleted (the reaper counts only
+      that shape), e.g. `T1 · retry · standards: prose-density Change cell 495 > 400 chars → fixed`.
 
 ## Seeded draft
 
