@@ -1,0 +1,46 @@
+---
+id: TASK-422
+title: "Reconcile the sprint template's 'created lazily' Execution Log with the rollup gate that FAILs an absent one"
+priority: P2
+size: S
+risk: low
+autonomy: HITL
+class: decision
+tier: X
+authority: J2
+origin: manual
+state: needs-info
+depends-on: []
+---
+
+# TASK-422 — Reconcile the sprint template's "created lazily" Execution Log with the rollup gate that FAILs an absent one
+
+## Why
+
+At the SPRINT-121 promote, the sprint file followed `templates/SPRINT.md.template` § Execution Log, which says the log is "created
+lazily at the first entry". System verify then FAILed: the night-run rollup check reads an active sprint with no log as "exactly
+the silence this check exists to catch" (`check-night-run-rollup.ts` / `.sh`). The template and the gate disagree, and anyone
+following the template hits the failure. It is a measured defect, so it is admissible under the interim governance restriction.
+Owner ruling 2026-10-10: a separate task, kept out of SPRINT-121's bounded vehicle.
+
+## Done when
+
+- [ ] The template, the promote procedure (`/lean-doc-generator` promote by reference) and the rollup check state one rule for
+      when an active sprint's Execution Log must exist. The owner rules which side moves: the log is created at promote, or the
+      check tolerates a log-less sprint that has no run.
+- [ ] A fixture reproduces the SPRINT-121 promote shape (an active sprint, no log) and shows the ruled behaviour, with a sibling
+      control.
+- [ ] README/CHANGELOG note the change if the template or a skill changed (consumer-facing).
+
+## Touches
+
+- `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/lean-doc-generator/references/sprint-by-reference.md` ·
+  `scripts/lib/check-night-run-rollup.ts` · `scripts/lib/check-night-run-rollup.sh` · `evals/`
+
+## Assumes
+
+- **open:** which side moves (template/promote or the check). The owner rules this at G2.
+
+## Tracker
+
+- SPRINT-121 promote, system verify `301 pass, 3 fail` (Execution Log entry 2026-10-10) · owner ruling 2026-10-10
