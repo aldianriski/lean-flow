@@ -155,3 +155,32 @@ local tip, the allowlist probe with a must-deny control, the pre-flight gate, a 
 (SPRINT-122) and `check-authority.ts` (SPRINT-123), none of which was on its task's Layers or Cites. Each is now on a `Cites:` line,
 because each is read and not edited (log entries stay append-only). Local re-run: `check-sprint-by-reference --scope-change` 4/0 on both
 sprints, and promote-check 7/0 on both.
+
+### 2026-10-10 | progress | T2 fired: vehicle run AUTHORITY_BOUNDARY, 1 repair, 1 park; merged `29cefb66`; every claim checked against artifacts
+**Fire (J2, owner-delegated):** `~/lf-run` at `eed60569`; launcher pre-flight gate `QA-CHECK: 288 pass, 0 fail`; `run mode: overnight` ·
+`fired detached: pid=1390349` · `ALIVE` · rc 0. Run: exit 0 · `subtype=success` · **$1.32** · 26 turns · **0 permission denials** · about
+3 min. Seven commits (six by the run, all bare `sprint(123):`; one for the reaper's block), bundled back and fast-forwarded. Nothing pushed.
+**Verified against artifacts, not the run's report (SPRINT-123 log line numbers):**
+- **Fired line:** l.79 `fired · 2026-10-10T10:05:33Z · overnight`.
+- **Live wrapper (SPRINT-122 T1 on real input):** TASK-424 transcribes ancestor `1390349 1 sh scripts/night-run.sh --wrap …`, the same pid
+  the launcher printed.
+- **Finding → repair → re-check (CW5):** l.94 `prose-density: 29 pass, 1 fail`; l.96 `29 pass, 0 fail`; l.97
+  `T1 · retry · standards: prose-density Change cell 493 > 400 chars → fixed`, column 0; repair commit `86672c57`. Exactly one retry.
+- **Park (D5 control):** l.106 `T2 · parked-hitl · reviewer FINDING "the draft must name the option lean-flow adopts" is a judgment
+  (ADR-022, no retry) · unblock: the owner … picks A or B for TD-247`; reviewer `review · T2 · scoped-reviewer`; commit `b56272b5`.
+- **Reaper block:** `run · 3 of 4 DoD ticked` · `outcome · PARTIAL` · `terminal · AUTHORITY_BOUNDARY` · `repair-cycles · 1` · `parks · 1`.
+- Guards: layers-observed PASS (base 838e714) · by-reference `--scope-change` 4/0 · prose-density 29/0 · authority all J1.
+**One named check FAILs:** `check-night-run-rollup.ts` on the log: "claims terminal · AUTHORITY_BOUNDARY but carries no 'Tn · parked-hitl ·'
+… line". The guard reads only the LAST `run-complete` block (`check-night-run-rollup.ts:107-120, 176`), and the reaper copies only
+`unattempted` lines into it (`night-run.sh:432-447`, "a task the run DID report as … parked … already has its line and is left alone").
+That contradicts ADR-016 / Part 4 / SKILL.md step 5 (a park is one line *inside* the rollup block). So every reaped AUTHORITY_BOUNDARY
+FAILs, and the gate (`qa-check.sh:528-545`) is red on SPRINT-123's log. This is the first reaped AUTHORITY_BOUNDARY since the guard was
+windowed (census: SPRINT-088, SPRINT-090 and SPRINT-123 carry one; only 123 postdates SPRINT-093), and no fixture covers it. L-181's shape
+(producer and consumer read different windows) again. **Owner ruling (popup): fix the reaper now.**
+
+### 2026-10-10 | scope-change | T2 gains the reaper fix: the launcher's block carries every non-green task line (ADR-016)
+What broke: TASK-415 DoD3 ("the rollup guard PASSes on the committed log") cannot pass, because the producer omits what the contract
+requires. Impact: T2 `Layers:` gain `scripts/night-run.sh` · `evals/run-reap-terminal-fixtures.sh` · `evals/fixtures/night-run-reaper/`.
+Consequential Tier G (D4): a must-FAIL fixture plus a sibling control, seeded breaks, and a worktree-isolated outside review (Codex).
+After the fix, SPRINT-123's log is re-reaped ONCE with the fixed launcher, using the run's own `--reap` arguments (from the transcribed
+wrapper line). It is appended, not edited, and logged as a re-reap; DoD3's guard verdict is read on that. G2 is re-confirmed by the popup.

@@ -45,7 +45,8 @@ worktree-isolated outside review. G2 rules how a user stop is told apart from a 
 HARD_FAILURE.
 
 ### T2 — Prove bounded unattended repair and Dogfood 2 in one overnight run `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `docs/epic/EPIC-015-execution-autonomy.md`
+Layers: `docs/epic/EPIC-015-execution-autonomy.md` · `scripts/night-run.sh` · `evals/run-reap-terminal-fixtures.sh`
+  · `evals/fixtures/night-run-reaper/`
   · `docs/work/todo/TASK-415-prove-bounded-unattended-repair-and-dogfood-2-in-one-overnight-run.md`
   · `docs/work/in_progress/TASK-415-prove-bounded-unattended-repair-and-dogfood-2-in-one-overnight-run.md`
 Depends-on: T1
