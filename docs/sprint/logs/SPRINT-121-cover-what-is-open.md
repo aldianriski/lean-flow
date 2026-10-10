@@ -224,3 +224,33 @@ forced by a fact found mid-run:
 4. **TASK-419 box 2:** caused by a criterion whose premise ("any entry") collided with §11's collapse rule (L-088). Logged with 3.
 Verdict for EPIC-015 CW7, Dogfood-1 half: **proven**. Continuous attended sprint-bulk asked no per-task confirmation, and every
 pause is named with its cause in this log. Dogfood 2 (TASK-415) remains, so CW7 stays `[ ]` until both halves are proven.
+
+### 2026-10-10 | run-complete | attended sprint-bulk exited, Plan exhausted (rollup written by the coordinator)
+
+Evidence provenance: mechanical = counted from member files and this log (cross-checked by `sprint-members-cli.ts counts`:
+`dod 22 0`, `units 7 7`); model-reported = written by the run; derived = a function of the fields below it.
+
+```
+run · 22 of 22 DoD ticked  [mechanical]
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED  [derived]
+terminal · PLAN_EXHAUSTED · every task reached a resolved state  [derived]
+tasks · 7 attempted / 7 completed / 7 total  [mechanical]
+parks · 0  [model-reported]
+repair-cycles · 1  [model-reported]
+verification · QA_FULL 297 pass 0 fail at 1ad8a708 (VPS fresh clone)  [model-reported]
+warnings · CW6 stays open (TASK-423); 3 Gated S10.PROMOTION findings deferred to the next promote by owner ruling  [mechanical]
+T1 · done · CW6 not ticked: USER_STOP is emitted by no code path; TASK-423 filed and covers it
+T2 · done · S4.APPEND clean, corrections kept as appended sections
+T3 · done · Round 23; TASK-404 target 50% (433.1 s -> <= 216.5 s)
+T4 · done · ledger folded to 4 active entries; L-185/L-217/L-219 go to the next promote
+T5 · done · Codex r1 2 findings fixed (the one repair cycle), r2 RESOLVED
+T6 · done · 4 epics now in workdoo; ADR-052 amends ADR-041
+T7 · done · Dogfood 1 proven; four pauses named with their causes
+```
+
+Calibration row (Part 4). Cost and turn count are unavailable in an attended interactive session, and are stated as such rather
+than omitted. Wall clock runs from the G1/G2 sign-off commit (`db2c91eb`, 13:04) to this rollup (14:32), from the commit clock:
+
+```
+run · cost unavailable · turns unavailable · 88 min · 7 of 7 units · coordinator + 3 builders (T3 · T4 · T5) + 2 G2 recon + 2 scoped reviewers (T2 · T6) + 2 Codex rounds (T5)
+```
