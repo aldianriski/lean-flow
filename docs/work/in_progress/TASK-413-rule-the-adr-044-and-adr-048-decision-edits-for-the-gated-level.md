@@ -24,7 +24,7 @@ SPRINT-120 brought lean-flow to conformance level Structural on its own tree. Th
 
 ## Done when
 
-- [ ] For each of ADR-044 and ADR-048, the owner has ruled on one path (revert § Decision to the accepted text, mark the ADR superseded by a
+- [x] For each of ADR-044 and ADR-048, the owner has ruled on one path (revert § Decision to the accepted text, mark the ADR superseded by a ✓ owner ruled restore + appended correction for both (G2, 2026-10-10); `1aaf8085`; VPS `sh conformance.sh .` at 1aaf8085: `PASS S4.APPEND -- 51 ADR(s) unedited since their deciding commit`; scoped review CLEAR 6/6
       new one, or record a post-decision header marker), and `sh conformance.sh .` reports 0 `S4.APPEND` findings.
 
 ## Touches

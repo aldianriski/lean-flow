@@ -93,3 +93,24 @@ made a condition at G2 (Codex: one run proves one run), failed on one path. `rea
 interrupt therefore reads as HARD_FAILURE, or as no rollup at all. CW6 is not ticked. The gap is filed as **TASK-423** (backlog,
 P1, Consequential G, epic EPIC-015), which also gives CW6 a covering task under the new active-epic coverage rule (TASK-420).
 Line numbers were re-derived by a second grep before this entry (the first draft cited :329–345, which was wrong).
+
+### 2026-10-10 | progress | promote governance checklist, recorded late, as the owner signed it at promote (S10.PROMOTEREVIEW)
+The checklist was shown to the owner and signed by popup at promote, but it was never written to the promote record: this log did
+not exist at `plan_commit`, and the plan-lock message did not carry it. Conformance on the VPS (at `1aaf8085`) named this gap,
+`promote-checklist-absent`, and this entry is the record:
+- ☑ L-promotion (count≥2, promoted:no): none. Two routes agree. 62 active entries, each count 1, are handled by T4 (TASK-419).
+- ☑ TD aging (≥3 sprints unaddressed): 120 of 126 open rows are aged. TD-231 to TD-236 are newly aged and named in the
+  SPRINT-121 sweep (`448641e`). TD-168 (`high`) is routed to TASK-404 and TASK-421.
+- ☑ doc-aging (§11 retention + §2 caps): TD-122 and TD-124 deleted (owner-approved, `448641e`). CHANGELOG rotated at 2.3.0. No
+  cap breach. **MISSED at promote:** the store prune. `TASK-327` (`done/`, closed at SPRINT-118) became retention-due when the
+  current sprint reached 121, and nothing live names it (S11.BACKLOG). It is proposed for §11 deletion now, pending owner approval.
+- ☑ epic rollup currency: EPIC-015 current. EPIC-019's member pointer is stale, which TASK-418 (T6) owns.
+- ☑ handoff ledger: none exists.
+
+### 2026-10-10 | progress | T2 done: S4.APPEND clean, with corrections kept as an appended record
+consequence · T2 · behaviour:low · governance:med
+review · T2 · scoped-reviewer · behaviour:low · governance:med
+ADR-044 and ADR-048 each have their accepted § Decision body restored (hash-identical to `f1efa36b` / `3e725ef4`), a header
+`Corrected:` marker, and an appended `## Correction 2026-10-10` that quotes the formerly in-force text verbatim (`1aaf8085`). The
+scoped reviewer was CLEAR on 6/6 bounded checks. VPS conformance at `1aaf8085`: `PASS S4.APPEND -- 51 ADR(s) unedited`. That run
+also surfaced two Gated findings outside T2: the promote checklist (recorded in the entry above) and TASK-327's retention (proposed).
