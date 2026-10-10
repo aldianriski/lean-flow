@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,21 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.15.0 — 2026-10-10
+
+**MINOR (§15) — an active epic's open Closed-when conditions must each be covered; prose only, no rule row.** No rule id
+is added, removed or renumbered and no conformance verdict changes over an unchanged repository (the check lives in the
+lifecycle skills, not the engine), so not MAJOR. More than PATCH because it adds a lifecycle obligation. Owner ruling
+(G2, SPRINT-121; TASK-420).
+
+- **§2** (after the core-files table), new paragraph *Epic coverage*: while an epic is `status: active`, each open
+  `## Closed when` condition ends with `→ TASK-NNN[, TASK-MMM]` or `→ next slice: <name>`; a named task in `done/` /
+  `cancel/` (or absent) does not cover a still-open condition; a `proposed` epic is exempt.
+- **Skills, same release:** `/lean-doc-generator` (epic activation + promote list uncovered conditions; promote refuses
+  without a recorded owner override), `/triage` (lists them with their epic), `/prime` (`Coverage:` count).
+
+Rule tables, rule ids and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
 
 ## 0.14.0 — 2026-10-09
 

@@ -31,6 +31,7 @@ locations second. Adapt the globs to the host project's layout.
 | 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
 | 5 | `docs/work/`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Work-item store + debt ledger — frontmatter + open `- [ ]` items only |
 | 6 | `docs/architecture/overview.md`, `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
+| 7 | `docs/epic/EPIC-*.md` with `status: active` (not `archive/`) — § Closed when only | Epic coverage count (below) |
 
 **README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +
 CONTEXT.md (2) + ARCHITECTURE.md (6). Stat its presence for the health line, but **read its full
@@ -46,6 +47,10 @@ sprint (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · pa
 sprint → fall back to the backlog.
 `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
 **On v1 or mixed** — prime reports the `Layout:` row `v1 layout → run /lean-doc-generator migrate`, skips the task count, and continues; it never aborts.
+**Epic coverage (read-only count):** for each `status: active` epic, an open `- [ ]` § Closed-when item is
+**covered** when it ends with `→ next slice: <name>` or `→ TASK-NNN[, …]` naming ≥1 id whose file
+(`docs/work/*/TASK-NNN-*.md`) is outside `done/` · `cancel/`; otherwise **uncovered** (unmarked, stale or missing id).
+Count uncovered across all active epics (`proposed` epics exempt); no epics → omit the row. Rule → STANDARD § 2.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
 
 **Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root
@@ -92,6 +97,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
      (`orchestrator/references/night-run.md`)
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
+   - uncovered epic conditions > 0 → also name `/triage` (it lists them with their epic)
    - nothing tracked yet → `/task-decomposer "<intent>"`
 
 ## Output format
@@ -106,6 +112,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 [OK]      ARCHITECTURE.md
 Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open
+Coverage: 2 uncovered epic conditions (EPIC-015 ×2) → /triage
 Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
 Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run)
 ```
@@ -114,13 +121,15 @@ The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reach
 sprint AND no `HANDOFF-LEDGER.md`) — otherwise report it, including `none outstanding`, so its
 absence is never mistaken for "nothing was ever taken."
 
+The `Coverage:` row is omitted when no active epic exists; otherwise it reports the count, `0 uncovered` included. Prime never edits an epic.
+
 The `Skills:` row is omitted only when it would be meaningless — no manifest **and** no version in the
 base dir; otherwise report it, including `n/a`, so its absence is never mistaken for a pass.
 
 ## Red flags
 
 ❌ **Reading files outside the declared slots** (beyond a referenced handoff, the plugin manifest the
-   freshness row compares against, and the Execution Log / `HANDOFF-LEDGER.md` the Handoff row reads)
+   freshness row compares against, and the Execution Log / `HANDOFF-LEDGER.md` the Handoff row reads, and the active epics' § Closed when the Coverage row reads)
    — adds noise; not this skill's job.
 ❌ **Aborting on a missing file** — everything is optional; `[MISSING]` is the correct response.
 ❌ **Summarizing file contents inline** — emit the health check only; files are already in context for downstream skills.

@@ -1,0 +1,51 @@
+# Epic coverage — every open condition of an active epic is covered
+
+The procedure behind the `epic` and `promote` rows of SKILL.md. The rule itself is the standard's
+(`spec/STANDARD.md` § 2, *Epic coverage*); this is how to apply it. **Read-only until the owner acts.**
+
+## The rule in one line
+
+An epic with `status: active` may not carry an open `- [ ]` § Closed-when condition that nothing is
+going to deliver. `status: proposed` epics are exempt (a plan, not admitted scope); `[x]` conditions need nothing.
+
+## The mark
+
+Each open condition **ends** with one of (the epic file alone holds its coverage — no condition numbers,
+no back-reference from the task):
+
+- `→ TASK-NNN` or `→ TASK-NNN, TASK-MMM` — the open task(s) that deliver it
+- `→ next slice: <name>` — a slice named in the epic but not yet cut into tasks
+
+A condition may span several lines; the mark is on the **last** line of the item (the `- [ ]` line plus
+its indented continuation lines).
+
+## Check (per active epic)
+
+1. Glob `docs/epic/EPIC-*.md` (not `archive/`). None, or no `docs/epic/` → report `no epics` and stop;
+   never an error. Keep only files whose frontmatter has `status: active`.
+2. Take every `- [ ]` item under `## Closed when`. Skip `[x]` items.
+3. Read the item's mark and classify it:
+
+| Mark | Verdict |
+|---|---|
+| none, or an empty `next slice:` | **uncovered** — unmarked |
+| `next slice: <name>` | covered |
+| `TASK-…` ids | for each id find `docs/work/*/TASK-<id>-*.md` (match by number, zero-padded ids count): covered if **at least one** sits in `backlog/` · `todo/` · `in_progress/` · `review/` |
+| every named id is in `done/` or `cancel/`, or has no file | **uncovered** — stale coverage (name which: done · cancelled · missing) |
+
+4. Report one line per uncovered condition: `EPIC-NNN · "<first ~60 chars of the condition>" · uncovered (<unmarked | stale: TASK-NNN done | missing: TASK-NNN>)`; otherwise `EPIC-NNN · fully covered (N open, N mapped)`.
+   Cross-check before acting on it: open items counted by the scan = covered + uncovered reported.
+
+## Where each caller uses it
+
+- **Epic activation** (setting `status: active` — at creation or at the first member-sprint promote): run the
+  check and list the uncovered conditions. Activation is not blocked, but the next promote is.
+- **Promote** — emit `☐ epic coverage (every active epic): <findings|none>` in the Governance checklist.
+  - An active epic **this sprint touches** (the sprint's `epic:` frontmatter, or any chosen member's `epic:`
+    stamp) with an uncovered condition → **refuse to render the sprint**. Resolve by annotating the epic
+    (`→ TASK-…` after the task exists, or `→ next slice: …`), or by an **owner override**: the owner says so
+    at the checklist, and the first Execution Log entry of the new sprint records it as
+    `### <date> | scope-change | epic-coverage override: EPIC-NNN "<condition>" — <owner's reason>`.
+  - An uncovered condition in an epic the sprint does **not** touch is listed, never blocking.
+  - Unattended: promote already parks (HITL); a headless run never records an override.
+- `/triage` and `/prime` run the same read of the epic file for their own reports; they never edit the epic.

@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.14.0
+version: 0.15.0
 status: current
 ---
 
@@ -158,6 +158,16 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`; tree docs use a flattened name
 (`architecture-overview.md.template` · `database-erd.md.template` · …).
+
+**Epic coverage (an active epic's open conditions).** When an epic is `status: active`, every open `- [ ]`
+condition under its `## Closed when` must be **covered**: it maps to at least one open task (any `docs/work/`
+folder except `done/` and `cancel/`) or to a named next slice. The epic file alone records the mapping: each
+open line **ends** with `→ TASK-NNN[, TASK-MMM]` or `→ next slice: <name>`. A ticked `[x]` condition needs
+nothing, and a `status: proposed` epic is exempt (a plan, not admitted scope). A named task that is in `done/`
+or `cancel/` while its condition is still `[ ]`, or whose file does not exist, does **not** cover it (stale
+coverage). The rule is enforced by the lifecycle skills (`promote` refuses to form a sprint over an uncovered
+condition unless the owner records an override; `/triage` and `/prime` report them), not by a conformance rule:
+it adds no row to the rule tables (0.15.0).
 
 **Placement is canonical.** Root keeps the daily working files + the TemiDev root set above;
 AI-context lives in `.claude/`; everything else lives under the `docs/` tree. Generation targets

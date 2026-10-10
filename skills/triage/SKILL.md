@@ -46,6 +46,11 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 
 1. **Scan `.out-of-scope/` first** — if a backlog task resembles a prior rejection, surface it and ask before keeping it.
 2. **Load** — after the layout check above (v1/mixed stops here): read every `docs/work/backlog/TASK-*.md` — frontmatter + `## Done when` + `## Assumes` (+ root `TECH-DEBT.md`). Read other folders only to resolve a `depends-on:` id; never groom them.
+   **Also read every `status: active` epic** (`docs/epic/EPIC-*.md`, not `archive/`; none → skip) — read-only, to run
+   the coverage check (STANDARD § 2, *Epic coverage*): each open `- [ ]` § Closed-when item must **end** with
+   `→ TASK-NNN[, TASK-MMM]` (≥1 id with a file in `backlog/` · `todo/` · `in_progress/` · `review/`) or
+   `→ next slice: <name>`. Unmarked, or every named id in `done/` · `cancel/` · missing = **uncovered**.
+   `proposed` epics are exempt; `[x]` items need nothing.
 3. **Bug intake** — a BUG.md-shaped item (or bug-flavored backlog entry) is routed, not ranked like a feature:
    - known cause + trivial fix → a new task file in `backlog/` (`state: ready`, **`origin: triage-bug`**) — same shape and id rule as `/task-decomposer` writes (id = max over `docs/work/*/TASK-*.md`, all six folders, + 1)
    - unknown cause / needs investigation → record as a task, `next: /diagnose` (**`origin: triage-bug`**)
@@ -60,7 +65,10 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
 6. **State** — set `state:` `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
 7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then `git mv` the task file `backlog/ → cancel/` (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
-8. **Output** — the groomed backlog in derived order + a **ready-to-promote shortlist** (that order, `ready` only). Apply changes only after human `y`.
+8. **Output** — the groomed backlog in derived order + a **ready-to-promote shortlist** (that order, `ready` only) + **uncovered epic conditions**, one line each:
+   `EPIC-NNN · "<condition, ~60 chars>" · uncovered (unmarked | stale: TASK-NNN done/cancelled | missing: TASK-NNN)`.
+   Close a gap by proposing a task (`/task-decomposer --epic`) or a `→ next slice:` mark — triage never edits the epic.
+   Apply changes only after human `y`.
 
 ## Order (derived, never stored)
 
@@ -106,7 +114,7 @@ requests for the same thing accumulate under one file's `prior-requests` list.
 
 ## Hard rules
 
-- **Backlog only** — never re-order, re-state or move a file in `todo/` · `in_progress/` · `review/` (a sprint in flight is locked).
+- **Backlog only** — never re-order, re-state or move a file in `todo/` · `in_progress/` · `review/` (a sprint in flight is locked). Active epics are read, never written.
 - **Readiness is a field** — `state:` changes are frontmatter edits; the only move triage makes is `backlog/ → cancel/`.
 - **No order file** — order is derived (§ Order); never write a sequence anywhere.
 - **HITL** — propose re-ranks, state changes, merges, and rejections; apply only after `y`. **Unattended** (headless): the `y` can never arrive — there is no ask channel at all (`AskUserQuestion` unregistered; `dontAsk` auto-denies). Emit the proposal and **park** it (`night-run.md` Part 0); a missing `y` is a no, never a yes.
