@@ -162,7 +162,7 @@ declared — the failure that reads as success, because a turn that simply ends 
 | `AUTHORITY_BOUNDARY` | work remains, but all of it is J2 or blocked behind a park | take the named human step; the rest already completed around it |
 | `HARD_FAILURE` | a step failed in a way the run cannot proceed past (a red gate, a broken tree) | read the named finding; fix before re-firing |
 | `BUDGET_STOP` | a declared budget ceiling was reached with Plan remaining | raise the ceiling or re-fire; the Plan is unchanged |
-| `USER_STOP` | a human interrupted | resume at will |
+| `USER_STOP` | a human signalled the launcher's wrapper (the `fired detached: pid=` process) | resume at will |
 
 **The state goes in the rollup, and the launcher writes it** — the same division ADR-016 already
 fixed for the DoD count, and for the same reason: a run's own sense of "I am finished" is exactly
@@ -642,6 +642,10 @@ A small wrapper the OS scheduler runs alongside Part 2's `claude -p` call — no
   other, so the reaper (Part 2) fires and writes the block regardless of how the run ended. The
   watchdog does not need to produce the report, and should not be extended to — it fires only on a
   *stall*, and the failure that motivated the rollup is a run that ends cleanly and early.
+- **A human stop reads differently from the watchdog.** To stop a run so it reports `USER_STOP`, TERM
+  the wrapper pid the launcher prints; it forwards the stop to the child and the reaper writes the
+  rollup. A kill of the `claude -p` child directly — the watchdog's way — reads as `HARD_FAILURE`. On a
+  detached run only TERM reaches the wrapper (INT and HUP are ignored on entry), so use TERM.
 - **Verify it actually started, before you walk away.** A watchdog that dies at launch guards nothing
   and is **indistinguishable from a healthy one** — both are silent, and silence is what a working
   watchdog looks like all night. This is the inert-permission-rule family (Part 1) one layer up, with

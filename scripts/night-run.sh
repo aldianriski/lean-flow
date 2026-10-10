@@ -309,10 +309,13 @@ reap() {
   # `terminal · PLAN_EXHAUSTED` with T1, T2 and T4 all logged `· blocked ·`, and the retro entry
   # beside it asserted that verdict was correct. Nothing the author ran could find it; a reviewer
   # reading the state list against the code did, immediately (L-165).
-  # USER_STOP is NOT derivable here -- an external kill never reaches this code path at all; it is
-  # the die_doa() path's to report. Naming it in the table without emitting it here would be a state
-  # nothing can ever produce, so it is named as out-of-scope rather than silently absent (L-166).
+  # USER_STOP is a signal CAUGHT BY THE WRAPPER (`--wrap` above), which leaves `$rp_log.stop` before
+  # reaping. A bare child exit of 130/143, or a TERM sent straight to the child (the watchdog), leaves
+  # no marker and stays HARD_FAILURE. With the marker, USER_STOP outranks the non-zero exit, stalled/
+  # denied-tool, unattempted and parked -- but NOT a member-count error or a revise-ceiling breach,
+  # which still read HARD_FAILURE (SPRINT-122 owner ruling). No marker: the order above is unchanged.
   rp_ec=$(cat "$rp_log.exit" 2>/dev/null || printf '')
+  rp_stop=""; [ -f "$rp_log.stop" ] && rp_stop=$(cat "$rp_log.stop" 2>/dev/null)
   rp_unatt=0
   for tn in $rp_unit_list; do
     tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " || rp_unatt=$((rp_unatt + 1))
@@ -337,7 +340,13 @@ reap() {
     ''|0) rp_term_ok=1 ;;
     *)    rp_term_ok=0 ;;
   esac
-  if [ "$rp_term_ok" -eq 0 ]; then
+  if [ -n "$rp_stop" ] && [ -n "$rp_cnt_err" ] && [ "$rp_v2" -eq 1 ]; then
+    rp_term="HARD_FAILURE"; rp_term_why="$rp_cnt_err"   # outranks a stop: no trustworthy DoD figure
+  elif [ -n "$rp_stop" ] && [ "$rp_ceiling_rc" -ne 0 ]; then
+    rp_term="HARD_FAILURE"; rp_term_why="$rp_ceiling_reason"   # outranks a stop: a Part 0 breach
+  elif [ -n "$rp_stop" ]; then
+    rp_term="USER_STOP"; rp_term_why="stopped by SIG$rp_stop caught by the wrapper — not a failure; remaining work is unchanged, re-fire to continue"
+  elif [ "$rp_term_ok" -eq 0 ]; then
     rp_term="HARD_FAILURE"; rp_term_why="wrapped process exited with status $rp_ec"
   elif [ -n "$rp_cnt_err" ] && [ "$rp_v2" -eq 1 ]; then
     # A by-reference sprint whose members cannot be counted has NO trustworthy DoD or unit figure;
@@ -441,6 +450,47 @@ reap() {
       "$rp_cost" "$rp_turns" "$rp_wall" "$rp_units_done" "$rp_units"
   } >> "$rp_logdoc"
 }
+
+# The detached wrapper (SPRINT-122 T1 · TASK-423): the process the launcher prints as `fired detached:
+# pid=`. It owns the run's death, so it is the one place a HUMAN stop can be told from a failure: a
+# signal CAUGHT HERE is USER_STOP. A bare child exit, or a TERM sent straight to the child (the
+# watchdog, night-run.md Part 3 -- exit 143), never reaches this trap and stays HARD_FAILURE.
+#   sh night-run.sh --wrap <log> <ecfile> <root> <started> <base> <sprint> <reap 0|1> -- <command...>
+# Its own entry for the reason `--reap` has one: a fixture drives this real code, not a copy of it.
+# Only TERM is guaranteed catchable; INT and HUP are trapped too, but a shell cannot trap a signal
+# that was ignored on entry (nohup ignores HUP; an async start ignores INT), so they may never fire.
+wrap() {
+  wr_log=$1; wr_ec=$2; wr_root=$3; wr_start=$4; wr_base=$5; wr_sprint=$6; wr_reap=$7
+  shift 7; [ "${1:-}" = "--" ] && shift
+  wr_child=""
+  rm -f "$wr_log.stop" 2>/dev/null || true
+  wr_on_signal() {
+    printf '%s' "$1" >"$wr_log.stop"
+    [ -n "$wr_child" ] && kill -TERM "$wr_child" 2>/dev/null
+    return 0
+  }
+  trap 'wr_on_signal TERM' TERM
+  trap 'wr_on_signal INT' INT
+  trap 'wr_on_signal HUP' HUP
+  "$@" >"$wr_log" 2>&1 </dev/null &
+  wr_child=$!
+  wait "$wr_child"; wr_rc=$?
+  # A trapped signal interrupts `wait` with 128+n while the child may still be running: wait again
+  # until it is gone, so the exit file holds the CHILD's status, never the interruption's.
+  while kill -0 "$wr_child" 2>/dev/null; do wait "$wr_child"; wr_rc=$?; done
+  printf '%s' "$wr_rc" >"$wr_ec"
+  # Emitted after the exit code is recorded, so it runs on EVERY exit -- clean finish, early
+  # end-of-turn, non-zero, or a stop. The failure guarded against is a run that ends mid-Plan and
+  # reports success (night-run.md Part 4).
+  if [ "$wr_reap" = "1" ]; then
+    sh "$0" --reap "$wr_log" "$wr_root" "$wr_start" "$wr_base" "$wr_sprint" >/dev/null 2>&1 || true
+  fi
+}
+
+if [ "${1:-}" = "--wrap" ]; then
+  shift; wrap "$@"
+  exit 0
+fi
 
 if [ "${1:-}" = "--reap" ]; then
   reap "${2:-}" "${3:-}" "${4:-}" "${5:-0}" "${6:-}"
@@ -850,17 +900,9 @@ if [ -n "$resolved_sprint" ]; then
 fi
 
 (
-  NR_LOG="$logfile" NR_EC="$ecfile" NR_SELF="$0" NR_ROOT="$repo_root" \
-  NR_REAP="$reap" NR_START="$started" NR_BASE="$logdoc_base" NR_SPRINT="$resolved_sprint" nohup sh -c '
-    "$@" >"$NR_LOG" 2>&1 </dev/null
-    printf "%s" "$?" >"$NR_EC"
-    # Emitted here, after the exit code is recorded, so it runs on EVERY exit -- clean
-    # finish, early end-of-turn, or non-zero. This is the whole point: the failure being
-    # guarded against is a run that ends mid-Plan and reports success (night-run.md Part 4).
-    if [ "$NR_REAP" = "1" ]; then
-      sh "$NR_SELF" --reap "$NR_LOG" "$NR_ROOT" "$NR_START" "$NR_BASE" "$NR_SPRINT" >/dev/null 2>&1 || true
-    fi
-  ' sh "$@" &
+  # The wrapper body is `--wrap` above (SPRINT-122 T1): `$!` is still the wrapper's pid, the one a
+  # human signals to stop the run so it reports USER_STOP.
+  nohup sh "$0" --wrap "$logfile" "$ecfile" "$repo_root" "$started" "$logdoc_base" "$resolved_sprint" "$reap" -- "$@" &
   echo $! >"$pidfile"
 ) &
 wait "$!" 2>/dev/null || true

@@ -146,6 +146,77 @@ case_fx "v1-counts-unchanged-beside-store" "v1-with-unrelated-store" "T1 · done
 T2 · done · b" \
   "run · 1 of 3 DoD ticked  [mechanical]" "tasks · 2 attempted / 0 completed / 2 total" "terminal · PLAN_EXHAUSTED"
 
+# --- USER_STOP: a signal caught by the detached wrapper (SPRINT-122 T1 · TASK-423) ----------------
+# The wrapper is `night-run.sh --wrap` (the process the launcher prints as `fired detached: pid=`).
+# Only a signal IT catches is a human stop; a bare child exit, or a TERM sent straight to the child
+# (the watchdog's way, exit 143), stays HARD_FAILURE. Fixtures drive the real --wrap, bounded: every
+# wait is a capped poll and every background pid is killed on the way out.
+wait_for() { # <file> : up to ~10 s
+  n=0; while [ ! -e "$1" ] && [ "$n" -lt 100 ]; do sleep 0.1; n=$((n + 1)); done; [ -e "$1" ]
+}
+# case_wrap <label> <want-terminal> <how: term-wrapper|exit3|term-child> <log-body> [<pattern>...]
+case_wrap() {
+  label=$1; want=$2; how=$3; body=$4; shift 4
+  d="$work/$label"
+  mkdir -p "$d/docs/sprint/logs"
+  cat > "$d/docs/sprint/SPRINT-960-fx.md" <<EOF
+---
+sprint: 960
+status: active
+---
+
+## Plan
+
+### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
+Layers: \`a.md\`
+
+**DoD:**
+- [ ] a thing
+EOF
+  printf '# log\n%s\n' "$body" > "$d/docs/sprint/logs/SPRINT-960-fx.md"
+  doc="$d/docs/sprint/logs/SPRINT-960-fx.md"
+  cpid=""
+  if [ "$how" = exit3 ]; then
+    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'exit 3' &
+  else
+    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'echo $$ >"$0"; exec sleep 30' "$d/child.pid" &
+  fi
+  wpid=$!
+  if [ "$how" != exit3 ]; then
+    wait_for "$d/child.pid" || echo "note($label): child never recorded its pid"
+    cpid=$(cat "$d/child.pid" 2>/dev/null)
+    sleep 0.3
+    if [ "$how" = term-wrapper ]; then kill -TERM "$wpid" 2>/dev/null; else kill -TERM "$cpid" 2>/dev/null; fi
+  fi
+  n=0; while kill -0 "$wpid" 2>/dev/null && [ "$n" -lt 100 ]; do sleep 0.1; n=$((n + 1)); done
+  if kill -0 "$wpid" 2>/dev/null; then kill -KILL "$wpid" 2>/dev/null; echo "note($label): wrapper hung, killed"; fi
+  [ -n "$cpid" ] && kill -KILL "$cpid" 2>/dev/null
+  got=$(grep -oE '^terminal · [A-Z_]+' "$doc" 2>/dev/null | sed 's/^terminal · //')
+  miss=""
+  for pat in "$@"; do grep -qF -- "$pat" "$doc" || miss="$miss [$pat]"; done
+  if [ "$got" = "$want" ] && [ -z "$miss" ]; then
+    echo "PASS fixture($label): terminal · $got"
+  else
+    echo "FAIL fixture($label): got '${got:-<none>}', wanted '$want'${miss:+ -- missing$miss}"
+    fail=1
+  fi
+}
+# must-FAIL against the pre-wrapper code: the TERM'd wrapper yields USER_STOP, PARTIAL, and every field
+# the reaper emits for the other four states (the field list is reap()'s own emitted block).
+case_wrap "wrapper-term-is-user-stop" "USER_STOP" term-wrapper "" \
+  "run-complete" "run · 0 of 1 DoD ticked  [mechanical]" \
+  "outcome · PARTIAL · derived from terminal USER_STOP  [derived]" "terminal · USER_STOP · " \
+  "tasks · 0 attempted / 0 completed / 1 total  [mechanical]" "parks · 0  [model-reported]" \
+  "repair-cycles · 0  [model-reported]" "verification · none logged  [model-reported]" "warnings · " \
+  "T1 · unattempted ·" "Calibration row (Part 4)"
+# controls: a bare non-zero exit, and a TERM straight to the child (the watchdog), are NOT a human stop
+case_wrap "wrapped-exit3-is-hard-failure" "HARD_FAILURE" exit3 "" "outcome · FAILED" "status 3"
+case_wrap "term-to-child-is-hard-failure" "HARD_FAILURE" term-child "" "outcome · FAILED" "status 143"
+# rank: a revise-ceiling breach outranks the stop marker
+case_wrap "ceiling-breach-outranks-stop" "HARD_FAILURE" term-wrapper "T1 · retry · Spec: a → fixed
+T1 · retry · Spec: b → fixed
+T1 · done" "revise-loop-ceiling-exceeded"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REAP-TERMINAL FIXTURES: all green"; else echo "REAP-TERMINAL FIXTURES: FAILURES above"; fi
 exit $fail
