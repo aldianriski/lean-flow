@@ -81,5 +81,6 @@ judgment, so ADR-022 parks it: no retry.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/work/in_progress/TASK-424-verify-the-live-run-is-wrapped-and-repair-one-seeded-check-fail.md` | T1 | live witness that SPRINT-122 T1's TERM-catching `night-run.sh --wrap` owns this run: its ancestor `ps` line, verbatim in DoD1 (fixtures only proved it before) | Low | `ps` ancestry, verbatim |
 
 ## Retro

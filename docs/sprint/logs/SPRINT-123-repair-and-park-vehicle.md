@@ -87,3 +87,12 @@ file's § Files Changed, T2 owns nothing shared). The coordinator owns this log 
 S, docs-only, and dispatch would add a worktree merge-back for one line of work each.
 consequence · T1 · behaviour:low · governance:low
 consequence · T2 · behaviour:low · governance:low
+
+### 2026-10-10 | progress | T1 (TASK-424): ancestry transcribed; seeded row FAILed the named check, one ADR-022 retry, then PASS
+DoD1: `ps -eo pid=,ppid=,args=` traced by ppid from `claude -p` 1390357 → `timeout 3600` 1390355 → `sh scripts/night-run.sh --wrap`
+1390349 (ppid 1, setsid-detached); the line is verbatim in TASK-424's evidence. DoD2: the § Seeded draft row written verbatim printed
+`prose-density: 29 pass, 1 fail` (line 84, no baseline row). Retry (mechanical carve-out, the done-when-named check): Change cell cut
+from 493 chars (measured between the cell's ` | ` delimiters; the promote entry's 495 counts its padding) to 158. Re-run:
+`prose-density: 29 pass, 0 fail`. Review: self-review (low/low, one table row and two ticks).
+T1 · retry · standards: prose-density Change cell 493 > 400 chars → fixed
+review · T1 · self-review · behaviour:low · governance:low

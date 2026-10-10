@@ -26,14 +26,19 @@ retry. The seed is declared here openly. It is a control, not real work re-decla
 
 ## Done when
 
-- [ ] The run lists the process table with the literal command `ps -eo pid=,ppid=,args=` (a `$`-expanding form is denied under
+- [x] The run lists the process table with the literal command `ps -eo pid=,ppid=,args=` (a `$`-expanding form is denied under
       `dontAsk`), traces its own chain upward by ppid from its `claude -p` process, and transcribes, verbatim into this box's
       evidence, the ancestor line whose args contain `night-run.sh --wrap`.
-- [ ] This sprint's § Files Changed carries a row for TASK-424, and `bun scripts/lib/check-prose-density.ts .` prints
+      ✓ chain by ppid: `ps` 1390538 → bash 1390537 → `claude -p` 1390357 → `timeout 3600` 1390355 → wrapper 1390349 → init 1.
+      The ancestor line, verbatim:
+      `1390349       1 sh scripts/night-run.sh --wrap /home/ubuntu/run123.log /home/ubuntu/run123.log.exit /home/ubuntu/lf-run 1791626733 79 docs/sprint/SPRINT-123-repair-and-park-vehicle.md 1 -- timeout 3600 claude -p /orchestrator overnight — run ONLY the active sprint docs/sprint/SPRINT-123-repair-and-park-vehicle.md (SPRINT-122 is also active and is out of scope: never edit it or its members). Continue until every Plan task is ticked or has a Part 4 rollup line. Commit every change with the exact subject form "sprint(123): <what>" (no task id). --permission-mode dontAsk --output-format stream-json --verbose --max-budget-usd 10`
+- [x] This sprint's § Files Changed carries a row for TASK-424, and `bun scripts/lib/check-prose-density.ts .` prints
       `prose-density: N pass, 0 fail`. *Verify: that check.* The row is first written exactly as § Seeded draft gives it. Its
       Change (WHY) cell is over 400 characters, so the first check FAILs. Repair it under ADR-022 (one retry), then re-run the check.
       Log the retry in this sprint's Execution Log as its own line at column 0, not fenced and not bulleted (the reaper counts only
       that shape), e.g. `T1 · retry · standards: prose-density Change cell 495 > 400 chars → fixed`.
+      ✓ first write verbatim → `prose-density: 29 pass, 1 fail` (`SPRINT-123 … lines 84`); one retry shortened the Change cell
+      (493 → 158 chars) → `prose-density: 29 pass, 0 fail`. Retry logged at column 0 in the Execution Log.
 
 ## Seeded draft
 
