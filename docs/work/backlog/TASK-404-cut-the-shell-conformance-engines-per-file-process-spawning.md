@@ -35,6 +35,7 @@ whole `QA_FULL=1` gate runs in 105–109 s (Round 22), so the cost is Windows-sh
 
 - needs-info: the target fraction, set by the owner once the profile exists. Unblock: the first Done-when box ticked.
 - **blocked-by:** TASK-421 (the profile, and the owner's target proposed from it).
+- **target (ruled 2026-10-10 by the SPRINT-121 G2 rule):** 50% cut of the engine's Windows wall clock (433.1 s → ≤ 216.5 s), from Round 23.
 
 ## Amended 2026-10-10
 
