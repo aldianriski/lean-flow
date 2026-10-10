@@ -9,6 +9,8 @@ related: [ADR-035, ADR-032, ADR-027, ADR-012]
 # ADR-041 — The pilot platform lives in its own repository; lean-flow is consumed there as a pinned plugin
 
 - **Status:** accepted (2026-09-09)
+- **Scope amended by:** [ADR-052](ADR-052-an-epics-outcome-record-lives-with-its-execution.md) (2026-10-10) — the outcome record of an
+  epic built in `workdoo` now lives in `workdoo` (EPIC-016 · 018 · 019 · 020 moved, ids unchanged); every other ruling below stands.
 - **Deciders:** Maintainer
 - **Context driver:** the Agentic Governance Dashboard pilot targets a working run from a browser in
   five working days. Its first structural question — *which repository holds the service?* — was

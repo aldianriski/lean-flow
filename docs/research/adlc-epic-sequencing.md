@@ -143,6 +143,12 @@ and deletions or merges of existing machinery are not new machinery. EPIC-015's 
 SPRINT-090, ~6% of commits touched `skills/` and ~69% touched governance docs, and the freeze above never covered governance.
 `TASK-417` replaces this paragraph with the ADR, the widened freeze and its placement, so only one version of the rule stays live.
 
+**Amended 2026-10-10 — workdoo-built epics moved (ADR-052, owner).** EPIC-016, EPIC-018, EPIC-019 and EPIC-020 now live in
+`workdoo`'s `docs/epic/` with their ids unchanged. ADR-052 amends ADR-041: an epic's outcome record lives with its execution. The live
+order above still holds, and the workdoo chain (016 → 019 → 020 → 018) is maintained in workdoo's `docs/epic/INDEX.md`. **The
+next lean-flow epic id is derived across both repositories**, because EPIC-016 to 020 are now workdoo's (ADR-052, negative
+consequence). EPIC-015 and Lanes 1–2 are unaffected.
+
 ## Out of scope / open questions
 
 - **Platform repository boundary** — where dashboard/gateway/adapters live *as source*, undecided and owed
