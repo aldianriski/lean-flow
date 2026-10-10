@@ -115,3 +115,21 @@ DoD1 ✓ `wrapper-term-is-user-stop` + the real-launcher `fire-site-wrapper-catc
 two controls, and seeds S1-S7 each reddening their own case. DoD3 ✓ `night-run.sh:312-316`. DoD4 ✓ CW6 ticked with terminals
 :344-368 and fields :424-430. TD-247 is named on the tick and does not block it: CW6 is about emission, and TD-247 is about trusting
 a USER_STOP claim. Next: T2 (TASK-415), whose vehicle sprint and envelope come to the owner first.
+
+### 2026-10-10 | g2 | T2 vehicle rulings signed (owner, one popup); TASK-415's J2 re-scoped to a judgment park met mid-run
+Recon: TASK-415 DoD1 asked for "one seeded J2 task", but pre-flight item 3 refuses any Plan with a declared J2 (`night-run.md:297`,
+TD-109, ruled STRICT by SPRINT-093 D3). night-run.md:73-75 names the J2 shape a run parks: one met mid-run, first example "a revise-loop
+judgment finding". `check-prose-density.ts` covers sprint files and no task file or log (proseFiles census on this tree), so a
+seeded over-400 line must land in the vehicle sprint file. Rulings (L-220, the STRICT ruling named in the option):
+- **J2 control:** a second J1 task whose review is seeded to return a judgment finding; ADR-022 parks it. STRICT is unchanged.
+- **Seed:** vehicle T1's brief supplies a Files Changed row over 400 characters; its done-when names `check-prose-density.ts`; one
+  ADR-022 retry shortens it; the re-check PASSes.
+- **Host and budget:** the VPS `~/lf-run`, results back by git bundle, nothing pushed, $10 / 60 min.
+- **Fire:** the coordinator fires via ssh once pre-flight is green, under the same delegation as SPRINT-118.
+consequence · T2 · behaviour: material (a live unattended run on the autonomy machinery) · governance: high (the epic's proof
+criteria) → scoped review of the vehicle before the envelope is signed; claims are verified against artifacts after the run.
+
+### 2026-10-10 | scope-change | TASK-415 DoD1/DoD2: "a seeded J2 task" becomes a seeded judgment park met mid-run
+What broke: a declared J2 task makes the vehicle unlaunchable (pre-flight item 3, STRICT). Impact: DoD1 seeds a second J1 task whose
+review returns a judgment finding; DoD2 reads "the seeded judgment finding parks". CW7's "J2 park or seeded control" and D5's "seed
+it" are both still met. G2 is re-confirmed by the popup above.
