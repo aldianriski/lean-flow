@@ -62,3 +62,8 @@ What broke: TASK-415 DoD1 seeds "a review ... to return one concrete finding". U
 so that seed could prove only the park path, never a repair. Impact: DoD1 and DoD2 now seed a done-when-named check FAIL under a
 `repair-policy` that grants the carve-out. CW5's text is unchanged, and its tick will name this reading. ADR-022 is unchanged.
 G2 is re-confirmed by the same popup.
+
+### 2026-10-10 | dispatch | T1 (TASK-423) to a Sonnet builder in the main tree (single wave; T2 depends on it)
+consequence · T1 · behaviour: changes how the launcher derives the terminal state (a new USER_STOP path) · governance: workflow
+contract (night-run.md Part 3/4, read by every adopter firing a run) → material, Consequential Tier G: scoped Sonnet review, then a
+worktree-isolated Codex review that seeds breaks. Preflight: one task in the wave, no cycle, no shared file (D1 orders the epic file).
