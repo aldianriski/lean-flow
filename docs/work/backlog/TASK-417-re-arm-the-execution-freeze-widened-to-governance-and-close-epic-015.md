@@ -41,6 +41,7 @@ review H0). Evidence: of 941 commits since SPRINT-090, ~6% touch `skills/` and ~
 ## Assumes
 
 - **blocked-by:** TASK-414 (CW6), TASK-415 and TASK-416 (both dogfoods). The dogfoods are defined at V3 §56 and the re-arm rule
+- **blocked-by:** TASK-423 — EPIC-015 CW6 was not met by TASK-414 (USER_STOP is emitted by no code path), so the epic cannot close until TASK-423 ticks it (/triage, 2026-10-10).
   is V3 §58; EPIC-015 D1 cites both, so they do not conflict.
 
 ## Tracker

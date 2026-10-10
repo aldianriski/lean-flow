@@ -9,7 +9,7 @@ class: execution
 tier: G
 authority: J2
 origin: manual
-state: blocked
+state: ready
 depends-on: [TASK-421]
 ---
 
