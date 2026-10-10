@@ -29,3 +29,8 @@ System verify at promote (`QA_FULL=1`, VPS fresh clone of `7679f3f6`): `301 pass
 log as a FAIL, so this entry creates the log. (2) **The fresh clone had no `node_modules`**, so `typecheck` and
 `typecheck-population` could not find `tsc`. That is a property of the run environment, not of the tree, and the re-run installs
 dependencies first.
+
+### 2026-10-10 | progress | system verify at promote is green after the log fix
+`QA_FULL=1` on a VPS fresh clone of `d38a4f71`, with `bun install --frozen-lockfile` run first: `QA-CHECK: 303 pass, 0 fail`, rc 0,
+120 s, read from the run's own `gate121.rc` and `gate121.secs` files. The two typecheck FAILs from the first run were the
+environment (no `node_modules` on a fresh clone). The rollup FAIL was the missing log, which the promote entry above created.
