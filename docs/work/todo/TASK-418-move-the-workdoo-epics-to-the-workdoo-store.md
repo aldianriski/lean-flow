@@ -36,6 +36,9 @@ EPIC-013 stay as closed history.
 - [ ] Both repositories' gates are green after the move: lean-flow `sh conformance.sh .` reports no new finding and its gate passes.
       workdoo's commit-attribution rule is checked **before** committing there, because workdoo's SPRINT-012 is active, and the
       workdoo commit is shaped to satisfy it.
+- [ ] A new ADR amends ADR-041's governance split (an epic's outcome record lives with its execution): ADR-041 carries a
+      `Scope amended by:` header marker with its § Decision untouched, and workdoo's `.claude/CLAUDE.md` and `AGENTS.md` point to the
+      new home.
 
 ## Touches
 
