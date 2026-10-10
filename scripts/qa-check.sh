@@ -785,6 +785,22 @@ if [ -f docs/LEARNINGS.md ]; then
   ' docs/LEARNINGS.md)
   if [ -z "$badmeta" ]; then ok "learnings metadata complete (tags+status, known vocab)"
   else bad "learnings metadata:$badmeta"; fi
+
+  # 4a'. body metadata: every ACTIVE entry carries '- count:' and '- promoted:' (promoted pointers are
+  # collapsed and exempt). The awk text is extracted verbatim by evals/run-learnings-metadata-fixtures.ts.
+  # >>> learnings-body-meta
+  lm_awk='
+    function flush() { if (id != "") { if (!c) printf " %s(count)", id; if (!p) printf " %s(promoted)", id }; id = "" }
+    /^## / { flush() }
+    /^## L-[0-9]+ \[tags: [^]]*\] \[status: active\]/ { id = $2; c = 0; p = 0; next }
+    /^- count:/ { c = 1 }
+    /^- promoted:/ { p = 1 }
+    END { flush() }
+  '
+  # <<< learnings-body-meta
+  badbody=$(awk "$lm_awk" docs/LEARNINGS.md)
+  if [ -z "$badbody" ]; then ok "learnings body metadata complete (count+promoted on every active entry)"
+  else bad "learnings body metadata missing:$badbody"; fi
 fi
 
 # 4b. ADR + research frontmatter: dangling refs + completeness -- ONE awk pass over the cache built
@@ -1153,7 +1169,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts"
 eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
