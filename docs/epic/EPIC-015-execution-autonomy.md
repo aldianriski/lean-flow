@@ -146,8 +146,12 @@ shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattend
       confirmation during the run
       — **SPRINT-089**, the second half of that same row: the ten-dimension `approval_envelope:` was
       recorded in frontmatter, pinned, and consumed with no repeated J0/J1 confirmation
-- [ ] **Bounded unattended repair runs**: a concrete J1 critic finding → repair → re-review → continue,
-      with the retry ceiling still exactly what ADR-022 admits → TASK-415
+- [x] **Bounded unattended repair runs**: a concrete J1 critic finding → repair → re-review → continue,
+      with the retry ceiling still exactly what ADR-022 admits
+      — **SPRINT-122** T2 (vehicle **SPRINT-123**, merged `29cefb66`): one real `--mode overnight` run hit the done-when-named check's
+      seeded FAIL (`prose-density: 29 pass, 1 fail`), took exactly one ADR-022 retry (`T1 · retry · … → fixed`, repair commit
+      `86672c57`), re-checked to `0 fail` and continued to T2. Owner reading (G2): the "critic finding" is a named-check FAIL,
+      because ADR-022 parks every judgment finding. Rollup `repair-cycles · 1`; the guard PASSes on the re-reaped log (`d4b726db`)
 - [x] Every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD, tasks attempted/completed, parks,
       repair cycles, verification state, warnings and terminal reason
       — **SPRINT-122** T1 (TASK-423): the fifth path now exists. A TERM to the wrapper's printed pid leaves a marker that
@@ -156,8 +160,13 @@ shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattend
       reason :425, tasks :426, parks :427, repair cycles :428, verification :429, warnings :430. Proven by
       `wrapper-term-is-user-stop` and the real-launcher `fire-site-wrapper-catches-term` (`663d9a5c`). A USER_STOP is not yet
       bound to its run (TD-247)
-- [ ] **Dogfood 1** (continuous attended `sprint-bulk`, no per-task confirmation) and **Dogfood 2**
+- [x] **Dogfood 1** (continuous attended `sprint-bulk`, no per-task confirmation) and **Dogfood 2**
       (overnight with ≥1 J1 decision, ≥1 repair, and a J2 park or seeded control) both ran on this
-      repository, each naming what proved it → TASK-415, TASK-416
+      repository, each naming what proved it
+      — Dogfood 1: **SPRINT-121** (TASK-416). Dogfood 2: **SPRINT-122** T2 / vehicle **SPRINT-123** (TASK-415). Two J1 tasks ran
+      unattended inside the pinned envelope with no confirmation (0 permission denials, $1.32), with one repair (above). The seeded
+      judgment finding parked T2 with its unblock condition (`T2 · parked-hitl · …`), the D5 control met mid-run, because a declared J2
+      fails pre-flight item 3. Ended `AUTHORITY_BOUNDARY` / `PARTIAL`. The live run also exposed a reaper defect (it omitted parks from its
+      block), fixed in SPRINT-122 T2 (`27d75a78` → `dc490880`)
 - [ ] **The freeze is re-armed** in `adlc-epic-sequencing.md` after the dogfoods pass (V3 §58) — this
       epic does not close leaving the execution architecture unfrozen → TASK-417

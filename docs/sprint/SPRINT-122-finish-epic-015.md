@@ -50,7 +50,7 @@ Layers: `docs/epic/EPIC-015-execution-autonomy.md` · `scripts/night-run.sh` · 
   · `docs/work/todo/TASK-415-prove-bounded-unattended-repair-and-dogfood-2-in-one-overnight-run.md`
   · `docs/work/in_progress/TASK-415-prove-bounded-unattended-repair-and-dogfood-2-in-one-overnight-run.md`
 Depends-on: T1
-Cites: `TASK-415` · EPIC-015 CW5 · CW7 · D5 · ADR-022
+Cites: `TASK-415` · EPIC-015 CW5 · CW7 · D5 · ADR-022 · `scripts/lib/check-approval-envelope.sh` (run, not edited)
 
 It runs after T1, so the vehicle run already carries the USER_STOP-capable launcher. The vehicle sprint (its Plan, envelope and
 seeded J1/J2 tasks) and the files its J1 task touches are ruled at G2. If recon shows the overnight path cannot review and revise

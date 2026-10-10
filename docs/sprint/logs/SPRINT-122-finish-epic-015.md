@@ -210,3 +210,26 @@ copies as "reached"; excluding them corrects it. K5 OK.
 Fix round 2 (final): copy exactly what was counted (dedupe); C2b inverts to `block-copies-counted-fenced-park`; anchor the header; new
 fixtures for `blocked` and `stalled`/`denied-tool`. Stop rule: then Codex round 2 on that diff only, and the owner.
 Spend: seeding ~68k, Codex ~20k.
+
+### 2026-10-10 | review | T2 reaper fix round 2 (final): Codex R1 OK; R2 CRLF fixed inline and proven on Linux; R3 moot; R4 covered
+Fix round (`39787db8`): the copy reads what was counted (deduped); the header cut is end-anchored; fixtures for blocked and
+stalled/denied-tool, each red under its own dropped alternative. Codex round 2: **R1 OK** (K1 closed). **R2 FINDING**: a CRLF or
+trailing-space header defeats the end anchor → fixed inline (`dc490880`; one line plus `block-recount-crlf`, a deterministic
+change proven by its fixture, past the review stop rule). Measured: MSYS gawk drops the CR itself, so the case cannot discriminate
+on this host. On the VPS (GNU Awk 5.2.1) the seed (strip removed, landing confirmed `found 1` and `1 file changed`) reddens ONLY
+`block-recount-crlf` (`parks · 2`) while `block-recount` stays green; restored by hash `d7182bec`. Two earlier seed attempts did not
+land (sed/heredoc escaping) and were caught by the landing check, not read as green. **R3 moot**: the guard never reads `parks ·`.
+**R4 covered**: each new case was shown red under its own break. Spend on the T2 reaper fix: builder ~205k, seeding ~68k, Codex ~39k.
+
+### 2026-10-10 | progress | T2 (TASK-415) 4 of 4 ticked: re-reap guard PASS; EPIC-015 CW5 and CW7 ticked; TD-248 filed
+**Re-reap (once, on the VPS, fixed launcher `dc490880`):** `sh scripts/night-run.sh --reap /home/ubuntu/run123.log /home/ubuntu/lf-run
+1791626733 79 docs/sprint/SPRINT-123-repair-and-park-vehicle.md` → reap_rc 0. It appended a second launcher block, leaving the first
+in place: `run · 3 of 4` · `AUTHORITY_BOUNDARY` · `parks · 1` (the earlier block in the window is not recounted) · `repair-cycles · 1` ·
+the copied `T2 · parked-hitl · …` line. Its calibration wall reads `67 min` because it is measured to the re-reap. The run's real wall
+is the first block's `3 min`. Committed `d4b726db`, bundled back, fast-forwarded. **Guard:** `check-night-run-rollup.ts` →
+`PASS … agrees with its per-task lines`, on the VPS and on this Windows CRLF checkout.
+TASK-415: DoD1-4 ✓. CW5 ✓ (with the owner's G2 reading of "critic finding"). CW7 ✓ (Dogfood 1 SPRINT-121, Dogfood 2 SPRINT-123).
+EPIC-015 has one open condition left: CW8, the freeze re-arm (TASK-417, which was blocked on 415 and 423, both now done).
+**TD-248** (id derived: ledger max 247; nothing cites 248 or 249): `check-layers-observed.ts` attributes `sprint(NNN) Tn:` to Tn for any
+NNN, so SPRINT-122 T2's reaper commits FAIL SPRINT-123's leg. It leaves the gate when SPRINT-123 is archived at close; the owner
+rules on the close-time override.
