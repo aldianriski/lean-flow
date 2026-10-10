@@ -124,7 +124,7 @@ The other six run in attended `sprint-bulk` with no confirmation between authori
 
 ## Execution Log
 
-> **Lives in its own file** — `docs/sprint/logs/SPRINT-121-cover-what-is-open.md`, created lazily at the first entry (ADR-014).
+> **Lives in its own file** — `docs/sprint/logs/SPRINT-121-cover-what-is-open.md`, created at promote (ADR-014).
 
 ## Files Changed
 
