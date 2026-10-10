@@ -33,7 +33,7 @@ EPIC-013 stay as closed history.
 - [x] lean-flow no longer carries the four files. Its epic INDEX, the sequencing register and any live doc that needs the ✓ lean-flow `4a634592`: 4 files removed; INDEX rows → relation pointers; sequencing register amended; archives untouched; prose-density baseline row dropped; scoped review item 6: no live local link remains
       relation carry a one-line pointer to the workdoo path; archived sprints and logs stay unedited as history; the
       `scripts/lib/prose-density-baseline.txt` row for EPIC-016 is removed.
-- [ ] Both repositories' gates are green after the move: lean-flow `sh conformance.sh .` reports no new finding and its gate passes.
+- [x] Both repositories' gates are green after the move: lean-flow `sh conformance.sh .` reports no new finding and its gate passes. ✓ lean-flow VPS fresh clone `1ad8a708`: `QA-CHECK: 297 pass, 0 fail`; conformance level Structural, no finding from the move (only the 3 owner-deferred S10.PROMOTION findings from T4); workdoo checked first: no attribution gate, path-scoped commit `16252b2`; workdoo `verify` 3/4 steps pass, the 1 failing test is the known Windows-only SIGKILL case (workdoo TECH-DEBT.md:413), and biome processes none of the moved files
       workdoo's commit-attribution rule is checked **before** committing there, because workdoo's SPRINT-012 is active, and the
       workdoo commit is shaped to satisfy it.
 - [x] A new ADR amends ADR-041's governance split (an epic's outcome record lives with its execution): ADR-041 carries a ✓ ADR-052 (`4a634592`, Context precision `c2f48fef`); ADR-041 `Scope amended by:` marker, § Decision hash-identical to `9ecd81bb`; workdoo .claude/CLAUDE.md + AGENTS.md point to docs/epic/; scoped review items 4, 5, 7 PASS
