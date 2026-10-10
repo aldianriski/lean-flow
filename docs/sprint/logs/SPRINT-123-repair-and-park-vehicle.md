@@ -96,3 +96,12 @@ from 493 chars (measured between the cell's ` | ` delimiters; the promote entry'
 `prose-density: 29 pass, 0 fail`. Review: self-review (low/low, one table row and two ticks).
 T1 · retry · standards: prose-density Change cell 493 > 400 chars → fixed
 review · T1 · self-review · behaviour:low · governance:low
+
+### 2026-10-10 | park | T2 (TASK-425): options drafted; the scoped reviewer returned a judgment FINDING, so ADR-022 parks it, no retry
+DoD1 ticked: § Options holds A (stamp the `.stop` marker with `wr_start`, match it in `reap()`) and B (carry the binding into the
+`terminal · USER_STOP` reason, checked by `check-night-run-rollup.ts`), neither picked. DoD2: one Sonnet reviewer, briefed with
+§ Review seed alone, returned `VERDICT: FINDING` (verbatim in TASK-425 § Review verdict). The finding is a judgment, and the
+repair-policy permits a retry only on a done-when-named check FAIL. So T2 parks with no retry; DoD2 stays open and TASK-425 stays in
+`in_progress/`. A1 confirmed for both legs: one retry on T1's named-check FAIL, a park on T2's judgment finding.
+T2 · parked-hitl · reviewer FINDING "the draft must name the option lean-flow adopts" is a judgment (ADR-022, no retry) · unblock: the owner rules on the finding and picks A or B for TD-247 (the seed requires the draft not to)
+review · T2 · scoped-reviewer · behaviour:low · governance:low
