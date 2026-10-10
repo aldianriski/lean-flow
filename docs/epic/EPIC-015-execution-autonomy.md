@@ -145,11 +145,11 @@ shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattend
       — **SPRINT-089**, the second half of that same row: the ten-dimension `approval_envelope:` was
       recorded in frontmatter, pinned, and consumed with no repeated J0/J1 confirmation
 - [ ] **Bounded unattended repair runs**: a concrete J1 critic finding → repair → re-review → continue,
-      with the retry ceiling still exactly what ADR-022 admits
+      with the retry ceiling still exactly what ADR-022 admits → TASK-415
 - [ ] Every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD, tasks attempted/completed, parks,
-      repair cycles, verification state, warnings and terminal reason
+      repair cycles, verification state, warnings and terminal reason → TASK-423
 - [ ] **Dogfood 1** (continuous attended `sprint-bulk`, no per-task confirmation) and **Dogfood 2**
       (overnight with ≥1 J1 decision, ≥1 repair, and a J2 park or seeded control) both ran on this
-      repository, each naming what proved it
+      repository, each naming what proved it → TASK-415, TASK-416
 - [ ] **The freeze is re-armed** in `adlc-epic-sequencing.md` after the dogfoods pass (V3 §58) — this
-      epic does not close leaving the execution architecture unfrozen
+      epic does not close leaving the execution architecture unfrozen → TASK-417
