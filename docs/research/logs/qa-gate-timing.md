@@ -2207,3 +2207,82 @@ the evidence TASK-348 (TD-143's cost half) asks for: the gate's runtime cost is 
 
 **Retained:** run logs and `prof{1,2,3}.tsv` on the VPS (`~/r115/`). An earlier set on `2297345` (`~/r115/first/`, 101–110 s, `313 pass, 3 fail`)
 is kept, and its three FAILs were this sprint's own unwired Layers (SPRINT-115 Log, scope-change entry), not timing.
+
+## Round 23 — the engine's Windows cost is five rules' per-row spawn loops, ~100 ms per spawn (SPRINT-121 T3, 2026-10-10)
+
+SPRINT-121 T3 (`TASK-421`, TD-168's profile). **Tree:** `b306e52a` (worktree of main; the engine is unchanged by this task, `git diff --stat HEAD -- scripts/` empty).
+**Host:** the Windows maintainer host, Git-for-Windows `sh` = bash 5.2.37 (msys). **Host load, stated plainly:** this host is memory-starved, not quiet.
+Free RAM was 765 MB at the start, 436 MB when the clean runs began and 1448 MB at the end (of 14,078 MB); `vmmemWSL` held ~770 MB, a `node`
+process ~1.9 GB, and a **workdoo API server** (`bun run apps/api/src/server.ts`, not ours) was running throughout, as it is on this host
+normally. The coordinator's own workdoo `bun run verify` (tsc + Biome) overlapped my first run and was killed; **that run (and the orphaned
+engine it left behind, killed by hand) is discarded**, along with nothing else. Every run reported below started after that contamination ended.
+Absolute seconds are therefore inflated against Round 18's 173.1 s (a 2.5x gap, same engine class, memory-pressured host, larger corpus: 120 open
+TD rows now); the *shares* are what this Round rests on.
+
+### The whole run (measure 1)
+
+| run | what | real | user | sys |
+|---|---|---:|---:|---:|
+| A | `time sh conformance.sh .`, uninstrumented (exit 1: 3 real `learning-recurred-unpromoted` findings, L-185/217/219 — a verdict, not timing) | **433.1 s** | 79.3 | 234.0 |
+| B | same engine, temp copy with one `EPOCHREALTIME` read before/after each `assert_*` call | **391.4 s** | 77.4 | 232.1 |
+| C | B plus PATH shims that log every external command (counting only) | 617.5 s | 123.8 | 355.5 |
+
+`sys` is 54-60% of CPU time in A and B, 3 min 52 s of 6 min 31 s: Round 18's kernel-bound shape reproduces. A vs B differ by 9.6%, which is this
+host's run-to-run band (Round 8 and Round 18 saw +-20%), so cross-run comparison is held to **+-10%**; reconciliation *within* one run is held to **1%**.
+Run B's report is byte-identical to A's except the one line that prints the engine's own path (`diff` = that line).
+
+### Method and its overhead (justified, not assumed)
+
+- **Time per site: one clock read before and after each `assert_*` call** in a temp copy of the engine (outside the repo). `$EPOCHREALTIME` is a bash
+  builtin, so the probe spawns nothing; 45 rules x 2 reads is microseconds against 390 s. Overhead is below the resolution, and run B's 391.4 s
+  against A's 433.1 s is inside the band, not above it. A "site" here is the rule function, the unit the driver dispatches.
+- **Spawn count per site: run C only.** Shims for 49 common externals (`grep sed awk git tail head cut tr sort find …`) append `<rule> <command>` to a
+  log and `exec` the real binary. A shim is itself a bash start, so C costs +58% (617 vs 391 s): its *times are discarded*, its **counts are kept**.
+  Counts are `exec`'d external commands only; the `$(...)` and `|` forks that never exec an external are **not** in them, so they are a floor on process
+  creation. Run C's ranking of rules by spawns matches run B's by time (the same five on top).
+- **Second route:** (1) sum of the 45 per-rule times vs the whole run; (2) a per-spawn model from the counts, independent of the clocks.
+
+### Per-site table (run B times, run C counts; 45 dispatched rules, 4,135 exec'd spawns)
+
+| site (rule) | spawns | wall | share | cum. | ms/spawn | dominant commands |
+|---|---:|---:|---:|---:|---:|---|
+| `S10.TDAGING` (per-TD-row loop over `TECH-DEBT.md`) | 884 | 111.4 s | 28.5% | 28.5% | 126 | sed 504 · grep 249 · head 129 |
+| `S11.WHENITRUNS` | 597 | 57.1 s | 14.6% | 43.2% | 96 | git 357 · tail 120 · awk 120 |
+| `S1.LAW2` | 691 | 53.7 s | 13.8% | 56.9% | 78 | awk 347 · grep 342 |
+| `S11.LOGPAIR` | 368 | 30.8 s | 7.9% | 64.8% | 84 | git 221 · tail 147 |
+| `S4.APPEND` | 325 | 23.7 s | 6.1% | 70.9% | 73 | git 163 · awk 104 · grep 57 |
+| `S11.BACKLOG` | 183 | 18.3 s | 4.7% | 75.6% | 100 | |
+| `S11.TDDELETE` | 138 | 18.2 s | 4.7% | 80.3% | 132 | |
+| `S4.SECTIONS` | 313 | 16.8 s | 4.3% | 84.6% | 54 | |
+| `S4.ONEFILE` | 108 | 12.0 s | 3.1% | 87.6% | 111 | |
+| `S4.NEGATIVE` | 157 | 10.2 s | 2.6% | 90.2% | 65 | |
+| `S9.PLANFROZEN` | 10 | 9.4 s | 2.4% | 92.6% | 943 | (10 heavy `git` history reads) |
+| `S11.SPRINT` | 121 | 8.1 s | 2.1% | 94.7% | 67 | |
+| other 33 rules | 240 | 20.6 s | 5.3% | 100% | | |
+
+Whole-run command mix: grep 1,282 · sed 853 · git 772 · awk 717 · tail 270 · head 130 · cut 60 (6 spawns happen before the loop, in the spec reader).
+
+### Reconciliation
+
+| route | figure | vs the whole |
+|---|---:|---|
+| sum of 45 per-rule times (run B) | **390.3 s** | engine's own start-to-exit clock 391.0 s: residual 0.7 s (**0.2%**); external `time` real 391.4 s: residual 1.1 s (**0.3%**) — inside the stated 1%. The 0.7 s is the spec reader (0.5 s) plus the driver's note lines for the 55 non-dispatched rules |
+| spawn model, independent of clocks | 4,135 spawns x **100 ms** (least-squares slope of per-rule time on per-rule spawns; correlation **0.965** over 45 rules) | 414 s, within 6% of run B's 391 s and 5% of run A's 433 s |
+| shim overhead as a unit cost | (617.5 - 391.4) s / 4,135 = **55 ms** per extra bash start | the shim is one bash start; a real external pays that plus the tool and its own work, so 55 ms is a floor under the 100 ms |
+
+Reading: per-rule time is **spawn count x ~100 ms**, with S9.PLANFROZEN the one outlier (10 spawns, 0.94 s each: whole-history `git` reads), so the
+cost is process creation and not the rules' computation, as TD-168 hypothesised. TD-168's Mitigation line named "an in-process port" as the instrument; this
+profile shows something narrower and cheaper to reach: **the whole run is 5 rules' per-row loops** (`S10.TDAGING` over ~120 TD rows, `S1.LAW2`, `S11.WHENITRUNS`,
+`S11.LOGPAIR`, `S4.APPEND`, each spawning several externals per input row), 70.9% of wall clock and 2,865 of 4,135 spawns (69%). The per-row
+`printf | grep | head | sed` chains in `S10.TDAGING` alone are 884 spawns that parameter expansion (as the driver already did for TD-073) would remove.
+That is a hypothesis for TASK-404, not a result: this Round measures where the cost is, not what removing it recovers.
+
+### The TASK-404 target (owner rule, SPRINT-121 G2, applied mechanically)
+
+"Top sites" = the smallest set the profile shows dominating: **the top 3 rules (`S10.TDAGING`, `S11.WHENITRUNS`, `S1.LAW2`) = 56.9% of wall clock**, the top 5 = 70.9%.
+The share is above 50%, so the rule's "lower of the two" is **50%**: cut the engine's Windows wall clock by **>=50%**, **433.1 s -> <= 216.5 s** (run A, the clean
+uninstrumented baseline). The before/after must be taken on the same host in a comparable memory state (+-10% band above); a +-10% reading near the line is
+re-run, not rounded.
+
+**Not measured here:** fork-only subshells (not counted), the saving an actual rewrite recovers, and Linux (Round 22's gate runs in 105-109 s there).
+**Retained:** per-rule times, spawn log, instrumented engine copies and the three run outputs in the session scratchpad (not committed).
