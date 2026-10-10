@@ -120,3 +120,26 @@ The one pause in this run so far: the owner was asked by popup to approve §11 d
 SPRINT-118, nothing live names it). It became due when the current sprint reached 121, and the promote doc-aging line missed it.
 Approved, and the file was removed in its own commit. Its record stays in CHANGELOG, the sprint archive and git, and the id is
 retired. For Dogfood 1 (TASK-416) this is a named pause with its cause, not a confirmation between authorized tasks.
+
+### 2026-10-10 | progress | T5 built and merged (`45a13010` → `313a9a41`); real-input run on live EPIC-015: fully covered
+consequence · T5 · behaviour:med · governance:high
+A builder in an isolated worktree, base `105a8ea8` verified. Spec 0.15.0 gains an "Epic coverage" paragraph in § 2 (prose only, no
+rule-table row). `/lean-doc-generator` gains epic activation listing, promote refusal unless an owner override is recorded, and
+`☐ epic coverage`, with the procedure in the new `references/epic-coverage.md` (SKILL.md stays at 138 lines). `/triage` lists
+uncovered conditions (132 lines). `/prime` adds a `Coverage:` row (139 lines). CONTEXT, README and the root CHANGELOG
+(`## Unreleased`) are updated. Five fixture cases, walked by hand, match the expected verdict 5/5. The builder's bare gate
+truncated on this host at 528 s, so system verify runs on the VPS. **Real input (coordinator, `e735c590`):** EPIC-015's four
+open lines are annotated CW5 → 415 · CW6 → 423 · CW7 → 415, 416 · CW8 → 417, and the procedure reports it fully covered
+(4 open, 4 mapped; cross-check 4 = 4 + 0). TASK-414 sits in `done/`, so CW6 needed re-pointing to TASK-423, which is the
+stale-coverage case the rule exists to catch. Codex review round 1 dispatched.
+
+### 2026-10-10 | progress | T6 built: four epics moved to workdoo (`16252b2`), ADR-052 amends ADR-041 (`4a634592`)
+consequence · T6 · behaviour:low · governance:high
+workdoo (committed by explicit path while another session was committing there; owner ruled path-scoped): `docs/epic/` gains
+EPIC-016/018/019/020 with ids unchanged and an INDEX. Its GitHub links became relative, lean-flow refs are prefixed, and
+EPIC-019's SPRINT-010 row is corrected (closed, `5770c6d`). `.claude/CLAUDE.md` and `AGENTS.md` now point to `docs/epic/`.
+lean-flow: the four files are removed. INDEX rows became relation pointers, the sequencing register got an amendment (the next
+epic id is derived across both repositories), ADR-041 got a `Scope amended by:` marker (Decision untouched), and ADR-052 and its
+DECISIONS row were added. The prose-density baseline row is dropped. Two ADR figures were re-derived before freezing (336 lines,
+not 339; 21 open conditions, not 13). The GitHub pointer links resolve once workdoo is pushed (push is owner-reserved). Gates:
+pending system verify.
