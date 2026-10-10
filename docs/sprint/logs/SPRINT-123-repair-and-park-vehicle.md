@@ -75,3 +75,15 @@ TASK-425 DoD2 briefs the reviewer with § Review seed alone and states the rollu
 no criterion changes what it proves. Also logged here (it was logged only in SPRINT-122's log): T1's `Cites:` gained
 `scripts/lib/check-authority.ts`, which the DoD1 scope-change above names (the gate's `scope-change-outside-layers`). Known, not a
 blocker: `timeout 3600` and `--max-budget-usd` end as HARD_FAILURE, not BUDGET_STOP (SPRINT-118's TD note (a)). G2 is unaffected.
+
+fired · 2026-10-10T10:05:33Z · overnight
+
+### 2026-10-10 | progress | run start: G1 (full checklist, both members `origin: manual`) and G2 confirmed against the pins @ 838e714
+G1 · T1 (TASK-424): done when DoD1's ancestry line is transcribed and `check-prose-density.ts` prints `0 fail` after exactly one
+logged retry · size S · touches TASK-424's file and this sprint's § Files Changed · out: any source or guard edit, any push · assumes
+none. G1 · T2 (TASK-425): done when § Options holds two unpicked options and one scoped reviewer's verdict is recorded and acted on
+per ADR-022 · size S · touches TASK-425's file only · out: choosing TD-247's option. G2: the overlap map is disjoint (T1 owns the sprint
+file's § Files Changed, T2 owns nothing shared). The coordinator owns this log and every `git mv`. Run sequentially, inline: both are
+S, docs-only, and dispatch would add a worktree merge-back for one line of work each.
+consequence · T1 · behaviour:low · governance:low
+consequence · T2 · behaviour:low · governance:low
