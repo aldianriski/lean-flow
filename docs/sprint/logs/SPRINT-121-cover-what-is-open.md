@@ -143,3 +143,12 @@ epic id is derived across both repositories), ADR-041 got a `Scope amended by:` 
 DECISIONS row were added. The prose-density baseline row is dropped. Two ADR figures were re-derived before freezing (336 lines,
 not 339; 21 open conditions, not 13). The GitHub pointer links resolve once workdoo is pushed (push is owner-reserved). Gates:
 pending system verify.
+
+### 2026-10-10 | progress | T5 reviewed: Codex round 1 7/7 PASS + 2 findings, fixed inline (`b306e52a`), round 2 RESOLVED; 4 of 5 boxes ticked
+review · T5 · codex · behaviour:med · governance:high
+Round 1 (static, packet-fed): items 1–7 PASS. F1: /triage's "read other folders only to resolve a `depends-on:` id" blocked the
+coverage lookup. F2: an epic activated *by* a promote could pass that same promote. Both were fixed as the one bounded retry,
+coordinator-inline, with the spec, the reference and /triage aligned. Round 2: F1 RESOLVED, F2 RESOLVED, no new contradiction.
+Box 4 (real input) is held for an owner ruling. Its text names "TASK-414–417", but T1 closed TASK-414 with CW6 still open, so
+the live run reports EPIC-015 fully covered by 415, 416, 417 and **423**: the stale-coverage rule doing its job. Ticking it as
+written would be re-reading the criterion to fit (L-088), so it waits for a recorded ruling.
