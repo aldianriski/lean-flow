@@ -35,6 +35,12 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-124 promote (2026-10-11).** **130 of 132 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 124. Second route: 132 open − 2 filed at 122 (TD-247 · TD-248) = 130. **Newly aged since the SPRINT-121 sweep, named for
+> re-review:** TD-237 · TD-238 · TD-239 · TD-240 · TD-241 · TD-242 (filed at 120) · TD-243 · TD-244 · TD-245 · TD-246 (filed at
+> 121). The one `high` row, TD-168, is a member of SPRINT-124 through TASK-404. **§11 deletion** (owner-approved): TD-206, resolved
+> at SPRINT-120 and now 4 sprints on. Its id stays retired.
+>
 > **Aging sweep — SPRINT-121 promote (2026-10-10).** **120 of 126 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 121. Second route: 126 open − 6 filed at 120 (TD-237..242) = 120; nothing was filed at 119. **Newly aged since the
 > SPRINT-120 sweep, named for re-review:** TD-231 · TD-232 · TD-233 · TD-234 · TD-235 · TD-236 (filed at 118). The other 114
@@ -616,14 +622,6 @@ status: current
   - Summary: **The engine's task-file exemption accepts any folder name as a status.** `docs/work/*/TASK-*.md` exempts
     `docs/work/anything/TASK-1.md` from the ownership-header check. Census 2026-09-30: 0 non-status folders.
   - Mitigation (hypothesis): enumerate the six status folders (backlog · todo · in_progress · review · done · cancel), as ADR-045 names them.
-
-- **TD-206** severity: medium | status: resolved → TASK-410 (SPRINT-120 T5, §11 live-citation set widened in spec 0.14.0 and the engine) | created: Sprint-110 (T3 outside review)
-  - Summary: **The store prune reads §11's "not live-named" as only `depends-on:`, active Members and the highest id.** On this
-    repo it flags TASK-359, TASK-360 and TASK-374 as `closed-task-past-retention`. Open backlog tasks still cite two of them in their
-    `## Done when` (TASK-378 → 359, TASK-386 → 374), and EPIC-017's Task map names all three. The message says "nothing live names it",
-    which overclaims. The rule is propose → approve, so nothing is deleted automatically.
-  - Mitigation (hypothesis): either clarify §11's "live-named" (a spec edit), or widen the exclusion to ids cited by open task
-    files and active epics. Owner to rule at the SPRINT-110 close before any of the three is deleted.
 
 - **TD-205** severity: low | status: open | created: Sprint-110 (T3 outside review)
   - Summary: **The ordering half of S9.SCOPECHANGE is lost for member-file edits.** The owner accepted the split: the member freeze
