@@ -4,7 +4,7 @@ slug: execution-autonomy
 owner: Maintainer
 last_updated: 2026-10-11
 status: active
-member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101, SPRINT-118, SPRINT-119, SPRINT-121, SPRINT-122, SPRINT-123]
+member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101, SPRINT-118, SPRINT-119, SPRINT-121, SPRINT-122, SPRINT-123, SPRINT-124]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -75,6 +75,7 @@ loop · push/deploy/external destructive authorization · a scheduler or queue s
 | [SPRINT-121](../sprint/archive/SPRINT-121-cover-what-is-open.md) | Cover What Is Open | **closed** 2026-10-10 · `d9c6466` — 7 of 7 members | **Dogfood 1 PROVEN** (CW7 first half, TASK-416): continuous attended `sprint-bulk`, no per-task confirmation, four pauses each named with its cause (Execution Log, T7 entry). **CW6 not met:** USER_STOP is emitted by no code path, so TASK-423 was filed and covers it. Also rules **CW6** on SPRINT-119's real-run rollup (TASK-414). CW5, Dogfood 2 and CW8 follow as TASK-415 and TASK-417. |
 | [SPRINT-122](../sprint/archive/SPRINT-122-finish-epic-015.md) | Finish EPIC-015 | **closed** 2026-10-11 · `d69331f` — 2 of 2 members, 8/8 DoD | **CW6, CW5 and CW7 PROVEN.** CW6: a TERM to the wrapper reports USER_STOP (TASK-423). CW5 + Dogfood 2: one overnight run (vehicle SPRINT-123) repaired a seeded check FAIL in one retry and parked a seeded judgment (TASK-415). The live run exposed a reaper defect, fixed and re-reaped to a guard PASS. Only **CW8** (TASK-417) remains. |
 | [SPRINT-123](../sprint/archive/SPRINT-123-repair-and-park-vehicle.md) | Repair-and-Park Vehicle | **closed** 2026-10-11 · `d69331f` — 2 of 2 members | **Contributed the run CW5 and CW7 were proven on**: fired 2026-10-10 on the VPS, $1.32, 0 denials, `AUTHORITY_BOUNDARY`/`PARTIAL`, `repair-cycles · 1`, `parks · 1`. The park was resolved by owner ruling (TD-247 Option A). |
+| [SPRINT-124](../sprint/SPRINT-124-close-epic-015-and-cut-the-engine.md) | Close EPIC-015 and Cut the Engine | **active** (promoted 2026-10-11) | Targets **CW8** (TASK-417: the re-armed freeze, widened to governance, as an ADR), which closes the epic. Also carries TASK-426 (TD-247 Option A), a follow-up of this epic's USER_STOP work, and TASK-404 (the engine cut, outside the epic). |
 
 _First member sprint promoted 2026-08-26._ The freeze amendment that blocked it
 **closed 2026-08-25** (§ Open questions), so this epic is admissible. Its other condition — sequenced
