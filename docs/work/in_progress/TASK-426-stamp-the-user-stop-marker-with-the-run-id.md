@@ -26,10 +26,10 @@ frozen Part 4 contract. Consequential Tier G: the launcher decides what an unatt
 
 ## Done when
 
-- [x] The wrapper's trap writes `<signal> <wr_start>` into `<log>.stop`, and reap() reports USER_STOP only when that id equals its own
-      `rp_started`. A marker with a foreign or missing id is ignored and named in the `warnings ·` field. ✓ 7470f1a0; reap harness 31 PASS (coordinator + isolated re-run); Codex CLEAR 5/5
-- [x] A retained must-FAIL fixture: a stale marker with a foreign id reads HARD_FAILURE (or the state its log implies), never
-      USER_STOP. The sibling `wrapper-term-is-user-stop` stays green. ✓ stale-marker-foreign-id + stale-marker-without-id; isolated seed (accept any id) reddens exactly the foreign-id case, sibling green, restore hash-exact
+- [x] The wrapper's trap writes `<signal> <wr_start>` into `<log>.stop`, and reap() reports USER_STOP only when that id equals its own ✓ 7470f1a0; reap harness 31 PASS (coordinator + isolated re-run); Codex CLEAR 5/5
+      `rp_started`. A marker with a foreign or missing id is ignored and named in the `warnings ·` field.
+- [x] A retained must-FAIL fixture: a stale marker with a foreign id reads HARD_FAILURE (or the state its log implies), never ✓ stale-marker-foreign-id + stale-marker-without-id; isolated seed (accept any id) reddens exactly the foreign-id case, sibling green, restore hash-exact
+      USER_STOP. The sibling `wrapper-term-is-user-stop` stays green.
 - [x] TD-247 is updated: C3 resolved; C6 (the guard accepts an unbacked USER_STOP) stays open with its census. ✓ 50a8fa54 (C6 census 0, control reaches 10 terminals)
 
 ## Touches
