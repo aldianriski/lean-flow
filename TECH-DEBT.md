@@ -371,6 +371,11 @@ status: current
   - Mitigation (owner-chosen 2026-10-11, Option A of TASK-425): the wrapper writes `<signal> <wr_start>` into `<log>.stop`, and
     reap() reads USER_STOP only when the id equals its own `rp_started`. This closes C3. C6 (the guard accepts an unbacked USER_STOP)
     stays open; it has no occurrences so far. Option B (bind in the rollup, guard-checked) was rejected: it changes the frozen Part 4 contract.
+  - **C3 resolved → TASK-426** (SPRINT-124 T1, `7470f1a0`): the marker is `<signal> <started>`, and a foreign or missing id is ignored
+    and named in `warnings ·`. Retained must-FAIL fixtures: `stale-marker-foreign-id-is-not-user-stop` and
+    `stale-marker-without-id-is-not-user-stop`. **C6 stays open.** Census 2026-10-11: 0 line-start `terminal · USER_STOP` in
+    `docs/sprint/` (control: the same query reaches 10 real terminals, 6 PLAN_EXHAUSTED and 4 AUTHORITY_BOUNDARY). The row stays
+    `open` for C6.
 
 - **TD-246** severity: low | status: open | created: Sprint-121 (dispatch)
   - Summary: **Agent worktrees accumulate: 14 under `.claude/worktrees/` at SPRINT-121 close, several `locked`.** dispatch.md says
