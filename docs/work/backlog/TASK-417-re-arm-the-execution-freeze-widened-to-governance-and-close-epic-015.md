@@ -10,8 +10,8 @@ class: decision
 tier: P
 authority: J2
 origin: decomposer
-state: blocked
-depends-on: [TASK-414, TASK-415, TASK-416]
+state: ready
+depends-on: [TASK-414, TASK-415, TASK-416, TASK-423]
 ---
 
 # TASK-417 — Re-arm the execution freeze, widened to governance work, and close EPIC-015
@@ -43,6 +43,7 @@ review H0). Evidence: of 941 commits since SPRINT-090, ~6% touch `skills/` and ~
 - **blocked-by:** TASK-414 (CW6), TASK-415 and TASK-416 (both dogfoods). The dogfoods are defined at V3 §56 and the re-arm rule
   is V3 §58; EPIC-015 D1 cites both, so they do not conflict.
 - **blocked-by:** TASK-423 — EPIC-015 CW6 was not met by TASK-414 (USER_STOP is emitted by no code path), so the epic cannot close until TASK-423 ticks it (/triage, 2026-10-10).
+- **Unblocked 2026-10-11** (SPRINT-124 promote): TASK-414, 415, 416 and 423 are all in `done/`; CW5–CW7 were proven at SPRINT-122.
 
 ## Tracker
 
