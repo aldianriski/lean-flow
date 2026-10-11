@@ -362,8 +362,9 @@ status: current
     signal name, so a standalone `night-run.sh --reap` over an old log can read a stale marker (the wrapper clears it only at its own
     start). `check-night-run-rollup.ts` accepts `terminal · USER_STOP` with no wrapper evidence, so a model-written claim passes the
     guard. Census: zero real occurrences (no run has reported USER_STOP yet; manual `--reap` is testing only).
-  - Mitigation (hypothesis): write a run identity (the `fired ·` timestamp) into the marker, have reap() cite it in the terminal
-    reason, and have the guard require it on a USER_STOP block.
+  - Mitigation (owner-chosen 2026-10-11, Option A of TASK-425): the wrapper writes `<signal> <wr_start>` into `<log>.stop`, and
+    reap() reads USER_STOP only when the id equals its own `rp_started`. This closes C3. C6 (the guard accepts an unbacked USER_STOP)
+    stays open; it has no occurrences so far. Option B (bind in the rollup, guard-checked) was rejected: it changes the frozen Part 4 contract.
 
 - **TD-246** severity: low | status: open | created: Sprint-121 (dispatch)
   - Summary: **Agent worktrees accumulate: 14 under `.claude/worktrees/` at SPRINT-121 close, several `locked`.** dispatch.md says

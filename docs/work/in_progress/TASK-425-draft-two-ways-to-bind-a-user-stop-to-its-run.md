@@ -30,11 +30,13 @@ which the run meets mid-run. The seed is declared here openly.
       which file it touches, drawn from TD-247 and `scripts/night-run.sh` (`wrap()`, `reap()`). The draft does NOT pick one.
       ✓ § Options: A (marker stamped with `wr_start`, matched in `reap()`) and B (binding carried into the rollup, checked by the
       guard), each with binds · costs · touches; "Neither is picked". Names verified against `night-run.sh:209`, :462-495.
-- [ ] One scoped reviewer pass judges § Options against the § Review seed criterion alone (the reviewer is not shown this
+- [x] One scoped reviewer pass judges § Options against the § Review seed criterion alone (the reviewer is not shown this
       `## Done when`), its verdict is recorded verbatim in this file, and the run acts on that verdict exactly as the revise loop's
       rules require. Any rollup line goes in this sprint's Execution Log on its own line at column 0, not fenced and not bulleted.
       Open: the verdict is recorded (§ Review verdict) and acted on — a judgment finding, so ADR-022 parks it with no retry
       (`T2 · parked-hitl ·` in the Execution Log). The box stays open until the owner rules on the finding.
+      ✓ Owner ruled 2026-10-11 (popup, J2): **Option A** (stamp the marker with the run's id; reap() matches it). The park is resolved;
+      the build is a follow-up task, filed at close.
 
 ## Review seed
 

@@ -148,3 +148,8 @@ Calibration row (Part 4), transcribed from the harness result event:
 ```
 run · $1.3245145 · 26 turns · 67 min · 1 of 2 units · inline
 ```
+
+### 2026-10-11 | park-resolved | T2 (TASK-425): owner ruled Option A for TD-247; the park is resolved
+The owner took the parked J2 step interactively (popup): **Option A** (stamp `<log>.stop` with the run's start epoch; reap() matches
+it). Option B (bind in the rollup, guard-checked) was rejected because it changes the frozen Part 4 rollup contract (ADR-016). TASK-425's
+second box is ticked with the ruling; TD-247's mitigation records the choice. Building it is a follow-up task, filed at close.
