@@ -47,7 +47,7 @@ USER_STOP.
 
 ### T2 — Cut the Shell engine's per-file process spawning `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/logs/qa-gate-timing.md`
-  · `TECH-DEBT.md`
+  · `TECH-DEBT.md` · `evals/run-adr-family-fixtures.sh` · `evals/run-sprint-family-fixtures.sh`
   · `docs/work/todo/TASK-404-cut-the-shell-conformance-engines-per-file-process-spawning.md`
   · `docs/work/in_progress/TASK-404-cut-the-shell-conformance-engines-per-file-process-spawning.md`
 Depends-on: none

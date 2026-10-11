@@ -87,3 +87,12 @@ Consequential G bar:
 - **Coordinator:** ran the harness on the main tree (31 PASS, `all green`). TD-247 is updated at `50a8fa54`. C6's census is 0
   line-start USER_STOP terminals, and a control query over the same logs reaches 10 terminals.
 Spend: builder ~78k · Codex ~24k · isolated verify ~56k sub-agent tokens.
+
+### 2026-10-11 | scope-change | T2 Layers gain the two fixture harnesses its seeded breaks must redden
+What broke: the signed G2 bar needs one seeded break per changed evaluator, and each must redden its fixture. The builder's seeds on
+S10.TDAGING, S11.LOGPAIR and S11.WHENITRUNS reddened nothing, because no case in `evals/run-sprint-family-fixtures.sh` reaches them
+(age only 100/1 asserted · no re-added Plan path · no unreachable/placeholder/missing close_commit). The S4.APPEND status-match seed
+was a fourth gap, and the builder closed it with one case in `evals/run-adr-family-fixtures.sh`. Neither file is in T2's Layers.
+Impact: T2 Layers add `evals/run-adr-family-fixtures.sh` and `evals/run-sprint-family-fixtures.sh` (new cases only, no existing case
+edited). TASK-404's `## Done when` is unchanged. Engine evidence so far: the report is byte-identical (`cmp` silent on 2 after-runs, rc 0
+== 0), and the time went from 417.4 s to 136.3 s / 82.5 s. Re-confirm G2: the owner ruled "close the gaps" by popup.
