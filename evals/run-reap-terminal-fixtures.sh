@@ -175,14 +175,14 @@ Layers: \`a.md\`
 EOF
   printf '# log\n%s\n' "$body" > "$d/docs/sprint/logs/SPRINT-960-fx.md"
   doc="$d/docs/sprint/logs/SPRINT-960-fx.md"
-  cpid=""
+  cpid=""; wstart=1760180000   # the run id the wrapper binds its stop marker to
   if [ "$how" = exit3 ]; then
-    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'exit 3' &
+    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "$wstart" 0 "" 1 -- sh -c 'exit 3' &
   elif [ "$how" = term-wrapper-slowchild ]; then
     # the child catches TERM itself, lingers ~1 s, then exits 7
-    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'echo $$ >"$0"; trap "sleep 1; exit 7" TERM; sleep 30 & wait' "$d/child.pid" &
+    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "$wstart" 0 "" 1 -- sh -c 'echo $$ >"$0"; trap "sleep 1; exit 7" TERM; sleep 30 & wait' "$d/child.pid" &
   else
-    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "" 0 "" 1 -- sh -c 'echo $$ >"$0"; exec sleep 30' "$d/child.pid" &
+    sh "$launcher" --wrap "$d/run.log" "$d/run.log.exit" "$d" "$wstart" 0 "" 1 -- sh -c 'echo $$ >"$0"; exec sleep 30' "$d/child.pid" &
   fi
   wpid=$!
   if [ "$how" != exit3 ]; then
@@ -226,13 +226,46 @@ T1 · done" "revise-loop-ceiling-exceeded"
 want_ec=7 case_wrap "stop-keeps-child-exit-status" "USER_STOP" term-wrapper-slowchild "" "terminal · USER_STOP · "
 # rank: an unresolvable by-reference member outranks a stop marker, with its own named reason
 d="$work/stop-unresolved-member"; mkdir -p "$d" && cp -R "$fxdir/v2-unresolved-member/." "$d/" && mkdir -p "$d/docs/sprint/logs"
-printf '# log\nT1 · done · a\n' > "$d/docs/sprint/logs/SPRINT-961-v2.md"; : > "$d/run.log"; printf TERM > "$d/run.log.stop"; printf 143 > "$d/run.log.exit"
-sh "$launcher" --reap "$d/run.log" "$d" "" 0 "" >/dev/null 2>&1
+printf '# log\nT1 · done · a\n' > "$d/docs/sprint/logs/SPRINT-961-v2.md"; : > "$d/run.log"; printf 'TERM 1760180000' > "$d/run.log.stop"; printf 143 > "$d/run.log.exit"
+sh "$launcher" --reap "$d/run.log" "$d" 1760180000 0 "" >/dev/null 2>&1
 if grep -q '^terminal · HARD_FAILURE · member DoD unreadable: SPRINT-MEMBER-UNRESOLVED' "$d/docs/sprint/logs/SPRINT-961-v2.md"; then
   echo "PASS fixture(stop-plus-unresolved-member-is-hard-failure): terminal · HARD_FAILURE, member reason named"
 else
   echo "FAIL fixture(stop-plus-unresolved-member-is-hard-failure): $(grep '^terminal ·' "$d/docs/sprint/logs/SPRINT-961-v2.md")"; fail=1
 fi
+
+# TD-247 C3: the stop marker is bound to the run that wrote it. must-FAIL against the pre-change reaper
+# (any marker was a stop). stale_stop <label> <marker> <warning-text>: a wrapped exit-3 run whose marker was
+# left by another run (or carries no id), reaped as run 1760180000 -> HARD_FAILURE from the log, marker named.
+stale_stop() {
+  label=$1; marker=$2; warn=$3
+  d="$work/$label"; mkdir -p "$d/docs/sprint/logs"
+  cat > "$d/docs/sprint/SPRINT-960-fx.md" <<EOF
+---
+sprint: 960
+status: active
+---
+
+## Plan
+
+### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
+Layers: \`a.md\`
+
+**DoD:**
+- [ ] a thing
+EOF
+  printf '# log\n' > "$d/docs/sprint/logs/SPRINT-960-fx.md"; : > "$d/run.log"
+  printf '%s' "$marker" > "$d/run.log.stop"; printf 3 > "$d/run.log.exit"
+  sh "$launcher" --reap "$d/run.log" "$d" 1760180000 0 "" >/dev/null 2>&1
+  doc="$d/docs/sprint/logs/SPRINT-960-fx.md"
+  if grep -q '^terminal · HARD_FAILURE · wrapped process exited with status 3' "$doc" && grep '^warnings ·' "$doc" | grep -qF "$warn" && ! grep -q 'USER_STOP' "$doc"; then
+    echo "PASS fixture($label): HARD_FAILURE from the log, marker ignored and named"
+  else
+    echo "FAIL fixture($label): $(grep '^terminal ·' "$doc") / $(grep '^warnings ·' "$doc")"; fail=1
+  fi
+}
+stale_stop "stale-marker-foreign-id-is-not-user-stop" "TERM 1760099999" "stop marker ignored (id 1760099999 != run 1760180000)"
+stale_stop "stale-marker-without-id-is-not-user-stop" "TERM" "stop marker ignored (no run id)"
 
 # the wiring: the REAL launcher's fire site must hand the wrapper pid it prints a TERM-catching wrapper.
 # Throwaway git repo + the gate-exception harness's clean qa stub; the command is a long sleep.
@@ -249,8 +282,8 @@ wait_for "$d/child.pid" >/dev/null; fs_cpid=$(cat "$d/child.pid" 2>/dev/null)
 [ -n "$fs_pid" ] && kill -TERM "$fs_pid" 2>/dev/null
 n=0; while [ ! -e "$d/run.log.exit" ] && [ "$n" -lt 100 ]; do sleep 0.1; n=$((n + 1)); done
 [ -n "$fs_pid" ] && kill -KILL "$fs_pid" 2>/dev/null; [ -n "$fs_cpid" ] && kill -KILL "$fs_cpid" 2>/dev/null
-if [ "$(cat "$d/run.log.stop" 2>/dev/null)" = "TERM" ]; then
-  echo "PASS fixture(fire-site-wrapper-catches-term): pid=$fs_pid left run.log.stop = TERM"
+if printf '%s' "$(cat "$d/run.log.stop" 2>/dev/null)" | grep -qE '^TERM [0-9]+$'; then
+  echo "PASS fixture(fire-site-wrapper-catches-term): pid=$fs_pid left run.log.stop = $(cat "$d/run.log.stop")"
 else
   echo "FAIL fixture(fire-site-wrapper-catches-term): pid='${fs_pid:-<none>}' stop marker='$(cat "$d/run.log.stop" 2>/dev/null)' -- output: $fs_out"; fail=1
 fi

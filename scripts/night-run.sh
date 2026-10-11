@@ -314,13 +314,26 @@ reap() {
   # `terminal · PLAN_EXHAUSTED` with T1, T2 and T4 all logged `· blocked ·`, and the retro entry
   # beside it asserted that verdict was correct. Nothing the author ran could find it; a reviewer
   # reading the state list against the code did, immediately (L-165).
-  # USER_STOP is a signal CAUGHT BY THE WRAPPER (`--wrap` above), which leaves `$rp_log.stop` before
-  # reaping. A bare child exit of 130/143, or a TERM sent straight to the child (the watchdog), leaves
+  # USER_STOP is a signal CAUGHT BY THE WRAPPER (`--wrap` above), which leaves `$rp_log.stop` -- `<signal>
+  # <run id>`, the run id being the launcher's start epoch -- before reaping. The marker counts ONLY when its id
+  # equals this reap's start arg (non-empty): a stale marker from an earlier run, or one with no id, is
+  # ignored with a `warnings` token and the log decides (TD-247 C3). A bare child exit of 130/143, or a TERM sent straight to the child (the watchdog), leaves
   # no marker and stays HARD_FAILURE. With the marker, USER_STOP outranks the non-zero exit, stalled/
   # denied-tool, unattempted and parked -- but NOT a member-count error or a revise-ceiling breach,
   # which still read HARD_FAILURE (SPRINT-122 owner ruling). No marker: the order above is unchanged.
   rp_ec=$(cat "$rp_log.exit" 2>/dev/null || printf '')
-  rp_stop=""; [ -f "$rp_log.stop" ] && rp_stop=$(cat "$rp_log.stop" 2>/dev/null)
+  rp_stop=""; rp_stop_warn=""
+  if [ -f "$rp_log.stop" ]; then
+    rp_mk=$(cat "$rp_log.stop" 2>/dev/null)
+    rp_mk_sig=${rp_mk%% *}; rp_mk_id=""; case "$rp_mk" in *" "*) rp_mk_id=${rp_mk#* } ;; esac
+    if [ -n "$rp_mk_id" ] && [ -n "$rp_started" ] && [ "$rp_mk_id" = "$rp_started" ]; then
+      rp_stop=$rp_mk_sig
+    elif [ -z "$rp_mk_id" ]; then
+      rp_stop_warn="stop marker ignored (no run id)"
+    else
+      rp_stop_warn="stop marker ignored (id $rp_mk_id != run ${rp_started:-none})"
+    fi
+  fi
   # This run's window, MINUS any earlier reaper entry inside it (a `### … | run-complete | run exited — …` entry, up to the next
   # `### `). The block below copies the run's non-green lines into a fenced region at column 0, so a
   # re-reap whose window still holds an earlier block would otherwise count every copy a second time.
@@ -429,6 +442,7 @@ reap() {
   [ "$rp_cost" = "cost unavailable" ] && rp_warn="${rp_warn}${rp_warn:+; }cost unavailable"
   [ "$rp_turns" = "?" ] && rp_warn="${rp_warn}${rp_warn:+; }turn count unavailable"
   [ -n "$rp_cnt_err" ] && rp_warn="${rp_warn}${rp_warn:+; }$rp_cnt_err"
+  [ -n "$rp_stop_warn" ] && rp_warn="${rp_warn}${rp_warn:+; }$rp_stop_warn"
   [ -n "$rp_warn" ] || rp_warn="none"
 
   {
@@ -474,7 +488,8 @@ reap() {
 
 # The detached wrapper (SPRINT-122 T1 · TASK-423): the process the launcher prints as `fired detached:
 # pid=`. It owns the run's death, so it is the one place a HUMAN stop can be told from a failure: a
-# signal CAUGHT HERE is USER_STOP. A bare child exit, or a TERM sent straight to the child (the
+# signal CAUGHT HERE is USER_STOP, recorded as `<signal> <started>` so the reaper can tell this run's
+# stop from a stale marker. A bare child exit, or a TERM sent straight to the child (the
 # watchdog, night-run.md Part 3 -- exit 143), never reaches this trap and stays HARD_FAILURE.
 #   sh night-run.sh --wrap <log> <ecfile> <root> <started> <base> <sprint> <reap 0|1> -- <command...>
 # Its own entry for the reason `--reap` has one: a fixture drives this real code, not a copy of it.
@@ -486,7 +501,7 @@ wrap() {
   wr_child=""
   rm -f "$wr_log.stop" 2>/dev/null || true
   wr_on_signal() {
-    printf '%s' "$1" >"$wr_log.stop"
+    printf '%s %s' "$1" "$wr_start" >"$wr_log.stop"
     [ -n "$wr_child" ] && kill -TERM "$wr_child" 2>/dev/null
     return 0
   }
