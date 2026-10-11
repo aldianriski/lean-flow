@@ -68,3 +68,22 @@ What broke: T3's Layers named `skills/lean-doc-generator/SKILL.md` and `skills/t
 G2 placed the rule in `.claude/CLAUDE.md` instead, to keep lean-flow's own freeze out of the shipped skills. Impact: T3 Layers
 drop both SKILL.md files and add `.claude/CLAUDE.md` and `docs/LEARNINGS.md` (L-217's `retain` pointer is re-disposed once the ADR
 lands, which that pointer requires). TASK-417's `## Done when` is unchanged. Re-confirm G2: done in the same popup round.
+
+### 2026-10-11 | task-done | T1 TASK-426 — the stop marker is bound to its run (3/3)
+Builder: one `general-purpose` agent (sonnet) under `/tdd`. Red was 28 PASS / 3 FAIL against the old reaper. Green is 31 PASS. Commit
+`7470f1a0` touches `scripts/night-run.sh` and `evals/run-reap-terminal-fixtures.sh` only.
+Consequential G bar:
+- **Seeded breaks** (builder, in place, restore hash `a2151e4e` each time). S1 accept-any-id reddens only the foreign-id case. S2
+  accept-no-id reddens only the no-id case. S3 bare-signal trap reddens `wrapper-term-is-user-stop`, `ceiling-breach-outranks-stop`,
+  `stop-keeps-child-exit-status` and `fire-site-wrapper-catches-term`. Each seed passed `cmp` against the pristine copy, parsed,
+  and kept a 0-line delta.
+- **Review round 1 of 2 (cap):** Codex static review, with the diff pasted in (the sandbox cannot read or run): **CLEAR**, one OK line
+  per threat item (handoff identity · rank order · `SIG` text · warnings readers · fixture reach). Its qualifier: the edited
+  rank/wrapper cases are compatibility controls, and only the two new cases plus the fire-site regex discriminate. This is accepted
+  and matches the seed table.
+- **Worktree-isolated run** (sonnet): the harness printed `all green` with 31 PASS at `7470f1a0`. One seed (equality → `true`)
+  reddened exactly `stale-marker-foreign-id-is-not-user-stop`, the sibling `wrapper-term-is-user-stop` stayed PASS, and the restore
+  was hash-equal (`a2151e4e` == `a2151e4e`).
+- **Coordinator:** ran the harness on the main tree (31 PASS, `all green`). TD-247 is updated at `50a8fa54`. C6's census is 0
+  line-start USER_STOP terminals, and a control query over the same logs reaches 10 terminals.
+Spend: builder ~78k · Codex ~24k · isolated verify ~56k sub-agent tokens.
