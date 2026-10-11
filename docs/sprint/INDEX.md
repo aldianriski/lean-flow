@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-09
+last_updated: 2026-10-11
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,8 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-123 — Repair-and-Park Vehicle — closed 2026-10-11 · `d69331f` · 2 of 2 members in `done/` (the run: `AUTHORITY_BOUNDARY` · `PARTIAL`, $1.32, 1 repair, 1 seeded park resolved by owner ruling; no consumer-facing file) · `epic: EPIC-015` · vehicle for SPRINT-122 T2
+- SPRINT-122 — Finish EPIC-015 — closed 2026-10-11 · `d69331f` · 2 of 2 members in `done/` (released in `2.5.0`; `scripts/night-run.sh` USER_STOP + reaper block, `night-run.md` changed) · **EPIC-015 member**
 - SPRINT-121 — Cover What Is Open — closed 2026-10-10 · `d9c6466` · 7 of 7 members in `done/` (released in `2.4.0`; spec 0.15.0 + lean-doc-generator/triage/prime changed) · **EPIC-015 member** — every open item got a home: the active-epic coverage rule, the workdoo epics moved (ADR-052), the learnings ledger folded to 4 active entries, the engine profiled (Round 23), and Dogfood 1 proven; CW6 stays open (TASK-423)
 - SPRINT-120 — Conform to Our Own Standard — closed 2026-10-09 · `79ce173` · 7 of 7 members in `done/` (released in `2.3.0`; conformance engine + spec 0.14.0 changed) · **standalone, no `epic:` stamp** — lean-flow passes its own `conformance.sh` at level Structural (from `level: none`)
 - SPRINT-119 — Fire-Ledger Vehicle — closed 2026-10-09 · `5bb2dd3` · 1 of 1 member in `done/` (the run itself: `PLAN_EXHAUSTED` · `DELIVERED`, $0.83; no consumer-facing file) · `epic: EPIC-015` — the seeded all-J0 vehicle SPRINT-118 T2's run fired against
