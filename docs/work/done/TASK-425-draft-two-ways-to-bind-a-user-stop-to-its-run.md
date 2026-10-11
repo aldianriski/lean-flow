@@ -35,8 +35,8 @@ which the run meets mid-run. The seed is declared here openly.
       rules require. Any rollup line goes in this sprint's Execution Log on its own line at column 0, not fenced and not bulleted.
       Open: the verdict is recorded (§ Review verdict) and acted on — a judgment finding, so ADR-022 parks it with no retry
       (`T2 · parked-hitl ·` in the Execution Log). The box stays open until the owner rules on the finding.
-      ✓ Owner ruled 2026-10-11 (popup, J2): **Option A** (stamp the marker with the run's id; reap() matches it). The park is resolved;
-      the build is a follow-up task, filed at close.
+      ✓ Owner ruled 2026-10-11 (popup, J2): **Option A** (stamp the marker with the run's id; reap() matches it). The park is cleared;
+      building Option A is follow-up TASK-426.
 
 ## Review seed
 

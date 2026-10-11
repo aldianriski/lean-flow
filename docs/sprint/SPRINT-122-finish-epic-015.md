@@ -3,8 +3,8 @@ sprint: 122
 slug: finish-epic-015
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-10-10
-status: active
+last_updated: 2026-10-11
+status: closed
 plan_commit: d399167
 gates_signed: G1,G2 @ d1341c4
 update_trigger: sprint execute/close events
@@ -82,5 +82,41 @@ unattended, the task stops for a scope ruling.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/night-run.sh` | T1 | `--wrap` traps TERM and leaves `<log>.stop`; reap() ranks it USER_STOP below the integrity fails | High | reap-terminal fixtures + 7 seeds + Codex ×2 |
+| `scripts/night-run.sh` | T2 | the reaper's block copies the run's non-green lines; counters skip only its own entries (CRLF-safe) | High | reap-terminal fixtures + 6 seeds + Codex ×2; live re-reap |
+| `evals/run-reap-terminal-fixtures.sh` | T1 · T2 | 7 wrapper cases + 10 block cases, each red under its own break | Med | the harness itself |
+| `skills/orchestrator/references/night-run.md` | T1 | which pid to TERM so a stop reports USER_STOP; INT/HUP are ignored | Low | read-through (Codex C7 OK) |
+| `docs/epic/EPIC-015-execution-autonomy.md` | T1 · T2 | CW6, CW5 and CW7 ticked with file:line and commit evidence | Low | rollup + epic checks |
+| `TECH-DEBT.md` | close | TD-247 (Option A ruled) · TD-248 (narrowed) | Low | — |
 
 ## Retro
+
+**Retrieval check:** mixed. The landing check (L-223's "cmp the seed landed") caught three seeds that never landed. Without it, two
+green runs would have been read as "the fixture does not discriminate". The "diff the environments" rule (edit-safety (d)) resolved
+the single-file vs gate disagreement on layers-observed. Two misses: I filed TD-248 on one query before reproducing the gate's own call
+(L-130), and I read a gate log before its run finished (L-045). Both are logged as sightings on the family heads.
+
+**Cost:** about 640k sub-agent tokens: one builder over six rounds (~205k), two seeding campaigns (~148k), four Codex rounds (~77k),
+G2 recon (~62k) and a pre-run reviewer (~144k). Plus $1.32 for the overnight run and ~$0.3 of allowlist probes. 174 min of attended
+wall clock (commit clock) to system verify.
+
+**Worked**
+- **The live run paid for itself.** SPRINT-123's first reaped AUTHORITY_BOUNDARY exposed a reaper defect that every fixture had missed:
+  no fixture ever ran the guard on a reaper-written AUTHORITY_BOUNDARY block. It is the L-181 producer/consumer gap, and it was found
+  only on real input (L-007).
+- **Proving the seed before promote** (L-136's REACHES question) caught a seed that would never have fired: prose-density measures a
+  table row by its longest cell.
+- The pre-run review's two soft fixes (the retry-line shape; briefing the reviewer with the seed alone) are why the repair was counted
+  and the park actually happened.
+
+**Friction**
+- My own bookkeeping reddened the pre-flight gate twice: scope-change entries naming undeclared paths, and `Tn:` subjects on member
+  moves (L-151's family again, after SPRINT-121 named it).
+- Shell-quoted seeds over ssh failed to land three times. A small script file shipped with `chr(92)` was what worked.
+- Every review round found something real, and the stop rule held: T1 needed two rounds, the T2 reaper fix three including an inline fix.
+
+**Pattern candidate:** none new; every item is a sighting on an existing family (A ×1 · B ×1 · C2 ×2 · E ×1).
+
+**Buckets:** routed with vehicle SPRINT-123's (one run, one vehicle). Shipped → `CHANGELOG.md` § SPRINT-122 (unreleased). Debt → TD-247
+(Option A ruled) · TD-248. Follow-ups → TASK-426 (`origin: close-retro`, TD-247 Option A). Learnings → sightings on L-130 · L-045 · L-166
+(×2) · L-151. TASK-417 (CW8) is unblocked for the next promote.

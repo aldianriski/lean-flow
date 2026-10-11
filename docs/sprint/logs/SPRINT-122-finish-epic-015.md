@@ -239,3 +239,30 @@ rules on the close-time override.
 The rollup leg PASSes on SPRINT-123. Cross-check of TD-248 (a direct single-file run FAILs, the gate leg PASSes): the gate calls the
 checker with every sprint file at once, and it skips sibling sprints' commits (`check-layers-observed.ts:538`). Reproduced locally in
 both orders: PASS/PASS. TD-248 is narrowed to the single-file direct run, severity low.
+
+### 2026-10-11 | run-complete | attended sprint-bulk exited, Plan exhausted (rollup written by the coordinator)
+
+Evidence provenance: mechanical = counted from member files and this log (cross-checked by `sprint-members-cli.ts counts`:
+`dod 8 0`, `units 2 2`); model-reported = written by the run; derived = a function of the fields below it.
+
+```
+run · 8 of 8 DoD ticked  [mechanical]
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED  [derived]
+terminal · PLAN_EXHAUSTED · every task reached a resolved state  [derived]
+tasks · 2 attempted / 2 completed / 2 total  [mechanical]
+parks · 0  [model-reported]
+repair-cycles · 4  [model-reported]
+verification · QA_FULL 301 pass 0 fail at cc965c3b (VPS ~/lf-gate)  [model-reported]
+warnings · TD-247 ruled Option A → TASK-426; TD-248 filed and narrowed; vehicle SPRINT-123 closes with this sprint  [mechanical]
+T1 · done · USER_STOP reportable: a TERM to the wrapper's printed pid (INT/HUP are ignored on entry); CW6 ticked
+T2 · done · vehicle SPRINT-123: 1 repair, 1 seeded park; reaper defect found live and fixed; re-reap guard PASS; CW5 + CW7 ticked
+```
+
+Repair cycles, each a bounded builder round on a concrete finding: T1 ×1 (review round 1: race, exit status, three uncovered seeds);
+T2 ×3 (a coordinator-caught over-broad cut; review round 1: K1, K2, S6; R2's CRLF fix applied inline). Calibration row (Part 4).
+Cost and turns are unavailable in an attended session. Wall clock comes from the commit clock, G1/G2 sign-off (`f91db920`,
+2026-10-10 15:24) to system verify (`43aa0061`, 18:18). The close ran the next day (owner ruling on TASK-425's park first):
+
+```
+run · cost unavailable · turns unavailable · 174 min · 2 of 2 units · coordinator + 1 builder (T1 then T2, 6 rounds) + 2 Explore/recon + 2 seeding reviewers + 4 Codex rounds + 1 pre-run reviewer + 1 overnight vehicle run ($1.32)
+```

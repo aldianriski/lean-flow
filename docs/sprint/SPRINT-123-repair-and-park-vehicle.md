@@ -4,7 +4,7 @@ slug: repair-and-park-vehicle
 epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-10-10
-status: active
+status: closed
 plan_commit: 838e714
 gates_signed: G1,G2 @ 838e714
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 838e714
@@ -82,5 +82,21 @@ judgment, so ADR-022 parks it: no retry.
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `docs/work/in_progress/TASK-424-verify-the-live-run-is-wrapped-and-repair-one-seeded-check-fail.md` | T1 | live witness that SPRINT-122 T1's TERM-catching `night-run.sh --wrap` owns this run: its ancestor `ps` line, verbatim in DoD1 (fixtures only proved it before) | Low | `ps` ancestry, verbatim |
+| `docs/work/done/TASK-425-draft-two-ways-to-bind-a-user-stop-to-its-run.md` | T2 | TD-247's two options drafted; the seeded judgment finding parked; the owner ruled Option A (coordinator, 2026-10-11) | Low | rollup guard PASS on the re-reap |
 
 ## Retro
+
+**Retrieval check:** no miss inside the envelope. The run used the literal `ps -eo` form, the bare `sprint(123):` subjects, the column-0
+retry line and the seed-only reviewer brief, all as the pre-run review had fixed them.
+
+**Cost:** $1.32 (harness result event), 26 turns, about 3 min, 0 permission denials. One scoped reviewer, inside the run.
+
+**Worked:** a seeded J1 Plan fired under a strict pre-flight (no declared J2). T1 met its named-check FAIL and took exactly one ADR-022
+retry; T2 met its seeded judgment finding and parked instead of picking an option. It ended at `AUTHORITY_BOUNDARY`, the expected
+state (D4). The owner resolved the park interactively the next day (TD-247, Option A).
+
+**Friction:** the reaper's first block could not pass the rollup guard (the park line was missing from it). That was a launcher defect,
+fixed in SPRINT-122 T2. A re-reap with the fixed launcher (`d4b726db`) passed. The re-reap's calibration wall (`67 min`) measures to the
+re-reap; the run's real wall is the first block's `3 min`.
+
+**Buckets:** routed with SPRINT-122's (one run, one vehicle).
