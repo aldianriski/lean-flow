@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-10-11
 status: active
 plan_commit: 443cc5ac
+gates_signed: G1,G2 @ 1c11a350
 update_trigger: sprint execute/close events
 ---
 
@@ -62,8 +63,7 @@ measured on the same host and tree, and every retained engine fixture is unchang
 
 ### T3 — Re-arm the execution freeze, widened to governance, and close EPIC-015 `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/adr/` · `docs/DECISIONS.md` · `docs/knowledge-index.md` · `docs/research/adlc-epic-sequencing.md`
-  · `docs/epic/EPIC-015-execution-autonomy.md` · `skills/lean-doc-generator/SKILL.md` · `skills/task-decomposer/SKILL.md`
-    (the placement targets: promote and intake, per the DoD; G2 may add more, logged and edited here as exact paths)
+  · `docs/epic/EPIC-015-execution-autonomy.md` · `.claude/CLAUDE.md` (the placement target, ruled at G2) · `docs/LEARNINGS.md`
   · `docs/work/todo/TASK-417-re-arm-the-execution-freeze-widened-to-governance-and-close-epic-015.md`
   · `docs/work/in_progress/TASK-417-re-arm-the-execution-freeze-widened-to-governance-and-close-epic-015.md`
 Depends-on: T1, T2
