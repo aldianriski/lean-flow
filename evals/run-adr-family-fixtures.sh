@@ -160,6 +160,24 @@ git_commit_all "$marked" "mark the ADR as amended in the open" || { echo "FAIL h
 run_case_anywhere "post-decision-marker-passes" 0 "1 ADR(s) unedited since their deciding commit" -- \
   sh "$engine" "$marked" --spec "$adr_spec"
 
+# (b2) MUST PASS -- proposed first, accepted later. The deciding revision is the ACCEPTANCE, so a
+# § Decision rewritten while the ADR was still proposed is not an edit after the decision. Retained
+# for TASK-404: the status match was the one part of the history walk no case reached -- an engine that
+# measured from the first revision, accepted or not, stayed green on every other case here.
+late_src="$work/append-late-src"
+mkdir -p "$late_src" && cp -R "$fx/clean/." "$late_src/" || { echo "FAIL harness: could not build the late-accept source"; exit 2; }
+adr="$late_src/docs/adr/ADR-001-a-real-decision.md"
+sed -e 's/^status: accepted$/status: proposed/' -e 's/^- \*\*Status:\*\* accepted .*$/- **Status:** proposed/' \
+    -e 's/^We chose the first option\.$/We are still weighing the options./' "$adr" > "$adr.tmp" && mv "$adr.tmp" "$adr"
+grep -q 'still weighing' "$adr" || { echo "FAIL harness: the late-accept seed did not apply"; exit 2; }
+late="$work/append-late-accept"
+git_repo_from "$late" "$late_src" || { echo "FAIL harness: could not build the late-accept repo"; exit 2; }
+cp "$fx/clean/docs/adr/ADR-001-a-real-decision.md" "$late/docs/adr/ADR-001-a-real-decision.md"
+git_commit_all "$late" "accept it" || { echo "FAIL harness: could not commit the acceptance"; exit 2; }
+
+run_case_anywhere "proposed-then-accepted-passes" 0 "1 ADR(s) unedited since their deciding commit" -- \
+  sh "$engine" "$late" --spec "$adr_spec"
+
 # (c) The honest-report case: no history to read. Not a FAIL of the repository -- the rule cannot be
 # answered, and saying so is the attestation-style behaviour A3 assumes.
 nogit="$work/append-nogit"

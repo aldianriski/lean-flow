@@ -1215,10 +1215,11 @@ _own_adr_count() {
 # driver -- they cannot hand each other a value, and the driver has no business knowing that this family
 # would like to share one. First call fills them; the rest read them.
 #
-# Deliberately NOT a single awk over all files at once (one process instead of ~236). That version needs
-# a cross-file state machine and silently drops a zero-byte file, because awk never reaches FNR==1 for
-# one -- a doc missing from the scan is a doc no rule reports on, which is the silent skip this engine
-# exists to prevent (L-058). This version is fast enough and cannot lose a row.
+# One awk for the whole set (TASK-404), but NOT the cross-file state machine an earlier draft used: that
+# version silently dropped a zero-byte file, because awk never reaches FNR==1 for one -- a doc missing
+# from the scan is a doc no rule reports on, which is the silent skip this engine exists to prevent
+# (L-058). Here awk is fed the doc LIST and opens each doc itself with `getline < file`, so an empty
+# doc is still a doc (reported as `nohdr`) and cannot lose a row.
 #
 # The awk emits ready-made lists rather than a row to be re-parsed downstream: splitting a row per doc
 # per rule in the shell would have put the spawns straight back.
@@ -1235,64 +1236,56 @@ _own_scan() {
   r=$1
   docs=$(_own_docs "$r")
   [ -n "$docs" ] || { _OWN_SCAN_DONE=1; return; }
-  saved_ifs_s=$IFS
-  IFS='
-'
-  for d in $docs; do
-    IFS=$saved_ifs_s
-    _OWN_N_DOCS=$((_OWN_N_DOCS + 1))
-    row=$(awk '
-      NR == 1 { if ($0 != "---") { print "nohdr"; exit } infm = 1; next }
-      infm && $0 == "---" { exit }
-      infm {
-        if ($0 ~ /^owner:/)               { v = $0; sub(/^owner:[ ]*/, "", v);          owner = v }
-        else if ($0 ~ /^update_trigger:/) { v = $0; sub(/^update_trigger:[ ]*/, "", v); upd = v }
-        else if ($0 ~ /^last_updated:/)   { v = $0; sub(/^last_updated:[ ]*/, "", v);   lu = v }
-        else if ($0 ~ /^status:/)         { v = $0; sub(/^status:[ ]*/, "", v);         st = v }
+  # ONE awk for the whole doc set (TASK-404; ~347 spawns, ~54 s in Round 23). It still reads each doc
+  # on its own -- `getline < file`, so a zero-byte doc IS a doc (it reports `nohdr`) and none can fall
+  # out of the scan -- which is the property the one-awk-over-all-files version above lost. One tagged
+  # line per fact, in doc order; the tag is the first character:
+  #   D <n docs>   H <path> no header   T <path> no update_trigger   U <path> has one
+  #   O <path><TAB><owner>   M <path> --<missing fields>
+  _osrow=$(printf '%s\n' "$docs" | R="$r" awk '
+    $0 == "" { next }
+    {
+      d = $0; f = ENVIRON["R"] "/" d; nd++
+      owner = ""; lu = ""; upd = ""; st = ""
+      rc = (getline l < f)
+      if (rc < 0) { print "T" d; next }
+      if (rc == 0 || l != "---") { close(f); print "H" d; print "T" d; next }
+      while ((getline l < f) > 0) {
+        if (l == "---") break
+        if (l ~ /^owner:/)               { v = l; sub(/^owner:[ ]*/, "", v);          owner = v }
+        else if (l ~ /^update_trigger:/) { v = l; sub(/^update_trigger:[ ]*/, "", v); upd = v }
+        else if (l ~ /^last_updated:/)   { v = l; sub(/^last_updated:[ ]*/, "", v);   lu = v }
+        else if (l ~ /^status:/)         { v = l; sub(/^status:[ ]*/, "", v);         st = v }
       }
-      END {
-        if (NR == 0) { print "nohdr"; exit }
-        if (!infm && owner == "" && lu == "" && upd == "" && st == "" && NR == 1) { print "nohdr"; exit }
-        miss = ""
-        if (owner == "") miss = miss " owner"
-        if (lu    == "") miss = miss " last_updated"
-        if (upd   == "") miss = miss " update_trigger"
-        if (st    == "") miss = miss " status"
-        print "owner\t" owner
-        print "upd\t" upd
-        print "miss\t" miss
-      }
-    ' "$r/$d")
-    case "$row" in
-      nohdr*)
-        _OWN_NOHDR="$_OWN_NOHDR$d
-"
-        _OWN_NOTRIG="$_OWN_NOTRIG$d
-"
-        ;;
-      *)
-        o=${row#owner	}; o=${o%%
-*}
-        u=${row#*upd	}; u=${u%%
-*}
-        m=${row#*miss	}; m=${m%%
-*}
-        [ -n "$o" ] && _OWN_OWNERS="$_OWN_OWNERS$d	$o
-"
-        if [ -n "$u" ]; then
-          _OWN_N_TRIG=$((_OWN_N_TRIG + 1))
-        else
-          _OWN_NOTRIG="$_OWN_NOTRIG$d
-"
-        fi
-        [ -n "$m" ] && _OWN_FIELDMISS="$_OWN_FIELDMISS$d --$m
-"
-        ;;
+      close(f)
+      miss = ""
+      if (owner == "") miss = miss " owner"
+      if (lu    == "") miss = miss " last_updated"
+      if (upd   == "") miss = miss " update_trigger"
+      if (st    == "") miss = miss " status"
+      if (owner != "") print "O" d "\t" owner
+      if (upd != "") print "U" d; else print "T" d
+      if (miss != "") print "M" d " --" miss
+    }
+    END { print "D" nd + 0 }
+  ')
+  # Walked by parameter expansion, not a heredoc: a heredoc body would re-read a `\\` or `\$` inside an
+  # owner value, and these lines carry free text.
+  while [ -n "$_osrow" ]; do
+    case "$_osrow" in
+      *"$_NL"*) _osl=${_osrow%%"$_NL"*}; _osrow=${_osrow#*"$_NL"} ;;
+      *)        _osl=$_osrow; _osrow="" ;;
     esac
-    IFS='
-'
+    _osv=${_osl#?}
+    case "$_osl" in
+      D*) _OWN_N_DOCS=$_osv ;;
+      H*) _OWN_NOHDR="$_OWN_NOHDR$_osv$_NL" ;;
+      T*) _OWN_NOTRIG="$_OWN_NOTRIG$_osv$_NL" ;;
+      U*) _OWN_N_TRIG=$((_OWN_N_TRIG + 1)) ;;
+      O*) _OWN_OWNERS="$_OWN_OWNERS$_osv$_NL" ;;
+      M*) _OWN_FIELDMISS="$_OWN_FIELDMISS$_osv$_NL" ;;
+    esac
   done
-  IFS=$saved_ifs_s
   _OWN_SCAN_DONE=1
 }
 
@@ -1351,28 +1344,45 @@ assert_S1_LAW2() {
     return
   fi
   n_checked=0; n_role=0
-  saved_ifs6=$IFS
-  IFS='
-'
   # An ABSENT owner is S3.SCHEMA's finding, not this one -- _OWN_OWNERS carries only docs that have a
   # value. LAW 2 is about the VALUE being a role; reporting one missing field under two names doubles a
   # single defect and makes the report read as worse than the repo is.
-  for line in $_OWN_OWNERS; do
-    IFS=$saved_ifs6
-    [ -n "$line" ] || { IFS='
-'; continue; }
+  #
+  # The role test is ONE awk over every owner line, not a `printf | grep -qix` per doc (TASK-404; ~347
+  # spawns). `grep -qix -- "$v"` is a case-insensitive WHOLE-LINE REGEX match, so a literal compare is
+  # only equivalent where the value holds no regex metacharacter in either dialect: the awk answers
+  # Y/N for a value made solely of letters, digits, space, `_`, `/` and `-`, and tags everything else
+  # G -- re-asked of grep exactly as before, so a value like `a.b` or `(x)` keeps its regex reading.
+  _lw=$(printf '%s' "$_OWN_OWNERS" | ROLES="$roles" LC_ALL=C awk '
+    BEGIN { nr = split(ENVIRON["ROLES"], role, "\n"); for (i = 1; i <= nr; i++) lc[tolower(role[i])] = 1 }
+    $0 == "" { next }
+    {
+      v = substr($0, index($0, "\t") + 1)
+      if (v ~ /^[A-Za-z0-9 _\/-]+$/) print ((tolower(v) in lc) ? "Y" : "N") $0
+      else print "G" $0
+    }')
+  while [ -n "$_lw" ]; do
+    case "$_lw" in
+      *"$_NL"*) line=${_lw%%"$_NL"*}; _lw=${_lw#*"$_NL"} ;;
+      *)        line=$_lw; _lw="" ;;
+    esac
+    [ -n "$line" ] || continue
+    _lt=${line%"${line#?}"}
+    line=${line#?}
     d=${line%%	*}
     v=${line#*	}
     n_checked=$((n_checked + 1))
-    if printf '%s\n' "$roles" | grep -qix -- "$v"; then
+    case "$_lt" in
+      Y) _hit=1 ;;
+      N) _hit=0 ;;
+      *) if printf '%s\n' "$roles" | grep -qix -- "$v"; then _hit=1; else _hit=0; fi ;;
+    esac
+    if [ "$_hit" -eq 1 ]; then
       n_role=$((n_role + 1))
     else
       bad "owner-not-a-role: $d -- owner '$v' is not in the role vocabulary ($src). LAW 2 wants a role, not a person; declare .conformance-roles if '$v' is one of yours"
     fi
-    IFS='
-'
   done
-  IFS=$saved_ifs6
   if [ "$n_checked" -eq 0 ]; then
     note "S1.LAW2             -- no doc carries an owner: field to evaluate (see S3.SCHEMA's findings); reported rather than passed"
   elif [ "$n_role" -eq "$n_checked" ]; then
@@ -1695,46 +1705,74 @@ assert_S4_APPEND() {
 
   n_clean=0
   n_undecided=0
-  saved_ifs4=$IFS
-  IFS='
-'
-  for a in $adrs; do
-    IFS=$saved_ifs4
-    # Oldest-first, so the FIRST revision carrying an accepted status is the deciding one. A file
-    # that was proposed first and accepted later is measured from the acceptance, not from creation.
-    revs=$(git -C "$repo" log --reverse --format=%H -- "$a" 2>/dev/null)
-    if [ -z "$revs" ]; then
-      note "S4.APPEND           -- $a has no commit touching it (untracked or added since the last commit); nothing to compare against"
-      IFS='
-'
-      continue
-    fi
-    deciding=""
-    for r in $revs; do
-      if git -C "$repo" show "$r:$a" 2>/dev/null |
-         grep -qiE '^status: *accepted|^- \*\*Status:\*\* *accepted'; then
-        deciding=$r
-        break
-      fi
-    done
-    if [ -z "$deciding" ]; then
-      n_undecided=$((n_undecided + 1))
-      IFS='
-'
-      continue
-    fi
-    then_body=$(git -C "$repo" show "$deciding:$a" 2>/dev/null | _adr_section Decision)
-    now_body=$(_adr_section Decision < "$repo/$a")
-    if [ "$then_body" = "$now_body" ]; then
-      n_clean=$((n_clean + 1))
-    else
-      short=$(git -C "$repo" rev-parse --short "$deciding" 2>/dev/null)
-      bad "adr-edited-after-decision: $a -- § Decision differs from the text accepted at $short. §4 is append-only: a decided ADR is marked deprecated or superseded, never rewritten, because the record of what was decided is the only thing that makes the reasoning auditable later. A post-decision MARKER in the header is the supported path and does not trip this"
-    fi
-    IFS='
-'
-  done
-  IFS=$saved_ifs4
+  # History is read in THREE batches, not per ADR (TASK-404; ~325 spawns, 24 s in Round 23): one
+  # `git log` over docs/adr names, per commit, the files it touched (`--no-renames` so a rename stays
+  # the touch the old per-path pathspec saw; `-c` so a merge that rewrote a file still lists it);
+  # one `git cat-file --batch` returns every candidate revision's blob; one awk walks them.
+  # Oldest-first, so the FIRST revision carrying an accepted status is the deciding one. A file that
+  # was proposed first and accepted later is measured from the acceptance, not from creation.
+  _areqs=$(git -C "$repo" log --reverse --no-renames -c --name-only --format=@%H -- docs/adr 2>/dev/null |
+    ADRS="$adrs" awk '
+      BEGIN { n = split(ENVIRON["ADRS"], a, "\n"); for (i = 1; i <= n; i++) want[a[i]] = 1 }
+      /^@/ { h = substr($0, 2); next }
+      ($0 in want) { cnt[$0]++; rv[$0, cnt[$0]] = h }
+      END { for (i = 1; i <= n; i++) for (j = 1; j <= cnt[a[i]]; j++) print rv[a[i], j] ":" a[i] }')
+  _ares=$({ printf '%s\n' "$_areqs"; printf '@@@\n'; printf '%s\n' "$_areqs" | git -C "$repo" cat-file --batch 2>/dev/null; } |
+    ADRS="$adrs" REPO="$repo" LC_ALL=C awk '
+      # The section extractor is the _adr_section awk, line for line: a `## ` line opens a section, only the
+      # one whose heading starts with the wanted name is kept, and the heading line itself is not.
+      function sect(line) {
+        if (line ~ /^## /) { inside = (index(substr(line, 4), "Decision") == 1); return 0 }
+        return inside
+      }
+      function strip(s) { sub(/\n+$/, "", s); return s }
+      function fin() { if (acc && !(nm in dec)) { dec[nm] = rv_; then_[nm] = body } }
+      BEGIN { n = split(ENVIRON["ADRS"], adr, "\n") }
+      sw == 0 && $0 == "@@@" { sw = 1; next }
+      sw == 0 { if ($0 == "") next; req[++nr] = $0; i = index($0, ":"); nm = substr($0, i + 1); hasrev[nm] = 1; next }
+      inb {
+        rem = size - consumed
+        if (rem <= 0) { inb = 0; fin(); next }
+        if (!(nm in dec) && tolower($0) ~ /^status: *accepted|^- \*\*status:\*\* *accepted/) acc = 1
+        if (sect($0)) body = body $0 "\n"
+        consumed += length($0) + 1
+        if (consumed > size) { inb = 0; fin() }
+        next
+      }
+      {
+        m++
+        if (NF == 3 && $3 ~ /^[0-9]+$/ && $2 != "missing") {
+          inb = 1; size = $3 + 0; consumed = 0; body = ""; acc = 0; inside = 0
+          q = req[m]; i = index(q, ":"); rv_ = substr(q, 1, i - 1); nm = substr(q, i + 1)
+        }
+      }
+      END {
+        for (i = 1; i <= n; i++) {
+          p = adr[i]
+          if (!(p in hasrev)) { print "X\t" p; continue }
+          if (!(p in dec)) { print "U\t" p; continue }
+          nb = ""; inside = 0
+          f = ENVIRON["REPO"] "/" p
+          while ((getline l < f) > 0) if (sect(l)) nb = nb l "\n"
+          close(f)
+          if (strip(then_[p]) == strip(nb)) print "C\t" p; else print "E\t" p "\t" dec[p]
+        }
+      }')
+  while IFS= read -r _al; do
+    _at=${_al%%	*}; _ar=${_al#*	}
+    case "$_at" in
+      X) note "S4.APPEND           -- $_ar has no commit touching it (untracked or added since the last commit); nothing to compare against" ;;
+      U) n_undecided=$((n_undecided + 1)) ;;
+      C) n_clean=$((n_clean + 1)) ;;
+      E)
+        a=${_ar%%	*}; deciding=${_ar#*	}
+        short=$(git -C "$repo" rev-parse --short "$deciding" 2>/dev/null)
+        bad "adr-edited-after-decision: $a -- § Decision differs from the text accepted at $short. §4 is append-only: a decided ADR is marked deprecated or superseded, never rewritten, because the record of what was decided is the only thing that makes the reasoning auditable later. A post-decision MARKER in the header is the supported path and does not trip this"
+        ;;
+    esac
+  done <<EOF2
+$_ares
+EOF2
   [ "$last_bad" -eq 1 ] && return
   if [ "$n_clean" -eq 0 ]; then
     note "S4.APPEND           -- no ADR has reached an accepted status yet ($n_undecided still proposed); there is no decision to have been edited"
@@ -2453,27 +2491,50 @@ assert_S10_TDAGING() {
   # demanding a per-row `updated:` field, because the sweep is a per-promote note about many rows and
   # §10 asks for a re-review PROMPT, not a per-row edit. Anchored to the region, not to the sweep's
   # wording, so a re-phrased sweep does not read as an absent one (L-108).
-  first=$(grep -n '^- \*\*TD-[0-9]' "$repo/$led" | head -1 | cut -d: -f1)
-  [ -n "$first" ] || { note "S10.TDAGING         -- $led holds no TD rows -- nothing to age"; return; }
-  hdr=$(head -n $((first - 1)) "$repo/$led")
+  # ONE awk pass over the ledger, not ~7 spawns per row (TASK-404; ~884 spawns, 111 s on this host in
+  # Round 23). The header region is every line before the first row; a row's id is "named" if it
+  # appears anywhere in it -- a plain SUBSTRING test (`index`), exactly the old `grep -qF`, so TD-1 is
+  # still found inside TD-12. `lastnum` takes the digits after the LAST `<key>Sprint-` on the line,
+  # which is what the old greedy `sed 's/.*created: Sprint-\([0-9]*\).*/\1/p'` took.
+  _tdout=$(awk -v cur="$cur" '
+    function lastnum(s, key,   t, off, i, pos, rest) {
+      t = s; off = 0; pos = 0
+      while ((i = index(t, key)) > 0) { pos = off + i; off += i; t = substr(t, i + 1) }
+      if (!pos) return ""
+      rest = substr(s, pos + length(key)); match(rest, /^[0-9]*/)
+      return substr(rest, 1, RLENGTH)
+    }
+    /^- \*\*TD-[0-9]/ {
+      seenrow = 1
+      if (index($0, "status: open") == 0) next
+      match($0, /TD-[0-9]+/); tid = substr($0, RSTART, RLENGTH)
+      born = lastnum($0, "created: Sprint-"); upd = lastnum($0, "updated: Sprint-")
+      if (upd != "") born = upd
+      if (born == "") next
+      age = (cur + 0) - (born + 0)
+      if (age < 3) next
+      aged++
+      if (index(hdr, tid) > 0) next
+      printf "F\t%s\t%d\n", tid, age
+      next
+    }
+    !seenrow { hdr = hdr $0 "\n" }
+    END { if (!seenrow) print "Z"; else printf "N\t%d\n", aged + 0 }
+  ' "$repo/$led")
+  case "$_tdout" in Z) note "S10.TDAGING         -- $led holds no TD rows -- nothing to age"; return ;; esac
   n_aged=0; n_flagged=0
-  while IFS= read -r row; do
-    [ -n "$row" ] || continue
-    tid=$(printf '%s' "$row" | grep -oE 'TD-[0-9]+' | head -1)
-    case "$row" in *'status: open'*) : ;; *) continue ;; esac
-    born=$(printf '%s' "$row" | sed -n 's/.*created: Sprint-\([0-9]*\).*/\1/p')
-    seen=$(printf '%s' "$row" | sed -n 's/.*updated: Sprint-\([0-9]*\).*/\1/p')
-    [ -n "$seen" ] && born=$seen
-    case "$born" in ''|*[!0-9]*) continue ;; esac
-    age=$(( $(_dec "$cur") - $(_dec "$born") ))
-    [ "$age" -ge 3 ] || continue
-    n_aged=$((n_aged + 1))
-    if printf '%s\n' "$hdr" | grep -qF "$tid"; then continue; fi
-    n_flagged=$((n_flagged + 1))
-    bad "td-row-aged-unreviewed: $tid is $age sprints unaddressed and no aging sweep in $led names it. §10 makes >= 3 sprints a re-review prompt; a row nothing re-reviews is a cost nobody is deciding to keep"
-  done <<EOF
-$(grep '^- \*\*TD-[0-9]' "$repo/$led")
-EOF
+  while IFS= read -r _tdl; do
+    case "$_tdl" in
+      N"	"*) n_aged=${_tdl#N	} ;;
+      F"	"*)
+        _tdr=${_tdl#F	}; tid=${_tdr%%	*}; age=${_tdr#*	}
+        n_flagged=$((n_flagged + 1))
+        bad "td-row-aged-unreviewed: $tid is $age sprints unaddressed and no aging sweep in $led names it. §10 makes >= 3 sprints a re-review prompt; a row nothing re-reviews is a cost nobody is deciding to keep"
+        ;;
+    esac
+  done <<EOF2
+$_tdout
+EOF2
   [ "$n_flagged" -gt 0 ] && return
   ok "S10.TDAGING         -- $n_aged open row(s) at >= 3 sprints, each named in the ledger's aging sweep"
 }
@@ -2772,29 +2833,97 @@ _s11_archived_plans() {
   done
 }
 
-# _s11_archived_at <repo> <archive-path> -- the commit in which <archive-path> FIRST APPEARED, i.e.
-# the commit that performed the archive.
+# The ARCHIVE COMMIT of a path (column 2 of _s11_rows) -- the commit in which the path FIRST APPEARED,
+# i.e. the commit that performed the archive.
 #
 # NOT `log -1 --follow`, which was the first draft and was wrong: that returns the NEWEST commit to
 # touch the path, so an archived Plan resolved to a later release commit and its log to a later
 # labelling commit -- neither of them the archive. It reported 24 sprints as split pairs, none of
 # which were. Oldest-first `--diff-filter=A` names the appearance instead, which is the event §11
 # actually constrains.
-_s11_archived_at() {
-  git -C "$1" log --diff-filter=A --format='%H' -- "$2" 2>/dev/null | tail -1
+#
+# ONE pass over the whole archive (TASK-404), not one `git log` per path: `--name-only` lists the paths
+# each commit added, and the LAST commit printed for a path is the oldest -- exactly what the old
+# per-path `log --diff-filter=A -- <path> | tail -1` returned. `--no-renames` keeps a within-archive
+# move an add, as it was when the pathspec hid the rename's source; copies are never detected.
+#
+# The answers are joined to the Plan list INSIDE the awk, one row per archived Plan in <arch> order,
+# because a shell `case` search of a 20 KB map costs ~40 ms a lookup -- slower than the spawns it
+# replaced. A row: <plan> TAB <commit that archived it> TAB <its close_commit, "" when absent or a
+# bracketed placeholder> TAB <commit that archived its log>.
+_NL='
+'
+_S11_ROWS_KEY=""
+_S11_ROWS=""
+_s11_rows() {   # <repo> <arch-list>
+  [ "$_S11_ROWS_KEY" = "$1" ] && return
+  _S11_ROWS_KEY=$1
+  _S11_ROWS=$(git -C "$1" -c core.quotepath=off log --diff-filter=A --no-renames --name-only --format=@%H -- docs/sprint/archive 2>/dev/null |
+    ARCH="$2" R="$1" awk '
+      /^@/ { h = substr($0, 2); next }
+      NF   { at[$0] = h }
+      END {
+        n = split(ENVIRON["ARCH"], a, "\n")
+        for (i = 1; i <= n; i++) {
+          p = a[i]; if (p == "") continue
+          base = p; sub(/^.*\//, "", base)
+          f = ENVIRON["R"] "/" p; cc = ""
+          if ((getline l < f) > 0 && l == "---") {
+            while ((getline l < f) > 0) {
+              if (l == "---") break
+              if (l ~ /^close_commit:/) { sub(/^close_commit:[ ]*/, "", l); cc = l; break }
+            }
+          }
+          close(f)
+          if (substr(cc, 1, 1) == "[") cc = ""
+          print p "\t" at[p] "\t" cc "\t" at["docs/sprint/archive/logs/" base]
+        }
+      }')
 }
 
-# _s11_log_predated_archive <repo> <commit> <basename> -- was the live log present in the archive
-# commit's PARENT? Only then does "archive the pair together" bind.
+# _s11_present <repo> <requests> -- sets _S11_FLAGS to one line per request, in order: the object id
+# when it names an existing object, `-` when it does not. ONE `git cat-file --batch-check` answers all
+# of them; it prints exactly one line per request, ending in a size when the object exists and in
+# `missing` (or `ambiguous`) when it does not. A request must be a non-empty line; pass `-` for "none".
+_S11_FLAGS=""
+_s11_present() {
+  _S11_FLAGS=""
+  [ -n "$2" ] || return 0
+  _S11_FLAGS=$(printf '%s\n' "$2" | git -C "$1" cat-file --batch-check 2>/dev/null | awk '{ if ($NF ~ /^[0-9]+$/) print $1; else print "-" }')
+  return 0
+}
+
+# _s11_cursor / _s11_pop -- walk the rows and the flags in lockstep, one iteration each, without
+# touching the stored lists (two rules read them). _s11_pop sets _s11_p _s11_ac _s11_cc _s11_acl _s11_fl
+# and returns 1 when the rows are spent. A caller pops at the TOP of its loop, before any `continue`,
+# so the two lists cannot fall out of step.
+_s11_cursor() { _S11_RCUR=$_S11_ROWS; _S11_FCUR=$_S11_FLAGS; }
+_s11_pop() {
+  [ -n "$_S11_RCUR" ] || return 1
+  case "$_S11_RCUR" in
+    *"$_NL"*) _s11_row=${_S11_RCUR%%"$_NL"*}; _S11_RCUR=${_S11_RCUR#*"$_NL"} ;;
+    *)        _s11_row=$_S11_RCUR; _S11_RCUR="" ;;
+  esac
+  _s11_p=${_s11_row%%	*};  _s11_t=${_s11_row#*	}
+  _s11_ac=${_s11_t%%	*}; _s11_t=${_s11_t#*	}
+  _s11_cc=${_s11_t%%	*}; _s11_acl=${_s11_t#*	}
+  case "$_S11_FCUR" in
+    *"$_NL"*) _s11_fl=${_S11_FCUR%%"$_NL"*}; _S11_FCUR=${_S11_FCUR#*"$_NL"} ;;
+    *)        _s11_fl=$_S11_FCUR; _S11_FCUR="" ;;
+  esac
+  [ -n "$_s11_fl" ] || _s11_fl="-"
+  return 0
+}
+
+# "Was the live log present in the archive commit's PARENT?" (asked in assert_S11_LOGPAIR through
+# _s11_present on `<archive-commit>^:docs/sprint/logs/<basename>`.) Only then does "archive the pair
+# together" bind.
 #
 # §11's logs/ sibling arrived with ADR-014 at SPRINT-047, so every sprint archived before it had no
 # separate log to move, and its archived log was written later by that one-time migration. Comparing
 # commits without this guard reports a decade of correct closes as split pairs -- a finding no
 # adopter could act on, about a file that did not exist when the rule they are being judged against
 # would have applied.
-_s11_log_predated_archive() {
-  git -C "$1" cat-file -e "$2^:docs/sprint/logs/$3" 2>/dev/null
-}
 
 assert_S11_SPRINT() {
   repo=$1
@@ -2851,10 +2980,24 @@ assert_S11_LOGPAIR() {
   has_git=0
   _is_git_repo "$repo" && has_git=1
   n_pair=0; n_nolog=0; n_unjudged=0
+  if [ "$has_git" -eq 1 ]; then
+    # History is read in two batches, not per pair (TASK-404; ~368 spawns, 31 s in Round 23): the
+    # archive commit of every path from the shared rows, and "was the live log present in the
+    # archive commit's PARENT" for every Plan in ONE `git cat-file --batch-check`.
+    _s11_rows "$repo" "$arch"
+    _reqs=""
+    _s11_cursor
+    while _s11_pop; do
+      if [ -n "$_s11_ac" ]; then _reqs="$_reqs$_s11_ac^:docs/sprint/logs/${_s11_p##*/}$_NL"; else _reqs="$_reqs-$_NL"; fi
+    done
+    _s11_present "$repo" "$_reqs"
+    _s11_cursor
+  fi
   _oifs=$IFS; IFS='
 '
   for a in $arch; do
     IFS=$_oifs
+    [ "$has_git" -eq 1 ] && _s11_pop
     base=${a##*/}
     stray="docs/sprint/logs/$base"
     archlog="docs/sprint/archive/logs/$base"
@@ -2877,11 +3020,11 @@ assert_S11_LOGPAIR() {
       # Both archived. The remaining question is whether they moved TOGETHER -- §11 says "same
       # commit", and two archives a week apart satisfy every tree-shaped test while still having
       # stranded the evidence in between.
-      cp_plan=$(_s11_archived_at "$repo" "$a")
-      if [ -n "$cp_plan" ] && _s11_log_predated_archive "$repo" "$cp_plan" "$base"; then
+      cp_plan=$_s11_ac
+      if [ -n "$cp_plan" ] && [ "$_s11_fl" != "-" ]; then
         # The live log existed when the Plan moved, so the pair was there to be moved together and
         # §11 binds. Without this guard the check judges sprints that had no separate log to move.
-        cp_log=$(_s11_archived_at "$repo" "$archlog")
+        cp_log=$_s11_acl
         if [ -n "$cp_log" ] && [ "$cp_plan" != "$cp_log" ]; then
           bad "sprint-log-archived-apart-from-plan: ${base%.md} -- the live log existed when the Plan was archived at ${cp_plan%${cp_plan#???????}}, but the log only reached the archive at ${cp_log%${cp_log#???????}}. §11 requires the same commit: the pair is one record, and between those two commits a reader finds a Retro whose evidence is not beside it"
           IFS='
@@ -2961,13 +3104,24 @@ assert_S11_WHENITRUNS() {
   arch=$(_s11_archived_plans "$repo")
   [ -n "$arch" ] || { note "S11.WHENITRUNS      -- no archived sprint, so no close-time retention has run yet -- absence is not a wrong phase"; return; }
   n_ok=0; n_unread=0
+  # The per-sprint lookups are batched (TASK-404; ~597 spawns, 57 s in Round 23): every close_commit
+  # and archive commit from the shared rows, and every "does that commit exist" in ONE
+  # `git cat-file --batch-check`. Only the ancestry test stays per sprint.
+  _s11_rows "$repo" "$arch"
+  _reqs=""
+  _s11_cursor
+  while _s11_pop; do
+    if [ -n "$_s11_cc" ]; then _reqs="$_reqs$_s11_cc^{commit}$_NL"; else _reqs="$_reqs-$_NL"; fi
+  done
+  _s11_present "$repo" "$_reqs"
+  _s11_cursor
   _oifs=$IFS; IFS='
 '
   for a in $arch; do
     IFS=$_oifs
-    cc=$(_fm_real "$repo/$a" close_commit)
-    ac=$(_s11_archived_at "$repo" "$a")
-    if [ -z "$cc" ] || [ -z "$ac" ] || ! git -C "$repo" rev-parse --verify "$cc^{commit}" >/dev/null 2>&1; then
+    _s11_pop
+    cc=$_s11_cc; ac=$_s11_ac
+    if [ -z "$cc" ] || [ -z "$ac" ] || [ "$_s11_fl" = "-" ]; then
       n_unread=$((n_unread + 1)); IFS='
 '; continue
     fi
