@@ -122,3 +122,20 @@ seeds needed (`caf7276b`, after the scope-change above). Coordinator applied the
 - A local post-R1 run on this host was killed by the memory reaper. The owner ruled by popup to verify on the VPS instead.
 - TD-168 → resolved (TASK-404). TD-249 filed.
 Spend: builder 1 ~254k · builder 2 ~107k · Codex ~20k + ~19k · isolated verify ~62k sub-agent tokens.
+
+### 2026-10-12 | task-done | T3 TASK-417 — the freeze re-arms, widened to governance; EPIC-015 closes (4/4)
+Tier P: G1 plus the owner's read-through. The coordinator drafted ADR-053 inline (a `decision` task), and the owner accepted it as written by popup.
+- **ADR-053** (`65ede7df`) covers six points: the frozen scope (the loop, EPIC-015's additions, and new guard · checker · gate leg · `qa-check.sh`
+  leg · ledger · ledger field), the five conditions, what is not frozen, the admission named in `## Why` and read at G1 with no new field, bounded
+  review (a G2 round cap, default 2; spend shown; census-zero → TD), and the placement. A figure check while drafting: "941 commits" had no
+  source, so it was cut. The ~6% `skills/` share was re-derived (61 of 1,077 commits, 5.7%), and the ~69% governance share is cited to the
+  interim ruling.
+- **Placement:** one `.claude/CLAUDE.md` Anti-Pattern. The file stays at 80/80 because two short adjacent anti-patterns (CONTEXT/README sync ·
+  no `git push` in `release-patch`) now share one physical line, with their text unchanged. Token budget ~13,728 ≤ 16,087. `check-doc-caps`
+  rc 0, 0 FAIL.
+- **§ FROZEN** carries the 2026-10-12 amendment, which points to the ADR. The interim paragraph is deleted, and a grep finds no other live copy.
+  The file went from 161 to 158 lines.
+- **L-217** re-disposed: move-to-reference → ADR-053 § Decision 5. The knowledge index was regenerated.
+- **EPIC-015:** CW8 is `[x]` (`928d4a43`), 8/8 conditions met, `status: closed`. `check-epic-archive` PASSes it as correctly not yet archived
+  until SPRINT-124 closes.
+Spend: no sub-agents. Consequence row (G2): governance high → Tier P read-through, done.
