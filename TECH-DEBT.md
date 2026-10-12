@@ -351,6 +351,11 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-250** severity: minor | status: open | created: Sprint-124 (close, T2's fixture builder)
+  - Summary: **`evals/run-sprint-family-fixtures.sh`'s header still says it was "enumerated from the 68 assertions below", and its
+    per-section tally sums to 68.** The cases kept growing after that header was written, and TASK-404 alone added 10 assertions. The
+    header claims to be derived from the assertions, so a stale count is a false statement about the file it heads.
+  - Fix direction: re-derive the tally from the assertions, or drop the count and keep the per-section list.
 - **TD-249** severity: low | status: open | created: Sprint-124 (T2 review, Codex R1 T1/T4 + R2 R1)
   - Summary: **TASK-404's batched engine passes can still differ from the per-file code they replaced, on three input shapes no real
     corpus holds.** (1) `S10.TDAGING` does its age arithmetic in awk floats, so a sprint number above 2^53 rounds and an age can read one

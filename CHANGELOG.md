@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-11
+last_updated: 2026-10-12
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,23 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+
+## SPRINT-124 — Close EPIC-015 and Cut the Engine (2026-10-12) — unreleased
+
+**Consumer-facing:**
+- **`conformance.sh` runs about three times faster on Windows.** On this repository it went from 417 s to 136 s, and from 23 s to 3 s on
+  Linux. Five rules that started processes for every row now read their inputs in one pass. Verdicts, finding ids, report text and
+  exit codes are unchanged: the full report is byte-identical before and after, under bash and under dash with gawk and mawk.
+- **A stale stop marker is no longer read as a user stop.** The launcher's `<log>.stop` marker now carries the run's start epoch, and
+  the reaper reports `USER_STOP` only when it matches the run it is reaping. A foreign or missing id is ignored and named under
+  `warnings ·`.
+
+**Maintainer-side:**
+- ADR-053: the execution freeze re-arms, widened to new governance machinery (the five admission conditions, a G2 review-round cap).
+- EPIC-015 is closed (8 of 8).
+- TD-168 resolved · TD-249 · TD-250.
 
 ---
 

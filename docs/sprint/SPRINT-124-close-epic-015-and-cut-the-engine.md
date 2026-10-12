@@ -3,8 +3,8 @@ sprint: 124
 slug: close-epic-015-and-cut-the-engine
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-10-11
-status: active
+last_updated: 2026-10-12
+status: closed
 plan_commit: 443cc5ac
 gates_signed: G1,G2 @ 1c11a350
 update_trigger: sprint execute/close events
@@ -100,6 +100,56 @@ sprint's other work, so the freeze lands on the finished execution architecture.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/night-run.sh` | T1 | the `.stop` marker carries `<signal> <run start>`; reap() reports USER_STOP only for its own run | High | reap-terminal fixtures 31 PASS + 3 seeds + Codex + isolated seed |
+| `evals/run-reap-terminal-fixtures.sh` | T1 | real epochs, plus two stale-marker must-FAIL cases (foreign id, no id) | Med | the harness itself |
+| `scripts/lib/conformance-engine.sh` | T2 | five per-row spawn loops batched; Codex R1: quotepath off, byte-exact role hits | High | report `cmp` (Windows; dash+gawk/mawk) + 9 seeds + Codex ×2 + isolated |
+| `evals/run-adr-family-fixtures.sh` | T2 | `proposed-then-accepted-passes`, `non-ascii-name-edited-fires` | Med | the harness itself |
+| `evals/run-sprint-family-fixtures.sh` | T2 | TDAGING age edges, LOGPAIR re-add, WHENITRUNS unphased close | Med | the harness itself (VPS) |
+| `TECH-DEBT.md` | T1 · T2 | TD-247 C3 resolved · TD-168 resolved · TD-249 filed | Low | census per row |
+| `docs/research/logs/qa-gate-timing.md` | T2 | Round 24 | Low | figures re-derived from the time files |
+| `docs/adr/ADR-053-…` · `docs/DECISIONS.md` · `docs/knowledge-index.md` | T3 | the freeze re-arms, widened to governance machinery | Med | owner read-through |
+| `docs/research/adlc-epic-sequencing.md` | T3 | § FROZEN amendment → ADR-053; interim paragraph removed | Low | grep: no second live copy |
+| `.claude/CLAUDE.md` | T3 | one Anti-Pattern line for ADR-053 | Med | caps 80/80 · density 4 ≤ 4 · gate 283/0 |
+| `docs/LEARNINGS.md` | T3 | L-217 re-disposed to ADR-053 | Low | — |
+| `docs/epic/EPIC-015-execution-autonomy.md` | T3 | CW8 `[x]`, epic closed | Low | `check-epic-archive` PASS |
 
 ## Retro
-<!-- Written at close (STANDARD §10). -->
+
+**Retrieval check:** mixed. L-130's cross-check caught an unsourced figure ("941 commits") before it froze into ADR-053. The 5.7%
+`skills/` share was re-derived, and the governance share is cited to its ruling. Two misses: I joined two CLAUDE.md lines to stay at 80,
+against STANDARD 157's "split, never squeeze", and only system verify caught it. And L-217's own stop rule, landing in this sprint's
+ADR, was what ended T2's review at the cap.
+
+**Cost:** about 620k sub-agent tokens for 8 DoD across 3 members, plus three G1/G2 recon passes that were not metered:
+- T1: builder ~78k · Codex ~24k · isolated verify ~56k.
+- T2: builder ~254k · fixture builder ~107k · Codex ~20k + ~19k · isolated verify ~62k.
+- T3: inline, no sub-agents.
+Shape: coordinator plus 8 agents, sequential and attended. The commit clock ran from `plan_commit` (2026-10-11 17:24) to system verify
+(2026-10-12 10:45), mostly builder and gate wall time on a memory-starved host.
+
+**Worked**
+- **The signed seed bar did its job.** "Each seed must redden its fixture" turned a green T2 into four named fixture gaps. They were closed
+  through a scope-change rather than accepted quietly.
+- **Codex found what parity could not.** Byte-identical output over this repo said nothing about non-ASCII ADR paths, because there are
+  none. Round 1 reasoned its way to a real adopter-reachable false negative, and a probe confirmed it. At the cap, the three census-zero
+  shapes went to TD-249 instead of a third round.
+- **The off-host route held when this host could not.** The memory reaper killed a run and forks failed. The VPS gave parity under dash
+  with both gawk and mawk, the seed check, and the full gate.
+
+**Friction**
+- **Line caps pulled against each other.** Joining two lines kept CLAUDE.md at 80, but `check-doc-caps` does not measure width, and
+  prose-density (400 chars) is a gate leg. The first system verify FAILed at 282/1.
+- **TASK-426's ✓ tails broke the freeze check.** The tails sat on continuation lines, where `dispatch.md` says "after the frozen text",
+  but the checker accepts a tail only on the box line → TASK-427.
+- **Escaping and line endings bit again.** A heredoc ate backslashes in Python edit anchors twice (`chr(92)` again). Git Bash
+  `grep -c $'\r'` read 0 on CRLF working copies, and a Python count disagreed and was right.
+- The first builder edited a file outside T2's `Layers:`. It reported this, and the change was routed by popup and scope-change.
+
+**Pattern candidate:** none new. Every item is a sighting on an existing family: A ×2 (L-130), B ×1 (L-045), C1 ×1 (L-186), C2 ×1 (L-166).
+
+**Buckets:**
+- Shipped → `CHANGELOG.md` § SPRINT-124 (unreleased).
+- Debt → TD-168 resolved · TD-249 (filed at T2) · TD-250.
+- Follow-ups → TASK-427 (`origin: close-retro`).
+- Learnings → sightings on L-130 (×2) · L-045 · L-186 · L-166.
+- EPIC-015 closed 8/8 and archives with this sprint.
