@@ -144,6 +144,26 @@ git_commit_all "$edited" "quietly rewrite the decision" || { echo "FAIL harness:
 run_case_anywhere "edited-after-decision-fires" 1 "adr-edited-after-decision: docs/adr/ADR-001-a-real-decision.md" -- \
   sh "$engine" "$edited" --spec "$adr_spec"
 
+# (a2) MUST FAIL -- the same rewrite on an ADR whose name holds non-ASCII bytes. Retained for TASK-404
+# (Codex review R1 T3): git's default `core.quotepath` prints such a path quoted and octal-escaped, so a
+# history pass that matches names literally finds no commit for it and stays silent on the edit.
+qp_src="$work/append-quoted-src"
+mkdir -p "$qp_src" && cp -R "$fx/clean/." "$qp_src/" || { echo "FAIL harness: could not build the quoted-name source"; exit 2; }
+qp_name=$(printf 'ADR-001-d\303\251cision.md')
+mv "$qp_src/docs/adr/ADR-001-a-real-decision.md" "$qp_src/docs/adr/$qp_name" || { echo "FAIL harness: could not rename the quoted-name ADR"; exit 2; }
+for f in $(grep -rl 'ADR-001-a-real-decision' "$qp_src"); do
+  sed "s/ADR-001-a-real-decision\.md/$qp_name/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+quoted="$work/append-quoted"
+git_repo_from "$quoted" "$qp_src" || { echo "FAIL harness: could not build the quoted-name repo"; exit 2; }
+adr="$quoted/docs/adr/$qp_name"
+sed 's/^We chose the first option\.$/We chose the second option after all./' "$adr" > "$adr.tmp" && mv "$adr.tmp" "$adr"
+grep -q 'second option after all' "$adr" || { echo "FAIL harness: the quoted-name seed did not apply"; exit 2; }
+git_commit_all "$quoted" "quietly rewrite the decision" || { echo "FAIL harness: could not commit the quoted-name edit"; exit 2; }
+
+run_case_anywhere "non-ascii-name-edited-fires" 1 "adr-edited-after-decision: docs/adr/$qp_name" -- \
+  sh "$engine" "$quoted" --spec "$adr_spec"
+
 # (b) MUST PASS -- a post-decision MARKER in the header, § Decision untouched. This is the
 # distinction the task exists to draw: this repo's own ADR-008 and ADR-027 both carry legitimate
 # `Scope amended by:` / refinement markers, and a rule that reddens on them is unusable here before

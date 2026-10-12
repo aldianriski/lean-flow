@@ -1351,14 +1351,15 @@ assert_S1_LAW2() {
   # The role test is ONE awk over every owner line, not a `printf | grep -qix` per doc (TASK-404; ~347
   # spawns). `grep -qix -- "$v"` is a case-insensitive WHOLE-LINE REGEX match, so a literal compare is
   # only equivalent where the value holds no regex metacharacter in either dialect: the awk answers
-  # Y/N for a value made solely of letters, digits, space, `_`, `/` and `-`, and tags everything else
-  # G -- re-asked of grep exactly as before, so a value like `a.b` or `(x)` keeps its regex reading.
+  # Y for a value made solely of letters, digits, space, `_`, `/` and `-` that equals a role byte for byte,
+  # and tags everything else G -- re-asked of grep exactly as before, so a value like `a.b` or `(x)` keeps
+  # its regex reading and a case-only match keeps grep's locale's case folding (Codex R1 T2).
   _lw=$(printf '%s' "$_OWN_OWNERS" | ROLES="$roles" LC_ALL=C awk '
-    BEGIN { nr = split(ENVIRON["ROLES"], role, "\n"); for (i = 1; i <= nr; i++) lc[tolower(role[i])] = 1 }
+    BEGIN { nr = split(ENVIRON["ROLES"], role, "\n"); for (i = 1; i <= nr; i++) rs[role[i]] = 1 }
     $0 == "" { next }
     {
       v = substr($0, index($0, "\t") + 1)
-      if (v ~ /^[A-Za-z0-9 _\/-]+$/) print ((tolower(v) in lc) ? "Y" : "N") $0
+      if (v ~ /^[A-Za-z0-9 _\/-]+$/ && (v in rs)) print "Y" $0
       else print "G" $0
     }')
   while [ -n "$_lw" ]; do
@@ -1374,7 +1375,6 @@ assert_S1_LAW2() {
     n_checked=$((n_checked + 1))
     case "$_lt" in
       Y) _hit=1 ;;
-      N) _hit=0 ;;
       *) if printf '%s\n' "$roles" | grep -qix -- "$v"; then _hit=1; else _hit=0; fi ;;
     esac
     if [ "$_hit" -eq 1 ]; then
@@ -1711,7 +1711,7 @@ assert_S4_APPEND() {
   # one `git cat-file --batch` returns every candidate revision's blob; one awk walks them.
   # Oldest-first, so the FIRST revision carrying an accepted status is the deciding one. A file that
   # was proposed first and accepted later is measured from the acceptance, not from creation.
-  _areqs=$(git -C "$repo" log --reverse --no-renames -c --name-only --format=@%H -- docs/adr 2>/dev/null |
+  _areqs=$(git -C "$repo" -c core.quotepath=off log --reverse --no-renames -c --name-only --format=@%H -- docs/adr 2>/dev/null |
     ADRS="$adrs" awk '
       BEGIN { n = split(ENVIRON["ADRS"], a, "\n"); for (i = 1; i <= n; i++) want[a[i]] = 1 }
       /^@/ { h = substr($0, 2); next }
