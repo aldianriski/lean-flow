@@ -139,3 +139,12 @@ Tier P: G1 plus the owner's read-through. The coordinator drafted ADR-053 inline
 - **EPIC-015:** CW8 is `[x]` (`928d4a43`), 8/8 conditions met, `status: closed`. `check-epic-archive` PASSes it as correctly not yet archived
   until SPRINT-124 closes.
 Spend: no sub-agents. Consequence row (G2): governance high → Tier P read-through, done.
+
+### 2026-10-12 | system-verify | QA_FULL green on the integrated tree after one fix (283 pass, 0 fail)
+Run on the VPS (the owner ruled the off-host route this sprint after this host's memory reaper killed a run). First run at `b9e3ec93`:
+`QA-CHECK: 282 pass, 1 fail`. The fail was `prose-density: .claude/CLAUDE.md grew to 5 dense lines, baseline 4` (STANDARD 157: split, never
+squeeze): T3's new Anti-Pattern line was 488 chars, over the 400 limit. Fixed by tightening its wording to 396 chars, with every clause kept
+(`92d85d2a`, T3 Layers). Local `check-prose-density .` gives 29 pass / 0 fail; `check-doc-caps` gives CLAUDE.md 80/80 and the token budget
+~13,697 ≤ 16,087. Re-run at `92d85d2a`: **`QA-CHECK: 283 pass, 0 fail`**, rc 0, 110 s.
+Learning candidate for the Retro: joining lines to stay under one cap (80 lines) can breach a sibling cap (400 chars/line). The two caps
+pull against each other, and only the full gate saw both.
