@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-06
+last_updated: 2026-10-12
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -197,7 +197,7 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-190: SPRINT-095)
 - count: 4
 - promoted: yes
-- **L-217 → promoted: retained** · disposition: retain — justification: family H (×4) belongs in TASK-417's ADR bounded-review / stop rule (SPRINT-122), and is re-disposed when that lands (SPRINT-122 promote, owner).
+- **L-217 → promoted: yes → ADR-053 § Decision 5** (bounded review: a G2-declared round cap, cumulative spend, census-zero → TD, threat-model briefs) + its `.claude/CLAUDE.md` Anti-Patterns line · disposition: move-to-reference — every flow here reads CLAUDE.md, and the ADR holds the rule; this entry stays as the record (SPRINT-124 T3, re-disposed as the SPRINT-122 promote required).
 - related: L-165 (every Tier G change gets an outside reviewer — this bounds how many) · L-186 (vary the selection) · L-088 (re-agree a criterion execution invalidated)
 
 ---

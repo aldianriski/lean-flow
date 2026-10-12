@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 update_trigger: A roadmap phase closes, an epic is opened or gated, or a measurement changes a lane assignment
 status: current
 id: adlc-epic-sequencing
@@ -128,20 +128,17 @@ final § Closed-when condition, so that epic cannot close leaving the execution 
 Recorded **here** rather than only in EPIC-015 or a commit message, because this is the file consulted
 when an epic is proposed — a ruling its reader cannot reach governs nothing (L-151).
 
+**Amended 2026-10-12 — re-armed and widened (ADR-053, owner).** V3 §56's two dogfoods passed (SPRINT-121; SPRINT-122 on vehicle SPRINT-123),
+so the freeze is **back in force**, and it now covers **new governance machinery** (a guard, checker, gate leg, `qa-check.sh` leg, ledger or
+ledger field) as well as the loop above, on the same five conditions. What is not frozen, how an admission is recorded and the bounded-review
+rule live in [ADR-053](../adr/ADR-053-the-freeze-re-arms-widened-to-governance.md); this file keeps the pointer.
+
 **Amended 2026-10-07 — roadmap grooming (owner).** Recorded here because this is the file read when an epic is proposed (L-151).
 - **EPIC-014 retired** (ADR-051, 2026-10-06): the Shell engine is the only engine.
 - **EPIC-010 and EPIC-013 merged into EPIC-016** (owner, 2026-10-07); their unowned remainders are open questions there.
 - **EPIC-005 now admits on EPIC-015 closed** alone (EPIC-014's clause dropped).
 - **Live order, from the epics themselves:** EPIC-016 (P0, workdoo) → workdoo SPRINT-009 → EPIC-019 → EPIC-020 → EPIC-018 (EPIC-020 D6). EPIC-015 runs alongside; Lanes 1–2 (005 · 006→007→008 · 009) wait behind it.
 - **Freeze opened for EPIC-020's scope:** its D5 states the core execution architecture is "opened for exactly this scope"; recorded here per that decision.
-
-**Amended 2026-10-10 — interim governance restriction (owner, after two Codex review rounds).** Until `TASK-417` lands its ADR,
-**new governance machinery** (a new guard, checker, gate leg, ledger, or ledger field) is admitted **only** on the five conditions
-above: a measured defect · a measured cost · a repeated failure (≥2 sightings) · a security issue · adopter evidence. Defect fixes
-and deletions or merges of existing machinery are not new machinery. EPIC-015's closing work is capped to its four tasks
-(`TASK-414`–`417`); if `TASK-415`'s recon shows a build rather than a bounded proof run, stop for a scope ruling. Why: since
-SPRINT-090, ~6% of commits touched `skills/` and ~69% touched governance docs, and the freeze above never covered governance.
-`TASK-417` replaces this paragraph with the ADR, the widened freeze and its placement, so only one version of the rule stays live.
 
 **Amended 2026-10-10 — workdoo-built epics moved (ADR-052, owner).** EPIC-016, EPIC-018, EPIC-019 and EPIC-020 now live in
 `workdoo`'s `docs/epic/` with their ids unchanged. ADR-052 amends ADR-041: an epic's outcome record lives with its execution. The live

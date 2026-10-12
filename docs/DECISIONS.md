@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-06
+last_updated: 2026-10-12
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-053](adr/ADR-053-the-freeze-re-arms-widened-to-governance.md) | **The execution freeze re-arms, widened to new governance machinery.** A new guard, checker, gate leg, `qa-check.sh` leg, ledger or ledger field is admitted only on one of the five conditions, named with its evidence in the task's `## Why`; admitted work declares a review-round cap at G2 (default 2) and routes a census-zero finding to TD. Placed as one `.claude/CLAUDE.md` Anti-Pattern, never in shipped skills; replaces the 2026-10-10 interim paragraph. | accepted | 2026-10-12 |
 | [ADR-052](adr/ADR-052-an-epics-outcome-record-lives-with-its-execution.md) | **An epic's outcome record lives in the repository that executes it.** EPIC-016/018/019/020 move to `workdoo` with ids unchanged; lean-flow keeps relation pointers only. Amends ADR-041's "lean-flow owns the outcome record" clause; its other rulings stand. |
 | [ADR-051](adr/ADR-051-the-typescript-port-is-retired.md) | **The TypeScript port of the conformance engine is retired; the Shell engine is the only engine.** EPIC-014 closes as retired (six conditions dropped, not met), and `evals/run-adr-family-fixtures.sh` returns to the always-on set. Supersedes ADR-038 and ADR-039, and ADR-035's engine decision | accepted | 2026-10-06 |
 | [ADR-050](adr/ADR-050-proof-bar-scales-with-consequence.md) | **The proof bar scales with consequence, and a new standing rule retires an old one.** Tier G keeps the full bar (seeded-mutation proof, worktree-isolated outside review) only for consequential guard logic (what `conformance.sh` executes, scripts a shipped skill names as an adopter-run step's mechanism); every other guard change takes the retained must-FAIL fixture plus one exercise on its real artifact. No new anti-pattern line, DoD checkbox, gate leg or spec rule without naming what it retires. Shell/TS parity is kept only where the Shell side is the adopter contract (today the engine's §4). Grounded in `docs/research/guard-audit.md`: 24 of 60 guards ever caught a real defect (>=70 catch events) against ~235 upkeep events. Narrows ADR-029 and the `CLAUDE.md` Tier G bar in part; leaves ADR-039 (§4 only), ADR-043, ADR-021, ADR-022 unchanged | accepted · clause 3 narrowed to zero kept pairs by ADR-051 | 2026-10-02 |
