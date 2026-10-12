@@ -25,14 +25,14 @@ review H0). Evidence: of 941 commits since SPRINT-090, ~6% touch `skills/` and ~
 
 ## Done when
 
-- [ ] An ADR records the widened freeze: what it covers (the execution loop plus governance machinery), the five admission
+- [x] An ADR records the widened freeze: what it covers (the execution loop plus governance machinery), the five admission ✓ ADR-053 § Decision 1–5 (65ede7df), owner read-through accepted by popup
       conditions, what is explicitly not frozen (consumer-facing skill work, defect fixes), how an admission is recorded, and a
       bounded-review / stop rule for admitted governance work (a declared effort cap per item; a finding whose shape has zero
       occurrences in the real corpus routes to TD, not another round).
-- [ ] `docs/research/adlc-epic-sequencing.md` § FROZEN carries the re-arm and the widening, and the rule is placed where every flow
+- [x] `docs/research/adlc-epic-sequencing.md` § FROZEN carries the re-arm and the widening, and the rule is placed where every flow ✓ § FROZEN amendment 2026-10-12 → ADR-053; placed as a .claude/CLAUDE.md Anti-Pattern per the G2 ruling (read by promote + decomposer intake; caps PASS 80/80)
       that proposes new governance work reads it (§10 placement test — at least promote and task-decomposer intake).
-- [ ] The interim restriction recorded on 2026-10-10 is replaced by the ADR, leaving no second live version of the rule.
-- [ ] EPIC-015 CW8 is ticked and the epic closes by its own rules (all eight `[x]`).
+- [x] The interim restriction recorded on 2026-10-10 is replaced by the ADR, leaving no second live version of the rule. ✓ paragraph removed (65ede7df); grep finds no other live copy outside archive/done
+- [x] EPIC-015 CW8 is ticked and the epic closes by its own rules (all eight `[x]`). ✓ 8/8 [x], status: closed (928d4a43); check-epic-archive PASS, archives at SPRINT-124 close
 
 ## Touches
 
