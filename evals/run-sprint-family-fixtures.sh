@@ -968,6 +968,86 @@ else
   fi
 fi
 
+# === TASK-404 retained cases: the three discriminations the batched rewrite left unasserted =========
+# SPRINT-124 T2 batched the spawn loops of S10.TDAGING, S11.LOGPAIR and S11.WHENITRUNS. The full report
+# stayed byte-identical, yet seeded breaks on each reddened nothing here: the threshold was only ever
+# asserted at ages 100 and 1, no fixture re-added a Plan path, and none held an unreadable close_commit.
+# Each case below was written against the PRE-batch engine too (51db7f5a) -- it pins unchanged behaviour.
+
+# assert_line <name> <dir> <fixed-substring> -- must-FAIL: the engine's own output must carry this text.
+assert_line() {
+  _n=$1; _d=$2; _f=$3
+  _o=$(sh "$engine" "$_d" --spec "$spec" 2>&1)
+  if printf '%s\n' "$_o" | grep -qF "$_f"; then
+    echo "PASS fixture($_n): line present -- '$_f'"
+  else
+    echo "FAIL fixture($_n): expected line '$_f' and it was not printed -- got:"
+    printf '%s\n' "$_o" | grep -E 'S10\.TDAGING|S11\.LOGPAIR|S11\.WHENITRUNS' | sed 's/^/    /'
+    fail=1
+  fi
+}
+
+# --- S10.TDAGING, the boundary: exactly 3 sprints fires, 2 does not (TASK-404) --------------------
+# Retained for TASK-404: a threshold moved from 3 to 4 reddened nothing, because only ages 100 and 1
+# were asserted. The Plan says sprint 900. Ages: TD-301 = 3 (fires), TD-302 = 2 (silent), TD-303 =
+# created 800 but updated 899 (updated overrides created -> age 1, silent), TD-304 = two created: keys,
+# the LAST one is read (899 -> silent), TD-305 = leading zeros, Sprint-0897 (= 897 -> age 3, fires),
+# TD-306 = id that is a substring of the swept TD-3060 (a plain substring test, so it reads as named).
+d="$work/aging-edge"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+{ printf -- '---\nowner: Maintainer\nlast_updated: 2026-01-01\nupdate_trigger: debt filed\nstatus: current\n---\n\n# Tech Debt\n\n'
+  printf '> Aging sweep -- SPRINT-900 promote. Held, with reasons: TD-3060.\n\n'
+  printf -- '- **TD-301** status: open | created: Sprint-897\n'
+  printf -- '- **TD-302** status: open | created: Sprint-898\n'
+  printf -- '- **TD-303** status: open | created: Sprint-800 | updated: Sprint-899\n'
+  printf -- '- **TD-304** status: open | created: Sprint-800 | created: Sprint-899\n'
+  printf -- '- **TD-305** status: open | created: Sprint-0897\n'
+  printf -- '- **TD-306** status: open | created: Sprint-100\n'
+} > "$d/TECH-DEBT.md"
+assert_finding "s10-td-aged-edge-three-fires"        "$d" "td-row-aged-unreviewed: TD-301 is 3 sprints"
+assert_finding "s10-td-aged-edge-leading-zeros-fire" "$d" "td-row-aged-unreviewed: TD-305 is 3 sprints"
+assert_absent  "s10-td-aged-edge-two-silent"         "$d" "td-row-aged-unreviewed: TD-302 "
+assert_absent  "s10-td-aged-edge-updated-overrides"  "$d" "td-row-aged-unreviewed: TD-303 "
+assert_absent  "s10-td-aged-edge-last-created-wins"  "$d" "td-row-aged-unreviewed: TD-304 "
+assert_absent  "s10-td-aged-edge-id-substring-named" "$d" "td-row-aged-unreviewed: TD-306 "
+
+# --- S11.LOGPAIR, the OLDEST add of a path is its archive commit (TASK-404) ------------------------
+# Retained for TASK-404: reading the NEWEST add instead of the oldest reddened nothing, because no fixture
+# re-added a Plan path. Here the pair is archived together, then the Plan is moved out and back in a later
+# pair of commits -- its newest add is not its archive commit, and a correct close must stay silent.
+d="$work/arch-readd"; mkdir -p "$d"; archive_repo "$d"
+git -C "$d" mv docs/sprint/archive/SPRINT-900-fixture.md docs/sprint/SPRINT-900-fixture.md >/dev/null 2>&1
+commit_msg "$d" "move the archived Plan back out for an edit"
+git -C "$d" mv docs/sprint/SPRINT-900-fixture.md docs/sprint/archive/SPRINT-900-fixture.md >/dev/null 2>&1
+commit_msg "$d" "put the Plan back into the archive"
+assert_absent "s11-logpair-readd-oldest-add-wins" "$d" "sprint-log-archived-apart-from-plan"
+assert_line   "s11-logpair-readd-still-one-pair"   "$d" "S11.LOGPAIR         -- 1 pair(s) archived together in one commit"
+
+# --- S11.WHENITRUNS, an unreadable close_commit is unphased, never judged (TASK-404) -------------
+# Retained for TASK-404: treating an unreachable close_commit as reachable reddened nothing, because no
+# fixture held an unreachable, placeholder or absent close_commit. SPRINT-901 is reachable (judged and
+# fine); 902 names a commit that does not exist, 903 a bracketed placeholder, 904 no key at all. Those
+# three are "could not be phased" -- reported as unread, and NOT as a wrong-phase finding.
+d="$work/arch-unphased"; mkdir -p "$d/docs/sprint/logs" "$d/docs/sprint/archive/logs"
+git -C "$d" init -q >/dev/null 2>&1
+for _n in 901 902 903 904; do
+  printf -- '---\nowner: M\nsprint: %s\nstatus: closed\n---\n\n# p\n' "$_n" > "$d/docs/sprint/SPRINT-$_n-a.md"
+  echo log > "$d/docs/sprint/logs/SPRINT-$_n-a.md"
+done
+commit_msg "$d" "plans locked"
+_c1=$(git -C "$d" rev-parse HEAD)
+_pl() {  # <n> <close_commit-value>
+  printf -- '---\nowner: M\nsprint: %s\nstatus: closed\nclose_commit: %s\n---\n\n# p\n' "$1" "$2" > "$d/docs/sprint/SPRINT-$1-a.md"
+}
+_pl 901 "$_c1"; _pl 902 deadbeef0000; _pl 903 "[sha -- set at close]"
+commit_msg "$d" "close commits recorded"
+for _n in 901 902 903 904; do
+  git -C "$d" mv docs/sprint/SPRINT-$_n-a.md docs/sprint/archive/SPRINT-$_n-a.md >/dev/null 2>&1
+  git -C "$d" mv docs/sprint/logs/SPRINT-$_n-a.md docs/sprint/archive/logs/SPRINT-$_n-a.md >/dev/null 2>&1
+done
+commit_msg "$d" "archive all four"
+assert_absent "s11-whenitruns-unreadable-close-not-wrong-phase" "$d" "retention-trigger-ran-in-wrong-phase"
+assert_line   "s11-whenitruns-unreadable-close-is-unphased"     "$d" "S11.WHENITRUNS      -- 1 archived sprint(s) archived at or after their own close_commit; 3 could not be phased"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "SPRINT-FAMILY FIXTURES: all green"
