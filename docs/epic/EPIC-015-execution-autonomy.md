@@ -2,8 +2,8 @@
 epic: 015
 slug: execution-autonomy
 owner: Maintainer
-last_updated: 2026-10-11
-status: active
+last_updated: 2026-10-12
+status: closed
 member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101, SPRINT-118, SPRINT-119, SPRINT-121, SPRINT-122, SPRINT-123, SPRINT-124]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -169,5 +169,8 @@ shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattend
       judgment finding parked T2 with its unblock condition (`T2 · parked-hitl · …`), the D5 control met mid-run, because a declared J2
       fails pre-flight item 3. Ended `AUTHORITY_BOUNDARY` / `PARTIAL`. The live run also exposed a reaper defect (it omitted parks from its
       block), fixed in SPRINT-122 T2 (`27d75a78` → `dc490880`)
-- [ ] **The freeze is re-armed** in `adlc-epic-sequencing.md` after the dogfoods pass (V3 §58) — this
-      epic does not close leaving the execution architecture unfrozen → TASK-417
+- [x] **The freeze is re-armed** in `adlc-epic-sequencing.md` after the dogfoods pass (V3 §58) — this
+      epic does not close leaving the execution architecture unfrozen
+      — **SPRINT-124** T3 (TASK-417, `65ede7df`): ADR-053 re-arms it and widens it to new governance machinery on the same five
+      conditions. § FROZEN carries the amendment and points to the ADR, the 2026-10-10 interim paragraph is gone, and the rule is
+      placed as one `.claude/CLAUDE.md` Anti-Pattern, which every flow in this repository reads
