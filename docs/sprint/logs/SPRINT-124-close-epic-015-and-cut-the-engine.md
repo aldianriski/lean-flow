@@ -96,3 +96,29 @@ was a fourth gap, and the builder closed it with one case in `evals/run-adr-fami
 Impact: T2 Layers add `evals/run-adr-family-fixtures.sh` and `evals/run-sprint-family-fixtures.sh` (new cases only, no existing case
 edited). TASK-404's `## Done when` is unchanged. Engine evidence so far: the report is byte-identical (`cmp` silent on 2 after-runs, rc 0
 == 0), and the time went from 417.4 s to 136.3 s / 82.5 s. Re-confirm G2: the owner ruled "close the gaps" by popup.
+
+### 2026-10-12 | task-done | T2 TASK-404 — the engine runs in a third of the time, report byte-identical (1/1)
+Builder: one `general-purpose` agent (sonnet) batched the five Round-23 loops (`2d07c3f2`). A second builder added the sprint-family cases that its
+seeds needed (`caf7276b`, after the scope-change above). Coordinator applied the Codex R1 fix (`b4ee69a6`) and the ledger (`449acf7f`).
+- **Timing** (this host, `qa-gate-timing.md` Round 24): 417.4 s → **136.3 s** (−67.4%), a second run 82.5 s. Target ≤ 216.5 s. The before is 3.6%
+  under Round 23's 433.1 s, inside ±10%, so A2 holds. A1 holds: the five loops alone reach the target.
+- **Parity:** the full `sh conformance.sh .` report is byte-identical before vs after (`cmp` silent on both after-runs, rc 0 == 0). On the VPS
+  (dash), old vs new is identical under gawk 5.2.1 and mawk 1.3.4, for `cdc8b7ef` and again for `b4ee69a6`.
+- **Seeds** (one per changed evaluator; every one cmp-differs, parses and keeps its line count, with a hash-equal restore): LAW2 always-Y
+  → 2 ownership cases red · `_own_scan` → `update-trigger-absent-fires` · APPEND newest-wins / compare-forced-clean → `edited-after-decision-fires` ·
+  APPEND status-skip → `proposed-then-accepted-passes` (new) · TDAGING 3→4 → `s10-td-aged-edge-three-fires` + leading-zeros (new) · LOGPAIR newest-add →
+  `s11-logpair-readd-still-one-pair` (new) · WHENITRUNS unreachable-as-reachable → both `s11-whenitruns-*` (new) · quotepath revert →
+  `non-ascii-name-edited-fires` (new). A sibling stayed green in each. Harnesses at `b4ee69a6` on the VPS: ownership 23/0 · adr-family 19/0 ·
+  sprint-family 114/0, each `all green`.
+- **Review, round 1 of 2:** Codex NOT CLEAR, 4 items. T3 was **confirmed** by a probe: an ADR with a non-ASCII name, edited after its decision,
+  read "no commit touching it" with rc 0, a false negative. Fixed with `-c core.quotepath=off`, plus a retained case. T2 (locale case folding) is
+  fixed: awk answers only byte-exact hits (census 350/350 exact, so no added spawns). T1 (sprint > 2^53) and T4 (crafted merge
+  simplification) are census-zero → TD-249.
+- **Review, round 2 of 2 (cap):** R2 OK. R3 rejected on evidence: Codex read `\303\251` with its backslashes stripped by the paste, and the VPS
+  seed shows the case reddens. R1 (a path with a double quote, backslash or control character is still quoted) is census-zero → TD-249.
+- **Worktree-isolated verify** (sonnet, at `b4ee69a6`): **CONFIRMED**. Both harnesses were green unseeded. The LAW2 seed reddened exactly the 2
+  role cases, with `maintainer-is-a-role` green. The quotepath seed reddened exactly `non-ascii-name-edited-fires`, with `edited-after-decision-fires`
+  green. Restores were hash-equal (`63b40ba3`).
+- A local post-R1 run on this host was killed by the memory reaper. The owner ruled by popup to verify on the VPS instead.
+- TD-168 → resolved (TASK-404). TD-249 filed.
+Spend: builder 1 ~254k · builder 2 ~107k · Codex ~20k + ~19k · isolated verify ~62k sub-agent tokens.
