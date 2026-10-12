@@ -351,6 +351,18 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-249** severity: low | status: open | created: Sprint-124 (T2 review, Codex R1 T1/T4 + R2 R1)
+  - Summary: **TASK-404's batched engine passes can still differ from the per-file code they replaced, on three input shapes no real
+    corpus holds.** (1) `S10.TDAGING` does its age arithmetic in awk floats, so a sprint number above 2^53 rounds and an age can read one
+    sprint off. (2) `S4.APPEND` and the S11 archive map run ONE `git log` over a directory, not one per path. On a crafted merge where
+    both parents differ from the merged directory but one is TREESAME for a single file, history simplification picks a different add
+    or revision date. (3) Even with `core.quotepath=off`, git still quotes a path holding a double quote, a backslash or a control
+    character, so the literal lookup in `S4.APPEND` (and the S11 map) misses it, where the old pathspec passed it intact.
+  - Census (SPRINT-124 T2): 0 for each. The max sprint number is 124. 0 merges touch `docs/sprint/archive/`, and the one merge touching
+    `docs/adr/` gives byte-identical output. 0 tracked paths under `docs/` hold those characters, and Windows forbids a double quote in a
+    filename. Routed here under the review stop rule (cap 2 reached, census-zero shape → TD), not into a third builder round.
+  - Fix direction (not a ruling): `-z` output for (3) needs NUL handling that POSIX awk does not promise (ADR-043 keeps mawk in scope).
+    Re-open on the first real sighting.
 - **TD-248** severity: low | status: open | created: Sprint-122 (T2, the vehicle's layers-observed)
   - Summary: **`check-layers-observed.ts` attributes `sprint(NNN) Tn:` commits to Tn whatever NNN is.** Its subject rules match
     `sprint([0-9]+)` (`check-layers-observed.ts:302-309`). When two sprints are active and their commit ranges overlap, one
@@ -933,7 +945,7 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-168** severity: high | status: open | created: Sprint-103
+- **TD-168** severity: high | status: resolved → TASK-404 | created: Sprint-103
   - Summary: **`scripts/lib/conformance-engine.sh` is the QA gate's single largest cost centre and is
     kernel-bound, but it is consumer-facing, so the fix needs its own sprint.** Measured at
     SPRINT-103 T3 (`qa-gate-timing.md` Rounds 17-18): the engine accounts for **542 s — 71% of Round
@@ -967,6 +979,10 @@ status: current
     **consumer-facing**: an adopter on Windows pays the same fork cost, and the off-host route is not theirs.
   - **Owner (SPRINT-116 promote, owner-approved 2026-10-06):** TASK-357 is done, so the row had no live owner. SPRINT-116 T1 (TASK-399) assigns it with its ruling: *finish* → TASK-393 carries it at P1; *cut* → a new P1 task for the Shell engine's spawn cost.
   - **Owner (SPRINT-116 T1, ADR-051):** TASK-404 (P1, needs-info) — the Shell engine is the only engine, so the spawn cost is fixed there.
+  - **Resolved (SPRINT-124 T2, TASK-404):** batching the five Round-23 spawn loops cut the engine's Windows wall clock from **417.4 s to
+    136.3 s** (−67%; a second run 82.5 s), against the ≤216.5 s target. The full report is byte-identical to the old engine's on Windows
+    and on dash with both gawk and mawk (`qa-gate-timing.md` Round 24). Still per-row, and out of this row: `S11.SPRINT` (~120 `grep`)
+    and `S11.WHENITRUNS`' per-sprint `merge-base` (~11 s). Residual divergence shapes → TD-249.
 - **TD-167** severity: medium | status: open | created: Sprint-102
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's

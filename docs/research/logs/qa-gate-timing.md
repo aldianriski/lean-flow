@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-06
+last_updated: 2026-10-12
 update_trigger: a measurement round is appended
 status: active
 id: qa-gate-timing-log
@@ -2286,3 +2286,27 @@ re-run, not rounded.
 
 **Not measured here:** fork-only subshells (not counted), the saving an actual rewrite recovers, and Linux (Round 22's gate runs in 105-109 s there).
 **Retained:** per-rule times, spawn log, instrumented engine copies and the three run outputs in the session scratchpad (not committed).
+
+## Round 24 — batching the five spawn loops cuts the engine 67%, report byte-identical (SPRINT-124 T2, 2026-10-11/12)
+
+SPRINT-124 T2 (`TASK-404`, TD-168). **Engine:** `2d07c3f2` (the batch), then `b4ee69a6` (Codex R1: two lines, no pass added or removed).
+**Host:** the Windows maintainer host, as in Round 23, memory-starved as there; free RAM is noted per run.
+
+| run | engine | real | user | sys | free RAM | rc |
+|---|---|---:|---:|---:|---:|---:|
+| before (clean; an earlier 6m45s run overlapped profiling and is discarded) | `51db7f5a` | **417.4 s** | 80.0 | 256.2 | 1576 MB | 0 |
+| after 1 | `cdc8b7ef` | **136.3 s** | 26.1 | 81.6 | 935 MB | 0 |
+| after 2 | `cdc8b7ef` | **82.5 s** | 22.1 | 44.0 | 499 MB | 0 |
+
+The before-figure is 3.6% under Round 23's 433.1 s, inside the ±10% band, so A2 holds and the target stays ≤ 216.5 s. After 1 is a 67.4% cut,
+and after 2 an 80.2% cut; the gap between the two after-runs is host noise, and neither is near the line. **Parity:** each after-report is
+byte-identical to the before-report (`cmp` silent, rc equal). On the Ubuntu VPS, under dash, the old and new engines also give identical reports with
+both gawk 5.2.1 and mawk 1.3.4, for `cdc8b7ef` and for `b4ee69a6`; the engine there takes **23 s → 3 s**.
+
+Per rule, standalone on Windows (builder's runs): `S10.TDAGING` 122 s → 1.3 s · `S1.LAW2` 41.8 s → 3.0 s · `S4.APPEND` 22.0 s → 2.0 s ·
+`S11.LOGPAIR` 32 s → 1.4 s · `S11.WHENITRUNS` 52 s → 11 s. That removes ~2,000 of Round 23's 4,135 counted spawns. `S11.WHENITRUNS` keeps 120 per-sprint
+`merge-base --is-ancestor` calls (~11 s). R1 sends a case-only role match back to `grep`; the census on this repo is **350 of 350** owner values byte-exact,
+so it adds no spawns here.
+
+**Not measured:** `b4ee69a6` on Windows. The re-run was killed by the host's memory reaper; R1 changes no batched pass, and its parity was taken on
+the VPS. **Left per-row:** `S11.SPRINT` (~120 `grep`), `S11.BACKLOG`, `S11.TDDELETE`, `S4.SECTIONS`, the next sites in Round 23's table.
