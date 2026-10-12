@@ -28,7 +28,7 @@ whole `QA_FULL=1` gate runs in 105–109 s (Round 22), so the cost is Windows-sh
 
 ## Done when
 
-- [ ] The engine's run against this repo on the Windows host drops by a stated, measured fraction, with the before and after taken on
+- [x] The engine's run against this repo on the Windows host drops by a stated, measured fraction, with the before and after taken on ✓ 417.4 s → 136.3 s (−67%; target ≤216.5 s), full report byte-identical (cmp; also dash+gawk/mawk on VPS); seeds redden their cases in ownership-header, adr-family, sprint-family; isolated verify CONFIRMED at b4ee69a6; Codex R2 residuals → TD-249 (2d07c3f2..449acf7f)
       the same host and tree, and no rule's verdict, finding id, or exit meaning changes (ADR-034's compatibility contract), proven by the
       retained engine fixtures plus a seeded break per changed evaluator.
 
