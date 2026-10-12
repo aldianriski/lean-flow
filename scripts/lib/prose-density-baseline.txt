@@ -23,7 +23,6 @@
 # format: <path> <count-at-adoption>
 .claude/CLAUDE.md 4
 .claude/CONTEXT.md 16
-docs/epic/EPIC-015-execution-autonomy.md 6
 docs/research/adhd-adaptation.md 2
 docs/research/adlc-epic-sequencing.md 1
 docs/research/allowed-tools-audit.md 1

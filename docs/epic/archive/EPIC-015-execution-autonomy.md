@@ -1,0 +1,176 @@
+---
+epic: 015
+slug: execution-autonomy
+owner: Maintainer
+last_updated: 2026-10-12
+status: closed
+member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101, SPRINT-118, SPRINT-119, SPRINT-121, SPRINT-122, SPRINT-123, SPRINT-124]
+update_trigger: a member sprint closes, or a decision lands that changes the outcome
+---
+
+# EPIC-015 — Execution Autonomy
+
+> **Outcome:** an approved sprint Plan runs to a **named terminal state** without per-task human
+> confirmation — delegated judgment (J1) executes inside the pre-authorized envelope, authority
+> decisions (J2) park — and every run reports `DELIVERED` / `PARTIAL` / `FAILED` with the evidence
+> behind that verdict.
+
+## Why this, why now
+
+Task completion is being read as run completion. `sprint-bulk` pauses between tasks the owner already
+authorized, `overnight` is not the discoverable name of the mode that exists, the authority classes the
+loop already behaves as if it has (mechanical · delegated · human) are nowhere declared, and a run's
+outcome is a prose rollup rather than a typed verdict. Each is cheap alone; together they are why an
+approved Plan still needs a human sitting beside it.
+
+It spans sprints because the authority model (J0/J1/J2) has to be declared and *proven* — including a
+**seeded J2 control**, since a natural J2 park cannot be scheduled — before the envelope, the repair
+loop and the run-outcome vocabulary can rest on it, and because V3 §56's two dogfoods are integration
+boundaries, not steps inside a task.
+
+### It supersedes SPRINT-082's freeze — owner ruling, 2026-08-24
+
+SPRINT-082 T5 wrote *"the core execution architecture is FROZEN"* into
+`docs/research/adlc-epic-sequencing.md`, admitting further workflow change only on a measured defect ·
+measured cost · repeated workflow failure · security issue · consumer evidence. That freeze was written
+before V3 existed. The owner ruled that **V3 supersedes it**: the freeze re-arms after V3's integrated
+dogfood (V3 §56/§58), not after SPRINT-082.
+
+> **Owner-action — DONE 2026-08-25.** The ruling was not in force until written where the admission
+> decision reads it: `adlc-epic-sequencing.md` is the file consulted when an epic is proposed, so a
+> ruling recorded only here, or only in a commit message, governs nothing (**L-151** — this epic would
+> otherwise *be* that failure). The amendment had been deferred solely because SPRINT-082's close held
+> uncommitted WIP in that file (L-042); that close landed and the file went clean, so the amendment is
+> now written into its § *The core execution architecture is FROZEN*. **D1 is binding.**
+
+## Scope
+
+**In:** the sprint-bulk continuation contract and its five terminal states · `overnight` registered as
+the canonical mode with its aliases · the J0/J1/J2 authority classes · the pre-authorized AFK envelope
+with one recorded approval · bounded unattended Gauntlet repair · generator budget awareness · a
+reusable unattended capability profile · typed run outcomes (V3 H27–H31, H35–H37).
+
+**Out (explicitly not):** **H32 · H33 · H34 — already shipped in SPRINT-082** (T1 risk-aware
+`no-gate-discovered` + declared gate rung/ADR-033 · T2 risk-based review depth · T3 Verify
+reachability). This epic *exercises* them in dogfood and re-implements none of them. Also out: any new
+agent definition, hook or reviewer role · a critic swarm · turning the bounded revise into an unbounded
+loop · push/deploy/external destructive authorization · a scheduler or queue service · run-state resume
+(ADR-013 (b) was deferred, and EPIC-006 carries its guardrail) · the reference-engine migration
+(**EPIC-014**, retired by ADR-051).
+
+## Member sprints
+<!-- Contribution rows live in docs/epic/logs/EPIC-015-execution-autonomy.md per ADR-030, created
+     lazily at the first member close. -->
+
+| Sprint | Theme | Status | What it contributed to the outcome |
+|---|---|---|---|
+| [SPRINT-088](../../sprint/archive/SPRINT-088-execution-autonomy-foundation.md) | Execution Autonomy Foundation | **closed** 2026-08-26 · `dc3690a` — 13 of 16 DoD | **Contributed:** the authority vocabulary the rest of the epic is written in — `J0`/`J1`/`J2` declared per task and guarded (`check-authority.sh`); the continuation contract with five named terminal states, emitted by the launcher (`reap()` + `check-night-run-rollup.sh`); `overnight` canonical with every prior name resolving as an alias (`resolve-run-mode.sh`) — **§ Closed-when 2 complete**; and a ten-dimension `approval_envelope:` recorded in sprint frontmatter (`check-approval-envelope.sh`). Five retained harnesses, 49 assertions. **Did NOT complete § Closed-when 1, 3 or 4:** each needs a real unattended run, and this Plan is entirely `HITL`, which Part 1 pre-flight forbids a run against — the criteria were unreachable the moment the Plan froze (L-111, cited *inside* the DoD that repeated it). Carried by **TASK-301**, which seeds a Plan a run is permitted to execute. An independent Tier G review found 2 HIGH defects post-hoc, both fixed, both invisible to 39 green assertions (L-165 ×3). Slice: V3 H27–H30, targeting § Closed-when **1–4**. The authority model first, because the envelope is expressed in J-classes and the continuation contract has no definition of "already authorized" without them. Then continuation with five named terminal states, `overnight` as the canonical mode named after the contract it runs, and one pre-launch approval written where the run reads it. **This repo's first parallel stream** (`stream: autonomy`), running beside EPIC-014 rather than after it — admissible because the two surfaces are disjoint, verified token-by-token at promote, and because TASK-299 taught the gate to scope attribution by commit ownership. Deferred: bounded repair (TASK-296), typed outcomes (TASK-297, gated on the EPIC-008 `RunSummary` ruling), both dogfoods and the freeze re-arm. |
+| [SPRINT-089](../../sprint/archive/SPRINT-089-prove-the-unattended-run.md) | Prove the Unattended Run | **closed** 2026-08-27 · `cc46d18` — 10 of 10 DoD | **Contributed § Closed-when 3 and 4, complete.** The epic's first real unattended run: a `J1` task executed headless inside the recorded envelope with **no confirmation**, and a **seeded** `J2` parked with its unblock condition — the seeded control D5 requires, not a naturally occurring one. The ten-dimension `approval_envelope:` was recorded in frontmatter, pinned, and consumed with no repeated J0/J1 confirmation. Every claim was verified **against artifacts rather than the run's own report**: the commit, its window, `check-authority.sh`'s `1 park, 0 execution, 0 owner-ruling`, and zero commits touching the parked task's Layers. **§ Closed-when 1 deliberately NOT ticked** — the run itself ended at `AUTHORITY_BOUNDARY` correctly, but the launcher's reaper simultaneously published a false `PLAN_EXHAUSTED` into a different sprint's log and `check-night-run-rollup.sh` **passed it**, so "a run ends only at one of five named states" is not yet true of what a run *reports* (**TD-112** · `TASK-303`). **T1 first, and it missed its stated target — recorded as missing it.** The 83s cut was not achieved; what it bought instead was Round 8's finding that the gate's cost is **host-dependent** (1.92–2.20× on byte-identical code), so TD-090's re-raise condition was restated as reproducible arithmetic against a pinned anchor rather than a wall-clock figure, and a Tier G coverage hole was closed — the engine's git-availability branch had *zero* discriminating coverage in either direction, and now has 15 assertions that redden in disjoint sets. **The sprint's durable output is the map**: five independent foreclosures stood between a promoted Plan and an executed one — an all-`HITL` Plan (L-111), pre-flight item 3 versus a declared `J2` (**TD-109**), `sprint-bulk` step 0's unanswerable "which sprint", the launcher's green-gate catch-22 (**TD-110**), and midnight index staleness (**TD-111**) — and **not one was found by reading the procedure**. An independent reviewer then found the author's own reasoning defect in the D4 ruling (2 of 3 cited mechanisms overclaimed), so D4 is recorded as a judgement between two defensible readings and routed to `TASK-306` rather than inherited as precedent. L-175 · L-176 · L-177 · L-178 · L-179 filed. |
+| [SPRINT-090](../../sprint/archive/SPRINT-090-run-evidence-vehicle.md) | Run-Evidence Vehicle | **closed** 2026-08-27 · `cc46d18` — 6 of 6 DoD | **Contributed the vehicle itself**, seeded per `TASK-301` because SPRINT-088's Plan was entirely `HITL` and pre-flight forbids a run against one — and re-declaring real work AFK to make a run fire would have been reshaping a task to dodge a gate. One honestly AFK/`J1` task and one honestly `J2` task, disjoint by design so the park could not block the execution. Both resolved as intended: `T1` ran unattended and committed `docs/research/logs/qa-gate-timing.md` § Round 9; `T2` parked. **Its own history is the evidence for TD-109/110/111**: `T1` had to be rewritten mid-sprint because its first form repaired a gate FAIL, and the launcher refuses to fire on a red gate — so the run could not start until the work it existed to do was already done. The replacement had to be **gate-neutral**, a property measured by probe rather than argued. The run then parked its own close on a red system-verify caused by midnight staleness, exactly as `repair-policy: none` requires — the contract holding on a case outside its authors' design. |
+| [SPRINT-093](../../sprint/archive/SPRINT-093-close-the-autonomy-guard-gap.md) | Close the Autonomy Guard Gap | **closed** 2026-08-30 · `33187dc` — 19 of 19 DoD | **Contributed the guard layer § Closed-when 1 rests on — but NOT the condition itself, which stays open by ruling.** `check-night-run-rollup.sh` now asserts **agreement** rather than shape: a `terminal ·` state that contradicts the per-task lines beside it FAILs, each state requires positive corroborating evidence, and every check is scoped to the **last** `run-complete` block (a contradiction in a later block previously passed by borrowing an earlier block's terminal claim). The reaper writes into the Plan it was **pointed at** — `find_sprint()` refuses ambiguity instead of picking the first match, and `--sprint FILE` declares the target. **The sharpest find was nobody's task and had been latent five sprints:** `night-run.sh` gated the reaper on a literal `*sprint-bulk*` while **`overnight`** has been canonical since SPRINT-088, so a run fired the documented way never reaped and never wrote a `terminal ·` line at all — and once T5 built an attendedness signal on that line, a genuinely unattended unparked `J2` execution read as *attended*, the exact shape T5 exists to prevent, reachable through the canonical trigger (→ **L-183**). Three foreclosures that could refuse a launch outright are also cleared: the knowledge index no longer goes stale on the clock **or on a fresh checkout** (`core.autocrlf=true` delivered CRLF against a pure-LF generator, so **the gate was red on every fresh clone** and every gate run in the repo's history had been reading its own output rather than git's → **L-182**); the green-gate precondition is stated in Part 1's checklist where its reader meets it, with a **narrow named-exception** grant (verbatim whole `FAIL` lines, never a prefix — leg 13 prints three distinct FAILs sharing one prefix — and no `--force` anywhere); and **pre-flight item 3 is ruled STRICT** against a declared `J2`, with `AFK-safe`/`J2` reconciled as the same rule read at two moments rather than one side picked (**supersedes SPRINT-090 D4**, per D3's refusal to inherit it). **T5 was added mid-sprint** because `check-authority.sh` failed this sprint's own attended work — it applied the *unattended* park protocol to every run without reading the mode (L-105's family, and the sprint's theme arriving one level up). **Why § Closed-when 1 is NOT ticked:** the guard gap is closed and each half is proven, but *"a run ends only at one of five named states"* is a claim about what a **run** does, and no unattended run has fired since the reap gate was repaired — ticking it on fixtures plus a reviewer's throwaway-repo reproduction is the unreachable-criterion failure this epic has already paid for twice (L-111 · L-166). Carried by **`TASK-319`**. T1 needed **four passes**, each fixing something real and each leaving something real behind; by the third the truth table matched `reap()` exactly and the guard was still blind, because the producer scoped to its own append window and the consumer never did — nobody compared them (→ **L-181**). **Not one defect this sprint was caught by recalling the rule that governed it**; three coordinator judgements were overturned by independent worktree-isolated passes, all three recorded rather than smoothed. `TD-124` filed (attendedness cannot be inferred airtight from inside the leg; the id had been cited in a commit and two shipped fixtures before any row existed — L-143) · `TD-110`/`111`/`112`/`123` resolved · `TASK-319`/`320` filed `origin: close-retro` · **L-181** · **L-182** · **L-183**. |
+| [SPRINT-098](../../sprint/archive/SPRINT-098-prove-the-run-then-report-it.md) | Prove the Run, Then Report It | **closed** 2026-09-11 · `f3551d6` — 20 of 27 DoD, `AUTHORITY_BOUNDARY` | **Contributed the three guards a real run would be judged by — and NOT the run, so § Closed-when 1 stays open.** The rollup guard now FAILs named on an **absent** Execution Log rather than skipping it: leg 2g built its input from live Plans that already had a log, so the one state it exists to catch — a run that dies before writing anything — was filtered out before the checker saw it. The continuation contract moved into its own headed section at G1/G2's level (**L-192** — form, not wording). **§ Closed-when 5 contributed but QUALIFIED:** the ADR-022 ceiling is enforced inside `reap()` where the terminal state is derived, so a second retry or an unescalated `still-open` becomes `HARD_FAILURE` — but nothing mechanically emits the `Tn · retry ·` line it reads, so an unlogged retry and no retry are indistinguishable and both pass (**TD-152**, ruled an inherent limit of guarding a model-executed loop, not a defect). **§ Closed-when 6 contributed but QUALIFIED:** every reaped run emits a fail-closed `outcome ·` plus eight evidence fields, each tagged `[mechanical]`/`[model-reported]`/`[derived]` **in the artifact**, so a counted figure and a model-written one are never presented at equal confidence; `RunSummary` deliberately not minted, EPIC-008 keeps the portable protocol. Its consistency rule is defeated by a hand-written entry placing an example above real evidence (**TD-153**, ruled inherent; the fix is a machine-only sidecar, named not attempted). **T4 and T5 parked**: T4 is `J2` and no `approval_envelope:` was ever recorded, which reads as NOT approved — `TASK-319` and `TASK-188` return to the Backlog still paired, the pairing ruling surviving the sprint that did not spend it. Filed `TD-151` · `TD-152` · `TD-153` · **L-195**–**L-198**. Closed under a recorded **ADR-021 override**: six gate attempts, three memory kills, last verdict `229 pass, 1 fail` with that one fixed and verified directly. |
+| [SPRINT-101](../../sprint/archive/SPRINT-101-prove-the-run.md) | Prove the Run | **closed** 2026-09-15 · `c8bc300` — 11 of 20 DoD | **Cleared § Closed-when 1's standing blocker and replaced it with a measured one — but NOT the run, so the condition stays open.** The ten-dimension `approval_envelope:` is **signed, in frontmatter, pinned `@ 2472fab`** and verifying (`all 10 dimensions covered`), so the `AUTHORITY_BOUNDARY` that parked SPRINT-098 T4 is gone; the Plan was deliberately not all-`J2`, so SPRINT-088's foreclosure is gone too. **Both historic blockers are cleared and the run still did not fire**, because `night-run.sh` refuses a red gate and **no configuration of this gate is green**: bare it truncates at 600 s with 13 harnesses unrun, raised it completes in **945 s** against a **600 s** external ceiling, `217 pass, 1 fail` where the lone FAIL is the gate timing itself. TD-117 is annotated with both runs and is now a wall rather than a cost; **`TASK-349` owns it and this sprint deferred it under the standing epic-first ruling — the ruling deferred the very task the epic is blocked on.** Contributed the DoD-delta guard (`check-dod-delta.ts`, gate leg 16, 12 retained fixtures across five selection arms) after **four** rounds, each finding another live commit-subject shape; the largest gap — **137 of 701** commits, ~37% of the task-naming population, silently exempt — was reachable by no fixture, no seeded break and no adversarial review, all of which passed, and fell only to partitioning 951 real subjects (→ **L-202**). **L-196 was found defective by its own subject** (→ **L-203**). Filed `TD-160` · `TD-161` · `TD-162` · `TASK-351`; `TASK-319`/`TASK-188` return paired, blocked on the gate rather than the envelope. — promoted to fire **§ Closed-when 1**, the one condition that has foreclosed twice: SPRINT-088's Plan was entirely `HITL` so pre-flight forbade a run against it, and SPRINT-098's T4 parked at `AUTHORITY_BOUNDARY` because no `approval_envelope:` was ever recorded. `TASK-319` and `TASK-188` travel together per the SPRINT-097 `/triage` pairing ruling — 319 is the only task that deliberately fires a real unattended run, and 188's trigger is a run that stops mid-Plan, so promoting 319 alone spends the artifact with nobody positioned to claim it (L-111's other half). `TASK-326` and `TASK-335` are honest AFK/`J1` work, not real work re-declared AFK to make a run fire — they exist so the Plan is not all-`J2`, which SPRINT-093 T4's STRICT ruling refuses outright. |
+| [SPRINT-118](../../sprint/archive/SPRINT-118-prove-the-run.md) | Prove the Run | **closed** 2026-10-09 · `5bb2dd3` — 4 of 4 | **Closed-when 1, complete.** A fire-time `fired ·` ledger; `--close` FAILs an unreaped run (TD-122/124 resolved). One real overnight run (vehicle 119) hit `PLAN_EXHAUSTED`, checked on the committed log. Residual TD-232/234. |
+| [SPRINT-119](../../sprint/archive/SPRINT-119-fire-ledger-vehicle.md) | Fire-Ledger Vehicle | **closed** 2026-10-09 · `5bb2dd3` — 1 of 1 member | **Contributed the vehicle the condition was met on.** One honest all-J0 verification task under strict pre-flight item 3, with `gates_signed:` and the envelope pinned `@ 85b3ffc`; the run stayed inside it. |
+| [SPRINT-121](../../sprint/archive/SPRINT-121-cover-what-is-open.md) | Cover What Is Open | **closed** 2026-10-10 · `d9c6466` — 7 of 7 members | **Dogfood 1 PROVEN** (CW7 first half, TASK-416): continuous attended `sprint-bulk`, no per-task confirmation, four pauses each named with its cause (Execution Log, T7 entry). **CW6 not met:** USER_STOP is emitted by no code path, so TASK-423 was filed and covers it. Also rules **CW6** on SPRINT-119's real-run rollup (TASK-414). CW5, Dogfood 2 and CW8 follow as TASK-415 and TASK-417. |
+| [SPRINT-122](../../sprint/archive/SPRINT-122-finish-epic-015.md) | Finish EPIC-015 | **closed** 2026-10-11 · `d69331f` — 2 of 2 members, 8/8 DoD | **CW6, CW5 and CW7 PROVEN.** CW6: a TERM to the wrapper reports USER_STOP (TASK-423). CW5 + Dogfood 2: one overnight run (vehicle SPRINT-123) repaired a seeded check FAIL in one retry and parked a seeded judgment (TASK-415). The live run exposed a reaper defect, fixed and re-reaped to a guard PASS. Only **CW8** (TASK-417) remains. |
+| [SPRINT-123](../../sprint/archive/SPRINT-123-repair-and-park-vehicle.md) | Repair-and-Park Vehicle | **closed** 2026-10-11 · `d69331f` — 2 of 2 members | **Contributed the run CW5 and CW7 were proven on**: fired 2026-10-10 on the VPS, $1.32, 0 denials, `AUTHORITY_BOUNDARY`/`PARTIAL`, `repair-cycles · 1`, `parks · 1`. The park was resolved by owner ruling (TD-247 Option A). |
+| [SPRINT-124](../../sprint/archive/SPRINT-124-close-epic-015-and-cut-the-engine.md) | Close EPIC-015 and Cut the Engine | **closed** 2026-10-12 · `8e875a6` — 3 of 3 members, 8/8 DoD | **CW8 met, so the epic closes.** ADR-053 re-arms the freeze, widened to new governance machinery, placed as a `.claude/CLAUDE.md` Anti-Pattern; the interim paragraph is gone (TASK-417). It also bound USER_STOP to its own run (TASK-426, TD-247 C3) and cut the engine 67% outside the epic (TASK-404). |
+
+_First member sprint promoted 2026-08-26._ The freeze amendment that blocked it
+**closed 2026-08-25** (§ Open questions), so this epic is admissible. Its other condition — sequenced
+after **SPRINT-083** so the two epics do not contend for `skills/orchestrator/**` and `scripts/` in the
+same window — is also met: SPRINT-083 closed 2026-08-24. The gate was set at that sprint, **not** at
+EPIC-014's close, so running as a **second stream alongside EPIC-014 is admitted** (EPIC-014 was later retired by ADR-051; no cutover occurs). The one genuinely
+shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattended; EPIC-014 touches
+§ Sprint model at cutover) — it takes a single owner and a commit order at G2, never a parallel build.
+
+## Decisions
+
+- **D1** — **V3 supersedes SPRINT-082's freeze** (owner ruling 2026-08-24). **Binding since
+  2026-08-25**, when the amendment was written into `adlc-epic-sequencing.md` § *The core execution
+  architecture is FROZEN*. The freeze re-arms after V3 §56's dogfoods, never at this epic's promote —
+  which is why re-arming is the last § Closed-when condition rather than an assumption.
+- **D2** — **H32/H33/H34 are shipped, not re-opened.** They are verified by SPRINT-082's retained
+  fixtures and re-exercised by V3 §56's dogfoods. Re-implementing them would create a second definition
+  of risk beside the classifier SPRINT-082 T1 defined — the second SSOT LAW 4 forbids.
+- **D3** — **J2 stays human, and absence is never consent.** Headless has no ask channel; a missing
+  channel, a denial or a timeout is a BLOCK, never a default-yes, and never reasoned out by the run
+  (`orchestrator/references/night-run.md` Part 0). This epic widens what J1 may do; it does not narrow
+  J2.
+- **D4** — **Every new autonomy behaviour is ADR-029 Tier G.** A false negative in a continuation
+  contract, an authority classification or a park is silent by construction: the run reports success and
+  the omission leaves no trace. Retained must-FAIL fixture + sibling control + a seeded-break
+  discrimination proof, per task.
+- **D5** — **The seeded J2 control is required, not a fallback.** V3 §56 Dogfood 2 asks for one J2 park
+  *or* a seeded control; a natural park cannot be scheduled, and TASK-188 is the standing evidence that
+  waiting for one to occur foreclosed the criterion once already (L-111). Seed it.
+- **D6** — **Final integration runs the Shell gate's own `QA_FULL=1` profile.** V3 §23 routes final integration to
+  a `STANDARD` System Verify. The reference-engine profile once planned for it (EPIC-014 H17) will never
+  exist — ADR-051 retired EPIC-014 and superseded ADR-039 — so this epic's System Verify step names that
+  profile, the only one, and never forks it.
+
+## Open questions
+
+- ~~**The freeze amendment**~~ — **CLOSED 2026-08-25.** The unblock condition (`git status` shows
+  `adlc-epic-sequencing.md` clean) was met once SPRINT-082's close committed; the amendment is written
+  into that file's § *The core execution architecture is FROZEN*, recording that V3 supersedes the
+  freeze for V3's execution-autonomy scope only, and that it re-arms after V3 §56's two dogfoods.
+  **This epic is now admissible** — the first member sprint is no longer gated on it.
+- **Does `overnight` become the canonical mode name in `spec/STANDARD.md`, or only in the skills?** →
+  a **judgement call, closed by ruling** (L-094) at the first member sprint's G2 — ADR-grade only if it
+  adds a §2 row.
+- **What is the repair budget?** V3 says "bounded" and SPRINT-082 kept exactly one retry. Whether
+  unattended repair inherits that ceiling or earns its own → a **measurement** (L-094): it accumulates
+  from EPIC-006's records. Do not freeze a number before they exist (L-130).
+- **Does the run-outcome vocabulary belong to this epic or to EPIC-008's Run Protocol?** V3 §11 says
+  build only what hardening needs and that EPIC-008 still owns the portable protocol. → ruled at the
+  member sprint that ships H37, so the two do not mint competing `RunSummary` shapes.
+
+## Closed when
+
+- [x] `sprint-bulk` does not pause between already-authorized tasks, and a run ends **only** at
+      `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP`
+      — **SPRINT-118** T2 (vehicle **SPRINT-119**): one real `--mode overnight` run fired against the repaired reaper,
+      reached `PLAN_EXHAUSTED` with no confirmation asked, and `check-night-run-rollup.ts` PASSed its agreement check on
+      the committed log (merged `312ddea`)
+- [x] **`overnight` is the canonical mode name**, discoverable in `/orchestrator` and `/flow`, with
+      `night-run` · `unattended` · `sprint-bulk unattended` resolving to it as aliases
+      — **SPRINT-088**, which its § Member sprints row records as "§ Closed-when 2 complete": the
+      canonical name plus every prior name resolving through `resolve-run-mode.sh`
+- [x] **J0 / J1 / J2 are declared per task**, J1 executes unattended inside the approved envelope, and a
+      **J2 parks** — proven by a *seeded* J2 control, not only by a naturally occurring one (D5)
+      — **SPRINT-089**, whose row records "Contributed § Closed-when 3 and 4, complete": a `J1` task
+      executed headless with no confirmation and a seeded `J2` parked with its unblock condition
+- [x] **One recorded pre-launch approval** covers goal · scope · acceptance · design · verification · J1
+      delegation · capabilities · repair policy · budget · stop conditions, with no repeated J0/J1
+      confirmation during the run
+      — **SPRINT-089**, the second half of that same row: the ten-dimension `approval_envelope:` was
+      recorded in frontmatter, pinned, and consumed with no repeated J0/J1 confirmation
+- [x] **Bounded unattended repair runs**: a concrete J1 critic finding → repair → re-review → continue,
+      with the retry ceiling still exactly what ADR-022 admits
+      — **SPRINT-122** T2 (vehicle **SPRINT-123**, merged `29cefb66`): one real `--mode overnight` run hit the done-when-named check's
+      seeded FAIL (`prose-density: 29 pass, 1 fail`), took exactly one ADR-022 retry (`T1 · retry · … → fixed`, repair commit
+      `86672c57`), re-checked to `0 fail` and continued to T2. Owner reading (G2): the "critic finding" is a named-check FAIL,
+      because ADR-022 parks every judgment finding. Rollup `repair-cycles · 1`; the guard PASSes on the re-reaped log (`d4b726db`)
+- [x] Every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD, tasks attempted/completed, parks,
+      repair cycles, verification state, warnings and terminal reason
+      — **SPRINT-122** T1 (TASK-423): the fifth path now exists. A TERM to the wrapper's printed pid leaves a marker that
+      `reap()` turns into `USER_STOP` (`scripts/night-run.sh:348`), beside HARD_FAILURE :344-362, BUDGET_STOP :364,
+      AUTHORITY_BOUNDARY :366 and PLAN_EXHAUSTED :368. Each feeds the same block: outcome :424 (mapped at :193), DoD, terminal
+      reason :425, tasks :426, parks :427, repair cycles :428, verification :429, warnings :430. Proven by
+      `wrapper-term-is-user-stop` and the real-launcher `fire-site-wrapper-catches-term` (`663d9a5c`). A USER_STOP is not yet
+      bound to its run (TD-247)
+- [x] **Dogfood 1** (continuous attended `sprint-bulk`, no per-task confirmation) and **Dogfood 2**
+      (overnight with ≥1 J1 decision, ≥1 repair, and a J2 park or seeded control) both ran on this
+      repository, each naming what proved it
+      — Dogfood 1: **SPRINT-121** (TASK-416). Dogfood 2: **SPRINT-122** T2 / vehicle **SPRINT-123** (TASK-415). Two J1 tasks ran
+      unattended inside the pinned envelope with no confirmation (0 permission denials, $1.32), with one repair (above). The seeded
+      judgment finding parked T2 with its unblock condition (`T2 · parked-hitl · …`), the D5 control met mid-run, because a declared J2
+      fails pre-flight item 3. Ended `AUTHORITY_BOUNDARY` / `PARTIAL`. The live run also exposed a reaper defect (it omitted parks from its
+      block), fixed in SPRINT-122 T2 (`27d75a78` → `dc490880`)
+- [x] **The freeze is re-armed** in `adlc-epic-sequencing.md` after the dogfoods pass (V3 §58) — this
+      epic does not close leaving the execution architecture unfrozen
+      — **SPRINT-124** T3 (TASK-417, `65ede7df`): ADR-053 re-arms it and widens it to new governance machinery on the same five
+      conditions. § FROZEN carries the amendment and points to the ADR, the 2026-10-10 interim paragraph is gone, and the rule is
+      placed as one `.claude/CLAUDE.md` Anti-Pattern, which every flow in this repository reads
