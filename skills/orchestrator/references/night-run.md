@@ -516,7 +516,7 @@ launcher's fire step at all, because getting there already proves a recognised m
 present (Part 0's mode-signal gate refuses anything else before launch). Decision and its trade →
 **ADR-016**.
 
-**lean-flow's launcher follows this contract (TASK-392).** `scripts/night-run.sh` counts member boxes through
+**The script follows this contract (TASK-392).** lean-flow's launcher `scripts/night-run.sh` counts member boxes through
 `scripts/lib/sprint-members-cli.ts`; a v1 sprint (inline Plan DoD, no members) is counted as before, and a
 by-reference sprint whose members cannot be counted ends `HARD_FAILURE`, never a quiet `0 of 0`.
 
