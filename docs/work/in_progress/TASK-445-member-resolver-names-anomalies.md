@@ -26,12 +26,12 @@ task-origin guard and the resolver disagree on what the store is (TD-190), and `
 
 ## Done when
 
-- [ ] `resolveMembers` returns its anomalies (an id matching two files, an id matching none, a file outside
+- [x] `resolveMembers` returns its anomalies (an id matching two files, an id matching none, a file outside ✓ resolveMembersChecked returns members and anomalies; every caller, the CLI included, prints each by its shared name; plain resolver deleted (496b1c76)
       `docs/work/<folder>/`) beside its members, and every caller prints each one as a named finding.
-- [ ] The task-origin guard and the resolver count the same store population, and `--no-members` prints that member legs are off.
-- [ ] A retained must-FAIL fixture per anomaly, each naming its finding, and a control that resolves cleanly.
-- [ ] No verdict moves on today's corpus: 0 duplicate ids and 0 nested files exist, so every existing check stays as it is.
-- [ ] Full Tier G bar: seeded breaks each redden exactly their case, and an isolated outside review.
+- [x] The task-origin guard and the resolver count the same store population, and `--no-members` prints that member legs are off. ✓ task-origin counts the same store population; --no-members prints its NOTE
+- [x] A retained must-FAIL fixture per anomaly, each naming its finding, and a control that resolves cleanly. ✓ mechanical: must-FAIL per kind with a clean control, through four checkers and the CLI; empty-store and CLI later-line cases (Codex R1)
+- [x] No verdict moves on today's corpus: 0 duplicate ids and 0 nested files exist, so every existing check stays as it is. ✓ mechanical: old-vs-new on 127 archived + live, zero changed lines; conformance A/B identical; post-merge rc 0, progress counts only
+- [x] Full Tier G bar: seeded breaks each redden exactly their case, and an isolated outside review. ✓ mechanical: seeds A1-A5, S1-S2, Q1, Q4 each redden only their case; coordinator re-seeded the ambiguous drop (4 + 3); Codex R1 -> R2 CLEAR
 
 ## Touches
 
