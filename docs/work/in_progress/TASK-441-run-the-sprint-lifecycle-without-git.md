@@ -24,16 +24,16 @@ step. An adopter without git needs the same promote → execute → close to com
 
 ## Done when
 
-- [ ] The promote, tick and close procedures detect git; without it, promote writes each member's `## Done when` verbatim into the
+- [x] The promote, tick and close procedures detect git; without it, promote writes each member's `## Done when` verbatim into the ✓ sprint-by-reference § Without git + promote/tick/close rows (`58755038`); Codex R2 CLEAR
       promote entry and sets `plan_commit: none (no git)`, and tick and close compare live text to that snapshot (a change needs a
       `scope-change` entry, as with git).
-- [ ] Status moves, `gates_signed`, close and archive each state their no-git form (plain moves, dates instead of shas); the
+- [x] Status moves, `gates_signed`, close and archive each state their no-git form (plain moves, dates instead of shas); the ✓ moves · sign-off · close · archive · triage cancel name both forms (`58755038`, R1 fix `35117c5f`)
       git-required wording names the git case, never the only case.
-- [ ] The conformance engine's S9.PLANFROZEN "history unavailable" note names the promote-entry snapshot as where the frozen text
+- [x] The conformance engine's S9.PLANFROZEN "history unavailable" note names the promote-entry snapshot as where the frozen text ✓ note reworded, same note class; scratch git-less run prints it (`51f81f14`)
       lives — wording only, no verdict change.
-- [ ] S9.GATESWELLFORMED accepts `gates_signed: <GATE>[,…] @ <YYYY-MM-DD>` only when the repo has no git, with retained
+- [x] S9.GATESWELLFORMED accepts `gates_signed: <GATE>[,…] @ <YYYY-MM-DD>` only when the repo has no git, with retained ✓ mechanical: gates-signed fixtures 11/11; seeds M1–M3 each redden only their case; M1 re-seeded by the coordinator, same result
       must-FAIL fixtures for both sides; no git repo's verdict moves (owner ruling at G2, logged as a scope-change).
-- [ ] Exercised on a scratch repo with no `.git`: one sprint goes promote → tick → close by the shipped procedures, a deliberate
+- [x] Exercised on a scratch repo with no `.git`: one sprint goes promote → tick → close by the shipped procedures, a deliberate ✓ judgment: scratch promote → tick → frozen-box edit caught by snapshot diff → scope-change → close (builder evidence)
       edit to a frozen box is caught against the snapshot, and the close completes.
 
 ## Touches
