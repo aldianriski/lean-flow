@@ -52,6 +52,7 @@ apart from the named anomalies.
 ### T2 — Move the remaining Plan readers onto the parser `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/lib/check-authority.ts` · `scripts/lib/check-sprint-by-reference.ts` · `scripts/lib/sprint-members-cli.ts`
   · `scripts/lib/check-dod-delta.ts` · `evals/`
+  · `scripts/lib/check-layers-completeness.ts` · `scripts/lib/check-layers-observed.ts`
   · `docs/work/todo/TASK-444-move-the-remaining-plan-readers-onto-the-shared-parser.md`
   · `docs/work/in_progress/TASK-444-move-the-remaining-plan-readers-onto-the-shared-parser.md`
 Depends-on: T1
