@@ -47,7 +47,7 @@ fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
 
-fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
+fmv() { awk -v k="$2" '{sub(/\r$/,"")} NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
 # First live citer of <basename>, or empty. Historical and generated surfaces never count.
 live_citer() { # <basename> <self-relative-path>

@@ -1103,6 +1103,20 @@ commit_msg "$d" "archive all four"
 assert_absent "s11-whenitruns-unreadable-close-not-wrong-phase" "$d" "retention-trigger-ran-in-wrong-phase"
 assert_line   "s11-whenitruns-unreadable-close-is-unphased"     "$d" "S11.WHENITRUNS      -- 1 archived sprint(s) archived at or after their own close_commit; 3 could not be phased"
 
+# --- TD-131 (TASK-447): CRLF frontmatter reads like its LF twin ------------------------------------
+# Twins of two cases above, rebuilt with CRLF line endings and read through an awk that does NOT fold
+# CRLF (this host's gawk does, which hides the defect). `_fm` and S11's close_commit reader first-line-
+# guard on `---`; a raw `---\r` made status/close_commit read empty, so the closed sprint stopped being
+# seen and the wrong-phase archive stopped being phased: both verdicts silently flipped to "nothing wrong".
+. "$root/evals/lib/harness-common.sh"
+raw_awk_dir "$work/rawawk"
+crlf_twin "$work/arch-phase" "$work/arch-phase-crlf"
+crlf_twin "$work/arch-live"  "$work/arch-live-crlf"
+_path0=$PATH; PATH="$work/rawawk:$PATH"
+assert_finding "s11-retention-wrong-phase-crlf" "$work/arch-phase-crlf" "retention-trigger-ran-in-wrong-phase"
+assert_finding "s11-closed-not-archived-crlf"   "$work/arch-live-crlf"  "closed-sprint-not-archived"
+PATH=$_path0
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "SPRINT-FAMILY FIXTURES: all green"

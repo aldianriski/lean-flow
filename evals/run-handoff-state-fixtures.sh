@@ -268,6 +268,20 @@ run_case_anywhere "closed-empty-then-repeated-path" 1 \
   "SPRINT-971-x.md handoff at line 9 (<no handoff-path recorded>) carries UNKNOWN status ('live')" -- \
   sh "$checker" "$fx/closed-empty-then-repeated-path"
 
+# --- TD-131: the same fixture with CRLF frontmatter must read the same status -------------------
+# `fmv` first-line-guards on `$0!="---"`; on a raw `---\r` that exits and `status` reads empty, so the
+# sprint is not seen as closed and the outstanding handoff passes. The shim awk reads bytes untranslated
+# (this host's gawk folds CRLF on read, which hides the defect), so the reader must strip the CR itself.
+raw_awk_dir "$work/rawawk"
+crlf_twin "$fx/closed-live-outstanding" "$work/crlf-closed-live-outstanding"
+run_case_anywhere "crlf-closed-live-outstanding" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-930-x.md)" -- \
+  env PATH="$work/rawawk:$PATH" sh "$checker" "$work/crlf-closed-live-outstanding"
+crlf_twin "$fx/closed-all-spent" "$work/crlf-closed-all-spent"
+run_case_anywhere "crlf-closed-all-spent" 0 \
+  "handoff spent at /tmp/handoff-934-x.md" -- \
+  env PATH="$work/rawawk:$PATH" sh "$checker" "$work/crlf-closed-all-spent"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "HANDOFF-STATE FIXTURES: all green"; else echo "HANDOFF-STATE FIXTURES: at least one FAIL"; fi
 exit $fail
