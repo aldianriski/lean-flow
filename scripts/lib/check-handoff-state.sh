@@ -60,7 +60,7 @@ bad() { checked=$((checked + 1)); fail=1; printf 'FAIL  %s\n' "$1"; }
 
 # Frontmatter value for <key>, first block only (the check-epic-archive.sh convention, TD-087/TD-097's
 # reason not to reinvent a second reader for the same shape).
-fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
+fmv() { awk -v k="$2" '{sub(/\r$/,"")} NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
 # handoff_records <file> -- "<line>\t<path-or-EMPTY>\t<status-or-EMPTY>" per `handoff` heading block.
 handoff_records() {
@@ -104,7 +104,7 @@ handoff_records() {
     # status truthful; a squashed status like `live spent` fails status_valid and reports UNKNOWN,
     # which is the safe direction.
     function clean(line, key,   s) {
-      s = line; sub("^" key ":[ \t]*", "", s); gsub(/[ \t]+$/, "", s); gsub(/\t/, " ", s); return s
+      s = line; sub(/\r$/, "", s); sub("^" key ":[ \t]*", "", s); gsub(/[ \t]+$/, "", s); gsub(/\t/, " ", s); return s
     }
     function flush() { printf "%d\t%s\t%s\n", ln, path, status }
   ' "$1"

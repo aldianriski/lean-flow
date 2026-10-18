@@ -236,6 +236,57 @@ const CASES: Case[] = [
     },
     expect: [],
   },
+  // TD-205: the entry must PRECEDE the edit, as § Plan edits already require (S9.SCOPECHANGE). The two
+  // cases differ only in commit order; the claim-bearing one is the FAIL, the PASS proves the order is read
+  // and not that every logged edit now fails.
+  {
+    name: "scope-change-committed-after-edit (must-FAIL: TD-205, a justification written knowing the outcome)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit");
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: TASK-901 needs a benchmark. Impact: T1 stays S. G2 re-confirmed.");
+      commit(d, "scope-change, a commit later");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-committed-before-edit (must-PASS control: TD-205)",
+    mutate: (d) => {
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: TASK-901 needs a benchmark. Impact: T1 stays S. G2 re-confirmed.");
+      commit(d, "scope-change first");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit, a commit later");
+    },
+    expect: [],
+  },
+  // Codex R1: this repo merges every task branch --no-ff. A side branch that forked BEFORE the baseline and
+  // carries an older `## Done when` is merged after a properly logged edit; its commit is in `base..HEAD` but
+  // is not an edit since the baseline, so it must not be taken for the first edit (it has no entry in its log).
+  // The merge resolves the add/add conflict to a text matching neither parent, so history simplification
+  // cannot prune the side commit and only --ancestry-path keeps it out of the walk.
+  {
+    name: "side-branch-forked-before-baseline-merged-after-logged-edit (must-PASS: TD-205, R1)",
+    mutate: (d) => {
+      const main = git(d, ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
+      const root = git(d, ["rev-list", "--max-parents=0", "HEAD"]).trim();
+      git(d, ["checkout", "-q", "-b", "side", root]);
+      put(d, W("todo", T901), fix(T901).replace("- [ ] a retained fixture covers the empty input", "- [ ] an older wording of the same box"));
+      commit(d, "side: older Done when, forked before the baseline");
+      git(d, ["checkout", "-q", main]);
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: TASK-901 needs a benchmark. Impact: T1 stays S. G2 re-confirmed.");
+      commit(d, "edit + scope-change");
+      try {
+        git(d, ["merge", "--no-ff", "-q", "-m", "merge side", "side"]);
+      } catch {
+        // add/add conflict: resolve to a text that is neither parent's
+        put(d, W("todo", T901), fix(T901).replace("- [ ] a retained fixture covers the empty input", "- [ ] a retained fixture covers the empty input\n- [ ] a benchmark stays under 5ms\n- [ ] merged wording"));
+        git(d, ["add", "-A"]);
+        git(d, ["commit", "-q", "--no-edit"]);
+      }
+    },
+    expect: [],
+  },
   {
     name: "scope-change-names-other-id (must-FAIL)",
     mutate: (d) => {

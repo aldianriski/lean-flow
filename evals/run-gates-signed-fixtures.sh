@@ -158,6 +158,14 @@ mk_gl "$work/gl-sha" 'G1,G2 @ 1f0c012'
 run_case_anywhere "sha-without-git-still-passes" 0 "G1,G2 signed @ 1f0c012" -- \
   sh "$engine" "$work/gl-sha" --spec "$gs_spec"
 
+# --- TD-131: a CRLF sprint reads the same gates_signed as its LF twin ----------------------------------
+# On a raw `---\r` the first-line guard exits and the field reads absent, so a signed sprint is reported
+# NOT SIGNED. The shim awk reads bytes untranslated (this host's gawk folds CRLF, hiding the defect).
+raw_awk_dir "$work/rawawk"
+crlf_twin "$fx/wellformed" "$work/crlf-wellformed"
+run_case_anywhere "crlf-wellformed-passes" 0 "G1,G2 signed @ 1f0c012" -- \
+  env PATH="$work/rawawk:$PATH" sh "$engine" "$work/crlf-wellformed" --spec "$gs_spec"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "GATES-SIGNED FIXTURES: all green"; else echo "GATES-SIGNED FIXTURES: at least one FAIL"; fi
 exit $fail

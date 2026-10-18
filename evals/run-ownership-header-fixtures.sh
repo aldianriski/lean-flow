@@ -224,6 +224,29 @@ case $(sh "$engine" "$d" --spec "$own_spec" 2>&1) in
   *) echo "PASS fixture(todo-md-no-longer-governed-silent): nothing names TODO.md" ;;
 esac
 
+# --- TD-131 (TASK-447): CRLF twins of the header scan and the governed:false exemption -----------------
+# `_own_scan` and `_own_governed_off` first-line-guard on `---`; a raw `---\r` made every headed doc read
+# as header-less and the declared tree stop being exempt. Read through an awk that does NOT fold CRLF
+# (this host's gawk does, which hides the defect), each twin must give its LF original's verdict.
+raw_awk_dir "$work/rawawk"
+crlf_twin "$fx/clean" "$work/crlf-clean"
+out=$(PATH="$work/rawawk:$PATH" sh "$engine" "$work/crlf-clean" --spec "$own_spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -qE 'carry a complete ownership header'; then
+  echo "PASS fixture(crlf-clean-headers-read): a CRLF tree's headers all read, exit 0"
+else
+  echo "FAIL fixture(crlf-clean-headers-read): expected exit 0 and a complete-header line on a CRLF twin of 'clean' -- got exit $rc:"
+  printf '%s\n' "$out" | grep -E '^FAIL |S3\.SCHEMA'; fail=1
+fi
+crlf_twin "$fx/governed-off" "$work/crlf-governed-off"
+out=$(PATH="$work/rawawk:$PATH" sh "$engine" "$work/crlf-governed-off" --spec "$own_spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -qE '^FAIL +(ownership-header|update-trigger)' &&
+   printf '%s\n' "$out" | grep -q 'exempt: the tree declares'; then
+  echo "PASS fixture(crlf-governed-false-exempts): a CRLF governed:false declaration still exempts its tree"
+else
+  echo "FAIL fixture(crlf-governed-false-exempts): expected exit 0, no ownership finding and a named exemption on a CRLF twin -- got exit $rc:"
+  printf '%s\n' "$out" | grep -E '^FAIL |exempt'; fail=1
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "OWNERSHIP-HEADER FIXTURES: all green"

@@ -752,7 +752,7 @@ _ATT_PRESENT=0
 # deliberate rather than refactored mid-migration, because D2 makes this task a move and a shared
 # frontmatter reader is a change. Filed at close.
 _att_fmv_stdin() {
-  awk -v k="$1" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}'
+  awk -v k="$1" '{sub(/\r$/,"")} NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}'
 }
 
 # Gate names compared as a SET, not as a string: `Gate: G2,G1` and a record of `G1, G2` state the same
@@ -964,7 +964,7 @@ assert_S13_UNSIGNEDCLAIM() {
 # _s9_gates_fmv <file> -- the frontmatter value of `gates_signed:`; empty for both a genuinely absent
 # field and an unfilled template placeholder (both read as absence, never as a value).
 _s9_gates_fmv() {
-  v=$(awk -v k=gates_signed 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1")
+  v=$(awk -v k=gates_signed '{sub(/\r$/,"")} NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1")
   case "$v" in "["*) v="" ;; esac
   printf '%s' "$v"
 }
@@ -1150,7 +1150,7 @@ _own_governed_off() {
   for idx in "$1"/docs/*/README.md "$1"/docs/*/INDEX.md "$1"/docs/*/*/README.md "$1"/docs/*/*/INDEX.md; do
     [ -f "$idx" ] || continue
     # Frontmatter only -- a `governed: false` mentioned in prose is discussion, not a declaration.
-    awk 'NR==1 && $0!="---"{exit} NR==1{next} $0=="---"{exit} /^governed:[ \t]*false([ \t]|#|$)/{found=1; exit} END{exit !found}' "$idx" || continue
+    awk '{sub(/\r$/,"")} NR==1 && $0!="---"{exit} NR==1{next} $0=="---"{exit} /^governed:[ \t]*false([ \t]|#|$)/{found=1; exit} END{exit !found}' "$idx" || continue
     d=${idx%/*}
     printf '%s/\n' "${d#"$1"/}"
   done
@@ -1256,10 +1256,11 @@ _own_scan() {
     {
       d = $0; f = ENVIRON["R"] "/" d; nd++
       owner = ""; lu = ""; upd = ""; st = ""
-      rc = (getline l < f)
+      rc = (getline l < f); sub(/\r$/,"",l)
       if (rc < 0) { print "T" d; next }
       if (rc == 0 || l != "---") { close(f); print "H" d; print "T" d; next }
       while ((getline l < f) > 0) {
+        sub(/\r$/,"",l)
         if (l == "---") break
         if (l ~ /^owner:/)               { v = l; sub(/^owner:[ ]*/, "", v);          owner = v }
         else if (l ~ /^update_trigger:/) { v = l; sub(/^update_trigger:[ ]*/, "", v); upd = v }
@@ -2103,7 +2104,7 @@ _s2_cap_for() {
 }
 
 _fm() {
-  awk -v k="$2" 'NR==1 && $0 != "---" { exit } NR==1 { next } $0 == "---" { exit }
+  awk -v k="$2" '{ sub(/\r$/,"") } NR==1 && $0 != "---" { exit } NR==1 { next } $0 == "---" { exit }
     $0 ~ "^" k ":" { sub("^" k ":[ ]*", ""); print; exit }' "$1"
 }
 _fm_real() {   # <file> <key> -- the value only when it is not a bracketed placeholder
@@ -2924,8 +2925,10 @@ _s11_rows() {   # <repo> <arch-list>
           p = a[i]; if (p == "") continue
           base = p; sub(/^.*\//, "", base)
           f = ENVIRON["R"] "/" p; cc = ""
-          if ((getline l < f) > 0 && l == "---") {
+          ok = ((getline l < f) > 0); sub(/\r$/,"",l)
+          if (ok && l == "---") {
             while ((getline l < f) > 0) {
+              sub(/\r$/,"",l)
               if (l == "---") break
               if (l ~ /^close_commit:/) { sub(/^close_commit:[ ]*/, "", l); cc = l; break }
             }

@@ -106,3 +106,24 @@ run_case_anywhere() {
       ;;
   esac
 }
+
+# crlf_twin <src-dir> <dst-dir> -- copy a fixture tree and give every *.md CRLF line endings (TD-131).
+# Built at run time, never tracked: a tracked CRLF file is rewritten by a checkout's autocrlf and
+# stops being the fixture. The LF original is the oracle: a reader that is correct on the twin
+# returns what it returns on the original.
+crlf_twin() {
+  mkdir -p "$2" && cp -R "$1/." "$2/" || fatal "harness: crlf_twin could not copy $1"
+  _cr=$(printf '\r')
+  find "$2" -name '*.md' -type f | while IFS= read -r _f; do
+    sed "s/\$/$_cr/" "$_f" > "$_f.crlf" && mv "$_f.crlf" "$_f"
+  done
+}
+
+# raw_awk_dir <dir> -- a dir holding an `awk` shim that reads bytes untranslated (gawk BINMODE=3). A
+# host awk that folds CRLF to LF on read (this repo's Windows gawk) hides a reader that does not
+# strip the CR itself; prepend this dir to PATH so the reader meets the awk a Linux runner has.
+raw_awk_dir() {
+  mkdir -p "$1" || fatal "harness: raw_awk_dir could not create $1"
+  printf '#!/bin/sh\nexec "%s" -v BINMODE=3 "$@"\n' "$(command -v awk)" > "$1/awk"
+  chmod +x "$1/awk"
+}

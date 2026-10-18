@@ -74,6 +74,22 @@ run_case_anywhere "worktree-lookalike-citer" 0 \
   "superseded but still cited by docs/worktrees/notes.md -- correctly left in place" -- \
   sh "$checker" "$fx/worktree-lookalike-citer"
 
+# --- TD-131: CRLF frontmatter reads the same status as its LF twin ---------------------------------
+# A raw `---\r` fails `fmv`'s first-line guard, so `status` reads empty and the verdict silently changes.
+# The shim awk reads bytes untranslated (this host's gawk folds CRLF, hiding the defect). The FAIL twin
+# is the claim-bearing case; the PASS twin is its control (same reader, no finding to hide behind).
+work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
+trap 'rm -rf "$work"' EXIT INT TERM
+raw_awk_dir "$work/rawawk"
+crlf_twin "$fx/archived-not-superseded" "$work/crlf-archived-not-superseded"
+run_case_anywhere "crlf-archived-not-superseded" 1 \
+  "is archived while status is 'current'" -- \
+  env PATH="$work/rawawk:$PATH" sh "$checker" "$work/crlf-archived-not-superseded"
+crlf_twin "$fx/archived-clean" "$work/crlf-archived-clean"
+run_case_anywhere "crlf-archived-clean" 0 \
+  "archived correctly (superseded, no live citer)" -- \
+  env PATH="$work/rawawk:$PATH" sh "$checker" "$work/crlf-archived-clean"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "RESEARCH-ARCHIVE FIXTURES: all green"; else echo "RESEARCH-ARCHIVE FIXTURES: at least one FAIL"; fi
 exit $fail
