@@ -67,3 +67,27 @@ and the reaper drops into that branch, so the premise is false.
 **Impact.** Box 2 is reworded to the owner's ruling: the v1 counting is deleted; a v1 sprint gets a named "unsupported since 2.0"
 error, and a missing bun gives zero counts plus the existing bun line. TD-049 still closes.
 **Re-confirm G2.** The owner signed G1 + G2 with this rewording in the same popup.
+
+### 2026-10-18 | T4 | TASK-446 — the Shell twins and the reaper's v1 counting retired; merged `53b886d0` (`82057d08` + coordinator fix `f4b69d73`)
+Worktree-base guard PASS (`3125766f`). Deleted: `check-layers-observed.sh`, `check-authority.sh`, `evals/run-layers-observed-fixtures.sh`,
+`evals/run-authority-differential.ts` (−2,945 lines across 20 files). `layers_tokens` moved into `check-layers-completeness.sh`, which
+keeps the dispatch preflight's parity oracle. Reaper: no Plan parsing. A v1 sprint gets "v1 sprint unsupported since 2.0 (ADR-046)",
+a missing bun keeps its line, and the counts are zero. The reaper's harnesses were converted from v1 to v2 trees, with a retained
+must-FAIL case `v1-is-named-unsupported-beside-store` (the old reaper printed `1 of 3`).
+**Coordinator verify caught one defect.** The "byte-equivalent" move wrote a literal newline inside `printf '%s…'` where the original
+had `\n`. The output was identical only because `*.sh` is pinned to LF. Restored from a script file (`chr(92)`, one match); the
+function body diffed identical to the original, and the completeness, preflight and sprint-close harnesses were re-run green. A scan of
+every added line for an unterminated quote or a lost escape found no other case.
+Builder findings, ruled:
+- A new opt-in wrapper `evals/run-layers-observed-test-fixtures.ts` (13-test floor) is accepted. The deleted runner was the only path
+  to `layers-observed.test.ts`, so this replaces existing coverage and is not new machinery.
+- The deleted runner's Plan-path cases ran against the Shell only, so the TS leg loses nothing it had. T1 adds must-FAIL fixtures
+  for the Plan-path behaviour it moves.
+- Comments in `check-authority.ts`, `check-layers-observed.ts`, `check-layers-completeness.ts` and `check-dod-delta.ts` still call
+  the twins live. They go to T1 (observed · completeness) and T2 (authority · dod-delta), the tasks that own those files.
+- Reaper blind spot (no bun and a v1 sprint, so silent zeros) → TD at close. Census: no v1 sprint exists in a v2 tree.
+- Live docs still naming the twins (e.g. `docs/QA.md`) → close-time doc-freshness.
+Post-merge: layers-observed, completeness, freeze (6/0) and scope-change (7/0) clean; tsc rc 0 with 0 errors; prose-density 28/0;
+duplicate-id check empty. QA_FULL launched on the VPS at `53b886d0` for box 3.
+QA_FULL on the VPS at `53b886d0`: **QA-CHECK: 304 pass, 0 fail**, rc 0. It covers every always-on leg, so the bare profile too. Box 3 is
+ticked on it. All three ticks went through `tick-box.ts` (freeze 6/0, layers 15/0 after each write).
