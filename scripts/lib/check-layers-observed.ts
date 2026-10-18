@@ -1,5 +1,5 @@
 // scripts/lib/check-layers-observed.ts -- SPRINT-103 T2: a faithful, fork-free TypeScript port of
-// scripts/lib/check-layers-observed.sh, run by Bun.
+// scripts/lib/check-layers-observed.sh (retired at SPRINT-128 T4; this file is the only implementation), run by Bun.
 //
 // WHY THIS EXISTS. docs/research/logs/qa-gate-timing.md Round 20: evals/run-layers-observed-
 // fixtures.sh runs 185.7/182.9s wall, 59% sys CPU, roughly a third of wall spent blocked on
@@ -32,13 +32,13 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, posix } from "node:path";
-import { section, resolveMembers, anomalyFinding, parsePlan, sprintNumber, type Member } from "./sprint-members.ts";
+import { section, resolveMembersChecked, memberAnomalyFinding, anomalyFinding, parsePlan, sprintNumber, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151), identical logic to the copy in
 // check-layers-completeness.ts -- both are independent, byte-identical ports of the SAME shell
-// predicate (scripts/lib/archive-path.sh's lf_is_archived_path()), matching the shell world's own
-// direction (check-layers-completeness.sh sources check-layers-observed.sh, not the reverse), so
-// this file carries the canonical TS copy rather than importing across the pair. ------------------
+// predicate (scripts/lib/archive-path.sh's lf_is_archived_path()). The shell original of this file used
+// to be sourced by check-layers-completeness.sh and is retired (SPRINT-128 T4), so the two TS ports each
+// carry their own copy rather than importing across the pair. -------------------------------------------
 function sameDirIdentity(a: string, b: string): boolean {
   try {
     const sa = statSync(a);
@@ -318,6 +318,9 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
   };
   const skip = (msg: string) => lines.push(`SKIP  ${msg}`);
   const note = (msg: string) => lines.push(`      ${msg}`);
+  if (noMembers) {
+    note("layers observed: --no-members -- the member legs are OFF; no member is resolved, so no member finding is run");
+  }
 
   // Computed once per run, not per sprint file (see computeSortedUniqueWip's own comment).
   let wipComputed: string[] | null = null;
@@ -406,7 +409,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     // ---- members (SPRINT-110 T2): a by-reference sprint's task files, each governed by the ### Tn
     // block whose Cites: names it. `## Touches` stays prose -- never parsed. ---------------------
     const root = posix.dirname(posix.dirname(posix.dirname(sp.replace(/\\/g, "/"))));
-    const members = noMembers ? [] : resolveMembers(root, sp);
+    const { members, anomalies: memberAnomalies } = noMembers ? { members: [], anomalies: [] } : resolveMembersChecked(root, sp);
     const governing = (id: string): string[] => [...cites].filter(([, ids]) => ids.includes(id)).map(([t]) => t);
     const memberIds = new Set(members.map((m) => m.id));
     let earlyHit = false;
@@ -417,6 +420,10 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
       bad(
         `${sp} layers observed: ${anomalyFinding(a)}`,
       );
+    }
+    for (const a of memberAnomalies) {
+      earlyHit = true;
+      bad(`${sp} layers observed: ${memberAnomalyFinding(a)}`);
     }
     for (const m of members) {
       if (governing(m.id).length === 0) {

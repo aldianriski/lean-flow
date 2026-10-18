@@ -90,6 +90,46 @@ describe("member out-of-layers (Task: TASK-NNN trailer attribution)", () => {
   test("--no-members (the differential's named exclusion) drops the member finding, keeps the v1 path", () => {
     const off = run(d, ["--no-members", SPRINT]);
     expect(off.out).not.toContain("member-out-of-layers");
+    expect(off.out).toContain("--no-members -- the member legs are OFF"); // TD-198: switched off aloud, never silently
+    expect(r.out).not.toContain("the member legs are OFF"); // control: the default run prints no such note
+  });
+});
+
+// --- SPRINT-128 T3 (TASK-445, TD-188): the resolver's anomalies are named FAILs here too -------------------------
+describe("member resolver anomalies (member-ambiguous / member-missing / member-misplaced)", () => {
+  const M2G = "docs/work/todo/TASK-902-ghost.md";
+  const T = (path: string, id: string) => ({ path, id });
+  const clean = build("anom-clean", { members: [M1], plan: T1("`TASK-901`") }, [T(M1, "TASK-901")]);
+  const dup = build("anom-dup", { members: [M1], plan: T1("`TASK-901`") }, [T(M1, "TASK-901"), T("docs/work/done/TASK-901-dup.md", "TASK-901")]);
+  const ghost = build("anom-ghost", { members: [M1, M2G], plan: T1("`TASK-901`") }, [T(M1, "TASK-901")]);
+  const nested = build("anom-nested", { members: [M1], plan: T1("`TASK-901`") }, [T(M1, "TASK-901"), T("docs/work/todo/sub/TASK-903-n.md", "TASK-903")]);
+
+  test("control: a clean tree prints no resolver anomaly", () => {
+    const r = run(clean);
+    expect(r.out).not.toMatch(/member-(ambiguous|missing|misplaced)/);
+  });
+  test("MUST-FAIL member-ambiguous: names the id and BOTH paths", () => {
+    const r = run(dup);
+    expect(r.fail).toBe(true);
+    const line = r.out.split("\n").find((l) => l.includes("member-ambiguous:"))!;
+    expect(line).toContain("TASK-901");
+    expect(line).toContain("docs/work/done/TASK-901-dup.md");
+    expect(line).toContain(M1);
+  });
+  test("MUST-FAIL member-missing: a listed id with no file is named", () => {
+    const r = run(ghost);
+    expect(r.fail).toBe(true);
+    expect(r.out.split("\n").find((l) => l.includes("member-missing:"))).toContain("TASK-902");
+  });
+  test("MUST-FAIL member-misplaced: a nested task file is named with its path", () => {
+    const r = run(nested);
+    expect(r.fail).toBe(true);
+    expect(r.out.split("\n").find((l) => l.includes("member-misplaced:"))).toContain("docs/work/todo/sub/TASK-903-n.md");
+  });
+  test("--no-members runs none of them (the NOTE says so), so the duplicate is not reported", () => {
+    const r = run(dup, ["--no-members", SPRINT]);
+    expect(r.out).not.toContain("member-ambiguous");
+    expect(r.out).toContain("the member legs are OFF");
   });
 });
 

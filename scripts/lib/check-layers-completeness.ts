@@ -52,7 +52,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { anomalyFinding, parsePlan, resolveMembers, section, type Member } from "./sprint-members.ts";
+import { anomalyFinding, memberAnomalyFinding, parsePlan, resolveMembersChecked, section, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151) ---------------------------------------
 // Ported from scripts/lib/archive-path.sh's lf_is_archived_path(). Two tests, in the SAME order:
@@ -259,8 +259,8 @@ const TID_RE = /\bT[0-9]+\b/g;
 // the TD-NNN "resolved" -> TECH-DEBT.md rule). A member NO block cites has no declaration to check
 // against and is a named FAIL, never silence (owner ruling R1). scripts/lib/check-layers-completeness.sh
 // is NOT taught this (decision D1: it stays the Plan-path oracle); the differential names the exclusion.
-// `## Touches` stays prose and is not parsed. An id resolveMembers cannot resolve to exactly one file
-// is dropped by it silently (TD-188) -- reported by check-sprint-by-reference (MEMBER-MISSING), not here.
+// `## Touches` stays prose and is not parsed. An id the resolver cannot resolve to exactly one well-placed
+// file is a named FAIL here too (member-missing / member-ambiguous / member-misplaced, TD-188), not a silent drop.
 interface BlockDecl {
   tidFull: string;
   citedTasks: Set<string>;
@@ -419,7 +419,8 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
     // Member files (SPRINT-110 T1). root = the sprint file's grandparent-of-grandparent under the
     // `<root>/docs/sprint/<file>` convention (same derivation as check-authority.ts); resolveMembers
     // returns [] when that root has no docs/work/, so a v1 sprint adds nothing here.
-    const members = resolveMembers(dirname(dirname(dirname(sp))), sp);
+    const { members, anomalies } = resolveMembersChecked(dirname(dirname(dirname(sp))), sp);
+    for (const a of anomalies) emit.push({ kind: "line", text: `FAIL  layers-completeness: ${sp} ${memberAnomalyFinding(a)}` });
     if (members.length > 0) {
       const root = dirname(dirname(dirname(sp)));
       const res = evaluateMemberLayers(sp, members, decls, (m) => readFileSync(join(root, m.path), "utf8"));

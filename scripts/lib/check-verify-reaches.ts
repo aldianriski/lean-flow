@@ -77,7 +77,7 @@
 
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
-import { resolveMembers, section, taskIds } from "./sprint-members.ts";
+import { memberAnomalyFinding, resolveMembersChecked, section, taskIds } from "./sprint-members.ts";
 
 // --- the shared archive predicate, reimplemented (this file may not edit archive-path.sh, and a new
 // .sh file is not admissible -- ADR verbatim carryover of scripts/lib/archive-path.sh's own logic,
@@ -305,7 +305,11 @@ export function checkSprintFile(scriptRoot: string, sp: string): FileCheckOutcom
   // --- member files (TASK-387, owner ruling A+B) --------------------------------------------------
   const memberRoot = memberRootFor(sp);
   const listedIds = taskIds(section(content, "Members"));
-  const members = resolveMembers(memberRoot, sp);
+  const { members, anomalies } = resolveMembersChecked(memberRoot, sp);
+  for (const a of anomalies) {
+    fail = true;
+    out.push(`FAIL  verify-reaches: ${sp} ${memberAnomalyFinding(a)}`);
+  }
 
   if (listedIds.size > 0 && members.length === 0) {
     fail = true;
