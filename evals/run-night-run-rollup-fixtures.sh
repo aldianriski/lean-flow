@@ -288,6 +288,18 @@ else
   printf '%s\n' "$out"
   fail=1
 fi
+# 12e2 (promote shape, TASK-422): the log exists from promote and holds ONLY the `promote` entry; open members -> green.
+d="$fx/qa-leg2g-v2-promoted-log-promote-entry-only"
+out=$(run_leg2g "$d"); ec=$?
+if [ "$ec" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'has no completed-run entry yet -- nothing to verify' \
+   && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=0 fail=0'; then
+  echo "PASS fixture(qa-leg2g-v2-promoted-log-promote-entry-only-ok): a sprint promoted with a promote-only log (no work entries yet) is not FAILed -- the leg skips it as nothing-to-verify"
+else
+  echo "FAIL fixture(qa-leg2g-v2-promoted-log-promote-entry-only-ok): expected a clean PASS -- got exit $ec:"
+  printf '%s\n' "$out"
+  fail=1
+fi
 # 12f (selection): every member ticked -> the missing log is not owed; excluded from the population.
 d="$fx/qa-leg2g-v2-closed-members-no-log"
 out=$(run_leg2g "$d"); ec=$?

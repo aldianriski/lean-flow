@@ -87,7 +87,7 @@ Cites: [the member TASK-NNN(s) this block delivers, then any other sources it an
 ## Execution Log
 
 > **Lives in its own file** — `docs/sprint/logs/SPRINT-NNN-<slug>.md`, rendered from
-> `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here:
+> `templates/sprint-log.md.template` and created at promote, its first entry the `promote` / `plan locked` record (earlier than STANDARD §9's "at the first entry" minimum, which it satisfies). Append there, never here:
 > the Log grows with the work done, so keeping it out of this file is what stops it consuming the
 > 400-line budget the Plan needs (STANDARD §9 · ADR-014). The `logs/` subdirectory is load-bearing —
 > the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory

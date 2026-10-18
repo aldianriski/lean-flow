@@ -19,7 +19,8 @@ to tick, mirror or drift (ADR-047). This file is the procedure behind the `promo
      the member `TASK-NNN` it delivers), one to three lines of WHY, and `**Acceptance:**`. **No DoD
      checkboxes** — those are the member file's, and a copy here drifts, because only one of the two
      ever gets ticked.
-4. Commit the stamp + sprint file as `sprint(N): plan locked`, then record **that commit's sha** as
+4. Render the sprint's Execution Log (`docs/sprint/logs/SPRINT-NNN-<slug>.md`, from `templates/sprint-log.md.template`) with the
+   `promote` entry carrying the signed governance checklist, then commit the stamp + sprint file + that log as `sprint(N): plan locked`, then record **that commit's sha** as
    `plan_commit:` — the first commit in which both the Plan and the stamped members exist.
 
 ## What `plan locked` pins — the freeze
