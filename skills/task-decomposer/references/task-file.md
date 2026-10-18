@@ -48,11 +48,14 @@ authority: J0 | J1 | J2   # J2 = human-reserved; an unattended run parks on it
 origin: decomposer        # always — these entries met the grill; it is what earns G1's fast-path
 state: ready | needs-info | blocked
 depends-on: [TASK-040, TASK-041]   # or []
+gates_signed: G1,G2 @ 1a2b3c4d     # optional — written by /orchestrator, never by intake; absent = NOT signed (`@ YYYY-MM-DD` without git)
 ---
 
 # TASK-042 — <title>
 
 ## Why            (optional — one to three lines)
+
+## Approved design (optional — the owner-approved G2 design, one paragraph; /orchestrator writes it)
 
 ## Done when
 

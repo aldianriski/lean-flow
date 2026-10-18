@@ -695,7 +695,7 @@ function byteIdentical(a: string, b: string): boolean {
 
 // --- SCHEMA CROSS-CHECK against docs/work/README.md (outside review MED #4) --------------------
 
-const KNOWN_OPTIONAL_FIELDS = ["epic", "sprint", "depends-on"];
+const KNOWN_OPTIONAL_FIELDS = ["epic", "sprint", "depends-on", "gates_signed"];
 
 function readmeSection(text: string, heading: string): string {
   const idx = text.indexOf(heading);
