@@ -138,3 +138,14 @@ Coordinator rulings on builder findings: headings outside `## Plan` are no longe
 plans have it, and the result is a visible skip). The `` `A` and `B` `` lead gap and the original dod-delta fixture it weakened are
 fixed in T3, the parser's owner. Combined `### T1+T2` headings: census 0, accepted. Stale twin comments in the Layers checkers go
 to T3. Ticks via `tick-box` (4/4).
+QA_FULL on the VPS at `6e0a31a7`: **QA-CHECK: 304 pass, 0 fail**, rc 0.
+
+### 2026-10-19 | scope-change | T3 TASK-445 also carries two T2 residuals, as the next owner of their files
+**What broke.** T2 could not touch `sprint-members.ts`, so two items it found sit in files T3 owns next. `leadTaskIds` stops at
+a backticked id after `and` (`` `TASK-1` and `TASK-2` `` yields only TASK-1), and T2 reworded an existing dod-delta fixture to
+avoid it, which weakened that test. Stale comments in `check-layers-completeness.ts` and `check-layers-observed.ts` (and one in
+`evals/dod-delta.test.ts`) still call the retired Shell twins live or the oracle.
+**Impact.** T3 fixes `leadTaskIds` and restores the original fixture wording, with a must-FAIL on the restored form, and cleans
+those comments. All the files are in T3's Layers already (`evals/` covers the test). No DoD change; the work is recorded in T3's
+log entry.
+**Re-confirm G2.** Not needed: it completes the leading-run rule the owner already ruled, and the comment edits change no behaviour.
