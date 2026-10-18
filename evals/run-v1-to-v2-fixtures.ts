@@ -490,8 +490,8 @@ const REQUIRED_FIELDS = [
 ];
 const REQUIRED_SECTIONS = ["## Done when", "## Touches", "## Assumes", "## Tracker"];
 
-{
-  const files = findV2Files(EXPECTED);
+function schemaProblems(root: string): { files: V2File[]; problems: string[] } {
+  const files = findV2Files(root);
   const problems: string[] = [];
   for (const f of files) {
     if (!FILENAME_RULE.test(f.filename)) problems.push(`${f.filename}: filename fails TASK-NNN-kebab-slug.md rule`);
@@ -506,6 +506,11 @@ const REQUIRED_SECTIONS = ["## Done when", "## Touches", "## Assumes", "## Track
       if (!body.includes(section)) problems.push(`${f.filename}: body missing '${section}'`);
     }
   }
+  return { files, problems };
+}
+
+{
+  const { files, problems } = schemaProblems(EXPECTED);
   const ok = files.length > 0 && problems.length === 0;
   report(
     "schema-expected",
@@ -514,6 +519,55 @@ const REQUIRED_SECTIONS = ["## Done when", "## Touches", "## Assumes", "## Track
       ? `${files.length} file(s) in expected/ each match the filename rule and carry every required field/section`
       : problems.join("; "),
   );
+}
+
+// --- (6) withheld: an incomplete task (no tier:) is withheld, a complete one written (SPRINT-125 T8, TASK-433) ---
+// migrate's post-write required-field checklist (migration-map.md § Verification). input-withheld-missing-tier/
+// has TASK-941 (complete) + TASK-942 (no tier:). A correct run writes 941, withholds 942 and records it in
+// WITHHELD.txt ("TASK-NNN: <missing fields>", one per line -- what the plan report carries).
+
+const INPUT_WITHHELD = join(FIXTURES, "input-withheld-missing-tier");
+const EXPECTED_WITHHELD = join(FIXTURES, "expected-withheld-missing-tier");
+const EXPECTED_WITHHELD_WRITTEN = join(FIXTURES, "expected-withheld-missing-tier-written");
+
+function withheldIds(root: string): string[] {
+  const p = join(root, "WITHHELD.txt");
+  return existsSync(p) ? readText(p).split(/\r?\n/).map((l) => l.match(/^(TASK-\d+):/)?.[1]).filter((x): x is string => !!x) : [];
+}
+
+// Every v1 row is accounted for as written XOR withheld, and no withheld id has a file on disk.
+function withheldFindings(input: string, root: string): string[] {
+  const meant = v1BacklogIds(input);
+  const written = v2Ids(root);
+  const withheld = withheldIds(root);
+  const out: string[] = [];
+  for (const id of meant) {
+    if (written.includes(id) && withheld.includes(id)) out.push(`withheld-but-written: ${id}`);
+    if (!written.includes(id) && !withheld.includes(id)) out.push(`unaccounted-id: ${id}`);
+  }
+  return out;
+}
+
+{
+  const { files, problems } = schemaProblems(EXPECTED_WITHHELD);
+  const ok = files.length === 1 && problems.length === 0;
+  report("schema-withheld-expected", ok, ok ? "every written file in expected-withheld-missing-tier/ satisfies the required set" : problems.join("; "));
+  const f = withheldFindings(INPUT_WITHHELD, EXPECTED_WITHHELD);
+  const written = v2Ids(EXPECTED_WITHHELD);
+  const ok2 = f.length === 0 && written.join() === "TASK-941" && withheldIds(EXPECTED_WITHHELD).join() === "TASK-942";
+  report("withheld-missing-tier", ok2, ok2 ? "TASK-941 written, TASK-942 (no tier:) absent from the write set and named in WITHHELD.txt" : `${f.join("; ")} written=[${written}]`);
+
+  // must-FAIL: the incomplete TASK-942 left on disk -> schema invariant names the missing tier, and the withheld check names withheld-but-written.
+  const bad = schemaProblems(EXPECTED_WITHHELD_WRITTEN);
+  const named = "TASK-942-log-the-sync-steps-duration.md: frontmatter missing 'tier:'";
+  const ok3 = bad.problems.length === 1 && bad.problems[0] === named;
+  report("schema-withheld-written (must-FAIL sibling)", ok3, ok3 ? `reddens with exactly '${named}'` : `problems=[${bad.problems.join("; ")}], wanted exactly ['${named}']`);
+  const bf = withheldFindings(INPUT_WITHHELD, EXPECTED_WITHHELD_WRITTEN);
+  const ok4 = bf.length === 1 && bf[0] === "withheld-but-written: TASK-942";
+  report("withheld-written (must-FAIL sibling)", ok4, ok4 ? "reddens with exactly 'withheld-but-written: TASK-942'" : `findings=[${bf.join("; ")}]`);
+  // sibling control: TASK-941 stays clean in the bad tree
+  const ok5 = !bad.problems.some((x) => x.startsWith("TASK-941"));
+  report("schema-withheld-written TASK-941 (sibling control, must stay PASS)", ok5, ok5 ? "the complete task raises no finding on the tree that reddens TASK-942" : "TASK-941 also red");
 }
 
 // --- MUST-FAIL siblings ---------------------------------------------------------------------
