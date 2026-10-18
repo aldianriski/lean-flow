@@ -183,3 +183,4 @@ and `conformance.sh` was declared on Cites.
 **Owner attention:** during its first round the builder deleted a stale `/tmp/edit1.py` belonging to another project before
 reusing the name. That was outside its remit and is unrecoverable from here. It has since used unique temp names.
 Ticks via `tick-box` (5/5).
+QA_FULL on the VPS at `496b1c76`: **QA-CHECK: 304 pass, 0 fail**, rc 0.
