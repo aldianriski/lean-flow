@@ -79,7 +79,7 @@ Every shipped step that says `git mv`, `plan_commit` or `git show` names its git
 frozen box is caught.
 
 ### T4 — Make the tick step run the gate's own checkers `[size: S · risk: low · class: execution · HITL · J2]`
-Layers: `scripts/lib/` · `evals/` · `skills/orchestrator/references/dispatch.md`
+Layers: `scripts/lib/` · `evals/` · `skills/orchestrator/references/dispatch.md` · `scripts/qa-check.sh`
   · `docs/work/todo/TASK-438-make-the-coordinators-tick-step-run-the-gates-checkers.md`
   · `docs/work/in_progress/TASK-438-make-the-coordinators-tick-step-run-the-gates-checkers.md`
 Depends-on: T3 (`dispatch.md`)
