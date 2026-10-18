@@ -333,6 +333,27 @@ describe("member-clean (sibling control -- every member governed and covered)", 
   });
 });
 
+// --- SPRINT-128 T2 (TASK-444, TD-199): a Cites: task id governs a member only in the LEADING run ----------
+// T1's Cites: opens with TASK-940 and mentions TASK-941 after a non-TASK token (`split from`). The mention is a
+// citation, not a declaration, so TASK-941 has no governing block -- it used to be masked as governed.
+describe("member-cites-later-mention (retained must-FAIL fixture -- TD-199)", () => {
+  let r: Captured;
+  const dir = posix.join(FIXTURES, "member-cites-later-mention/docs/sprint/SPRINT-925-fx.md");
+  beforeAll(() => {
+    r = capture([dir]);
+  });
+  test("MUST-FAIL: a member named only by a later mention is a named member-layers-undeclared", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(
+      `FAIL  member-layers-undeclared: ${dir} member docs/work/todo/TASK-941-later-mention.md (TASK-941) has no governing Plan block`,
+    );
+  });
+  test("control: the member that LEADS the same line is governed and complete", () => {
+    expect(r.output).toContain(`PASS  member-layers-complete: ${dir} ### T1 member docs/work/todo/TASK-940-leads.md (TASK-940)`);
+    expect(r.output).not.toContain("member-layers-undeclared: " + dir + " member docs/work/todo/TASK-940");
+  });
+});
+
 // --- SPRINT-128 T1 (TASK-443): a Done-when BARE filename vs a full-path Layers: entry (TD-178 · TD-215) --
 // A bare `one.ts` is declared when EXACTLY ONE Layers: path ends in that basename. Two such paths make the
 // prose ambiguous (which one?), so it stays undeclared and the finding says so; none stays undeclared too.

@@ -1676,6 +1676,56 @@ const CASES: Case[] = [
     mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
     expect: ["scope-change-outside-layers T1 src/helper.ts"],
   },
+  // --- SPRINT-128 T2 (TASK-444, TD-199): a Cites: id governs a Tn only in the LEADING run of the line -----
+  {
+    name: "scope-change-id-only-a-later-mention (control: TASK-901 follows `split from`, so it does not attribute T1 -- unattributed, no finding)",
+    opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902` · split from TASK-901") },
+    mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
+    expect: [],
+  },
+  {
+    name: "scope-change-id-leads-the-line (must-FAIL: the same line with TASK-901 LEADING attributes T1; src/helper.ts undeclared)",
+    opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-901` · split from TASK-902") },
+    mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
+    expect: ["scope-change-outside-layers T1 src/helper.ts"],
+  },
+  {
+    name: "scope-change-cites-under-a-non-task-heading (control: `### Notes` resets -- TASK-777 under it attributes no Tn, so no finding)",
+    opts: { pre: (d) => edit(d, SPRINT, "### T2 — Deliver beta", "### Notes\nCites: `TASK-777`\n\n### T2 — Deliver beta") },
+    mutate: (d) => logEntry(d, "scope-change", "TASK-777 gains a helper", "Adds `src/helper.ts`."),
+    expect: [],
+  },
+  {
+    name: "freeze-edit-cites-under-a-non-task-heading (must-FAIL: the frozen reader resets at `### Notes`, so T1 does not govern TASK-901 cited there)",
+    opts: {
+      pre: (d) => {
+        edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902`");
+        edit(d, SPRINT, "### T2 — Deliver beta", "### Notes\nCites: `TASK-901`\n\n### T2 — Deliver beta");
+      },
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: alpha needs a benchmark. G2 re-confirmed.");
+      commit(d, "edit + Tn entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-names-a-suffixed-Tn(must-FAIL: `### T2a` is a task block; src/helper.ts is undeclared there)",
+    opts: { pre: (d) => edit(d, SPRINT, "### T2 — Deliver beta", "### T2a — Deliver beta") },
+    mutate: (d) => logEntry(d, "scope-change", "T2a also touches the helper", "T2a edits `src/helper.ts`."),
+    expect: ["scope-change-outside-layers T2a src/helper.ts"],
+  },
+  {
+    name: "freeze-edit-covered-only-by-a-later-mention(must-FAIL: `T1 ...` entry names T1, whose Cites: mentions TASK-901 only after `split from`)",
+    opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902` · split from TASK-901") },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: alpha needs a benchmark. G2 re-confirmed.");
+      commit(d, "edit + Tn entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
   {
     name: "scope-change-narrowing-names-a-path-it-drops (control: src/old.ts was in Layers: at plan_commit, since removed)",
     opts: { pre: (d) => edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `src/old.ts`") },

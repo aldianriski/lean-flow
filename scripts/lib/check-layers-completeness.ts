@@ -254,7 +254,7 @@ const TID_RE = /\bT[0-9]+\b/g;
 // A v2 sprint keeps its DoD in member task files (docs/work/), not in the inline Plan, so the
 // Plan-shape checks above can pass without reading any of it (Codex r1 F1). For each member
 // (resolveMembers: `## Members` UNION `sprint:`-stamped, live tree) find the `### Tn` block(s) whose
-// Cites: names its TASK id -- that block's Layers/Cites are the declaration the member's `## Done when`
+// Cites: LEADING RUN names its TASK id (a later mention governs nothing, TD-199) -- that block's Layers/Cites are the declaration the member's `## Done when`
 // is checked against, by the SAME "implies file X" rule the Plan prose gets (backticked file tokens +
 // the TD-NNN "resolved" -> TECH-DEBT.md rule). A member NO block cites has no declaration to check
 // against and is a named FAIL, never silence (owner ruling R1). scripts/lib/check-layers-completeness.sh
@@ -281,7 +281,7 @@ export function evaluateMemberLayers(
     if (governing.length === 0) {
       anyFail = true;
       lines.push(
-        `FAIL  member-layers-undeclared: ${sp} member ${m.path} (${m.id}) has no governing Plan block -- no ### Tn whose Cites: names ${m.id}, so its Layers are checked against nothing`,
+        `FAIL  member-layers-undeclared: ${sp} member ${m.path} (${m.id}) has no governing Plan block -- no ### Tn whose Cites: leading run names ${m.id}, so its Layers are checked against nothing`,
       );
       continue;
     }
@@ -410,7 +410,7 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
       emit.push({ kind: "block", index });
       decls.push({
         tidFull,
-        citedTasks: new Set(block.cites.all),
+        citedTasks: new Set(block.cites.lead), // the leading run governs (owner ruling TD-199); a later mention does not
         layersToks: layersTokItems,
         citesToks: citesTokItems,
       });

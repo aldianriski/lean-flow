@@ -40,7 +40,7 @@ function loadFixture(name: string): { subject: string; trailer: string | null; o
 describe("parseDodSections", () => {
   test("splits a doc into per-task DoD item lists, folding wrapped continuation lines into one item", () => {
     const doc = [
-      "### T1 -- Title `[size: S]`",
+      "## Plan", "### T1 -- Title `[size: S]`",
       "**DoD:**",
       "- [ ] First item wraps",
       "      onto a continuation line",
@@ -61,10 +61,10 @@ describe("parseDodSections", () => {
 
 describe("findNewTicks", () => {
   test("matches ticks by task + text, never by line position (L-009)", () => {
-    const oldDoc = ["### T1 -- x `[]`", "**DoD:**", "- [ ] A", "- [ ] B"].join("\n");
+    const oldDoc = ["## Plan", "### T1 -- x `[]`", "**DoD:**", "- [ ] A", "- [ ] B"].join("\n");
     // B is INSERTED ahead of A and ticked; A stays unticked. A position-based diff would
     // misread B's tick as belonging to A's old slot.
-    const newDoc = ["### T1 -- x `[]`", "**DoD:**", "- [x] B", "- [ ] A"].join("\n");
+    const newDoc = ["## Plan", "### T1 -- x `[]`", "**DoD:**", "- [x] B", "- [ ] A"].join("\n");
     const ticks = findNewTicks(oldDoc, newDoc);
     expect(ticks).toEqual([{ task: "T1", text: "B" }]);
   });
@@ -294,7 +294,7 @@ describe("checkDodDelta -- finding 4 END-TO-END: parenthetical arm `(SPRINT-NNN 
 
 describe("parseDodSections -- finding 3: a letter-suffixed heading is its own task section", () => {
   test("### T2a is parsed as task 'T2a', distinct from T2", () => {
-    const doc = ["### T2a -- Split half `[]`", "**DoD:**", "- [x] Done"].join("\n");
+    const doc = ["## Plan", "### T2a -- Split half `[]`", "**DoD:**", "- [x] Done"].join("\n");
     const sections = parseDodSections(doc);
     expect(sections.has("T2a")).toBe(true);
     expect(sections.has("T2")).toBe(false);
@@ -463,7 +463,7 @@ describe("loadCommit -- finding 6: an archive-move commit must not throw uncaugh
       commitFile(
         dir,
         "docs/sprint/SPRINT-301-x.md",
-        ["### T1 -- x `[]`", "**DoD:**", "- [ ] A", "", "### T2 -- y `[]`", "**DoD:**", "- [ ] B", ""].join("\n"),
+        ["## Plan", "### T1 -- x `[]`", "**DoD:**", "- [ ] A", "", "### T2 -- y `[]`", "**DoD:**", "- [ ] B", ""].join("\n"),
         "sprint(301) T1: draft",
       );
       // git mv, in the SAME commit that also ticks T1's box -- the exact shape the review named: the
@@ -475,7 +475,7 @@ describe("loadCommit -- finding 6: an archive-move commit must not throw uncaugh
       });
       writeFileSync(
         join(dir, "docs/sprint/archive/SPRINT-301-x.md"),
-        ["### T1 -- x `[]`", "**DoD:**", "- [x] A", "", "### T2 -- y `[]`", "**DoD:**", "- [ ] B", ""].join("\n"),
+        ["## Plan", "### T1 -- x `[]`", "**DoD:**", "- [x] A", "", "### T2 -- y `[]`", "**DoD:**", "- [ ] B", ""].join("\n"),
         "utf8",
       );
       execFileSync("git", ["add", "-A"], { cwd: dir });
@@ -698,7 +698,7 @@ describe("checkDodDelta -- SPRINT-102 T4 must-FAIL: real unmatched-shape subject
 describe("parsePlanCites -- Tn -> the TASK ids in ITS OWN Cites: line", () => {
   test("reads one Cites: line per Tn block, ignoring non-TASK tokens", () => {
     const plan = [
-      "### T1 -- Amend STANDARD `[size: M]`",
+      "## Plan", "### T1 -- Amend STANDARD `[size: M]`",
       "Layers: `spec/STANDARD.md`",
       "Depends-on: none",
       "Cites: `TASK-377` · EPIC-017 D1 · D2 · ADR-045",
@@ -715,13 +715,68 @@ describe("parsePlanCites -- Tn -> the TASK ids in ITS OWN Cites: line", () => {
   });
 
   test("a Tn block with no Cites: line maps to an empty array, never undefined-guessed", () => {
-    const plan = ["### T1 -- x `[]`", "Layers: y", "", "### T2 -- z `[]`", "Cites: `TASK-1`"].join("\n");
+    const plan = ["## Plan", "### T1 -- x `[]`", "Layers: y", "", "### T2 -- z `[]`", "Cites: `TASK-1`"].join("\n");
     expect(parsePlanCites(plan).get("T1")).toEqual([]);
   });
 
   test("a Cites: line naming TWO TASK ids keeps both", () => {
-    const plan = ["### T1 -- x `[]`", "Cites: `TASK-1` and `TASK-2`"].join("\n");
+    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-1` · `TASK-2`"].join("\n");
     expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1", "TASK-2"]);
+  });
+});
+
+// --- SPRINT-128 T2 (TASK-444, TD-199): the leading run governs; a ### Tna heading is its own task ---------
+
+describe("parsePlanCites -- a Cites: task id governs only in the LEADING run (TD-199)", () => {
+  test("MUST-FAIL shape: a later mention (`split from TASK-9`) is not a governing id; the leading id is", () => {
+    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-1` · split from TASK-9"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1"]);
+  });
+
+  test("control: two ids both in the leading run are both kept, whichever order they come in", () => {
+    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-9` · `TASK-1`"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-9", "TASK-1"]);
+  });
+
+  test("an indented continuation line extends the leading run (the old reader read the first line only)", () => {
+    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-1`", "  `TASK-2` · ADR-3"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1", "TASK-2"]);
+  });
+
+  test("a ### T3a block is its own task: it neither folds into T3 nor loses its Cites", () => {
+    const plan = ["## Plan", "### T3 -- a `[]`", "Cites: `TASK-3`", "", "### T3a -- b `[]`", "Cites: `TASK-4`"].join("\n");
+    const m = parsePlanCites(plan);
+    expect(m.get("T3")).toEqual(["TASK-3"]);
+    expect(m.get("T3a")).toEqual(["TASK-4"]);
+  });
+});
+
+describe("parsePlanCites -- a non-task heading does not end a Tn's region (Codex R1)", () => {
+  test("a Tn with no Cites: of its own takes the FIRST Cites: under the `### Notes` after it", () => {
+    const plan = ["## Plan", "### T1 -- a `[]`", "Layers: x", "", "### Notes", "Cites: `TASK-5`", "", "### T2 -- b `[]`", "Cites: `TASK-6`"].join("\n");
+    const m = parsePlanCites(plan);
+    expect(m.get("T1")).toEqual(["TASK-5"]);
+    expect(m.get("T2")).toEqual(["TASK-6"]);
+  });
+
+  test("control: a Tn's own Cites: wins over one under the Notes heading after it", () => {
+    const plan = ["## Plan", "### T1 -- a `[]`", "Cites: `TASK-1`", "", "### Notes", "Cites: `TASK-5`"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1"]);
+  });
+});
+
+describe("parseDodSections -- a heading outside `## Plan` is not a task block (shared Plan parser)", () => {
+  test("a ### T1 under another section yields no section; the same lines under ## Plan do", () => {
+    const body = ["### T1 -- x `[]`", "**DoD:**", "- [ ] A"];
+    expect(parseDodSections(["## Notes", ...body].join("\n")).has("T1")).toBe(false);
+    expect(parseDodSections(["## Plan", ...body].join("\n")).get("T1")?.items).toEqual([{ text: "A", checked: false }]);
+  });
+
+  test("T3a's DoD is kept apart from T3's", () => {
+    const doc = ["## Plan", "### T3 -- a `[]`", "**DoD:**", "- [ ] one", "", "### T3a -- b `[]`", "**DoD:**", "- [x] two"].join("\n");
+    const s = parseDodSections(doc);
+    expect(s.get("T3")?.items).toEqual([{ text: "one", checked: false }]);
+    expect(s.get("T3a")?.items).toEqual([{ text: "two", checked: true }]);
   });
 });
 
@@ -769,7 +824,7 @@ describe("parseDoneWhenItems / findNewMemberTicks -- the evidence-append tick co
 
 describe("checkDodDeltaWithMembers -- must-FAIL: a member tick outside the claimed Tn's Cites", () => {
   const sprint = [
-    "### T1 -- x `[]`",
+    "## Plan", "### T1 -- x `[]`",
     "Cites: `TASK-900`",
     "",
     "### T2 -- y `[]`",
@@ -821,7 +876,7 @@ describe("checkDodDeltaWithMembers -- v2 sprint, no inline Plan DoD: must NOT pa
   // `{ok:true, findings:[]}` with NO note -- indistinguishable from "nothing examined". Asserting a
   // note naming the member correlation is what proves this run actually looked at something.
   test("a v2 Plan block (Cites only, no **DoD:** list) still examines the member's own box", () => {
-    const sprint = ["### T1 -- x `[size: M]`", "Layers: y", "Cites: `TASK-910`", "", "**Acceptance:** prose only."].join(
+    const sprint = ["## Plan", "### T1 -- x `[size: M]`", "Layers: y", "Cites: `TASK-910`", "", "**Acceptance:** prose only."].join(
       "\n",
     );
     const legacyAlone = checkDodDelta("sprint(910) T1: work", null, sprint, sprint);
@@ -843,7 +898,7 @@ describe("checkDodDeltaWithMembers -- v2 sprint, no inline Plan DoD: must NOT pa
 
 describe("checkDodDeltaWithMembers -- COORD/unscoped exemption is PRESERVED, not loosened (rule C)", () => {
   test("a bare sprint(NNN): commit ticking a member's box stays exempt (dispatch.md's own tick step)", () => {
-    const sprint = ["### T1 -- x `[]`", "Cites: `TASK-920`"].join("\n");
+    const sprint = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-920`"].join("\n");
     const result = checkDodDeltaWithMembers("sprint(920): tick TASK-920's box", null, sprint, sprint, [
       {
         id: "TASK-920",
@@ -858,7 +913,7 @@ describe("checkDodDeltaWithMembers -- COORD/unscoped exemption is PRESERVED, not
   });
 
   test("sibling: the SAME COORD commit ticking a NEVER-cited member id is still exempt (unchanged rule)", () => {
-    const sprint = ["### T1 -- x `[]`", "Cites: `TASK-920`"].join("\n");
+    const sprint = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-920`"].join("\n");
     const result = checkDodDeltaWithMembers("sprint(920): tick an unrelated box", null, sprint, sprint, [
       {
         id: "TASK-999",
@@ -1081,7 +1136,7 @@ describe("check-dod-delta CLI -- ruled exemption through a real plan_commit..HEA
   const doc = (t2: boolean, t3: boolean, base: string) =>
     [
       "---", "sprint: 960", `plan_commit: ${base}`, "---", "",
-      "### T1 -- a", "**DoD:**", "- [ ] t1 box", "",
+      "## Plan", "### T1 -- a", "**DoD:**", "- [ ] t1 box", "",
       "### T2 -- b", "**DoD:**", `- [${t2 ? "x" : " "}] t2 box`, "",
       "### T3 -- c", "**DoD:**", `- [${t3 ? "x" : " "}] t3 box`, "",
     ].join("\n");

@@ -129,6 +129,26 @@ describe("member-layers-undeclared (owner ruling R1)", () => {
     expect(r.out).not.toContain("PASS");
   });
 
+  test("MUST-FAIL (TD-199): a member named only by a LATER Cites: mention is undeclared; the member that leads the line is not", () => {
+    const d = build("later-mention", { members: [M1, M2], plan: T1("`TASK-901` · split from TASK-902") }, [
+      { path: M1, id: "TASK-901" },
+      { path: M2, id: "TASK-902" },
+    ]);
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("member-layers-undeclared: TASK-902");
+    expect(r.out).not.toContain("member-layers-undeclared: TASK-901");
+  });
+
+  test("control (TD-199): the same two ids both in the LEADING run -> neither is undeclared", () => {
+    const d = build("leading-run", { members: [M1, M2], plan: T1("`TASK-901` · `TASK-902`") }, [
+      { path: M1, id: "TASK-901" },
+      { path: M2, id: "TASK-902" },
+    ]);
+    const r = run(d);
+    expect(r.out).not.toContain("member-layers-undeclared");
+  });
+
   test("MUST-FAIL: a v2 sprint with members and NO ### Tn blocks (all commits COORD) never passes vacuously", () => {
     const d = build("no-tn", { members: [M1], plan: "Just prose, no task blocks.\n" }, [{ path: M1, id: "TASK-901" }]);
     writeFile(d, "docs/notes.md", "x\n");

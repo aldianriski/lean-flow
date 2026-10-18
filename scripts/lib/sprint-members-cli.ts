@@ -12,10 +12,10 @@
 //                     `## Members` path is resolved by id). Named error if any listed id has no unique file.
 //   counts <sprint>   line-oriented, in this order:
 //                       dod <ticked> <open>                    `## Done when` boxes summed over members
-//                       units <total> <delivered>              `### Tn` blocks whose `Cites:` names >=1 CURRENT member
+//                       units <total> <delivered>              `### Tn` blocks whose `Cites:` LEADING RUN names >=1 CURRENT member
 //                       member <TASK-id> <ticked> <open> <path>  one per member
 //                       unit <Tn> <delivered|open>             one per counted unit, Plan order
-//                     A unit is delivered when EVERY current member its `Cites:` names has no open box.
+//                     A unit is delivered when EVERY current member its `Cites:` leading run names has no open box.
 //                     A Tn citing no current member is scoped out and leaves both unit counts.
 //   active            sprint numbers (one per line, ascending) of top-level `<root>/docs/sprint/SPRINT-*.md`
 //                     files whose frontmatter says `status: active` (archive/ and logs/ are not candidates).
@@ -32,6 +32,7 @@ import { join, resolve } from "node:path";
 import {
   frontmatterField,
   nowTree,
+  parsePlan,
   resolveMembers,
   scanBlocks,
   section,
@@ -60,29 +61,17 @@ export function doneWhenBoxes(text: string): { ticked: number; open: number } {
   return { ticked, open };
 }
 
-/** `### Tn` blocks of the sprint's `## Plan` with the TASK ids their `Cites:` field names. */
+/** `### Tn` blocks of the sprint's `## Plan` with the TASK ids that govern them: the leading run of the
+ * `Cites:` declaration (owner ruling TD-199), read through the shared Plan parser. */
 export function planUnits(sprintText: string): { tn: string; cites: Set<string> }[] {
-  const plan = section(sprintText, "Plan");
-  if (plan === null) return [];
-  const units: { tn: string; citesText: string[] }[] = [];
-  let inCites = false;
-  for (const { line, hidden } of scanBlocks(plan)) {
-    if (hidden) continue;
-    const h = line.match(/^### (T\d+)\b/);
-    if (h) {
-      units.push({ tn: h[1]!, citesText: [] });
-      inCites = false;
-      continue;
-    }
-    const cur = units[units.length - 1];
-    if (!cur) continue;
-    if (/^Cites:/.test(line)) {
-      inCites = true;
-      cur.citesText.push(line);
-    } else if (inCites && /^\s+\S/.test(line)) cur.citesText.push(line); // wrapped continuation
-    else inCites = false;
+  // A non-task `###` (e.g. `### Notes`) does not end the unit: its Cites: stay with the preceding Tn (b.carry),
+  // as this reader always read them -- the night-run reaper's counts depend on it.
+  const units: { tn: string; cites: Set<string> }[] = [];
+  for (const b of parsePlan(sprintText).blocks) {
+    if (b.tid !== "") units.push({ tn: b.tid, cites: new Set(b.cites.lead) });
+    else if (b.carry !== "") for (const id of b.cites.lead) units[units.length - 1]!.cites.add(id);
   }
-  return units.map((u) => ({ tn: u.tn, cites: taskIds(u.citesText.join("\n")) }));
+  return units;
 }
 
 function sprintText(sprintFile: string): string {

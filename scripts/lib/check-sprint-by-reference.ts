@@ -49,6 +49,7 @@ import {
   frontmatterField,
   lf,
   nowTree,
+  parsePlan,
   resolveId,
   scanBlocks,
   section,
@@ -217,26 +218,15 @@ function pathsIn(text: string): string[] {
   // a span may hold a command (`bun x.ts --close`): each word is tried, so the file in it still counts
   return [...text.matchAll(/`([^`]+)`/g)].flatMap((m) => m[1]!.split(/\s+/).map(repoPath)).filter((p): p is string => p !== null);
 }
-/** `Tn` -> its declared paths (`Layers:` ∪ `Cites:`, continuation lines included) and the TASK ids it Cites. */
+/** `Tn` -> its declared paths (`Layers:` ∪ `Cites:`, continuation lines included) and the TASK ids that
+ * govern it: the leading run of its `Cites:` (owner ruling TD-199). Read through the shared Plan parser. */
 function planDecls(sprintText: string): Map<string, { paths: Set<string>; ids: Set<string> }> {
   const out = new Map<string, { paths: Set<string>; ids: Set<string> }>();
-  let cur: { paths: Set<string>; ids: Set<string> } | null = null;
-  let key = ""; // the Layers:/Cites: declaration being read, indented continuation lines included
-  for (const { line, hidden } of scanBlocks(section(sprintText, "Plan") ?? "")) {
-    if (hidden) continue;
-    const h = line.match(/^### (T\d+)\b/);
-    if (h || /^#{1,3} /.test(line)) {
-      cur = h ? { paths: new Set(), ids: new Set() } : null;
-      if (h) out.set(h[1]!, cur!);
-      key = "";
-      continue;
-    }
-    const d = line.match(/^(Layers|Cites):/);
-    key = d ? d[1]! : /^[ \t]+\S/.test(line) ? key : "";
-    if (cur && key) {
-      for (const p of pathsIn(line)) cur.paths.add(p);
-      if (key === "Cites") for (const id of taskIds(line)) cur.ids.add(id);
-    }
+  for (const b of parsePlan(sprintText).blocks) {
+    if (b.tid === "") continue;
+    const paths = new Set<string>();
+    for (const l of b.lines) if (l.tag === "Layers" || l.tag === "Cites") for (const p of pathsIn(l.text)) paths.add(p);
+    out.set(b.tid, { paths, ids: new Set(b.cites.lead) });
   }
   return out;
 }
@@ -429,36 +419,11 @@ function main(argv: string[]) {
     return newSince.get(base)!;
   };
 
-  // `Tn` -> the TASK ids its frozen Plan block Cites, so an entry naming `T1` names T1's members.
+  // `Tn` -> the TASK ids that govern its frozen Plan block (the leading run of its `Cites:`, TD-199), so an
+  // entry naming `T1` names T1's members.
   const frozenSprint = showAt(pc, "sprint");
   const tCites = new Map<string, Set<string>>();
-  let curT: string | null = null;
-  let curTLines: string[] = [];
-  const flushT = () => {
-    if (curT) {
-      const citesLine = stripComments(curTLines.join("\n"))
-        .split("\n")
-        .find((l) => /^Cites:/.test(l));
-      if (citesLine) tCites.set(curT, taskIds(citesLine));
-    }
-    curTLines = [];
-  };
-  for (const { line, hidden } of scanBlocks(section(frozenSprint, "Plan") ?? "")) {
-    if (hidden) continue;
-    const h = line.match(/^### (T\d+)\b/);
-    if (h) {
-      flushT();
-      curT = h[1]!;
-      continue;
-    }
-    if (/^#{1,3} /.test(line)) {
-      flushT();
-      curT = null;
-      continue;
-    }
-    if (curT) curTLines.push(line);
-  }
-  flushT();
+  for (const b of parsePlan(frozenSprint).blocks) if (b.tid !== "" && b.cites.lead.length > 0) tCites.set(b.tid, new Set(b.cites.lead));
   const names = (entries: string[], id: string): boolean =>
     entries.some(
       // a `Tn` counts only in the heading: in a body it is as often sequencing prose as a subject

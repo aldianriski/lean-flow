@@ -12,7 +12,7 @@
 // must fail these as loudly as one that reddens nothing) -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
 import { fileURLToPath } from "node:url";
-import { runCheckAuthority } from "../scripts/lib/check-authority.ts";
+import { parseCites, parseTaskRecords, runCheckAuthority } from "../scripts/lib/check-authority.ts";
 
 const FX = fileURLToPath(new URL("fixtures/authority/", import.meta.url));
 
@@ -228,5 +228,31 @@ describe("check-authority.ts -- retained fixtures", () => {
   test("member case C sibling (L-186 selection, folder arm): a stamp-only member in done/ (not todo/) is reached and stays PASS", () => {
     const r = run("member-only-no-plan/docs/sprint/SPRINT-917-fx.md");
     expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-918 \(docs\/work\/done\/TASK-918-valid\.md\) authority: J1$/m);
+  });
+
+  // --- SPRINT-128 T2 (TASK-444, TD-199): a Cites: id governs only in the LEADING run; a ### T3a heading is a task ---
+
+  test("leading-run case (must-FAIL): a member that LEADS its Cites line is governed -- T2 (J1) vs TASK-920 (J2) mismatches", () => {
+    const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).toContain("T2 Plan declares J1, member docs/work/todo/TASK-920-beta.md (TASK-920) declares J2");
+  });
+
+  test("leading-run sibling (L-142 discrimination): a member named only by a LATER mention governs nothing, so TASK-919 (J2) under T1 (J1) stays PASS", () => {
+    const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
+    expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-919 \(docs\/work\/todo\/TASK-919-alpha\.md\) authority: J2$/m);
+    expect(r.text).not.toContain("T1 Plan declares J1, member docs/work/todo/TASK-919-alpha.md");
+  });
+
+  test("non-task heading (Codex R1): a Cites: under `### Notes` is dropped, not carried to the preceding T1 -- this reader always reset there", () => {
+    const plan = ["## Plan", "### T1 -- a `[J1]`", "Layers: `a.md`", "", "### Notes", "Cites: `TASK-5`", "", "### T2 -- b `[J1]`", "Cites: `TASK-6`"].join("\n");
+    expect([...parseCites(plan)].map(([k, v]) => [k, [...v]])).toEqual([["T2", ["TASK-6"]]]);
+    expect(parseTaskRecords(plan).map((r) => r.tid)).toEqual(["T1", "T2"]);
+  });
+
+  test("suffix case (must-FAIL): a classless ### T3a is a task block and is named, not silently skipped", () => {
+    const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
+    expect(r.text).toContain("authority-undeclared: ");
+    expect(r.text).toContain("T3a carries no J0/J1/J2 in its header meta");
   });
 });
