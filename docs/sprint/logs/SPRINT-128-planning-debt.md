@@ -120,3 +120,21 @@ without applying it, so its behaviour-preservation proof stayed clean.
 **Impact.** T2 Layers gain both files, so the ownership order becomes T1 → T2 → T3 for completeness and T1 → T2 → T3 → T5 for
 observed. T3 already depends on T2 and T5 on T2/T3, so no wave moves. No DoD change.
 **Re-confirm G2.** Not needed: no new behaviour. The owner's leading-run ruling already covers it, and the box already names the finding.
+
+### 2026-10-19 | T2 | TASK-444 — the remaining Plan readers on parsePlan, Cites governs by leading run; merged `6e0a31a7` (`b973c8cd..70368785`, R1 fix `bfb92d3d`); done
+Worktree-base guard PASS (`d78edb1f`). Authority, by-reference (`planDecls` and the frozen-Plan reader), the members CLI and dod-delta
+read Plans only through `parsePlan()`; their heading and `Cites:` regexes are gone. Governance uses `cites.lead` in those four and in
+both Layers checkers' member legs (TD-199), with a retained must-FAIL plus a leading-id control in each of the six harnesses.
+Proof (consequential G): the builder's `conformance.sh .` A/B was identical (114 lines). The coordinator's post-merge run is rc 0
+with no FAIL, and its deltas against the promote-time run are sprint progress only. Old-vs-new over 283 Plans: 0 unexplained
+differences, and the four readers agree on 283 of 283. Seeds L1a–g (`all` for `lead`) · L2a–d (old heading/suffix) · L3a–e (`tid`
+for `carry`) each reddened only their case; the coordinator re-seeded L1f independently (exactly the TD-199 case reddened).
+Review: Codex R1 found that `planUnits` dropped `Cites:` under a non-task `###`, where the old CLI carried it to the preceding Tn.
+The builder checked every reader's old behaviour (authority and by-reference reset; the CLI and dod-delta carried) and fixed both
+carriers, the second one unflagged by Codex, in `bfb92d3d`. R2 left one point open. A block with two `Cites:` lines takes the
+leading run of their concatenation, which is neither the old CLI's union nor dod-delta's first line. Census by two routes: 316
+`Cites:` lines over 316 blocks, so 0 of 505 real blocks carry two. → TD at close (bounded-review rule; 2-round cap reached).
+Coordinator rulings on builder findings: headings outside `## Plan` are no longer read (accepted: the template's contract, 127/127
+plans have it, and the result is a visible skip). The `` `A` and `B` `` lead gap and the original dod-delta fixture it weakened are
+fixed in T3, the parser's owner. Combined `### T1+T2` headings: census 0, accepted. Stale twin comments in the Layers checkers go
+to T3. Ticks via `tick-box` (4/4).
