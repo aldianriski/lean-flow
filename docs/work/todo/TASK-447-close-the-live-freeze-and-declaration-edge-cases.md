@@ -1,5 +1,6 @@
 ---
 id: TASK-447
+sprint: SPRINT-128
 title: "Close the live freeze and declaration edge cases: CRLF fields, member-edit ordering, dead Layers tokens, preflight wraps"
 epic: EPIC-022
 priority: P2

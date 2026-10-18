@@ -1,5 +1,6 @@
 ---
 id: TASK-445
+sprint: SPRINT-128
 title: "Make the member resolver name every anomaly instead of dropping the member"
 epic: EPIC-022
 priority: P1
