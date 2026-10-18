@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-12
+last_updated: 2026-10-18
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-125 — Consumer Maturity and Cleanup — closed 2026-10-18 · `ff04f84` · 9 of 9 members in `done/` (released in `2.6.0`; spec 0.16.0 + orchestrator/prime/lean-doc-generator/release-patch/templates/handoff + conformance engine changed) · **EPIC-022 member** — the shipped surface stops naming lean-flow's scripts, two false-green rules fixed, platform epics retired
 - SPRINT-124 — Close EPIC-015 and Cut the Engine — closed 2026-10-12 · `8e875a6` · 3 of 3 members in `done/`, 8/8 DoD (unreleased; `scripts/lib/conformance-engine.sh` and `scripts/night-run.sh` changed, MINOR candidate) · **EPIC-015 member, closes it** — the engine runs 67% faster with a byte-identical report, a stop marker is bound to its run, and ADR-053 re-arms the freeze widened to governance
 - SPRINT-123 — Repair-and-Park Vehicle — closed 2026-10-11 · `d69331f` · 2 of 2 members in `done/` (the run: `AUTHORITY_BOUNDARY` · `PARTIAL`, $1.32, 1 repair, 1 seeded park resolved by owner ruling; no consumer-facing file) · `epic: EPIC-015` · vehicle for SPRINT-122 T2
 - SPRINT-122 — Finish EPIC-015 — closed 2026-10-11 · `d69331f` · 2 of 2 members in `done/` (released in `2.5.0`; `scripts/night-run.sh` USER_STOP + reaper block, `night-run.md` changed) · **EPIC-015 member**
