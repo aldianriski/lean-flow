@@ -24,10 +24,10 @@ the roadmap template and the task-level gate record as an adopter would.
 
 ## Done when
 
-- [ ] workdoo's `docs/product/company-workspace-roadmap.md` delivery sequence is carried into `docs/product/roadmap.md` from the
+- [x] workdoo's `docs/product/company-workspace-roadmap.md` delivery sequence is carried into `docs/product/roadmap.md` from the ✓ 16 rows, cells 1–4 identical by pipe-cut diff, 2 done · 1 active · 13 planned; source sha256 unchanged; owner approved by popup
       template, every row keeping its content and gaining a Status and a Covered-by cell, with workdoo's owner approving the write.
-- [ ] One real workdoo task goes G1/G2 → done with `gates_signed: G1,G2 @ <YYYY-MM-DD>` written on approval, without git.
-- [ ] `/prime` and `/triage` run in workdoo report its roadmap coverage correctly; whatever does not fit is recorded as a
+- [x] One real workdoo task goes G1/G2 → done with `gates_signed: G1,G2 @ <YYYY-MM-DD>` written on approval, without git. ✓ workdoo TASK-046, G1 then G2 by popup → `G1,G2 @ 2026-10-18` + Approved design; plain moves backlog → in_progress → done
+- [x] `/prime` and `/triage` run in workdoo report its roadmap coverage correctly; whatever does not fit is recorded as a ✓ judgment: the current procedures read workdoo as 0 uncovered (P2 active, next slice P2d); a seeded P3 reads uncovered; findings F1–F2 in the log
       finding (TD or a follow-up), never smoothed over.
 
 ## Touches
