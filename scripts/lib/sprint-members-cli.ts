@@ -33,7 +33,6 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
   frontmatterField,
-  nowTree,
   memberAnomalyFinding,
   parsePlan,
   resolveMembersChecked,
@@ -85,8 +84,7 @@ function sprintText(sprintFile: string): string {
 /** v2 iff the store has task files AND this sprint lists a Members id or is stamped by a task. */
 function isV2(root: string, sprintFile: string): boolean {
   const text = sprintText(sprintFile);
-  const tree = nowTree(root);
-  if (tree.paths.length === 0) return false;
+  if (!existsSync(join(root, WORK))) return false;
   if (taskIds(section(text, "Members")).size > 0) return true;
   // A stamped id the resolver could not seat (two files, or a misplaced one) is membership evidence too: reading it
   // as v1 would be the silent short answer this CLI exists to refuse.
@@ -101,7 +99,10 @@ function requireMembers(root: string, sprintFile: string) {
   const have = new Set(members.map((m) => m.id));
   const missing = [...taskIds(section(text, "Members"))].filter((id) => !have.has(id)).sort();
   if (missing.length > 0) {
-    throw new CliError(2, "SPRINT-MEMBER-UNRESOLVED", `${missing.join(" ")} -- listed in ${sprintFile} ## Members but no unique ${WORK}/*/TASK-NNN-*.md file resolves`);
+    // Line 1 is byte-stable (every consumer reads only it). Any anomaly line 1 does not already cover follows on its own
+    // line: a missing/ambiguous id line 1 names is redundant, a stray file or an unlisted id is not.
+    const rest = anomalies.filter((a) => a.kind === "member-misplaced" || !missing.includes(a.id)).map(memberAnomalyFinding);
+    throw new CliError(2, "SPRINT-MEMBER-UNRESOLVED", [`${missing.join(" ")} -- listed in ${sprintFile} ## Members but no unique ${WORK}/*/TASK-NNN-*.md file resolves`, ...rest].join("\n"));
   }
   if (anomalies.length > 0) {
     throw new CliError(2, "SPRINT-MEMBER-ANOMALY", anomalies.map(memberAnomalyFinding).join(" | "));

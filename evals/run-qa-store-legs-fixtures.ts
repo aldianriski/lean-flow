@@ -227,6 +227,24 @@ function v2(): string {
   check("cli members: control -- the same sprint with one file per id resolves clean (exit 0, the one path)",
     x.code === 0 && x.out === "docs/work/todo/TASK-973-a.md\n" && x.err === "", `code ${x.code} out ${x.out} err ${x.err}`);
 
+  // Codex R1 Q1: a store that EXISTS but holds no task file still owes its listed members a name (it lost its last file);
+  // only an ABSENT docs/work/ is not a by-reference tree.
+  const remp = tree({ "docs/sprint/SPRINT-970-fx.md": SPRINT, "docs/work/todo/.gitkeep": "" });
+  x = cli(remp, "members", s);
+  check("cli members: an existing but EMPTY docs/work/ + listed members -> exit 2, SPRINT-MEMBER-UNRESOLVED naming TASK-971",
+    x.code === 2 && x.out === "" && /SPRINT-MEMBER-UNRESOLVED/.test(x.err) && x.err.includes("TASK-971"), `code ${x.code} err ${x.err}`);
+  // Codex R1 Q4: a simultaneous unlisted anomaly is not hidden behind SPRINT-MEMBER-UNRESOLVED; line 1 is unchanged.
+  const rboth = tree({
+    "docs/sprint/SPRINT-970-fx.md": SPRINT,
+    "docs/work/in_progress/TASK-971-a.md": task("TASK-971", "SPRINT-970", T),
+    "docs/work/todo/sub/TASK-975-stray.md": task("TASK-975", null, OPEN),
+  });
+  x = cli(rboth, "members", s);
+  const bothLines = x.err.split("\n");
+  check("cli members: a listed missing id AND a misplaced stray -> exit 2, line 1 still the SPRINT-MEMBER-UNRESOLVED message, the misplaced finding on a later line",
+    x.code === 2 && x.out === "" && bothLines[0] === `SPRINT-MEMBER-UNRESOLVED: TASK-972 -- listed in ${s} ## Members but no unique docs/work/*/TASK-NNN-*.md file resolves` &&
+      bothLines.slice(1).some((l) => l.startsWith("member-misplaced: docs/work/todo/sub/TASK-975-stray.md")), `code ${x.code} err ${JSON.stringify(x.err)}`);
+
   // a v1 sprint (no docs/work store) is not by-reference
   const r1 = tree({ "docs/sprint/SPRINT-970-fx.md": "---\nsprint: 970\nstatus: active\n---\n\n## Plan\n\n### T1 — x\n- [ ] a\n" });
   x = cli(r1, "kind", s);

@@ -285,7 +285,9 @@ export function resolveMembersChecked(root: string, sprintFile: string): MemberR
   const sprintText = readFileSync(sprintFile, "utf8");
   const sprintNo = sprintNumber(frontmatterField(sprintText, "sprint"));
   const tree = nowTree(root);
-  if (tree.paths.length === 0) return none;
+  // Only an ABSENT store (no docs/work/ at all: not a by-reference tree) skips resolution. A store that exists but holds
+  // no task file still owes every listed id a member-missing (it lost its last file).
+  if (!existsSync(join(root, WORK))) return none;
   const listed = taskIds(section(sprintText, "Members"));
   const stamped = sprintNo !== null ? stampedIn(tree, sprintNo) : new Set<string>();
   const ids = [...new Set([...listed, ...stamped])].sort();

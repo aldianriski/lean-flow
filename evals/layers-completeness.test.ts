@@ -561,6 +561,20 @@ describe("member resolver anomalies (retained must-FAIL fixtures -- member-ambig
     expect(memberAnomalyFinding(res.anomalies[0]!)).toContain("matches 2 task files");
   });
 
+  test("Codex R1 Q1 (must-FAIL): a docs/work/ that EXISTS but holds no task file still names every listed id member-missing", () => {
+    const root = posix.join(tmp, "empty-store");
+    const sprint = buildAnomalyTree(root, "clean").replace(/\\/g, "/");
+    rmSync(posix.join(root, "docs/work/todo/TASK-951-ok.md"));
+    const res = resolveMembersChecked(root, sprint);
+    expect(res.members).toEqual([]);
+    expect(res.anomalies.map((a) => [a.kind, a.id])).toEqual([["member-missing", "TASK-951"]]);
+  });
+  test("Codex R1 Q1 control: no docs/work/ at all is not a by-reference tree -- no anomaly, as before", () => {
+    const root = posix.join(tmp, "absent-store");
+    const sprint = buildAnomalyTree(root, "clean").replace(/\\/g, "/");
+    rmSync(posix.join(root, "docs/work"), { recursive: true, force: true });
+    expect(resolveMembersChecked(root, sprint)).toEqual({ members: [], anomalies: [] });
+  });
   test("resolver API: a misplaced file is reported store-wide and never becomes a member", () => {
     for (const k of ["misplaced-nested", "misplaced-root", "misplaced-unknown"] as const) {
       const res = resolveMembersChecked(posix.join(tmp, k), roots.get(k)!.sprint);
