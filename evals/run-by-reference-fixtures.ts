@@ -134,6 +134,9 @@ const TICK_901 = (dir: string, rel: string) => {
   edit(dir, rel, "for every input in the table", "for every input in the table ✓ `abc1234` — 12/0");
   edit(dir, rel, "- [ ] a retained fixture", "- [X] a retained fixture");
 };
+// SPRINT-125 T2: wrap alpha's first box onto a continuation line, before the plan commit freezes it.
+const WRAP_901 = (d: string) =>
+  edit(d, W("todo", T901), "documented value for every input", "documented value\n  for every input");
 const ARCH = "docs/sprint/archive/SPRINT-901-fixture.md";
 const ARCH_LOG = "docs/sprint/archive/logs/SPRINT-901-fixture.md";
 const archive = (d: string, withLog = true) => {
@@ -909,6 +912,26 @@ const CASES: Case[] = [
         "- [ ] a retained fixture covers the empty input ✓ -- dropped: null input out of scope",
       );
       commit(d, "unticked box gains a check tail");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  // SPRINT-125 T2 (TD-229): a ticked box that wraps -- the ✓ tail belongs on the FIRST line (the checker strips it only there).
+  {
+    name: "multiline-box-tail-on-first-line (must-PASS: the tick rule's placement)",
+    opts: { pre: WRAP_901 },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "- [ ] alpha returns the documented value", "- [x] alpha returns the documented value ✓ `abc1234` — 12/0");
+      commit(d, "tick wrapped box, tail on first line");
+    },
+    expect: [],
+  },
+  {
+    name: "multiline-box-tail-on-continuation (must-FAIL sibling: tail on the wrapped line is an edit)",
+    opts: { pre: WRAP_901 },
+    mutate: (d) => {
+      edit(d, W("todo", T901), "- [ ] alpha returns the documented value", "- [x] alpha returns the documented value");
+      edit(d, W("todo", T901), "for every input in the table", "for every input in the table ✓ `abc1234` — 12/0");
+      commit(d, "tick wrapped box, tail on continuation line");
     },
     expect: ["FREEZE-EDIT TASK-901"],
   },

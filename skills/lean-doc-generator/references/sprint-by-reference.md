@@ -27,7 +27,7 @@ to tick, mirror or drift (ADR-047). This file is the procedure behind the `promo
 `plan_commit` **is** the frozen snapshot. No hash or copy is stored beside it: git already holds every
 member exactly as approved, at that commit. What is frozen is each member's `## Done when` **text**:
 
-- **Not an edit:** ticking a box (`[ ]` → `[x]`) and the ` ✓ <evidence>` a tick appends · moving the
+- **Not an edit:** ticking a box (`[ ]` → `[x]`) and the ` ✓ <evidence>` a tick appends (placement: step 4) · moving the
   file between status folders · a `## Amended <date>` section (it sits outside `## Done when`) ·
   frontmatter changes · line endings.
 - **An edit:** any other change to the `## Done when` body — a box added, removed or reworded.
@@ -44,7 +44,7 @@ The log is append-only. "New" means **appended after** the baseline's text. If a
 reworded, or the baseline text is no longer a prefix of today's log, that is a finding
 (`LOG-REWRITTEN`), and it excuses nothing. The log's frontmatter is metadata, so bumping
 `last_updated` is not a rewrite. Naming is lexical: an entry that mentions an id counts as
-naming it, whatever the prose around it says. The same holds for the ` ✓ …` tail on a ticked box.
+naming it, whatever the prose around it says. The same holds for the ` ✓ …` tail on a ticked box (placement: step 4).
 The reader of the log is the check on both.
 
 **The freeze point is fixed too.** `plan_commit` must be an ancestor of `HEAD` and must already
@@ -95,8 +95,9 @@ baseline is the first commit that stamps or lists it, so its later edits need a 
    to treat every earlier entry as new. If there is no `## Done when` on either side, that is a
    finding, never a pass.
 4. Compare line by line, ignoring blank lines, trailing space, line endings, the tick state of
-   `[ ]`/`[x]` boxes (`-`, `*`, `+` or numbered), and the ` ✓ …` tail that a tick appends after the
-   frozen text.
+   `[ ]`/`[x]` boxes (`-`, `*`, `+` or numbered), and the ` ✓ …` tail that a tick appends at the end of a box's FIRST line (the `- [ ]` line itself). A tail on a
+   wrapped continuation line, or on a line of its own, is not that tail: the continuation no longer equals its
+   frozen counterpart, or the line count changes, so it is an edit.
 5. Equal means the member holds the freeze. Different passes only under the scope-change rule
    above. Otherwise it is an **unlogged post-promote edit**, and the sprint cannot close on it.
 6. A member that resolves to no file (or to two) at its baseline or now is itself a finding.
