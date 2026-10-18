@@ -68,7 +68,7 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    is **delivered** when every member its `Cites:` names has no open `## Done when` box; a `Tn` whose
    `Cites:` names no current member (all scoped out) is not counted as a unit at all.
 5. **Tick** — the coordinator ticks the member file's box, `- [ ]` → `- [x]`, appending
-   ` ✓ <evidence>` after the frozen text. Nothing else in `## Done when` changes: any other edit
+   ` ✓ <evidence>` at the end of the box's FIRST line (the `- [ ]` line itself) — never on a wrapped continuation line, never as a separate line. Nothing else in `## Done when` changes: any other edit
    first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze). Then re-run the
    checker **the gate itself runs** over every file just written: the evidence suffix is content that
    checker reads, and a sibling implementation's PASS or a pre-write PASS is not its verdict (L-224).
