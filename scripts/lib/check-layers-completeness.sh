@@ -80,8 +80,7 @@ fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"
 # a token ending in "/" is a directory prefix and is returned verbatim so callers can still test it
 # as one.
 layers_tokens() {
-  printf '%s
-' "$1" | grep -oE '`[^`]+`' | tr -d '`'
+  printf '%s\n' "$1" | grep -oE '`[^`]+`' | tr -d '`'
 }
 
 fail=0
