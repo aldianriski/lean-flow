@@ -9,6 +9,26 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.17.0 — 2026-10-18
+
+**MINOR (§15) carrying MAJOR meaning at `0.x` — a new §2 placement row makes `S2.R-PLACEMENT` flag a misplaced roadmap, so verdicts can move pass → fail.**
+§15's test (could a repository that conformed now fail?) answers yes for one shape: `S2.R-PLACEMENT` reads §2 dynamically, so a
+`roadmap.md` under `docs/` other than `docs/product/roadmap.md` (or the legacy `docs/roadmap.md`) now raises
+`file-outside-canonical-placement`. A repository with no roadmap owes nothing. Owner ruling under ADR-034's behaviour-change
+rule (G2, SPRINT-126; TASK-435). Consumer evidence: a first outside consumer hand-rolled a phased delivery plan with no status
+and no link to the tasks delivering it.
+
+- **§2**: a `product/roadmap.md` row (legacy path `docs/roadmap.md`, matched second; created lazily when a delivery sequence
+  spans ≥ 2 sprints or epics; cap 150 soft; scoped row plans under `product/roadmap/<row>.md` are free-form), and a
+  **Roadmap coverage** paragraph after Epic coverage: an `active` row names an open task, an active epic or
+  `next slice: <name>`; `planned` rows are exempt, `done` rows need nothing; a mark is stale only when none of those remains.
+  Enforced by `/prime` and `/triage` (report) and `promote`'s checklist (warn) — adds no row to the rule tables.
+- **Template**: `roadmap.md.template` (Outcome · Delivery sequence · Gates · Out of scope); template count 33 → 34 core.
+- **Upgrade note:** a `roadmap.md` elsewhere under `docs/` is now flagged by `S2.R-PLACEMENT` — move it to
+  `docs/product/roadmap.md` or rename it. A root `ROADMAP.md` is not flagged.
+
+Rule tables, rule ids and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
+
 ## 0.16.0 — 2026-10-18
 
 **MINOR (§15) carrying MAJOR meaning at `0.x` — `S4.NEGATIVE` is tightened; `S11.TDDELETE` reads more row shapes, so verdicts can move pass → fail.**

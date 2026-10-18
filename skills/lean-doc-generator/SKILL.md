@@ -31,6 +31,7 @@ SSOT for every standard-owned rule (ADR-023).
 - `${CLAUDE_SKILL_DIR}/templates/*.md.template` — the canonical format per doc type. **The template IS the format** — read the matching one before writing any core doc.
 - `templates/DESIGN.md.template` — **OPTIONAL · frontend-only · non-core.** Offer only for UI/frontend repos wanting a shared design-system / token contract (`docs/DESIGN.md` or repo's design dir). Never auto-create; never include in core doc generation.
 - `templates/RESEARCH.md.template` — **occasional · create-lazily.** A decision-driving question → options · evidence · recommendation that **feeds an ADR** (desk synthesis; distinct from `/prototype` = design you must *feel*, and `/council` = a hard fork). → `docs/research/<slug>.md`.
+- `templates/roadmap.md.template` — **occasional · create-lazily** (a delivery sequence spanning ≥ 2 sprints or epics; ordinary `<type> <subject>` mode). Phased vertical-slice rows with Status + Covered by. → `docs/product/roadmap.md`.
 - `templates/deployment-guide.md.template` + `templates/deployment-rollback.md.template` — **occasional · create-lazily.** Deploy flow, env matrix, migration order, health checks, release verification (guide) + rollback process + verification (rollback) — operational, like setup. `/release-patch` bumps + stops before push; these own the push/deploy/rollback steps. → `docs/deployment/deployment-guide.md` / `docs/deployment/rollback-guide.md`.
 
 ## Modes

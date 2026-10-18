@@ -1,0 +1,35 @@
+---
+owner: [role — e.g. PM / Product Maintainer, not a personal name]
+last_updated: YYYY-MM-DD
+update_trigger: a row changes status, is added or re-sequenced
+status: current
+---
+
+<!-- Lives at docs/product/roadmap.md (STANDARD §2). Create-lazily: only when a delivery sequence
+     spans >= 2 sprints or epics. One roadmap per repo. WHY/WHERE only — never HOW. A scoped plan for
+     one row may live in docs/product/roadmap/<row>.md (free-form, not coverage-checked). -->
+
+# [Project Name] — Roadmap [CUSTOMIZE]
+
+## Outcome
+[What is true when the sequence is done — the observable end state, and who can do what. 2–4 sentences.]
+
+## Delivery sequence
+Each row is a reviewable vertical slice, not permission to run the whole roadmap. A broad row is split into
+runnable tasks at promotion. The row id is the leading token of the first cell and is unique in the table.
+
+| Row | Usable outcome | Depends on | Acceptance evidence | Status | Covered by |
+|---|---|---|---|---|---|
+| R1 — [slice name] | [what a user can do once it lands] | [rows / external] | [what proves it before cutover] | done | |
+| R2 — [slice name] | [usable outcome] | R1 | [evidence] | active | TASK-NNN, TASK-MMM |
+| R3 — [slice name] | [usable outcome] | R2 | [evidence] | planned | |
+
+<!-- Status: done · active · planned. Covered by: TASK-NNN[, TASK-MMM] · EPIC-NNN · next slice: <name>.
+     An `active` row must be covered by an open task, an active epic, or a named next slice; `planned`
+     and `done` rows owe nothing. Delete the placeholder rows. -->
+
+## Gates
+[Conditions every row must clear before it ships or cuts over — one line each, a reason not a procedure.]
+
+## Out of scope
+[What this roadmap deliberately does not sequence, so a reader does not assume it is queued.]
