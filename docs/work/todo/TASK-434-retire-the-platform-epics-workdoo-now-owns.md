@@ -20,7 +20,7 @@ depends-on: []
 ## Done when
 
 - [ ] EPIC-006 · 008 · 009 · 011 · 012 read `status: closed` — superseded → workdoo (owner ruling 2026-10-18,
-      ADR-052), archived with their INDEX rows kept and re-based; EPIC-005 · 007 untouched.
+      ADR-052), closed in place like EPIC-010 · 013 (§11 cannot archive them), INDEX rows updated; EPIC-005 · 007 untouched.
 - [ ] TD-100 · TD-161 · TD-176 resolved with the evidence each is already fixed (re-verified at G1);
       TD-243 resolved → moved to workdoo.
 - [ ] `docs/research/adlc-epic-sequencing.md` and the INDEX preamble no longer present the retired

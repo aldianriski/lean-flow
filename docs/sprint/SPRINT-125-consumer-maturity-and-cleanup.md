@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-10-18
 status: active
 plan_commit: a9887515
+gates_signed: G1,G2 @ eb394ec7
 update_trigger: sprint execute/close events
 ---
 
@@ -40,12 +41,12 @@ EPIC-005 · 007 · TASK-322 · 366 · 367 · 402.
 ## Plan
 
 ### T1 — Retire the platform epics workdoo now owns `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `docs/epic/` · `docs/epic/archive/` · `docs/epic/INDEX.md` · `docs/research/adlc-epic-sequencing.md` · `TECH-DEBT.md`
+Layers: `docs/epic/` · `docs/epic/archive/` · `docs/epic/INDEX.md` · `docs/research/adlc-epic-sequencing.md`
   · `.cap-dispositions`
   · `docs/work/todo/TASK-434-retire-the-platform-epics-workdoo-now-owns.md`
   · `docs/work/in_progress/TASK-434-retire-the-platform-epics-workdoo-now-owns.md`
 Depends-on: none
-Cites: `TASK-434` · EPIC-022 D1 · ADR-052 · ADR-041
+Cites: `TASK-434` · EPIC-022 D1 · ADR-052 · ADR-041 · `TECH-DEBT.md` (coordinator-written, D1)
 
 Owner ruling 2026-10-18 (D1). Governance-file work, Tier P. The `retain` disposition on the sequencing file named EPIC-015's close
 as its revisit point, and that has happened.
@@ -55,7 +56,7 @@ with their evidence.
 
 ### T2 — Make the tick wording match the freeze checker `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/references/dispatch.md` · `skills/lean-doc-generator/references/sprint-by-reference.md`
-  · `evals/` · `CHANGELOG.md` · `TECH-DEBT.md`
+  · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/`
   · `docs/work/todo/TASK-427-make-the-tick-rule-and-the-freeze-checker-agree-on-the-tail.md`
   · `docs/work/in_progress/TASK-427-make-the-tick-rule-and-the-freeze-checker-agree-on-the-tail.md`
 Depends-on: none
@@ -70,8 +71,9 @@ still FAILs.
 
 ### T3 — Create the Execution Log at promote `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/lean-doc-generator/templates/sprint-log.md.template`
-  · `skills/lean-doc-generator/references/sprint-by-reference.md` · `skills/lean-doc-generator/SKILL.md` · `evals/`
-  · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+  · `skills/lean-doc-generator/references/sprint-by-reference.md` · `skills/lean-doc-generator/SKILL.md`
+  · `skills/handoff/SKILL.md` · `.claude/CONTEXT.md` · `evals/run-night-run-rollup-fixtures.sh` · `evals/fixtures/night-run-rollup/`
+  · `README.md`
   · `docs/work/todo/TASK-422-reconcile-the-sprint-templates-lazy-log-with-the-rollup-gate.md`
   · `docs/work/in_progress/TASK-422-reconcile-the-sprint-templates-lazy-log-with-the-rollup-gate.md`
 Depends-on: T2 (`sprint-by-reference.md`)
@@ -85,7 +87,7 @@ fixture shows a log-less active sprint FAILs while a promoted one passes.
 ### T4 — Stop shipped skills naming repo-only script paths `[size: M · risk: low · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/night-run.md`
   · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/review-scoping.md`
-  · `skills/lean-doc-generator/SKILL.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+  · `skills/lean-doc-generator/SKILL.md`
   · `docs/work/todo/TASK-428-stop-shipped-skills-naming-repo-only-script-paths.md`
   · `docs/work/in_progress/TASK-428-stop-shipped-skills-naming-repo-only-script-paths.md`
 Depends-on: T2 (`dispatch.md`), T3 (`lean-doc-generator/SKILL.md`)
@@ -97,7 +99,7 @@ The census found 19 occurrences in 5 files, each ruled per reference. Lean-flow'
 only mechanism.
 
 ### T5 — Fix `/prime`'s freshness row and night-run offer `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `skills/prime/SKILL.md` · `skills/prime/references/` · `CHANGELOG.md` · `TECH-DEBT.md`
+Layers: `skills/prime/SKILL.md` · `skills/prime/references/`
   · `docs/work/todo/TASK-429-make-prime-report-right-under-plugin-dir-and-for-hitl-sprints.md`
   · `docs/work/in_progress/TASK-429-make-prime-report-right-under-plugin-dir-and-for-hitl-sprints.md`
 Depends-on: none
@@ -110,7 +112,7 @@ Cites: `TASK-429` · TD-220 · TD-230 · ADR-006 · `.claude-plugin/plugin.json`
 ### T6 — Give governed templates their ownership header `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `skills/lean-doc-generator/templates/AGENTS.md.template` · `skills/lean-doc-generator/templates/BUG.md.template`
   · `skills/lean-doc-generator/templates/CODE_OF_CONDUCT.md.template` · `skills/lean-doc-generator/templates/DESIGN.md.template`
-  · `skills/lean-doc-generator/templates/QA-TESTCASE.md.template` · `CHANGELOG.md` · `TECH-DEBT.md`
+  · `skills/lean-doc-generator/templates/QA-TESTCASE.md.template`
   · `docs/work/todo/TASK-431-give-governed-templates-an-ownership-header.md`
   · `docs/work/in_progress/TASK-431-give-governed-templates-an-ownership-header.md`
 Depends-on: none
@@ -121,11 +123,13 @@ The judgement is the triage: does what this template renders land where §3 gove
 **Acceptance:** a rendered QA-TESTCASE draws no `S3.SCHEMA` finding, and each of the five templates carries its ruling.
 
 ### T7 — Stop two conformance rules passing what they exist to catch `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/` · `docs/adr/` · `docs/DECISIONS.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-adr-family-fixtures.sh` · `evals/fixtures/adr-family/`
+  · `evals/run-sprint-family-fixtures.sh` · `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/architecture/overview.md`
+  · `docs/adr/` · `docs/DECISIONS.md`
   · `docs/work/todo/TASK-432-stop-two-conformance-rules-passing-what-they-exist-to-catch.md`
   · `docs/work/in_progress/TASK-432-stop-two-conformance-rules-passing-what-they-exist-to-catch.md`
 Depends-on: none
-Cites: `TASK-432` · TD-187 · TD-118 · ADR-034 · ADR-050 · L-166 · L-186 · `conformance.sh` (run, not edited)
+Cites: `TASK-432` · TD-187 · TD-118 · ADR-034 · ADR-050 · L-166 · L-186 · `conformance.sh` (run, not edited) · `TECH-DEBT.md` (coordinator-written, D1)
   · the rule ids, asserted inside `conformance-engine.sh`: `S11.TDDELETE` · `S4.NEGATIVE`
 
 `conformance.sh` executes both rules, so this is Consequential Tier G and takes the full bar: seeded breaks, a `cmp` restore, and a
@@ -135,7 +139,7 @@ worktree-isolated outside review. Tightening `S4.NEGATIVE` changes what it accep
 named `not judged`.
 
 ### T8 — Make `migrate` withhold incomplete task files on every run `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `skills/lean-doc-generator/references/migration-map.md` · `evals/` · `CHANGELOG.md` · `TECH-DEBT.md`
+Layers: `skills/lean-doc-generator/references/migration-map.md` · `evals/run-v1-to-v2-fixtures.ts` · `evals/fixtures/v1-to-v2/`
   · `docs/work/todo/TASK-433-make-migrate-withhold-incomplete-task-files-every-run.md`
   · `docs/work/in_progress/TASK-433-make-migrate-withhold-incomplete-task-files-every-run.md`
 Depends-on: none
@@ -147,10 +151,10 @@ step must work in a repo that has no `scripts/`.
 **Acceptance:** on a real v1 fixture tree, a task lacking `tier:` is withheld and named, and a complete one is written.
 
 ### T9 — Make `/release-patch` bump every linted version reference `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `skills/release-patch/SKILL.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+Layers: `skills/release-patch/SKILL.md`
   · `docs/work/todo/TASK-430-make-release-patch-bump-every-version-reference-the-gate-lints.md`
   · `docs/work/in_progress/TASK-430-make-release-patch-bump-every-version-reference-the-gate-lints.md`
-Depends-on: T1–T8 (it is exercised by this sprint's own release)
+Depends-on: T1, T2, T3, T4, T5, T6, T7, T8 (it is exercised by this sprint's own release)
 Cites: `TASK-430` · TD-093 · L-015 · L-007
 
 The step stays generic, because the README footer is this repo's convention and not a consumer's. It runs last, so the close's
@@ -161,8 +165,9 @@ patch release is its real input.
 ## Decisions (pre-locked)
 
 - **D1** — Shared files: `dispatch.md` is T2 → T4; `sprint-by-reference.md` is T2 → T3; `lean-doc-generator/SKILL.md` is
-  T3 → T4. `CHANGELOG.md` and `TECH-DEBT.md` are touched by every task. Each is committed per hunk by its task (`git add -p`, then
-  read `git diff --cached`), in Plan order.
+  T3 → T4. `CHANGELOG.md` and `TECH-DEBT.md` are **coordinator-owned**: every task returns its entry text in its report, and the
+  coordinator writes them in `sprint(125):` commits, per hunk (`git add -p`, then read `git diff --cached`). Scope-change
+  2026-10-18: the preflight read them as unowned overlaps between parallel tasks.
 - **D2** — TASK-422: the log is created at promote, and the check is unchanged. TASK-427: the wording moves, and the checker is
   unchanged. Both are owner rulings, made by popup on 2026-10-18.
 
