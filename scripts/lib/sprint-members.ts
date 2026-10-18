@@ -20,15 +20,19 @@
 // `plan_commit` resolution, the planned-vs-current diff, scope-change entries, `## Done when`
 // comparison, close-mode -- because that is freeze-specific, not "what are the members." This
 // file answers only "what is a member of this sprint in the LIVE working tree right now," which is
-// all `resolveMembers()` below does.
+// all `resolveMembersChecked()` below does.
 //
 // API (the whole surface a caller needs):
-//   resolveMembers(root, sprintFile) -> Member[]   -- id, path, folder, frontmatter, for every
-//                                                      CURRENT member, live-tree only (no git).
+//   resolveMembersChecked(root, sprintFile) -> {members, anomalies} -- id, path, folder, frontmatter for every
+//                                                      CURRENT member, live-tree only (no git), PLUS every
+//                                                      anomaly the resolver used to drop silently
+//                                                      (TD-188): an id matching 2+ files, an id with
+//                                                      no file, a task file outside docs/work/<folder>/.
+//                                                      Callers print each one as a named FAIL.
 //   nowTree(root) / stampedIn(tree, sprintNo) / resolveId(paths, id) -- the building blocks, kept
 //                                                      exported so a caller needing raw paths
 //                                                      (rather than parsed Member rows) is not
-//                                                      forced through resolveMembers().
+//                                                      forced through resolveMembersChecked().
 // Degrades to [] (never throws) when `root` has no docs/work/ store at all -- the shape every
 // pre-existing flat authority/task-origin fixture has, so wiring a caller to this module adds zero
 // behaviour to any input that predates it.
@@ -184,10 +188,11 @@ export interface Tree {
   read: (p: string) => string | null;
 }
 
-/** Every `docs/work/<folder>/TASK-NNN-*.md` in the live working tree, all six status folders,
- * walked recursively (a nested subfolder is not a different population -- matches
- * check-sprint-by-reference.ts's commit-tree `ls-tree -r` behaviour). `[]` when `root` has no
- * docs/work/ store at all. */
+/** Every `TASK-*.md` under docs/work/ in the live working tree, walked recursively (a nested subfolder
+ * is not a different population -- matches check-sprint-by-reference.ts's commit-tree `ls-tree -r`
+ * behaviour). This is the SAME population check-task-origin.sh counts (TD-190); a file that is not at
+ * `docs/work/<folder>/TASK-NNN-<slug>.md` is returned here and NAMED by `placementProblem`, never
+ * dropped. `[]` when `root` has no docs/work/ store at all. */
 export function nowTree(root: string): Tree {
   const paths: string[] = [];
   const workDir = join(root, WORK);
@@ -195,7 +200,7 @@ export function nowTree(root: string): Tree {
     const walk = (rel: string) => {
       for (const e of readdirSync(join(root, rel), { withFileTypes: true })) {
         if (e.isDirectory()) walk(`${rel}/${e.name}`);
-        else if (/^TASK-\d+-.*\.md$/.test(e.name)) paths.push(`${rel}/${e.name}`);
+        else if (/^TASK-.*\.md$/.test(e.name)) paths.push(`${rel}/${e.name}`);
       }
     };
     walk(WORK);
@@ -209,7 +214,8 @@ export function stampedIn(t: Tree, sprintNo: number): Set<string> {
   for (const p of t.paths) {
     const c = t.read(p);
     if (c !== null && sprintNumber(frontmatterField(c, "sprint")) === sprintNo) {
-      s.add(basename(p).match(/^(TASK-\d+)-/)![1]!);
+      const id = basename(p).match(/^(TASK-\d+)-/)?.[1];
+      if (id !== undefined) s.add(id);
     }
   }
   return s;
@@ -224,35 +230,93 @@ export interface Member {
   readonly frontmatter: Record<string, string>;
 }
 
+/** Why a task path is not at `docs/work/<folder>/TASK-NNN-<slug>.md`, or null when it is. */
+export function placementProblem(p: string): string | null {
+  const rel = p.slice(WORK.length + 1).split("/");
+  if (rel.length === 1) return "directly in docs/work/";
+  const folder = rel[0]!;
+  if (!(FOLDERS as readonly string[]).includes(folder)) return `unknown folder '${folder}'`;
+  if (rel.length > 2) return `nested ${rel.length - 2} level(s) below docs/work/${folder}/`;
+  if (!/^TASK-\d+-.*\.md$/.test(rel[1]!)) return "name is not TASK-NNN-<slug>.md";
+  return null;
+}
+
+export type MemberAnomalyKind = "member-ambiguous" | "member-missing" | "member-misplaced";
+
+/** One thing the resolver found wrong, with its evidence: `id` is "" for a misplaced file whose name
+ * carries no task id; `paths` is every file involved (empty for member-missing). */
+export interface MemberAnomaly {
+  kind: MemberAnomalyKind;
+  id: string;
+  paths: string[];
+  detail: string;
+}
+
+/** The one finding text for an anomaly, shared by every caller (owner ruling, SPRINT-128 T3: each FAILs). */
+export function memberAnomalyFinding(a: MemberAnomaly): string {
+  if (a.kind === "member-ambiguous") {
+    return `member-ambiguous: ${a.id} matches ${a.paths.length} task files (${a.paths.join(", ")}) -- a task id must name exactly one file; remove or rename the duplicate`;
+  }
+  if (a.kind === "member-missing") {
+    return `member-missing: ${a.id} is listed in ## Members or stamped for this sprint but no ${WORK}/<folder>/${a.id}-<slug>.md exists`;
+  }
+  return `member-misplaced: ${a.paths[0]} is outside ${WORK}/<folder>/TASK-NNN-<slug>.md (${a.detail}) -- move it into one of ${FOLDERS.join(", ")}`;
+}
+
+export interface MemberResolution {
+  members: Member[];
+  anomalies: MemberAnomaly[];
+}
+
 /**
  * The sprint's CURRENT members: `## Members` paths (resolved by task id) UNION every task file
  * under any docs/work status folder stamped `sprint: <this sprint's number>`, live-working-tree
  * only (no git history -- that is check-sprint-by-reference.ts's freeze-specific job, not this one).
  *
- * An id that resolves to zero or more-than-one file is left OUT (ambiguous/missing resolution is
- * a finding for the checker doing the resolving to report, e.g. check-sprint-by-reference.ts's own
- * MEMBER-MISSING -- this module only ever returns unambiguous rows).
+ * Every id that resolves to anything but one well-placed file is NAMED in `anomalies` (TD-188), never
+ * dropped: 2+ files -> member-ambiguous; none -> member-missing; and every task file outside
+ * `docs/work/<folder>/TASK-NNN-<slug>.md` -> member-misplaced (store-wide, sprint-listed or not). A
+ * misplaced lone file is not a member. `members` is identical to what the silent resolver returned
+ * for every clean id. With no docs/work/ store at all both lists are empty (the flat-fixture shape).
  */
-export function resolveMembers(root: string, sprintFile: string): Member[] {
-  if (!existsSync(sprintFile)) return [];
+export function resolveMembersChecked(root: string, sprintFile: string): MemberResolution {
+  const none: MemberResolution = { members: [], anomalies: [] };
+  if (!existsSync(sprintFile)) return none;
   const sprintText = readFileSync(sprintFile, "utf8");
   const sprintNo = sprintNumber(frontmatterField(sprintText, "sprint"));
   const tree = nowTree(root);
-  if (tree.paths.length === 0) return [];
+  // Only an ABSENT store (no docs/work/ at all: not a by-reference tree) skips resolution. A store that exists but holds
+  // no task file still owes every listed id a member-missing (it lost its last file).
+  if (!existsSync(join(root, WORK))) return none;
   const listed = taskIds(section(sprintText, "Members"));
   const stamped = sprintNo !== null ? stampedIn(tree, sprintNo) : new Set<string>();
   const ids = [...new Set([...listed, ...stamped])].sort();
   const members: Member[] = [];
+  const anomalies: MemberAnomaly[] = [];
+  const misplaced = new Set<string>();
+  for (const p of [...tree.paths].sort()) {
+    const why = placementProblem(p);
+    if (why === null) continue;
+    misplaced.add(p);
+    anomalies.push({ kind: "member-misplaced", id: basename(p).match(/^(TASK-\d+)-/)?.[1] ?? "", paths: [p], detail: why });
+  }
   for (const id of ids) {
-    const matches = resolveId(tree.paths, id);
-    if (matches.length !== 1) continue;
+    const matches = resolveId(tree.paths, id).sort();
+    if (matches.length === 0) {
+      anomalies.push({ kind: "member-missing", id, paths: [], detail: "no file" });
+      continue;
+    }
+    if (matches.length > 1) {
+      anomalies.push({ kind: "member-ambiguous", id, paths: matches, detail: `${matches.length} files` });
+      continue;
+    }
     const path = matches[0]!;
+    if (misplaced.has(path)) continue;
     const content = tree.read(path);
     if (content === null) continue;
-    const folder = path.split("/")[2] as Folder;
-    members.push({ id, path, folder, frontmatter: parseFrontmatter(content) });
+    members.push({ id, path, folder: path.split("/")[2] as Folder, frontmatter: parseFrontmatter(content) });
   }
-  return members;
+  return { members, anomalies };
 }
 
 // --- the Plan parser (SPRINT-128 T1, TASK-443) -----------------------------------------------------
@@ -333,7 +397,7 @@ function leadTaskIds(text: string): string[] {
   const out: string[] = [];
   let rest = text;
   for (;;) {
-    const m = /^[\s,;·•|&+`]*(?:and\s+)?(TASK-[0-9]+)(?![0-9])/.exec(rest);
+    const m = /^(?:[\s,;·•|&+`]|\band\b)*(TASK-[0-9]+)(?![0-9])/.exec(rest);
     if (!m) break;
     out.push(m[1]!);
     rest = rest.slice(m[0].length);

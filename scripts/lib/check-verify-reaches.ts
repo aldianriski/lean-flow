@@ -20,7 +20,7 @@
 // on a v2 sprint it silently examined zero clauses and reported nothing wrong -- a vacuous PASS of
 // exactly the kind L-136 exists to catch, one level up. This file reads BOTH: the sprint file's own
 // Plan text (legacy, v1 -- unchanged semantics) AND every current member's `## Done when` section
-// (TASK-382's `resolveMembers`), and reports a NAMED, NON-ZERO-DENOMINATOR line either way (owner
+// (TASK-382's `resolveMembersChecked`), and reports a NAMED, NON-ZERO-DENOMINATOR line either way (owner
 // ruling B) -- "0 mechanical clauses" is reported, never silently skipped, because zero real clauses
 // and zero EXAMINED clauses must never look the same (L-156).
 //
@@ -77,7 +77,7 @@
 
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
-import { resolveMembers, section, taskIds } from "./sprint-members.ts";
+import { memberAnomalyFinding, resolveMembersChecked, section, taskIds } from "./sprint-members.ts";
 
 // --- the shared archive predicate, reimplemented (this file may not edit archive-path.sh, and a new
 // .sh file is not admissible -- ADR verbatim carryover of scripts/lib/archive-path.sh's own logic,
@@ -305,7 +305,11 @@ export function checkSprintFile(scriptRoot: string, sp: string): FileCheckOutcom
   // --- member files (TASK-387, owner ruling A+B) --------------------------------------------------
   const memberRoot = memberRootFor(sp);
   const listedIds = taskIds(section(content, "Members"));
-  const members = resolveMembers(memberRoot, sp);
+  const { members, anomalies } = resolveMembersChecked(memberRoot, sp);
+  for (const a of anomalies) {
+    fail = true;
+    out.push(`FAIL  verify-reaches: ${sp} ${memberAnomalyFinding(a)}`);
+  }
 
   if (listedIds.size > 0 && members.length === 0) {
     fail = true;

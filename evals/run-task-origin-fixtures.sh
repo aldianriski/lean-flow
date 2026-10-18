@@ -130,7 +130,44 @@ case "$out" in
     ;;
 esac
 
-min_tests=11
+# --- case 10 (SPRINT-128 T3, TD-190; must-FAIL): a task file OUTSIDE docs/work/<folder>/ is counted and NAMED ----
+# The member resolver walks every TASK-*.md under docs/work/ and names a stray member-misplaced; this guard used
+# to glob one level deep and never saw it. Built in a temp tree (a stray task file committed under evals/ would
+# be read by every repo-wide store scan). todo/TASK-960 is the well-placed sibling control: it keeps its PASS.
+mis=$(mktemp -d "${TMPDIR:-/tmp}/task-origin-misplaced.XXXXXX")
+mkdir -p "$mis/docs/work/todo/sub" "$mis/docs/work/parked"
+for rel in todo/TASK-960-ok todo/sub/TASK-961-nested TASK-962-loose parked/TASK-963-odd; do
+  printf -- '---\nid: %s\norigin: manual\n---\n' "${rel##*/}" > "$mis/docs/work/$rel.md"
+done
+run_case_anywhere "store-misplaced-nested" 1 \
+  "member-misplaced: docs/work/todo/sub/TASK-961-nested.md is outside docs/work/<folder>/" -- \
+  sh "$checker" "$mis"
+run_case_anywhere "store-misplaced-root" 1 \
+  "member-misplaced: docs/work/TASK-962-loose.md is outside docs/work/<folder>/" -- \
+  sh "$checker" "$mis"
+run_case_anywhere "store-misplaced-unknown-folder" 1 \
+  "member-misplaced: docs/work/parked/TASK-963-odd.md is outside docs/work/<folder>/" -- \
+  sh "$checker" "$mis"
+# Clean control on its OWN tree (a store with no stray): exit 0 and its PASS line. It must stay green when the
+# stray scan is broken, so a break that reddens the three cases above cannot also redden the control (L-142).
+mkdir -p "$mis/ok/docs/work/todo"
+printf -- '---\nid: TASK-960-ok\norigin: manual\n---\n' > "$mis/ok/docs/work/todo/TASK-960-ok.md"
+run_case_anywhere "store-misplaced-sibling-control" 0 \
+  "TASK-960 (store: docs/work/todo/) origin: manual" -- \
+  sh "$checker" "$mis/ok"
+out=$(sh "$checker" "$mis" 2>&1)
+case "$out" in
+  *"member-misplaced: docs/work/todo/TASK-960"*)
+    echo "FAIL fixture(store-misplaced-control-not-flagged): the well-placed todo/TASK-960 was reported misplaced -- got: $out"
+    fail=1
+    ;;
+  *)
+    echo "PASS fixture(store-misplaced-control-not-flagged): the well-placed task is not reported misplaced"
+    ;;
+esac
+rm -rf "$mis"
+
+min_tests=15
 n_run=$(grep -c '^run_case_anywhere' "$0")
 if [ "$n_run" -lt "$min_tests" ]; then
   echo "FAIL harness: only $n_run case(s) wired in this file, expected at least $min_tests -- coverage SHRANK"

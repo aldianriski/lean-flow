@@ -36,7 +36,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { parsePlan, resolveMembers, type Member } from "./sprint-members.ts";
+import { memberAnomalyFinding, parsePlan, resolveMembersChecked, type Member, type MemberAnomaly } from "./sprint-members.ts";
 
 // --- frontmatter (pure) -----------------------------------------------------------------------
 
@@ -249,10 +249,13 @@ export interface SprintFileInput {
    * pre-existing fixture and every input that predates this ruling, so wiring this in changes
    * nothing for them. */
   readonly members: readonly Member[];
+  /** SPRINT-128 T3: what the resolver found wrong (duplicate id, id with no file, misplaced file) -- each is a
+   * named FAIL. Absent = none, so every pre-existing caller is unchanged. */
+  readonly anomalies?: readonly MemberAnomaly[];
 }
 
 export function evaluateSprintFile(input: SprintFileInput): string[] {
-  const { path: sp, content, logExists, logContent, members } = input;
+  const { path: sp, content, logExists, logContent, members, anomalies = [] } = input;
   const out: string[] = [];
 
   if (content === null) {
@@ -267,6 +270,8 @@ export function evaluateSprintFile(input: SprintFileInput): string[] {
     );
     return out;
   }
+
+  for (const a of anomalies) out.push(`FAIL  authority: ${sp} ${memberAnomalyFinding(a)}`);
 
   const defenced = logExists ? defence(logContent) : "";
   const mode = computeModeSignal(logExists, defenced, content);
@@ -337,12 +342,12 @@ export function runCheckAuthority(sprintFilePaths: readonly string[]): CheckAuth
     }
     // TASK-382 owner ruling B: `root` is `sp`'s grandparent-of-grandparent under the
     // `<root>/docs/sprint/<file>` convention every real sprint doc AND every member-shaped fixture
-    // (evals/fixtures/authority/<case>/docs/sprint/<file>) follows. resolveMembers() degrades to
+    // (evals/fixtures/authority/<case>/docs/sprint/<file>) follows. resolveMembersChecked() degrades to
     // [] when that root has no docs/work/ at all -- every PRE-EXISTING flat fixture (no docs/sprint
     // subdir), so this addition changes nothing for any input that predates this ruling.
     const root = dirname(dirname(dirname(sp)));
-    const members = content !== null ? resolveMembers(root, sp) : [];
-    lines.push(...evaluateSprintFile({ path: sp, content, logExists, logContent, members }));
+    const { members, anomalies } = content !== null ? resolveMembersChecked(root, sp) : { members: [], anomalies: [] };
+    lines.push(...evaluateSprintFile({ path: sp, content, logExists, logContent, members, anomalies }));
   }
 
   const exitCode = lines.some((l) => l.startsWith("FAIL")) ? 1 : 0;

@@ -720,7 +720,7 @@ describe("parsePlanCites -- Tn -> the TASK ids in ITS OWN Cites: line", () => {
   });
 
   test("a Cites: line naming TWO TASK ids keeps both", () => {
-    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-1` · `TASK-2`"].join("\n");
+    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-1` and `TASK-2`"].join("\n");
     expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1", "TASK-2"]);
   });
 });

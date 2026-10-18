@@ -12,7 +12,11 @@
 // must fail these as loudly as one that reddens nothing) -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
 import { fileURLToPath } from "node:url";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { parseCites, parseTaskRecords, runCheckAuthority } from "../scripts/lib/check-authority.ts";
+import { ANOMALY_CASES, EXPECTED, buildAnomalyTree, type AnomalyCase } from "./fixtures/member-anomalies/tree.ts";
 
 const FX = fileURLToPath(new URL("fixtures/authority/", import.meta.url));
 
@@ -255,4 +259,33 @@ describe("check-authority.ts -- retained fixtures", () => {
     expect(r.text).toContain("authority-undeclared: ");
     expect(r.text).toContain("T3a carries no J0/J1/J2 in its header meta");
   });
+});
+
+// --- SPRINT-128 T3 (TASK-445, TD-188 / TD-190): every resolver anomaly is a named FAIL ------------------------
+describe("check-authority.ts -- member resolver anomalies (trees from fixtures/member-anomalies/tree.ts)", () => {
+  const tmp = mkdtempSync(join(tmpdir(), "member-anomalies-auth-"));
+  const runCase = (k: (typeof ANOMALY_CASES)[number]) => {
+    const r = runCheckAuthority([buildAnomalyTree(join(tmp, k), k)]);
+    return { ...r, text: r.lines.join("\n"), lines: r.lines };
+  };
+
+  test("control (clean): exits 0, TASK-951 is a member with its authority PASS, no anomaly line", () => {
+    const r = runCase("clean");
+    expect(r.exitCode).toBe(0);
+    expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-951 \(docs\/work\/todo\/TASK-951-ok\.md\) authority: J1$/m);
+    expect(r.text).not.toMatch(/member-(ambiguous|missing|misplaced)/);
+  });
+
+  for (const k of ANOMALY_CASES.filter((c): c is Exclude<AnomalyCase, "clean"> => c !== "clean")) {
+    test(`MUST-FAIL ${k}: a named ${EXPECTED[k].name} FAIL carrying its evidence, and the clean member is still checked`, () => {
+      const r = runCase(k);
+      expect(r.exitCode).toBe(1);
+      const line = r.lines.find((l) => l.startsWith("FAIL  authority:") && l.includes(`${EXPECTED[k].name}:`));
+      expect(line).toBeDefined();
+      for (const ev of EXPECTED[k].evidence) expect(line).toContain(ev);
+      if (k !== "ambiguous") expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-951 /m);
+    });
+  }
+
+  test("cleanup", () => rmSync(tmp, { recursive: true, force: true }));
 });

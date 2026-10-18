@@ -19,7 +19,8 @@ import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import { runLayersCompleteness } from "../scripts/lib/check-layers-completeness.ts";
-import { anomalyFinding, parsePlan } from "../scripts/lib/sprint-members.ts";
+import { anomalyFinding, memberAnomalyFinding, parsePlan, resolveMembersChecked } from "../scripts/lib/sprint-members.ts";
+import { ANOMALY_CASES, EXPECTED, buildAnomalyTree, type AnomalyCase } from "./fixtures/member-anomalies/tree.ts";
 import {
   buildArchiveSelectionPair,
   buildCaseVariantFixture,
@@ -271,7 +272,7 @@ describe("space-token-wordsplit (retained must-FAIL fixture -- the oracle's IFS 
 // --- SPRINT-110 T1 (TASK-390): member task files on a by-reference (v2) sprint ---------------------
 // The Plan-shape checks above read a Plan's INLINE DoD; a v2 sprint's DoD lives in its member files, so
 // the guard used to pass without looking at any of it (Codex r1 F1). Each fixture below is a
-// self-contained `<root>/docs/sprint + docs/work` tree -- the shape resolveMembers() reads.
+// self-contained `<root>/docs/sprint + docs/work` tree -- the shape resolveMembersChecked() reads.
 //
 // member-mixed carries every VERDICT and varies the SELECTION (L-186): T1 cites TWO members (the second
 // wrapped onto a continuation line), T2 is covered by a Layers DIRECTORY, T3's member is reached ONLY by
@@ -438,6 +439,14 @@ describe("parsePlan (the one Plan reader both Layers checkers use)", () => {
     expect(byTid("T1").cites.all).toEqual(["TASK-901", "TASK-902", "TASK-903"]);
     expect(byTid("T1").cites.lead).toEqual(["TASK-901", "TASK-902"]);
   });
+  test("A4 (must-FAIL, SPRINT-128 T3): a backticked id after `and` is part of the leading run -- `TASK-1` and `TASK-2` keeps BOTH", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- x\nCites: `TASK-1` and `TASK-2`\n");
+    expect(q.blocks.find((b) => b.tid === "T1")!.cites.lead).toEqual(["TASK-1", "TASK-2"]);
+  });
+  test("A4 sibling control: `and` followed by prose ends the run -- `TASK-1` and then TASK-2 keeps only TASK-1", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- x\nCites: `TASK-1` and then TASK-2\n");
+    expect(q.blocks.find((b) => b.tid === "T1")!.cites.lead).toEqual(["TASK-1"]);
+  });
   test("a column-0 continuation is a named anomaly with its line number, and its tokens are not folded in", () => {
     expect(p.anomalies).toEqual([{ kind: "column-0-continuation", decl: "Layers", line: 13, text: "`wrapped.ts`" }]);
     expect(byTid("T3a").layers).toEqual(["c.ts"]);
@@ -496,5 +505,81 @@ describe("col0-prose (retained must-FAIL fixture -- remedy named; blank-line sib
     const hits = r.output.split("\n").filter((l) => l.includes("declaration continuation"));
     expect(hits.length).toBe(1);
     expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
+  });
+});
+
+// --- SPRINT-128 T3 (TASK-445, TD-188 / TD-190): the member resolver NAMES every anomaly ------------------
+// The resolver used to skip an id matching 0 or 2 files and nothing said so, so every caller silently
+// checked less. Each case below is a tree from evals/fixtures/member-anomalies/tree.ts; the clean case is the
+// control, and TASK-951 (clean) must be a member in EVERY case that does not make it ambiguous.
+describe("member resolver anomalies (retained must-FAIL fixtures -- member-ambiguous / member-missing / member-misplaced)", () => {
+  const roots = new Map<AnomalyCase, { sprint: string; r: Captured }>();
+  const tmp = mkdtempSync(posix.join(tmpdir().replace(/\\/g, "/"), "member-anomalies-lc-"));
+  beforeAll(() => {
+    for (const k of ANOMALY_CASES) {
+      const sprint = buildAnomalyTree(posix.join(tmp, k), k).replace(/\\/g, "/");
+      roots.set(k, { sprint, r: capture([sprint]) });
+    }
+  });
+  afterAll(() => rmSync(tmp, { recursive: true, force: true }));
+
+  test("control (clean): no anomaly, exits 0, TASK-951 is a member and PASSes", () => {
+    const { sprint, r } = roots.get("clean")!;
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain(`PASS  member-layers-complete: ${sprint} ### T1 member docs/work/todo/TASK-951-ok.md (TASK-951)`);
+    expect(r.output).not.toMatch(/member-(ambiguous|missing|misplaced)/);
+    const res = resolveMembersChecked(posix.join(tmp, "clean"), sprint);
+    expect(res.anomalies).toEqual([]);
+    expect(res.members.map((m) => m.id)).toEqual(["TASK-951"]);
+  });
+
+  for (const k of ANOMALY_CASES.filter((c): c is Exclude<AnomalyCase, "clean"> => c !== "clean")) {
+    test(`MUST-FAIL ${k}: a named ${EXPECTED[k].name} FAIL carrying its evidence`, () => {
+      const { sprint, r } = roots.get(k)!;
+      expect(r.exitCode).toBe(1);
+      const line = r.output.split("\n").find((l) => l.startsWith("FAIL  layers-completeness:") && l.includes(`${EXPECTED[k].name}:`));
+      expect(line).toBeDefined();
+      for (const ev of EXPECTED[k].evidence) expect(line).toContain(ev);
+      expect(line).toContain(sprint);
+    });
+  }
+
+  test("sibling: every case keeps the governed clean member checked (the anomaly adds a finding, drops nothing)", () => {
+    for (const k of ANOMALY_CASES.filter((c) => c !== "ambiguous")) {
+      expect(roots.get(k)!.r.output).toContain("member docs/work/todo/TASK-951-ok.md (TASK-951)");
+    }
+  });
+
+  test("resolver API: the ambiguous id is NOT a member and names BOTH paths; the clean members are untouched", () => {
+    const { sprint } = roots.get("ambiguous")!;
+    const root = posix.join(tmp, "ambiguous");
+    const res = resolveMembersChecked(root, sprint);
+    expect(res.members).toEqual([]);
+    expect(res.anomalies.map((a) => [a.kind, a.id, a.paths])).toEqual([
+      ["member-ambiguous", "TASK-951", ["docs/work/done/TASK-951-dup.md", "docs/work/todo/TASK-951-ok.md"]],
+    ]);
+    expect(memberAnomalyFinding(res.anomalies[0]!)).toContain("matches 2 task files");
+  });
+
+  test("Codex R1 Q1 (must-FAIL): a docs/work/ that EXISTS but holds no task file still names every listed id member-missing", () => {
+    const root = posix.join(tmp, "empty-store");
+    const sprint = buildAnomalyTree(root, "clean").replace(/\\/g, "/");
+    rmSync(posix.join(root, "docs/work/todo/TASK-951-ok.md"));
+    const res = resolveMembersChecked(root, sprint);
+    expect(res.members).toEqual([]);
+    expect(res.anomalies.map((a) => [a.kind, a.id])).toEqual([["member-missing", "TASK-951"]]);
+  });
+  test("Codex R1 Q1 control: no docs/work/ at all is not a by-reference tree -- no anomaly, as before", () => {
+    const root = posix.join(tmp, "absent-store");
+    const sprint = buildAnomalyTree(root, "clean").replace(/\\/g, "/");
+    rmSync(posix.join(root, "docs/work"), { recursive: true, force: true });
+    expect(resolveMembersChecked(root, sprint)).toEqual({ members: [], anomalies: [] });
+  });
+  test("resolver API: a misplaced file is reported store-wide and never becomes a member", () => {
+    for (const k of ["misplaced-nested", "misplaced-root", "misplaced-unknown"] as const) {
+      const res = resolveMembersChecked(posix.join(tmp, k), roots.get(k)!.sprint);
+      expect(res.members.map((m) => m.id)).toEqual(["TASK-951"]);
+      expect(res.anomalies.map((a) => a.kind)).toEqual(["member-misplaced"]);
+    }
   });
 });

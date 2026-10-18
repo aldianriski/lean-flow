@@ -16,8 +16,10 @@
 # the first is checkable, so that is what this guards. A MISSING origin is a FAIL rather than a
 # default, because "unstamped" is exactly the state the old prose could not distinguish.
 #
-# POPULATION: every docs/work/<folder>/TASK-NNN-*.md, across ALL SIX status folders (backlog todo
-# in_progress review done cancel). The legacy TODO.md § Backlog population was retired (TODO.md
+# POPULATION: every TASK-*.md under docs/work/ -- the SAME set the member resolver (sprint-members.ts
+# nowTree) walks (TD-190). A file at docs/work/<folder>/TASK-*.md (ALL SIX status folders: backlog todo
+# in_progress review done cancel) gets the per-file origin check; one anywhere else (nested deeper,
+# directly in docs/work/, an unknown folder) is a named FAIL, member-misplaced, never uncounted. The legacy TODO.md § Backlog population was retired (TODO.md
 # retired, SPRINT-111 T3 / spec 0.13.0); this checker skips-with-nothing-to-verify only when the
 # store has no task files.
 #
@@ -55,6 +57,22 @@ for folder in backlog todo in_progress review done cancel; do
     fi
   done
 done
+
+# --- strays: any other TASK-*.md under docs/work/ (the resolver names the same files member-misplaced) --
+if [ -d "$root/docs/work" ]; then
+  find "$root/docs/work" -type f -name 'TASK-*.md' | sort > "$out.all"
+  while IFS= read -r f; do
+    rel=${f#"$root/docs/work/"}
+    folder=${rel%%/*}
+    case "$rel" in
+      */*/*) ;;
+      */*) case " backlog todo in_progress review done cancel " in *" $folder "*) continue ;; esac ;;
+    esac
+    seen=1
+    printf 'FAIL  %s\n' "task-origin: member-misplaced: docs/work/$rel is outside docs/work/<folder>/ (backlog todo in_progress review done cancel) -- the member resolver names this file member-misplaced too; move it into a status folder" >> "$out"
+  done < "$out.all"
+  rm -f "$out.all"
+fi
 
 # --- population 2 (legacy TODO.md § Backlog) retired: TODO.md retired, SPRINT-111 T3 / spec 0.13.0. --
 # A leftover TODO.md is no longer read here; the store above is the only population.
