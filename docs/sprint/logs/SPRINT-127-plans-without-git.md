@@ -149,3 +149,32 @@ active and unmarked: reads `roadmap · P3 · uncovered (unmarked)`, and active 2
 - **F2.** Workdoo pins lean-flow 2.5.0 / Standard 0.15.0 (its version-alignment record). That `/prime` has no roadmap slot, and it
   predates task-level `gates_signed` and the git-less freeze, so a `/prime` run under workdoo's own pin prints no Coverage row. Box
   3 holds for the current procedures, not for the pinned ones. → workdoo owner-action: bump the pin after this sprint's release.
+
+### 2026-10-18 | T3 | TASK-441 — the sprint lifecycle without git; merged `65fda03e` (`51f81f14` engine, `58755038` procedures, R1 fix `35117c5f`); done
+Worktree-base guard PASS (`c5a4f71e`). Procedures in lean-doc-generator (SKILL rows plus sprint-by-reference § Without git),
+orchestrator (Loop, one net line, 139), dispatch (tick and transitions), triage, the SPRINT template and both READMEs name the git
+case and the no-git form. Engine: S9.GATESWELLFORMED accepts a strict `YYYY-MM-DD` only when `_is_git_repo` fails, and in a git
+repo a date keeps the byte-identical `malformed` FAIL. The S9.PLANFROZEN note names the snapshot. Four retained fixtures: date
+without git passes · date in a git repo fails · malformed date fails · sha without git still passes (control).
+Consequential G bar. The builder's seeds M1 (date always accepted, the rejected design) · M2 (date off) · M3 (loose pattern) each
+differed, parsed, kept 11 assertions and 3587 lines, and reddened only their claim-bearing case; the restore was hash-checked. The
+coordinator re-seeded M1 independently. The first attempt did not land (an inline heredoc in a subshell; `cmp` caught it). Re-seeded
+from a script file: only `date-in-git-repo-fails` reddened, 10 of 11 stayed green, and the restore hash matched.
+Review: Codex `gpt-6-astra` R1 found 2 items. G2 (`@[ ]*` allows no space) was ruled no change, since it mirrors the existing sha
+branch; Codex agreed in R2. G5 (the close row's squash-commit and triage's separate-commit edit read as git-only) was fixed by the
+coordinator in `35117c5f`. R2 CLEAR.
+Post-merge: tsc rc 0 with 0 errors; layers-observed / completeness / freeze clean; gates-signed fixtures green. `conformance.sh .`
+rc 0, level Gated, no FAIL. Versus the post-T2 run, the only deltas are sprint progress (ADR count, a second scope-change, ticked
+criteria now earning S9.VERIFYCLAUSE), and the builder's same-tree before/after engine diff was empty.
+Builder findings, for close: the `#### TASK-NNN` snapshot heading is a convention fixed in sprint-by-reference; no engine rule reads
+the snapshot (debt, as ruled); `check-sprint-by-reference.ts` was not exercised on `plan_commit: none (no git)` (it is lean-flow's own
+tooling, not an adopter step).
+Session note (L-219 sighting): a bare `cd` into the T3 worktree for the re-seed made the harness adopt it as the session's checkout.
+The seed was finished and restored first, then the session `cd`'d back. T4 runs in the main tree with no isolated dispatch, so no
+worktree can branch from a stale tip.
+
+### 2026-10-18 | scope-change | T4 TASK-438 Layers gain `scripts/qa-check.sh` (one harness list entry; owner, popup)
+**What broke.** The gate's completeness leg FAILs any `evals/run-*` harness that is in no list in `scripts/qa-check.sh`, and a
+`*.test.ts` alone is never run by the gate. So T4's retained must-FAIL case is gated only through one list entry outside its Layers.
+**Impact.** T4 Layers gain `scripts/qa-check.sh`, limited to one `eval_harnesses_always` entry plus its reason comment. No DoD change.
+**Re-confirm G2.** The owner chose always-on by popup.
