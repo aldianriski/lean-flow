@@ -43,7 +43,7 @@ Confirm before touching code. BLOCK if any answer is "unknown":
 
 ## G2 — Design gate (mvp + sprint-bulk)
 
-Before implementing, draft the design in **`/plan`** (plan mode) and get human sign-off:
+Before implementing, draft the design in **`/plan`** (plan mode) and get human sign-off; on approval (plan-mode exit or popup) mvp sets the task file's `gates_signed: G1,G2 @ <sha>` (G1 the moment it passes) and a one-paragraph `## Approved design` (sprint-bulk keeps the sprint-level field):
 - [ ] Approach chosen over alternatives, with a one-line WHY
 - [ ] Micro-task list, each independently verifiable (for an **L** design, present + approve it section-by-section, not one monolith)
 - [ ] Each `done-when` notes its **verification method** where a mechanical check exists — that named check's FAIL then blocks the *silent* tick: surface → recorded owner ruling, never tick past it quietly (ADR-021)
@@ -80,7 +80,7 @@ this changes *when* a run stops, never *who* records it. Full contract → `refe
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
-2. **G1** — run the checklist; BLOCK on any fail.
+2. **G1** — run the checklist; BLOCK on any fail. On the owner's approval (plan-mode exit or popup) write the task file's `gates_signed: G1 @ <sha>` (`@ <YYYY-MM-DD>` with no git).
 3. **Implement** — execute per Implement routing (new behaviour → `/tdd` by default); flag scope creep the moment it appears.
 4. **Self-review** — run the review checklist (below) as the floor; heavier isolated `/code-review` / `/verify` passes apply to non-trivial diffs and mvp+sprint-bulk, not quick low-risk tasks.
 5. **Commit** — structured message: `type(scope): summary`.

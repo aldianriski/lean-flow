@@ -43,8 +43,8 @@ Vocabulary adopted verbatim from `kerjaan` (EPIC-017 "Reference adopted").
 ## Frontmatter fields
 
 `id · title · epic · sprint · priority · size · risk · autonomy · class · tier · authority ·
-origin · state · depends-on`. `sprint:` / `epic:` may be absent (a plain backlog file usually has
-neither).
+origin · state · depends-on · gates_signed`. `sprint:` / `epic:` may be absent (a plain backlog file usually has
+neither); `gates_signed:` is optional too — `<GATE>[,<GATE>] @ <sha | YYYY-MM-DD>`, the owner's G1/G2 sign-off for work done without a sprint. Absent means NOT signed, never approval.
 
 ## Membership
 
@@ -58,7 +58,7 @@ sprint's subtree instead of staying one glob (ADR-045 D1).
 
 ## Sections
 
-`## Why` (optional) · `## Done when` · `## Amended <date>` (optional) · `## Touches` ·
+`## Why` (optional) · `## Approved design` (optional) · `## Done when` · `## Amended <date>` (optional) · `## Touches` ·
 `## Assumes` · `## Tracker`.
 
 ## `## Assumes` conventions

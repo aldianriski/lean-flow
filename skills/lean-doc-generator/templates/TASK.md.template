@@ -12,6 +12,7 @@ authority: J0 | J1 | J2   # J2 = human-reserved; an unattended run parks on it
 origin: decomposer        # always, for /task-decomposer output
 state: ready | needs-info | blocked
 depends-on: []            # or [TASK-NNN, TASK-NNN]
+gates_signed: [G1,G2 @ <sha | YYYY-MM-DD> — set by /orchestrator quick|mvp when the owner approves; OMIT until then. Absence means NOT signed]
 ---
 
 <!-- One task = one file: docs/work/backlog/TASK-NNN-kebab-slug.md (new tasks land in backlog/ only;
@@ -23,6 +24,10 @@ depends-on: []            # or [TASK-NNN, TASK-NNN]
 ## Why
 
 [one to three lines on why this task exists — optional, delete the section if the title says it]
+
+## Approved design
+
+[optional — the one-paragraph design the owner approved at G2; omit on a G1-only task]
 
 ## Done when
 
