@@ -29,7 +29,8 @@ and the SSOT docs name, or adopters keep passing it as an unstructured `--prd` f
       edits the roadmap itself (creates vs consumes); `skills/task-decomposer/SKILL.md` stays ≤ ~140 lines.
 - [ ] The roadmap is named everywhere the loop is described: `/flow`'s stage that feeds work, `.claude/CONTEXT.md` § Sprint model,
       README, and CHANGELOG — a wiring check (every new name has a reader) finds no unwired mention.
-- [ ] Exercised on the TASK-435 scratch copy of workdoo's roadmap: `--roadmap P2b` yields tasks scoped to that row only.
+- [ ] Exercised on the TASK-435 scratch copy of workdoo's roadmap: `--roadmap P2` yields tasks scoped to that row only, and
+      `--roadmap P2b` (not a row) takes the no-such-row path.
 
 ## Touches
 

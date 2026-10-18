@@ -90,3 +90,11 @@ CHANGELOG (consumer):
   to its tasks, epic or next slice.
 - Spec 0.17.0 (MINOR carrying MAJOR meaning) adds the row (legacy `docs/roadmap.md`) and the roadmap-coverage rule, which skills
   enforce. A `roadmap.md` elsewhere is flagged by S2.R-PLACEMENT.
+
+### 2026-10-18 | scope-change | T3 TASK-437 box 3: the frozen example row `P2b` is not a row — reworded to `P2`, with `P2b` kept as the miss case (owner)
+**What broke.** Box 3 froze "`--roadmap P2b` yields tasks scoped to that row only". In workdoo's real roadmap, the first-cell row
+tokens are P0 P1 P2 P3 P4 P5 P6 P7a P7b P8a P8b P9F P9H P10 P11 P12; `P2b` is only prose inside P2's Covered-by cell. The box was
+written before that was checked (L-130: a value in a frozen artifact is a query result).
+**Owner ruling (popup).** Box 3 now reads: `--roadmap P2` yields tasks scoped to that row only, and `--roadmap P2b` (not a row)
+takes the no-such-row path. Both were already exercised by the T3 builder (`f9510f57`).
+**Re-confirm G2.** The owner confirmed by popup. This adds no scope.
