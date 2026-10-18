@@ -1154,7 +1154,8 @@ status: current
     versus its declared run mode), and a guard here would have caught all three. Weigh against
     ADR-029's tiering: this is Tier G by the false-negative test.
 
-- **TD-160** severity: medium | status: open | created: Sprint-101
+- **TD-160** severity: medium | status: resolved → SPRINT-125 T3 | created: Sprint-101
+  - Resolved (SPRINT-125 T3, `4ca7438a`; owner ruling at G2: procedure only): the Execution Log is rendered at promote with the `promote` entry first (templates, promote procedure, handoff fallback), so a promoted sprint is never red by construction; the rollup check and STANDARD §9 are unchanged. Retained must-PASS fixture `qa-leg2g-v2-promoted-log-promote-entry-only`.
   - Summary: **A sprint is RED BY CONSTRUCTION between its promote and its first Execution Log entry.**
     `check-night-run-rollup.sh` treats an **absent** log as a named FAIL — deliberately, and correctly:
     SPRINT-098 changed it precisely because leg 2g built its input from live Plans that already had a

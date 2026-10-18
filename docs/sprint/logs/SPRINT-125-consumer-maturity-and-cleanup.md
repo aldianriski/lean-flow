@@ -164,3 +164,13 @@ re-ran with `--model gpt-6-astra --effort high`.
 **Correction to the G2 entry above.** It said the S11.TDDELETE change "moves no verdict and needs no bump". That is wrong (Codex T5).
 Overdue rows in shapes the old extractor missed now FAIL. Spec 0.16.0 already carries MAJOR meaning for S4.NEGATIVE, so the version
 stands; the spec text and CHANGELOG are corrected in the T7 revise.
+
+### 2026-10-18 | T3 | TASK-422 — Execution Log created at promote (procedure only); merged `9fb8fa5a`
+The templates, the promote row, by-reference step 4, the handoff fallback ("only if absent"), CONTEXT and README now say the log is
+rendered at promote, with the promote entry first. STANDARD §9, the engine, the rollup check and ADR-014 are untouched. The new
+fixture `qa-leg2g-v2-promoted-log-promote-entry-only` is not FAILed: the leg skips with "no completed-run entry yet", pass=0 fail=0,
+and the harness is all green. Post-merge: prose-density 28/0, layers-observed PASS, caps PASS (lean-doc-generator 138, handoff 100).
+TD-160 is resolved. Box 3 (README/CHANGELOG) stays open: README is done and the CHANGELOG lands at close. The task is in `review/`
+until its Codex pass, batched with T2/T4.
+CHANGELOG (consumer): the sprint Execution Log is created at promote, with the promote / plan-locked entry first in the same commit,
+instead of lazily at the first entry. That is earlier than STANDARD §9's minimum, which it satisfies.
