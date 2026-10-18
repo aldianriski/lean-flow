@@ -1,5 +1,6 @@
 ---
 id: TASK-439
+sprint: SPRINT-127
 title: "Record a G1/G2 sign-off on the task file itself, so work without a sprint keeps its approval where the next reader finds it"
 epic: EPIC-022
 priority: P1

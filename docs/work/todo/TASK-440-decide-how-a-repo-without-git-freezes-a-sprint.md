@@ -1,5 +1,6 @@
 ---
 id: TASK-440
+sprint: SPRINT-127
 title: "Decide and specify how a repo without git freezes, signs and closes a sprint (ADR-054, spec 0.18.0)"
 epic: EPIC-022
 priority: P1

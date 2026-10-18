@@ -4,7 +4,7 @@ slug: plans-that-work-for-any-consumer
 owner: Maintainer
 last_updated: 2026-10-18
 status: active
-member_sprints: [SPRINT-125, SPRINT-126]
+member_sprints: [SPRINT-125, SPRINT-126, SPRINT-127]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -42,6 +42,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 |---|---|---|---|
 | [SPRINT-125](../sprint/archive/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | closed · `ff04f84` | Closed-when 1–3: the shipped surface stops naming lean-flow's scripts, two false-green conformance rules fixed (spec 0.16.0), migrate/prime/release-patch/templates fixed, platform epics retired; released as **2.6.0** |
 | [SPRINT-126](../sprint/archive/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | closed · `4ff484b` | Closed-when 4: roadmap template + §2 row + coverage rule (spec 0.17.0), coverage reported by /prime · /triage · promote, `--roadmap <row>`; released as **2.7.0** |
+| [SPRINT-127](../sprint/SPRINT-127-plans-without-git.md) | Plans Without Git | active | — (filled at close) |
 
 ## Decisions
 
@@ -75,11 +76,12 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
       row ends `→ TASK-NNN` or `→ next slice:`, and `/prime` + `/triage` report uncovered rows.
       → TASK-435, TASK-436, TASK-437 — closed SPRINT-126
 - [ ] Approving a G2 design in plan mode leaves a persisted sign-off in the sprint or task file.
-      → next slice: S3 plan-mode G2 record
+      → TASK-439
 - [ ] A repo without git can promote, freeze and close a sprint, under an ADR.
-      → next slice: S3 git-less lifecycle
+      → TASK-440, TASK-441
 - [ ] The planning-checker clusters are retired: one shared `Layers:` parser, a member resolver
       that names anomalies instead of dropping them, and the freeze-checker edge cases.
       → next slice: S4 planning debt
-- [ ] Exercised on the real consumer: workdoo writes its roadmap from the template and runs one
-      sprint through promote → close without git (L-007). → next slice: S3 git-less lifecycle
+- [ ] Exercised on the real consumer: workdoo writes its roadmap from the template and runs one task
+      through G1/G2 → done with a persisted gate record, without git (L-007); a git-less sprint is proven on a
+      scratch repo (reworded at SPRINT-127 promote, owner ruling 2026-10-18 — workdoo runs one-off tasks, not sprints). → TASK-442

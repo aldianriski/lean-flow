@@ -1,5 +1,6 @@
 ---
 id: TASK-438
+sprint: SPRINT-127
 title: "Make the coordinator's tick step run the checkers the gate runs, so a tick tail can never redden the gate"
 priority: P2
 size: S

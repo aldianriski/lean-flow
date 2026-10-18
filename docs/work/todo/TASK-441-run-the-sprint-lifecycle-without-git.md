@@ -1,5 +1,6 @@
 ---
 id: TASK-441
+sprint: SPRINT-127
 title: "Run the sprint lifecycle without git: promote writes the snapshot, tick and close check against it"
 epic: EPIC-022
 priority: P1
