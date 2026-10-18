@@ -26,10 +26,10 @@ already marked "lean-flow itself").
 
 ## Done when
 
-- [ ] Every `scripts/…` occurrence under `skills/` is ruled per reference — reworded to name the property
+- [x] Every `scripts/…` occurrence under `skills/` is ruled per reference — reworded to name the property ✓ `1edcc08a`: re-census 19 = 19 on two selectors (occurrences · lines/file); 5 R1 reworded to the property, 10 R2 marked lean-flow's own, 3 R3 already marked; night-run.md top note; survivors table in the T4 log entry
       (not the path), marked "where the host repo has one", or marked as this repo's own tooling — and
       a re-census lists each survivor with its ruling (TD-137 · TD-214).
-- [ ] Read on the consumer path: each touched step still completes for a repo with no `scripts/`.
+- [x] Read on the consumer path: each touched step still completes for a repo with no `scripts/`. ✓ each R1 step completes with no `scripts/` (host's gate · reachability checker where the host has one · sprint-close checker or the plain-git fallback); stale EPIC-008 status fixed in night-run.md + scripts/night-run.sh (comment, `sh -n` ok)
 - [ ] CHANGELOG notes the consumer-facing change; touched SKILL.md files stay ≤ ~140 lines.
 
 ## Touches

@@ -617,7 +617,8 @@ status: current
   - Mitigation (hypothesis): make the TS port match by basename as the Shell does (the TS is the gate), or rule the stricter behaviour correct and
     align the Shell. Either way, a fixture with a bare name against a full-path Layers entry.
 
-- **TD-214** severity: low | status: open | created: Sprint-112 (T1 audit, owner ruling Q10)
+- **TD-214** severity: low | status: resolved → SPRINT-125 T4 | created: Sprint-112 (T1 audit, owner ruling Q10)
+  - Resolved (SPRINT-125 T4, `1edcc08a`): same pass as TD-137 — G2/review-scoping/night-run steps name the check as optional ("where the host has one") with lean-flow's script as the example.
   - Summary: **Shipped skills name repo-only `scripts/…` checkers as the mechanism of a step an adopter runs.** For example,
     `skills/orchestrator/SKILL.md`'s G2 checklist names `scripts/lib/check-verify-reaches.ts`, and review-scoping and night-run name
     others (G18 · S03 · S05). An adopter has no `scripts/`, so the step's mechanism is absent for them (L-015). The audit keeps these guards
@@ -1603,7 +1604,8 @@ status: current
   - **Re-file fresh if** the depth accounting is revisited, or a malformed bracket is found to
     corrupt a verdict rather than only its diagnostic.
 
-- **TD-137** severity: medium | status: open | created: Sprint-094
+- **TD-137** severity: medium | status: resolved → SPRINT-125 T4 | created: Sprint-094
+  - Resolved (SPRINT-125 T4, `1edcc08a`): the orchestrator surface now names the property for every adopter step (the host's gate · a reachability checker where the host has one · a sprint-close checker) and marks `scripts/night-run.sh` · `qa-check.sh` · `resolve-run-mode.sh` · `check-verify-reaches.ts` as lean-flow's own reference implementation; night-run.md opens with that note. 19 occurrences ruled, none an adopter step's only mechanism.
   - Summary: **Four consumer-facing `skills/orchestrator/` files name this repository's own script
     paths, so an installed consumer reads instructions that resolve nowhere.** SPRINT-094 T2 cleaned
     this class out of the 35 templates and out of `handoff` / `prime` / `lean-doc-generator`; the

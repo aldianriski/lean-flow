@@ -174,3 +174,17 @@ TD-160 is resolved. Box 3 (README/CHANGELOG) stays open: README is done and the 
 until its Codex pass, batched with T2/T4.
 CHANGELOG (consumer): the sprint Execution Log is created at promote, with the promote / plan-locked entry first in the same commit,
 instead of lazily at the first entry. That is earlier than STANDARD §9's minimum, which it satisfies.
+
+### 2026-10-18 | T4 | TASK-428 — shipped skills mark lean-flow's scripts as its own; adopter steps name the property; merged `eaf8cc7b`
+Re-census found 19 occurrences in 5 files on two selectors (occurrences, and lines per file), before and after; paths were marked,
+not deleted.
+- R1 (5), reworded to the property: orchestrator/SKILL.md:50 · review-scoping.md:223 · dispatch.md:81 · the night-run.md 4c row
+  and gate items.
+- R2 (10), marked lean-flow's own. R3 (3), left as already marked.
+- night-run.md now opens with a note: the scripts are lean-flow's reference implementation, and an adopter substitutes their own
+  trigger and gate.
+- The stale "EPIC-008 status: proposed" is fixed in night-run.md and in one scripts/night-run.sh comment (`sh -n` ok).
+Post-merge: prose-density 28/0, layers-observed PASS, caps 138/138. TD-137 and TD-214 are resolved. Box 3 (CHANGELOG) stays open
+until close. The task is in `review/` until the wave B Codex pass.
+CHANGELOG (consumer): orchestrator references no longer present lean-flow's `scripts/` tooling as the mechanism of an adopter step.
+Those steps now name the property, and night-run.md opens with a note that an adopter uses their own `claude -p` trigger and gate.
