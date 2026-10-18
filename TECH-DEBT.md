@@ -35,6 +35,11 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-127 promote (2026-10-18).** **118 of 120 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 127. Second route: 120 open − 2 filed at 125 (TD-251 · TD-252) = 118. **Newly aged since the SPRINT-126 sweep, named for
+> re-review:** TD-249 · TD-250 (filed at 124). No open row is `high`. **§11 deletion** (owner-approved): TD-168, resolved at
+> SPRINT-124 (TASK-404) and now 3 sprints on. Its id stays retired. The 15 rows resolved at 125 are due at 128.
+>
 > **Aging sweep — SPRINT-126 promote (2026-10-18).** **116 of 120 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 126. Second route: 120 open − 2 filed at 124 (TD-249 · TD-250) − 2 filed at 125 (TD-251 · TD-252) = 116. **Newly aged since
 > the SPRINT-125 sweep: none** — nothing was filed at sprint 123. No open row is `high`. No §11 deletion is due (TD-168, resolved at
@@ -980,44 +985,6 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-168** severity: high | status: resolved → TASK-404 | created: Sprint-103
-  - Summary: **`scripts/lib/conformance-engine.sh` is the QA gate's single largest cost centre and is
-    kernel-bound, but it is consumer-facing, so the fix needs its own sprint.** Measured at
-    SPRINT-103 T3 (`qa-gate-timing.md` Rounds 17-18): the engine accounts for **542 s — 71% of Round
-    16's measured top five** — across three call sites. Against THIS repo it runs **173.1 s real /
-    53.8 user / 81.1 sys**, of which fixed dispatch is 2.9 s (**1.7%**). **60% of CPU time in the
-    kernel** means it shells out per file per rule and pays `fork()` emulation on each, so an
-    in-process port is the instrument that reaches it.
-  - **Why it is not simply a port task.** ADR-027 amended ADR-008 so the root `conformance.sh`
-    answers for *any* repository, and **this exit code is a contract an adopter may gate CI on**.
-    Three properties bind the port: exit-code parity over the real corpus, report-text parity
-    (adopters diff and grep it), and — the one no test run here can surface — **a new `bun`
-    requirement on the adopter's machine, where `sh` suffices today** (L-015). The first two are
-    reversible; the third is not, which is why ADR-043 exists rather than only this row.
-  - **Not the same cost as its siblings, and the distinction is load-bearing.**
-    `run-sprint-family-fixtures.sh` pays *fixed per-rule dispatch* 68× against tiny fixture dirs
-    (~26 ms/rule, removable with an awk-derived reduced spec — SPRINT-103 T1's fix, which touches no
-    consumer surface). This row is the *other* cost: per-file spawns over a large corpus, which no
-    spec reduction reaches without dropping rules (a coverage change, D6). Do not conflate them; the
-    T1 fix will not move this number.
-  - Fix direction (**not a ruling**): its own sprint, with a consumer-facing design that settles the
-    `bun` question explicitly — possibly shipping both implementations, or porting only this repo's
-    internal legs and leaving `conformance.sh` on `sh`. Tier **G** under ADR-029, so the full bar
-    applies plus byte-identical differential parity against the retained `.sh` oracle (D5).
-  - **Not measured:** whether an in-process implementation actually recovers the 81 s of `sys`. That
-    is a prototype's question and nothing here promises the size of the win.
-  - Mitigated, partially and already: SPRINT-084 T1 made leg 2f-ter hand the engine a reduced spec on
-    the DEFAULT profile, so this full sweep runs only under `QA_FULL=1` — promote, close, and any
-    full-profile run (ADR-039). Real cost, but not on every gate run.
-  - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): stays `high`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1`
-    gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s, so on Linux the engine is not a bottleneck. It stays high because the engine is
-    **consumer-facing**: an adopter on Windows pays the same fork cost, and the off-host route is not theirs.
-  - **Owner (SPRINT-116 promote, owner-approved 2026-10-06):** TASK-357 is done, so the row had no live owner. SPRINT-116 T1 (TASK-399) assigns it with its ruling: *finish* → TASK-393 carries it at P1; *cut* → a new P1 task for the Shell engine's spawn cost.
-  - **Owner (SPRINT-116 T1, ADR-051):** TASK-404 (P1, needs-info) — the Shell engine is the only engine, so the spawn cost is fixed there.
-  - **Resolved (SPRINT-124 T2, TASK-404):** batching the five Round-23 spawn loops cut the engine's Windows wall clock from **417.4 s to
-    136.3 s** (−67%; a second run 82.5 s), against the ≤216.5 s target. The full report is byte-identical to the old engine's on Windows
-    and on dash with both gawk and mawk (`qa-gate-timing.md` Round 24). Still per-row, and out of this row: `S11.SPRINT` (~120 `grep`)
-    and `S11.WHENITRUNS`' per-sprint `merge-base` (~11 s). Residual divergence shapes → TD-249.
 - **TD-167** severity: medium | status: open | created: Sprint-102
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
