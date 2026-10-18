@@ -1690,7 +1690,13 @@ const CASES: Case[] = [
     expect: ["scope-change-outside-layers T1 src/helper.ts"],
   },
   {
-    name: "freeze-edit-covered-only-by-a-later-mention (must-FAIL: `T1 ...` entry names T1, whose Cites: mentions TASK-901 only after `split from`)",
+    name: "scope-change-names-a-suffixed-Tn (must-FAIL: `### T2a` is a task block; src/helper.ts is undeclared there)",
+    opts: { pre: (d) => edit(d, SPRINT, "### T2 — Deliver beta", "### T2a — Deliver beta") },
+    mutate: (d) => logEntry(d, "scope-change", "T2a also touches the helper", "T2a edits `src/helper.ts`."),
+    expect: ["scope-change-outside-layers T2a src/helper.ts"],
+  },
+  {
+    name: "freeze-edit-covered-only-by-a-later-mention(must-FAIL: `T1 ...` entry names T1, whose Cites: mentions TASK-901 only after `split from`)",
     opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902` · split from TASK-901") },
     mutate: (d) => {
       EDIT_901(d, W("todo", T901));
