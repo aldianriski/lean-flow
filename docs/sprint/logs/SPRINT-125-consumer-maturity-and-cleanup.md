@@ -188,3 +188,9 @@ Post-merge: prose-density 28/0, layers-observed PASS, caps 138/138. TD-137 and T
 until close. The task is in `review/` until the wave B Codex pass.
 CHANGELOG (consumer): orchestrator references no longer present lean-flow's `scripts/` tooling as the mechanism of an adopter step.
 Those steps now name the property, and night-run.md opens with a note that an adopter uses their own `claude -p` trigger and gate.
+
+### 2026-10-18 | review | Codex gauntlet, wave B (T2 · T3 · T4 shipped diffs; gpt-6-astra, read-only) — B1–B5 CLEAR, B6 low pre-existing
+B6: `.claude/CONTEXT.md:104` exceeds 400 chars. The line was already overlong before T3 and sits under its prose-density baseline
+(gate 28/0); T3 only lengthened it. It is recorded for the close Retro's doc-aging rather than fixed here (outside every Layers line's
+intent: an SSOT dedup pass, L-008). TASK-427 has every box ticked and Codex CLEAR → `done/`. TASK-422 and TASK-428 keep box 3
+(CHANGELOG) open until close.
