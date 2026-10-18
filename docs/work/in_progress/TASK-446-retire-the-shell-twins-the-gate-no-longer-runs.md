@@ -26,11 +26,11 @@ although v1 trees are refused since 2.0 (ADR-046).
 
 ## Done when
 
-- [ ] `check-layers-observed.sh` and `check-authority.sh` are deleted with the opt-in harnesses that exist only to compare them,
+- [x] `check-layers-observed.sh` and `check-authority.sh` are deleted with the opt-in harnesses that exist only to compare them, ✓ twins + their only harnesses deleted, layers_tokens moved and diffed identical (53b886d0)
       and `layers_tokens` moves into `check-layers-completeness.sh`, which stays as the dispatch preflight's parity oracle.
-- [ ] The reaper's v1 counting is deleted: a v1 sprint gets a named "unsupported since 2.0" error, and a missing bun gives
+- [x] The reaper's v1 counting is deleted: a v1 sprint gets a named "unsupported since 2.0" error, and a missing bun gives ✓ v1 Plan counting gone; v1 named, no-bun line kept; retained must-FAIL case (82057d08)
       zero counts plus the existing bun line (reworded at G2 by scope-change: the branch was also the no-bun fallback).
-- [ ] No prose names a deleted file as live (the qa-check lists, `dispatch.md`, `night-run.md`), and the bare gate and
+- [x] No prose names a deleted file as live (the qa-check lists, `dispatch.md`, `night-run.md`), and the bare gate and ✓ mechanical: QA_FULL on the VPS 304 pass 0 fail at 53b886d0 (covers the bare legs); no prose names a twin as live
       `QA_FULL=1` both stay green.
 
 ## Touches
