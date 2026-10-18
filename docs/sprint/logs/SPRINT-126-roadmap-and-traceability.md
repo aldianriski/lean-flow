@@ -127,3 +127,15 @@ The decomposer gains the input and resolution paragraph (130 lines). `/flow` Fee
 row all name the roadmap. Box 3 was reworded by scope-change: `P2` resolves and drafts 3 row-scoped tasks, and `P2b` takes the
 no-such-row path. CHANGELOG SPRINT-126 block written. All boxes on TASK-436 and 437 ticked; tick tails carry no file paths, and
 promote-check (10/0) plus the freeze check (5/0) were re-run after the ticks (L-224).
+
+### 2026-10-18 | system-verify | QA_FULL on the VPS at `b25254cf`: **QA-CHECK: 293 pass, 0 fail**, rc 0
+That is 6 fewer passes than SPRINT-125's 299. This is consistent with per-sprint and per-member legs scaling down (one active
+sprint with 3 members vs 9; two task files pruned), but it was not verified leg by leg.
+
+### 2026-10-18 | close | 3 of 3 members in `done/` (close gate 8/0), PLAN_EXHAUSTED; released 2.7.0 (`ed6448b3`); Retro + buckets
+- **Shipped:** CHANGELOG v2.7.0.
+- **Tech debt:** none new.
+- **Follow-up:** TASK-438 (`origin: close-retro`), which turns L-224 into a tool, since the rule has recurred 6 times.
+- **Learnings:** an L-224 sighting (count 6) and an L-130 sighting; knowledge index current.
+- **Epic rollup:** EPIC-022 Closed-when 4 is `[x]`, so 4 of 8 are met. **Handoff reconciliation:** none.
+- **§11** (owner-approved): archive the sprint and its log.

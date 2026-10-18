@@ -4,7 +4,7 @@ slug: roadmap-and-traceability
 epic: EPIC-022
 owner: Maintainer
 last_updated: 2026-10-18
-status: active
+status: closed
 plan_commit: 2f224e6e
 gates_signed: G1,G2 @ bed1348d
 update_trigger: sprint execute/close events
@@ -102,5 +102,34 @@ The decomposer consumes the roadmap and never edits it. The `Covered by` cell is
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `templates/roadmap.md.template`, `spec/STANDARD.md` · `CHANGELOG.md` (0.17.0), `lean-doc-generator/SKILL.md`, count claims (CLAUDE · CONTEXT · README · overview) | T1 | roadmap doc type + coverage rule; legacy `docs/roadmap.md` | **Med** (placement verdict for adopters) | empirical stray pair · conformance A/B · Codex R1→R2 |
+| `references/epic-coverage.md`, `prime/SKILL.md`, `triage/SKILL.md`, `lean-doc-generator/SKILL.md` | T2 | one coverage procedure, two sources; promote warns | Low | 5-row scratch exercise · Codex D1–D6 |
+| `task-decomposer/SKILL.md`, `flow/SKILL.md`, `.claude/CONTEXT.md`, `README.md` | T3 | `--roadmap <row>` + wiring | Low | P2 / P2b scratch exercise · Codex D4/D5 |
+| 4 manifests, README footer, `CHANGELOG.md`, `docs/changelog/CHANGELOG-2.5.0.md` | close | release 2.7.0 | Low | lockstep PASS · step 3b history hits left |
 
 ## Retro
+
+**Retrieval check** — yes. L-224 (re-check with the checker the gate runs) misfired again on the coordinator's TASK-435 tick tails,
+after being recorded at the previous close; escalated to a tool (TASK-438). L-130 (a frozen value is a query result) also recurred:
+TASK-437's DoD named the example row `P2b` without checking the real roadmap's row tokens.
+
+**Cost** — coordinator + 10 dispatches: 1 recon, 3 builders (+ 1 revise round on T1), 4 Codex passes (`gpt-6-astra`, all accepted
+first try). Sub-agent spend ≈ 0.62M tokens (dispatch reports; coordinator excluded) for 3 members ≈ 205k per member. One `QA_FULL`
+on the VPS (~110 s, 293/0).
+
+**Worked**
+- Codex caught a real adopter verdict move the builder's own conformance A/B could not see (no roadmap in this repo): the new §2
+  row made S2.R-PLACEMENT flag any `roadmap.md` outside `docs/product/`. Confirmed empirically before ruling; the owner chose a legacy
+  path + MAJOR meaning in one popup.
+- Builders ran the whole-tree legs on their branches before review (L-235 → L-224): no prose-density or text-contract surprise at
+  merge or system verify this time.
+- T2 ∥ T3 on disjoint files merged cleanly; T3 correctly flagged that its wiring text had no reader until T2 merged.
+
+**Friction**
+- The coordinator's own tick tails reddened promote-check again (L-224 ×6) — fixed by Cites, escalated to TASK-438.
+- Two frozen DoD lines were wrong at freeze: "no verdict moves" (box 2, TASK-435) and the `P2b` example (box 3, TASK-437); both
+  needed a scope-change and an owner ruling. Both were checkable at authoring time.
+- The scope-change checker reads example paths in log prose as file claims; adopter paths had to be declared on `Cites:` twice.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- None new: both frictions are sightings of promoted rules (L-224, L-130); the response is the tool in TASK-438.

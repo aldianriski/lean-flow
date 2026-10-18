@@ -41,7 +41,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-125](../sprint/archive/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | closed · `ff04f84` | Closed-when 1–3: the shipped surface stops naming lean-flow's scripts, two false-green conformance rules fixed (spec 0.16.0), migrate/prime/release-patch/templates fixed, platform epics retired; released as **2.6.0** |
-| [SPRINT-126](../sprint/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | active | — (filled at close) |
+| [SPRINT-126](../sprint/archive/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | closed · `<close_commit>` | Closed-when 4: roadmap template + §2 row + coverage rule (spec 0.17.0), coverage reported by /prime · /triage · promote, `--roadmap <row>`; released as **2.7.0** |
 
 ## Decisions
 
@@ -71,9 +71,9 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 - [x] lean-flow's epic index holds only outcomes lean-flow executes: 006 · 008 · 009 · 011 · 012
       closed in place as superseded → workdoo (§11 cannot archive them), with the stale rows TD-100 · TD-161 · TD-176 · TD-243 closed.
       → TASK-434 — closed SPRINT-125
-- [ ] A repo writes a phased delivery plan from a shipped template with a STANDARD row, each open
+- [x] A repo writes a phased delivery plan from a shipped template with a STANDARD row, each open
       row ends `→ TASK-NNN` or `→ next slice:`, and `/prime` + `/triage` report uncovered rows.
-      → TASK-435, TASK-436, TASK-437
+      → TASK-435, TASK-436, TASK-437 — closed SPRINT-126
 - [ ] Approving a G2 design in plan mode leaves a persisted sign-off in the sprint or task file.
       → next slice: S3 plan-mode G2 record
 - [ ] A repo without git can promote, freeze and close a sprint, under an ADR.
