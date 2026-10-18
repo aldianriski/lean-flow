@@ -12,7 +12,7 @@ authority: J0 | J1 | J2   # J2 = human-reserved; an unattended run parks on it
 origin: decomposer        # always, for /task-decomposer output
 state: ready | needs-info | blocked
 depends-on: []            # or [TASK-NNN, TASK-NNN]
-gates_signed: [G1,G2 @ <sha | YYYY-MM-DD> — set by /orchestrator quick|mvp when the owner approves; OMIT until then. Absence means NOT signed]
+gates_signed: [G1,G2 @ <sha> (a YYYY-MM-DD date only in a repo without git) — set by /orchestrator quick|mvp when the owner approves; OMIT until then. Absence means NOT signed]
 ---
 
 <!-- One task = one file: docs/work/backlog/TASK-NNN-kebab-slug.md (new tasks land in backlog/ only;

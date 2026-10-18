@@ -44,7 +44,7 @@ Vocabulary adopted verbatim from `kerjaan` (EPIC-017 "Reference adopted").
 
 `id · title · epic · sprint · priority · size · risk · autonomy · class · tier · authority ·
 origin · state · depends-on · gates_signed`. `sprint:` / `epic:` may be absent (a plain backlog file usually has
-neither); `gates_signed:` is optional too — `<GATE>[,<GATE>] @ <sha | YYYY-MM-DD>`, the owner's G1/G2 sign-off for work done without a sprint. Absent means NOT signed, never approval.
+neither); `gates_signed:` is optional too — `<GATE>[,<GATE>] @ <sha>` (a `YYYY-MM-DD` date only in a repo without git), the owner's G1/G2 sign-off for work done without a sprint. Absent means NOT signed, never approval.
 
 ## Membership
 
