@@ -17,7 +17,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 > back, and breaks the circuit when a worker misbehaves — without the local plugin losing the ability to
 > run alone.
 
-> **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-008
+> **Historical (pre-closure):** **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-008
 > stable** + **one concrete second-runtime use case** — a *named workflow a second worker must execute*.
 > No such workflow has been named. The register states the discriminator outright: **a protocol existing
 > is not a gateway being needed** (`00 § 5.4`, graduated infrastructure).

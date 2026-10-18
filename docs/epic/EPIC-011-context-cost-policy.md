@@ -16,7 +16,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 > each memory layer, what is retrieved, what a run may spend — and that policy is **enforced wherever a
 > runtime exposes a seam, and stated as an adapter requirement wherever none exists**, never faked.
 
-> **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-006**
+> **Historical (pre-closure):** **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-006**
 > + **EPIC-008**. None has happened. Note the register's own ruling of 2026-08-24: **policy before the
 > gateway** — this epic is sequenced ahead of EPIC-012 deliberately, a judgement call closed by ruling
 > as `L-094` prescribes.

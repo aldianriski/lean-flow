@@ -17,7 +17,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 > and read-only from git-resident records, with no central database, no sync, no assignment and no
 > control authority.
 
-> **Admission — NOT met (gated register).** `adlc-epic-sequencing.md` admits this epic when
+> **Historical (pre-closure):** **Admission — NOT met (gated register).** `adlc-epic-sequencing.md` admits this epic when
 > **EPIC-006 produces records a reader consumes, and two real sprints of them exist**. EPIC-006 is
 > `proposed` and has emitted nothing. This file exists because the owner asked for the roadmap written
 > down; it is **not** a licence to promote a member sprint. `03-ADLC-ROADMAP.md`'s rule still binds —

@@ -18,7 +18,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 > **Admission — NOT met (gated register).** Admitted only on **Platform Decision Gate PASSED** +
 > **EPIC-008 stable** + **EPIC-009's shadow proof** + a **minimal identity/authority contract**. The
-> gate has not run, EPIC-008 is `proposed`, EPIC-009 is `proposed` and unadmitted. This file records
+> gate has not run, EPIC-008 is `proposed`, EPIC-009 is `proposed` and unadmitted (both closed — superseded → workdoo, 2026-10-18). This file records
 > the destination; it does not open the work.
 
 ## Why this, why now
