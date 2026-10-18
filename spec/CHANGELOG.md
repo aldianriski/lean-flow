@@ -24,8 +24,10 @@ and no link to the tasks delivering it.
   `next slice: <name>`; `planned` rows are exempt, `done` rows need nothing; a mark is stale only when none of those remains.
   Enforced by `/prime` and `/triage` (report) and `promote`'s checklist (warn) — adds no row to the rule tables.
 - **Template**: `roadmap.md.template` (Outcome · Delivery sequence · Gates · Out of scope); template count 33 → 34 core.
-- **Upgrade note:** a `roadmap.md` elsewhere under `docs/` is now flagged by `S2.R-PLACEMENT` — move it to
-  `docs/product/roadmap.md` or rename it. A root `ROADMAP.md` is not flagged.
+- **Upgrade note:** a repo with neither `docs/product/roadmap.md` nor the legacy `docs/roadmap.md` but a file named
+  `roadmap.md` somewhere else (outside `docs/product/`) is now flagged by `S2.R-PLACEMENT` — move it to `docs/product/roadmap.md`
+  or rename it. Once either the canonical or the legacy file exists, other `roadmap.md` files are not checked. A root `ROADMAP.md`
+  is not flagged (the match is case-sensitive).
 
 Rule tables, rule ids and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
 
