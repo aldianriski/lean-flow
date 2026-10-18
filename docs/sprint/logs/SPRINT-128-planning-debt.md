@@ -158,3 +158,7 @@ silent `resolveMembers`, so an ambiguous *stamped* id would drop without a word.
 by its shared finding name, and the plain `resolveMembers` is deleted once nothing calls it (TD-188's trap for a future caller).
 No DoD change.
 **Re-confirm G2.** Not needed: it completes box 1 as written, under the owner's anomalies-FAIL ruling.
+
+### 2026-10-19 | scope-change | T3 TASK-445 Cites: the engine entry point the entry above names, read only
+**What broke.** The previous entry names `conformance.sh` as what reaches the CLI, and the scope-change checker reads every named
+path as a claim. **Impact.** T3 Cites gains bare `conformance.sh` (read only; it is not edited). **Re-confirm G2.** Not needed.
