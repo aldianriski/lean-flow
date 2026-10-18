@@ -98,3 +98,10 @@ written before that was checked (L-130: a value in a frozen artifact is a query 
 **Owner ruling (popup).** Box 3 now reads: `--roadmap P2` yields tasks scoped to that row only, and `--roadmap P2b` (not a row)
 takes the no-such-row path. Both were already exercised by the T3 builder (`f9510f57`).
 **Re-confirm G2.** The owner confirmed by popup. This adds no scope.
+
+### 2026-10-18 | scope-change | T1 TASK-435 Cites: evidence paths from the coordinator's own tick tails
+**What broke.** promote-check reported `member-layers-incomplete`: the T1 ticks name two evidence paths, the empirical stray
+`roadmap.md` under `docs/plans/` and the scratch conversion file. The coordinator re-checked those ticks with the freeze checker
+only, not with the layers leg the gate runs. That is a sixth sighting of L-224, recorded for the Retro.
+**Impact.** T1's `Cites:` gains both as evidence-only paths, so promote-check reads 10/0. No `## Done when` change.
+**Re-confirm G2.** This adds no scope.
