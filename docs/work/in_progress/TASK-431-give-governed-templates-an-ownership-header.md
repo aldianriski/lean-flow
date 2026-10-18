@@ -19,10 +19,10 @@ depends-on: []
 
 ## Done when
 
-- [ ] Each of the five header-less templates (`AGENTS` · `BUG` · `CODE_OF_CONDUCT` · `DESIGN` · `QA-TESTCASE`;
+- [x] Each of the five header-less templates (`AGENTS` · `BUG` · `CODE_OF_CONDUCT` · `DESIGN` · `QA-TESTCASE`; ✓ `226a6a44`/`24fbcd43`: CODE_OF_CONDUCT + QA-TESTCASE headed; BUG/DESIGN exemption comments; AGENTS footer exception unchanged; census 6/35 = TD-078
       `README` is §3's stated exception) is ruled against one test — does what it renders land where §3
       governs? — and those that do carry the four-field header (TD-078).
-- [ ] A rendered `QA-TESTCASE` no longer draws an `S3.SCHEMA` finding from `conformance.sh`.
+- [x] A rendered `QA-TESTCASE` no longer draws an `S3.SCHEMA` finding from `conformance.sh`. ✓ `conformance.sh` on a rendered QA doc: `PASS S3.SCHEMA`; header-less control FAILs `ownership-header-missing`
 
 ## Touches
 

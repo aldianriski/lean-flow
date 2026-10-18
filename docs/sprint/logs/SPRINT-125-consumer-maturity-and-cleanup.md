@@ -79,3 +79,52 @@ Closed-when ticked, and the five have unticked conditions and no members. The pr
 - **TASK-434** box 1 becomes: closed in place, superseded → workdoo, with no archive move.
 **Re-confirm G2.** These follow from the rulings signed above. They narrow the bounds and add no scope; the owner confirmed by
 signing the run shape.
+
+### 2026-10-18 | dispatch | wave A — five worktree builders (sonnet) from declared base `0ef06517`; every base verified
+Each builder reported `git rev-parse HEAD` = `0ef06517` as its first output, and `git merge-base <branch> HEAD` agreed for every branch.
+The worktree-base guard intent is met: under `worktree.baseRef: "head"` no base was stale. Fifteen leftover agent worktrees from
+earlier sessions (several `locked`) were left alone, because they may belong to live sessions (TD-246); new agent ids did not collide.
+
+### 2026-10-18 | review | wave A — one scoped sonnet reviewer over T1 · T5 · T6 · T8, Standards and Spec separately
+- Spec: CLEAR ×4.
+- Standards: T1 med. `skills/orchestrator/references/night-run.md:692` and `scripts/night-run.sh:184` still call EPIC-008 `status:
+  proposed`. These are routed to T4, which owns night-run.md; the `.sh` comment sits outside every Layers line, so T4's scope-change
+  adds it. T1 low: pre-closure admission callouts in EPIC-009 · 011 · 012 are marked historical, and EPIC-010's stale line is fixed.
+  T6 low: DESIGN cites §2/§3. T8 low: plan mode checks planned frontmatter.
+- Before review, the coordinator also caught that T1 had dropped F4, which harness-delta.md:34 cites; it was restored at `eb17680c`.
+  T8's 878-char bullet was wrapped at `39bc7ba6`.
+Each builder had one bounded retry per finding.
+
+### 2026-10-18 | merge | wave A merged on an integration worktree, `--no-ff` per task (T1 → T5 → T6 → T8); main fast-forwarded to `a5ba6204`
+The post-merge cross-cutting legs ran on the merged tree:
+- check-doc-caps: no breach.
+- check-epic-archive: PASS.
+- check-sprint-by-reference: 10/0.
+- layers-observed: PASS.
+- duplicate-id check: none.
+- prose-density: **5 FAIL**. The new Closed banners in EPIC-006 · 008 · 009 · 011 · 012 were single lines over 400 chars, which the
+  per-branch review missed. T1 wrapped them at `034cd442`, they were re-merged, and prose-density is now 28/0.
+The typecheck leg was not run here (no node_modules in the integration worktree); it runs at system verify.
+
+### 2026-10-18 | T1 | TASK-434 — platform epics closed in place, superseded → workdoo; sequencing register re-ruled
+EPIC-006 · 008 · 009 · 011 · 012 are `status: closed` with a superseded banner, and their Closed-when boxes are left unticked (not
+delivered). EPIC-005 · 007 are untouched. INDEX rows and preamble are updated. adlc-epic-sequencing.md went from 158 to 102 lines,
+and its `.cap-dispositions` retain line is deleted. TD-100 · 161 · 176 were re-verified still fixed; TD-243 moved to workdoo
+(`48c3119f`). No CHANGELOG line: this is maintainer-side.
+
+### 2026-10-18 | T5 | TASK-429 — /prime live-checkout freshness + night-run offer gated on AFK J0/J1
+Only `skills/prime/SKILL.md` changed (`83684fa6`), and it stays at 139 lines. The live-checkout row was checked by reading: no live
+`--plugin-dir` run was possible from a cached-install session. CHANGELOG (consumer): `/prime` reports `fresh` under `claude
+--plugin-dir <repo>`, where it used to report `n/a`, and names `sprint-bulk unattended` only when an open AFK J0/J1 task exists.
+
+### 2026-10-18 | T6 | TASK-431 — ownership headers on governed templates
+CODE_OF_CONDUCT and QA-TESTCASE gained the §3 header; BUG and DESIGN carry exemption comments; AGENTS is unchanged.
+`conformance.sh`: S3.SCHEMA PASSes on a rendered QA doc and FAILs on the header-less control. CHANGELOG (consumer): the
+CODE_OF_CONDUCT and QA-TESTCASE templates carry the four-field ownership header, so an adopter rendering them no longer collects
+S3.SCHEMA findings.
+
+### 2026-10-18 | T8 | TASK-433 — migrate post-write required-field checklist
+migration-map.md § Verification has a mandatory checklist (11 fields, plus id = filename) for both plan and apply. A file failing it
+is withheld and named; it is never defaulted. The check was hand-run on a fixture (TASK-942 withheld), and the harness reads 101/0,
+including the must-FAIL tree. CHANGELOG (consumer): `migrate` withholds and names any incomplete task file on every run, and needs no
+script or bun.

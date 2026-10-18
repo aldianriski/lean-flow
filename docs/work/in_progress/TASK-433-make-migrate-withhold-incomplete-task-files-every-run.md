@@ -24,9 +24,9 @@ run honour it and another write 10 files without `tier:` (TD-217). Prose a model
 
 ## Done when
 
-- [ ] `migrate` checks its own written task files for every required store field after writing, and a
+- [x] `migrate` checks its own written task files for every required store field after writing, and a ✓ `05cbb27f`..`87825795`: mandatory post-write checklist in migration-map.md § Verification (11 fields + id = filename, plan and apply), no script; scoped review CLEAR
       failing file is withheld and named — by a step that works in an adopter repo with no `scripts/`.
-- [ ] Exercised on a real v1 fixture tree: a task lacking `tier:` is withheld, a complete one is written.
+- [x] Exercised on a real v1 fixture tree: a task lacking `tier:` is withheld, a complete one is written. ✓ hand-run on `input-withheld-missing-tier` (TASK-942 withheld, TASK-941 written), retained as expected tree + must-FAIL tree; `run-v1-to-v2-fixtures.ts` 101 pass, 0 fail
 
 ## Touches
 
