@@ -178,3 +178,17 @@ worktree can branch from a stale tip.
 `*.test.ts` alone is never run by the gate. So T4's retained must-FAIL case is gated only through one list entry outside its Layers.
 **Impact.** T4 Layers gain `scripts/qa-check.sh`, limited to one `eval_harnesses_always` entry plus its reason comment. No DoD change.
 **Re-confirm G2.** The owner chose always-on by popup.
+
+### 2026-10-18 | T4 | TASK-438 — the tick step runs the gate's own checkers (`4255567f`, stamp fix `972d78f9`); done
+Run in the main tree, with no isolated dispatch (see the T3 session note). `bun scripts/lib/tick-box.ts <TASK> <box#> "<evidence>"`
+ticks the box's first line, keeping line endings. It then runs `check-sprint-by-reference.ts` and `check-layers-completeness.ts`
+over the member's sprint and prints their verdict lines. A FAIL keeps the box ticked and exits 1, and a refusal exits 2 before any
+write. The retained harness (13 cases, ~14 s) holds the must-FAIL (`member-layers-incomplete`), a path-free control, refusals and
+CRLF. It is listed always-on in `qa-check.sh` with its ADR-053 reason. `dispatch.md` rule 5 keeps the property and names the tool
+as lean-flow's own reference implementation; no adopter step depends on it.
+Other-G bar (ADR-050): sanity break "skip the layers check" reddened 3 cases, restored by hash. Coordinator self-review of the
+source; no outside review, as ruled at G2.
+**Real run, and what it caught.** The builder's first real run (box 2) ticked and then skipped both checks: the stamp regex took
+only `sprint: 127`, not the `SPRINT-127` form real members carry, and the fixtures used the numeric form, so they could not see it.
+Fixed in `972d78f9`, with both forms in the fixtures. The coordinator then ticked boxes 1 and 3 through the fixed tool: freeze
+6/0, layers 15/0, exit 0. The layers count agrees with the checker run directly (15 PASS, 0 FAIL).
