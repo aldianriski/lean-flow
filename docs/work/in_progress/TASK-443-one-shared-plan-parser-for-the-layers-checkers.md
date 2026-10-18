@@ -26,16 +26,16 @@ Consequential G: the module lives in `sprint-members.ts`, which `conformance.sh`
 
 ## Done when
 
-- [ ] `sprint-members.ts` exports one Plan parser: the `## Plan` section (fence-aware), `### Tn` headings with an optional letter
+- [x] `sprint-members.ts` exports one Plan parser: the `## Plan` section (fence-aware), `### Tn` headings with an optional letter ✓ parsePlan exported; column-0 continuation returned as a named anomaly (868765ea)
       suffix, and `Layers:` · `Cites:` · `Depends-on:` with their continuation lines, a column-0 wrap returned as a named anomaly.
-- [ ] `check-layers-completeness.ts` and `check-layers-observed.ts` read Plans only through it; their own `extractPlanLines`,
+- [x] `check-layers-completeness.ts` and `check-layers-observed.ts` read Plans only through it; their own `extractPlanLines`, ✓ both checkers read through parsePlan, own extractors deleted, column-0 named in both; non-task headings keep each checker's old reading (Codex R1 P1)
       token extractors and heading regexes are deleted, and both name a column-0 wrap instead of dropping or crashing on it.
-- [ ] A Done-when bare filename matches a `Layers:` path whose basename it equals when exactly one declared path has that
+- [x] A Done-when bare filename matches a `Layers:` path whose basename it equals when exactly one declared path has that ✓ basename rule exactly-one, ambiguous named; own-sprint attribution; seeded S2/S3 redden only their case
       basename (TD-178 · TD-215), and `check-layers-observed` attributes a `sprint(NNN) Tn:` commit only when NNN is its own sprint
       (TD-248).
-- [ ] Verdicts unchanged elsewhere: both checkers give the same verdict as before on all 127 archived plans and every existing
+- [x] Verdicts unchanged elsewhere: both checkers give the same verdict as before on all 127 archived plans and every existing ✓ mechanical: 145-plan old-vs-new projection 0 differences; completeness CLI byte-identical bar the reworded finding; observed CLI identical on the live sprint
       fixture, apart from the named-anomaly cases above, recorded as a before/after differential.
-- [ ] Full Tier G bar: a retained must-FAIL fixture per new behaviour, and seeded breaks that each redden exactly their case.
+- [x] Full Tier G bar: a retained must-FAIL fixture per new behaviour, and seeded breaks that each redden exactly their case. ✓ mechanical: seeds S1/S2/S3 + P1a/P1b + err-loud each redden exactly their cases; coordinator re-seeded S1 independently (54/4); Codex R2 CLEAR
 
 ## Touches
 
