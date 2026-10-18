@@ -77,8 +77,8 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/` in **its own commit**, never
    sharing one with a content edit (ADR-045 D6). **Coordinator-owned** — § Merge-back queue.
 7. **Close precondition (step 6)** — every member sits in `docs/work/done/` or `docs/work/cancel/`;
-   Plan boxes are never counted. Where the host keeps the gate, run
-   `bun scripts/lib/check-sprint-by-reference.ts <sprint-file> --close` (it also re-runs the freeze
+   Plan boxes are never counted. Where the host keeps a sprint-close checker, run
+   it (lean-flow's own: `bun scripts/lib/check-sprint-by-reference.ts <sprint-file> --close`; it also re-runs the freeze
    check). Plain-git fallback for any consumer: resolve each member by rule 2 and confirm its folder
    is `done/` or `cancel/`. Any member in `todo/`, `in_progress/` or `review/` blocks close, and the
    freeze check is `/lean-doc-generator`'s sprint-by-reference procedure.
@@ -678,7 +678,7 @@ at the repo root — its first non-blank, non-`#` line is the command, run from 
 reasons, which is what makes them trustworthy — nobody writes a `package.json` to satisfy this pass.
 But all three can miss on a repo that genuinely has a gate, and then the discovery order reports *no
 gate* about a repo that runs one on every commit. That is not hypothetical: **lean-flow itself is such
-a repo** — no package manifest, no `Makefile`, no `justfile`, no CI workflow, while `sh
+a repo** — no package manifest, no `Makefile`, no `justfile`, no CI workflow, while lean-flow's own `sh
 scripts/qa-check.sh` gates every commit. Until SPRINT-082 this file claimed lean-flow "dogfoods this as
 `sh scripts/qa-check.sh`", which was true of the repository and false of the procedure: the command
 existed and the discovery order could not reach it (ADR-033). Rung 4 is last because a declaration is

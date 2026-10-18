@@ -60,7 +60,7 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
 
 - **Ceiling: one retry per review pass, total.** Both findings travel together; there is never a second
   retry. Whatever the re-review still flags goes to the owner as `still-open` — the loop cannot spiral.
-  **Unattended, this is not only stated here** — `scripts/night-run.sh`'s reaper (`check_revise_ceiling`,
+  **Unattended, this is not only stated here** — lean-flow's own launcher (`scripts/night-run.sh`) reaper (`check_revise_ceiling`,
   called from `reap()`) reads the run's own `Tn · retry ·` lines off the Execution Log at exit and FAILs
   the run's `terminal ·` state named (`revise-loop-ceiling-exceeded` / `revise-loop-escalation-missing`)
   if a task fired more than one retry, or a `still-open` outcome never escalated to `parked-hitl` — the
@@ -220,7 +220,7 @@ anyone reading the tick afterwards. So G2 asks four questions of every mechanica
 is recorded as **not-valid-proof**, never accepted; and where nothing mechanical reaches it, the
 criterion stays a judgment tick that says so — manufacturing a checker to make a criterion *look*
 mechanical is the failure this rule names, not its remedy. EXISTS and REACHES are pre-screened by
-`scripts/lib/check-verify-reaches.ts`; RUNS and PROVES stay human, and the checker says so rather than
+a reachability checker where the host has one (lean-flow's own: `scripts/lib/check-verify-reaches.ts`); RUNS and PROVES stay human, and the checker says so rather than
 implying it settled all four.
 
 When the diff **touches tests**, the test-quality standard (`skills/tdd/references/test-standard.md`) is

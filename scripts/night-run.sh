@@ -181,8 +181,8 @@ check_revise_ceiling() {
 
 # --- typed run outcome (T3, SPRINT-098 -- EPIC-015 Closed-when 6) ----------------------------------
 # A3 (owner-ruled 2026-09-11): this is EPIC-015's own LOCAL, non-portable outcome vocabulary, not
-# EPIC-008's portable RunEnvelope/WorkItem/RunEvent/Evidence family -- EPIC-008 is `status: proposed`
-# with no member sprints and its object set explicitly refuses to assume a repository at all. The
+# EPIC-008's portable RunEnvelope/WorkItem/RunEvent/Evidence family -- EPIC-008 (closed 2026-10-18,
+# superseded -> workdoo) had no member sprints and its object set explicitly refuses to assume a repository at all. The
 # name `RunSummary` is NOT minted here (binding condition of the ruling); this shape is named for the
 # Part 4 rollup it types. EPIC-008 may later subsume or map it -- nothing here assumes it will.
 #

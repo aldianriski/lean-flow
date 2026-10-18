@@ -12,6 +12,10 @@ Read before firing `sprint-bulk` unattended overnight. The mechanism is already 
 `--dangerously-skip-permissions` (it removes every guardrail for a run nobody is watching to catch —
 an unacceptable risk unattended). This file is the operational procedure, not a re-decision.
 
+> **Scripts named here are lean-flow's own.** The launcher and gate scripts below (`scripts/night-run.sh`,
+> `scripts/qa-check.sh`, `scripts/lib/…`) are the reference implementation in lean-flow's repository. An
+> adopter substitutes their own `claude -p` trigger and their own gate — this file's contract binds, not those files.
+
 ## Part 0 — The unattended contract (read first)
 
 What the run may do when nobody is watching. Everything below Part 0 is procedure; this part is the
@@ -21,7 +25,7 @@ rule the procedure serves.
 runs (Part 0's authority classes, Part 0b's continuation contract), not the script that launches it.
 `night-run`, `unattended` and `sprint-bulk unattended` remain accepted **aliases**: the rename is
 additive, and an installed consumer's existing trigger keeps working unchanged (L-015 · L-016).
-Resolution is mechanical — `scripts/lib/resolve-run-mode.sh`, reached by `night-run.sh --mode`.
+Resolution is mechanical — in lean-flow's launcher, `scripts/lib/resolve-run-mode.sh`, reached by `night-run.sh --mode`.
 
 **Mode signal — declared, never inferred.** The trigger prompt carries one of those names
 (`claude -p "/orchestrator overnight" …`, or the older `… sprint-bulk unattended`). No signal → the
@@ -205,7 +209,7 @@ process, where there is no ask channel to halt into.
 | 3 | no active sprint holds the work — no top-level `docs/sprint/SPRINT-*.md` with `status: active` has the task as a member (`## Members` ∪ `sprint:` stamp, `dispatch.md` § Members by reference) | `/lean-doc-generator promote` | governance checklist sign-off |
 | 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |
 | 4b | G1/G2 are signed but no **approval envelope** is recorded | write `approval_envelope:` into the sprint frontmatter | human approval of all ten dimensions |
-| 4c | the gate (`scripts/qa-check.sh`) is red and **this Plan's purpose is repairing it** | write `gate_exceptions:` into the sprint frontmatter, naming only the check(s) the Plan repairs | owner ruling naming those specific checks — never a blanket grant |
+| 4c | the host's gate is red and **this Plan's purpose is repairing it** | write `gate_exceptions:` into the sprint frontmatter, naming only the check(s) the Plan repairs | owner ruling naming those specific checks — never a blanket grant |
 | 5 | all of the above are green | Part 1 pre-flight → Part 2 trigger | — |
 
 **The approval envelope (step 4b).** Gates say *this Plan is sound*; the envelope says *this run may
@@ -231,8 +235,8 @@ themselves give it (L-099 · L-151). **Absence is not approval**, and the shippe
 bracketed placeholder counts as absent — otherwise the artifact that creates every sprint would bless
 every sprint.
 
-**The gate exception (step 4c) — TD-110, owner ruling at SPRINT-093 T3.** `night-run.sh` refuses to
-fire on ANY non-zero exit from `scripts/qa-check.sh` (Part 1's green-gate item, below) — which means a
+**The gate exception (step 4c) — TD-110, owner ruling at SPRINT-093 T3.** lean-flow's launcher (`night-run.sh`) refuses to
+fire on ANY non-zero exit from the host's gate (`scripts/qa-check.sh` in lean-flow; Part 1's green-gate item, below) — which means a
 Plan whose entire purpose is *repairing* a gate FAIL could never run at all; SPRINT-090 hit exactly
 this. **The owner's ruling: a narrow exception is permitted, never a blanket one.** A run may fire
 against *specific, named, pre-approved* failing checks; any other failing check still refuses the
@@ -240,7 +244,7 @@ launch.
 
 The mechanism is a second frontmatter field, not a flag, pinned the same way the envelope is — a
 block list, one **complete, verbatim** `FAIL  …` line per item (copy it exactly from a fresh
-`scripts/qa-check.sh` run at approval time), plus a separate pin:
+gate run at approval time), plus a separate pin:
 
 ```
 gate_exceptions:
@@ -313,7 +317,7 @@ All items must pass or the night-run does not fire:
       `## Assumes`) — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
 - [ ] **The gate is green, or every failing check is a named, pre-approved exception.**
-      `night-run.sh` refuses to fire on ANY non-zero exit from `scripts/qa-check.sh` — otherwise a
+      lean-flow's launcher refuses to fire on ANY non-zero exit from the host's gate — otherwise a
       Plan whose purpose is *repairing* a red gate could never run (TD-110). The only door is
       `gate_exceptions:` in *this* sprint's own frontmatter (step 4c above): named, pre-approved
       checks, recorded before this evening's run — never a blanket `--force`/`--skip-gate` (none
@@ -502,7 +506,7 @@ it is a hope. **The guarantee lives in the launcher instead** — see the reaper
 
 ### The reaper — who actually writes the rollup
 
-`scripts/night-run.sh` fires the run inside a wrapper that captures its exit code. That wrapper
+lean-flow's launcher (`scripts/night-run.sh`) fires the run inside a wrapper that captures its exit code. That wrapper
 outlives the model, so it is where the rollup belongs: after the fired command exits — cleanly, early,
 or badly — the launcher re-enters itself, counts the `## Done when` boxes across the active sprint's
 **member files** (`## Members` ∪ `sprint:` stamps — the Plan carries none), lifts the
@@ -512,7 +516,7 @@ launcher's fire step at all, because getting there already proves a recognised m
 present (Part 0's mode-signal gate refuses anything else before launch). Decision and its trade →
 **ADR-016**.
 
-**The script follows this contract (TASK-392).** `scripts/night-run.sh` counts member boxes through
+**lean-flow's launcher follows this contract (TASK-392).** `scripts/night-run.sh` counts member boxes through
 `scripts/lib/sprint-members-cli.ts`; a v1 sprint (inline Plan DoD, no members) is counted as before, and a
 by-reference sprint whose members cannot be counted ends `HARD_FAILURE`, never a quiet `0 of 0`.
 
@@ -527,7 +531,7 @@ as an attended completion. Fixed by removing the second, hand-copied alias test 
 extending it: the mode-signal gate is the one place that vocabulary is allowed to live.
 
 **Declare the target explicitly with `--sprint FILE`** whenever more than one sprint might carry
-`status: active` at once — e.g. `sh scripts/night-run.sh --sprint docs/sprint/SPRINT-093-....md
+`status: active` at once — e.g. with lean-flow's launcher, `sh scripts/night-run.sh --sprint docs/sprint/SPRINT-093-....md
 --mode overnight -- claude -p ...`. Optional but recommended: without it, both the reaper above and
 the gate-exception lookup (Part 1a step 4c) fall back to scanning for the sole `status: active`
 sprint and **refuse** — write nothing, grant nothing — if they find zero or more than one, rather
@@ -689,7 +693,7 @@ three-way, EPIC-015-LOCAL vocabulary — `DELIVERED | PARTIAL | FAILED` — a pu
 alone (PLAN_EXHAUSTED → DELIVERED; AUTHORITY_BOUNDARY/BUDGET_STOP/USER_STOP → PARTIAL; HARD_FAILURE →
 FAILED; an unrecognised terminal token fails CLOSED to FAILED, never defaults to DELIVERED). **A3
 (owner-ruled):** this is not EPIC-008's portable `RunEnvelope`/`WorkItem`/`RunEvent`/`Evidence`
-family — EPIC-008 is `status: proposed` with no member sprints and its object set refuses to assume a
+family — EPIC-008 (closed 2026-10-18, superseded → workdoo) had no member sprints and its object set refuses to assume a
 repository at all — and the name `RunSummary` is deliberately NOT minted here; EPIC-008 may later
 subsume or map this shape.
 
@@ -762,7 +766,7 @@ retry and no retry at all are indistinguishable, and **both pass**. That is the 
 every other Part 4 state line already sits inside, not a new one — stated here rather than glossed,
 because an earlier draft of this passage claimed the opposite and an independent review ruled it
 false (SPRINT-098 T2 · `TD-152`). The reaper (§ The reaper, above) reads
-these same lines back at exit — `check_revise_ceiling()` in `scripts/night-run.sh`, called from
+these same lines back at exit — `check_revise_ceiling()` in lean-flow's launcher (`scripts/night-run.sh`), called from
 `reap()` before `terminal ·` is derived — and FAILs the run named if a task carries more than one
 `retry` line in this run's window (`revise-loop-ceiling-exceeded`) or a `still-open` outcome has no
 matching `Tn · parked-hitl ·` line (`revise-loop-escalation-missing`): a second firing, or a
