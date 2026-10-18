@@ -87,7 +87,7 @@ fixture shows a log-less active sprint FAILs while a promoted one passes.
 ### T4 — Stop shipped skills naming repo-only script paths `[size: M · risk: low · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/night-run.md`
   · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/review-scoping.md`
-  · `skills/lean-doc-generator/SKILL.md`
+  · `skills/lean-doc-generator/SKILL.md` · `scripts/night-run.sh` (one comment, scope-change 2026-10-18)
   · `docs/work/todo/TASK-428-stop-shipped-skills-naming-repo-only-script-paths.md`
   · `docs/work/in_progress/TASK-428-stop-shipped-skills-naming-repo-only-script-paths.md`
 Depends-on: T2 (`dispatch.md`), T3 (`lean-doc-generator/SKILL.md`)

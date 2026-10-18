@@ -128,3 +128,10 @@ migration-map.md § Verification has a mandatory checklist (11 fields, plus id =
 is withheld and named; it is never defaulted. The check was hand-run on a fixture (TASK-942 withheld), and the harness reads 101/0,
 including the must-FAIL tree. CHANGELOG (consumer): `migrate` withholds and names any incomplete task file on every run, and needs no
 script or bun.
+
+### 2026-10-18 | scope-change | T4 Layers gain `scripts/night-run.sh` (one stale EPIC-008 comment, wave A review finding)
+**What broke.** T1 closed EPIC-008, which left two sentences false: `skills/orchestrator/references/night-run.md:692` (already T4's
+file) and a comment at `scripts/night-run.sh:184`. Both say EPIC-008 is `status: proposed`.
+**Impact.** T4's `Layers:` gains `scripts/night-run.sh`, for that comment only. The script's behaviour is unchanged, and no member's
+`## Done when` changes.
+**Re-confirm G2.** This adds no scope: it corrects a status claim that this sprint's own T1 falsified.
