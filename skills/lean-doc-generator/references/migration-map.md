@@ -191,7 +191,7 @@ under the row → `## Why`. "Verbatim" in the table's Note column means the *val
    trailing qualifier or parenthetical moves **verbatim** to `## Why` as a `- <field>: <text>` bullet (to `## Assumes` where
    the text is an assumption).
 2. **Missing `class:` / `tier:` / `authority:`** → flag the row in the plan; the owner supplies the value before apply. The
-   file is **withheld** until then — never guessed, never defaulted.
+   file is **withheld** until then — never guessed, never defaulted (the post-write checklist in § Verification enforces it).
 3. **Slugs are full.** Use the whole slug the title rule produces — never shortened to task-file.md's ≈6 words. On Windows a
    long slug can exceed `MAX_PATH` (260) with the repo path; the owner shortens it by hand, migrate does not.
 4. **No `done-when:`** → one placeholder box, flagged for the owner. Prefer a box written from the row's own text with the owner's
@@ -293,6 +293,12 @@ ingests the stray task.
 
 ### Verification (run every time, plan and apply alike)
 
+- **Required-field checklist, after the write (mandatory; in plan mode, against the planned set).** Apply mode: open every `docs/work/*/TASK-*.md` this run wrote.
+  Plan mode: no file exists yet, so check the planned frontmatter of each file the run would write. Tick, per file:
+  `id` · `title` · `priority` · `size` · `risk` · `autonomy` · `class` · `tier` · `authority` · `origin` · `state` are each present **and non-empty**, and `id` equals the id in the filename.
+  A file failing any tick is **withheld**: delete it from the write set (apply: remove the file this run just created),
+  name it in the report with its missing fields, and raise its owner-input row — never left on disk, never defaulted.
+  A withheld id is `pending` below. Run it by reading the files, not by trusting the write step's own account of them.
 - **Id set, diffed both ways.** `meant` = the id of every Backlog task **row header** (`- [ ] TASK-NNN — …`; an id merely
   mentioned in prose never counts) + every by-value Plan `Tn`'s `Cites:` id + each id newly allocated this run, taken before the
   run (by-reference sprints contribute none). `output` = the ids of store files that exist after the run and did not exist before it —

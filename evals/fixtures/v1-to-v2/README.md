@@ -169,3 +169,11 @@ independently of the ids v1 cites: `output ⊆ meant` and `meant = output ∪ ke
 `expected/` + a `TASK-999` file → `stray-output-id: TASK-999` (ticked-box count is the sibling control).
 `id-set-kept-conflict` passes `conflict-input/` → `conflict-expected/` (TASK-917 kept, TASK-918 written);
 `expected-missing-task/` → `unaccounted-id: TASK-914`, and declared `--pending TASK-914` it passes.
+
+## Scenario 6 — withheld incomplete task: `input-withheld-missing-tier/` → `expected-withheld-missing-tier/` (SPRINT-125 T8, TASK-433)
+
+Two Backlog rows: `TASK-941` complete, `TASK-942` lacks `tier:`. migration-map.md § Verification's post-write required-field
+checklist withholds `TASK-942`: `expected-withheld-missing-tier/` holds only `TASK-941`'s file plus `WITHHELD.txt`
+(`TASK-NNN: <missing fields>`, one per line — what the plan report carries). Hand-run exercise: both files were written, the
+checklist found `TASK-942` at 10/11 fields, it was removed. Must-FAIL `expected-withheld-missing-tier-written/` leaves
+`TASK-942` on disk → `frontmatter missing 'tier:'` (schema) and `withheld-but-written: TASK-942`; `TASK-941` is the sibling control.
