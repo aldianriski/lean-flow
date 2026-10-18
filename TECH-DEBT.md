@@ -357,6 +357,17 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-252** severity: trivial | status: open | created: Sprint-125 (close, wave B Codex B6)
+  - Summary: **`.claude/CONTEXT.md:104` (the sprint-model bullet) is one line over 400 chars.** It was already over before SPRINT-125;
+    T3 lengthened it ("created at promote …"). It sits under its prose-density baseline (16 dense lines), so the gate stays green and
+    nothing flags the growth.
+  - Fix direction: split it at the next CONTEXT.md dedup pass (L-008 · TD-006), never by squeezing.
+- **TD-251** severity: low | status: open | created: Sprint-125 (T7, Codex R1-T4)
+  - Summary: **`S11.TDDELETE` takes the FIRST sprint id in a resolved row's status field as its resolve sprint.** A status like
+    `resolved → TASK-404 (filed Sprint-880, resolved SPRINT-899)` would be aged from 880 and could FAIL early.
+  - Census (SPRINT-125 close): 0 of 112 distinct historical resolved rows carry two sprint ids in the status field. Routed here under
+    the bounded-review stop rule (census-zero shape → TD), not into a second builder round.
+  - Fix direction (not a ruling): prefer the sprint after a `resolved` / `→` token, or the last id; re-open on the first real sighting.
 - **TD-250** severity: minor | status: open | created: Sprint-124 (close, T2's fixture builder)
   - Summary: **`evals/run-sprint-family-fixtures.sh`'s header still says it was "enumerated from the 68 assertions below", and its
     per-section tally sums to 68.** The cases kept growing after that header was written, and TASK-404 alone added 10 assertions. The

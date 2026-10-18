@@ -4,7 +4,7 @@ slug: consumer-maturity-and-cleanup
 epic: EPIC-022
 owner: Maintainer
 last_updated: 2026-10-18
-status: active
+status: closed
 plan_commit: a9887515
 gates_signed: G1,G2 @ eb394ec7
 update_trigger: sprint execute/close events
@@ -189,5 +189,43 @@ patch release is its real input.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/epic/EPIC-006·008·009·011·012`, `INDEX.md`, `docs/research/adlc-epic-sequencing.md`, `.cap-dispositions` | T1 | platform epics closed in place, superseded → workdoo; register 158 → 102 lines | Low | check-epic-archive PASS ×5 · caps · prose-density |
+| `skills/orchestrator/references/dispatch.md`, `skills/lean-doc-generator/references/sprint-by-reference.md`, `evals/run-by-reference-fixtures.ts` | T2 | ✓ tail on the box's first line | Low | by-reference 149/0 · seeded checker |
+| `templates/SPRINT.md` · `sprint-log.md`, `lean-doc-generator/SKILL.md`, `handoff/SKILL.md`, `.claude/CONTEXT.md`, `README.md`, rollup fixture | T3 | Execution Log created at promote | Low | rollup fixtures all green |
+| `skills/orchestrator/**`, `scripts/night-run.sh` (comment) | T4 | adopter steps name the property; lean-flow scripts marked its own | Low | census 19 = 19 · orchestrator-store 42/0 |
+| `skills/prime/SKILL.md` | T5 | live-checkout freshness row; night-run offer gated on AFK J0/J1 | Low | caps 139/140 · reading |
+| 5 templates under `skills/lean-doc-generator/templates/` | T6 | ownership header on CODE_OF_CONDUCT + QA-TESTCASE; BUG/DESIGN exemptions | Low | S3.SCHEMA PASS vs header-less FAIL |
+| `scripts/lib/conformance-engine.sh`, `spec/STANDARD.md` · `CHANGELOG.md` (0.16.0), `evals/` adr- + sprint-family, `overview.md` | T7 | S4.NEGATIVE bare-denial FAIL; S11.TDDELETE all-shape extractor | **Med** (adopter verdicts) | 14 seeds · Codex R1→R2 · conformance 53/53 |
+| `skills/lean-doc-generator/references/migration-map.md`, `evals/run-v1-to-v2-fixtures.ts`, v1-to-v2 fixtures | T8 | post-write required-field checklist | Low | v1-to-v2 101/0 |
+| `skills/release-patch/SKILL.md`; release: 4 manifests, README footer, CHANGELOG, `docs/changelog/CHANGELOG-2.4.0.md` | T9 | derived lockstep set + sibling-reference step; release 2.6.0 | Low | lockstep PASS · S11.CHANGELOG PASS |
 
 ## Retro
+
+**Retrieval check** — yes, twice. (1) L-224 (re-check a frozen artifact with the checker the gate runs) was promoted and in
+`dispatch.md`'s tick rule; the coordinator re-checked tick tails with the freeze checker only, and `member-layers-incomplete` surfaced
+at system verify (sighting 3). (2) The Codex-gauntlet memory covers *every shipped skill change*; it was first applied to Consequential
+G only, and wave A's skill diffs were caught up a round late.
+
+**Cost** — coordinator + 26 dispatches: 5 read-only recon/census passes, 9 builders (+ 9 bounded revise resumes), 2 scoped sonnet
+reviewers, 6 Codex passes (`gpt-6-astra`; 2 more rejected on the default model). Sub-agent spend ≈ 1.35M tokens (sum of the
+dispatch reports; coordinator excluded) for 9 members ≈ 150k per member delivered. Two `QA_FULL` runs on the VPS (~110 s each).
+
+**Worked**
+- Parallel wave A: five worktree builders under `baseRef: head`, every base verified, zero merge conflicts, zero duplicate ids.
+- Codex caught five real wrong-verdict defects in T7 that the builder's own 10-seed campaign did not — a different model family earns
+  its place on consequential G. The census-first stop rule kept it to one revise round (R1-T4 → TD-251).
+- The merged-tree cross-cutting legs caught the 400-char banners before system verify did.
+- The sprint dogfooded two of its own rulings on real input: the log existed from promote, and every tick put its tail on line one.
+
+**Friction**
+- System verify went 295/4 before 299/0, and all four were coordinator or brief misses: a pinned sentence reworded (T4), tick tails
+  naming bare harness names, a scope-change heading naming one task for three tasks' paths, and Plan J1 copied over members' J2.
+  promote-check compares Layers but not J-class, so the last one reached the gate.
+- G2 told the owner the S11.TDDELETE change "moves no verdict"; Codex R1-T5 showed it can (pass → fail on overdue rows). Corrected in
+  the log and the spec CHANGELOG before release; the version class was unaffected.
+- Codex's default model (`gpt-6.1-sol`) is rejected on this account; every review needs `--model gpt-6-astra`.
+- My R2 brief to Codex omitted the evals diff, so R2-T6 came back unverifiable and the coordinator verified it by reading.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- L-235 (count 2): run whole-tree legs (prose-density, text-contract pins) on the branch before review — due for promotion at the next
+  promote. L-234 (count 1): a scope-change heading must name every `Tn` its body touches.

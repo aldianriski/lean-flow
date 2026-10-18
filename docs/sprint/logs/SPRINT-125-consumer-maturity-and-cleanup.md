@@ -246,3 +246,17 @@ Fixes 2–4 are the Plan-meta scope-change below. Re-verify on the VPS after the
   TASK-434: `CHANGELOG.md` · `evals/` · `skills/handoff/SKILL.md` · `.claude/CONTEXT.md` · `spec/STANDARD.md` · `spec/CHANGELOG.md`
   · `docs/architecture/overview.md`.
 **Re-confirm G2.** This adds no scope. It brings the declarations in line with what was already ruled and built.
+
+### 2026-10-18 | system-verify | QA_FULL on the VPS at `7cdd3889`: **QA-CHECK: 299 pass, 0 fail**, rc 0
+The fixes for the four FAILs (`sprint(125) T4:` pinned phrase plus the Plan-meta scope-change) cleared the run. Release 2.6.0 followed
+(`3f17f0b4`, stops before push); its edits touch only manifests, the footer and the CHANGELOG, with lockstep and S11.CHANGELOG
+PASSing locally.
+
+### 2026-10-18 | close | 9 of 9 members in `done/` (close gate 20/0), PLAN_EXHAUSTED; Retro written; buckets routed
+- **Shipped:** CHANGELOG v2.6.0. It ships SPRINT-125 and SPRINT-124.
+- **Tech debt:** TD-251 (R1-T4, census 0/112) and TD-252 (CONTEXT.md:104) filed. 18 rows resolved this sprint.
+- **Follow-ups:** none new. EPIC-022 S2–S4 remain marked `→ next slice:`.
+- **Learnings:** L-234 (count 1), L-235 (count 2, due at the next promote), and a third sighting of L-224.
+- **Handoff reconciliation:** no `handoff` entry in this log. **Epic rollup:** EPIC-022 Closed-when 1–3 are `[x]`; 3 of 8 are met.
+- **§11 retention** (owner-approved at the close popup): archive the sprint and its log, then prune `done/TASK-423` once the engine
+  re-confirms it is uncited.

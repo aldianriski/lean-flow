@@ -40,7 +40,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-125](../sprint/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | active | — (filled at close) |
+| [SPRINT-125](../sprint/archive/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | closed · `<close_commit>` | Closed-when 1–3: the shipped surface stops naming lean-flow's scripts, two false-green conformance rules fixed (spec 0.16.0), migrate/prime/release-patch/templates fixed, platform epics retired; released as **2.6.0** |
 
 ## Decisions
 
@@ -58,17 +58,18 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 
 ## Closed when
 
-- [ ] No shipped skill names a repo-only `scripts/…` path as the mechanism of a step an adopter runs,
+- [x] No shipped skill names a repo-only `scripts/…` path as the mechanism of a step an adopter runs,
       and `/prime` reports correctly under `--plugin-dir` and for an all-HITL sprint
-      (TD-137 · TD-214 · TD-220 · TD-230). → TASK-428, TASK-429
-- [ ] The consumer defects in the shipped release, template and conformance surfaces are resolved:
+      (TD-137 · TD-214 · TD-220 · TD-230). → TASK-428, TASK-429 — closed SPRINT-125
+- [x] The consumer defects in the shipped release, template and conformance surfaces are resolved:
       footer bump (TD-093) · template ownership headers (TD-078) · `S11.TDDELETE` false PASS (TD-187)
       · `S4.NEGATIVE` substring (TD-118) · `migrate` withhold rule (TD-217) · the sprint template's lazy
       log vs the rollup gate (TD-160) · the tick-tail wording vs the freeze checker (TD-229) — and
-      released as a patch. → TASK-430, TASK-431, TASK-432, TASK-433, TASK-422, TASK-427
-- [ ] lean-flow's epic index holds only outcomes lean-flow executes: 006 · 008 · 009 · 011 · 012
-      closed as superseded → workdoo, with the stale rows TD-100 · TD-161 · TD-176 · TD-243 closed.
-      → TASK-434
+      released as a patch. → TASK-430, TASK-431, TASK-432, TASK-433, TASK-422, TASK-427 — closed SPRINT-125; released as
+      **2.6.0 MINOR**, not a patch (owner ruling at close: spec 0.16.0 moves adopter verdicts).
+- [x] lean-flow's epic index holds only outcomes lean-flow executes: 006 · 008 · 009 · 011 · 012
+      closed in place as superseded → workdoo (§11 cannot archive them), with the stale rows TD-100 · TD-161 · TD-176 · TD-243 closed.
+      → TASK-434 — closed SPRINT-125
 - [ ] A repo writes a phased delivery plan from a shipped template with a STANDARD row, each open
       row ends `→ TASK-NNN` or `→ next slice:`, and `/prime` + `/triage` report uncovered rows.
       → next slice: S2 roadmap + traceability
