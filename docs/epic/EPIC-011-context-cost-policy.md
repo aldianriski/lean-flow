@@ -10,7 +10,10 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 # EPIC-011 — Context & Cost Policy
 
-> **Closed 2026-10-18 — superseded → workdoo** (owner ruling, EPIC-022 D1). The platform/runtime layer this epic described is now built in the separate `workdoo` repository, and platform work executes there (ADR-041, ADR-052). Closed in place (STANDARD §11 cannot archive it: unticked Closed-when, no member sprints). Its Closed-when conditions below are **not met and will not be met here** — not delivered, superseded; the boxes are left unticked on purpose.
+> **Closed 2026-10-18 — superseded → workdoo** (owner ruling, EPIC-022 D1).
+> The platform/runtime layer this epic described is now built in the separate `workdoo` repository, and platform work executes there (ADR-041, ADR-052).
+> Closed in place (STANDARD §11 cannot archive it: unticked Closed-when, no member sprints).
+> Its Closed-when conditions below are **not met and will not be met here** — not delivered, superseded; the boxes are left unticked on purpose.
 
 > **Outcome:** memory, context and cost are governed by a **declared policy** — what is written at
 > each memory layer, what is retrieved, what a run may spend — and that policy is **enforced wherever a
