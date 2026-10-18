@@ -2,19 +2,21 @@
 epic: 011
 slug: context-cost-policy
 owner: Maintainer
-last_updated: 2026-10-07
-status: proposed
+last_updated: 2026-10-18
+status: closed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-011 — Context & Cost Policy
 
+> **Closed 2026-10-18 — superseded → workdoo** (owner ruling, EPIC-022 D1). The platform/runtime layer this epic described is now built in the separate `workdoo` repository, and platform work executes there (ADR-041, ADR-052). Closed in place (STANDARD §11 cannot archive it: unticked Closed-when, no member sprints). Its Closed-when conditions below are **not met and will not be met here** — not delivered, superseded; the boxes are left unticked on purpose.
+
 > **Outcome:** memory, context and cost are governed by a **declared policy** — what is written at
 > each memory layer, what is retrieved, what a run may spend — and that policy is **enforced wherever a
 > runtime exposes a seam, and stated as an adapter requirement wherever none exists**, never faked.
 
-> **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-006**
+> **Historical (pre-closure):** **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-006**
 > + **EPIC-008**. None has happened. Note the register's own ruling of 2026-08-24: **policy before the
 > gateway** — this epic is sequenced ahead of EPIC-012 deliberately, a judgement call closed by ruling
 > as `L-094` prescribes.

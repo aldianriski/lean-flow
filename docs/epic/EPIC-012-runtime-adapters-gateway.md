@@ -2,20 +2,22 @@
 epic: 012
 slug: runtime-adapters-gateway
 owner: Maintainer
-last_updated: 2026-10-07
-status: proposed
+last_updated: 2026-10-18
+status: closed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-012 — Runtime Adapters + Gateway
 
+> **Closed 2026-10-18 — superseded → workdoo** (owner ruling, EPIC-022 D1). The platform/runtime layer this epic described is now built in the separate `workdoo` repository, and platform work executes there (ADR-041, ADR-052). Closed in place (STANDARD §11 cannot archive it: unticked Closed-when, no member sprints). Its Closed-when conditions below are **not met and will not be met here** — not delivered, superseded; the boxes are left unticked on purpose.
+
 > **Outcome:** a **second runtime can execute a lean-flow workflow** — reached through a documented
 > adapter contract and a gateway that selects a worker, grants per-run capability, routes human gates
 > back, and breaks the circuit when a worker misbehaves — without the local plugin losing the ability to
 > run alone.
 
-> **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-008
+> **Historical (pre-closure):** **Admission — NOT met (gated register).** Admitted on **Platform Decision Gate PASSED** + **EPIC-008
 > stable** + **one concrete second-runtime use case** — a *named workflow a second worker must execute*.
 > No such workflow has been named. The register states the discriminator outright: **a protocol existing
 > is not a gateway being needed** (`00 § 5.4`, graduated infrastructure).

@@ -2,13 +2,15 @@
 epic: 006
 slug: run-evidence
 owner: Maintainer
-last_updated: 2026-08-23
-status: proposed
+last_updated: 2026-10-18
+status: closed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-006 — Run Evidence
+
+> **Closed 2026-10-18 — superseded → workdoo** (owner ruling, EPIC-022 D1). The platform/runtime layer this epic described is now built in the separate `workdoo` repository, and platform work executes there (ADR-041, ADR-052). Closed in place (STANDARD §11 cannot archive it: unticked Closed-when, no member sprints). Its Closed-when conditions below are **not met and will not be met here** — not delivered, superseded; the boxes are left unticked on purpose.
 
 > **Outcome:** every lean-flow run leaves structured, machine-readable evidence in the repo it ran in,
 > so the ADLC roadmap's operating metrics are computed from records rather than estimated, and the Run
