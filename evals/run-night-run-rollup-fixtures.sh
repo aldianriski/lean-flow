@@ -244,7 +244,7 @@ else
 fi
 
 # case 12c (must-vary-SELECTION, L-186): the IDENTICAL missing-log condition as 12a, but this
-# sprint's DoD is fully ticked (closed, awaiting archive -- check-layers-observed.sh's own "at
+# sprint's DoD is fully ticked (closed, awaiting archive -- check-layers-observed.ts's own "at
 # close" shape). The verdict must differ even though the file-existence fact does not: this sprint
 # must never reach the checker at all, because "open DoD" is the selection criterion DoD 1 states,
 # not bare log-existence. Being the sole sprint file in its scratch tree, total exclusion collapses

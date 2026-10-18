@@ -25,7 +25,7 @@
 # and two of these rules are defined over history -- PLANFROZEN diffs § Plan against `plan_commit`,
 # SCOPECHANGE reads the ORDER of two commits. Bolting git onto that suite would falsify its own
 # contract and add minutes to a harness already past six; the repo's convention for a git-backed
-# family is a sibling file (run-attestation-fixtures.sh, run-layers-observed-fixtures.sh).
+# family is a sibling file (run-attestation-fixtures.sh).
 #
 # WHY A REDUCED SPEC NOW (was: "WHY THE SHIPPED SPEC, NOT A REDUCED ONE"). The original argument --
 # every case asserts on a NAMED FINDING STRING, so other rules may fire freely, and a §9 row that

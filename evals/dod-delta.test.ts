@@ -70,7 +70,7 @@ describe("findNewTicks", () => {
   });
 });
 
-// --- attributeClaim -- ported attribution rules (mirrors check-layers-observed.sh's attribute()) --
+// --- attributeClaim -- ported attribution rules (mirrors the retired check-layers-observed.sh's attribute()) --
 
 describe("attributeClaim", () => {
   test("sprint(NNN) T<n>: -- the motivating shape", () => {
@@ -445,7 +445,7 @@ describe("commitsInRange -- finding 2: a real plan_commit..HEAD walk, not HEAD-o
   });
 });
 
-describe("frontmatterValue -- reads plan_commit the same way check-layers-observed.sh's fmv() does", () => {
+describe("frontmatterValue -- reads plan_commit the same way the retired check-layers-observed.sh's fmv() does", () => {
   test("reads a key from the leading frontmatter block only", () => {
     const doc = "---\nsprint: 300\nplan_commit: abc1234\n---\n\n# Body\nplan_commit: NOT-THIS-ONE\n";
     expect(frontmatterValue(doc, "plan_commit")).toBe("abc1234");

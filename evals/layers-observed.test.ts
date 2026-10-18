@@ -1,8 +1,8 @@
 // evals/layers-observed.test.ts -- SPRINT-110 T2 (TASK-391): retained must-FAIL fixtures for the
 // MEMBER-AWARE half of scripts/lib/check-layers-observed.ts (gate leg 15) on a by-reference ("v2")
-// sprint. The shell oracle (check-layers-observed.sh) stays a Plan-path oracle (decision D1) and is
-// NOT taught members; its own runner (run-layers-observed-fixtures.sh) still asserts it, and the
-// differential runs the port with --no-members so v1 parity holds and the exclusion is named.
+// sprint. The shell oracle (check-layers-observed.sh) and its runner were retired at SPRINT-128
+// (TASK-446); the gate runs this TS checker alone, and this file is run by
+// evals/run-layers-observed-test-fixtures.ts.
 //
 // Every must-FAIL asserts its NAMED finding and pairs with a sibling control that must stay green.
 // Fixtures build real git histories (the checker's subject is `git diff-tree` per commit) via

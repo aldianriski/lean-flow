@@ -1,12 +1,11 @@
 // evals/authority.test.ts -- retained fixtures for scripts/lib/check-authority.ts (TASK-355), ported
 // from evals/run-authority-fixtures.sh's shell-oracle cases to a single in-process Bun test file.
 //
-// WHY THIS SHAPE: the shell harness spawned `sh scripts/lib/check-authority.sh ...` once per case
+// WHY THIS SHAPE: the shell harness spawned the shell checker once per case
 // (~2.75s each under Windows fork() emulation) for a checker that is milliseconds of text matching.
 // This file calls `runCheckAuthority()` directly, in-process, the same shape evals/dod-delta.test.ts
-// and evals/doc-caps.test.ts already use. scripts/lib/check-authority.sh is UNCHANGED and remains
-// the live oracle -- differential parity against it lives in evals/run-authority-differential.ts
-// (opt-in, spawns the real shell checker), never here.
+// and evals/doc-caps.test.ts already use. The shell checker and its differential harness were
+// retired at SPRINT-128 (TASK-446); this file asserts the TS checker alone.
 //
 // Every case below is the SAME case evals/run-authority-fixtures.sh asserted, same fixture files,
 // same named findings, same sibling-discrimination pairing (L-142: a break that reddens everything

@@ -417,7 +417,6 @@ sh evals/run-task-origin-fixtures.sh           # SPRINT-055 T6
 sh evals/run-system-verify-fixtures.sh         # SPRINT-067 T1 / wired SPRINT-068 T2
 
 # opt-in selftests (slow — throwaway git repos; also run under QA_FULL=1)
-sh evals/run-layers-observed-fixtures.sh
 sh evals/run-worktree-base-fixtures.sh         # SPRINT-070 T2 / TD-054
 ```
 

@@ -547,7 +547,7 @@ else
   # (check-night-run-rollup.sh's own file-not-found guard), it just never used to be handed one. A
   # sprint whose Plan is fully ticked (closed, awaiting archive -- a transient state, not a crash)
   # is not required to carry one for THIS leg; "open DoD" reuses the exact derivation
-  # check-layers-observed.sh already uses for "is this sprint at close" (`## Plan` section,
+  # check-layers-observed.ts already uses for "is this sprint at close" (`## Plan` section,
   # `^- \[ \]` lines) rather than re-inventing it.
   nr_files=""
   for nr_sp in $(ls docs/sprint/SPRINT-*.md 2>/dev/null); do
@@ -1172,7 +1172,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
 eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts"
-eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
+eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-test-fixtures.ts run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
 # the git mv round trip (~2.5s) -- opt-in by the git-repo rule below (SPRINT-043 T1).
@@ -1200,10 +1200,9 @@ eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-fixtures.sh
 # needs a worktree genuinely behind a shared ancestor, `divergent` needs an unrelated root, and
 # hand-passed shas would test the harness rather than the guard. Costed rather than assumed: ~1.5s
 # for 3 repos + 2 worktrees on this host. Revisit if the guard ever gains a git-free leg.
-# run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
-# run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via
-# mktemp -d + git init -- the exact cost TD-016 named as the selftest-assert-* boundary (~4s for 4
-# repos on this host). Cheap-and-git-free stays always-on; git-repo-building stays opt-in (SPRINT-043 T1).
+# (The layers-observed shell checker and its runner were retired at SPRINT-128; its TS fixtures are gated by
+# run-layers-observed-test-fixtures.ts, opt-in on this rule -- real git histories, TD-016's selftest-assert-*
+# boundary.) Cheap-and-git-free stays always-on; git-repo-building stays opt-in (SPRINT-043 T1).
 # run-system-verify-fixtures.sh (SPRINT-068 T2, promoted from a nested harness -- see evals/README.md
 # "fixtures/system-verify/") joins the always-on set: it's dependency-free POSIX sh over 5 static
 # fixture logs, no git, no mktemp, measured at ~0.66s on this host -- well inside the cheap-and-git-free
@@ -1233,10 +1232,11 @@ eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-fixtures.sh
 # Harnesses deliberately NOT gated at all (neither always-on nor opt-in). Empty is a valid state --
 # but a paid/non-deterministic harness is excluded by being NAMED here with a reason, never by being
 # left out of the lists above.
-# The three remaining differential-parity harnesses (authority, doc-caps, night-run-rollup) compare a
-# ported TS checker against its retained .sh oracle row by row, so each needs BOTH implementations and
-# a real spawn per input; they live in eval_harnesses_optin above and are frozen under ADR-050 clause 3.
-# Measured 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s, night-run-rollup 44.0s (~104s).
+# The two remaining differential-parity harnesses (doc-caps, night-run-rollup) compare a ported TS
+# checker against its retained .sh oracle row by row, so each needs BOTH implementations and a real
+# spawn per input; they live in eval_harnesses_optin above and are frozen under ADR-050 clause 3. The
+# authority pair (21.2s) was retired at SPRINT-128 with its shell checker.
+# Measured 2026-09-20 on this host: doc-caps 38.8s, night-run-rollup 44.0s.
 # ADR-051 retired the fourth pair (the §4 TypeScript port against Shell); ADR-039 is superseded.
 #
 # S10 selftests + P4/P7 cut, SPRINT-113 T1 / ADR-050 (the frozen selftest-assert-* set, the layers-observed
@@ -1432,8 +1432,8 @@ fi
 # HONOURED is only checkable after a run and is the one whose false negative is invisible -- the run
 # reports success, the DoD is ticked, and nothing records that a human was skipped.
 # A MISSING class is a FAIL, never a default-to-J0: Part 0's invariant is that an unasked question is
-# a BLOCK, so the safe end is J2. Delegates to the retained checker (scripts/lib/check-authority.sh,
-# itself covered by evals/run-authority-fixtures.sh).
+# a BLOCK, so the safe end is J2. Delegates to the checker (scripts/lib/check-authority.ts,
+# covered by evals/run-authority-fixtures.sh); its shell twin was retired at SPRINT-128.
 au_script="scripts/lib/check-authority.ts"
 if ! command -v bun >/dev/null 2>&1; then
   bad "authority: bun not found on PATH -- cannot run $au_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
@@ -1502,7 +1502,7 @@ fi
 # name a file invented during implementation (TD-022). Two documents written by one author at one
 # moment are one source in two places (L-074) -- a second *authored* source closes the forgetting
 # gap, not the inventing gap. This leg delegates to a third, OBSERVED checker
-# (scripts/lib/check-layers-observed.sh, covered by evals/run-layers-observed-fixtures.sh) that
+# (scripts/lib/check-layers-observed.ts, covered by evals/layers-observed.test.ts via run-layers-observed-test-fixtures.ts) that
 # diffs the actual git state since the sprint's recorded `plan_commit:` against the union of every
 # task's declared `Layers:` -- it reads history rather than intent, so it cannot be forgotten the
 # way a second sentence can. Fails toward over-reporting, same as leg 14.
@@ -1558,13 +1558,13 @@ fi
 # evals/run-dod-delta-fixtures.sh in the always-on set above.
 #
 # Checks the RANGE `plan_commit..HEAD` per active sprint doc, sourced from each doc's own frontmatter
-# exactly as leg 15's check-layers-observed.sh already does (its `for c in $(git rev-list
+# exactly as leg 15's check-layers-observed.ts already does (its `for c in $(git rev-list
 # "$plan_commit..HEAD")`) -- reusing $lo_files rather than re-globbing. An adversarial review of the
 # first shipped shape (HEAD-only) found the premise wrong: this repo's gate does not run after every
 # single commit -- this very sprint landed a sibling task's commit plus several coordinator commits
 # between gate runs, and HEAD-only would leave all of them permanently unexamined (finding 2 of the
 # ca577e9 review). A commit the checker cannot attribute to exactly one task (a coordinator commit, an
-# unscoped multi-task token, or no sprint at all) is exempt by role, mirroring check-layers-observed.sh's
+# unscoped multi-task token, or no sprint at all) is exempt by role, mirroring check-layers-observed.ts's
 # own COORD exemption -- printed via `note`, never silently absent (L-020).
 if ! command -v bun >/dev/null 2>&1; then
   bad "dod-delta: bun not found on PATH -- cannot run scripts/lib/check-dod-delta.ts. This FAILS rather than skipping on purpose, same rule as the typecheck leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"

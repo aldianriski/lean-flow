@@ -525,7 +525,7 @@ command text contained the literal substring `sprint-bulk` — stale from before
 renamed the canonical mode to `overnight` and made `sprint-bulk unattended` one alias among four.
 Firing the now-documented canonical form (`--mode overnight`, or a trigger that never says the
 word "sprint-bulk") satisfied the mode-signal gate and then silently skipped the reaper anyway: no
-`terminal ·` line was ever written, and `check-authority.sh` (SPRINT-093 T5) trusts that line as
+`terminal ·` line was ever written, and `check-authority.ts` (SPRINT-093 T5) trusts that line as
 its only unattended-mode signal — reproduced live, a genuinely unattended, unparked J2 task read
 as an attended completion. Fixed by removing the second, hand-copied alias test rather than
 extending it: the mode-signal gate is the one place that vocabulary is allowed to live.

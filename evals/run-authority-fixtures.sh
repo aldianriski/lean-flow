@@ -5,10 +5,10 @@
 # construction -- the run reports success, the DoD is ticked, and nothing anywhere records that a
 # human was skipped.
 #
-# check-authority.ts is TypeScript run by Bun (TASK-355 -- ported off scripts/lib/check-authority.sh,
-# which stays UNCHANGED as the live ORACLE, never deleted), so this harness is a thin `bun test`
+# check-authority.ts is TypeScript run by Bun (TASK-355 -- ported off a shell checker, retired at
+# SPRINT-128), so this harness is a thin `bun test`
 # wrapper -- the same shape run-dod-delta-fixtures.sh and run-doc-caps-fixtures.sh already use. Where
-# the shell-oracle harness spawned `sh scripts/lib/check-authority.sh` once per case (~2.75s each
+# the shell-oracle harness spawned the shell checker once per case (~2.75s each
 # under Windows fork() emulation), evals/authority.test.ts calls the checker's exported
 # `runCheckAuthority()` directly, in-process, for every case in ONE Bun process. A missing runtime
 # FAILs rather than skips (TD-101/ADR-037): a skip is indistinguishable from a pass.
@@ -30,18 +30,10 @@
 # SPRINT-118 T1 (TD-124) added TWO more, both about the launcher-written `fired · ` line: fired-unattended
 # (a J2 task executed, log carries a column-1 `fired · ` line and NO `terminal ·` and NO envelope -- must
 # FAIL authority-j2-not-parked) and its sibling control fired-fenced-attended (the same line only inside a
-# bare fence -- stays attended, PASS). The shell oracle is frozen (ADR-050 §3) and cannot read the line.
+# bare fence -- stays attended, PASS). The retired shell checker could not read the line.
 #
-# Differential parity against the shell oracle lives in evals/run-authority-differential.ts (opt-in,
-# spawns the real `sh` checker over every fixture PLUS every real archived/active sprint doc this
-# repo has) -- never here; this harness's whole point is that it does NOT spawn. STATED HONESTLY
-# (outside-review correction): of that harness's compared inputs, only the 11 fixtures (10 original +
-# active-sprint-mixed) exercise the real DECLARED/HONOURED/BYPASSED logic. Every archived sprint doc
-# carries `status: closed` and returns on evaluateSprintFile's closed-status check BEFORE any of that
-# logic runs -- real input, but a CONFIRMED-TRIVIAL two-line early-return path, not a second
-# independent proof of the branches. Read that harness's own report as "11/11 real-logic fixtures
-# identical, plus N confirmed-trivial-path inputs (archived sprints + zero-args) also identical",
-# never as "N/N" standing for N independent proofs of the same weight.
+# The shell oracle and its differential harness (evals/run-authority-differential.ts) were retired at
+# SPRINT-128 (TASK-446): the gate ran only the TS checker, so every TS change had to be mirrored.
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
