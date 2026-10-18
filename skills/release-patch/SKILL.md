@@ -28,7 +28,7 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 
 | Detected file | Mode | Bump target |
 |---|---|---|
-| `.claude-plugin/plugin.json` | plugin | lockstep with `marketplace.json` (both must stay equal) |
+| `.claude-plugin/plugin.json` | plugin | lockstep set **derived**: every `*-plugin/*.json` carrying `"version"` (`grep -l '"version"' .*-plugin/*.json`) — all must stay equal |
 | `package.json` | npm | `version` field |
 | `pyproject.toml` | python | `[project]` or `[tool.poetry]` `version` |
 | `Cargo.toml` | cargo | `[package] version` |
@@ -40,7 +40,8 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 
 1. **Diff scan** — `git diff --name-only HEAD~1 HEAD` (or `HEAD` if uncommitted). **At sprint close → scan the whole sprint range `plan_commit..HEAD`** (read `plan_commit` from the just-closed sprint frontmatter) — else a multi-commit sprint is misjudged by its docs-only close commit. If every changed path is under `docs/`, abort: `[skip] docs-only diff — no version bump`. Exit.
 2. **Mode detect** — run the cascade; save the mode + manifest path(s). No manifest → **changelog-only mode** (below); do not exit.
-3. **PATCH bump** — increment the patch digit per mode. Plugin: verify both files are equal, then bump both. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
+3. **PATCH bump** — increment the patch digit per mode. Plugin: derive the lockstep set, verify every file agrees, then bump all together. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
+3b. **Sibling references** — `git grep -nF '<old>'` (tracked text files); list the hits and bump every one that states the **current** version and that the project lints or displays (README footer/badge, a sibling manifest). Never CHANGELOG history, never another project's version. Report each in `[siblings]`.
 4. **CHANGELOG entry** — detect root `CHANGELOG.md` (canonical placement, STANDARD §2, ADR-012), else legacy `docs/CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` (default root `CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
 5. **Stale-doc clear** — any doc with `last_updated:` frontmatter that appears in the diff → bump it to today (`yyyy-MM-dd`).
 6. **HARD STOP — push gate** — emit the message below and exit (if `docs/deployment/deployment-guide.md` exists — legacy `docs/DEPLOY.md` still matched — point to it for the push / deploy / verify / rollback steps). **This skill never invokes `git push`.**
@@ -60,7 +61,8 @@ Deploy steps: docs/deployment/deployment-guide.md (push · verify; rollback → 
 === RELEASE-PATCH ===
 [mode]      <plugin | npm | python | cargo | go | flat>
 [diff]      <N> files changed
-[bump]      <manifest>: 2.3.0 → 2.3.1  (both paths if plugin)
+[bump]      <manifest>: 2.3.0 → 2.3.1  (all lockstep manifests if plugin)
+[siblings]  <file:line bumped, or none>
 [changelog] entry prepended for v2.3.1
 [stale]     <N> docs touched; last_updated bumped
 [push]      HARD STOP — manual git push required
@@ -85,14 +87,14 @@ Gives manifestless repos (no `package.json` / `VERSION` / etc.) the changelog va
 
 ## Constraints
 
-- **Plugin lockstep**: `plugin.json` + `marketplace.json` versions MUST stay equal — never bump one without the other.
+- **Plugin lockstep**: every `*-plugin/*.json` manifest carrying `"version"` MUST stay equal — never bump a subset.
 - CHANGELOG format follows the detected file's existing entries verbatim — never invent a new shape.
 - The push gate is a hard text emit; exit immediately after.
 - Run the cascade every invocation — never hardcode the mode.
 
 ## Red flags
 
-❌ **Bumping `plugin.json` without `marketplace.json`** (or vice versa) — breaks the lockstep contract.
+❌ **Bumping a subset of the `*-plugin/*.json` manifests** — breaks the lockstep contract.
 ❌ **Skipping the diff check** — noisy version churn for docs-only commits.
 ❌ **MINOR / MAJOR bumps** — out of scope; those are governance-level decisions.
 ❌ **Invoking `git push`** — the skill stops at the gate, always.
