@@ -184,3 +184,19 @@ and `conformance.sh` was declared on Cites.
 reusing the name. That was outside its remit and is unrecoverable from here. It has since used unique temp names.
 Ticks via `tick-box` (5/5).
 QA_FULL on the VPS at `496b1c76`: **QA-CHECK: 304 pass, 0 fail**, rc 0.
+
+### 2026-10-19 | T5 | TASK-447 — the live freeze and declaration edges; merged `5bdc3131` (`57015df5`, `c2490632`, R1 fix `1ad6227e`); done
+Worktree-base guard PASS (`abc25615`). Every Shell frontmatter reader in the engine, `check-handoff-state.sh` and
+`check-research-archive.sh` strips a trailing CR itself (TD-131). Its CRLF twin fixtures run through a `BINMODE=3` awk shim, because
+this host's gawk folds CRLF and hid the defect. A member `## Done when` edit is covered only by a scope-change present as of its
+commit, walked over the baseline's descendants only (TD-205); census over 127 archived sprints: 5 covered edits, 0 covered only later.
+`layers-token-matches-nothing` (TD-177) fires in layers-observed only for a Tn whose leading-run members are all `done/`/`cancel/`,
+against the tree at HEAD plus every path the range changed, merge diffs and both rename sides included. The shipped dispatch preflight
+names a column-0 wrap, with the same err-loud remedy the TS checkers give (TD-138's shipped side).
+Proof: the `conformance.sh` A/B is identical, and the coordinator's post-merge run is rc 0 with 0 FAIL. Seeds C1a–c (CR strip) · C2
+(late scope-change) · C3 (no dead tokens) · C4 (preflight drop) · C5 (`--ancestry-path`) · C6 (`-m`) each reddened only their case;
+the coordinator re-seeded C1b in the engine independently (only `crlf-wellformed-passes` reddened). Full by-reference 158/0.
+Review: Codex R1 found 2 merge-commit gaps. Ordering could take an old DoD from a side branch forked before the baseline, and the
+dead-token scan skipped merge diffs. Both are live here, since every task merges `--no-ff`. Fixed in `1ad6227e`; R2 CLEAR.
+Builder residuals for close: `_att_fmv_stdin` (§13b) strips CR but has no CRLF fixture; `_own_scan` / `_own_governed_off` are covered
+by twins but were not seeded. Ticks via `tick-box` (5/5).
