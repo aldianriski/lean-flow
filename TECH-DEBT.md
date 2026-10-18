@@ -367,6 +367,18 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-254** severity: low | status: open | created: Sprint-127 (close; owner ruling at intake)
+  - Summary: **No conformance rule reads the git-less freeze.** Without git, the frozen text is the promote entry's snapshot
+    (ADR-054), and `S9.PLANFROZEN` / `S9.SCOPECHANGE` only report "history unavailable". The freeze holds only if the procedure is
+    followed, and an edited past log entry passes unseen.
+  - Fix direction: an engine rule that diffs each member's `## Done when` against its promote-entry block, built when the first
+    git-less adopter needs a tool rather than a reader to hold the freeze.
+- **TD-253** severity: low | status: open | created: Sprint-127 (close, T5 finding F1)
+  - Summary: **An adopter who already has a hand-rolled delivery table ends up with two copies of it.** workdoo's roadmap was rendered
+    from its persistence plan's table, which stays as it was, so the sequence now lives in two files. The template says nothing about
+    adopting from an existing table, and `migrate` has no mapping for one (out of scope at SPRINT-126).
+  - Fix direction: the template (or `migrate`) states that the roadmap becomes the sequence's single home and the source table
+    becomes a pointer, with the source owner's approval.
 - **TD-252** severity: trivial | status: open | created: Sprint-125 (close, wave B Codex B6)
   - Summary: **`.claude/CONTEXT.md:104` (the sprint-model bullet) is one line over 400 chars.** It was already over before SPRINT-125;
     T3 lengthened it ("created at promote …"). It sits under its prose-density baseline (16 dense lines), so the gate stays green and

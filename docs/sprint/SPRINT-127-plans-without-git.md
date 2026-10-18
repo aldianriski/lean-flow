@@ -4,7 +4,7 @@ slug: plans-without-git
 epic: EPIC-022
 owner: Maintainer
 last_updated: 2026-10-18
-status: active
+status: closed
 plan_commit: c861a339
 gates_signed: G1,G2 @ 23299244
 update_trigger: sprint execute/close events
@@ -126,5 +126,50 @@ This is the consumer itself rather than a scratch copy. Its findings are recorde
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `templates/TASK.md.template`, `task-file.md`, `docs/work/README.md`, `orchestrator/SKILL.md`, `README.md`, `run-v1-to-v2-fixtures.ts` | T1 | task-level `gates_signed` + `## Approved design`; `plansDirectory` as a MAY | Low | v1-to-v2 101/0 · git-less scratch, owner popup · Codex R1→R2 |
+| `docs/adr/ADR-054-…`, `DECISIONS.md`, `knowledge-index.md`, `spec/STANDARD.md` · `spec/CHANGELOG.md` (0.18.0) | T2 | the git-less freeze; the S9.GATESWELLFORMED behaviour change recorded | **Med** (spec semantics) | conformance A/B · Codex R1→R2 |
+| `conformance-engine.sh`, `run-gates-signed-fixtures.sh`, `sprint-by-reference.md`, `lean-doc-generator/SKILL.md`, `SPRINT.md.template`, `dispatch.md`, `triage/SKILL.md`, both READMEs | T3 | no-git forms of every lifecycle step; date form accepted only without git | **Med** (engine rule an adopter gates on) | seeds M1–M3 (M1 re-seeded) · git-less scratch lifecycle · Codex R1→R2 |
+| `scripts/lib/tick-box.ts`, `run-tick-box-fixtures.ts`, `qa-check.sh` (one list entry), `dispatch.md` rule 5 | T4 | the tick step runs the gate's own checkers | Low | must-FAIL + control · sanity break · real run |
+| workdoo (outside this repo): `docs/product/roadmap.md`, `docs/work/done/TASK-046-…` | T5 | the consumer exercise | Low | cells diffed · sha256 · seeded coverage control |
+| `.claude/CONTEXT.md`, `docs/architecture/overview.md` | close | doc-freshness (owner) | Low | caps · prose-density |
+| 4 manifests, README footer, `CHANGELOG.md`, `docs/changelog/CHANGELOG-2.6.0.md` | close | release 2.8.0 | Low | lockstep PASS · rotation diffed verbatim |
 
 ## Retro
+
+**Retrieval check** — yes, three promoted rules recurred. **L-224** in a new mode: every per-write re-check used the gate's own
+checker, but only in its default mode, and the gate also runs it with `--scope-change`, which reads the log. A scope-change entry
+that named two files as out of scope FAILed system verify (299/1). **L-166**: tick-box's first real run skipped its checks because
+the stamp regex took `127` while members carry `SPRINT-127`, and the fixtures used the shape the author expected. **L-219**: a
+bare `cd` into the T3 worktree for an independent re-seed made the harness adopt it; T4 then ran in the main tree, so nothing
+branched from a stale tip.
+
+**Cost** — coordinator + 3 builders (T1 · T3 · T4) + one Codex reviewer across 6 rounds (`gpt-6-astra`; the account rejects the
+default model, so `--model` is now explicit). Sub-agent spend ≈ 0.34M tokens (T1 79k · T3 129k · T4 94k · Codex ~39k) for 5
+members ≈ 68k per member. T2 and T5 ran inline. Two `QA_FULL` runs on the VPS (299/1, then 300/0).
+
+**Worked**
+- Recon before G2 found three gaps in the frozen Plan: A3 was only half true, the engine FAILed the planned date form, and README
+  named the freeze. All three were ruled in the G2 popup round, and none surfaced mid-build.
+- Codex found a real gap in every shipped task. The task-level field read as mandatory (T2), the date lacked its no-git qualifier
+  (T1), and two close/triage sentences stayed git-only (T3). Each was fixed in one round, and R2 was CLEAR every time.
+- The second query earned its keep twice on the coordinator's own work. A status census by a different route showed every workdoo
+  row as `planned`, and `cmp` showed an independent M1 seed had not landed.
+- T5 ran on the consumer itself and returned two findings the scratch runs could not: the duplicated sequence, and workdoo's pinned
+  2.5.0.
+
+**Friction**
+- System verify failed once, on a log entry. The scope-change checker reads every path a scope-change body names, the out-of-scope
+  ones included, which is SPRINT-126's Cites friction again, now at the cost of a gate run.
+- A status-move commit carried `sprint(127) T2:` and leg 15 reddened on `done/`; moves are coordinator commits (CONTEXT § Sprint
+  model). Caught locally.
+- Host memory pressure reaped the local waiter for the VPS gate; the remote run was unaffected.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- None new: all three are sightings of promoted rules (L-224 ×7 · L-166 · L-219), bumped at this close. L-224's new mode is now
+  half-automated: tick-box covers ticks, but a log write still needs `--scope-change` re-run by hand.
+
+**Owner actions**
+- Push `main` (release 2.8.0 is committed, not pushed).
+- workdoo: bump its pinned lean-flow to 2.8.0 / spec 0.18.0, so its own `/prime` reports roadmap coverage (finding F2).
+- 8 leftover agent worktrees under `.claude/worktrees/` were kept for review: `a08b86` and `aed338` are locked; `a5535`, `a8ac44` and
+  `ac3204` hold unmerged commits; `a8cc1f`, `a8d190` and `ace6ce` hold uncommitted files.

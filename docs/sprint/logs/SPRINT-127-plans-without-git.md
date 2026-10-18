@@ -208,3 +208,15 @@ The local waiter for the gate result was stopped by the harness for host memory 
 ### 2026-10-18 | system-verify | QA_FULL on the VPS at `3e29000c`: **QA-CHECK: 300 pass, 0 fail**, rc 0
 Bundled `9f7b1305..main`; the VPS clone was detached at `3e29000c`, equal to local HEAD. This is the final integrated tree. The
 count is one more pass than the failed run, since the scope-change leg is now green.
+
+### 2026-10-18 | close | 5 of 5 members in `done/` (close gate 12/0), PLAN_EXHAUSTED; released 2.8.0 (`8aae151e`); Retro + buckets
+run · 18 of 18 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 300/0 on the VPS at `3e29000c` (the first run, 299/1, is logged above with its fix). Release 2.8.0 MINOR:
+4 manifests in lockstep, the README footer, the CHANGELOG, and v2.6.x rotated verbatim to `docs/changelog/` (§11, owner-approved).
+Doc-freshness (owner-approved): the CONTEXT Flow line names the git-less snapshot (399 chars, still 150 lines), and the overview
+gives spec v0.18.0. Buckets: Shipped → CHANGELOG v2.8.0 · Tech debt → TD-253 (adopting from a hand-rolled table duplicates it) ·
+TD-254 (no engine rule reads the git-less snapshot; owner-ruled debt) · Follow-ups → none in lean-flow (workdoo's pin bump is that
+owner's action) · Learnings → sighting bumps on L-224 (×7, the `--scope-change` mode), L-166 and L-219, and no new entry. EPIC-022:
+Closed-when 5 · 6 · 8 ticked, 7 of 8; condition 7 (S4 planning debt) stays open, so the epic stays active. Handoff ledger: no
+`handoff` entry was taken this sprint.
