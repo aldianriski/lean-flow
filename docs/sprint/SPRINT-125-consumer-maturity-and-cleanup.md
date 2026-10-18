@@ -47,6 +47,9 @@ Layers: `docs/epic/` · `docs/epic/archive/` · `docs/epic/INDEX.md` · `docs/re
   · `docs/work/in_progress/TASK-434-retire-the-platform-epics-workdoo-now-owns.md`
 Depends-on: none
 Cites: `TASK-434` · EPIC-022 D1 · ADR-052 · ADR-041 · `TECH-DEBT.md` (coordinator-written, D1)
+  · named by the 2026-10-18 Plan-meta scope-change, whose heading cites TASK-434 though these belong to T3 · T7 · D1, not touched
+    by T1: `CHANGELOG.md` · `evals/` · `skills/handoff/SKILL.md` · `.claude/CONTEXT.md` · `spec/STANDARD.md` · `spec/CHANGELOG.md`
+    · `docs/architecture/overview.md`
 
 Owner ruling 2026-10-18 (D1). Governance-file work, Tier P. The `retain` disposition on the sequencing file named EPIC-015's close
 as its revisit point, and that has happened.
@@ -54,14 +57,14 @@ as its revisit point, and that has happened.
 **Acceptance:** `docs/epic/` holds only EPIC-005 · 007 · 022 as live epics, and the four stale or moved TD rows read resolved
 with their evidence.
 
-### T2 — Make the tick wording match the freeze checker `[size: S · risk: low · class: execution · HITL · J1]`
+### T2 — Make the tick wording match the freeze checker `[size: S · risk: low · class: execution · HITL · J2]`
 Layers: `skills/orchestrator/references/dispatch.md` · `skills/lean-doc-generator/references/sprint-by-reference.md`
   · `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/`
   · `docs/work/todo/TASK-427-make-the-tick-rule-and-the-freeze-checker-agree-on-the-tail.md`
   · `docs/work/in_progress/TASK-427-make-the-tick-rule-and-the-freeze-checker-agree-on-the-tail.md`
 Depends-on: none
 Cites: `TASK-427` · ADR-047 · ADR-053 · TD-229 · `scripts/lib/check-sprint-by-reference.ts` (read, not edited)
-  · bare names as the member's Done when spells them: `check-sprint-by-reference.ts` · `dispatch.md` · `sprint-by-reference.md`
+  · bare names as the member's Done when spells them: `check-sprint-by-reference.ts` · `dispatch.md` · `sprint-by-reference.md` · `run-by-reference-fixtures.ts`
 
 The wording moves and the checker stays (owner ruling), so adopters see no verdict change. The retained case pair proves that
 the placement the wording names is the one the checker accepts.
@@ -69,7 +72,7 @@ the placement the wording names is the one the checker accepts.
 **Acceptance:** a multi-line box ticked where the references say passes the freeze checker, and a tail placed anywhere else
 still FAILs.
 
-### T3 — Create the Execution Log at promote `[size: S · risk: low · class: decision · HITL · J1]`
+### T3 — Create the Execution Log at promote `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/lean-doc-generator/templates/sprint-log.md.template`
   · `skills/lean-doc-generator/references/sprint-by-reference.md` · `skills/lean-doc-generator/SKILL.md`
   · `skills/handoff/SKILL.md` · `.claude/CONTEXT.md` · `evals/run-night-run-rollup-fixtures.sh` · `evals/fixtures/night-run-rollup/`
@@ -77,7 +80,7 @@ Layers: `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/lean
   · `docs/work/todo/TASK-422-reconcile-the-sprint-templates-lazy-log-with-the-rollup-gate.md`
   · `docs/work/in_progress/TASK-422-reconcile-the-sprint-templates-lazy-log-with-the-rollup-gate.md`
 Depends-on: T2 (`sprint-by-reference.md`)
-Cites: `TASK-422` · TD-160 · ADR-014 · `scripts/lib/check-night-run-rollup.ts` (read, not edited)
+Cites: `TASK-422` · TD-160 · ADR-014 · `scripts/lib/check-night-run-rollup.ts` (read, not edited) · `run-night-run-rollup-fixtures.sh`
 
 Owner ruling: promote renders the log and the check stays as it is. This sprint is the first rendered that way.
 
@@ -143,7 +146,7 @@ Layers: `skills/lean-doc-generator/references/migration-map.md` · `evals/run-v1
   · `docs/work/todo/TASK-433-make-migrate-withhold-incomplete-task-files-every-run.md`
   · `docs/work/in_progress/TASK-433-make-migrate-withhold-incomplete-task-files-every-run.md`
 Depends-on: none
-Cites: `TASK-433` · TD-217 · TD-204 · L-007
+Cites: `TASK-433` · TD-217 · TD-204 · L-007 · `run-v1-to-v2-fixtures.ts`
 
 G2 rules the mechanism: a post-write checklist in prose, or a shipped check. TD-204 says adopters may not have bun, and the
 step must work in a repo that has no `scripts/`.

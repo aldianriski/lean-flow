@@ -224,3 +224,25 @@ prose-density pass. Box 2 is exercised by this sprint's own release. Codex T9 pa
 ### 2026-10-18 | close-prep | CHANGELOG SPRINT-125 block written (`4a29e70f`); box 3 ticked on TASK-422 · 428 · 432; TASK-430 box 1
 TASK-422 · 428 · 432 have every box ticked and a CLEAR Codex verdict (wave B, and T7 R2), so they move `review/ → done/`.
 TASK-430 waits in `in_progress/`: its Codex pass is pending, and box 2 needs the real release.
+
+### 2026-10-18 | system-verify | QA_FULL on the VPS at `d1dc165b`: 295 pass, 4 fail — close blocked (ADR-021)
+1. The orchestrator-store text contract pins "**The script follows this contract (TASK-392).**" in night-run.md, and T4 had reworded
+   it. Restored with T4's intent kept (`sprint(125) T4:` commit); the store harness reads 42/0.
+2. Layers completeness: the coordinator's tick tails named harness files by bare name, and those names are absent from the blocks'
+   `Cites:`.
+3. Scope-change layers: the "Plan meta corrected" entry names TASK-434 in its heading, so the checker attributes all of its paths
+   (which belong to T3 · T7 · D1) to T1.
+4. Authority: the T2 and T3 Plan headers declare J1, while members TASK-427 and TASK-422 declare J2.
+Fixes 2–4 are the Plan-meta scope-change below. Re-verify on the VPS after them.
+
+### 2026-10-18 | scope-change | T1 T2 T3 T8 Plan meta after system verify: J2 on T2/T3, bare harness names on Cites, T1 attribution note
+**What broke.** See the system-verify entry above, findings 2–4.
+**Impact.** These are Plan meta edits only; no member's `## Done when` changes.
+- T2 and T3 headers move J1 → J2, matching their members (the safe end; both ran attended).
+- T2 `Cites:` gains `run-by-reference-fixtures.ts`.
+- T3 `Cites:` gains `run-night-run-rollup-fixtures.sh`.
+- T8 `Cites:` gains `run-v1-to-v2-fixtures.ts`.
+- T1 `Cites:` gains a note naming the paths the earlier Plan-meta entry listed, cited only because that entry's heading names
+  TASK-434: `CHANGELOG.md` · `evals/` · `skills/handoff/SKILL.md` · `.claude/CONTEXT.md` · `spec/STANDARD.md` · `spec/CHANGELOG.md`
+  · `docs/architecture/overview.md`.
+**Re-confirm G2.** This adds no scope. It brings the declarations in line with what was already ruled and built.
