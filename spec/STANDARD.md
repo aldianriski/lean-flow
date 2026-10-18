@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-10-18
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.17.0
+version: 0.18.0
 status: current
 ---
 
@@ -580,6 +580,14 @@ Close requires every member in `docs/work/done/` or `docs/work/cancel/`; it coun
 TASK id, so a later folder move does not matter — is the approved text. Git already holds it, so no
 copy or hash is stored beside it. Ticking a box and the ` ✓ <evidence>` a tick appends are not edits.
 
+**Without git, the freeze is a snapshot (ADR-054).** A repository is git-less when `git rev-parse --git-dir`
+fails at its root; nothing declares it. There, `promote` copies each member's `## Done when` verbatim into
+the log's `promote` entry, one block per member headed by its TASK id, and sets `plan_commit: none (no git)`.
+That block is the approved text, compared exactly as above, and a `scope-change` entry counts only when it
+comes after the `promote` entry. The rest takes its no-git form: a status move is a plain file move,
+`gates_signed:` carries a date instead of a sha (below), and close records
+`close_commit: none (no git) · closed <YYYY-MM-DD>`. Everything else in this section is unchanged.
+
 The Plan and every member's `## Done when` stay frozen at promote; a mid-sprint scope shift is logged
 as a `scope-change` entry in the log file (what broke · impact · re-confirm G2) **before** either is
 edited.
@@ -588,10 +596,13 @@ edited.
 
 ```
 gates_signed: <GATE>[,<GATE>...] @ <sha>      e.g.  gates_signed: G1,G2 @ 1f0c012
+gates_signed: <GATE>[,<GATE>...] @ <date>     e.g.  gates_signed: G1,G2 @ 2026-10-18   (no git only)
 ```
 
-It records which gates a human approved and the commit they approved against. Three properties carry
-the weight:
+It records which gates a human approved and the commit they approved against; a git-less repository has
+no commit, so it records the date (`YYYY-MM-DD`), and a date in a git repository is malformed. A task
+signed outside any sprint carries the same field in its own frontmatter (schema: `work/README.md`).
+Three properties carry the weight:
 
 - **Omit it until the gates are actually signed.** A missing `gates_signed:` means **NOT SIGNED** and
   must never be read as approval. An unfilled template placeholder is absence, not a value.
@@ -620,11 +631,11 @@ answer; the field or the git object is.
 |---|---|---|---|
 | `S9.TWOFILES` | Structural | mechanical | both paths exist; `wc -l` on the Plan (400 **hard**) |
 | `S9.LOGDIR` | Structural | mechanical | path shape — load-bearing, the sprint glob is non-recursive |
-| `S9.GATESWELLFORMED` | Gated | mechanical | the `gates_signed:` frontmatter field |
+| `S9.GATESWELLFORMED` | Gated | mechanical | the `gates_signed:` frontmatter field (a sha; a date only when the tree is not a git repository) |
 | `S9.GATESABSENT` | Gated | mechanical | field absent ⇒ **NOT SIGNED**, never approval |
 | `S9.GATESINFILE` | Gated | restated | the same field — a session transcript is unreadable to any tool, which is the point |
 | `S9.GATESMALFORMED` | — | **implementation-directed** | constrains the *reader*: report it, never default either way |
-| `S9.PLANFROZEN` | Gated | split | mechanical via git (did § Plan change after `plan_commit`?); whether a change was legitimate is not |
+| `S9.PLANFROZEN` | Gated | split | mechanical via git (did § Plan change after `plan_commit`?); whether a change was legitimate is not. Without git, the promote-entry snapshot, read by the procedure (no engine rule yet) |
 | `S9.SCOPECHANGE` | Gated | split | the two commits' order is mechanical; "was this a scope shift?" is not |
 | `S9.VERIFYCLAUSE` | Gated | mechanical | the `*Verify: …*` clause's presence on the criterion line |
 | `S9.JUDGMENTTICK` | Gated | judgment-only | — |

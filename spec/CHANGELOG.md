@@ -9,6 +9,25 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.18.0 — 2026-10-18
+
+**MINOR (§15) — a repository without git can now run the sprint lifecycle. No git repository's verdict moves.**
+§15's test (could a repository that conformed now fail?) answers no. Every new sentence applies only when
+`git rev-parse --git-dir` fails, and the one verdict change moves a git-less tree's dated `gates_signed:` from fail to pass.
+Decided in ADR-054 (SPRINT-127; TASK-440). Consumer evidence: the first outside consumer has no git, and recorded its gates as
+dated prose because the freeze and the sign-off both required a commit.
+
+- **§9**: a **Without git, the freeze is a snapshot** paragraph. `promote` copies each member's `## Done when` verbatim into
+  the log's `promote` entry and sets `plan_commit: none (no git)`; a `scope-change` entry counts only after that entry. Status
+  moves are plain file moves, and close records `close_commit: none (no git) · closed <YYYY-MM-DD>`.
+- **§9**: `gates_signed:` takes `@ <YYYY-MM-DD>` in a git-less repository, and a date in a git repository stays malformed. A task
+  signed outside any sprint carries the same field in its own frontmatter.
+- **§9 table**: `S9.GATESWELLFORMED`'s artifact cell names the date form, and `S9.PLANFROZEN`'s names the snapshot as where the
+  frozen text lives without git. No engine rule reads the snapshot yet (ADR-054 decision 5).
+
+Rule ids, levels, marks and the `evals/fixtures/compat/` snapshot are untouched (ADR-034). `S9.GATESWELLFORMED`'s acceptance
+widens for git-less trees only, under ADR-034's behaviour-change rule (owner ruling, SPRINT-127 G2).
+
 ## 0.17.0 — 2026-10-18
 
 **MINOR (§15) carrying MAJOR meaning at `0.x` — a new §2 placement row makes `S2.R-PLACEMENT` flag a misplaced roadmap, so verdicts can move pass → fail.**
