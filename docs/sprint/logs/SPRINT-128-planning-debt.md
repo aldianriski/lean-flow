@@ -91,3 +91,24 @@ Post-merge: layers-observed, completeness, freeze (6/0) and scope-change (7/0) c
 duplicate-id check empty. QA_FULL launched on the VPS at `53b886d0` for box 3.
 QA_FULL on the VPS at `53b886d0`: **QA-CHECK: 304 pass, 0 fail**, rc 0. It covers every always-on leg, so the bare profile too. Box 3 is
 ticked on it. All three ticks went through `tick-box.ts` (freeze 6/0, layers 15/0 after each write).
+
+### 2026-10-18 | T1 | TASK-443 — one shared Plan parser; merged `868765ea` (`63105338`, R1 fix `c3465f68`, owner ruling `8876eef7`); done
+Worktree-base guard PASS (`beb9d90d`). `parsePlan()` in `sprint-members.ts` is the one Plan reader, and both Layers checkers read
+through it with their own extractors, token and heading regexes deleted. A column-0 continuation is a named anomaly in both. A
+Done-when bare filename matches by basename when exactly one declared path has it (ambiguous is named; TD-178 · TD-215). A
+`sprint(NNN) Tn:` commit attributes only for its own sprint (TD-248). The twin-oracle comments are gone from both files.
+Proof (consequential G): an old-vs-new projection over 145 Plans (127 archived, the live sprint, fixtures) shows 0 differences in
+blocks, tokens, Cites, Depends-on or anomalies. The completeness CLI is byte-identical apart from the reworded finding. Observed's
+CLI was compared on the live sprint only, since an archived run takes ~7 min; the projection covers its Plan reading. Seeds S1 (drop
+the anomaly) · S2 (any basename match) · S3 (ignore NNN) · P1a/P1b · err-loud each reddened exactly their cases. The coordinator
+re-seeded S1 independently and got the same 54/4. A first malformed seed threw rather than dropping, and was discarded and redone.
+Review: Codex `gpt-6-astra` R1 found 4 items.
+- P1: a non-task `###` changed observed's reading. The old checkers disagreed, so `carry` keeps each one's own. Fixed.
+- P2: a backtick-led prose line after a declaration is flagged. **Owner ruling: err loud.** In the archive, strict token-only made
+  2 real annotated wraps silent drops, against 2 prose lines it would spare. The finding now gives the remedy instead.
+- P3: no change; an exact path precedes the basename fallback.
+- P5: settled by grep; the deleted functions have no outside callers.
+R2 CLEAR. Post-merge: layers-observed / completeness / freeze / scope-change clean, tsc rc 0, suites 68/0, the observed wrapper 27-case
+floor green, preflight green, promote-check 16/0. Builder residuals for close: TD-178's Plan-prose leg still compares literally; the
+`(SPRINT-N Tn)` trailing form still ignores N; the parser no longer joins a backtick span broken across lines (0 in the corpus).
+Ticks via `tick-box` (5/5; freeze 6/0, layers 15/0 after each).
