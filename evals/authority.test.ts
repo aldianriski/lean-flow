@@ -229,4 +229,24 @@ describe("check-authority.ts -- retained fixtures", () => {
     const r = run("member-only-no-plan/docs/sprint/SPRINT-917-fx.md");
     expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-918 \(docs\/work\/done\/TASK-918-valid\.md\) authority: J1$/m);
   });
+
+  // --- SPRINT-128 T2 (TASK-444, TD-199): a Cites: id governs only in the LEADING run; a ### T3a heading is a task ---
+
+  test("leading-run case (must-FAIL): a member that LEADS its Cites line is governed -- T2 (J1) vs TASK-920 (J2) mismatches", () => {
+    const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
+    expect(r.exitCode).toBe(1);
+    expect(r.text).toContain("T2 Plan declares J1, member docs/work/todo/TASK-920-beta.md (TASK-920) declares J2");
+  });
+
+  test("leading-run sibling (L-142 discrimination): a member named only by a LATER mention governs nothing, so TASK-919 (J2) under T1 (J1) stays PASS", () => {
+    const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
+    expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-919 \(docs\/work\/todo\/TASK-919-alpha\.md\) authority: J2$/m);
+    expect(r.text).not.toContain("T1 Plan declares J1, member docs/work/todo/TASK-919-alpha.md");
+  });
+
+  test("suffix case (must-FAIL): a classless ### T3a is a task block and is named, not silently skipped", () => {
+    const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
+    expect(r.text).toContain("authority-undeclared: ");
+    expect(r.text).toContain("T3a carries no J0/J1/J2 in its header meta");
+  });
 });

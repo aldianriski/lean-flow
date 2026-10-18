@@ -1,67 +1,49 @@
-// scripts/lib/check-authority.ts -- TypeScript port of check-authority.sh (TASK-355), run by Bun.
+// scripts/lib/check-authority.ts -- the authority checker (TASK-355), run by Bun.
 //
-// WHY: the shell version launches ~12 subprocesses (awk/grep) per invocation, each costing ~2.75s
-// under Windows fork() emulation. This port moves the same logic in-process. It is a SPEED change
-// only -- every assertion the shell checker makes, this file makes identically, bug for bug.
-// scripts/lib/check-authority.sh is UNCHANGED and remains the live oracle; this file is checked
-// against it by a differential-parity harness, never trusted on its own say-so.
+// WHY: it began as a port of check-authority.sh, whose ~12 subprocesses (awk/grep) cost ~2.75s each
+// under Windows fork() emulation. The shell version is retired (SPRINT-128 T4); this file is the
+// only implementation. The rationale (TD-123/TD-124 mode signal, the de-fenced-copy fix, the two
+// assertions' different kinds) is carried by the comments on the functions below.
 //
-// See check-authority.sh's own header comment for the FULL rationale (TD-123/TD-124 mode signal,
-// the de-fenced-copy fix, the two assertions' different kinds) -- not re-derived here, only ported.
+// THE MODE SIGNAL IS PARTLY A RECORDED FACT (SPRINT-118 T1, TD-124). Attendedness used to be INFERRED
+// from two defeatable signals (a `terminal · ` line the reaper may never write, a pinned envelope that
+// proves a grant and not a run). night-run.sh now appends one `fired · <ts> · <mode>` line to the
+// sprint's Execution Log before the wrapped command runs, not gated on reap(), and this file reads it
+// as a third signal, OR-ed with the other two (kept for logs written before that line existed).
+// RESIDUAL, stated honestly: a run fired OUTSIDE night-run.sh leaves no `fired · ` line, and
+// night-run.md's pre-flight forbids that path. A log written before this line existed still rests on
+// the two older signals and keeps their gap.
 //
-// THE MODE SIGNAL IS NOW PARTLY A RECORDED FACT, AND THAT PART IS TS-ONLY (SPRINT-118 T1, TD-124).
-// check-authority.sh could only INFER attendedness from two defeatable signals (a `terminal · ` line the
-// reaper may never write, a pinned envelope that proves a grant and not a run). night-run.sh now appends
-// one `fired · <ts> · <mode>` line to the sprint's Execution Log before the wrapped command runs, not
-// gated on reap(), and this file reads it as a third signal, OR-ed with the other two (kept for logs
-// written before that line existed). check-authority.sh is NOT updated: ADR-050 §3 froze it as the
-// differential oracle, so evals/run-authority-differential.ts diverges from it on the fired-unattended
-// fixture by construction, the same way member-file findings are excluded -- a named consequence of the
-// freeze, not a port defect. RESIDUAL, stated honestly: a run fired OUTSIDE night-run.sh leaves no
-// `fired · ` line, and night-run.md's pre-flight forbids that path. A log written before this line
-// existed still rests on the two older signals and keeps their gap.
-//
-// MEMBER-FILE READING IS TS-ONLY (TASK-382, owner ruling B). check-authority.sh keeps reading ONLY
-// the Plan header meta -- it stays the differential oracle for that half, unchanged. This file
-// additionally resolves the sprint's CURRENT docs/work/ members (scripts/lib/sprint-members.ts,
-// live tree only -- no git) and reads each member's own `authority:` frontmatter field:
+// MEMBER-FILE READING (TASK-382, owner ruling B). Besides the Plan header meta, this file resolves
+// the sprint's CURRENT docs/work/ members (scripts/lib/sprint-members.ts, live tree only -- no git)
+// and reads each member's own `authority:` frontmatter field:
 //   - missing/invalid `authority:` -> FAIL authority-undeclared, naming the MEMBER FILE (distinct
 //     from the Plan-header authority-undeclared above, which names a `Tn` instead).
-//   - a `### Tn` block whose `Cites:` names the member, where Tn's bracket J-class DIFFERS from
+//   - a `### Tn` block whose `Cites:` LEADING RUN names the member, where Tn's bracket J-class DIFFERS from
 //     the member's declared `authority:` -> FAIL authority-plan-member-mismatch, naming Tn, the
 //     TASK id, and both values.
 //   - otherwise -> PASS authority-member-declared.
 // A sprint with NO `### Tn` blocks but with members is NOT a skip -- the member checks still run
-// (see evaluateSprintFile below). Because check-authority.sh does not read member files at all,
-// evals/run-authority-differential.ts's comparison against it EXCLUDES every line this addition
-// produces -- stated there explicitly, not silently (owner ruling B's own requirement).
+// (see evaluateSprintFile below).
 //
-// PARITY CLAIM, STATED PRECISELY (outside-review correction, TASK-355 revise): differential parity
-// was run over every retained fixture PLUS every real archived and active docs/sprint/*.md this
-// repo has -- but every ARCHIVED sprint carries `status: closed`, which returns from
-// evaluateSprintFile on the closed-status check BEFORE parsing any `### Tn` block, before the mode
-// signal, before any J2 logic. Real input, but a confirmed-trivial two-line early-return path --
-// not a second independent proof that DECLARED/HONOURED/BYPASSED agree. The load-bearing evidence is
-// the 11 retained fixtures (evals/fixtures/authority/*, including active-sprint-mixed -- ONE real
-// active-sprint-shaped Plan/log pair carrying honoured + bypassed + attended-executed + a J1 sibling
-// together, the shape an independent reviewer built from scratch and confirmed byte-identical). Read
-// any differential total as "11/11 real-logic fixtures identical, plus N confirmed-trivial-path
-// inputs also identical" -- never as N independent proofs of the same weight.
+// WHAT THE EVIDENCE IS: every ARCHIVED sprint carries `status: closed`, which returns from
+// evaluateSprintFile on the closed-status check BEFORE parsing any `### Tn` block -- a confirmed-trivial
+// early return. The load-bearing evidence is the retained fixtures (evals/fixtures/authority/*,
+// including active-sprint-mixed: honoured + bypassed + attended-executed + a J1 sibling together).
 //
 // Usage: bun scripts/lib/check-authority.ts <sprint-file>...
 // Prints one PASS/FAIL/note line per assertion; exits 1 if any FAIL line was printed, 0 otherwise.
 
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { resolveMembers, type Member } from "./sprint-members.ts";
+import { parsePlan, resolveMembers, type Member } from "./sprint-members.ts";
 
 // --- frontmatter (pure) -----------------------------------------------------------------------
 
 /**
- * Ports the awk one-liner that reads a `KEY: value` line from the leading `---` frontmatter block:
- * first line must be exactly `---`; scan stops at the closing `---` or the first matching key.
- * Value is NOT trimmed beyond the `[ \t]*` the shell regex itself strips (faithful to the oracle,
- * not "cleaned up").
+ * Reads a `KEY: value` line from the leading `---` frontmatter block: first line must be exactly
+ * `---`; scan stops at the closing `---` or the first matching key. Value is NOT trimmed beyond the
+ * `[ \t]*` after the key.
  */
 export function frontmatterField(content: string, key: string): string | null {
   const lines = content.split(/\r?\n/);
@@ -102,18 +84,15 @@ export interface TaskRecord {
 }
 
 /**
- * Ports the awk block that extracts `"<Tn>\t<class-or-empty>"` per `### Tn ` heading. The heading
- * regex requires digits immediately followed by a space -- a letter-suffixed task id (`T2a`) is
- * OUT OF SCOPE for this specific checker's heading match (unlike check-dod-delta.ts's TASK_TOKEN),
- * faithfully preserved rather than "improved" on the oracle's own narrower regex.
+ * `<Tn>` and its class (or empty) per `### Tn` heading of the `## Plan`, read through the shared Plan
+ * parser (TASK-444) -- so a letter-suffixed task id (`T2a`) is a record like any other, not skipped.
  */
 export function parseTaskRecords(spContent: string): TaskRecord[] {
-  const lines = spContent.split(/\r?\n/);
   const records: TaskRecord[] = [];
-  for (const line of lines) {
-    if (!/^### T[0-9]+ /.test(line)) continue;
-    const fields = line.split(/\s+/).filter((x) => x.length > 0);
-    const tid = fields[1] ?? "";
+  for (const b of parsePlan(spContent).blocks) {
+    if (b.tid === "") continue;
+    const line = b.heading;
+    const tid = b.tid;
     const metaMatch = line.match(/\[[^\]]*\]/);
     const meta = metaMatch ? metaMatch[0] : "";
     let cls = "";
@@ -207,29 +186,14 @@ function j2Verdict(sp: string, tid: string, defenced: string, mode: ModeSignal):
 const VALID_CLASSES = new Set(["J0", "J1", "J2"]);
 
 /**
- * `Tn -> the TASK ids its Cites: line names`, read from the sprint's OWN `### Tn` blocks (never
- * fence/comment-aware like check-sprint-by-reference.ts's Execution Log parsing -- a Plan header's
- * `Cites:` line is not the kind of place this repo's own docs quote a worked example inside a bare
- * fence, so that hardening was judged out of scope here; noted as a deliberate narrower reading of
- * the oracle's own rigor, not an oversight).
+ * `Tn -> the TASK ids that govern it`: the LEADING RUN of its `Cites:` declaration (`cites.lead`, owner
+ * ruling TD-199). A later mention (`split from TASK-991`) is a citation and governs nothing. Read through
+ * the shared Plan parser, continuation lines included.
  */
 export function parseCites(spContent: string): Map<string, Set<string>> {
   const map = new Map<string, Set<string>>();
-  let curT: string | null = null;
-  for (const line of spContent.split(/\r?\n/)) {
-    const h = line.match(/^### (T\d+)\b/);
-    if (h) {
-      curT = h[1]!;
-      continue;
-    }
-    if (/^#{1,3} /.test(line)) {
-      curT = null;
-      continue;
-    }
-    if (curT && /^Cites:/.test(line)) {
-      const ids = new Set([...line.matchAll(/\bTASK-\d+\b/g)].map((m) => m[0]));
-      if (ids.size > 0) map.set(curT, ids);
-    }
+  for (const b of parsePlan(spContent).blocks) {
+    if (b.tid !== "" && b.cites.lead.length > 0) map.set(b.tid, new Set(b.cites.lead));
   }
   return map;
 }

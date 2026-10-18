@@ -1676,6 +1676,29 @@ const CASES: Case[] = [
     mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
     expect: ["scope-change-outside-layers T1 src/helper.ts"],
   },
+  // --- SPRINT-128 T2 (TASK-444, TD-199): a Cites: id governs a Tn only in the LEADING run of the line -----
+  {
+    name: "scope-change-id-only-a-later-mention (control: TASK-901 follows `split from`, so it does not attribute T1 -- unattributed, no finding)",
+    opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902` · split from TASK-901") },
+    mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
+    expect: [],
+  },
+  {
+    name: "scope-change-id-leads-the-line (must-FAIL: the same line with TASK-901 LEADING attributes T1; src/helper.ts undeclared)",
+    opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-901` · split from TASK-902") },
+    mutate: (d) => logEntry(d, "scope-change", "TASK-901 gains a helper", "Adds `src/helper.ts`."),
+    expect: ["scope-change-outside-layers T1 src/helper.ts"],
+  },
+  {
+    name: "freeze-edit-covered-only-by-a-later-mention (must-FAIL: `T1 ...` entry names T1, whose Cites: mentions TASK-901 only after `split from`)",
+    opts: { pre: (d) => edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902` · split from TASK-901") },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: alpha needs a benchmark. G2 re-confirmed.");
+      commit(d, "edit + Tn entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
   {
     name: "scope-change-narrowing-names-a-path-it-drops (control: src/old.ts was in Layers: at plan_commit, since removed)",
     opts: { pre: (d) => edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `src/old.ts`") },

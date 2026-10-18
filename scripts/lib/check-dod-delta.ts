@@ -34,7 +34,7 @@
 // checkDodDelta/parseDodSections/attributeClaim, which stay the sprint-file (v1) path, verbatim, so
 // v1 sprints keep working exactly as before (owner ruling C, last sentence).
 
-import { section, taskIds } from "./sprint-members.ts";
+import { parsePlan, section } from "./sprint-members.ts";
 //
 // A member tick differs from a v1 DoD tick in one load-bearing way: dispatch.md's own tick rule
 // ("Tick" step 5) appends ` <checkmark> <evidence>` to the SAME bullet line at tick time, so the
@@ -60,12 +60,13 @@ export interface TaskSection {
 // shape for split subtasks, adversarial-review finding 3 of ca577e9). A combined heading may chain
 // several with "+".
 const TASK_TOKEN = "T\\d+[a-zA-Z]?";
-const HEADING_RE = new RegExp(`^###\\s+(${TASK_TOKEN}(?:\\+${TASK_TOKEN})*)\\s`);
 const DOD_HEADER_RE = /^\*\*DoD:\*\*/;
 const ITEM_RE = /^-\s\[([ xX])\]\s?(.*)$/;
 
 /**
- * Splits a sprint doc's body into per-task DoD lists, keyed by the heading's task token.
+ * Splits a sprint doc's body into per-task DoD lists, keyed by the heading's task token. The `### Tn`
+ * headings come from the shared Plan parser (TASK-444), so a letter-suffixed `### T3a` is its own task;
+ * a joint heading (`### T1+T2`) is keyed by its first task (no such heading exists in the corpus).
  *
  * A DoD block runs from its own task's "**DoD:**" line to the next blank line (this repo's DoD lists
  * never carry a blank line BETWEEN items -- a wrapped bullet's continuation lines are indented and
@@ -77,9 +78,20 @@ const ITEM_RE = /^-\s\[([ xX])\]\s?(.*)$/;
 export function parseDodSections(content: string): Map<string, TaskSection> {
   const lines = content.split(/\r?\n/);
   const sections = new Map<string, TaskSection>();
-  let currentTask: string | null = null;
+  const tasks = parsePlan(content).blocks.filter((b) => b.tid !== "");
+
+  tasks.forEach((b, k) => {
+    // the block's body: the lines after its heading (1-based `line`) up to the next task heading
+    const body = lines.slice(b.line, k + 1 < tasks.length ? tasks[k + 1]!.line - 1 : lines.length);
+    sections.set(b.tid, { task: b.tid, items: dodItems(body) });
+  });
+  return sections;
+}
+
+/** The DoD items of one task block's body lines (everything after its heading). */
+function dodItems(lines: readonly string[]): DodItem[] {
   let inDod = false;
-  let items: DodItem[] = [];
+  const items: DodItem[] = [];
   let current: { checked: boolean; text: string[] } | null = null;
 
   const closeItem = () => {
@@ -88,21 +100,8 @@ export function parseDodSections(content: string): Map<string, TaskSection> {
       current = null;
     }
   };
-  const flushSection = () => {
-    closeItem();
-    if (currentTask !== null) sections.set(currentTask, { task: currentTask, items });
-  };
 
   for (const line of lines) {
-    const h = HEADING_RE.exec(line);
-    if (h) {
-      flushSection();
-      currentTask = h[1]!;
-      items = [];
-      inDod = false;
-      continue;
-    }
-    if (currentTask === null) continue;
     if (!inDod) {
       if (DOD_HEADER_RE.test(line)) inDod = true;
       continue;
@@ -126,8 +125,8 @@ export function parseDodSections(content: string): Map<string, TaskSection> {
     closeItem();
     inDod = false;
   }
-  flushSection();
-  return sections;
+  closeItem();
+  return items;
 }
 
 export interface Tick {
@@ -180,8 +179,8 @@ function commitSprintNumber(subject: string): string | null {
  * Attributes a commit's subject (+ optional `Task:` trailer) to exactly ONE task, a sprint-wide
  * COORD claim, or UNSCOPED.
  *
- * Ported from scripts/lib/check-layers-observed.sh's `attribute()` (SPRINT-049 T1, TD-031 / TD-035),
- * which already survived adversarial review for precisely this class of ambiguity: a qualifier that
+ * Originally ported from the shell checker's `attribute()` (SPRINT-049 T1, TD-031 / TD-035; that shell
+ * twin is retired), which survived adversarial review for precisely this class of ambiguity: a qualifier that
  * embeds a SECOND task reference (`T1 and T2:`, `T1-T3:`) must fall through rather than resolve to
  * the first token (L-108's family -- a guard matched by substring, failing green). Reusing this
  * repo's already-hardened attribution logic is deliberate: inventing a second, simpler regex for the
@@ -381,31 +380,12 @@ export function checkDodDelta(
 
 // --- member-file DoD (SPRINT-109 T4, TASK-387) ----------------------------------------------------
 
-/** `### Tn` -> the TASK ids in that block's OWN `Cites:` line (never guessed from prose elsewhere --
- * a block with no `Cites:` line, or none of them TASK-shaped, maps to `[]`). */
+/** `### Tn` -> the TASK ids that govern it: the LEADING RUN of that block's OWN `Cites:` declaration
+ * (owner ruling TD-199; a later mention such as `split from TASK-NNN` is a citation and governs nothing).
+ * Read through the shared Plan parser. A block with no `Cites:`, or none of them TASK-shaped, maps to `[]`. */
 export function parsePlanCites(content: string): Map<string, string[]> {
-  const lines = content.split(/\r?\n/);
   const out = new Map<string, string[]>();
-  let currentTask: string | null = null;
-  let buffer: string[] = [];
-  const flush = () => {
-    if (currentTask !== null) {
-      const citesLine = buffer.find((l) => /^Cites:/.test(l));
-      out.set(currentTask, citesLine ? [...taskIds(citesLine)] : []);
-    }
-  };
-  for (const line of lines) {
-    const h = HEADING_RE.exec(line);
-    if (h) {
-      flush();
-      currentTask = h[1]!;
-      buffer = [];
-      continue;
-    }
-    if (currentTask === null) continue;
-    buffer.push(line);
-  }
-  flush();
+  for (const b of parsePlan(content).blocks) if (b.tid !== "") out.set(b.tid, [...new Set(b.cites.lead)]);
   return out;
 }
 
@@ -645,7 +625,7 @@ export function loadCommit(repoRoot: string, ref: string): LoadedCommit {
   return { subject, taskTrailer, sprintDocPath, oldContent, newContent };
 }
 
-/** Reads a frontmatter key's value the way `check-layers-observed.sh`'s `fmv()` does: only within
+/** Reads a frontmatter key's value: only within
  * the leading `---`-delimited block, first match wins. */
 export function frontmatterValue(content: string, key: string): string | null {
   const lines = content.split(/\r?\n/);
@@ -783,7 +763,7 @@ export function checkOneCommit(
 }
 
 if (import.meta.main) {
-  // Usage mirrors check-layers-observed.sh's own CLI shape: repo root + every ACTIVE sprint doc path,
+  // Usage: repo root + every ACTIVE sprint doc path,
   // never a single ref. HEAD-only (this checker's first shipped shape) was reviewed and found wrong
   // (finding 2 of the ca577e9 review): the gate does not run after every single commit in practice --
   // this very sprint landed T4's commit plus three coordinator commits between gate runs, and all

@@ -154,6 +154,22 @@ function v2(): string {
   check("cli counts: a unit citing two members stays open while ONE of them has an open box (T1 delivered, T2 open)",
     x.code === 0 && x.out.includes("unit T1 delivered\nunit T2 open\nunit T3 delivered\n"), JSON.stringify(x.out));
 
+  // SPRINT-128 T2 (TASK-444, TD-199): a Cites: id governs only in the LEADING run, and a `### T2a` heading
+  // is its own unit. T1 names TASK-972 only after `split from` (so it is delivered by TASK-971 alone, though
+  // 972 is open); T2a cites TASK-973 and must not fold into T2 (which stays open on 972).
+  const SPRINT_LEAD = SPRINT.slice(0, SPRINT.indexOf("## Plan")) +
+    "## Plan\n\n### T1 — one `[size: S]`\nCites: `TASK-971` · split from TASK-972\n\n" +
+    "### T2 — two `[size: S]`\nCites: `TASK-972`\n\n### T2a — two-a `[size: S]`\nCites: `TASK-973`\n";
+  const r4 = tree({
+    "docs/sprint/SPRINT-970-fx.md": SPRINT_LEAD,
+    "docs/work/done/TASK-971-a.md": task("TASK-971", "SPRINT-970", DONE),
+    "docs/work/in_progress/TASK-972-b.md": task("TASK-972", "SPRINT-970", T),
+    "docs/work/done/TASK-973-c.md": task("TASK-973", "970", DONE),
+  });
+  x = cli(r4, "counts", s);
+  check("cli counts: a later Cites: mention governs nothing (T1 delivered by TASK-971 alone) and T2a is its own unit, not folded into T2",
+    x.code === 0 && x.out.includes("units 3 2\n") && x.out.includes("unit T1 delivered\nunit T2 open\nunit T2a delivered\n"), JSON.stringify(x.out));
+
   // must-FAIL: a listed member that cannot be resolved is a named error, never a silent short list
   const rm = tree({
     "docs/sprint/SPRINT-970-fx.md": SPRINT,

@@ -359,13 +359,14 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     // layersAll is the all-task UNION for the WIP leg: every Layers: token in the Plan, wherever it sits.
     const layersAll = plan.blocks.flatMap((b) => b.layers).join(" ");
     const declsByTask = new Map<string, string[]>();
-    // Tn -> the TASK ids its Cites: names (SPRINT-110 T2). A Tn with none is absent from the map.
+    // Tn -> the TASK ids that govern it: the LEADING RUN of its Cites: (SPRINT-110 T2; owner ruling TD-199 --
+    // a later mention such as `split from TASK-NNN` is a citation and governs nothing). A Tn with none is absent.
     const cites = new Map<string, string[]>();
     for (const b of plan.blocks) {
       // Layers: under a non-task `###` stays with the preceding Tn (b.carry); Cites: under one is dropped
       // (b.tid ""). The two old readers differed here and each keeps its own behaviour.
       if (b.carry !== "") declsByTask.set(b.carry, [...(declsByTask.get(b.carry) ?? []), ...b.layers]);
-      if (b.tid !== "" && b.cites.all.length > 0) cites.set(b.tid, [...(cites.get(b.tid) ?? []), ...b.cites.all]);
+      if (b.tid !== "" && b.cites.lead.length > 0) cites.set(b.tid, [...(cites.get(b.tid) ?? []), ...b.cites.lead]);
     }
     const mySprint = fmv(fileLines, "sprint");
 
@@ -421,7 +422,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
       if (governing(m.id).length === 0) {
         earlyHit = true;
         bad(
-          `${sp} layers observed: member-layers-undeclared: ${m.id} (${m.path}) is cited by no ### Tn block's Cites: -- no Plan Layers govern it`,
+          `${sp} layers observed: member-layers-undeclared: ${m.id} (${m.path}) is cited by no ### Tn block's Cites: leading run -- no Plan Layers govern it`,
         );
       }
     }
