@@ -1,6 +1,7 @@
 <!-- BUG report — capture a defect at intake, then route it (CONTEXT.md § the bug-intake rule):
      trivial known cause → a TASK-NNN · needs investigation → /diagnose · architectural → TD-NNN.
-     Lean: repro + expected/actual is the core; drop a field that is genuinely N/A. WHY/WHERE, never HOW. -->
+     Lean: repro + expected/actual is the core; drop a field that is genuinely N/A. WHY/WHERE, never HOW.
+     No STANDARD §3 header on purpose: renders to the OS temp dir, never committed. -->
 
 # BUG — [short symptom title] [CUSTOMIZE]
 

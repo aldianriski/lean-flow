@@ -1,3 +1,10 @@
+---
+owner: [role — not a personal name] [CUSTOMIZE]
+last_updated: YYYY-MM-DD
+update_trigger: The area under test or its expected behaviour changed
+status: current
+---
+
 <!-- QA test-case — a repeatable check of ONE behaviour. NON-CORE template (like DESIGN):
      outside the core doc-generation loop. Filled instances live in docs/qa/ — one file per case,
      QA-NNN-<slug>.md; keep it small + agent-runnable. WHY/WHERE + observable outcome, never HOW. -->
