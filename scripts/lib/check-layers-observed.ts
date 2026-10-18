@@ -299,9 +299,11 @@ function gitTreePaths(): string[] {
   return r.code === 0 ? r.stdout.split("\0").filter(Boolean) : [];
 }
 /** Every path any commit in `range` touched. `--no-renames` lists BOTH sides of a rename and a deleted
- *  path is listed too: a token naming a file the task moved or removed is live, not dead. */
+ *  path is listed too: a token naming a file the task moved or removed is live, not dead. `-m` adds each
+ *  merge's diff against each parent: this repo merges task branches --no-ff, and a path deleted or moved
+ *  only in a conflict resolution appears in no other commit. */
 function gitRangePaths(range: string): string[] {
-  const r = gitRun(["log", "--no-renames", "--name-only", "--format=", "-z", range]);
+  const r = gitRun(["log", "-m", "--no-renames", "--name-only", "--format=", "-z", range]);
   return r.code === 0 ? r.stdout.split("\0").filter(Boolean) : [];
 }
 /** A token is dead when it matches no path in `paths`: a file token by equality, a directory token

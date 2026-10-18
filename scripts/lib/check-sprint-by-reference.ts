@@ -503,10 +503,12 @@ function main(argv: string[]) {
     return null;
   };
 
+  // Only DESCENDANTS of the baseline are walked (--ancestry-path): a --no-ff merge brings in side-branch
+  // commits that forked before it and carry an older `## Done when`, which are not edits since the baseline.
   // The first commit after `baseCommit` where member `id`'s `## Done when` stops matching `frozen` (ticks and
   // their evidence ignored), or null when no commit shows it (the edit is in the working tree only).
   const firstEdit = (baseCommit: string, id: string, frozen: string): string | null => {
-    const cs = git(root, ["log", "--reverse", "--format=%H", `${baseCommit}..HEAD`, "--", `${WORK}/*/${id}-*`]).split("\n").filter(Boolean);
+    const cs = git(root, ["log", "--reverse", "--ancestry-path", "--format=%H", `${baseCommit}..HEAD`, "--", `${WORK}/*/${id}-*`]).split("\n").filter(Boolean);
     for (const c of cs) {
       const t = commitTree(root, c);
       const f = resolveId(t.paths, id);

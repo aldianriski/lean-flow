@@ -9,6 +9,7 @@
 // evals/fixtures/layers-observed/git-fixtures.ts; the checker is called in-process with cwd switched
 // to the fixture repo (all its git calls run against cwd).
 import { afterAll, describe, expect, setDefaultTimeout, test } from "bun:test";
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
@@ -436,6 +437,31 @@ describe("dead Layers: token (TD-177)", () => {
       rmSync(posix.join(d, "src/a.ts"));
       writeFile(d, "src/b.ts", "a\n");
       commitAll(d, "rename a to b\n\nTask: TASK-901");
+      expect(run(d).out).not.toContain(DEAD);
+    }
+  });
+
+  // Codex R1: task branches are merged --no-ff and `git log` omits a merge's own diff, so a path removed or
+  // moved only in a conflict resolution (touched by neither parent's commits) read as dead.
+  test("control: a path deleted or renamed ONLY in a merge commit is live", () => {
+    const git = (d: string, a: string[]) =>
+      execFileSync("git", ["-C", d, "-c", "user.name=Fixture Bot", "-c", "user.email=fixture@example.com", ...a], { encoding: "utf8", stdio: "pipe" });
+    for (const [name, gone, renamedTo] of [
+      ["merge-delete", "src/other.ts", null],
+      ["merge-rename", "src/a.ts", "src/b.ts"],
+    ] as const) {
+      const d = mk(name, `\`${gone}\` · \`src/side.ts\` · \`src/main.ts\``);
+      const main = git(d, ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
+      git(d, ["checkout", "-q", "-b", "side"]);
+      writeFile(d, "src/side.ts", "s\n");
+      commitAll(d, "side work\n\nTask: TASK-901");
+      git(d, ["checkout", "-q", main]);
+      writeFile(d, "src/main.ts", "m\n");
+      commitAll(d, "main work\n\nTask: TASK-901");
+      git(d, ["merge", "--no-ff", "--no-commit", "side"]);
+      if (renamedTo === null) git(d, ["rm", "-q", gone]);
+      else git(d, ["mv", gone, renamedTo]);
+      git(d, ["commit", "-q", "-m", "merge side, resolving by hand"]);
       expect(run(d).out).not.toContain(DEAD);
     }
   });
