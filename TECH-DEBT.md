@@ -419,7 +419,8 @@ status: current
     task whose consequence line is misspelled reads as having no review owed.
   - Mitigation (hypothesis): FAIL any `^consequence · ` line that does not match the vocabulary, naming the bad token.
 
-- **TD-243** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
+- **TD-243** severity: minor | status: resolved → SPRINT-125 T1 (moved to workdoo) | created: Sprint-121 (T6, ADR-052)
+  - Resolved (SPRINT-125 T1, owner ruling 2026-10-18, EPIC-022 D1): the platform epics are closed in place as superseded → workdoo (ADR-052); epic conformance for workdoo's own epics is workdoo's to run.
   - Summary: **workdoo now holds four epics but runs no conformance check, so the epic standard (Closed-when, rollup currency, the new
     active-epic coverage rule) has no gate behind it there.** This is ADR-052's accepted negative consequence. workdoo's `verify` is
     typecheck · biome · bun test, and none of them reads `docs/epic/`.
@@ -504,7 +505,8 @@ status: current
   - Mitigation (hypothesis): read a fenced `terminal ·` line inside a `### … | run-complete |` entry, the same carve-out
     `check-sprint-by-reference.ts --close` uses, or retire the signal once no pre-ledger log is in scope.
 
-- **TD-230** severity: low | status: open | created: Sprint-117 (close, T1 cold run)
+- **TD-230** severity: low | status: resolved → SPRINT-125 T5 | created: Sprint-117 (close, T1 cold run)
+  - Resolved (SPRINT-125 T5, `83684fa6`): `/prime` step 6 names `sprint-bulk unattended` only when at least one open member is AFK at J0/J1; an all-HITL/J2 sprint gets `/orchestrator` alone.
   - Summary: **`/prime`'s `Next:` names `sprint-bulk unattended` for any active sprint, even when every open task is HITL or J2.** The
     rule (`skills/prime/SKILL.md` step 6) offers the night run whenever open tasks sit in an active sprint; an unattended run parks every
     J2 task, so for a sprint like SPRINT-117 (one J2 member) the suggestion would end at `AUTHORITY_BOUNDARY` having done nothing.
@@ -561,7 +563,8 @@ status: current
   - done-when: the git call that fails on a rename-only commit has its stderr captured and either handled or suppressed with a reason, and
     a `git mv` commit in the checked range produces no `fatal:` line.
 
-- **TD-220** severity: low | status: open | created: Sprint-114 (close retro, T3(d) `--plugin-dir` run)
+- **TD-220** severity: low | status: resolved → SPRINT-125 T5 | created: Sprint-114 (close retro, T3(d) `--plugin-dir` run)
+  - Resolved (SPRINT-125 T5, `83684fa6`): § Skill freshness gains a live-checkout row — a base dir with no `<version>/` segment reads `<base-dir>/../../.claude-plugin/plugin.json` and reports `<v> live checkout → fresh`. Checked by reading, not by a live `--plugin-dir` run.
   - Summary: **`/prime`'s `Skills:` row reads `n/a` under `claude --plugin-dir <repo>`** even though `plugin.json` sits in that base dir.
     The skill compares the base-dir version with the host repo's manifest and treats "no version in the path" as "no local plugin repo". A
     `--plugin-dir` session has no version segment in its path, so the row degrades to `n/a`, the very session where freshness is
@@ -587,7 +590,8 @@ status: current
   - Mitigation (hypothesis): match the closing `---` at a line start including the immediate-close case, strip a leading BOM, allow a trailing
     YAML comment, and follow symlinks via `statSync` — each with a must-FAIL fixture under the maintainer-only bar.
 
-- **TD-217** severity: medium | status: open | created: Sprint-114 (T3 real runs, owner ruling)
+- **TD-217** severity: medium | status: resolved → SPRINT-125 T8 | created: Sprint-114 (T3 real runs, owner ruling)
+  - Resolved (SPRINT-125 T8, `05cbb27f`..`87825795`): migration-map.md § Verification carries a mandatory post-write required-field checklist (G2: checklist, no script) that withholds and names any task file missing one of the 11 required fields. Exercised on `evals/fixtures/v1-to-v2/input-withheld-missing-tier` (TASK-942 withheld, TASK-941 written); harness 101/0 with a retained must-FAIL tree. Residual: the procedure is still agent-executed; the fixture checks the output invariant, not the run.
   - Summary: **`migrate`'s withhold rule is applied inconsistently across runs of the same procedure.** migration-map.md:194 says
     a task missing a field with no source is "withheld … never guessed, never defaulted". In SPRINT-114 T3, the rc.1 `migrate`
     withheld two 1.x tasks lacking `priority`/`tier`/`authority` on one tree (`v2c`), but on another (`v1d`, after "move everything")
@@ -875,7 +879,8 @@ status: current
     must name an existing path, an existing directory, or a file the task says it creates. Tier **G**.
   - **Re-file fresh if** `covers()` gains glob support (the finding would then need a different shape).
 
-- **TD-176** severity: low | status: open | created: Sprint-105
+- **TD-176** severity: low | status: resolved → SPRINT-125 T1 (already fixed; re-verified) | created: Sprint-105
+  - Resolved (SPRINT-125 T1 re-verification): `docs/sprint/INDEX.md` has a row for each of the 46 archived sprints 059…104 — 46 INDEX rows = 46 archive files, and a per-id loop found no gap.
   - Summary: **`docs/sprint/INDEX.md` skips 46 sprints.** Its newest entry before SPRINT-105 is
     **SPRINT-058** (2026-08-10); SPRINT-059…SPRINT-104 are archived under `docs/sprint/archive/`
     and were never indexed. STANDARD §11 makes the one-line index part of close.
@@ -1165,7 +1170,8 @@ status: current
     Resist the obvious cure of skipping absent logs: that reinstates exactly the blind spot SPRINT-098
     removed (L-058).
 
-- **TD-161** severity: minor | status: open | created: Sprint-101
+- **TD-161** severity: minor | status: resolved → SPRINT-125 T1 (already fixed; re-verified) | created: Sprint-101
+  - Resolved (SPRINT-125 T1 re-verification): `orderNonArchiveFirst` (`scripts/lib/check-dod-delta.ts:562-566`) lowercases before the `/archive/` test.
   - Summary: **`scripts/lib/check-dod-delta.ts:277` ranks archive candidates with a case-sensitive
     substring test** — `!p.includes("/archive/")` never matches `/Archive/`, so a mis-cased path is
     treated as non-archive and can win by list order. This is the un-normalized shape SPRINT-099 T3
@@ -1997,7 +2003,8 @@ status: current
   - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
     stops being load-bearing.
 
-- **TD-100** severity: medium | status: open | created: Sprint-087
+- **TD-100** severity: medium | status: resolved → SPRINT-125 T1 (already fixed; re-verified) | created: Sprint-087
+  - Resolved (SPRINT-125 T1 re-verification): `_repo_files()` prunes `./.claude/worktrees` (`conformance-engine.sh:1839`, comment 1833-35); `_s12_tracked` excludes it too (:3170).
   - Summary: **`conformance-engine.sh`'s `_repo_files()` walks agent worktrees, so the engine can emit a
     finding that names a `.claude/worktrees/` path.** Lines 1722–1731 prune `.git`, `node_modules`,
     `vendor`, `.venv`, `dist`, `build` — not `.claude/worktrees`. The cached walk feeds roughly fifty
@@ -2282,7 +2289,8 @@ status: current
     reference implementation disagreeing with the standard it publishes, in opposite directions — one
     ships a defect, this one ships an unstated change.
 
-- **TD-078** severity: minor | status: open | created: Sprint-081
+- **TD-078** severity: minor | status: resolved → SPRINT-125 T6 | created: Sprint-081
+  - Resolved (SPRINT-125 T6, `226a6a44`/`24fbcd43`): census re-derived 6/35 header-less templates. README/AGENTS use the §3 footer exception; CODE_OF_CONDUCT + QA-TESTCASE gained the four-field header; BUG (temp dir, never committed) and DESIGN (§2/§3 token-frontmatter carve-out) carry an exemption comment. A rendered QA doc passes S3.SCHEMA; the header-less copy FAILs `ownership-header-missing`.
   - Summary: **`QA-TESTCASE.md.template` ships with no §3 ownership header, yet renders into
     `docs/qa/` — a tree the engine governs.** Every adopter who renders it collects an `S3.SCHEMA`
     finding the moment the file lands, for doing exactly what the template told them to do. This is
