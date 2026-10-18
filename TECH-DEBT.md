@@ -2068,7 +2068,8 @@ status: current
   - **Re-file fresh if** the consequence-line grammar changes — the finding is that malformed and
     absent are indistinguishable to this reader, and any new grammar inherits that unless fixed.
 
-- **TD-093** severity: minor | status: open | created: Sprint-085
+- **TD-093** severity: minor | status: resolved → SPRINT-125 T9 | created: Sprint-085
+  - Resolved (SPRINT-125 T9, `17a23624`; exercised by release 2.6.0, `3f17f0b4`): /release-patch derives the plugin lockstep set from every `*-plugin/*.json` carrying `"version"`, and step 3b bumps the other current-version references found by `git grep -nF '<old>'` (README footer included, never CHANGELOG history), reported under `[siblings]`. Generic — no repo path hardcoded.
   - Summary: **`/release-patch` has no step that bumps the README footer version the gate lints**, so
     every release leaves a drift the QA gate catches a sprint later.
   - Evidence: caught at SPRINT-085's close as the single gate FAIL — `README footer version

@@ -26,7 +26,7 @@ Twice a release left the README footer behind and the next close's gate caught i
 
 - [x] `/release-patch` has a step that finds the version references beside the manifest (sibling ✓ `17a23624`: derived lockstep set + step 3b (`git grep -nF`, current-version refs only) + `[siblings]` output; dry-run on 2.5.0 selected 4 manifests + README footer, left 2 history hits
       manifests, a README footer) and bumps each in lockstep, named generically.
-- [ ] Exercised on this repo's next release: all four `*-plugin/*.json` manifests and the README footer
+- [x] Exercised on this repo's next release: all four `*-plugin/*.json` manifests and the README footer ✓ release 2.6.0 (`3f17f0b4`): derived set = 4 manifests, all 2.6.0 (`check-manifest-lockstep` PASS); step 3b bumped the README footer to v2.6.0 and left 2 history hits (EPIC-022:21, sprint INDEX:14); Codex T9 R1–R4 CLEAR
       agree afterwards (L-007).
 
 ## Touches
