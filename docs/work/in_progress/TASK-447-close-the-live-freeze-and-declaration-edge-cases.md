@@ -26,15 +26,15 @@ column-0 wrapped `Layers:` line silently (TD-138's shipped side).
 
 ## Done when
 
-- [ ] Every Shell frontmatter reader strips a trailing CR itself, with a retained CRLF fixture; no verdict on the 7 CRLF plans
+- [x] Every Shell frontmatter reader strips a trailing CR itself, with a retained CRLF fixture; no verdict on the 7 CRLF plans ✓ mechanical: every Shell frontmatter reader strips CR itself; CRLF twin fixtures read through a BINMODE awk shim (the host awk hid it); seeds C1a-c
       depends on the host's awk.
-- [ ] A member `## Done when` edit counts as covered only by a `scope-change` entry that comes before the edit, as § Plan edits
+- [x] A member `## Done when` edit counts as covered only by a `scope-change` entry that comes before the edit, as § Plan edits ✓ mechanical: ordering walks the baseline's descendants; after-edit must-FAIL, before-edit and side-branch controls; census 5 covered, 0 late, of 127 sprints
       already are, with a must-FAIL fixture for the out-of-order case.
-- [ ] A `Layers:` token that matches no file or directory is named, with a must-FAIL fixture (admitted under ADR-053 as a
+- [x] A `Layers:` token that matches no file or directory is named, with a must-FAIL fixture (admitted under ADR-053 as a ✓ mechanical: layers-token-matches-nothing for finished tasks only, merge diffs included; 5 must-FAILs plus rename, delete and merge controls; live sprint clean
       measured defect).
-- [ ] The dispatch preflight in `dispatch.md` names a column-0 wrapped `Layers:` line instead of dropping it, its parity
+- [x] The dispatch preflight in `dispatch.md` names a column-0 wrapped `Layers:` line instead of dropping it, its parity ✓ mechanical: the preflight names a column-0 wrap with the remedy; parity harness green; Codex R1 -> R2 CLEAR on the shipped wording
       harness stays green, and the shipped wording passes the Codex review.
-- [ ] Full Tier G bar on the conformance-reached parts: seeded breaks each redden exactly their case.
+- [x] Full Tier G bar on the conformance-reached parts: seeded breaks each redden exactly their case. ✓ mechanical: seeds C1-C6 each redden only their case; coordinator re-seeded C1b (one case); conformance A/B identical
 
 ## Touches
 
