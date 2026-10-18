@@ -204,3 +204,7 @@ The local waiter for the gate result was stopped by the harness for host memory 
 **What broke.** The checker reads every path a scope-change entry names as a file claim, including the ones it rules out.
 **Impact.** T3 Cites gains bare `night-run.md` · `migration-map.md`, which are read-only mentions and were not edited. No DoD or Layers change.
 **Re-confirm G2.** Not needed: it declares a reference and changes no scope (the SPRINT-126 Cites precedent).
+
+### 2026-10-18 | system-verify | QA_FULL on the VPS at `3e29000c`: **QA-CHECK: 300 pass, 0 fail**, rc 0
+Bundled `9f7b1305..main`; the VPS clone was detached at `3e29000c`, equal to local HEAD. This is the final integrated tree. The
+count is one more pass than the failed run, since the scope-change leg is now green.
