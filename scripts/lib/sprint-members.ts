@@ -276,8 +276,8 @@ export interface PlanLine {
   text: string; // a declaration line: the value after its key / the continuation, left-trimmed
 }
 
-/** A column-0 line that continues a declaration (starts with a backtick directly after a declaration
- * line, not indented). Named, never dropped: the author's intent is a guess, so the caller reports it. */
+/** A column-0 line that STARTS with a backtick directly after a declaration line (not indented). Named,
+ * never dropped: whether it is a wrapped declaration or prose is a guess, so the caller reports it. */
 export interface PlanAnomaly {
   kind: "column-0-continuation";
   decl: PlanDecl;
@@ -320,9 +320,6 @@ export interface ParsedPlan {
 }
 
 const PLAN_TASK_HEADING = /^### (T[0-9]+[a-z]?)\b/;
-// A column-0 line continues a declaration only when it is TOKEN-ONLY: backtick tokens separated by
-// whitespace, commas or `·`. Anything else at column 0 is ordinary prose that happens to start with a backtick.
-const COL0_TOKEN_ONLY = /^`[^`]+`(?:[ 	,·]+`[^`]+`)*[ 	,·]*$/;
 const PLAN_DECL_KEY = /^(Layers|Depends-on|Cites):[ \t]*/;
 
 function backtickTokens(text: string): string[] {
@@ -342,6 +339,13 @@ function leadTaskIds(text: string): string[] {
     rest = rest.slice(m[0].length);
   }
   return out;
+}
+
+/** The one finding text for a column-0 anomaly, shared by both checkers. It errs LOUD (owner ruling,
+ * SPRINT-128 T1): a backtick-led column-0 line right after a declaration is either a wrapped declaration
+ * (silently dropping its paths was TD-138) or prose, and the parser cannot tell which -- so the author fixes it. */
+export function anomalyFinding(a: PlanAnomaly): string {
+  return `declaration continuation: column-0 line ${a.line} after the ${a.decl}: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose`;
 }
 
 export function parsePlan(content: string): ParsedPlan {
@@ -384,7 +388,7 @@ export function parsePlan(content: string): ParsedPlan {
       cur.lines.push({ n, tag: decl, text: line.slice(key[0].length) });
     } else if (!hidden && decl !== null && /^[ \t]+[^ \t]/.test(line)) {
       cur.lines.push({ n, tag: decl, text: line.replace(/^[ \t]+/, "") });
-    } else if (!hidden && decl !== null && COL0_TOKEN_ONLY.test(line)) {
+    } else if (!hidden && decl !== null && line.startsWith("`")) {
       cur.anomalies.push({ kind: "column-0-continuation", decl, line: n, text: line });
       cur.lines.push({ n, tag: "P", text: line });
       decl = null;

@@ -262,7 +262,9 @@ describe("column-0 wrap is NAMED, not dropped (TD-138; completeness already FAIL
     const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts` ·\n`src/other.ts`\nDepends-on: none\n");
     const r = run(d);
     expect(r.fail).toBe(true);
-    expect(r.out).toContain("declaration continuation: a wrapped Layers line (line ");
+    expect(r.out).toContain(
+      "declaration continuation: column-0 line 14 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
     expect(r.out).not.toContain("PASS");
   });
   test("sibling control: the same declaration wrapped with an indent is clean", () => {
@@ -273,9 +275,17 @@ describe("column-0 wrap is NAMED, not dropped (TD-138; completeness already FAIL
   });
 });
 
-describe("P2: column-0 PROSE starting with a backtick is not a wrap (control)", () => {
-  test("not named; the declaration it follows is still read", () => {
+describe("P2 (err loud): column-0 PROSE starting with a backtick directly after a declaration is named", () => {
+  test("MUST-FAIL: named with the remedy", () => {
     const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts`\n`some note` describes this\nDepends-on: none\n");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain(
+      "declaration continuation: column-0 line 14 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
+  });
+  test("control: the same prose separated by a blank line is not flagged", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts`\n\n`some note` describes this\nDepends-on: none\n");
     const r = run(d);
     expect(r.fail).toBe(false);
     expect(r.out).not.toContain("declaration continuation");

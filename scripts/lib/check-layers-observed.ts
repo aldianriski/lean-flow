@@ -32,7 +32,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, posix } from "node:path";
-import { section, resolveMembers, parsePlan, sprintNumber, type Member } from "./sprint-members.ts";
+import { section, resolveMembers, anomalyFinding, parsePlan, sprintNumber, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151), identical logic to the copy in
 // check-layers-completeness.ts -- both are independent, byte-identical ports of the SAME shell
@@ -414,7 +414,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     for (const a of plan.anomalies) {
       earlyHit = true;
       bad(
-        `${sp} layers observed: declaration continuation: a wrapped ${a.decl} line (line ${a.line}) must be indented to continue; at column 0 it is dropped from the declaration`,
+        `${sp} layers observed: ${anomalyFinding(a)}`,
       );
     }
     for (const m of members) {

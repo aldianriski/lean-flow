@@ -19,7 +19,7 @@ import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import { runLayersCompleteness } from "../scripts/lib/check-layers-completeness.ts";
-import { parsePlan } from "../scripts/lib/sprint-members.ts";
+import { anomalyFinding, parsePlan } from "../scripts/lib/sprint-members.ts";
 import {
   buildArchiveSelectionPair,
   buildCaseVariantFixture,
@@ -111,7 +111,7 @@ describe("unindented-continuation (retained must-FAIL fixture)", () => {
   test("FAILs on a wrapped declaration line left at column 0", () => {
     expect(r.exitCode).toBe(1);
     expect(r.output).toContain(
-      "declaration continuation: a wrapped Layers line must be indented",
+      "declaration continuation: column-0 line 30 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
     );
   });
 });
@@ -372,7 +372,8 @@ describe("column-0 wrap named by the shared parser (retained must-FAIL fixture, 
   test("T1 (column-0 wrap) is named for the declaration it wrapped; T2 (indented wrap) is not", () => {
     const stray = r.output.split("\n").filter((l) => l.includes("declaration continuation"));
     expect(stray.length).toBe(1);
-    expect(stray[0]).toContain("### T1 declaration continuation: a wrapped Layers line must be indented to continue");
+    expect(stray[0]).toContain("### T1 declaration continuation: column-0 line ");
+    expect(stray[0]).toContain("after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose");
     expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
   });
 });
@@ -426,9 +427,12 @@ describe("parsePlan (the one Plan reader both Layers checkers use)", () => {
     expect(none.found).toBe(false);
     expect(none.blocks.filter((b) => b.tid !== "")).toEqual([]);
   });
-  test("P2: only a TOKEN-ONLY column-0 line continues a declaration; prose that starts with a backtick does not", () => {
-    const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n`b.ts`, `c.ts` · `d.ts`\n\n### T2 -- t\nLayers: `a.ts`\n`README.md` describes this\n");
-    expect(q.anomalies.map((a) => [a.decl, a.line])).toEqual([["Layers", 5]]);
+  test("P2 (err loud): ANY backtick-led column-0 line directly after a declaration is an anomaly; a blank line ends it", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n`b.ts`, `c.ts` · `d.ts`\n\n### T2 -- t\nLayers: `a.ts`\n`README.md` describes this\n\n### T3 -- t\nLayers: `a.ts`\n\n`README.md` describes this\n");
+    expect(q.anomalies.map((a) => [a.decl, a.line])).toEqual([["Layers", 5], ["Layers", 9]]);
+    expect(anomalyFinding(q.anomalies[1]!)).toBe(
+      "declaration continuation: column-0 line 9 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
   });
   test("P1: a non-task `###` block has tid \"\" and carries the preceding task's tid", () => {
     const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n\n### Notes\nLayers: `n.ts`\n\n### T2 -- t\nLayers: `c.ts`\n");
@@ -454,14 +458,22 @@ describe("notes-heading (retained must-FAIL fixture -- a non-task ### block is d
   });
 });
 
-// --- SPRINT-128 T1 Codex R1: P2 -- column-0 PROSE that starts with a backtick is not a wrap -------------
-describe("col0-prose (retained control -- not a declaration continuation)", () => {
+// --- SPRINT-128 T1 owner ruling P2 (err loud): column-0 PROSE that starts with a backtick, directly after a
+// declaration, is named with the remedy -- the parser cannot tell it from a wrap (TD-138 was the silent drop).
+describe("col0-prose (retained must-FAIL fixture -- remedy named; blank-line sibling control)", () => {
   let r: Captured;
   beforeAll(() => {
     r = capture([posix.join(FIXTURES, "col0-prose.md")]);
   });
-  test("passes cleanly with no declaration-continuation finding", () => {
-    expect(r.output).not.toContain("declaration continuation");
-    expect(r.exitCode).toBe(0);
+  test("T1: prose directly after the declaration FAILs with the remedy text", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(
+      "### T1 declaration continuation: column-0 line 14 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
+  });
+  test("T2 control: the same prose after a blank line is NOT flagged", () => {
+    const hits = r.output.split("\n").filter((l) => l.includes("declaration continuation"));
+    expect(hits.length).toBe(1);
+    expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
   });
 });

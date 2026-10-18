@@ -52,7 +52,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { parsePlan, resolveMembers, section, type Member } from "./sprint-members.ts";
+import { anomalyFinding, parsePlan, resolveMembers, section, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151) ---------------------------------------
 // Ported from scripts/lib/archive-path.sh's lf_is_archived_path(). Two tests, in the SAME order:
@@ -144,7 +144,7 @@ interface BlockCheckInputs {
   depsLine: string;
   citesLine: string;
   prose: string;
-  strays: string[]; // sorted, deduped
+  strays: string[]; // one finding text per column-0 anomaly, in file order
   citesToks: string[]; // sorted, deduped
   citesTids: string[]; // sorted, deduped
   layersToks: string[]; // sorted, deduped
@@ -165,12 +165,7 @@ function runCheckBlock(inp: BlockCheckInputs): { lines: string[]; anyFail: boole
   const { sp, tidFull, tshort, depsLine, prose, layersLine } = inp;
 
   // -- unindented continuation ----------------------------------------------------------------
-  const straysJoined = inp.strays.length > 0 ? inp.strays.join(" ") + " " : "";
-  if (straysJoined.trim() !== "") {
-    bad(
-      `${sp} ${tidFull} declaration continuation: a wrapped ${straysJoined}line must be indented to continue; at column 0 it reads as prose`,
-    );
-  }
+  for (const text of inp.strays) bad(`${sp} ${tidFull} ${text}`);
 
   const layersSet = new Set(inp.layersToks);
   const citesSet = new Set(inp.citesToks);
@@ -393,7 +388,7 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
       const strippedLayersLine = layersLine.replace(/`[^`]*`/g, "");
       const layersBareItems = strippedLayersLine.match(BARE_TOKEN_RE) ?? [];
       const oidItems = prose.match(TID_RE) ?? [];
-      const strayItems = block.anomalies.map((a) => a.decl);
+      const strayItems = block.anomalies.map(anomalyFinding);
 
       const index = pending.length;
       pending.push({
@@ -436,11 +431,10 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
   // read them back by position.
   const groups: string[][] = [];
   const groupIdx: Record<
-    "strays" | "citesToks" | "citesTids" | "layersToks" | "toks" | "layersBare" | "oids",
+    "citesToks" | "citesTids" | "layersToks" | "toks" | "layersBare" | "oids",
     number[]
-  > = { strays: [], citesToks: [], citesTids: [], layersToks: [], toks: [], layersBare: [], oids: [] };
+  > = { citesToks: [], citesTids: [], layersToks: [], toks: [], layersBare: [], oids: [] };
   for (const p of pending) {
-    groupIdx.strays.push(groups.push(p.strayItems) - 1);
     groupIdx.citesToks.push(groups.push(p.citesTokItems) - 1);
     groupIdx.citesTids.push(groups.push(p.citesTidItems) - 1);
     groupIdx.layersToks.push(groups.push(p.layersTokItems) - 1);
@@ -473,7 +467,7 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
       depsLine: p.depsLine,
       citesLine: p.citesLine,
       prose: p.prose,
-      strays: sorted[groupIdx.strays[i]!]!,
+      strays: p.strayItems,
       citesToks: sorted[groupIdx.citesToks[i]!]!,
       citesTids: sorted[groupIdx.citesTids[i]!]!,
       layersToks: sorted[groupIdx.layersToks[i]!]!,
