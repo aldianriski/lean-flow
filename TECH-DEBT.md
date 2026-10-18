@@ -782,7 +782,8 @@ status: current
   - **Second consumer confirmed (SPRINT-109 T4 review):** `check-verify-reaches.ts` inherits it. Its `verify-member-resolution-empty`
     fires only when ALL listed ids fail, never when one of several drops.
 
-- **TD-187** severity: medium | status: open | created: Sprint-109 (promote governance review)
+- **TD-187** severity: medium | status: resolved → SPRINT-125 T7 | created: Sprint-109 (promote governance review)
+  - Resolved (SPRINT-125 T7, `95993a47`/`a94182b9`): S11.TDDELETE reads the resolve sprint case-insensitively from every real resolved-row shape (status field up to the first `|`, else a trailing `closed:`); a row naming no sprint is listed in one `not judged` note. Verdicts can move pass → fail for overdue rows in shapes the old extractor missed (spec 0.16.0). Must-FAIL per shape + non-vacuous controls in `evals/run-sprint-family-fixtures.sh`. Codex R1 → R2 clear; residual R1-T4 (a status naming two sprints takes the first) filed as debt at close (0 of 112 historical rows).
   - Summary: **`S11.TDDELETE` prints PASS without judging any resolved row.** Its extractor
     (`conformance-engine.sh`, `assert_S11_TDDELETE`) wants `closed: Sprint-NNN` or `resolved … (Sprint-NNN`,
     with a lowercase `print`. All 5 resolved rows on 2026-09-28 wrote `→ SPRINT-NNN …` or `→ <sha> (SPRINT-NNN …`,
@@ -1963,7 +1964,8 @@ status: current
     fixture for a genuine contradiction, plus a control pairing the F4 registry with the dispatch
     registry that must PASS — the exact case this row was filed from.
 
-- **TD-118** severity: minor | status: open | created: Sprint-091
+- **TD-118** severity: minor | status: resolved → SPRINT-125 T7 | created: Sprint-091
+  - Resolved (SPRINT-125 T7, `95993a47`/`a94182b9`): S4.NEGATIVE FAILs a Consequences section whose every Negative mention is a bare denial ("no negatives identified", `Negative: none`, `Negatives: n/a`, a bare label then `none`); any other mention passes. Finding id unchanged (ADR-034 behaviour-change ruling, owner, SPRINT-125 G2); spec 0.16.0. The TS half was already deleted by ADR-051.
   - Summary: **`S4.NEGATIVE` is a bare substring match for "negative" in both engines**, so an ADR whose
     Consequences say *"no negatives identified"* — the exact thing the rule exists to catch — PASSES.
   - `packages/standard/src/rules/s4-negative.ts` uses `/negative/i.test(body)`; `conformance-engine.sh`

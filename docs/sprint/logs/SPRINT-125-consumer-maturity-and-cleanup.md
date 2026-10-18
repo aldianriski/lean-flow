@@ -194,3 +194,23 @@ B6: `.claude/CONTEXT.md:104` exceeds 400 chars. The line was already overlong be
 (gate 28/0); T3 only lengthened it. It is recorded for the close Retro's doc-aging rather than fixed here (outside every Layers line's
 intent: an SSOT dedup pass, L-008). TASK-427 has every box ticked and Codex CLEAR → `done/`. TASK-422 and TASK-428 keep box 3
 (CHANGELOG) open until close.
+
+### 2026-10-18 | T7 | TASK-432 — S4.NEGATIVE bare-denial FAIL + S11.TDDELETE all-shape extractor, spec 0.16.0; merged `ef9e96ab`
+**Consequential G bar met:**
+- Regression-first fixtures.
+- A 10-seed campaign on the first build plus 4 seeds on the revise, each reddening only its own cases, with sibling controls green.
+  The engine was restored by hash each time; the final hash equals HEAD.
+- Outside review: Codex R1 (5 findings) → one builder round → Codex R2. T2 · T3 · T5 came back FIXED and nothing new was found.
+  R2-T6 was "unverifiable": my R2 brief omitted the evals diff. The coordinator verified it directly: recent controls FAIL if
+  listed as not judged, the borderline control is split per shape, and the pending-label sibling is present.
+- R1-T4 goes to debt at close, by census (0 of 112).
+**Post-merge:** the always-on adr-family harness is all green, prose-density 28/0, layers-observed PASS. `conformance.sh .` shows
+S4.NEGATIVE PASS 53/53 and S11.TDDELETE PASS plus a note naming TD-168. The run also raised one §11 finding,
+`closed-task-past-retention: done/TASK-423`, which came due once TASK-427, its last live citer, moved to `done/`. It is routed to
+the close retention pass (owner approval).
+TD-187 and TD-118 are resolved. Box 3 (CHANGELOG) stays open until close, so the task is in `review/`.
+CHANGELOG (consumer, spec 0.16.0):
+- S4.NEGATIVE now FAILs an ADR whose § Consequences only denies a Negative; an ADR naming any real Negative passes.
+- S11.TDDELETE reads the resolve sprint from every resolved-row shape, so an overdue row the old extractor missed now FAILs. Rows
+  naming no sprint are listed in one note.
+- Rule ids and finding ids are unchanged.
