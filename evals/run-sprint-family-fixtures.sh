@@ -454,6 +454,58 @@ d="$work/tddelete-ok2"; mkdir -p "$d"; ledger_repo "$d"
 printf -- '- **TD-002** severity: major | status: open | created: Sprint-800\n' >> "$d/TECH-DEBT.md"
 assert_absent "s11-td-past-retention-control-open" "$d" "resolved-td-row-past-retention"
 
+# --- TD-187: every REAL resolved-row shape the ledger has used, one engine run ----------------------
+# The extractor once matched only `| closed: Sprint-N` and `resolved (Sprint-N`, so ~94 of 103 historical rows were
+# judged as nothing and the leg printed PASS. Shapes below are the real ones (TECH-DEBT.md history); TD-101..107 are
+# old (Sprint-880, current 900) and each MUST FAIL naming its own id; TD-201..204 are recent and MUST stay silent;
+# TD-301/302 name no sprint and must be listed in ONE `not judged` note -- never a FAIL, never silent. `created:
+# Sprint-870` rides every row so a whole-row read (the resolve date taken from `created:`) cannot hide.
+d="$work/tddelete-shapes"; mkdir -p "$d"; ledger_repo "$d"
+{
+  printf -- '- **TD-101** severity: minor | status: resolved → SPRINT-880 T3 | created: Sprint-870\n'
+  printf -- '- **TD-102** severity: minor | status: resolved → TASK-9 (Sprint-880) | created: Sprint-870\n'
+  printf -- '- **TD-103** severity: minor | status: resolved → TASK-9 (SPRINT-880 T2, ADR-026) | created: Sprint-870\n'
+  printf -- '- **TD-104** severity: minor | status: resolved → 1ab2c3d (SPRINT-880 T1; population fixture retained) | created: Sprint-870\n'
+  printf -- '- **TD-105** severity: minor | status: resolved (SPRINT-880 T1) | created: Sprint-870\n'
+  printf -- '- **TD-106** severity: minor | status: resolved → SPRINT-880 close (owner ruling, no task) | created: Sprint-870\n'
+  printf -- '- **TD-107** severity: minor | status: resolved → TASK-9 | created: Sprint-870 | closed: Sprint-880\n'
+  printf -- '- **TD-201** severity: minor | status: resolved → SPRINT-899 T3 | created: Sprint-870\n'
+  printf -- '- **TD-202** severity: minor | status: resolved → TASK-9 (Sprint-899) | created: Sprint-870\n'
+  printf -- '- **TD-203** severity: minor | status: resolved (SPRINT-899 T1) | created: Sprint-870\n'
+  printf -- '- **TD-204** severity: minor | status: resolved → SPRINT-899 close (owner ruling, no task) | created: Sprint-870\n'
+  printf -- '- **TD-301** severity: minor | status: resolved → TASK-404 | created: Sprint-870\n'
+  printf -- '- **TD-302** severity: minor | status: resolved → accepted (no task) | created: Sprint-870\n'
+} >> "$d/TECH-DEBT.md"
+_o=$(sh "$engine" "$d" --spec "$spec" 2>&1)
+for _id in TD-101 TD-102 TD-103 TD-104 TD-105 TD-106 TD-107; do
+  if printf '%s\n' "$_o" | grep -qF "resolved-td-row-past-retention: $_id resolved at SPRINT-880"; then
+    echo "PASS fixture(s11-td-shape-$_id): the old row's resolve sprint was extracted and judged past retention"
+  else
+    echo "FAIL fixture(s11-td-shape-$_id): an old resolved row of this shape was not judged -- the extractor misses a real shape (TD-187)"
+    fail=1
+  fi
+done
+for _id in TD-201 TD-202 TD-203 TD-204; do
+  if printf '%s\n' "$_o" | grep -qF "$_id resolved at"; then
+    echo "FAIL fixture(s11-td-shape-control-$_id): a recently resolved row fired -- a false positive"
+    fail=1
+  else
+    echo "PASS fixture(s11-td-shape-control-$_id): the recent row of this shape stayed silent"
+  fi
+done
+if printf '%s\n' "$_o" | grep -qF "not judged: 2 resolved row(s) name no resolve sprint, so their age has no scale: TD-301 TD-302"; then
+  echo "PASS fixture(s11-td-no-sprint-note): rows naming no sprint are listed in one named 'not judged' note"
+else
+  echo "FAIL fixture(s11-td-no-sprint-note): the no-sprint rows were not named in a 'not judged' note -- silent skip (TD-187)"
+  fail=1
+fi
+if printf '%s\n' "$_o" | grep -qE "resolved-td-row-past-retention: TD-30"; then
+  echo "FAIL fixture(s11-td-no-sprint-not-a-finding): a no-sprint row was turned into a FAIL -- it must be a note only"
+  fail=1
+else
+  echo "PASS fixture(s11-td-no-sprint-not-a-finding): the no-sprint rows raised no finding"
+fi
+
 # --- The threshold is READ, not written: move it in a scratch spec and the verdict follows -------
 # This is the DoD's mechanism test, and it is the whole reason the delay is parsed out of §11 rather
 # than typed into the checker. Same repository, same code -- only the spec changes.

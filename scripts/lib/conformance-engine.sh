@@ -1483,6 +1483,32 @@ _adr_section() {
   '
 }
 
+# _adr_negative_class -- reads a § Consequences body on stdin, prints `none` (no line mentions "negative"),
+# `denied` (every mention is a DENIAL: "no negatives identified", `Negative: none`, `Negatives: n/a`, a bare
+# `**Negative:**` label whose next line is only "none") or `real` (at least one mention is not a denial).
+# Denial-only is the narrow tighten (SPRINT-125 T7, TD-118): a bare `grep -qi negative` passed an ADR whose
+# entire Negative was the word "none". Anything not provably a denial counts as real, so the rule fails closed to PASS.
+_adr_negative_class() {
+  awk '
+    function denial(l) {
+      return (l ~ /(^|[^a-z])no ((significant|known|real|notable|major|material) )?negatives?( [a-z -]{0,40})?[ \t]*[.;!]*[ \t]*$/ \
+           || l ~ /negatives?[^:]{0,40}(:|-|—|–)[ \t]*(none|n\/a|nil|not applicable)[ \t]*[.;!)]*([ \t]+(identified|noted|known|at this time))?[ \t]*$/)
+    }
+    { l = tolower($0); gsub(/[*`_\r]/, "", l) }
+    pend {
+      if (l ~ /^[ \t]*$/) next
+      pend = 0
+      if (l ~ /^[ \t>-]*(none|n\/a|nil|not applicable)[ \t]*[.;!)]*[ \t]*$/) den++; else real++
+    }
+    l !~ /negative/ { next }
+    l ~ /negatives?[^:]{0,40}:[ \t]*$/ { pend = 1; next }
+    { if (denial(l)) den++; else real++ }
+    END {
+      if (pend) real++
+      print (real > 0 ? "real" : (den > 0 ? "denied" : "none"))
+    }'
+}
+
 assert_S4_ONEFILE() {
   repo=$1
   [ -d "$repo/docs/adr" ] || {
@@ -1651,8 +1677,11 @@ assert_S4_NEGATIVE() {
 '
       continue
     fi
-    if _adr_section Consequences < "$f" | grep -qi 'negative'; then
+    neg_class=$(_adr_section Consequences < "$f" | _adr_negative_class)
+    if [ "$neg_class" = real ]; then
       n_neg=$((n_neg + 1))
+    elif [ "$neg_class" = denied ]; then
+      bad "adr-no-negative-consequence: $a -- § Consequences DENIES a Negative (\"none\" / \"no negatives\") instead of naming one. §4 requires at least one because no decision is cost-free: a denial is not a trade-off, it is the absence of the examination"
     else
       bad "adr-no-negative-consequence: $a -- § Consequences names no Negative. §4 requires at least one because no decision is cost-free: an ADR listing only upsides has not been examined, it has been advertised"
     fi
@@ -2634,6 +2663,11 @@ _s11_collapse_markers() {
     }' "$1"
 }
 
+# _s11_first_sprint -- stdin text -> the number of its first `sprint-N` (case-insensitive, leading zeros dropped), or nothing.
+_s11_first_sprint() {
+  awk '{ s = tolower($0); if (match(s, /sprint-0*[0-9]+/)) { t = substr(s, RSTART, RLENGTH); sub(/sprint-/, "", t); print t + 0; exit } }'
+}
+
 assert_S11_TDDELETE() {
   repo=$1
   led="$repo/TECH-DEBT.md"
@@ -2646,7 +2680,7 @@ assert_S11_TDDELETE() {
   # discuss resolved rows in prose, and a grep for `status: resolved` alone counts the LEGEND LINE as
   # a row -- the exact miss L-108 records against a TECH-DEBT census, in this same file.
   rows=$(grep '^- \*\*TD-' "$led" 2>/dev/null)
-  n_over=0
+  n_over=0; n_nospr=0; nospr_ids=""
   _oifs=$IFS; IFS='
 '
   for ln in $rows; do
@@ -2656,9 +2690,15 @@ assert_S11_TDDELETE() {
 '; continue; }
     case "$ln" in *'status: resolved'*) ;; *) IFS='
 '; continue ;; esac
-    cl=$(printf '%s' "$ln" | sed -n 's/.*closed: *[Ss]print-0*\([0-9][0-9]*\).*/\1/p')
-    [ -n "$cl" ] || cl=$(printf '%s' "$ln" | sed -n 's/.*resolved[^(]*([Ss]print-0*\([0-9][0-9]*\).*/\1/p')
-    if [ -n "$cl" ]; then
+    # The resolve sprint is the FIRST `sprint-N` (any case) in a trailing `closed:` field, else in the status
+    # field up to its ` | ` delimiter -- never the whole row, whose `created: Sprint-N` would be read as the
+    # resolve date. Covers `→ SPRINT-N TN` · `→ TASK-N (Sprint-N)` · `→ <sha> (SPRINT-N …)` · `resolved (SPRINT-N TN)`
+    # · `→ SPRINT-N close (…)` (TD-187). A row naming none is NOT judged: it is listed in one named note below.
+    cl=$(printf '%s' "$ln" | sed -n 's/.*closed:\(.*\)/\1/p' | _s11_first_sprint)
+    [ -n "$cl" ] || cl=$(printf '%s' "$ln" | sed -n 's/.*status: resolved\([^|]*\).*/\1/p' | _s11_first_sprint)
+    if [ -z "$cl" ]; then
+      n_nospr=$((n_nospr + 1)); nospr_ids="$nospr_ids $tid"
+    else
       age=$((cur - cl))
       if [ "$age" -ge "$thr" ]; then
         bad "resolved-td-row-past-retention: $tid resolved at SPRINT-$cl, $age sprints before the current SPRINT-$cur -- §11 deletes the row once it is $thr sprints old. The substance already lives in CHANGELOG.md, the sprint archive and git; ids stay monotonic, so deleting never frees $tid for reuse"
@@ -2669,6 +2709,7 @@ assert_S11_TDDELETE() {
 '
   done
   IFS=$_oifs
+  [ "$n_nospr" -eq 0 ] || note "S11.TDDELETE        -- not judged: $n_nospr resolved row(s) name no resolve sprint, so their age has no scale:$nospr_ids (a note, never a finding -- name the sprint in the status or add \`| closed: Sprint-N\` to have the row judged)"
   [ "$n_over" -eq 0 ] && ok "S11.TDDELETE        -- no resolved TECH-DEBT row has reached §11's $thr-sprint deletion trigger (current SPRINT-$cur)"
 }
 

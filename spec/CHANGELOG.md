@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-10
+last_updated: 2026-10-18
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,24 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.16.0 — 2026-10-18
+
+**MINOR (§15) carrying MAJOR meaning at `0.x` — `S4.NEGATIVE` is tightened; `S11.TDDELETE` gains a named note, no verdict moves.**
+§15's test (could a repository that conformed now fail?) answers yes for `S4.NEGATIVE`: an ADR whose § Consequences only
+*denies* a Negative (`Negative: none`, "no negatives identified") used to pass on the bare word and now fails. Owner ruling
+under ADR-034's behaviour-change rule (G2, SPRINT-125; TASK-432, TD-118).
+
+- **§4** (prose and the `S4.NEGATIVE` row): a denial is not a Negative. The rule fails an ADR only when *every* mention of
+  "negative" in § Consequences is a denial; any real Negative (`**Negative (trade-offs accepted):** …`, `**Negative — …**`)
+  passes. Finding id `adr-no-negative-consequence` is unchanged; a denial-only section reuses it with a "DENIES" message.
+  This repository's 53 ADRs: none newly fails.
+- **`S11.TDDELETE` (engine, no spec text change):** the resolve sprint is now read from every real resolved-row shape
+  (`→ SPRINT-N TN`, `→ TASK-N (Sprint-N)`, `→ <sha> (SPRINT-N …)`, `resolved (SPRINT-N TN)`, `| closed: Sprint-N`). A resolved
+  row naming no sprint is listed in one `not judged` note, never a FAIL and never silent; rows judged past §11's delay still
+  raise the existing `resolved-td-row-past-retention`. Previously ~94 of 103 historical shapes were judged as nothing.
+
+Rule tables, rule ids and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
 
 ## 0.15.0 — 2026-10-10
 
