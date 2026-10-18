@@ -66,8 +66,23 @@ run_case_anywhere "index-missing-adr-fires" 1 "decisions-index-missing-adr: docs
 run_case_anywhere "required-section-missing-fires" 1 "adr-required-section-missing: docs/adr/ADR-001-a-real-decision.md -- Alternatives" -- \
   sh "$engine" "$fx/sections-missing" --spec "$adr_spec"
 
-run_case_anywhere "no-negative-consequence-fires" 1 "adr-no-negative-consequence: docs/adr/ADR-001-a-real-decision.md" -- \
+run_case_anywhere "no-negative-consequence-fires" 1 "adr-no-negative-consequence: docs/adr/ADR-001-a-real-decision.md -- § Consequences names no Negative" -- \
   sh "$engine" "$fx/no-negative" --spec "$adr_spec"
+
+# S4.NEGATIVE DENIAL (SPRINT-125 T7, TD-118): a § Consequences whose every Negative mention is a denial fails under the
+# SAME finding id (ADR-034 freezes ids) with the DENIES message. One must-FAIL per denial phrasing family, then a
+# borderline control that must PASS: real Negatives in the ADR-001 / ADR-039 shapes, plus a denial-looking phrase.
+for fam in denied-prose denied-label-none denied-na denied-next-line denied-none-identified denied-none-noted; do
+  run_case_anywhere "negative-denial-$fam-fires" 1 "adr-no-negative-consequence: docs/adr/ADR-001-a-real-decision.md -- § Consequences DENIES a Negative" -- \
+    sh "$engine" "$fx/$fam" --spec "$adr_spec"
+done
+# Must-PASS siblings, ONE shape per fixture so neither masks the other: the ADR-001 and ADR-039 Negative shapes,
+# a denial-looking opener that goes on to name a real cost ("No negatives except …", "… beyond …"), and a bare
+# `**Negative:**` label whose next line is a real cost.
+for fam in borderline-adr001 borderline-adr039 real-no-negatives-except real-no-negatives-beyond pending-label-real-cost; do
+  run_case_anywhere "negative-$fam-passes" 0 "PASS  S4.NEGATIVE" -- \
+    sh "$engine" "$fx/$fam" --spec "$adr_spec"
+done
 
 # --- S4.ONEFILE's other two sub-cases -------------------------------------------------------------
 # "One file per ADR at docs/adr/ADR-NNN-<slug>.md" is three separate claims, and a rule that only
