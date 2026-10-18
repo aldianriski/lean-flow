@@ -27,7 +27,7 @@ status: current
 ## File Structure
 → **`docs/architecture/overview.md` § Directory structure** — the where-things-live map, and the only one.
 A second tree here is a hand-maintained codemap, which § Orientation of CONTEXT.md rules out (it rots — LAW 3).
-Shape: **14 SKILL.md** auto-discovered at root · **33 canonical doc templates** + 2 non-core (DESIGN · QA-TESTCASE) **= 35 total**.
+Shape: **14 SKILL.md** auto-discovered at root · **34 canonical doc templates** + 2 non-core (DESIGN · QA-TESTCASE) **= 36 total**.
 
 ## The loop
 `/prime → /lean-doc-generator → /orchestrator → repeat`. `/handoff` ends a session; `/prime`

@@ -9,6 +9,21 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.17.0 — 2026-10-18
+
+**MINOR (§15) — additive; no verdict moves.** §15's test (could a repository that conformed now fail?) answers no: the new
+`product/roadmap.md` row is create-lazily, a repository without a roadmap owes nothing, and the coverage rule adds no
+conformance rule. Consumer evidence: a first outside consumer hand-rolled a phased delivery plan with no status and no
+link to the tasks delivering it (SPRINT-126, TASK-435).
+
+- **§2**: a `product/roadmap.md` row (created lazily when a delivery sequence spans ≥ 2 sprints or epics; cap 150 soft;
+  scoped row plans under `product/roadmap/<row>.md` are free-form), and a **Roadmap coverage** paragraph after Epic
+  coverage: an `active` row names an open task, an active epic or `next slice: <name>`; `planned` rows are exempt, `done`
+  rows need nothing. Enforced by `/prime` and `/triage` (report) and `promote`'s checklist (warn) — adds no row to the rule
+  tables.
+- **Template**: `roadmap.md.template` (Outcome · Delivery sequence · Gates · Out of scope); template count 33 → 34 core.
+Rule tables, rule ids and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
+
 ## 0.16.0 — 2026-10-18
 
 **MINOR (§15) carrying MAJOR meaning at `0.x` — `S4.NEGATIVE` is tightened; `S11.TDDELETE` reads more row shapes, so verdicts can move pass → fail.**

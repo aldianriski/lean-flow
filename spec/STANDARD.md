@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-10-18
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.16.0
+version: 0.17.0
 status: current
 ---
 
@@ -148,6 +148,7 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 | `deployment/rollback-guide.md` | base | Dev / ops | 80 | with deployment-guide | rollback process changes |
 | `flows/<slug>.md` (Mermaid) | medium+ | Dev | 100 each | a flow needs shared understanding | that flow changes |
 | `epic/EPIC-NNN-<slug>.md` + `epic/INDEX.md` (created lazily) | lean loop | Team / AI | 200 soft | a **multi-sprint** outcome is named — one sprint's worth of work is a sprint, and an unnameable destination is fog (`--fog`) until it isn't | a member sprint closes, or a decision changes the outcome |
+| `product/roadmap.md` (created lazily; scoped row plans in `product/roadmap/<row>.md` are free-form) | as needed | Dev / PM | 150 soft | a delivery sequence spanning ≥ 2 sprints or epics is planned | a row changes status or is re-sequenced |
 | `work/<status>/TASK-NNN-<slug>.md` — the **work-item store**, one file per task (schema: `work/README.md`) | lean loop | Dev / AI | no container cap — one file per task, so nothing accumulates | lean loop — work is tracked in-repo: the first task file is written (`/task-decomposer` · `/triage`), or `migrate` converts a v1 `TODO.md` | status = the folder (`backlog · todo · in_progress · review · done · cancel`), changed by a `git mv` in its own commit; title = the filename; membership = `sprint:` / `epic:` frontmatter (ADR-045) → §11 prune of `done/` · `cancel/` |
 | `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | Files Changed · Retro during sprint (Plan frozen at promote; DoD ticks land in the member task files, §9) → §11 archive |
 | `sprint/logs/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | append-only | lazily, at the first Execution Log entry | every Execution Log entry → §11 archive with its sprint. **Must live in the `logs/` subdirectory**: the sprint-file checks glob `docs/sprint/SPRINT-*.md`, which is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 400 and schema-checked as a Plan (ADR-014) |
@@ -168,6 +169,14 @@ or `cancel/` while its condition is still `[ ]`, or whose file does not exist, d
 coverage). The rule is enforced by the lifecycle skills (`promote` refuses to form a sprint over an uncovered
 condition unless the owner records an override; `/triage` and `/prime` report them), not by a conformance rule:
 it adds no row to the rule tables (0.15.0).
+
+**Roadmap coverage (a roadmap's active rows).** In `product/roadmap.md`, every row whose `Status` is `active` must be
+**covered**: its `Covered by` cell names at least one open task (any `docs/work/` folder except `done/` and `cancel/`),
+an `EPIC-NNN` that is `status: active`, or `next slice: <name>`. A `planned` row is exempt (a plan, not admitted scope)
+and a `done` row needs nothing. A mark is **stale** when every `TASK-NNN` it names is in `done/` or `cancel/` or has no
+file, or when it names only an epic that is not active. The rule is enforced by the lifecycle skills (`/prime` and
+`/triage` report; `promote`'s checklist warns and never refuses), not by a conformance rule: it adds no row to the
+rule tables (0.17.0).
 
 **Placement is canonical.** Root keeps the daily working files + the TemiDev root set above;
 AI-context lives in `.claude/`; everything else lives under the `docs/` tree. Generation targets

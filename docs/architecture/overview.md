@@ -33,7 +33,7 @@ skills/           14 skills (auto-discovered at root)
     task-decomposer/references/prd-and-slices.md  PRD template · tracer-bullet slices · breakdown quiz
     refactor-advisor/references/deepening.md      seam/depth vocab · dependency categories · design-it-twice
     prototype/references/{logic,ui}.md            throwaway TUI over a portable module · web UI variants
-  lean-doc-generator/templates/   33 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 35 total)
+  lean-doc-generator/templates/   34 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 36 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · development/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md
                   · research/ · qa/
