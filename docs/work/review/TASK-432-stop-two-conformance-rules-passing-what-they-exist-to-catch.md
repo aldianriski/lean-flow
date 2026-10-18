@@ -29,7 +29,7 @@ TD-118: `grep -qi 'negative'` passes an ADR saying "no negatives identified".
       `not judged` for a resolved row with none — a retained must-FAIL fixture per real shape (TD-187).
 - [x] `S4.NEGATIVE` fails an ADR whose Consequences deny any negative, ruled under ADR-034's frozen ✓ bare-denial matcher (prose · label · next-line); 6 must-FAIL + 5 must-PASS siblings incl. Codex's two examples; ADR-034 ruling + spec 0.16.0; this repo 53/53 unchanged; adr-family all green
       surface, with a must-FAIL fixture and a sibling control (TD-118).
-- [ ] Consequential-G bar: each assertion broken in turn reddens exactly its case; worktree-isolated
+- [x] Consequential-G bar: each assertion broken in turn reddens exactly its case; worktree-isolated ✓ seed campaigns (10 + 4, each reddening only its cases, engine restored by hash) · Codex R1 → revise → R2 clear (T6 coordinator-verified) · CHANGELOG verdict-change note (`4a29e70f`)
       outside review; CHANGELOG notes the verdict change for adopters.
 
 ## Touches

@@ -214,3 +214,13 @@ CHANGELOG (consumer, spec 0.16.0):
 - S11.TDDELETE reads the resolve sprint from every resolved-row shape, so an overdue row the old extractor missed now FAILs. Rows
   naming no sprint are listed in one note.
 - Rule ids and finding ids are unchanged.
+
+### 2026-10-18 | T9 | TASK-430 — release-patch derives the lockstep set and bumps sibling current-version references; merged `61e0da9d`
+`skills/release-patch/SKILL.md` grew from 98 to 100 lines. Plugin mode derives its lockstep set from `grep -l '"version"' .*-plugin/*.json`.
+The new step 3b runs `git grep -nF '<old>'` and bumps only the hits that state the current version (never CHANGELOG history); the
+output gains a `[siblings]` line. Dry-run on 2.5.0 selected 4 manifests plus the README footer and left 2 history hits. Caps and
+prose-density pass. Box 2 is exercised by this sprint's own release. Codex T9 pass pending.
+
+### 2026-10-18 | close-prep | CHANGELOG SPRINT-125 block written (`4a29e70f`); box 3 ticked on TASK-422 · 428 · 432; TASK-430 box 1
+TASK-422 · 428 · 432 have every box ticked and a CLEAR Codex verdict (wave B, and T7 R2), so they move `review/ → done/`.
+TASK-430 waits in `in_progress/`: its Codex pass is pending, and box 2 needs the real release.

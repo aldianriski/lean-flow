@@ -32,7 +32,7 @@ Owner ruling 2026-10-10: a separate task, kept out of SPRINT-121's bounded vehic
       ruling 2026-10-18); the check is unchanged. TD-160 (red by construction between promote and first entry) resolves with it.
 - [x] A fixture reproduces the SPRINT-121 promote shape (an active sprint, no log) and shows the ruled behaviour, with a sibling ✓ retained `qa-leg2g-v2-open-members-no-log` (FAIL) + `-with-log` + new `qa-leg2g-v2-promoted-log-promote-entry-only` (not FAILed: skip, pass=0 fail=0); `run-night-run-rollup-fixtures.sh` all green
       control.
-- [ ] README/CHANGELOG note the change if the template or a skill changed (consumer-facing).
+- [x] README/CHANGELOG note the change if the template or a skill changed (consumer-facing). ✓ README sprint-log row (`4ca7438a`) + CHANGELOG SPRINT-125 block (`4a29e70f`)
 
 ## Touches
 

@@ -30,7 +30,7 @@ already marked "lean-flow itself").
       (not the path), marked "where the host repo has one", or marked as this repo's own tooling — and
       a re-census lists each survivor with its ruling (TD-137 · TD-214).
 - [x] Read on the consumer path: each touched step still completes for a repo with no `scripts/`. ✓ each R1 step completes with no `scripts/` (host's gate · reachability checker where the host has one · sprint-close checker or the plain-git fallback); stale EPIC-008 status fixed in night-run.md + scripts/night-run.sh (comment, `sh -n` ok)
-- [ ] CHANGELOG notes the consumer-facing change; touched SKILL.md files stay ≤ ~140 lines.
+- [x] CHANGELOG notes the consumer-facing change; touched SKILL.md files stay ≤ ~140 lines. ✓ CHANGELOG SPRINT-125 block (`4a29e70f`); orchestrator/SKILL.md 138, lean-doc-generator/SKILL.md 138 lines (check-doc-caps PASS)
 
 ## Touches
 
