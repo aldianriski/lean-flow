@@ -389,17 +389,23 @@ function main(argv: string[]) {
   const rewritten = new Set<string>();
   const logHeadingChanged = new Set<string>();
   const newSince = new Map<string, string[]>();
-  const scopedSince = (base: string): string[] => {
-    if (!newSince.has(base)) {
+  // `at` (TD-205): read the log AS OF that commit instead of today's, so an entry written after an edit
+  // cannot cover it -- the order S9.SCOPECHANGE already enforces for § Plan. Problems are reported once, on
+  // the live read; a historical read that cannot be parsed simply counts nothing.
+  const scopedSince = (base: string, at?: string): string[] => {
+    const key = at === undefined ? base : `${base}@${at}`;
+    if (!newSince.has(key)) {
       const baseInlineSection = section(showAt(base, "sprint"), "Execution Log");
       const baseSources = [showAt(base, "log"), baseInlineSection ?? ""];
+      const atInline = at === undefined ? nowInlineSection : section(showAt(at, "sprint"), "Execution Log");
+      const sources: [string, string][] = at === undefined ? liveSources : [["logs/ file", showAt(at, "log")], ["inline ## Execution Log", atInline ?? ""]];
       const fresh: string[] = [];
-      liveSources.forEach(([label, live], i) => {
+      sources.forEach(([label, live], i) => {
         // The inline heading is expected to always exist somehow; unrecognisable at the baseline
         // but recognisable now (closed later, renamed, ...) must never silently make every
         // pre-promote entry new -- flag it instead, and count none of that source's entries.
-        if (i === 1 && baseInlineSection === null && nowInlineSection !== null) {
-          if (!logHeadingChanged.has(base)) {
+        if (i === 1 && baseInlineSection === null && atInline !== null) {
+          if (at === undefined && !logHeadingChanged.has(base)) {
             logHeadingChanged.add(base);
             bad("LOG-HEADING-CHANGED", `the inline ## Execution Log heading is unrecognisable at ${base.slice(0, 7)} but recognisable now -- its entries are not counted`);
           }
@@ -409,14 +415,14 @@ function main(argv: string[]) {
         const before = body(baseSources[i]!).trimEnd();
         const now = body(live);
         if (now.startsWith(before)) fresh.push(...scopeChangeEntries(now, before.length));
-        else if (!rewritten.has(`${label}@${base}`)) {
+        else if (at === undefined && !rewritten.has(`${label}@${base}`)) {
           rewritten.add(`${label}@${base}`);
           bad("LOG-REWRITTEN", `the ${label} as of ${base.slice(0, 7)} is no longer a prefix of today's -- a past entry was edited; its entries are not counted`);
         }
       });
-      newSince.set(base, fresh);
+      newSince.set(key, fresh);
     }
-    return newSince.get(base)!;
+    return newSince.get(key)!;
   };
 
   // `Tn` -> the TASK ids that govern its frozen Plan block (the leading run of its `Cites:`, TD-199), so an
@@ -497,6 +503,20 @@ function main(argv: string[]) {
     return null;
   };
 
+  // The first commit after `baseCommit` where member `id`'s `## Done when` stops matching `frozen` (ticks and
+  // their evidence ignored), or null when no commit shows it (the edit is in the working tree only).
+  const firstEdit = (baseCommit: string, id: string, frozen: string): string | null => {
+    const cs = git(root, ["log", "--reverse", "--format=%H", `${baseCommit}..HEAD`, "--", `${WORK}/*/${id}-*`]).split("\n").filter(Boolean);
+    for (const c of cs) {
+      const t = commitTree(root, c);
+      const f = resolveId(t.paths, id);
+      if (f.length !== 1) continue;
+      const dw = section(t.read(f[0]!) ?? "", "Done when");
+      if (dw !== null && !sameDoneWhen(frozen, dw)) return c;
+    }
+    return null;
+  };
+
   for (const id of all) {
     let base: Tree = pcTree;
     if (planned.has(id) && !current.has(id)) {
@@ -526,7 +546,16 @@ function main(argv: string[]) {
     } else if (sameDoneWhen(frozen, live)) {
       ok(`freeze ${id}`, `## Done when unchanged since ${base.label} (ticks ignored; now at ${nowP[0]})`);
     } else if (base.commit != null && names(scopedSince(base.commit), id)) {
-      ok(`freeze ${id}`, `## Done when changed since ${base.label}, covered by a scope-change entry new since then naming ${id}`);
+      // TD-205: a covering entry must also PRECEDE the edit. The edit is the first commit after the
+      // baseline whose `## Done when` differs from the frozen one; the log as of that commit (the same
+      // commit counts, as for § Plan) must already hold an entry naming the member. An edit that exists
+      // only in the working tree has no commit to order against and keeps the live read.
+      const editAt = firstEdit(base.commit, id, frozen);
+      if (editAt === null || names(scopedSince(base.commit, editAt), id)) {
+        ok(`freeze ${id}`, `## Done when changed since ${base.label}, covered by a scope-change entry new since then naming ${id}${editAt === null ? "" : ` and logged by the edit at ${editAt.slice(0, 7)}`}`);
+      } else {
+        bad(`FREEZE-EDIT ${id}`, `## Done when changed at ${editAt.slice(0, 7)} before any scope-change entry naming ${id} was logged -- logged afterwards it is a justification written knowing the outcome (§9 puts the entry first)`);
+      }
     } else {
       bad(`FREEZE-EDIT ${id}`, `## Done when changed since ${base.label} with no scope-change entry new since then naming ${id}`);
     }

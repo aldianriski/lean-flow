@@ -389,6 +389,76 @@ describe("a `sprint(NNN) Tn:` subject attributes to Tn only for THIS sprint (TD-
   });
 });
 
+// --- SPRINT-128 T5 (TASK-447 · TD-177): a Layers: token that matches nothing is named ------------------
+// Checked only for a Tn whose cited members are all in done/ or cancel/ (an unstarted task's own
+// in_progress/ path does not exist yet). A token is live when ANY path at HEAD or touched since
+// plan_commit matches it, both sides of a rename and deleted paths included.
+describe("dead Layers: token (TD-177)", () => {
+  const M1D = "docs/work/done/TASK-901-one.md";
+  const DEAD = "layers-token-matches-nothing";
+  const mk = (name: string, layers: string, member = M1D) =>
+    build(name, { members: [member], plan: T1("`TASK-901`", layers) }, [{ path: member, id: "TASK-901" }]);
+
+  test("MUST-FAIL: a file token naming no path is named; the live token beside it is not", () => {
+    const r = run(mk("dead-file", "`src/a.ts` · `src/nope.ts`"));
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain(`${DEAD}: T1 declares \`src/nope.ts\``);
+    expect(r.out).not.toContain("`src/a.ts` --");
+  });
+
+  test("MUST-FAIL: a glob token covers nothing, so it is dead (SPRINT-104's miss)", () => {
+    const r = run(mk("dead-glob", "`src/*.ts`"));
+    expect(r.out).toContain(`${DEAD}: T1 declares \`src/*.ts\``);
+  });
+
+  test("MUST-FAIL: a directory token with nothing under it is dead; one with files under it is live", () => {
+    const r = run(mk("dead-dir", "`src/` · `nodir/`"));
+    expect(r.out).toContain(`${DEAD}: T1 declares \`nodir/\``);
+    expect(r.out).not.toContain("`src/`");
+  });
+
+  test("control: a token for a file the sprint DELETED is live (gone at HEAD, touched in the range)", () => {
+    const d = mk("deleted", "`src/a.ts` · `src/other.ts`");
+    rmSync(posix.join(d, "src/other.ts"));
+    commitAll(d, "remove other\n\nTask: TASK-901");
+    const r = run(d);
+    expect(r.out).not.toContain(DEAD);
+    expect(r.fail).toBe(false);
+  });
+
+  test("control: BOTH sides of a rename are live, each on its own", () => {
+    for (const [name, layers] of [
+      ["rename-both", "`src/a.ts` · `src/b.ts`"],
+      ["rename-old-side", "`src/a.ts`"],
+      ["rename-new-side", "`src/b.ts`"],
+    ] as const) {
+      const d = mk(name, layers);
+      rmSync(posix.join(d, "src/a.ts"));
+      writeFile(d, "src/b.ts", "a\n");
+      commitAll(d, "rename a to b\n\nTask: TASK-901");
+      expect(run(d).out).not.toContain(DEAD);
+    }
+  });
+
+  test("selection: an UNFINISHED task's future path is not checked; the same token on a finished one is", () => {
+    const future = "`src/a.ts` · `src/future.ts`";
+    const open = run(mk("open-task", future, M1));
+    expect(open.out).not.toContain(DEAD);
+    expect(run(mk("done-task", future)).out).toContain(`${DEAD}: T1 declares \`src/future.ts\``);
+  });
+
+  test("selection: with two tasks only the finished one is checked", () => {
+    const plan = `${T1("`TASK-901`", "`src/a.ts` · `src/gone-1.ts`")}\n${T1("`TASK-902`", "`src/other.ts` · `src/gone-2.ts`").replace("### T1", "### T2")}`;
+    const d = build("two-tasks", { members: [M1D, M2], plan }, [
+      { path: M1D, id: "TASK-901" },
+      { path: M2, id: "TASK-902" },
+    ]);
+    const r = run(d);
+    expect(r.out).toContain(`${DEAD}: T1 declares \`src/gone-1.ts\``);
+    expect(r.out).not.toContain("src/gone-2.ts");
+  });
+});
+
 // keep writeFileSync/mkdirSync imports honest for future fixtures
 void writeFileSync;
 void mkdirSync;

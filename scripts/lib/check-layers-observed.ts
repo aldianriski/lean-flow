@@ -292,6 +292,26 @@ function computeSortedUniqueWip(): string[] {
   return sorted.split("\n").filter(Boolean);
 }
 
+// --- dead Layers: tokens (TD-177) ------------------------------------------------------------------
+/** Every path in the tree at HEAD. */
+function gitTreePaths(): string[] {
+  const r = gitRun(["ls-tree", "-r", "-z", "--name-only", "HEAD"]);
+  return r.code === 0 ? r.stdout.split("\0").filter(Boolean) : [];
+}
+/** Every path any commit in `range` touched. `--no-renames` lists BOTH sides of a rename and a deleted
+ *  path is listed too: a token naming a file the task moved or removed is live, not dead. */
+function gitRangePaths(range: string): string[] {
+  const r = gitRun(["log", "--no-renames", "--name-only", "--format=", "-z", range]);
+  return r.code === 0 ? r.stdout.split("\0").filter(Boolean) : [];
+}
+/** A token is dead when it matches no path in `paths`: a file token by equality, a directory token
+ *  (trailing `/`) when any path is under it. Exactly the two shapes covers() understands -- a glob or a
+ *  slash-less directory covers nothing, so it reads as complete while covering zero files (SPRINT-104:
+ *  14 files undeclared). */
+export function deadTokens(tokens: readonly string[], paths: readonly string[]): string[] {
+  return [...new Set(tokens)].filter((t) => !paths.some((p) => (t.endsWith("/") ? p.startsWith(t) : p === t)));
+}
+
 // --- top-level run ---------------------------------------------------------------------------
 export interface RunResult {
   lines: string[];
@@ -431,6 +451,26 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
         bad(
           `${sp} layers observed: member-layers-undeclared: ${m.id} (${m.path}) is cited by no ### Tn block's Cites: leading run -- no Plan Layers govern it`,
         );
+      }
+    }
+
+    // ---- dead tokens (TD-177): only a Tn whose cited members are ALL in done/ or cancel/. A task not yet
+    // finished has declared files it has not created (its own in_progress/ path included), so checking it
+    // mid-sprint would be a false FAIL. No new Plan syntax: the question is asked after the work, of the
+    // tree at HEAD and of every path the sprint's commit range touched.
+    const finished = [...cites]
+      .filter(([, ids]) => ids.every((id) => members.some((m) => m.id === id && (m.folder === "done" || m.folder === "cancel"))))
+      .map(([t]) => t);
+    if (finished.length > 0) {
+      const known = [...gitTreePaths(), ...gitRangePaths(`${planCommit}..HEAD`)];
+      for (const t of finished) {
+        const dead = deadTokens(declsByTask.get(t) ?? [], known);
+        if (dead.length > 0) {
+          earlyHit = true;
+          bad(
+            `${sp} layers observed: layers-token-matches-nothing: ${t} declares ${dead.map((d) => "`" + d + "`").join(" ")} -- no path at HEAD or changed since ${planCommit} matches (a file token needs the exact path; a directory token a trailing /; globs match nothing)`,
+          );
+        }
       }
     }
 

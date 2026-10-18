@@ -236,6 +236,29 @@ const CASES: Case[] = [
     },
     expect: [],
   },
+  // TD-205: the entry must PRECEDE the edit, as § Plan edits already require (S9.SCOPECHANGE). The two
+  // cases differ only in commit order; the claim-bearing one is the FAIL, the PASS proves the order is read
+  // and not that every logged edit now fails.
+  {
+    name: "scope-change-committed-after-edit (must-FAIL: TD-205, a justification written knowing the outcome)",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit");
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: TASK-901 needs a benchmark. Impact: T1 stays S. G2 re-confirmed.");
+      commit(d, "scope-change, a commit later");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-committed-before-edit (must-PASS control: TD-205)",
+    mutate: (d) => {
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: TASK-901 needs a benchmark. Impact: T1 stays S. G2 re-confirmed.");
+      commit(d, "scope-change first");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit, a commit later");
+    },
+    expect: [],
+  },
   {
     name: "scope-change-names-other-id (must-FAIL)",
     mutate: (d) => {

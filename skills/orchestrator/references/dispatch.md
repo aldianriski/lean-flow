@@ -237,9 +237,10 @@ dep_ids() {
       printf "%s", out
     }'
 }
-inplan=0; tid=""; layers=""; deps=""; cur=""; depsbad=""
+inplan=0; tid=""; layers=""; deps=""; cur=""; depsbad=""; n=0
 flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\t%s\n' "$tid" "$layers" "$deps" "$depsbad" >>"$records"; }
 while IFS= read -r line || [ -n "$line" ]; do
+  n=$((n + 1))
   case "$line" in
     "## Plan"*) inplan=1; continue ;;
     "## "*) inplan=0 ;;
@@ -292,6 +293,19 @@ while IFS= read -r line || [ -n "$line" ]; do
            case "$_d" in "!"*) depsbad=1; _d=${_d#!} ;; esac
            deps="$deps$_d" ;;
       esac
+      ;;
+    '`'*)
+      # TD-138. A column-0 line that OPENS with a backtick right after a declaration is either a
+      # wrapped declaration or prose, and this reader cannot tell which. It used to fall into the
+      # arm below and reset `cur`, dropping the wrapped paths in silence -- the ownership map was
+      # built from each task's first line only, a false PASS on a real overlap. Named instead, the
+      # same err-loud rule check-layers-completeness applies.
+      if [ -n "$cur" ]; then
+        case "$cur" in L) _k=Layers ;; D) _k=Depends-on ;; *) _k=Cites ;; esac
+        echo "FAIL declaration-continuation: $sprint line $n is at column 0 after the $_k: declaration -- indent it, or separate prose with a blank line"
+        fail=1
+      fi
+      cur=""
       ;;
     *) cur="" ;;
   esac

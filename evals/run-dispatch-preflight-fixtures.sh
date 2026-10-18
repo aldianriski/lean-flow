@@ -225,6 +225,21 @@ run_case_anywhere "deps-cont-close-without-open" 1 "FAIL depends-on-unreadable: 
 run_case_anywhere "deps-cont-markup-welds-id" 1 "FAIL shared-file-unowned: shared.md in T13 and T3" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-markup-welds-id/sprint.md\" \"$live_head\""
 
+# --- cases 26-27 (TD-138, shipped side): a column-0 line that opens with a backtick after a declaration -
+# Pre-fix such a line reset `cur` and its paths were dropped in silence, so the ownership map was built
+# from a task's first line only: the fixture's T1 and T2 share shared.md with no Depends-on edge, and the
+# snippet printed PREFLIGHT: CLEAR over it. Now named, with the remedy -- the err-loud rule the full
+# checker already applies (it FAILs the same file: asserted below on the SAME input, parser parity).
+# Asserted on output content: the dropped path made the exit code a CLEAR, so a status alone proves nothing.
+wrap="$here/fixtures/dispatch-preflight/column-0-wrap/sprint.md"
+run_case_anywhere "column-0-wrap" 1 "FAIL declaration-continuation: $wrap line 13 is at column 0 after the Layers: declaration -- indent it, or separate prose with a blank line" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$wrap\" \"$live_head\""
+run_case_anywhere "column-0-wrap/completeness" 1 "declaration continuation: a wrapped Layers line must be indented to continue" -- \
+  sh -c "cd \"$repo_root\" && sh scripts/lib/check-layers-completeness.sh \"$wrap\""
+# control: the same backtick-led line after a BLANK line is prose, and is not named.
+run_case_anywhere "column-0-wrap-blank-line-control" 0 "PREFLIGHT: CLEAR" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/column-0-wrap-blank-line-control/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail
