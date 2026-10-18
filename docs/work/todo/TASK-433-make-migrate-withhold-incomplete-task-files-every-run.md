@@ -2,6 +2,7 @@
 id: TASK-433
 title: "Make migrate withhold an incomplete task file on every run, not only some"
 epic: EPIC-022
+sprint: SPRINT-125
 priority: P2
 size: M
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-429
 title: "Make /prime report freshness under --plugin-dir and offer a night run only when one can work"
 epic: EPIC-022
+sprint: SPRINT-125
 priority: P2
 size: S
 risk: low

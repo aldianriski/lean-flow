@@ -2,6 +2,7 @@
 id: TASK-428
 title: "Stop shipped skills naming repo-only script paths as an adopter's mechanism"
 epic: EPIC-022
+sprint: SPRINT-125
 priority: P1
 size: M
 risk: low

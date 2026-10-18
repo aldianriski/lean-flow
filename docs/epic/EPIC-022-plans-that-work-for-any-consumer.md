@@ -4,7 +4,7 @@ slug: plans-that-work-for-any-consumer
 owner: Maintainer
 last_updated: 2026-10-18
 status: active
-member_sprints: []
+member_sprints: [SPRINT-125]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -40,6 +40,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
+| [SPRINT-125](../sprint/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | active | — (filled at close) |
 
 ## Decisions
 

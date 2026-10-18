@@ -2,6 +2,7 @@
 id: TASK-430
 title: "Make /release-patch bump every version reference the project lints, not only the manifest"
 epic: EPIC-022
+sprint: SPRINT-125
 priority: P2
 size: S
 risk: low

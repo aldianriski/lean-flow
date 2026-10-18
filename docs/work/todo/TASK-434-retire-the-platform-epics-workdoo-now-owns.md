@@ -2,6 +2,7 @@
 id: TASK-434
 title: "Retire the platform epics workdoo now owns and close the stale debt rows"
 epic: EPIC-022
+sprint: SPRINT-125
 priority: P1
 size: S
 risk: low
