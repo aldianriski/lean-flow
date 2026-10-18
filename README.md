@@ -299,7 +299,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 | `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
 | `docs/epic/EPIC-NNN-*.md` | `/lean-doc-generator epic` | a **multi-sprint** outcome + the sprints that carried it. Skip it when the work fits one sprint. While `active`, each open Closed-when line ends `→ TASK-NNN` or `→ next slice: <name>`; `/triage` and `/prime` flag the uncovered ones and `promote` refuses to form a sprint over one |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · files changed · retro (400-line hard cap) |
-| `docs/sprint/logs/SPRINT-NNN-*.md` | `/orchestrator` during execution | that sprint's execution log — append-only, uncapped, so it never eats the Plan's budget (ADR-014) |
+| `docs/sprint/logs/SPRINT-NNN-*.md` | `/lean-doc-generator` at promote · `/orchestrator` during execution | that sprint's execution log (created at promote) — append-only, uncapped, so it never eats the Plan's budget (ADR-014) |
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
 | `CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
 | `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |

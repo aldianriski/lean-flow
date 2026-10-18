@@ -13,6 +13,9 @@ update_trigger: an Execution Log entry is appended
 > this file grows with the work done, which is exactly why it is not inside the Plan's 400-line
 > budget (STANDARD §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
 >
+> Rendered at promote, in the same commit as `plan locked`; its first entry is the `promote` entry
+> carrying the signed governance checklist.
+>
 > The Plan is frozen at promote. A mid-sprint pivot that shifts scope is logged here as a
 > `scope-change` entry — what broke · impact · re-confirm G2 — **before** § Plan is edited.
 

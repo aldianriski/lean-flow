@@ -54,8 +54,8 @@ the sprint closed past it) — so "was this actioned?" is answerable without ope
    `status: active`; on a multi-stream repo keep the one whose `stream:` matches the work in hand
    (still more than one → ask). Its members — the `## Members` paths ∪ every `docs/work/*/TASK-*.md`
    stamped `sprint: SPRINT-NNN`, whatever folder it sits in — name the task in focus. The log to use
-   is `docs/sprint/logs/` + the sprint file's own filename (create lazily from `sprint-log.md.template`
-   if this is the sprint's first Log entry). No active sprint → the fallback ledger, root
+   is `docs/sprint/logs/` + the sprint file's own filename (it exists since promote; create it from
+   `sprint-log.md.template` only if absent — a sprint promoted before that rule). No active sprint → the fallback ledger, root
    `HANDOFF-LEDGER.md` (create lazily, same two-field shape, no sprint-specific content).
 2. **Close out a prior handoff you are now resuming** — if that log/ledger's newest entry for this
    context is `handoff-status: live`, append one entry reusing its `handoff-path` with
