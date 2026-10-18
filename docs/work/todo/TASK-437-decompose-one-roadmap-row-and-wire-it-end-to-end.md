@@ -2,6 +2,7 @@
 id: TASK-437
 title: "Let /task-decomposer --roadmap <row> decompose one row, and wire the roadmap through the loop"
 epic: EPIC-022
+sprint: SPRINT-126
 priority: P2
 size: S
 risk: low

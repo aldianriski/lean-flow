@@ -2,6 +2,7 @@
 id: TASK-436
 title: "Report uncovered active roadmap rows in /prime, /triage and the promote checklist"
 epic: EPIC-022
+sprint: SPRINT-126
 priority: P1
 size: M
 risk: low

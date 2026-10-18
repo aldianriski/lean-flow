@@ -4,7 +4,7 @@ slug: plans-that-work-for-any-consumer
 owner: Maintainer
 last_updated: 2026-10-18
 status: active
-member_sprints: [SPRINT-125]
+member_sprints: [SPRINT-125, SPRINT-126]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -41,6 +41,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-125](../sprint/archive/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | closed · `ff04f84` | Closed-when 1–3: the shipped surface stops naming lean-flow's scripts, two false-green conformance rules fixed (spec 0.16.0), migrate/prime/release-patch/templates fixed, platform epics retired; released as **2.6.0** |
+| [SPRINT-126](../sprint/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | active | — (filled at close) |
 
 ## Decisions
 
@@ -72,7 +73,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
       → TASK-434 — closed SPRINT-125
 - [ ] A repo writes a phased delivery plan from a shipped template with a STANDARD row, each open
       row ends `→ TASK-NNN` or `→ next slice:`, and `/prime` + `/triage` report uncovered rows.
-      → next slice: S2 roadmap + traceability
+      → TASK-435, TASK-436, TASK-437
 - [ ] Approving a G2 design in plan mode leaves a persisted sign-off in the sprint or task file.
       → next slice: S3 plan-mode G2 record
 - [ ] A repo without git can promote, freeze and close a sprint, under an ADR.
