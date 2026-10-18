@@ -44,7 +44,7 @@ Cites: `TASK-435` · EPIC-022 Closed-when 4 · ADR-053 (consumer evidence) · ST
   · bare names as the member's Done when spells them: `roadmap.md.template` · `product/roadmap.md` (the adopter's path the template renders to;
     this repo creates none)
   · adopter paths the 2026-10-18 placement scope-change names as examples (where an adopter's file may sit; read, never created here):
-    `docs/` · `docs/product/` · `docs/product/roadmap.md` · `docs/roadmap.md` · `ROADMAP.md`
+    `docs/` · `docs/product/` · `docs/product/roadmap.md` · `docs/roadmap.md` · `ROADMAP.md` · bare `roadmap.md`
 
 The template carries workdoo's real shape plus the two columns it lacked. The spec change adds a row and a prose rule, but no
 rule-table row, so no adopter verdict moves.
