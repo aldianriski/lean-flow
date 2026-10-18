@@ -112,3 +112,11 @@ R2 CLEAR. Post-merge: layers-observed / completeness / freeze / scope-change cle
 floor green, preflight green, promote-check 16/0. Builder residuals for close: TD-178's Plan-prose leg still compares literally; the
 `(SPRINT-N Tn)` trailing form still ignores N; the parser no longer joins a backtick span broken across lines (0 in the corpus).
 Ticks via `tick-box` (5/5; freeze 6/0, layers 15/0 after each).
+
+### 2026-10-18 | scope-change | T2 TASK-444 Layers gain the two Layers checkers, where TD-199's `member-layers-undeclared` is emitted
+**What broke.** TASK-444 box 2 ("a `Cites:` mention no longer masks `member-layers-undeclared`") is about a finding that
+`check-layers-completeness.ts` and `check-layers-observed.ts` emit, and neither is in T2's Layers. T1 deliberately exposed `lead`
+without applying it, so its behaviour-preservation proof stayed clean.
+**Impact.** T2 Layers gain both files, so the ownership order becomes T1 → T2 → T3 for completeness and T1 → T2 → T3 → T5 for
+observed. T3 already depends on T2 and T5 on T2/T3, so no wave moves. No DoD change.
+**Re-confirm G2.** Not needed: no new behaviour. The owner's leading-run ruling already covers it, and the box already names the finding.
