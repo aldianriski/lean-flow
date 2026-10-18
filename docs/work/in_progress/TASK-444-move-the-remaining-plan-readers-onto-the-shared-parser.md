@@ -26,13 +26,13 @@ checker and the CLI are reached by `conformance.sh`, so this is consequential G.
 
 ## Done when
 
-- [ ] `check-authority.ts`, `check-sprint-by-reference.ts`, `sprint-members-cli.ts` and `check-dod-delta.ts` read Plans only
+- [x] `check-authority.ts`, `check-sprint-by-reference.ts`, `sprint-members-cli.ts` and `check-dod-delta.ts` read Plans only ✓ four readers read Plans through parsePlan, own regexes deleted; each keeps its own reading of a non-task heading (6e0a31a7)
       through TASK-443's parser; their own heading and `Cites:` regexes are deleted.
-- [ ] A `Cites:` task id governs a member only in the declaring position the parser defines; a mention in prose (`split from
+- [x] A `Cites:` task id governs a member only in the declaring position the parser defines; a mention in prose (`split from ✓ mechanical: leading-run rule in six places with must-FAIL + leading control each; seeds L1a-g redden only their case; coordinator re-seeded L1f (1 case)
       TASK-NNN`) no longer masks `member-layers-undeclared` (TD-199), with a retained must-FAIL fixture.
-- [ ] `conformance.sh .` reports the same verdicts before and after, and the four readers agree with each other on every
+- [x] `conformance.sh .` reports the same verdicts before and after, and the four readers agree with each other on every ✓ mechanical: conformance A/B identical (builder); post-merge run rc 0 no FAIL, deltas only sprint progress; four readers agree on 283 of 283 plans
       archived plan, recorded as a differential.
-- [ ] Full Tier G bar: seeded breaks on the moved readers each redden exactly their case, and an isolated outside review.
+- [x] Full Tier G bar: seeded breaks on the moved readers each redden exactly their case, and an isolated outside review. ✓ mechanical: seeds L1-L3 per reader; Codex R1 -> R2, the one residual (multi-Cites lines, 0 of 505 blocks) routed to TD by the census-zero rule
 
 ## Touches
 
