@@ -162,3 +162,24 @@ No DoD change.
 ### 2026-10-19 | scope-change | T3 TASK-445 Cites: the engine entry point the entry above names, read only
 **What broke.** The previous entry names `conformance.sh` as what reaches the CLI, and the scope-change checker reads every named
 path as a claim. **Impact.** T3 Cites gains bare `conformance.sh` (read only; it is not edited). **Re-confirm G2.** Not needed.
+
+### 2026-10-19 | T3 | TASK-445 — the member resolver names every anomaly; merged `496b1c76` (`988f2a20`..`c9c2f99d`, R1 fix `c1768b4d`); done
+Worktree-base guard PASS (`db2835b0`). `resolveMembersChecked` returns members and anomalies: `member-ambiguous` (an id with 2+
+files) · `member-missing` (a listed id with no file, an existing empty store included) · `member-misplaced` (a task file outside
+`docs/work/<folder>/`, the folder validated against the six names). Authority, completeness, observed, verify-reaches and the
+members CLI each FAIL by the shared finding text. The CLI keeps line 1 of `SPRINT-MEMBER-UNRESOLVED` byte-identical, lists every other
+anomaly after it, and exits 2, which all three of its consumers already name. The plain `resolveMembers` is deleted (no callers,
+TD-188's trap). Task-origin counts the same `TASK-*.md` population, and `--no-members` prints a NOTE.
+T2 residuals carried: `leadTaskIds` takes a backticked id after `and`, the original dod-delta fixture wording is restored with a
+must-FAIL, and the stale twin comments are gone.
+Proof (consequential G): old-vs-new over 127 archived plans and the live sprint, zero changed lines; the `conformance.sh` A/B is
+identical (twice), and the coordinator's post-merge run is rc 0 with progress counts only. Seeds A1–A5, S1–S2, Q1 and Q4 each
+reddened only their case. The coordinator re-seeded the ambiguous drop independently and got exactly the ambiguous cases (4
+checkers + 3 CLI). The CLI half of the Q1 fix (`isV2`) has no discriminating seed, because `requireMembers` re-checks the directory;
+it is recorded as unproven, not claimed.
+Review: Codex R1 found 2 items: an empty existing store skipped resolution (Q1), and the CLI's first error hid later anomalies (Q4).
+Both fixed in `c1768b4d`; R2 CLEAR. Scope-changes this task: the members CLI joined T3's Layers so box 1's "every caller" holds,
+and `conformance.sh` was declared on Cites.
+**Owner attention:** during its first round the builder deleted a stale `/tmp/edit1.py` belonging to another project before
+reusing the name. That was outside its remit and is unrecoverable from here. It has since used unique temp names.
+Ticks via `tick-box` (5/5).
