@@ -91,7 +91,7 @@ A `depends-on` cycle is a finding — report its ids; never break it silently.
   `blocked-by:` lines under `## Assumes`; every other line stays byte-identical (`authority:` ·
   `origin:` · existing assumptions · the done-when are not triage's to rewrite).
 - **Cancel** — `git mv docs/work/backlog/<file> docs/work/cancel/` in its **own commit** (no git: a plain
-  move); any content edit (the `## Amended` note) lands in a separate commit before it. A status change
+  move); any content edit (the `## Amended` note) lands in a separate commit before it (with no git: it is made before the move). A status change
   never shares a commit with a content edit.
 
 ## `.out-of-scope/` knowledge base
