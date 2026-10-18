@@ -98,3 +98,34 @@ and the CHANGELOG said every new sentence was git-less only. Fixed in `c2aa9195`
 default Codex model (`gpt-6.1-sol`) is rejected for this account, so every review passes `--model gpt-6-astra`.
 Tick hygiene: the move commit first carried `sprint(127) T2:` and leg 15 reddened on `done/TASK-440`, a path T2 never declared.
 It was re-subjected to bare `sprint(127):` (COORD), which is how SPRINT-126 committed its moves; leg 15 is clean.
+
+### 2026-10-18 | T1 | TASK-439 — task-level `gates_signed` + `## Approved design`; merged `db8ced02` (`165780fc` + R1 fix `4420c141`); done
+A task file may carry `gates_signed: <GATE>[,<GATE>] @ <sha>` (a date only without git) and an optional `## Approved design`
+paragraph; absent or a `[` placeholder means NOT signed. Stated in the task template, the task-file reference and the store schema,
+with `gates_signed` added to the v1→v2 harness's known-optional list. `quick` step 2 and the G2 intro line write it, at 0 net lines
+(`orchestrator/SKILL.md` stays 138). README documents `plansDirectory` as a MAY.
+Builder evidence: v1-to-v2 101/0, orchestrator-store 42/0, store-writers 29/0, work-store 21/0, ownership-header and sprint-family
+green, doc-caps no FAIL, prose-density 28/0. Review: Codex `gpt-6-astra` R1 found 2 items. The template and schema offered the
+date with no "no git only" qualifier, and the mvp line lacked the date fallback; the coordinator suspected the second before the
+review. The coordinator fixed both in the worktree (`4420c141`, each replacement matched exactly once, CRLF kept, harnesses
+re-run green); R2 CLEAR. Post-merge: tsc rc 0 with 0 errors, layers-observed / layers-completeness / freeze / doc-caps clean,
+duplicate-id check empty.
+Box 4, judgment: on a git-less scratch tree (`git rev-parse --git-dir` fails), the owner approved scratch TASK-001's G1 and G2 by
+popup. It ended with `gates_signed: G1,G2 @ 2026-10-18` and an Approved design paragraph, written in procedure order (G1, then
+G1,G2); the never-approved TASK-002 carries neither.
+
+### 2026-10-18 | scope-change | T3 TASK-441 Layers gain the sprint template and the store README (owner, popup)
+**What broke.** A census of shipped files naming `git mv` / `plan_commit` / `git show` found two that the git-less lifecycle
+depends on outside T3's Layers. `SPRINT.md.template` frontmatter reads `plan_commit: [sha — set at promote]`, and its comments
+describe `git mv` moves; a git-less promote fills in that template first. `docs/work/README.md` states that a status change is a
+`git mv`. Out of scope, since they need git by nature: `night-run.md` (worktrees), `release-patch` (a sha range) and
+`migration-map.md` (a relocation is a move plus link fixes, outside the sprint lifecycle).
+**Impact.** T3 Layers gain `skills/lean-doc-generator/templates/SPRINT.md.template` and `docs/work/README.md`, so
+`docs/work/README.md` goes T1 → T3. No DoD change: box 2 ("the git-required wording names the git case") already covers both.
+**Re-confirm G2.** The owner approved by popup.
+
+### 2026-10-18 | gate | T5 G1: owner go-ahead to write into workdoo, via workdoo TASK-046 (popup)
+The vehicle is one real, docs-only workdoo task: TASK-046 carries `company-workspace-roadmap.md`'s delivery sequence (16 rows,
+P0–P12) into `docs/product/roadmap.md` from the template, with Status and Covered-by cells; the source file is untouched. It goes
+G1/G2 → done by popup with `gates_signed: G1,G2 @ 2026-10-18`, which covers TASK-442 boxes 1 and 2 in one task. Writes are limited
+to workdoo's `docs/work/` and `docs/product/roadmap.md`. /prime and /triage then run read-only there for box 3.
