@@ -35,6 +35,13 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-128 promote (2026-10-18).** **112 of 114 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 128. Second route: 122 open − 8 closed at this promote = 114, of which 2 were filed at 127 (TD-253 · TD-254) = 112. **Newly
+> aged since the SPRINT-127 sweep:** TD-251 · TD-252 (filed at 125). No open row is `high`. **§11 deletion** (owner-approved): the 15
+> rows resolved at 125 (TD-078 · 093 · 100 · 118 · 137 · 160 · 161 · 176 · 187 · 214 · 217 · 220 · 229 · 230 · 243); their ids stay
+> retired. **Closed at this promote** (owner-approved, evidence on each row): TD-142 · 119 · 145 already fixed; TD-189 · 151 · 185 ·
+> 186 census zero; TD-045 retained by design. They are due for deletion at 131.
+>
 > **Aging sweep — SPRINT-127 promote (2026-10-18).** **118 of 120 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 127. Second route: 120 open − 2 filed at 125 (TD-251 · TD-252) = 118. **Newly aged since the SPRINT-126 sweep, named for
 > re-review:** TD-249 · TD-250 (filed at 124). No open row is `high`. **§11 deletion** (owner-approved): TD-168, resolved at
@@ -452,12 +459,6 @@ status: current
     task whose consequence line is misspelled reads as having no review owed.
   - Mitigation (hypothesis): FAIL any `^consequence · ` line that does not match the vocabulary, naming the bad token.
 
-- **TD-243** severity: minor | status: resolved → SPRINT-125 T1 (moved to workdoo) | created: Sprint-121 (T6, ADR-052)
-  - Resolved (SPRINT-125 T1, owner ruling 2026-10-18, EPIC-022 D1): the platform epics are closed in place as superseded → workdoo (ADR-052); epic conformance for workdoo's own epics is workdoo's to run.
-  - Summary: **workdoo now holds four epics but runs no conformance check, so the epic standard (Closed-when, rollup currency, the new
-    active-epic coverage rule) has no gate behind it there.** This is ADR-052's accepted negative consequence. workdoo's `verify` is
-    typecheck · biome · bun test, and none of them reads `docs/epic/`.
-  - Mitigation (hypothesis): run lean-flow's `conformance.sh` against workdoo at its sprint close, or add an epic-rule step to its verify.
 
 - **TD-242** severity: minor | status: open | created: Sprint-120 (T5 build)
   - Summary: **The conformance-engine harness counts differently by host: 97 PASS on Windows, 98 on Linux, at the same commit (`bcb283f7`).** Both are
@@ -538,20 +539,7 @@ status: current
   - Mitigation (hypothesis): read a fenced `terminal ·` line inside a `### … | run-complete |` entry, the same carve-out
     `check-sprint-by-reference.ts --close` uses, or retire the signal once no pre-ledger log is in scope.
 
-- **TD-230** severity: low | status: resolved → SPRINT-125 T5 | created: Sprint-117 (close, T1 cold run)
-  - Resolved (SPRINT-125 T5, `83684fa6`): `/prime` step 6 names `sprint-bulk unattended` only when at least one open member is AFK at J0/J1; an all-HITL/J2 sprint gets `/orchestrator` alone.
-  - Summary: **`/prime`'s `Next:` names `sprint-bulk unattended` for any active sprint, even when every open task is HITL or J2.** The
-    rule (`skills/prime/SKILL.md` step 6) offers the night run whenever open tasks sit in an active sprint; an unattended run parks every
-    J2 task, so for a sprint like SPRINT-117 (one J2 member) the suggestion would end at `AUTHORITY_BOUNDARY` having done nothing.
-  - Mitigation (hypothesis): name the unattended option only when at least one open member is AFK and J0/J1.
 
-- **TD-229** severity: low | status: resolved → SPRINT-125 T2 | created: Sprint-116 (close)
-  - Resolved (SPRINT-125 T2, `2fa73542`; owner ruling at G2: the wording moves, the checker does not): dispatch.md rule 5 and sprint-by-reference.md step 4 put the ✓ tail on the box's first line; a retained must-PASS/must-FAIL pair guards the placement and a seeded-checker run discriminated them.
-  - Summary: **A tick on a multi-line `## Done when` box must put its ` ✓ <evidence>` on the box's FIRST line, and nothing says so.**
-    `check-sprint-by-reference.ts` (`sameDoneWhen`) accepts a tick tail only on a box line, so evidence appended where the frozen text
-    actually ends (its last continuation line) reads as `FREEZE-EDIT`. `references/sprint-by-reference.md` says the tail comes "after the
-    frozen text", which for a wrapped box is the continuation line. SPRINT-116 close hit it on TASK-399 and TASK-401 (moved in `close`).
-  - Mitigation (hypothesis): accept the tail on a box's last continuation line, or state the first-line rule in the reference; one of the two.
 
 - **TD-228** severity: low | status: open | created: Sprint-116 (close, T1 Codex R1)
   - Summary: **The Shell §4 rules disagree on an empty-slug ADR (`docs/adr/ADR-001-.md`).** S4.ONEFILE's glob needs one or more slug
@@ -597,14 +585,6 @@ status: current
   - done-when: the git call that fails on a rename-only commit has its stderr captured and either handled or suppressed with a reason, and
     a `git mv` commit in the checked range produces no `fatal:` line.
 
-- **TD-220** severity: low | status: resolved → SPRINT-125 T5 | created: Sprint-114 (close retro, T3(d) `--plugin-dir` run)
-  - Resolved (SPRINT-125 T5, `83684fa6`): § Skill freshness gains a live-checkout row — a base dir with no `<version>/` segment reads `<base-dir>/../../.claude-plugin/plugin.json` and reports `<v> live checkout → fresh`. Checked by reading, not by a live `--plugin-dir` run.
-  - Summary: **`/prime`'s `Skills:` row reads `n/a` under `claude --plugin-dir <repo>`** even though `plugin.json` sits in that base dir.
-    The skill compares the base-dir version with the host repo's manifest and treats "no version in the path" as "no local plugin repo". A
-    `--plugin-dir` session has no version segment in its path, so the row degrades to `n/a`, the very session where freshness is
-    guaranteed.
-  - done-when: under `--plugin-dir`, the row reads the base dir's own `.claude-plugin/plugin.json` and reports `fresh`; the cached-install
-    and no-manifest rows are unchanged.
 
 - **TD-219** severity: low | status: open | created: Sprint-114 (close retro, T1 RC cut)
   - Summary: **`scripts/lib/check-manifest-lockstep.sh` cannot read a prerelease version.** `ver_of` matches `X.Y.Z` only (l.26), so
@@ -624,17 +604,6 @@ status: current
   - Mitigation (hypothesis): match the closing `---` at a line start including the immediate-close case, strip a leading BOM, allow a trailing
     YAML comment, and follow symlinks via `statSync` — each with a must-FAIL fixture under the maintainer-only bar.
 
-- **TD-217** severity: medium | status: resolved → SPRINT-125 T8 | created: Sprint-114 (T3 real runs, owner ruling)
-  - Resolved (SPRINT-125 T8, `05cbb27f`..`87825795`): migration-map.md § Verification carries a mandatory post-write required-field checklist (G2: checklist, no script) that withholds and names any task file missing one of the 11 required fields. Exercised on `evals/fixtures/v1-to-v2/input-withheld-missing-tier` (TASK-942 withheld, TASK-941 written); harness 101/0 with a retained must-FAIL tree. Residual: the procedure is still agent-executed; the fixture checks the output invariant, not the run.
-  - Summary: **`migrate`'s withhold rule is applied inconsistently across runs of the same procedure.** migration-map.md:194 says
-    a task missing a field with no source is "withheld … never guessed, never defaulted". In SPRINT-114 T3, the rc.1 `migrate`
-    withheld two 1.x tasks lacking `priority`/`tier`/`authority` on one tree (`v2c`), but on another (`v1d`, after "move everything")
-    wrote all 10 files without `tier:` and only flagged the missing fields afterwards. The rule is prose a model executes, so whether it
-    holds depends on the run. An adopter can end up with task files missing fields the store schema requires.
-  - **Owner ruling (2026-10-03):** file it; no skill change this sprint. T1 guards the real workdoo migration mechanically instead: after
-    `migrate`, every written task file is checked for every required field, and a file that fails is sent back.
-  - Mitigation (hypothesis): a post-write field check `migrate` runs on its own output (the v1→v2 harness already has the schema), so the
-    rule stops depending on the model honouring prose.
 
 - **TD-216** severity: low | status: open | created: Sprint-113 (T1 seeded break B)
   - Summary: **`qa-check.sh` has no listed-but-missing check for `eval_harnesses_excluded`.** A name in the excluded list whose file no
@@ -650,14 +619,6 @@ status: current
   - Mitigation (hypothesis): make the TS port match by basename as the Shell does (the TS is the gate), or rule the stricter behaviour correct and
     align the Shell. Either way, a fixture with a bare name against a full-path Layers entry.
 
-- **TD-214** severity: low | status: resolved → SPRINT-125 T4 | created: Sprint-112 (T1 audit, owner ruling Q10)
-  - Resolved (SPRINT-125 T4, `1edcc08a`): same pass as TD-137 — G2/review-scoping/night-run steps name the check as optional ("where the host has one") with lean-flow's script as the example.
-  - Summary: **Shipped skills name repo-only `scripts/…` checkers as the mechanism of a step an adopter runs.** For example,
-    `skills/orchestrator/SKILL.md`'s G2 checklist names `scripts/lib/check-verify-reaches.ts`, and review-scoping and night-run name
-    others (G18 · S03 · S05). An adopter has no `scripts/`, so the step's mechanism is absent for them (L-015). The audit keeps these guards
-    under R1(b), because a skill tells agents to use them; the leak is the skill wording, not the guard.
-  - Mitigation (hypothesis): each such step names the check as optional, or "where the host repo has one", or the check ships with the plugin.
-    Census first: grep `skills/` for `scripts/` paths.
 
 - **TD-213** severity: low | status: open | created: Sprint-111 (T4 Codex round 2)
   - Summary: **The engine's retired-row marker regex has only been run under gawk.** `_s2_rows` matches a literal em dash
@@ -797,12 +758,13 @@ status: current
   - Mitigation (hypothesis): take the population from `nowTree()` (this means porting the guard to TS, per the no-shell rule) and
     normalise the value the way the TS frontmatter readers do. Tier G: a nested-file fixture (L-186).
 
-- **TD-189** severity: low | status: open | created: Sprint-109 (T3 outside review)
+- **TD-189** severity: low | status: resolved → won't fix, census zero (SPRINT-128 promote) | created: Sprint-109 (T3 outside review)
   - Summary: **`authority-plan-member-mismatch` never sees a letter-suffixed Plan block.** `parseCites` matches
     `^### (T\d+)\b`, so on `### T3a …` the digit-then-letter has no word boundary, its `Cites:` is dropped, and a J1 Plan bracket against a
     J2 member passes. Census 2026-09-28: 0 letter-suffixed `### T` headings in `docs/sprint/`.
   - Mitigation (hypothesis): accept `T\d+[a-z]?` as the dispatch preflight and `check-dod-delta` already do. A fixture
     in that shape (L-186).
+  - Resolved (SPRINT-128 promote, owner-approved): 0 letter-suffixed `### T` headings in 127 plans and 47 task files. TASK-444 makes suffix handling uniform anyway. Re-open on the first real sighting.
 
 - **TD-188** severity: medium | status: open | created: Sprint-109 (T3 outside review)
   - Summary: **`resolveMembers` drops an ambiguous member silently.** An id that resolves to two files (a
@@ -815,18 +777,8 @@ status: current
   - **Second consumer confirmed (SPRINT-109 T4 review):** `check-verify-reaches.ts` inherits it. Its `verify-member-resolution-empty`
     fires only when ALL listed ids fail, never when one of several drops.
 
-- **TD-187** severity: medium | status: resolved → SPRINT-125 T7 | created: Sprint-109 (promote governance review)
-  - Resolved (SPRINT-125 T7, `95993a47`/`a94182b9`): S11.TDDELETE reads the resolve sprint case-insensitively from every real resolved-row shape (status field up to the first `|`, else a trailing `closed:`); a row naming no sprint is listed in one `not judged` note. Verdicts can move pass → fail for overdue rows in shapes the old extractor missed (spec 0.16.0). Must-FAIL per shape + non-vacuous controls in `evals/run-sprint-family-fixtures.sh`. Codex R1 → R2 clear; residual R1-T4 (a status naming two sprints takes the first) filed as debt at close (0 of 112 historical rows).
-  - Summary: **`S11.TDDELETE` prints PASS without judging any resolved row.** Its extractor
-    (`conformance-engine.sh`, `assert_S11_TDDELETE`) wants `closed: Sprint-NNN` or `resolved … (Sprint-NNN`,
-    with a lowercase `print`. All 5 resolved rows on 2026-09-28 wrote `→ SPRINT-NNN …` or `→ <sha> (SPRINT-NNN …`,
-    so all 5 extracted empty and the leg reported "no row has reached the trigger" while 4 were due.
-    A control row in the expected shape extracts `100`. So the branch works, but no real row reaches it (L-166).
-  - Mitigation (hypothesis): match the sprint id case-insensitively in every resolved shape the ledger
-    uses, and print `not judged` for a resolved row with no extractable sprint instead of passing it.
-    Tier G: a retained must-FAIL fixture in each real shape (L-186).
 
-- **TD-186** severity: low | status: open | created: Sprint-108
+- **TD-186** severity: low | status: resolved → won't fix, census zero (SPRINT-128 promote) | created: Sprint-108
   - Summary: **the freeze checker does not model list-item containers or `<pre>` blocks.** A heading at
     column 0 after `- none` / `  <!--` (or a fence) under Assumes is real in CommonMark, because the list
     item ends there, but the checker keeps it hidden. A `<pre>` block wrapping `## Example` still ends Done
@@ -834,8 +786,9 @@ status: current
   - Mitigation (hypothesis): under A5 (err loud), treat an open block comment or fence as ending at a
     column-0 `## ` line, and a `## ` inside `<pre>…</pre>` as hidden. **Census the real corpus before
     building (L-217)**: a zero census stays TD.
+  - Resolved (SPRINT-128 promote, owner-approved): 0 of 47 task files hold an open comment or fence before a column-0 `## ` (seeded positive control fires), and 0 real `<pre>` blocks. One archived pre-store Plan (SPRINT-078) has the shape, outside the member freeze. Re-open on the first real sighting.
 
-- **TD-185** severity: low | status: open | created: Sprint-107 (outside review)
+- **TD-185** severity: low | status: resolved → won't fix, census zero (SPRINT-128 promote) | created: Sprint-107 (outside review)
   - Summary: **an uncommitted new member in `done/` is frozen against its own current content.** With
     no stamping commit, `check-sprint-by-reference.ts` falls back to `baseline now` and prints a
     `freeze … unchanged since now` PASS that asserts nothing. `sprint-by-reference.md` defines the
@@ -843,6 +796,7 @@ status: current
     rule reads either way.
   - Mitigation (hypothesis): rule it in the reference first. Either no stamping commit → `MEMBER-MISSING`,
     or keep `now` but print it as unverified, not as PASS.
+  - Resolved (SPRINT-128 promote, owner-approved): 0 uncommitted members; the fallback is reachable only for a member that joins after `plan_commit`. Re-open on the first real sighting.
 
 - **TD-184** severity: low | status: open | created: Sprint-107 (outside review)
   - Summary: **re-indenting a Done-when box is not a freeze edit.** `- [ ]` → `  - [ ]` changes the
@@ -915,21 +869,6 @@ status: current
     must name an existing path, an existing directory, or a file the task says it creates. Tier **G**.
   - **Re-file fresh if** `covers()` gains glob support (the finding would then need a different shape).
 
-- **TD-176** severity: low | status: resolved → SPRINT-125 T1 (already fixed; re-verified) | created: Sprint-105
-  - Resolved (SPRINT-125 T1 re-verification): `docs/sprint/INDEX.md` has a row for each of the 46 archived sprints 059…104 — 46 INDEX rows = 46 archive files, and a per-id loop found no gap.
-  - Summary: **`docs/sprint/INDEX.md` skips 46 sprints.** Its newest entry before SPRINT-105 is
-    **SPRINT-058** (2026-08-10); SPRINT-059…SPRINT-104 are archived under `docs/sprint/archive/`
-    and were never indexed. STANDARD §11 makes the one-line index part of close.
-  - **How it stayed invisible:** nothing reads the index to act, so no run reddens on its absence,
-    and a reader who opens it sees a plausible list — it is complete-looking, just old. This is
-    `L-210`'s shape in a generated-ish artifact: the missing rows produce no diff anywhere.
-  - **Why `low`:** the sprints themselves are archived, committed, and reachable by filename; what
-    is lost is the newest-first digest, not the record.
-  - **Mitigation (hypothesis).** Backfill is mechanical — every archived Plan carries `sprint:`,
-    `slug:`, `status:` and `close_commit:` in frontmatter, so the 46 rows can be derived rather
-    than hand-written. Better: have `close` append the row, or generate the index the way
-    `docs/knowledge-index.md` is generated, so it cannot fall behind again.
-  - **Re-file fresh if** the gap grows after a close that was supposed to append.
 
 - **TD-173** severity: medium | status: open | created: Sprint-104
   - Summary: **Two synthetic id blocks exist; only one is documented.** `TODO.md`'s standing-facts
@@ -1151,40 +1090,7 @@ status: current
     versus its declared run mode), and a guard here would have caught all three. Weigh against
     ADR-029's tiering: this is Tier G by the false-negative test.
 
-- **TD-160** severity: medium | status: resolved → SPRINT-125 T3 | created: Sprint-101
-  - Resolved (SPRINT-125 T3, `4ca7438a`; owner ruling at G2: procedure only): the Execution Log is rendered at promote with the `promote` entry first (templates, promote procedure, handoff fallback), so a promoted sprint is never red by construction; the rollup check and STANDARD §9 are unchanged. Retained must-PASS fixture `qa-leg2g-v2-promoted-log-promote-entry-only`.
-  - Summary: **A sprint is RED BY CONSTRUCTION between its promote and its first Execution Log entry.**
-    `check-night-run-rollup.sh` treats an **absent** log as a named FAIL — deliberately, and correctly:
-    SPRINT-098 changed it precisely because leg 2g built its input from live Plans that already had a
-    log, filtering out the one state the check exists to catch (a run that dies before writing
-    anything). But logs are created **lazily at the first entry** (STANDARD §9 · ADR-014), so every
-    freshly promoted sprint fails this check until somebody writes to it. Observed live at the
-    SPRINT-101 G2: the gate reported `no Execution Log found at docs/sprint/logs/SPRINT-101-…`, and
-    the same check passed minutes later against the file once created.
-  - Impact: a false positive on **every** sprint at exactly the moment its gate is first consulted —
-    the promote. Cheap to misread as a real failure, and cheaper still to learn to ignore, which is how
-    a guard dies.
-  - Fix direction (**not a ruling**): distinguish *promoted-but-unwritten* from *ran-and-wrote-nothing*.
-    The two are separable — a sprint whose `plan_commit` is its newest commit has not executed yet.
-    Resist the obvious cure of skipping absent logs: that reinstates exactly the blind spot SPRINT-098
-    removed (L-058).
 
-- **TD-161** severity: minor | status: resolved → SPRINT-125 T1 (already fixed; re-verified) | created: Sprint-101
-  - Resolved (SPRINT-125 T1 re-verification): `orderNonArchiveFirst` (`scripts/lib/check-dod-delta.ts:562-566`) lowercases before the `/archive/` test.
-  - Summary: **`scripts/lib/check-dod-delta.ts:277` ranks archive candidates with a case-sensitive
-    substring test** — `!p.includes("/archive/")` never matches `/Archive/`, so a mis-cased path is
-    treated as non-archive and can win by list order. This is the un-normalized shape SPRINT-099 T3
-    removed from ten checkers in favour of the filesystem-identity predicate `lf_is_archived_path`
-    (TD-145 · TD-151), reappearing in a TypeScript checker that **cannot** `source` it.
-  - Impact: **latent, not live.** `git log --all --name-only` shows this repo has never committed a
-    case-variant path in 1236 commits, so it is a defect in the code rather than in the data — but the
-    host is Windows, where the two spellings are one directory and one inode.
-  - Ruled at the SPRINT-101 close, on the builder's reasoning and recorded rather than smoothed: every
-    path this function ranks arrives from `git show --name-only`, so an archived path always carries the
-    literal substring under *some* casing; the filesystem-identity case (a path not containing
-    "archive" at all) cannot arise from that input. A case-insensitive compare is therefore sufficient
-    **here** and was applied; porting the full predicate would guard nothing. Filed so the next TS
-    checker does not re-derive the same reasoning from scratch — or skip it.
 
 - **TD-162** severity: minor | status: open | created: Sprint-101
   - Summary: **SPRINT-094's archived close summary now contradicts its own checkboxes.** It reads
@@ -1359,7 +1265,7 @@ status: current
   - Re-file fresh if: a retry-firing choke point lands but the ceiling check is not re-pointed at
     it — the guard would then read the old advisory line while a real record existed beside it.
 
-- **TD-151** severity: medium | status: open | created: Sprint-098
+- **TD-151** severity: medium | status: resolved → won't fix, census zero (SPRINT-128 promote) | created: Sprint-098
   - Tracker: none — found by SPRINT-098 T1's worktree-isolated outside review, which was looking for
     selection defects rather than logic defects (L-186) and found one in a shared helper.
   - Summary: **The `## Plan` / open-DoD derivation is a PREFIX match that also reads fenced code
@@ -1387,6 +1293,7 @@ status: current
     `TASK-339` and `TASK-342`, which already cluster on this family.
   - Re-file fresh if: a fourth call site copies the formula before this is fixed — the copy count is
     the thing that makes it expensive, not the defect itself.
+  - Resolved (SPRINT-128 promote, owner-approved): 0 `## Plan<suffix>` headings and 0 open-box lines inside fences within `## Plan`. Re-open on the first real sighting.
 
 - **TD-149** severity: medium | status: open | created: Sprint-097
   - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
@@ -1468,7 +1375,7 @@ status: current
     today — the round-3 narrowing means such an epic is reported as unverified rather than as
     verified-closed — but the fact is sitting in the field the parser already reads.
 
-- **TD-145** severity: medium | status: open | created: Sprint-097
+- **TD-145** severity: medium | status: resolved → already fixed (SPRINT-128 promote) | created: Sprint-097
   - Tracker: **`TASK-342`** (filed 2026-09-10 at the SPRINT-097 T3 outside review; owner ruled it grouped with `TASK-338` rather than left to age). Scheduled with the checker-accuracy cluster: same family, different files.
   - Summary: **The `*/archive/*` exclusion that keeps closed sprints out of three gate checkers is a
     case-sensitive string glob, and this repository's primary host filesystem is case-insensitive.**
@@ -1506,6 +1413,7 @@ status: current
   - **Re-file fresh if** the checkers move to a recursive walk or a different caller: the string/identity
     divergence stays, but the reachability argument above (`qa-check.sh` cannot emit such a path)
     dissolves, and the severity becomes `high`.
+  - Resolved (SPRINT-128 promote, owner-approved): `archive-path.sh` plus an `-ef`/inode identity check in the four TS copies. Residual: `check-dod-delta.ts:564` lowercases instead; census 0 mixed-case archive directories.
 
 - **TD-144** severity: medium | status: open | created: Sprint-097
   - Summary: **The epic-state checker resolves a member sprint's number against THIS repository's
@@ -1534,7 +1442,7 @@ status: current
   - **Re-file fresh if** a second epic takes members from another repository: the row's subject is
     the cross-repo case, and a fix keyed to EPIC-016 alone would not cover it.
 
-- **TD-142** severity: medium | status: open | created: Sprint-096
+- **TD-142** severity: medium | status: resolved → already fixed (SPRINT-128 promote) | created: Sprint-096
   - Summary: **Two checkers read the same `Layers:` declaration with different parsers, and each
     carries a comment asserting they are identical.** `check-layers-observed.sh`'s `task_decls`
     extracts only **backtick-quoted** tokens; `check-layers-completeness.sh` tests membership with
@@ -1561,6 +1469,7 @@ status: current
     quiet its own gate is L-088's shape even though the declaration's content would not change.
   - **Re-file fresh if** either checker's extractor is rewritten, since the divergence is the subject
     and a one-sided change closes the row without closing the gap.
+  - Resolved (SPRINT-128 promote, owner-approved): `layers_tokens` is the single extractor (`check-layers-observed.sh:63`, sourced by `check-layers-completeness.sh:91`) and matching is exact (`grep -qxF`; `check-layers-completeness.ts:313`). The two-parser claim no longer holds; the remaining consolidation is TASK-443.
 
 - **TD-138** severity: medium | status: open | created: Sprint-095
   - Summary: **A `Layers:` declaration that wraps at column 0 is silently dropped by the dispatch
@@ -1600,31 +1509,6 @@ status: current
   - **Re-file fresh if** the depth accounting is revisited, or a malformed bracket is found to
     corrupt a verdict rather than only its diagnostic.
 
-- **TD-137** severity: medium | status: resolved → SPRINT-125 T4 | created: Sprint-094
-  - Resolved (SPRINT-125 T4, `1edcc08a`): the orchestrator surface now names the property for every adopter step (the host's gate · a reachability checker where the host has one · a sprint-close checker) and marks `scripts/night-run.sh` · `qa-check.sh` · `resolve-run-mode.sh` · `check-verify-reaches.ts` as lean-flow's own reference implementation; night-run.md opens with that note. 19 occurrences ruled, none an adopter step's only mechanism.
-  - Summary: **Four consumer-facing `skills/orchestrator/` files name this repository's own script
-    paths, so an installed consumer reads instructions that resolve nowhere.** SPRINT-094 T2 cleaned
-    this class out of the 35 templates and out of `handoff` / `prime` / `lean-doc-generator`; the
-    orchestrator surface was outside that task's `Layers:` and was mentioned rather than touched.
-  - Location: **13 occurrences, 4 distinct paths, 4 files** — `references/night-run.md` (9) ·
-    `references/dispatch.md` (2) · `references/review-scoping.md` (1) · `SKILL.md` (1). The paths are
-    `scripts/qa-check.sh` · `scripts/night-run.sh` · `scripts/lib/resolve-run-mode.sh` ·
-    `scripts/lib/check-verify-reaches.sh`.
-  - **The figure was re-derived at close, and it corrects the record** (L-097 · the cross-check rule).
-    The T2 log entry that deferred this wrote "nine `scripts/…` references". Two agreeing queries at
-    close return **13** (occurrence count of `scripts/[A-Za-z0-9._/-]+`, and lines containing
-    `scripts/`); 9 is 13 minus the four `scripts/night-run.sh` self-references. The count in the log
-    was measured once and never re-measured — which is the shape it is filed under.
-  - Impact: **L-015 verbatim** — maintainer-correct, consumer-leaky. A consumer following
-    `night-run.md` is told to invoke a launcher that does not exist in their tree. Unlike the template
-    leak T2 fixed, some of these are genuinely lean-flow's *own* tooling being described, so the fix is
-    a ruling per reference (describe the mechanism · mark it as this repo's own · move it), not a
-    blanket delete.
-  - Mitigation (hypothesis, re-derive before building on it — L-091): per-reference triage, then the
-    same treatment T2 applied to `sprint-log.md.template` — name the property, not the path.
-  - **Re-file fresh if** a consumer-path sweep is ever wired into the gate, which would make this row
-    a finding rather than a debt.
-  - All four files predate SPRINT-094's `plan_commit`, so none of this is this sprint's mess.
 
 - **TD-117** severity: medium | status: open | created: Sprint-091
   - Summary: **Under concurrent load the gate exceeds its own 450s budget, SKIPS six eval harnesses, and
@@ -1939,7 +1823,7 @@ status: current
     sharing its `plan_commit` has also closed.** §11's trigger is "sprint closed" and says nothing
     about when the move must happen.
 
-- **TD-119** severity: minor | status: open | created: Sprint-091
+- **TD-119** severity: minor | status: resolved → already fixed (SPRINT-128 promote) | created: Sprint-091
   - Summary: **`check-layers-completeness.sh` matches `Cites:` tokens against the `Layers:` line by
     SUBSTRING, so a declaration is contradicted by any longer path that merely contains it.** A task
     declaring `f4-registry.ts` as touched cannot also cite the bare dispatch `registry.ts` as
@@ -1958,20 +1842,8 @@ status: current
     match to land on a `/` or start-of-token boundary) rather than by substring. Retain a must-FAIL
     fixture for a genuine contradiction, plus a control pairing the F4 registry with the dispatch
     registry that must PASS — the exact case this row was filed from.
+  - Resolved (SPRINT-128 promote, owner-approved): the substring `grep -qF` became the exact `grep -qxF` (`check-layers-completeness.sh`) and a `Set` lookup (`check-layers-completeness.ts:300`).
 
-- **TD-118** severity: minor | status: resolved → SPRINT-125 T7 | created: Sprint-091
-  - Resolved (SPRINT-125 T7, `95993a47`/`a94182b9`): S4.NEGATIVE FAILs a Consequences section whose every Negative mention is a bare denial ("no negatives identified", `Negative: none`, `Negatives: n/a`, a bare label then `none`); any other mention passes. Finding id unchanged (ADR-034 behaviour-change ruling, owner, SPRINT-125 G2); spec 0.16.0. The TS half was already deleted by ADR-051.
-  - Summary: **`S4.NEGATIVE` is a bare substring match for "negative" in both engines**, so an ADR whose
-    Consequences say *"no negatives identified"* — the exact thing the rule exists to catch — PASSES.
-  - `packages/standard/src/rules/s4-negative.ts` uses `/negative/i.test(body)`; `conformance-engine.sh`
-    uses `grep -qi 'negative'`. Found by the SPRINT-091 T6 reviewer, which also confirmed by test that
-    **both engines behave identically here** — so it is *not* a parity defect and did not block T6.
-  - It is L-108's shape living inside a rule rather than inside a query: a substring standing in for a
-    claim about meaning. Fixing it is a **§4 semantics** change, not a migration task — it would alter
-    what the rule accepts on real repositories and therefore needs a ruling under ADR-034's frozen
-    surface, exactly as the `ADR-001-.md` empty-slug divergence did.
-  - Route it whenever §4 semantics are next opened; do not fold it into a migration task.
-  - **Narrowed (SPRINT-116 T1, ADR-051):** the TypeScript half is deleted; the Shell half stands.
 
 - **TD-116** severity: minor | status: open | created: Sprint-091
   - Summary: **Every F12 finding sub-line prints its own name twice** -- `- secret-committed:
@@ -2004,35 +1876,6 @@ status: current
   - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
     stops being load-bearing.
 
-- **TD-100** severity: medium | status: resolved → SPRINT-125 T1 (already fixed; re-verified) | created: Sprint-087
-  - Resolved (SPRINT-125 T1 re-verification): `_repo_files()` prunes `./.claude/worktrees` (`conformance-engine.sh:1839`, comment 1833-35); `_s12_tracked` excludes it too (:3170).
-  - Summary: **`conformance-engine.sh`'s `_repo_files()` walks agent worktrees, so the engine can emit a
-    finding that names a `.claude/worktrees/` path.** Lines 1722–1731 prune `.git`, `node_modules`,
-    `vendor`, `.venv`, `dist`, `build` — not `.claude/worktrees`. The cached walk feeds roughly fifty
-    engine assertions, so every one of them inherits it.
-  - Evidence: reproduced by SPRINT-087's independent T8 reviewer in an isolated fixture. A conformant
-    repo missing `docs/architecture/overview.md` yields exactly one FAIL (`core-file-missing`) with
-    `S2.R-PLACEMENT` clean. Add a copy at `.claude/worktrees/agent-fake/docs/architecture/overview.md`
-    and `S2.R-PLACEMENT` additionally FAILs with `file-outside-canonical-placement: … the repository has
-    a file of that name at: .claude/worktrees/agent-fake/docs/architecture/overview.md`. Confirmed
-    independently by reading the prune list directly.
-  - **This is TD-095's third site, and the reason it is filed rather than fixed.** SPRINT-087 T8 closed
-    the `check-ephemeral-intake.sh` site and, at revise, `check-research-archive.sh`. This one is
-    deliberately left: the engine is the **live oracle** T1, T3 and T5 spawn inside their parity tests,
-    and sprint assumption A4 fixes it as the comparand that is never edited. Editing it mid-sprint
-    would move the reference every parity test is measured against — a silent change to the thing
-    proving correctness. The defect is real, visible, and knowingly deferred.
-  - Impact: a real agent worktree is a full repo checkout, so it contains canonical files by
-    definition — which makes this fire precisely when the prescribed worktree-dispatch pattern is in
-    use, the same perverse incentive TD-095 named. Failure direction is a false *positive* (a phantom
-    FAIL), so it is noisy rather than silent; `medium`, not `high`.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): add `.claude/worktrees` to
-    the `-prune` list, with a retained fixture proving a lookalike path is still walked. **Sequence it
-    after the Shell engine loses authority** (EPIC-014 H24/H25 cutover), or take it in a sprint whose
-    tasks do not spawn the engine as an oracle.
-  - **Re-file fresh if** worktrees move out of `.claude/` — the prune entry would name a stale path,
-    the same condition TD-095 carries.
-  - **Absorbs (SPRINT-116 promote, owner-approved 2026-10-06):** TD-053 · TD-095's surviving cost half.
 
 - **TD-099** severity: medium | status: open | created: Sprint-087
   - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
@@ -2063,21 +1906,6 @@ status: current
   - **Re-file fresh if** the consequence-line grammar changes — the finding is that malformed and
     absent are indistinguishable to this reader, and any new grammar inherits that unless fixed.
 
-- **TD-093** severity: minor | status: resolved → SPRINT-125 T9 | created: Sprint-085
-  - Resolved (SPRINT-125 T9, `17a23624`; exercised by release 2.6.0, `3f17f0b4`): /release-patch derives the plugin lockstep set from every `*-plugin/*.json` carrying `"version"`, and step 3b bumps the other current-version references found by `git grep -nF '<old>'` (README footer included, never CHANGELOG history), reported under `[siblings]`. Generic — no repo path hardcoded.
-  - Summary: **`/release-patch` has no step that bumps the README footer version the gate lints**, so
-    every release leaves a drift the QA gate catches a sprint later.
-  - Evidence: caught at SPRINT-085's close as the single gate FAIL — `README footer version
-    (footer=1.57.0, plugin.json=1.57.1)`, drift introduced by release `5f495c1`. **Second occurrence**:
-    `5bd4b1d` is titled *"sprint(082): bump README footer to v1.56.0 (missed in the close)"*.
-    `skills/release-patch/SKILL.md` contains no mention of the footer at all.
-  - Impact: small and self-correcting — the gate does catch it — but it charges the cost to the *next*
-    sprint's close, where it reads as an unrelated failure, and it consumed a full gate re-run here.
-  - Mitigation (hypothesis): the fix must stay **generic**. `/release-patch` is consumer-facing, and
-    hardcoding this repo's footer convention is precisely the L-015 leak; the shape is closer to
-    "bump every version reference the project's own gate lints" than to "edit README.md line 492".
-  - **Re-file fresh if** a third occurrence lands before the fix — that would argue for the gate
-    failing at *release* time rather than at the following close.
 
 - **TD-094** severity: trivial | status: open | created: Sprint-085
   - Summary: **ADR-030's epic-log split has never been executed.** Contribution rows are supposed to
@@ -2291,34 +2119,6 @@ status: current
     reference implementation disagreeing with the standard it publishes, in opposite directions — one
     ships a defect, this one ships an unstated change.
 
-- **TD-078** severity: minor | status: resolved → SPRINT-125 T6 | created: Sprint-081
-  - Resolved (SPRINT-125 T6, `226a6a44`/`24fbcd43`): census re-derived 6/35 header-less templates. README/AGENTS use the §3 footer exception; CODE_OF_CONDUCT + QA-TESTCASE gained the four-field header; BUG (temp dir, never committed) and DESIGN (§2/§3 token-frontmatter carve-out) carry an exemption comment. A rendered QA doc passes S3.SCHEMA; the header-less copy FAILs `ownership-header-missing`.
-  - Summary: **`QA-TESTCASE.md.template` ships with no §3 ownership header, yet renders into
-    `docs/qa/` — a tree the engine governs.** Every adopter who renders it collects an `S3.SCHEMA`
-    finding the moment the file lands, for doing exactly what the template told them to do. This is
-    the *cause* of TD-064's `docs/qa/` third: QA-001…003 lacked headers because the template they were
-    rendered from has none to give.
-  - Evidence: found at SPRINT-081 T1 while writing the three headers by hand — the fix worked, and
-    then the question was where the gap came from. Census of the template tree: **6 of 35 lack a
-    leading `---`** (`AGENTS` · `BUG` · `CODE_OF_CONDUCT` · `DESIGN` · `QA-TESTCASE` · `README`).
-    `README.md.template` is **not** a defect — §3 states the README exception in full (ownership moves
-    to a footer line, because a top YAML block renders as an ugly metadata table). The other four are
-    **untriaged**, and that is the point of this row: some are probably legitimate (intake scaffolding
-    that never lands in a governed tree) and some probably are not. Nobody has ruled.
-  - Impact: **consumer-facing, and it is ours that is the reference implementation** (L-015). Our own
-    three instances are fixed, which means the symptom is gone from this repo while the cause ships
-    unchanged in every `plugin install`. That asymmetry is the reason this is a row rather than a
-    footnote — dogfooding cured the half we can see, and the half the consumer meets is untouched
-    (L-016: verify on the consumer path, never read "clean here" as "clean there").
-  - Mitigation (hypothesis, not a plan — the filer's): triage the four undecided templates against one
-    test — *does what this renders land somewhere §3 governs?* — then add the four-field header to
-    those that do, with a `[CUSTOMIZE]` trigger placeholder in the template's own idiom. Cheap. The
-    judgement is the triage, not the typing. Deliberately **not** folded into T1, whose declared scope
-    is three instances and thirteen fields; widening it would have fixed the template by expedience
-    rather than by the ruling above.
-  - Sibling: **TD-064** (now resolved). That row was the symptom in this repo; this one is the cause
-    in the shipped artifact. Closing TD-064 does not move this, which is exactly why it is filed
-    separately rather than as a reopening.
 
 - **TD-076** severity: minor | status: open | created: Sprint-080
   - Summary: **Controls across the existing check families report only silence, so a control that is
@@ -2811,7 +2611,7 @@ status: current
     SPRINT-073 (spec annotation, all HITL, no night run) is the wrong sprint for it. Recorded
     explicitly so the next reviewer starts from *"unblocked but unscheduled"* rather than re-deriving
     a block that has already lifted.
-- **TD-045** severity: minor | status: open | created: Sprint-056
+- **TD-045** severity: minor | status: resolved → retained by design (SPRINT-128 promote, owner ruling) | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
     parser that `check-layers-completeness.sh` owns. SPRINT-056 T1 fixed the two drifts (TD-040,
     TD-043) and added a parity fixture, but did **not** remove the duplication.
@@ -2860,3 +2660,4 @@ status: current
     the G2 ruling behind it — `dispatch.md` publishes a dependency-free snippet, and pointing it at
     `scripts/lib/` would leak a maintainer-only path into a consumer-facing reference (L-015) — is
     unchanged and still correct. Neither side has moved since SPRINT-070. No vehicle in SPRINT-073.
+  - Resolved (SPRINT-128 promote, owner-approved): the dispatch preflight is a shipped step an adopter runs verbatim, so it cannot call a repo-only TS parser (L-015); `run-dispatch-preflight-fixtures.sh` guards its parity. Its silent column-0 drop is fixed by TASK-447.
