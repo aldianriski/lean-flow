@@ -72,7 +72,7 @@ Layers: `scripts/lib/sprint-members.ts` · `scripts/lib/check-authority.ts` · `
   · `docs/work/todo/TASK-445-member-resolver-names-anomalies.md`
   · `docs/work/in_progress/TASK-445-member-resolver-names-anomalies.md`
 Depends-on: T1, T2
-Cites: `TASK-445` · EPIC-022 Closed-when 7 · TD-188 · TD-190 · TD-198
+Cites: `TASK-445` · EPIC-022 Closed-when 7 · TD-188 · TD-190 · TD-198 · `conformance.sh` (reaches the CLI; read only)
 
 It follows the parser work because it edits the same files; the depends-on is ownership, not logic.
 
