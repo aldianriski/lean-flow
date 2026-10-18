@@ -82,3 +82,19 @@ fixtures). TASK-441's DoD has no box for the engine change the owner ruled at G2
 and its engine note widens to the two changes. TASK-441 gains one box: S9.GATESWELLFORMED accepts the date form only without git,
 with must-FAIL fixtures, and no git repo's verdict moves. TASK-441 is re-tiered P → G (consequential, ADR-050), on discovery.
 **Re-confirm G2.** The owner signed G1 + G2 on this design, these changes included, in the same popup round.
+
+### 2026-10-18 | dispatch | wave 1: T1 (Sonnet, worktree) ∥ T2 (coordinator); worktree-base guard PASS
+Before dispatch, `git worktree list` showed 16 leftover agent worktrees. The 8 that were merged into `main`, clean and unlocked
+were removed (their branches kept). Eight stay for the owner: two locked, and six holding unmerged commits or uncommitted files.
+T1's worktree branched from `f996fa17`, equal to coordinator HEAD (worktree-base guard PASS, checked while the agent was live).
+
+### 2026-10-18 | T2 | TASK-440 — ADR-054 + spec 0.18.0 (`b7d5ad0f`, R1 fix `c2aa9195`); done
+ADR-054 sets the git-less freeze (promote-entry snapshot, dates for shas, detection by `git rev-parse --git-dir`) and records the
+S9.GATESWELLFORMED behaviour change under ADR-034. STANDARD §9 gains the paragraph, the date form and two table cells; spec 0.18.0
+MINOR. Box 3, mechanical: `conformance.sh .` verdict lines diffed before and after, and only the four S4 ADR counts moved
+(53 → 54, all PASS); level Gated, the counts line and rc 0 are identical. Prose-density 28/0 (STANDARD 6 ≤ 6).
+Review: Codex `gpt-6-astra` R1 found 3 items, all from one sentence. The task-level `gates_signed` read as mandatory in a git repo,
+and the CHANGELOG said every new sentence was git-less only. Fixed in `c2aa9195` (MAY, with or without git); R2 CLEAR. The
+default Codex model (`gpt-6.1-sol`) is rejected for this account, so every review passes `--model gpt-6-astra`.
+Tick hygiene: the move commit first carried `sprint(127) T2:` and leg 15 reddened on `done/TASK-440`, a path T2 never declared.
+It was re-subjected to bare `sprint(127):` (COORD), which is how SPRINT-126 committed its moves; leg 15 is clean.
