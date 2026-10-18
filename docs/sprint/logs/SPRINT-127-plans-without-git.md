@@ -192,3 +192,15 @@ source; no outside review, as ruled at G2.
 only `sprint: 127`, not the `SPRINT-127` form real members carry, and the fixtures used the numeric form, so they could not see it.
 Fixed in `972d78f9`, with both forms in the fixtures. The coordinator then ticked boxes 1 and 3 through the fixed tool: freeze
 6/0, layers 15/0, exit 0. The layers count agrees with the checker run directly (15 PASS, 0 FAIL).
+
+### 2026-10-18 | system-verify | QA_FULL on the VPS at `9f7b1305`: **QA-CHECK: 299 pass, 1 fail**, rc 1 — scope-change leg
+Bundled `b25254cf..main` to `~/lf-gate`, which was detached at `9f7b1305` (equal to local HEAD); nothing pushed. The one FAIL is
+`scope-change-outside-layers T3`: the T3 Layers entry above names two files as *out of scope*, and the checker reads any named path
+as a claim. It reproduces locally with `check-sprint-by-reference.ts <sprint> --scope-change` (6 pass, 2 fail). The coordinator's
+per-write re-checks ran that checker only in its default mode, never in the `--scope-change` mode the gate also runs (L-224 sighting).
+The local waiter for the gate result was stopped by the harness for host memory pressure; the VPS run itself was unaffected.
+
+### 2026-10-18 | scope-change | T3 TASK-441 Cites: the two out-of-scope references its Layers entry names
+**What broke.** The checker reads every path a scope-change entry names as a file claim, including the ones it rules out.
+**Impact.** T3 Cites gains bare `night-run.md` · `migration-map.md`, which are read-only mentions and were not edited. No DoD or Layers change.
+**Re-confirm G2.** Not needed: it declares a reference and changes no scope (the SPRINT-126 Cites precedent).
