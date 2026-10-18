@@ -293,7 +293,8 @@ ingests the stray task.
 
 ### Verification (run every time, plan and apply alike)
 
-- **Required-field checklist, after the write (mandatory; in plan mode, against the planned set).** Open every `docs/work/*/TASK-*.md` this run wrote (plan: every file it would write) and tick, per file:
+- **Required-field checklist, after the write (mandatory; in plan mode, against the planned set).** Apply mode: open every `docs/work/*/TASK-*.md` this run wrote.
+  Plan mode: no file exists yet, so check the planned frontmatter of each file the run would write. Tick, per file:
   `id` · `title` · `priority` · `size` · `risk` · `autonomy` · `class` · `tier` · `authority` · `origin` · `state` are each present **and non-empty**, and `id` equals the id in the filename.
   A file failing any tick is **withheld**: delete it from the write set (apply: remove the file this run just created),
   name it in the report with its missing fields, and raise its owner-input row — never left on disk, never defaulted.
