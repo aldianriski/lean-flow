@@ -412,7 +412,7 @@ graceful window — every `2.x` queue skill carries exactly one read path.
 3. **Resume normal use.** `/prime`, `/triage`, `/task-decomposer`, `/handoff`, `/flow`,
    `/orchestrator` and promote/close all read the store from here on. A sprint now **references**
    its member task files instead of copying their DoD into its Plan. Each task's DoD lives only in
-   its own `## Done when`, and `plan_commit` is the freeze (ADR-047).
+   its own `## Done when`, and `plan_commit` is the freeze (ADR-047); with no git, a verbatim snapshot in the promote entry is (ADR-054).
 
 **New requirement: `bun` for checking a 2.x tree.** `conformance.sh` (and the gate and night-run) read a
 sprint's members through one TypeScript lookup, so checking a migrated repo needs [`bun`](https://bun.sh)

@@ -75,5 +75,5 @@ touches no other `## Assumes` line.
 ## Transitions
 
 A status change is a `git mv` to the destination folder, in its own commit; a content edit never
-shares that commit (D6, ruled at SPRINT-106 G2). `git mv` keeps rename detection, so
+shares that commit (D6, ruled at SPRINT-106 G2). With no git it is a plain file move (ADR-054). `git mv` keeps rename detection, so
 `git log --follow` shows the file's full history across every folder it has occupied.

@@ -6,10 +6,10 @@ epic: [EPIC-NNN if this sprint advances one — omit entirely otherwise]
 owner: [role — not personal name]
 last_updated: YYYY-MM-DD
 status: planned | active | closed
-gates_signed: [G1,G2 @ <sha> — set when the batch gates are signed; OMIT until they are. Absence means NOT signed]
+gates_signed: [G1,G2 @ <sha> (or @ <YYYY-MM-DD> with no git) — set when the batch gates are signed; OMIT until they are. Absence means NOT signed]
 approval_envelope: [goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ <sha> — the pre-launch approval an unattended run consumes. All TEN dimensions, or the envelope can silently widen along the one you left out. OMIT until approved; absence means NOT approved, and this bracketed placeholder counts as absent]
-plan_commit: [sha — set at promote]
-close_commit: [sha — set at close]
+plan_commit: [sha — set at promote; with no git: none (no git), the Done-when snapshot living in the promote Log entry]
+close_commit: [sha — set at close; with no git: none (no git) · closed <YYYY-MM-DD>]
 update_trigger: sprint execute/close events
 ---
 
@@ -25,11 +25,11 @@ update_trigger: sprint execute/close events
 
 ## Members
 <!-- REQUIRED -- the sprint BY REFERENCE (ADR-047): one member task file
-     (`docs/work/<status>/TASK-NNN-<slug>.md`) per line. `promote` moves each file backlog/ -> todo/ with
-     `git mv` in its own commit and stamps its `sprint:` frontmatter; the path here records where it
+     (`docs/work/<status>/TASK-NNN-<slug>.md`) per line. `promote` moves each file backlog/ -> todo/ (the git case:
+     `git mv` in its own commit; no git: a plain move) and stamps its `sprint:` frontmatter; the path here records where it
      sat at promote -- later folder moves do not edit this list. Each task's DoD lives ONLY in its
      member file's `## Done when`: tick it there, with evidence (`- [x] … ✓ <what proved it>`), and
-     /prime counts it there. `plan_commit` freezes those `## Done when` sections; rewording one after
+     /prime counts it there. `plan_commit` freezes those `## Done when` sections (no git: the promote entry's snapshot does); rewording one after
      promote needs a `scope-change` Log entry naming the id. `close` requires every member in
      done/ or cancel/ (references/sprint-by-reference.md). -->
 
