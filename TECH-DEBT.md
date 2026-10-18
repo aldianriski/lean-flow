@@ -35,6 +35,11 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-126 promote (2026-10-18).** **116 of 120 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 126. Second route: 120 open − 2 filed at 124 (TD-249 · TD-250) − 2 filed at 125 (TD-251 · TD-252) = 116. **Newly aged since
+> the SPRINT-125 sweep: none** — nothing was filed at sprint 123. No open row is `high`. No §11 deletion is due (TD-168, resolved at
+> 124, is due at 127; the 15 rows resolved at 125 are due at 128).
+>
 > **Aging sweep — SPRINT-125 promote (2026-10-18).** **131 of 133 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 125. Second route: 133 open − 2 filed at 124 (TD-249 · TD-250) = 131; nothing was filed at 123. **Newly aged since the
 > SPRINT-124 sweep, named for re-review:** TD-247 · TD-248 (filed at 122). No open row is `high`. Re-reviewed by routing: eleven
