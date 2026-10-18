@@ -69,13 +69,13 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    `Cites:` names no current member (all scoped out) is not counted as a unit at all.
 5. **Tick** — the coordinator ticks the member file's box, `- [ ]` → `- [x]`, appending
    ` ✓ <evidence>` at the end of the box's FIRST line (the `- [ ]` line itself) — never on a wrapped continuation line, never as a separate line. Nothing else in `## Done when` changes: any other edit
-   first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze). Then re-run the
+   first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze; with no git the frozen text is the promote entry's snapshot, and the entry must come after it). Then re-run the
    checker **the gate itself runs** over every file just written: the evidence suffix is content that
    checker reads, and a sibling implementation's PASS or a pre-write PASS is not its verdict (L-224).
 6. **Transitions** — `todo/` → `in_progress/` when the task starts · → `review/` when its work is
    committed and awaits review or merge-back · → `done/` once every box is ticked and review accepted.
    Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/` in **its own commit**, never
-   sharing one with a content edit (ADR-045 D6). **Coordinator-owned** — § Merge-back queue.
+   sharing one with a content edit (ADR-045 D6) — the git case; with no git it is a plain file move. **Coordinator-owned** — § Merge-back queue.
 7. **Close precondition (step 6)** — every member sits in `docs/work/done/` or `docs/work/cancel/`;
    Plan boxes are never counted. Where the host keeps a sprint-close checker, run
    it (lean-flow's own: `bun scripts/lib/check-sprint-by-reference.ts <sprint-file> --close`; it also re-runs the freeze
@@ -643,7 +643,7 @@ condition, salvage any doc/research artifacts, drop the code. **Returning it is 
 coordinator**, so the sprint's freeze and close checks stay green (ADR-047 § scoped out):
 1. append an Execution Log entry headed `### <date> | scope-change | …` that names the TASK id and
    its unblock condition (a prose mention under another event does not count);
-2. `git mv docs/work/<status>/TASK-NNN-<slug>.md docs/work/backlog/` in **its own commit**;
+2. `git mv docs/work/<status>/TASK-NNN-<slug>.md docs/work/backlog/` in **its own commit** (no git: a plain move);
 3. clear the file's `sprint:` stamp and remove its line from the sprint's `## Members` (one content
    commit, after the move).
 A task still stamped or listed after the move is still a member, so it blocks close from `backlog/`.

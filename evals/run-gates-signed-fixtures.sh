@@ -131,6 +131,33 @@ else
   fail=1
 fi
 
+# --- cases 6a-6d: the date form (ADR-054) -- accepted ONLY where the tree is not a git repository -----
+# Built under $work, outside this repo, because the engine's git test walks UP from the target: a fixture
+# nested under evals/fixtures/ is inside lean-flow's own work tree and would always read as a git repo.
+# (a) git-less + date -> PASS; (b) the SAME file in a git repo -> FAIL malformed (the rejected design is
+# "date accepted always", so (b) is the claim-bearing case); (c) git-less + a malformed date -> FAIL;
+# (d) git-less + a sha -> still passes as before (control: the new branch must not displace the old).
+mk_gl() { # <dir> <gates_signed value>
+  mkdir -p "$1/docs/sprint"
+  printf -- '---\nsprint: 914\nslug: fx\nstatus: active\ngates_signed: %s\nplan_commit: none (no git)\n---\n\n# SPRINT-914 -- fixture\n\n## Plan\n\n### T1 -- x\nLayers: `a.md`\n\n**DoD:**\n- [ ] x\n' "$2" > "$1/docs/sprint/SPRINT-914-fx.md"
+}
+mk_gl "$work/gl-date" 'G1,G2 @ 2026-10-18'
+run_case_anywhere "date-without-git-passes" 0 "G1,G2 signed @ 2026-10-18 (no git)" -- \
+  sh "$engine" "$work/gl-date" --spec "$gs_spec"
+
+mk_gl "$work/git-date" 'G1,G2 @ 2026-10-18'
+git init -q "$work/git-date" || { echo "FAIL harness: git init failed"; exit 2; }
+run_case_anywhere "date-in-git-repo-fails" 1 "malformed gates_signed: 'G1,G2 @ 2026-10-18'" -- \
+  sh "$engine" "$work/git-date" --spec "$gs_spec"
+
+mk_gl "$work/gl-baddate" 'G1,G2 @ 18-10-2026'
+run_case_anywhere "malformed-date-without-git-fails" 1 "malformed gates_signed: 'G1,G2 @ 18-10-2026'" -- \
+  sh "$engine" "$work/gl-baddate" --spec "$gs_spec"
+
+mk_gl "$work/gl-sha" 'G1,G2 @ 1f0c012'
+run_case_anywhere "sha-without-git-still-passes" 0 "G1,G2 signed @ 1f0c012" -- \
+  sh "$engine" "$work/gl-sha" --spec "$gs_spec"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "GATES-SIGNED FIXTURES: all green"; else echo "GATES-SIGNED FIXTURES: at least one FAIL"; fi
 exit $fail

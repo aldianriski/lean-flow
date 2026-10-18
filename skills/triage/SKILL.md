@@ -65,7 +65,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 4. **Re-rank** — re-evaluate each task's `priority:` (P0–P3, by impact × urgency); propose moves with a one-line reason each. Sequence is then **derived** (§ Order), never hand-set.
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
 6. **State** — set `state:` `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
-7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then `git mv` the task file `backlog/ → cancel/` (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
+7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then move the task file `backlog/ → cancel/` — `git mv` in the git case, a plain move with no git (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
 8. **Output** — the groomed backlog in derived order + a **ready-to-promote shortlist** (that order, `ready` only) + **uncovered epic conditions and roadmap rows**, one line each:
    `EPIC-NNN · "<condition, ~60 chars>" · uncovered (unmarked | stale: TASK-NNN done/cancelled | missing: TASK-NNN)`; a row: `roadmap · P2a · "<outcome, ~60 chars>" · uncovered (… | stale: EPIC-NNN not active)`.
    Close a gap by proposing a task (`/task-decomposer --epic`) or a `→ next slice:` mark — triage never edits the epic or roadmap.
@@ -90,9 +90,9 @@ A `depends-on` cycle is a finding — report its ids; never break it silently.
 - **Priority / state** — edit those two lines in place, and add or remove only the `open:` /
   `blocked-by:` lines under `## Assumes`; every other line stays byte-identical (`authority:` ·
   `origin:` · existing assumptions · the done-when are not triage's to rewrite).
-- **Cancel** — `git mv docs/work/backlog/<file> docs/work/cancel/` in its **own commit**; any content
-  edit (the `## Amended` note) lands in a separate commit before it. A status change never shares a
-  commit with a content edit.
+- **Cancel** — `git mv docs/work/backlog/<file> docs/work/cancel/` in its **own commit** (no git: a plain
+  move); any content edit (the `## Amended` note) lands in a separate commit before it (with no git: it is made before the move). A status change
+  never shares a commit with a content edit.
 
 ## `.out-of-scope/` knowledge base
 
@@ -111,7 +111,7 @@ requests for the same thing accumulate under one file's `prior-requests` list.
 ```
 
 - **Durable reason, not a deferral** — "we're too busy right now" is a deferral, not a rejection; don't file it. The reason must still hold next year.
-- **Match by concept, not keyword** — "night theme" matches `dark-mode.md`. On a match, surface it: *"resembles `.out-of-scope/<x>.md`, rejected because … — still true?"* → **confirm** (append to `prior-requests`, `git mv` the task to `cancel/`) · **reconsider** (delete the file, task proceeds) · **disagree** (related but distinct, task proceeds).
+- **Match by concept, not keyword** — "night theme" matches `dark-mode.md`. On a match, surface it: *"resembles `.out-of-scope/<x>.md`, rejected because … — still true?"* → **confirm** (append to `prior-requests`, move the task to `cancel/` — `git mv`, or a plain move with no git) · **reconsider** (delete the file, task proceeds) · **disagree** (related but distinct, task proceeds).
 
 ## Hard rules
 
@@ -119,7 +119,7 @@ requests for the same thing accumulate under one file's `prior-requests` list.
 - **Readiness is a field** — `state:` changes are frontmatter edits; the only move triage makes is `backlog/ → cancel/`.
 - **No order file** — order is derived (§ Order); never write a sequence anywhere.
 - **HITL** — propose re-ranks, state changes, merges, and rejections; apply only after `y`. **Unattended** (headless): the `y` can never arrive — there is no ask channel at all (`AskUserQuestion` unregistered; `dontAsk` auto-denies). Emit the proposal and **park** it (`night-run.md` Part 0); a missing `y` is a no, never a yes.
-- **Never silently delete** — a removed task is `git mv`-ed to `cancel/` (never `rm`), with an `.out-of-scope/` entry or a merge note. No task vanishes without a trail.
+- **Never silently delete** — a removed task is moved to `cancel/` (`git mv`, or a plain move with no git; never `rm`), with an `.out-of-scope/` entry or a merge note. No task vanishes without a trail.
 - **Don't re-decompose** — triage grooms existing tasks; new tasks come from `/task-decomposer`.
 
 ## Red flags

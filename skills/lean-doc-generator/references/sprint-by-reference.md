@@ -9,8 +9,9 @@ to tick, mirror or drift (ADR-047). This file is the procedure behind the `promo
 
 1. Pick the `state: ready` tasks from `docs/work/backlog/` (governance review and size-check first, as
    the lifecycle row says).
-2. **Move** each member `backlog/ → todo/` with `git mv`, all moves in **their own commit** — a
-   status change never shares a commit with a content edit (ADR-045).
+2. **Move** each member `backlog/ → todo/`. The git case: `git mv`, all moves in **their own commit** — a
+   status change never shares a commit with a content edit (ADR-045). With no git: plain file moves.
+   Git-less mode is detected, never declared: `git rev-parse --git-dir` fails at the repo root (ADR-054).
 3. **Stamp** each member's frontmatter `sprint: SPRINT-NNN`, and write the sprint file from
    `templates/SPRINT.md.template`:
    - `## Members` — one path per member file, by reference.
@@ -22,6 +23,9 @@ to tick, mirror or drift (ADR-047). This file is the procedure behind the `promo
 4. Render the sprint's Execution Log (`docs/sprint/logs/SPRINT-NNN-<slug>.md`, from `templates/sprint-log.md.template`) with the
    `promote` entry carrying the signed governance checklist, then commit the stamp + sprint file + that log as `sprint(N): plan locked`, then record **that commit's sha** as
    `plan_commit:` — the first commit in which both the Plan and the stamped members exist.
+   **With no git** there is no commit: write each member's `## Done when` verbatim into the `promote` entry
+   (one block per member, headed by its TASK id) and set `plan_commit: none (no git)`; sign the batch gates
+   as `gates_signed: G1,G2 @ <YYYY-MM-DD>`. § Without git.
 
 ## What `plan locked` pins — the freeze
 
@@ -107,9 +111,27 @@ baseline is the first commit that stamps or lists it, so its later edits need a 
 
 `close` verifies **every member sits in `docs/work/done/` or `docs/work/cancel/`** — it never counts
 Plan boxes (there are none to count) — and re-runs the freeze check above. A member still in
-`todo/`, `in_progress/` or `review/` blocks close; first finish it, `git mv` it to `cancel/`, or
+`todo/`, `in_progress/` or `review/` blocks close; first finish it, move it to `cancel/` (`git mv` in the git case), or
 scope it out (a `scope-change` entry, then its `sprint:` cleared and its `## Members` line removed).
 Then the Retro and the rest of the close row proceed as written.
+
+## Without git — the snapshot (ADR-054)
+
+The freeze above is the git case. With no git (`git rev-parse --git-dir` fails at the repo root), the
+approved text is a **snapshot in the `promote` entry** and every git step takes a plain form:
+
+- **Promote.** Copy each member's `## Done when` verbatim into the Execution Log's `promote` entry, one
+  block per member headed `#### TASK-NNN`; set `plan_commit: none (no git)`. Status moves are plain file
+  moves — with no commit to bound them, the move is the record.
+- **Tick and close.** Compare each member's live `## Done when` to its block with the normalisation of
+  step 4 above (tick state, the ` ✓ <evidence>` tail, line endings ignored). A difference needs a
+  `scope-change` entry naming the id that comes **after** the `promote` entry — in an append-only log,
+  entry order stands in for commit order. A task that joins later needs its own entry and snapshot.
+- **Sign-off and close.** `gates_signed: G1,G2 @ <YYYY-MM-DD>`; at close, `close_commit: none (no git) ·
+  closed <YYYY-MM-DD>`, and the archive moves and the `docs/sprint/INDEX.md` line carry the same date.
+
+No conformance rule reads the snapshot yet; `S9.PLANFROZEN` reports "history unavailable" and names it.
+The freeze holds only if this procedure is followed.
 
 A project that keeps an automated gate can run steps 1–5 and the folder check as one command; the
 procedure above is the contract that command implements.

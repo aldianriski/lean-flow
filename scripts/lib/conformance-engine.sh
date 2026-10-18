@@ -1002,7 +1002,12 @@ assert_S9_GATESWELLFORMED() {
     fi
     gates=$(printf '%s' "$gs" | sed -n 's/^\([^@]*\)@.*/\1/p' | tr -d ' ')
     sha=$(printf '%s' "$gs" | sed -n 's/^[^@]*@[ ]*\([0-9a-f]\{7,40\}\).*/\1/p')
-    if [ -z "$gates" ] || [ -z "$sha" ]; then
+    gdate=""
+    # ADR-054: a date stands in for a sha ONLY where git cannot supply one; in a git repository it stays malformed.
+    if [ -z "$sha" ] && ! _is_git_repo "$repo"; then
+      gdate=$(printf '%s' "$gs" | sed -n 's/^[^@]*@[ ]*\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\)[ ]*$/\1/p')
+    fi
+    if [ -z "$gates" ] || { [ -z "$sha" ] && [ -z "$gdate" ]; }; then
       bad "gates-signed: $sp -- malformed gates_signed: '$gs' (want '<GATE>[,<GATE>] @ <sha>'); a record nobody can parse looks like evidence and is worse than none"
       IFS='
 '
@@ -1016,7 +1021,11 @@ assert_S9_GATESWELLFORMED() {
         continue
         ;;
     esac
-    ok "gates-signed: $sp -- $gates signed @ $sha"
+    if [ -n "$gdate" ]; then
+      ok "gates-signed: $sp -- $gates signed @ $gdate (no git)"
+    else
+      ok "gates-signed: $sp -- $gates signed @ $sha"
+    fi
     IFS='
 '
   done
@@ -2268,7 +2277,7 @@ assert_S9_PLANFROZEN() {
   plans=$(_sprint_plans "$repo")
   [ -n "$plans" ] || { note "S9.PLANFROZEN       -- no active sprint Plan -- nothing to verify"; return; }
   if ! _is_git_repo "$repo"; then
-    note "S9.PLANFROZEN       -- history unavailable: $repo is not a git repository, so whether § Plan changed after its freeze cannot be answered. Reported rather than passed -- the absence of a record is not evidence that nothing happened"
+    note "S9.PLANFROZEN       -- history unavailable: $repo is not a git repository, so whether § Plan changed after its freeze cannot be answered (without git the frozen text is the snapshot in the Execution Log's promote entry, ADR-054). Reported rather than passed -- the absence of a record is not evidence that nothing happened"
     return
   fi
   n_frozen=0; n_accounted=0
