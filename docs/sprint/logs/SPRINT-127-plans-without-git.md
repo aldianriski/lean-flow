@@ -129,3 +129,23 @@ The vehicle is one real, docs-only workdoo task: TASK-046 carries `company-works
 P0–P12) into `docs/product/roadmap.md` from the template, with Status and Covered-by cells; the source file is untouched. It goes
 G1/G2 → done by popup with `gates_signed: G1,G2 @ 2026-10-18`, which covers TASK-442 boxes 1 and 2 in one task. Writes are limited
 to workdoo's `docs/work/` and `docs/product/roadmap.md`. /prime and /triage then run read-only there for box 3.
+
+### 2026-10-18 | T5 | TASK-442 — the plan support exercised on workdoo itself (no git); done
+consequence · T5 · behaviour: low · governance: low (consumer exercise; findings only, as logged at G2)
+Workdoo's max task id was 45 by three routes (file names, `id:` fields, citations), so the vehicle is TASK-046. It was created in
+`backlog/` unsigned. The owner approved G1 and then G2 by popup, which wrote `gates_signed: G1 @ 2026-10-18` and then `G1,G2` plus
+an `## Approved design` paragraph. It moved backlog → in_progress → done by plain moves, with its 3 boxes ticked.
+`docs/product/roadmap.md` was rendered from the template: 16 rows with cells 1–4 identical to the plan's table by a pipe-delimited
+`cut` diff, and 2 done · 1 active · 13 planned. The source plan's sha256 is unchanged (`58c7426f…`).
+**Caught by the second query.** The first render marked every row `planned`: a leading space broke the row-id parse in the
+coordinator's own script. The status census by a different route (cut on `|`) showed it; it was fixed and re-verified.
+Coverage, by the current `/prime` and `/triage` procedures (epic-coverage.md § Source B), run by hand read-only against workdoo:
+0 uncovered (P2 active → `next slice: P2d consolidated owner preview`). Negative control on a copy outside workdoo, with P3 seeded
+active and unmarked: reads `roadmap · P3 · uncovered (unmarked)`, and active 2 = covered 1 + uncovered 1.
+**Findings (recorded, not smoothed):**
+- **F1.** Workdoo now holds the delivery sequence twice, in the plan's table and in the roadmap, which is two SSOTs. The template
+  says nothing about adopting from an existing hand-rolled table, and `migrate` has no mapping for it (out of scope at SPRINT-126).
+  → TD at close.
+- **F2.** Workdoo pins lean-flow 2.5.0 / Standard 0.15.0 (its version-alignment record). That `/prime` has no roadmap slot, and it
+  predates task-level `gates_signed` and the git-less freeze, so a `/prime` run under workdoo's own pin prints no Coverage row. Box
+  3 holds for the current procedures, not for the pinned ones. → workdoo owner-action: bump the pin after this sprint's release.
