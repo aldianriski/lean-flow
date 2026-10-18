@@ -28,7 +28,8 @@ although v1 trees are refused since 2.0 (ADR-046).
 
 - [ ] `check-layers-observed.sh` and `check-authority.sh` are deleted with the opt-in harnesses that exist only to compare them,
       and `layers_tokens` moves into `check-layers-completeness.sh`, which stays as the dispatch preflight's parity oracle.
-- [ ] The reaper's v1 branch is deleted after showing no supported path reaches it.
+- [ ] The reaper's v1 counting is deleted: a v1 sprint gets a named "unsupported since 2.0" error, and a missing bun gives
+      zero counts plus the existing bun line (reworded at G2 by scope-change: the branch was also the no-bun fallback).
 - [ ] No prose names a deleted file as live (the qa-check lists, `dispatch.md`, `night-run.md`), and the bare gate and
       `QA_FULL=1` both stay green.
 
