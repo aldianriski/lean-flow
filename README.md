@@ -297,6 +297,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 |---|---|---|
 | `docs/work/<status>/TASK-NNN-*.md` | `/task-decomposer` · `/triage` · `/orchestrator` | one file per task — the folder is its status (`backlog/` → `todo/` → `in_progress/` → `review/` → `done/` \| `cancel/`) |
 | `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
+| `docs/product/roadmap.md` | `/lean-doc-generator roadmap` | a phased **delivery plan** across ≥ 2 sprints or epics: one row per vertical slice with Status + `Covered by`. `/task-decomposer --roadmap <row>` decomposes one row; `/prime` and `/triage` flag an `active` row nothing covers; `promote` warns. Skip it for a single-sprint plan |
 | `docs/epic/EPIC-NNN-*.md` | `/lean-doc-generator epic` | a **multi-sprint** outcome + the sprints that carried it. Skip it when the work fits one sprint. While `active`, each open Closed-when line ends `→ TASK-NNN` or `→ next slice: <name>`; `/triage` and `/prime` flag the uncovered ones and `promote` refuses to form a sprint over one |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · files changed · retro (400-line hard cap) |
 | `docs/sprint/logs/SPRINT-NNN-*.md` | `/lean-doc-generator` at promote · `/orchestrator` during execution | that sprint's execution log (created at promote) — append-only, uncapped, so it never eats the Plan's budget (ADR-014) |

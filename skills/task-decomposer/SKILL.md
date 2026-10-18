@@ -1,7 +1,7 @@
 ---
 name: task-decomposer
 description: Use when converting a freeform feature request, ticket URL, PRD, or epic into structured TASK-NNN task files in docs/work/backlog/ (one file per task). Enforces an assumption registry, risk scoring, vertical-slice granularity, and validation before writing. Self-contained, no specialist agents. Do not use when a task already exists and is ready to build — use /orchestrator instead.
-argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\" | --fog \"foggy goal\"]"
+argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\" | --roadmap P2a | --fog \"foggy goal\"]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 user-invocable: true
 version: "0.2.0"
@@ -23,6 +23,7 @@ On v1 or mixed, name it and refuse to write — point to `/lean-doc-generator mi
 | Ticket — `JIRA-123` or a Linear/GitHub URL | matches `[A-Z]+-[0-9]+` or a URL |
 | PRD — `--prd docs/feature.md` | `--prd` flag + path |
 | Epic — `--epic "Payments"` or `--epic EPIC-003` | `--epic` flag + name or id |
+| Roadmap row — `--roadmap P2a` | `--roadmap` flag + a row id |
 
 For a ticket, fetch the description first (ask the user to paste if credentials are missing — never block on env vars).
 **For an epic**, resolve the flag to `docs/epic/EPIC-NNN-<slug>.md` (match on id, else slug, else the
@@ -36,6 +37,13 @@ the owner names, never the whole epic at once: an epic spans sprints by definiti
 ~12 tasks. No epic doc for that name → it is not an epic yet; say so and offer `/lean-doc-generator epic`
 (nameable outcome) or `--fog` (not yet nameable). **Never create the epic here** — creation is the
 generator's job; this skill consumes.
+
+**For a roadmap row**, resolve `docs/product/roadmap.md` (legacy `docs/roadmap.md`) and find the Delivery-sequence row whose
+first-cell leading token equals the id (exact, case-sensitive). Its Usable outcome, Depends on and Acceptance evidence are
+already-settled context — read them, don't re-interview them. Decompose **only that row**, never the roadmap; set `epic:` only
+if its `Covered by` names an active epic. End by telling the owner what to put in the row's `Covered by` cell (the new `TASK-NNN`
+ids): the decomposer never edits the roadmap — the coverage mark is the owner's or promote's. No roadmap, or no such
+row → say so and offer `/lean-doc-generator roadmap` (create) or plain decomposition.
 
 ## Procedure
 
