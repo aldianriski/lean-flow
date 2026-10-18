@@ -1,3 +1,10 @@
+---
+owner: [role — not a personal name] [CUSTOMIZE]
+last_updated: YYYY-MM-DD
+update_trigger: Enforcement contact, scope, or the adopted Covenant version changed
+status: current
+---
+
 <!-- CODE OF CONDUCT — adapted from the Contributor Covenant v2.1 (CC BY 4.0).
      Created ← team ≥ 2, or on request (STANDARD §2 — same gate as CONTRIBUTING.md).
      A single-maintainer repo with no request has not met the condition and is not deviating.
@@ -107,6 +114,3 @@ https://www.contributor-covenant.org/translations.
 
 [homepage]: https://www.contributor-covenant.org
 [mozilla]: https://github.com/mozilla/diversity
-
----
-_Owner: [CUSTOMIZE: role — not a personal name] · Last updated: YYYY-MM-DD_

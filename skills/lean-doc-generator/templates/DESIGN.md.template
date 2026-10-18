@@ -1,4 +1,5 @@
-<!-- OPTIONAL · frontend-only · NOT a core lean-flow doc — a design-system / token contract (spec artifact). -->
+<!-- OPTIONAL · frontend-only · NOT a core lean-flow doc — a design-system / token contract (spec artifact).
+     No STANDARD §3 header: STANDARD §2/§3 carve DESIGN out — design-token frontmatter below instead. -->
 ---
 version: [e.g. 0.1.0]
 name: [Design System Name]
