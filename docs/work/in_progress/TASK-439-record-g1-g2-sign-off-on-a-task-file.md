@@ -25,14 +25,14 @@ sprint and records its gates as dated prose under `## Assumes` (consumer evidenc
 
 ## Done when
 
-- [ ] A task file may carry `gates_signed: <GATE>[,…] @ <sha | YYYY-MM-DD>` in its frontmatter — absent means NOT signed, never
+- [x] A task file may carry `gates_signed: <GATE>[,…] @ <sha | YYYY-MM-DD>` in its frontmatter — absent means NOT signed, never ✓ template + store schema + task-file reference, harness KNOWN_OPTIONAL_FIELDS (`165780fc`, `4420c141`); v1-to-v2 101/0
       approval — and the task template, the store schema and the task-file reference all state it.
-- [ ] `/orchestrator` `quick` and `mvp` write that field the moment the owner approves G1 (and G2), whether by a plan-mode exit or
+- [x] `/orchestrator` `quick` and `mvp` write that field the moment the owner approves G1 (and G2), whether by a plan-mode exit or ✓ quick step 2 + G2 intro line, 0 net lines (138); Codex gpt-6-astra R2 CLEAR
       a popup, and record the approved design's one-paragraph summary in the task file; a sprint keeps its existing sprint-level
       field.
-- [ ] The README / orchestrator docs say an adopter MAY set Claude Code's `plansDirectory` to a repo folder so plan mode's own file
+- [x] The README / orchestrator docs say an adopter MAY set Claude Code's `plansDirectory` to a repo folder so plan mode's own file ✓ README Plan-mode approvals paragraph (`165780fc`)
       is kept, and the record then cites that file; lean-flow never edits a settings file.
-- [ ] Exercised on a scratch repo: an `mvp` task approved by popup ends with `gates_signed: G1,G2 @ <date>` and its design summary,
+- [x] Exercised on a scratch repo: an `mvp` task approved by popup ends with `gates_signed: G1,G2 @ <date>` and its design summary, ✓ judgment: git-less scratch, owner approved G1 + G2 by popup, TASK-001 ended `G1,G2 @ 2026-10-18` + Approved design; TASK-002 has neither
       and a task never approved has no field.
 
 ## Touches
