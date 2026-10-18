@@ -1,0 +1,50 @@
+---
+id: TASK-443
+title: "Give the Plan one shared parser, and move the two Layers checkers onto it"
+epic: EPIC-022
+priority: P1
+size: M
+risk: med
+autonomy: HITL
+class: execution
+tier: G
+authority: J1
+origin: decomposer
+state: ready
+depends-on: []
+---
+
+# TASK-443 — One shared Plan parser for the Layers checkers
+
+## Why
+
+A `Layers:` declaration is read by about eight `### Tn` heading regexes, three copies of the token extractor and two identical
+`## Plan` extractors, and the copies disagree on wrapped lines. `check-layers-observed.ts` drops a column-0 wrap silently while
+`check-layers-completeness.ts` FAILs it (TD-138, 4 archived plans carry the shape). EPIC-022 Closed-when 7 asks for one parser.
+Consequential G: the module lives in `sprint-members.ts`, which `conformance.sh` reaches (ADR-050).
+
+## Done when
+
+- [ ] `sprint-members.ts` exports one Plan parser: the `## Plan` section (fence-aware), `### Tn` headings with an optional letter
+      suffix, and `Layers:` · `Cites:` · `Depends-on:` with their continuation lines, a column-0 wrap returned as a named anomaly.
+- [ ] `check-layers-completeness.ts` and `check-layers-observed.ts` read Plans only through it; their own `extractPlanLines`,
+      token extractors and heading regexes are deleted, and both name a column-0 wrap instead of dropping or crashing on it.
+- [ ] A Done-when bare filename matches a `Layers:` path whose basename it equals when exactly one declared path has that
+      basename (TD-178 · TD-215), and `check-layers-observed` attributes a `sprint(NNN) Tn:` commit only when NNN is its own sprint
+      (TD-248).
+- [ ] Verdicts unchanged elsewhere: both checkers give the same verdict as before on all 127 archived plans and every existing
+      fixture, apart from the named-anomaly cases above, recorded as a before/after differential.
+- [ ] Full Tier G bar: a retained must-FAIL fixture per new behaviour, and seeded breaks that each redden exactly their case.
+
+## Touches
+
+- scripts/lib/sprint-members.ts · scripts/lib/check-layers-completeness.ts · scripts/lib/check-layers-observed.ts · evals/
+
+## Assumes
+
+- A1: the consolidation preserves behaviour; the differential on the archived corpus is the proof, not a reading of the code.
+- Shares `sprint-members.ts` with TASK-445; the commit order is set at G2.
+
+## Tracker
+
+- EPIC-022 Closed-when 7 · TD-138 · TD-178 · TD-215 · TD-248 · SPRINT-127 intake recon (parser census)
