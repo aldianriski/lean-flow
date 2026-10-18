@@ -14,7 +14,13 @@ status: current
 
 ---
 
-## SPRINT-126 — Roadmap and Traceability (2026-10-18) — unreleased
+## v2.7.0 — a phased roadmap with row coverage (spec 0.17.0) (2026-10-18)
+
+**MINOR** — ships SPRINT-126 (Roadmap and Traceability). **Upgrade step:** spec 0.17.0 is MINOR carrying MAJOR meaning (§15): a
+`roadmap.md` outside `docs/product/` (with neither `docs/product/roadmap.md` nor the legacy `docs/roadmap.md` present) is now flagged
+by `S2.R-PLACEMENT` — re-run `sh conformance.sh <repo>` and move or rename it. Restart the session after installing.
+
+### SPRINT-126 — Roadmap and Traceability (2026-10-18)
 
 EPIC-022's second slice: a repo can write a phased delivery plan and see which rows nothing is delivering. **Spec 0.17.0.**
 
@@ -89,24 +95,5 @@ EPIC-022's first slice: the surface an installed consumer already meets stops mi
 - ADR-053: the execution freeze re-arms, widened to new governance machinery (the five admission conditions, a G2 review-round cap).
 - EPIC-015 is closed (8 of 8).
 - TD-168 resolved · TD-249 · TD-250.
-
----
-
-## v2.5.0 — stopping an unattended run reports USER_STOP; a run that parks passes its own rollup guard (2026-10-11)
-
-**MINOR** — ships SPRINT-122 (Finish EPIC-015). Installing the next release is enough; no upgrade step. The standard is unchanged
-(spec 0.15.0).
-
-**Consumer-facing (unattended runs):**
-- **Stopping a run now reports `USER_STOP`.** Send TERM to the pid the launcher prints as `fired detached: pid=`. The wrapper catches
-  it, stops the run, and the rollup reads `terminal · USER_STOP` / `PARTIAL` with every field. INT and HUP are ignored on entry to a
-  detached shell, so use TERM. Killing the `claude -p` process itself still reads `HARD_FAILURE`, the same as the watchdog
-  (`night-run.md` Part 3 and Part 4).
-- **A run that parks now passes its own rollup guard.** The launcher's rollup block carries every non-green task line (parked,
-  blocked, stalled, denied-tool), as Part 4 requires. Before this, every reaped `AUTHORITY_BOUNDARY` failed `check-night-run-rollup`.
-  A re-reap no longer double-counts, and a CRLF checkout no longer defeats it.
-
-**Maintainer-side:** EPIC-015 CW5, CW6 and CW7 proven. The first unattended repair cycle and Dogfood 2 ran on vehicle SPRINT-123
-($1.32, one ADR-022 retry, one seeded park). TD-247 (Option A → TASK-426) · TD-248.
 
 ---
