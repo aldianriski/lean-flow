@@ -149,3 +149,12 @@ avoid it, which weakened that test. Stale comments in `check-layers-completeness
 those comments. All the files are in T3's Layers already (`evals/` covers the test). No DoD change; the work is recorded in T3's
 log entry.
 **Re-confirm G2.** Not needed: it completes the leading-run rule the owner already ruled, and the comment edits change no behaviour.
+
+### 2026-10-19 | scope-change | T3 TASK-445 Layers gain the members CLI, so box 1's "every caller" holds
+**What broke.** Box 1 requires every caller of the resolver to print its anomalies. The members CLI is a caller and was not in
+T3's Layers. It names unresolved *listed* ids already (`SPRINT-MEMBER-UNRESOLVED`), but it still resolves through the plain,
+silent `resolveMembers`, so an ambiguous *stamped* id would drop without a word. The CLI is reached by `conformance.sh`.
+**Impact.** T3 Layers gain `scripts/lib/sprint-members-cli.ts`. The CLI moves to `resolveMembersChecked` and prints each anomaly
+by its shared finding name, and the plain `resolveMembers` is deleted once nothing calls it (TD-188's trap for a future caller).
+No DoD change.
+**Re-confirm G2.** Not needed: it completes box 1 as written, under the owner's anomalies-FAIL ruling.
