@@ -31,3 +31,54 @@ not the fast-path.
 Engine re-check with this file present: S10.TDAGING PASS (118, the same as the ledger count) · S11.TDDELETE PASS (TD-168 is
 gone). The store prune found `done/TASK-426` (closed at SPRINT-124) past retention; it was deleted with owner approval in `284502f1`.
 promote-check 16/0 (two bare paths declared on Cites:) · dispatch preflight CLEAR (waves T1 · T2 → T3 · T5 → T4).
+
+### 2026-10-18 | gate | G1 + G2 signed by the owner (two popup rounds); attended sprint-bulk, T1 ∥ T2 → T3 ∥ T5 → T4
+G1: T1 · T2 · T3 · T5 are `origin: decomposer`, so each took the fast-path confirm (scope unchanged since promote, apart from the
+Layers gaps below). T4 (`origin: close-retro`) took the full checklist: goal = a tick tool that runs the gate's own checkers; size S;
+touches `scripts/lib/` (new `tick-box.ts`) · one `evals/` fixture · `dispatch.md` rule 5; out of scope = any adopter step naming it.
+T5's write into workdoo still waits for its own G1 go-ahead (A5). Sizes M · M · M · S · S, with no split.
+Recon before G2 (each a second query that agreed):
+- **A3 holds for task files, not for the schema doc.** No checker rejects an extra task field, but
+  `evals/run-v1-to-v2-fixtures.ts` diffs `docs/work/README.md` § Frontmatter fields against `KNOWN_OPTIONAL_FIELDS` both ways, so
+  listing `gates_signed` in the README alone reddens it.
+- **A git-less sprint signed per the planned spec FAILs the engine.** S9.GATESWELLFORMED takes a hex sha after `@`; run on
+  `G1,G2 @ 2026-10-18` its sed returns empty, which is the `malformed gates_signed:` branch. The engine reads no task file, so a
+  task-level date form is out of its reach.
+- `README.md` states "`plan_commit` is the freeze", so T3 edits it. `skills/orchestrator/SKILL.md` is at 138 of ~140 lines, so
+  T1 and T3 each add at most one net line there; detail goes to `references/dispatch.md`. ADR-053 is the highest ADR id by both
+  `docs/adr/` and `DECISIONS.md`, so ADR-054 is free.
+G2 design:
+- **T1.** `gates_signed: G1[,G2] @ <HEAD sha at approval | YYYY-MM-DD>` on a task's frontmatter, absent = not signed; an optional
+  `## Approved design` section holds the one-paragraph summary. `quick`/`mvp` write both on approval (popup or plan-mode exit).
+  `plansDirectory` is a MAY, never written by lean-flow. Exercised on a scratch repo.
+- **T2** (inline, decision tier). ADR-054 = the promote-entry snapshot as the git-less freeze (rejected: content hash · no freeze),
+  and it records the S9.GATESWELLFORMED behaviour change ADR-034 requires (rule id, finding id and severity unchanged). Spec 0.18.0
+  MINOR states the git-less records, including the §9 row's no-git date form. Proof: `conformance.sh .` verdict lines diffed.
+- **T3.** Every `git mv` / `plan_commit` / `git show` step names its git case and gains a no-git form (switch: `git rev-parse
+  --git-dir` fails). The S9.PLANFROZEN note names the snapshot. **Owner ruling (popup): S9.GATESWELLFORMED accepts `@ YYYY-MM-DD`
+  only when the repo has no git**, so no git repo's verdict moves; that part is consequential G (ADR-050: full bar). Exercised on a
+  scratch repo with no `.git`, including a seeded edit to a frozen box.
+- **T4.** `bun scripts/lib/tick-box.ts <TASK> <box#> "<evidence>"` ticks, then runs `check-sprint-by-reference.ts` and
+  `check-layers-completeness.ts`, printing their verdict lines; any FAIL exits non-zero with the box left ticked. Other G (ADR-050):
+  must-FAIL fixture (`member-layers-incomplete`) + a passing sibling + one real run on this sprint's own ticks.
+- **Run shape.** Wave 1: T1 (Sonnet, worktree) ∥ T2 (coordinator, main tree). Wave 2: T3 (Sonnet) ∥ T5 (coordinator, attended).
+  Wave 3: T4 (Sonnet). Ownership: `orchestrator/SKILL.md` T1 → T3 · `README.md` T1 → T3 · `dispatch.md` T3 → T4. CHANGELOG,
+  TECH-DEBT, the ticks, the member files and this log are coordinator-owned.
+- **Review (owner ruling, popup).** Codex gauntlet on T1 · T2 · T3 (shipped surface), at most 2 rounds each; T4 takes the ADR-050
+  Other-G bar plus self-review; T5 is findings-only.
+- **Verification.** T2 box 3 and T4 boxes 1–2 are mechanical, and each method reaches its target. Every other box is a judgment tick
+  with recorded evidence, and says so.
+consequence · T1 · behaviour: low · governance: material (shipped template, store schema, orchestrator procedure)
+consequence · T2 · behaviour: low · governance: material (spec 0.18.0, an implementation-binding ADR)
+consequence · T3 · behaviour: med · governance: material (shipped lifecycle procedures, an engine rule)
+consequence · T4 · behaviour: low · governance: low (maintainer tooling)
+consequence · T5 · behaviour: low · governance: low (consumer exercise, findings only)
+
+### 2026-10-18 | scope-change | T1 + T3 Layers, and TASK-441 gains the S9.GATESWELLFORMED box (owner, G2 popup)
+**What broke.** The frozen Layers miss three files the work must touch: `evals/run-v1-to-v2-fixtures.ts` (T1, the schema
+cross-check above), `README.md` (T3, its `plan_commit` sentence) and `evals/run-gates-signed-fixtures.sh` (T3, the widened rule's
+fixtures). TASK-441's DoD has no box for the engine change the owner ruled at G2.
+**Impact.** T1 Layers gains `evals/run-v1-to-v2-fixtures.ts`. T3 Layers gains `README.md` and `evals/run-gates-signed-fixtures.sh`,
+and its engine note widens to the two changes. TASK-441 gains one box: S9.GATESWELLFORMED accepts the date form only without git,
+with must-FAIL fixtures, and no git repo's verdict moves. TASK-441 is re-tiered P → G (consequential, ADR-050), on discovery.
+**Re-confirm G2.** The owner signed G1 + G2 on this design, these changes included, in the same popup round.
