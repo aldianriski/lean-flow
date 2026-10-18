@@ -72,29 +72,29 @@ match; a project that vendors its own plugin may place it elsewhere — adapt th
 
 | Condition | Row |
 |---|---|
+| base dir has no `<version>/` segment (ends `…/skills/prime` — `--plugin-dir <repo>`, a live checkout) | `<v> live checkout → fresh` — read `<base-dir>/../../.claude-plugin/plugin.json`; no separate installed copy exists, so it cannot be stale |
 | versions equal | `<v> base-dir == <v> repo → fresh` |
 | versions differ | `<installed> base-dir != <repo> repo → STALE, reinstall before trusting any procedure` |
 | no manifest — the ordinary consumer, who never checked the plugin out | `n/a (no local plugin repo)` |
 
 **Never block on it.** Priming is read-only and reports; whether a stale procedure is acceptable is the
-session's call, not this skill's. One row covers every skill — a plugin installs under a single
-version-scoped root, so this skill's base dir is the whole roster's. Out of scope: a skill edited
-*without* a version bump still reads `fresh` here, since only the version string is compared.
+session's call. One row covers every skill (one version-scoped root). Out of scope: a skill edited
+*without* a version bump still reads `fresh` — only the version string is compared.
 
 ## Steps
 
 1. Read each path in order; track found/missing.
 2. From the active task list, count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check).
-3. Compare the invocation header's base-dir version against the plugin manifest (above).
+3. Compare the base-dir version against the plugin manifest — or, with no version segment, the live-checkout row (above).
 4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
 5. Emit the health report (below) — health check ONLY, no inline file summaries. Its first line — the banner itself — carries the **verdict** (ready · stale · blocked, why in one clause) and the next step, so the reader has both before reading a row.
 6. Emit one `Next:` line:
    - open tasks exist → `/orchestrator` to continue — and when those tasks sit in an **active
-     sprint**, name the unattended option too (`/orchestrator sprint-bulk unattended` — a night run
-     that executes the promoted Plan while nobody watches). **Naming it is the whole job:** priming is
-     read-only, so this line points at the next skill and never launches anything. The mode is
-     declared at the trigger, never inferred, and the run itself is gated by its own pre-flight
-     (`orchestrator/references/night-run.md`)
+     sprint** with ≥1 open member `autonomy: AFK` at authority `J0`/`J1`, name `/orchestrator
+     sprint-bulk unattended` too (a night run executing the promoted Plan). An all-HITL/J2 sprint gets
+     `/orchestrator` alone: an unattended run would park every J2 task and end at AUTHORITY_BOUNDARY
+     having done nothing. **Naming it is the whole job:** priming never launches anything; the mode is
+     declared at the trigger, and the run is gated by its own pre-flight (`orchestrator/references/night-run.md`)
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - uncovered epic conditions > 0 → also name `/triage` (it lists them with their epic)
@@ -114,7 +114,7 @@ Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open
 Coverage: 2 uncovered epic conditions (EPIC-015 ×2) → /triage
 Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
-Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run)
+Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run — only if an open AFK J0/J1 member exists)
 ```
 
 The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reachable (no active
