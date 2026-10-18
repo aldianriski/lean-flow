@@ -34,3 +34,36 @@ promote-check 16/0, after two prose fixes: T3 now declares its T1 ownership depe
 Dispatch preflight, first run: HALT. T4 shared the `evals/` token with T1–T3 and had no edge to them; 20 files name the twins,
 several of them evals the parser tasks also edit. Re-sequenced so T4 runs first, which spares T1–T3 any Shell mirroring.
 Preflight now CLEAR (waves T4 · T1 · T2 · T3 · T5).
+
+### 2026-10-18 | gate | G1 + G2 signed by the owner (two popup rounds); attended sprint-bulk, T4 → T1 → T2 → T3 → T5
+G1: all five members are `origin: decomposer`, so each took the fast-path confirm (scope unchanged since intake). Sizes 4 M + 1 S,
+with no split. A3 failed its check (below); A1 and A2 stand, confirmed in T1/T2's differentials and at T4.
+G2 design:
+- **Run shape.** Sequential Sonnet builders, each in its own worktree so a seeding campaign never touches `main`; the
+  worktree-base guard runs on every dispatch. Coordinator owns the log, the ticks, the member moves and CHANGELOG/TECH-DEBT.
+- **Proof.** T1 and T2 prove behaviour preservation by an old-vs-new differential over all 127 archived plans and every fixture.
+  T1 · T2 · T3 · T5's conformance-reached parts take the full bar (seeded breaks, plus an independent coordinator re-seed);
+  T4 takes ADR-050's Other-G bar plus self-review. Codex (`gpt-6-astra`) reviews T1 · T2 · T3 · T5, at most 2 rounds each.
+- **Rulings (owner, popup), each from a census:**
+  - TASK-444: a `Cites:` task id governs a member only in the leading run of ids that opens the line (the template's convention).
+    Across 21 by-reference plans, that run holds 89 of 89 member ids and excludes 4 of 6 non-member mentions.
+  - TASK-445: every resolver anomaly (duplicate id · listed id with no file · file outside `docs/work/<folder>/`) FAILs, named.
+    The census is 0 of each, so no current verdict moves.
+  - TASK-446: A3 is only half true, because the reaper's "v1" branch is also its fallback when `bun` is missing. It is replaced
+    by named errors with no parsing: a v1 sprint gets "unsupported since 2.0 (ADR-046)", and a missing bun gives zero counts plus
+    the existing bun line.
+  - TASK-447: TD-177's dead-token finding lives in `check-layers-observed`, after work. A token matching nothing in the tree and
+    nothing in the sprint's diff is named, with no new Plan syntax. Admitted under ADR-053 on SPRINT-104's measured miss (glob
+    tokens that covered 0 of the files changed, 14 left undeclared).
+consequence · T1 · behaviour: med · governance: material (a module conformance.sh reaches)
+consequence · T2 · behaviour: med · governance: material (conformance-reached readers)
+consequence · T3 · behaviour: med · governance: material (conformance-reached resolver)
+consequence · T4 · behaviour: low · governance: low (deletions of maintainer tooling; prose mentions only)
+consequence · T5 · behaviour: med · governance: material (engine field readers, the shipped preflight)
+
+### 2026-10-18 | scope-change | T4 TASK-446 box 2: the reaper's v1 branch is reachable (no-bun fallback), so it is replaced, not merely deleted (owner)
+**What broke.** Box 2 froze "deleted after showing no supported path reaches it". On a v2 sprint with no `bun`, `rp_v2` stays 0
+and the reaper drops into that branch, so the premise is false.
+**Impact.** Box 2 is reworded to the owner's ruling: the v1 counting is deleted; a v1 sprint gets a named "unsupported since 2.0"
+error, and a missing bun gives zero counts plus the existing bun line. TD-049 still closes.
+**Re-confirm G2.** The owner signed G1 + G2 with this rewording in the same popup.
