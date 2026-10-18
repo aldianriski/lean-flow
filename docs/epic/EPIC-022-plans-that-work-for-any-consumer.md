@@ -1,0 +1,82 @@
+---
+epic: 022
+slug: plans-that-work-for-any-consumer
+owner: Maintainer
+last_updated: 2026-10-18
+status: active
+member_sprints: []
+update_trigger: a member sprint closes, or a decision lands that changes the outcome
+---
+
+# EPIC-022 — Plans That Work for Any Consumer
+
+> **Outcome:** a repository that installs lean-flow — with or without git — plans from a phased
+> delivery roadmap down to sprint tasks, every open roadmap row traceable to a task or a named next
+> slice, every G2 sign-off recorded where the next reader finds it, and no shipped instruction
+> pointing at a file the consumer does not have.
+
+## Why this, why now
+
+The first real consumer outside this repository, workdoo (`D:\Research\workdoo`, pinned to plugin
+2.5.0), had to hand-roll what lean-flow does not ship: a phased delivery plan
+(`docs/product/company-workspace-roadmap.md`, slices P0–P16) and an agent-execution plan, neither
+with a template, a STANDARD row, or a traceability rule. It also has **no `.git`**, so the sprint
+freeze (`plan_commit`, read back with `git show`) cannot run there — it uses tasks only, no sprints.
+That is the consumer evidence ADR-053 admits new machinery on. G2 already says "draft in `/plan`",
+but the approval leaves no record outside the transcript (L-099 · L-151). And the debt census at
+SPRINT-124's close (133 open rows) holds 28 consumer-facing defects and 40 in the planning
+lifecycle. Four sprints' worth, sequenced cheap-and-shipping first.
+
+## Scope
+
+**In:** consumer-surface fixes + a patch release · retiring the ADLC platform epics workdoo now owns
+· a roadmap / delivery-plan doc with plan→task traceability · a persisted plan-mode G2 record · a
+sprint lifecycle that runs without git · the planning-checker debt clusters.
+**Out (explicitly not):** the 61 maintainer-only TD rows (gate cost, eval harness, reaper guards) ·
+EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo application work
+(ADR-041 · ADR-052) · the parked TASK-322 · 366 · 367 · 402.
+
+## Member sprints
+
+| Sprint | Theme | Status | What it contributed to the outcome |
+|---|---|---|---|
+
+## Decisions
+
+- **D1** — Platform/runtime epics (006 · 008 · 009 · 011 · 012) close as superseded by workdoo;
+  plugin-scoped 005 · 007 stay in lean-flow. Owner ruling 2026-10-18.
+- **D2** — Sprint order S1 consumer maturity → S2 roadmap → S3 plan mode + git-less → S4 planning
+  debt. Owner ruling 2026-10-18.
+- **D3** — How a git-less repo freezes a Plan is hard-to-reverse (it changes what `plan_commit`
+  means in STANDARD §2). **→ ADR at S3's G2.**
+
+## Open questions
+
+- Git-less freeze shape: a stored snapshot copy · a content hash · or no freeze with a named
+  warning? → S3 G2, `/council` if the fork stays close, then the ADR (D3).
+
+## Closed when
+
+- [ ] No shipped skill names a repo-only `scripts/…` path as the mechanism of a step an adopter runs,
+      and `/prime` reports correctly under `--plugin-dir` and for an all-HITL sprint
+      (TD-137 · TD-214 · TD-220 · TD-230). → TASK-428, TASK-429
+- [ ] The consumer defects in the shipped release, template and conformance surfaces are resolved:
+      footer bump (TD-093) · template ownership headers (TD-078) · `S11.TDDELETE` false PASS (TD-187)
+      · `S4.NEGATIVE` substring (TD-118) · `migrate` withhold rule (TD-217) · the sprint template's lazy
+      log vs the rollup gate (TD-160) · the tick-tail wording vs the freeze checker (TD-229) — and
+      released as a patch. → TASK-430, TASK-431, TASK-432, TASK-433, TASK-422, TASK-427
+- [ ] lean-flow's epic index holds only outcomes lean-flow executes: 006 · 008 · 009 · 011 · 012
+      closed as superseded → workdoo, with the stale rows TD-100 · TD-161 · TD-176 · TD-243 closed.
+      → TASK-434
+- [ ] A repo writes a phased delivery plan from a shipped template with a STANDARD row, each open
+      row ends `→ TASK-NNN` or `→ next slice:`, and `/prime` + `/triage` report uncovered rows.
+      → next slice: S2 roadmap + traceability
+- [ ] Approving a G2 design in plan mode leaves a persisted sign-off in the sprint or task file.
+      → next slice: S3 plan-mode G2 record
+- [ ] A repo without git can promote, freeze and close a sprint, under an ADR.
+      → next slice: S3 git-less lifecycle
+- [ ] The planning-checker clusters are retired: one shared `Layers:` parser, a member resolver
+      that names anomalies instead of dropping them, and the freeze-checker edge cases.
+      → next slice: S4 planning debt
+- [ ] Exercised on the real consumer: workdoo writes its roadmap from the template and runs one
+      sprint through promote → close without git (L-007). → next slice: S3 git-less lifecycle

@@ -9,7 +9,8 @@ class: decision
 tier: X
 authority: J2
 origin: manual
-state: needs-info
+state: ready
+epic: EPIC-022
 depends-on: []
 ---
 
@@ -26,8 +27,8 @@ Owner ruling 2026-10-10: a separate task, kept out of SPRINT-121's bounded vehic
 ## Done when
 
 - [ ] The template, the promote procedure (`/lean-doc-generator` promote by reference) and the rollup check state one rule for
-      when an active sprint's Execution Log must exist. The owner rules which side moves: the log is created at promote, or the
-      check tolerates a log-less sprint that has no run.
+      when an active sprint's Execution Log must exist: **the log is created at promote** with its `plan locked` entry (owner
+      ruling 2026-10-18); the check is unchanged. TD-160 (red by construction between promote and first entry) resolves with it.
 - [ ] A fixture reproduces the SPRINT-121 promote shape (an active sprint, no log) and shows the ruled behaviour, with a sibling
       control.
 - [ ] README/CHANGELOG note the change if the template or a skill changed (consumer-facing).
@@ -39,7 +40,7 @@ Owner ruling 2026-10-10: a separate task, kept out of SPRINT-121's bounded vehic
 
 ## Assumes
 
-- **open:** which side moves (template/promote or the check). The owner rules this at G2.
+- ruled 2026-10-18: template/promote moves, the check stays (popup, EPIC-022 S1 promote).
 
 ## Tracker
 

@@ -1,0 +1,45 @@
+---
+id: TASK-432
+title: "Stop S11.TDDELETE and S4.NEGATIVE passing the cases they exist to catch"
+epic: EPIC-022
+priority: P1
+size: M
+risk: med
+autonomy: HITL
+class: execution
+tier: G
+authority: J2
+origin: manual
+state: ready
+depends-on: []
+---
+
+# TASK-432 — Stop S11.TDDELETE and S4.NEGATIVE passing the cases they exist to catch
+
+## Why
+
+Both are false greens in rules `conformance.sh` runs for adopters — Consequential G (ADR-050). TD-187:
+the TD-deletion extractor matches no real resolved-row shape, so it prints PASS having judged nothing.
+TD-118: `grep -qi 'negative'` passes an ADR saying "no negatives identified".
+
+## Done when
+
+- [ ] `S11.TDDELETE` extracts the sprint from every resolved-row shape the ledger uses, and prints a named
+      `not judged` for a resolved row with none — a retained must-FAIL fixture per real shape (TD-187).
+- [ ] `S4.NEGATIVE` fails an ADR whose Consequences deny any negative, ruled under ADR-034's frozen
+      surface, with a must-FAIL fixture and a sibling control (TD-118).
+- [ ] Consequential-G bar: each assertion broken in turn reddens exactly its case; worktree-isolated
+      outside review; CHANGELOG notes the verdict change for adopters.
+
+## Touches
+
+- scripts/lib/conformance-engine.sh · evals/ · docs/adr/ (only if ADR-034 needs an amendment) · CHANGELOG.md ·
+  TECH-DEBT.md
+
+## Assumes
+
+- tightening S4.NEGATIVE may newly FAIL some adopter ADRs — acceptable as a documented verdict change.
+
+## Tracker
+
+- EPIC-022 Closed-when 2 · TD-187 · TD-118

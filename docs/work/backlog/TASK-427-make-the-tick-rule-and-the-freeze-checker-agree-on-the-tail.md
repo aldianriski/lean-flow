@@ -10,6 +10,7 @@ tier: G
 authority: J2
 origin: close-retro
 state: ready
+epic: EPIC-022
 depends-on: []
 ---
 
@@ -28,7 +29,8 @@ shipped wording, so either the wording or the checker is wrong. Which one change
 
 - [ ] A ticked multi-line box whose ✓ tail sits where the shipped references say passes `check-sprint-by-reference.ts`, and a tail anywhere
       else in the box still FAILs as a freeze edit: one retained case each.
-- [ ] `dispatch.md` § Tick and `sprint-by-reference.md` step 4 name the same placement the checker accepts.
+- [ ] `dispatch.md` § Tick and `sprint-by-reference.md` step 4 name the same placement the checker accepts: **the wording
+      moves** to "on the box's first line" (owner ruling 2026-10-18), the checker is unchanged; TD-229 resolves with it.
 
 ## Tracker
 
