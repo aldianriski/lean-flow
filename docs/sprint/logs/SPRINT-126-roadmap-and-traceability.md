@@ -57,3 +57,15 @@ G2 design:
 consequence · T1 · behaviour: low · governance: material (spec 0.17.0, shipped template)
 consequence · T2 · behaviour: low · governance: material (shipped prime/triage/promote procedure)
 consequence · T3 · behaviour: low · governance: material (shipped decomposer input)
+
+### 2026-10-18 | scope-change | T1 TASK-435 box 2: spec 0.17.0 moves a verdict (Codex C3, confirmed) — legacy path + MAJOR meaning (owner)
+**What broke.** Codex review of T1 (`225fa9ad`, gpt-6-astra) found that S2.R-PLACEMENT reads §2 dynamically, so the new
+`product/roadmap.md` row flags any same-named file outside `docs/product/`. Confirmed empirically in T1's worktree: an untracked
+`docs/roadmap.md` FAILs `file-outside-canonical-placement: docs/product/roadmap.md`. A root `ROADMAP.md` is not flagged, because
+the match is case-sensitive. Box 2 froze "MINOR, no rule-table row, no verdict moves", and that is false.
+**Owner ruling (popup).** The row names `docs/roadmap.md` as its legacy path, which is matched second and tolerated with a note.
+0.17.0 is declared MINOR carrying MAJOR meaning (§15), with a CHANGELOG upgrade note: a `roadmap.md` anywhere else under `docs/`
+is now flagged.
+**Impact.** TASK-435 box 2 is reworded to match. T1 takes one revise round, covering C3 plus C1: "stale" must apply only when no
+valid coverage remains, since a done task plus an active epic is covered. C6 (CONTEXT.md:104) is TD-252, already filed.
+**Re-confirm G2.** The owner confirmed by popup. This adds no new capability.

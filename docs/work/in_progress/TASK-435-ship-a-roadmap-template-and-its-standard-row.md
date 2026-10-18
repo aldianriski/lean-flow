@@ -32,7 +32,8 @@ progress lives in one prose line. Consumer evidence (ADR-053).
 - [ ] STANDARD §2 carries a `product/roadmap.md` row (created lazily when a delivery sequence spans ≥ 2 sprints or epics; cap
       ~150 soft) and a "Roadmap coverage" rule: an `active` row is covered by an open task, an active epic or a named next slice;
       `planned` rows are exempt; `done` rows need nothing; a mark whose every id is done, cancelled or missing is stale. Spec
-      0.17.0 (MINOR, no rule-table row, no verdict moves), with its spec CHANGELOG block.
+      0.17.0 (MINOR carrying MAJOR meaning under §15: the row names `docs/roadmap.md` as its legacy path, and a `roadmap.md`
+      elsewhere under `docs/` is newly flagged by S2.R-PLACEMENT; no rule-table row), with its spec CHANGELOG block and upgrade note.
 - [ ] `/lean-doc-generator` creates it as an ordinary `<type> <subject>` doc, and every template count claim agrees
       (34 core + 2 non-core = 36).
 - [ ] Exercised on real input (L-007): workdoo's actual roadmap, re-expressed in the template on a scratch copy, keeps every one of
