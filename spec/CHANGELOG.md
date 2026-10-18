@@ -12,8 +12,9 @@ status: current
 ## 0.18.0 — 2026-10-18
 
 **MINOR (§15) — a repository without git can now run the sprint lifecycle. No git repository's verdict moves.**
-§15's test (could a repository that conformed now fail?) answers no. Every new sentence applies only when
-`git rev-parse --git-dir` fails, and the one verdict change moves a git-less tree's dated `gates_signed:` from fail to pass.
+§15's test (could a repository that conformed now fail?) answers no. Every new requirement applies only when
+`git rev-parse --git-dir` fails, and the one verdict change moves a git-less tree's dated `gates_signed:` from fail to pass. The
+one addition for every repository is optional: a task MAY carry its own `gates_signed:`, and no rule reads it.
 Decided in ADR-054 (SPRINT-127; TASK-440). Consumer evidence: the first outside consumer has no git, and recorded its gates as
 dated prose because the freeze and the sign-off both required a commit.
 
@@ -21,7 +22,7 @@ dated prose because the freeze and the sign-off both required a commit.
   the log's `promote` entry and sets `plan_commit: none (no git)`; a `scope-change` entry counts only after that entry. Status
   moves are plain file moves, and close records `close_commit: none (no git) · closed <YYYY-MM-DD>`.
 - **§9**: `gates_signed:` takes `@ <YYYY-MM-DD>` in a git-less repository, and a date in a git repository stays malformed. A task
-  signed outside any sprint carries the same field in its own frontmatter.
+  worked outside any sprint MAY carry the same field in its own frontmatter, with or without git (optional; no rule reads it).
 - **§9 table**: `S9.GATESWELLFORMED`'s artifact cell names the date form, and `S9.PLANFROZEN`'s names the snapshot as where the
   frozen text lives without git. No engine rule reads the snapshot yet (ADR-054 decision 5).
 

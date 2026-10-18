@@ -601,7 +601,8 @@ gates_signed: <GATE>[,<GATE>...] @ <date>     e.g.  gates_signed: G1,G2 @ 2026-1
 
 It records which gates a human approved and the commit they approved against; a git-less repository has
 no commit, so it records the date (`YYYY-MM-DD`), and a date in a git repository is malformed. A task
-signed outside any sprint carries the same field in its own frontmatter (schema: `work/README.md`).
+worked outside any sprint MAY carry the same field in its own frontmatter, with or without git (schema:
+`work/README.md`); it is optional, and its absence means only that the task records no sign-off.
 Three properties carry the weight:
 
 - **Omit it until the gates are actually signed.** A missing `gates_signed:` means **NOT SIGNED** and
