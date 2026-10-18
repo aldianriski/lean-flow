@@ -28,7 +28,7 @@
 #
 # Leg (a) still earns a FAIL rather than a WARN because it is the only validation of `Layers:` that
 # runs BEFORE any file changes, and the worktree dispatch ownership map is derived from `Layers:` at
-# promote. The observed checker (check-layers-observed.sh) cannot substitute: it fires post-hoc,
+# promote. The observed checker (check-layers-observed.ts) cannot substitute: it fires post-hoc,
 # after the collision it exists to prevent. So the author declares intent instead of rewording the
 # documentation to keep the gate quiet -- which is the behaviour TD-032 recorded, ~11 times in one
 # sprint, as the check actively making docs worse.
@@ -43,7 +43,7 @@
 # The escape cannot become a blanket silencer: a token in BOTH Cites: and Layers: is contradictory
 # -- the block claims to touch it and to merely cite it -- and is its own named FAIL. Whether a
 # Cites: token was nonetheless CHANGED is not knowable here (this checker reads text, not history);
-# that is check-layers-observed.sh's job, which attributes real changes per task.
+# that is check-layers-observed.ts's job, which attributes real changes per task.
 #
 # --- multi-line declarations --------------------------------------------------------------------
 # A declaration continues onto following lines that are INDENTED, matching how TODO.md task entries
@@ -72,24 +72,17 @@ _lf_ap=$(dirname -- "$0")/archive-path.sh
 
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
-# --- ONE extractor, shared with check-layers-observed.sh (TD-142, ruled 2026-09-10) ----------------
-# Both checkers used to carry the comment "kept deliberately identical ... a parsing rule that
-# differs between them would make one of the two lie" while running two DIFFERENT parsers:
-# check-layers-observed.sh's task_decls() extracted only backtick-quoted tokens; this file tested
-# membership with `grep -qF` against the raw Layers: line -- a SUBSTRING test, backtick-agnostic,
-# that read a token as "declared" if it merely appeared anywhere in the line (inside a longer path,
-# or a trailing comment). One of the two was lying, and it was this file (L-108's shape: a guard
-# matched by substring instead of by shape, failing GREEN).
-#
-# The ruling: a declaration is backtick-delimited. Rather than re-typing the (now-strict) extraction
-# here as a second copy that can drift again, this file sources check-layers-observed.sh to reach its
-# ONE definition of layers_tokens() -- the comment above is enforced by construction, not by
-# discipline. LAYERS_OBSERVED_SOURCED tells that file to define its functions and stop, never running
-# its own `for sp in "$@"` main loop or its bare-invocation guard against THIS file's "$@".
-_layers_completeness_self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-LAYERS_OBSERVED_SOURCED=1
-. "$_layers_completeness_self_dir/check-layers-observed.sh"
-unset LAYERS_OBSERVED_SOURCED
+# --- ONE extractor (TD-142, ruled 2026-09-10) ------------------------------------------------------
+# A declaration is backtick-delimited. This used to be shared with the observed shell checker
+# (retired at SPRINT-128 -- the gate runs check-layers-observed.ts); layers_tokens() now lives here
+# only, byte-equivalent to the definition it was sourced from. Takes joined declaration text (one or
+# more already-isolated Layers: lines) and returns one token per output line, backticks stripped;
+# a token ending in "/" is a directory prefix and is returned verbatim so callers can still test it
+# as one.
+layers_tokens() {
+  printf '%s
+' "$1" | grep -oE '`[^`]+`' | tr -d '`'
+}
 
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
@@ -143,8 +136,8 @@ check_block() {
   cites_toks=$(layers_tokens "$cites_line" | sort -u)
   cites_tids=$(printf '%s' "$cites_line" | grep -oE '\bT[0-9]+\b' | sort -u)
 
-  # THE single extraction of what Layers: actually declares (TD-142) -- shared with
-  # check-layers-observed.sh via layers_tokens(), sourced above. Every membership test below reads
+  # THE single extraction of what Layers: actually declares (TD-142) -- kept in
+  # lockstep with check-layers-observed.ts, via layers_tokens() above. Every membership test below reads
   # this list with an EXACT match (`grep -qxF`), never a substring test against the raw line: a
   # substring test is what let a DoD-implied token read as "declared" merely because it happened to
   # appear inside a longer declared path, or inside a trailing comment on the Layers: line (L-108's
@@ -211,7 +204,7 @@ check_block() {
   # -- (d) NEW: a FILE-shaped token written in Layers: OUTSIDE backticks (TD-142 ruling, DoD item 3) -
   # A declaration is backtick-delimited by the ruling above -- an unbackticked path-shaped string in
   # Layers: is therefore NOT a declaration to either checker, but it IS still a declaration to the
-  # dispatch preflight's backtick-agnostic TOK extraction (see check-layers-observed.sh's BOUNDARY
+  # dispatch preflight's backtick-agnostic TOK extraction (see the observed checker's BOUNDARY
   # note above its covers() function). Left unreported, that is a silent three-way disagreement: both
   # checkers would read "nothing declared here" while the preflight reads "declared, shared-file-
   # checked". Detected by stripping every backtick-quoted span out of the raw line first, so a

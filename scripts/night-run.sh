@@ -224,21 +224,22 @@ reap() {
   # creating the file here would be this script inventing a record rather than completing one.
   [ -f "$rp_logdoc" ] || return 0
 
-  # DoD boxes -- the header count -- and UNITS. Two shapes of sprint, one contract (night-run.md
-  # Part 4): a v1 sprint carries its DoD inline in the Plan; a by-reference (v2) sprint's Plan carries
-  # NO boxes, its DoD is the `## Done when` boxes of its member files (`## Members` UNION `sprint:`
+  # DoD boxes -- the header count -- and UNITS (night-run.md Part 4). A by-reference (v2) sprint's
+  # Plan carries NO boxes (v1 inline-Plan counting was retired at SPRINT-128: ADR-046), its DoD is the `## Done when` boxes of its member files (`## Members` UNION `sprint:`
   # stamps), counted by scripts/lib/sprint-members-cli.ts (TASK-392, ADR-047). The v2 arm is chosen by
   # the CLI's `kind`, never inferred here.
   #
   # UNITS are Plan tasks, not checkboxes. The calibration series reads "4 of 7 units" and
   # means tasks; reporting DoD boxes in that field would silently redefine every existing
-  # row's scale. v1: a unit is delivered when its block has no open box left. v2: when every current
+  # row's scale. A unit is delivered when every current
   # member its `Cites:` names has no open box; a Tn citing no current member leaves both counts.
   # rp_unit_list is the OPEN units, one Tn per line, from whichever shape applies.
   rp_cli="$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd)/lib/sprint-members-cli.ts"
   rp_v2=0; rp_cnt_err=""
   if command -v bun >/dev/null 2>&1 && [ -f "$rp_cli" ]; then
-    [ "$(bun "$rp_cli" kind "$rp_sprint" --root "$rp_root" 2>/dev/null)" = "v2" ] && rp_v2=1
+    rp_kind=$(bun "$rp_cli" kind "$rp_sprint" --root "$rp_root" 2>/dev/null)
+    [ "$rp_kind" = "v2" ] && rp_v2=1
+    [ "$rp_kind" = "v1" ] && rp_cnt_err="v1 sprint unsupported since 2.0 (ADR-046) -- its DoD was not counted"
   elif grep -q '^## Members' "$rp_sprint" 2>/dev/null; then
     # A by-reference sprint we cannot count is SAID, not left as a quiet 0 of 0.
     rp_cnt_err="bun or sprint-members-cli.ts unavailable -- a by-reference sprint's member DoD was not counted"
@@ -256,14 +257,9 @@ reap() {
       rp_done=0; rp_open=0; rp_units=0; rp_units_done=0; rp_unit_list=""
     fi
   else
-    rp_done=$(grep -c '^- \[x\]' "$rp_sprint" 2>/dev/null)
-    rp_open=$(grep -c '^- \[ \]' "$rp_sprint" 2>/dev/null)
-    rp_units=$(grep -c '^### T[0-9]' "$rp_sprint" 2>/dev/null)
-    rp_units_done=$(awk '
-      /^### T[0-9]+ /{ if (t!="") { if (!o) d++ } t=$2; o=0 }
-      /^- \[ \]/{ if (t!="") o=1 }
-      END{ if (t!="" && !o) d++; print d+0 }' "$rp_sprint" 2>/dev/null)
-    rp_unit_list=$(awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" 2>/dev/null)
+    # No v1 Plan parsing (retired at SPRINT-128): a v1 sprint or a missing bun is SAID via rp_cnt_err
+    # above, and the counts stay zero.
+    rp_done=0; rp_open=0; rp_units=0; rp_units_done=0; rp_unit_list=""
   fi
   rp_total=$((rp_done + rp_open))
 
@@ -900,7 +896,7 @@ pre_commit=""
 # `overnight` and made `sprint-bulk unattended` one alias among four (night-run.md Part 0).
 # Firing the now-documented canonical form (`--mode overnight`, or a trigger prompt that never
 # says the word "sprint-bulk") satisfied the mode-signal gate above and then silently reap=0'd
-# anyway -- no `terminal ·` line was ever written. `check-authority.sh` (SPRINT-093 T5) trusts
+# anyway -- no `terminal ·` line was ever written. `check-authority.ts` (SPRINT-093 T5) trusts
 # that line as its ONLY unattended-mode signal; reproduced live, a genuinely unattended, unparked
 # J2 task then read as an attended completion -- exactly the silent false negative a J2-authority
 # guard exists to prevent.

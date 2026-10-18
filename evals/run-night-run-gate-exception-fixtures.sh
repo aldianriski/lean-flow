@@ -32,7 +32,7 @@
 # --- bounded retry (coordinator review, two findings) --------------------------------------------
 # Finding 1 (pre-existing, this file's Layer): the REAPER'S mode gate tested a literal substring
 # ("sprint-bulk") stale since SPRINT-088 T3 renamed the canonical mode to `overnight` -- firing the
-# documented canonical form skipped the reaper silently, and check-authority.sh (T5) trusts the
+# documented canonical form skipped the reaper silently, and check-authority.ts (T5) trusts the
 # `terminal ·` line it writes as its ONLY unattended-mode signal. `reap-fires-on-canonical-overnight`
 # below is the retained must-PASS proof: a `--mode overnight` run that never says "sprint-bulk"
 # must still produce a rollup.

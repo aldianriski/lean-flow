@@ -30,25 +30,28 @@ fail=0
 work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'rm -rf "$work"' EXIT INT TERM
 
+# mk_v2 <dir> <t1-box> [<t2-box>] -- a by-reference (v2) tree: one member per unit under docs/work/in_progress, a
+# `## Members` list and `Cites:` per unit. Box is the member's single `## Done when` box ("x" ticked, " " open).
+# v1 inline-Plan counting was retired at SPRINT-128 (ADR-046), so every reaper tree here is v2.
+mk_v2() {
+  mv_d=$1; mv_b1=$2; mv_b2=${3-}
+  mkdir -p "$mv_d/docs/sprint/logs" "$mv_d/docs/work/in_progress"
+  {
+    printf -- '---\nsprint: 960\nstatus: active\n---\n\n## Members\n\n- docs/work/in_progress/TASK-9601-a.md\n'
+    [ -n "$mv_b2" ] && printf -- '- docs/work/in_progress/TASK-9602-b.md\n'
+    printf -- '\n## Plan\n\n### T1 \342\200\224 x `[size: S]`\nLayers: `a.md`\nCites: `TASK-9601`\n'
+    [ -n "$mv_b2" ] && printf -- '\n### T2 \342\200\224 y `[size: S]`\nLayers: `b.md`\nCites: `TASK-9602`\n'
+  } > "$mv_d/docs/sprint/SPRINT-960-fx.md"
+  printf -- '---\nid: TASK-9601\nsprint: SPRINT-960\nstate: ready\n---\n\n# TASK-9601\n\n## Done when\n\n- [%s] a thing\n' "$mv_b1" > "$mv_d/docs/work/in_progress/TASK-9601-a.md"
+  [ -n "$mv_b2" ] && printf -- '---\nid: TASK-9602\nsprint: SPRINT-960\nstate: ready\n---\n\n# TASK-9602\n\n## Done when\n\n- [%s] b thing\n' "$mv_b2" > "$mv_d/docs/work/in_progress/TASK-9602-b.md"
+  return 0
+}
+
 # case <label> <want-state> <dod-box> <log-body> [<exit-code>]
 case_reap() {
   label=$1; want=$2; box=$3; body=$4; ec=${5:-}
   d="$work/$label"
-  mkdir -p "$d/docs/sprint/logs"
-  cat > "$d/docs/sprint/SPRINT-960-fx.md" <<EOF
----
-sprint: 960
-status: active
----
-
-## Plan
-
-### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
-Layers: \`a.md\`
-
-**DoD:**
-- [$box] a thing
-EOF
+  mk_v2 "$d" "$box"
   printf '# log\n%s\n' "$body" > "$d/docs/sprint/logs/SPRINT-960-fx.md"
   : > "$d/run.log"
   [ -n "$ec" ] && printf '%s' "$ec" > "$d/run.log.exit"
@@ -141,10 +144,11 @@ case_fx "v2-unresolved-member-hard-failure" "v2-unresolved-member" "T1 · done �
 T2 · done · b
 T3 · done · c" \
   "terminal · HARD_FAILURE · " "SPRINT-MEMBER-UNRESOLVED" "member DoD unreadable: SPRINT-MEMBER-UNRESOLVED: TASK-9619"
-# v1 stays exactly as before even when the tree also has an unrelated docs/work store
-case_fx "v1-counts-unchanged-beside-store" "v1-with-unrelated-store" "T1 · done · a
+# v1 is a NAMED error since SPRINT-128 (ADR-046), never a count -- even beside an unrelated docs/work store.
+# must-FAIL against the old reaper, which counted the inline Plan boxes (`1 of 3`) and said nothing.
+case_fx "v1-is-named-unsupported-beside-store" "v1-with-unrelated-store" "T1 · done · a
 T2 · done · b" \
-  "run · 1 of 3 DoD ticked  [mechanical]" "tasks · 2 attempted / 0 completed / 2 total" "terminal · PLAN_EXHAUSTED"
+  "run · 0 of 0 DoD ticked  [mechanical]" "v1 sprint unsupported since 2.0 (ADR-046)"
 
 # --- USER_STOP: a signal caught by the detached wrapper (SPRINT-122 T1 · TASK-423) ----------------
 # The wrapper is `night-run.sh --wrap` (the process the launcher prints as `fired detached: pid=`).
@@ -158,21 +162,7 @@ wait_for() { # <file> : up to ~10 s
 case_wrap() {
   label=$1; want=$2; how=$3; body=$4; shift 4
   d="$work/$label"
-  mkdir -p "$d/docs/sprint/logs"
-  cat > "$d/docs/sprint/SPRINT-960-fx.md" <<EOF
----
-sprint: 960
-status: active
----
-
-## Plan
-
-### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
-Layers: \`a.md\`
-
-**DoD:**
-- [ ] a thing
-EOF
+  mk_v2 "$d" " "
   printf '# log\n%s\n' "$body" > "$d/docs/sprint/logs/SPRINT-960-fx.md"
   doc="$d/docs/sprint/logs/SPRINT-960-fx.md"
   cpid=""; wstart=1760180000   # the run id the wrapper binds its stop marker to
@@ -239,21 +229,7 @@ fi
 # left by another run (or carries no id), reaped as run 1760180000 -> HARD_FAILURE from the log, marker named.
 stale_stop() {
   label=$1; marker=$2; warn=$3
-  d="$work/$label"; mkdir -p "$d/docs/sprint/logs"
-  cat > "$d/docs/sprint/SPRINT-960-fx.md" <<EOF
----
-sprint: 960
-status: active
----
-
-## Plan
-
-### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
-Layers: \`a.md\`
-
-**DoD:**
-- [ ] a thing
-EOF
+  d="$work/$label"; mk_v2 "$d" " "
   printf '# log\n' > "$d/docs/sprint/logs/SPRINT-960-fx.md"; : > "$d/run.log"
   printf '%s' "$marker" > "$d/run.log.stop"; printf 3 > "$d/run.log.exit"
   sh "$launcher" --reap "$d/run.log" "$d" 1760180000 0 "" >/dev/null 2>&1
@@ -292,11 +268,10 @@ fi
 # check-night-run-rollup.ts reads ONLY the last run-complete block, and for AUTHORITY_BOUNDARY demands
 # a `Tn · parked-hitl|blocked ·` line INSIDE it (ADR-016: a park is one line inside the rollup block).
 # reap() used to copy only `unattempted`, so every reaped AUTHORITY_BOUNDARY run failed its own guard.
-# blk <label> <t1-box> <t2-box> <log-body> [<base>] -- builds a v1 two-task tree, reaps it, sets $bdoc
+# blk <label> <t1-box> <t2-box> <log-body> [<base>] -- builds a v2 two-member tree, reaps it, sets $bdoc
 blk() {
   bl=$1; b1=$2; b2=$3; bbody=$4; bbase=${5:-0}
-  d="$work/$bl"; mkdir -p "$d/docs/sprint/logs"
-  printf -- '---\nsprint: 960\nstatus: active\n---\n\n## Plan\n\n### T1 — x\n- [%s] a\n\n### T2 — y\n- [%s] b\n' "$b1" "$b2" > "$d/docs/sprint/SPRINT-960-fx.md"
+  d="$work/$bl"; mk_v2 "$d" "$b1" "$b2"
   bdoc="$d/docs/sprint/logs/SPRINT-960-fx.md"
   printf '%s\n' "$bbody" > "$bdoc"; : > "$d/run.log"
   sh "$launcher" --reap "$d/run.log" "$d" "" "$bbase" "" >/dev/null 2>&1

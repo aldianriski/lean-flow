@@ -465,7 +465,7 @@ which the map can see:
 - **(b) Sprint infrastructure** — the sprint **Plan file** (its § Files Changed), its **Execution
   Log** sibling, and the **member task files** under `docs/work/` (their `## Done when` ticks and
   `git mv` transitions). Every task writes these; **no task declares them**, so they are in no
-  `Layers:` and the map cannot mark them *by construction*. `check-layers-observed.sh` already excludes
+  `Layers:` and the map cannot mark them *by construction*. `check-layers-observed.ts` already excludes
   `docs/sprint/*` on exactly this reasoning and already calls it coordinator-owned — the protection
   exists in the checker and was missing from the brief.
 

@@ -70,24 +70,19 @@ work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; fail=1; work=""; }
 if [ -n "$work" ]; then
   trap 'rm -rf "$work"' EXIT INT TERM
 
+  # mk_v2 <dir> <sprint-no> <slug> <box> -- a by-reference (v2) one-member tree. v1 inline-Plan counting was
+  # retired at SPRINT-128 (ADR-046), so the reaper only counts members' `## Done when` boxes.
+  mk_v2() {
+    mkdir -p "$1/docs/sprint/logs" "$1/docs/work/in_progress"
+    printf -- '---\nsprint: %s\nstatus: active\n---\n\n## Members\n\n- docs/work/in_progress/TASK-9701-a.md\n\n## Plan\n\n### T1 \342\200\224 x `[size: S]`\nLayers: `a.md`\nCites: `TASK-9701`\n' "$2" > "$1/docs/sprint/SPRINT-$2-$3.md"
+    printf -- '---\nid: TASK-9701\nsprint: SPRINT-%s\nstate: ready\n---\n\n# TASK-9701\n\n## Done when\n\n- [%s] a thing\n' "$2" "$4" > "$1/docs/work/in_progress/TASK-9701-a.md"
+    return 0
+  }
+
   case_outcome() {
     label=$1; want=$2; box=$3; body=$4; ec=${5:-}
     d="$work/$label"
-    mkdir -p "$d/docs/sprint/logs"
-    cat > "$d/docs/sprint/SPRINT-961-fx.md" <<EOF
----
-sprint: 961
-status: active
----
-
-## Plan
-
-### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
-Layers: \`a.md\`
-
-**DoD:**
-- [$box] a thing
-EOF
+    mk_v2 "$d" 961 fx "$box"
     printf '# log\n%s\n' "$body" > "$d/docs/sprint/logs/SPRINT-961-fx.md"
     : > "$d/run.log"
     [ -n "$ec" ] && printf '%s' "$ec" > "$d/run.log.exit"
@@ -121,21 +116,7 @@ EOF
   # from the output it checks would ratify a mislabel instead of catching it.
   case_tags() {
     d="$work/tags"
-    mkdir -p "$d/docs/sprint/logs"
-    cat > "$d/docs/sprint/SPRINT-962-tags.md" <<EOF
----
-sprint: 962
-status: active
----
-
-## Plan
-
-### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
-Layers: \`a.md\`
-
-**DoD:**
-- [x] a thing
-EOF
+    mk_v2 "$d" 962 tags x
     printf '# log\nT1 · done · 1 of 1 DoD\n' > "$d/docs/sprint/logs/SPRINT-962-tags.md"
     : > "$d/run.log"
     sh "$launcher" --reap "$d/run.log" "$d" "" 0 >/dev/null 2>&1
