@@ -144,3 +144,23 @@ prose-density 28/0, layers-observed PASS, freeze 10/0. This sprint's own ticks h
 is exercised on real input. TD-229 is resolved. The task is in `review/` until its Codex pass, which is batched with T3/T4.
 CHANGELOG (consumer): when a `## Done when` box wraps, append the ` ✓ <evidence>` tail to its first line, never to a continuation line
 or a line of its own; the freeze check treats those placements as edits.
+
+### 2026-10-18 | review | Codex gauntlet (gpt-6-astra, read-only, diff pasted) — wave A skills CLEAR; T7 R1 five medium findings
+The owner's standing ruling puts consequential G and every shipped skill/template change through Codex; the wave A sonnet pass had
+not covered that. The default Codex model (`gpt-6.1-sol`) was rejected on this ChatGPT-account login (HTTP 400), so both reviews
+re-ran with `--model gpt-6-astra --effort high`.
+- **Wave A skills (T5 · T6 · T8): W1–W6 CLEAR.** Caveat: the referenced exemption and resume rules could not be checked beyond the
+  pasted diff.
+- **T7 R1 (engine + spec + evals).** T1 portability: CLEAR. Findings, each medium:
+  - T2: false FAIL on "No negatives except slower builds." (unrestricted suffix).
+  - T3: false PASS on "Negative: None identified." (punctuation order).
+  - T4: the first sprint in a status field naming two sprints is taken as the resolve sprint.
+  - T5: the spec CHANGELOG says S11.TDDELETE "moves no verdict", but wider extraction can turn an overdue row from a silent PASS
+    into a FAIL.
+  - T6: the recent-row controls are vacuous if a row is skipped, and the combined borderline control masks itself.
+**Disposition:**
+- T2 · T3 · T5 · T6 → one builder round, then one Codex re-review (cap).
+- T4 → TD at close, by census: 0 of 112 historical resolved rows carry two sprint ids in the status field (bounded-review rule).
+**Correction to the G2 entry above.** It said the S11.TDDELETE change "moves no verdict and needs no bump". That is wrong (Codex T5).
+Overdue rows in shapes the old extractor missed now FAIL. Spec 0.16.0 already carries MAJOR meaning for S4.NEGATIVE, so the version
+stands; the spec text and CHANGELOG are corrected in the T7 revise.
