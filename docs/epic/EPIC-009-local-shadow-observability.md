@@ -2,13 +2,15 @@
 epic: 009
 slug: local-shadow-observability
 owner: Maintainer
-last_updated: 2026-10-07
-status: proposed
+last_updated: 2026-10-18
+status: closed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
 # EPIC-009 — Local Shadow Observability
+
+> **Closed 2026-10-18 — superseded → workdoo** (owner ruling, EPIC-022 D1). The platform/runtime layer this epic described is now built in the separate `workdoo` repository, and platform work executes there (ADR-041, ADR-052). Closed in place (STANDARD §11 cannot archive it: unticked Closed-when, no member sprints). Its Closed-when conditions below are **not met and will not be met here** — not delivered, superseded; the boxes are left unticked on purpose.
 
 > **Outcome:** the evidence a run already leaves is **readable as a portfolio** — active Work Items,
 > Runs, where human attention is owed, evidence refs and a conformance summary — projected locally

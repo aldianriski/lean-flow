@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-12
+last_updated: 2026-10-18
 update_trigger: An epic is opened, or closed and archived (STANDARD §11)
 status: current
 ---
@@ -15,14 +15,10 @@ outliving any single sprint file. Work that fits in one sprint is a sprint, not 
 destination cannot yet be named is fog (`/task-decomposer --fog`) until it can.
 
 **Sequencing, lanes and the gated register** → [`docs/research/adlc-epic-sequencing.md`](../research/adlc-epic-sequencing.md).
-It maps the remaining ADLC roadmap phases onto epics, assigns the two parallel lanes and their shared-file
-owner, and holds the admission condition for each future epic. **EPIC-009 · 010 · 011 · 012 · 013 were
-written as files on 2026-08-25 at owner request**, having previously been register rows only — each one
-carries its own **unmet** admission condition in a callout and states that it is not promotable. The
-register, not the file, is still the gate: a destination written down is not work admitted. Phase H and
-Outcome Feedback reserve no id and remain rows. The live
-phase ordering it implements is `03-ADLC-ROADMAP.md` § **Roadmap Amendment** (2026-08-24), which
-supersedes that document's earlier § Roadmap Adjustment block and the strategy README's sequence.
+It holds the lanes, the execution freeze and the admission condition for each remaining lean-flow epic. **EPIC-006 · 008 · 009 · 011 · 012
+are closed — superseded → workdoo** (EPIC-010 · 013 closed earlier, merged into EPIC-016; the platform/runtime layer is built in the separate `workdoo` repo, ADR-041 · ADR-052; owner ruling 2026-10-18,
+EPIC-022 D1), closed in place with their Closed-when unticked: not delivered here. Still open on lean-flow's roadmap: **EPIC-005** (Fleet) and
+**EPIC-007** (Workflow Packs), both `proposed`. The register, not the file, is the gate: a destination written down is not work admitted.
 
 - [EPIC-022](EPIC-022-plans-that-work-for-any-consumer.md) — Plans That Work for Any Consumer: plan from a phased roadmap down to sprint tasks, with or without git, every plan row traceable and every G2 sign-off recorded — **active** 2026-10-18 · four sprints, S1 consumer maturity first (owner ruling 2026-10-18) · driven by workdoo's consumer evidence · id derived across both repos (the old workdoo holds EPIC-021, TD-245)
 - EPIC-020 → **moved to workdoo** [`docs/epic/EPIC-020`](https://github.com/aldianriski/workdoo/blob/main/docs/epic/EPIC-020-governed-agents-follow-the-lean-flow-loop.md) (2026-10-10, ADR-052) — Governed Agents Follow the Lean-Flow Loop: one sentence → clarify rounds → approved proposals → build → independent review (Codex, read-only) → keep, with one policy table — **proposed** 2026-10-06 · member sprints are **workdoo** sprints · after EPIC-019, before EPIC-018
@@ -33,13 +29,13 @@ supersedes that document's earlier § Roadmap Adjustment block and the strategy 
 - [EPIC-015](archive/EPIC-015-execution-autonomy.md) — Execution Autonomy: an approved Plan runs to a named terminal state without per-task confirmation — closed 2026-10-12 · SPRINT-088 → SPRINT-124 (all eight Closed-when `[x]`) · the freeze it superseded re-armed, widened to governance machinery (ADR-053)
 - [EPIC-014](archive/EPIC-014-reference-engine.md) — Reference Engine: conformance + QA evaluated by a typed TS/Bun implementation, Shell retired — **closed — retired (ADR-051)** 2026-10-06 · 2 of 8 § Closed-when met, the other 6 dropped, not met · six member sprints closed, newest **SPRINT-116** (`9fa6356`), which ruled the port cut · the Shell engine is the only engine
 - [EPIC-013](EPIC-013-managed-adlc.md) — Managed ADLC: Runs dispatched to registered workers on a schedule, inside declared budgets and capability policy — **closed — merged into EPIC-016** 2026-10-07 · holds the who-owes-which table for the nine `06 § 9` exit criteria
-- [EPIC-012](EPIC-012-runtime-adapters-gateway.md) — Runtime Adapters + Gateway: a second runtime executes a lean-flow workflow — proposed 2026-08-25 · **admission NOT met** (Platform Decision Gate · EPIC-008 stable · **one named second-runtime workflow** — a protocol existing is not a gateway being needed, `00 § 5.4`)
-- [EPIC-011](EPIC-011-context-cost-policy.md) — Context & Cost Policy: memory/context/cost governed by declared policy, enforced only where a runtime seam exists — proposed 2026-08-25 · **admission NOT met** (gate · 006 · 008) · **policy before the gateway** (owner alignment 2026-08-24)
+- [EPIC-012](EPIC-012-runtime-adapters-gateway.md) — Runtime Adapters + Gateway: a second runtime executes a lean-flow workflow — **closed — superseded → workdoo** 2026-10-18 (owner ruling, EPIC-022 D1; ADR-052) · Closed-when unticked, not delivered here · closed in place
+- [EPIC-011](EPIC-011-context-cost-policy.md) — Context & Cost Policy: memory/context/cost governed by declared policy, enforced only where a runtime seam exists — **closed — superseded → workdoo** 2026-10-18 (owner ruling, EPIC-022 D1; ADR-052) · Closed-when unticked, not delivered here · closed in place
 - [EPIC-010](EPIC-010-connected-workspace.md) — Connected Workspace: work flows both ways, with a Human Inbox and a Run Inspector — **closed — merged into EPIC-016** 2026-10-07
-- [EPIC-009](EPIC-009-local-shadow-observability.md) — Local Shadow Observability: read-only local projection of run evidence, no DB and no control authority — proposed 2026-08-25 · **pre-gate** · **admission NOT met** (EPIC-006 records consumed across two real sprints) · owes the **platform repository boundary ADR** at its first G2
-- [EPIC-008](EPIC-008-run-protocol.md) — Run Protocol: portable work-system ↔ runtime contract, objects derived from recorded events — proposed 2026-08-24 · Lane 2 · gated on 006 (+ 005, Phase C)
+- [EPIC-009](EPIC-009-local-shadow-observability.md) — Local Shadow Observability: read-only local projection of run evidence, no DB and no control authority — **closed — superseded → workdoo** 2026-10-18 (owner ruling, EPIC-022 D1; ADR-052) · Closed-when unticked, not delivered here · closed in place
+- [EPIC-008](EPIC-008-run-protocol.md) — Run Protocol: portable work-system ↔ runtime contract, objects derived from recorded events — **closed — superseded → workdoo** 2026-10-18 (owner ruling, EPIC-022 D1; ADR-052) · Closed-when unticked, not delivered here · closed in place
 - [EPIC-007](EPIC-007-workflow-packs.md) — Workflow Packs: expertise reusable without the plugin — proposed 2026-08-24 · Lane 2 · pulled ahead of Phase D; buys decision-gate condition 6
-- [EPIC-006](EPIC-006-run-evidence.md) — Run Evidence: every run leaves machine-readable evidence — proposed 2026-08-23 · Lane 2 · re-enters ADR-013 (c) and must supersede it first
+- [EPIC-006](EPIC-006-run-evidence.md) — Run Evidence: every run leaves machine-readable evidence — **closed — superseded → workdoo** 2026-10-18 (owner ruling, EPIC-022 D1; ADR-052) · Closed-when unticked, not delivered here · closed in place
 - [EPIC-005](EPIC-005-fleet.md) — Fleet: one standard governing N repos — proposed 2026-08-10 · **Lane 1** · depends on 003 + 004 (both now closed) · **admission condition: EPIC-015 must be closed** — every § Closed-when `[x]`, including its re-armed freeze (owner ruling 2026-10-07; EPIC-014's clause dropped by ADR-051, which retired it). Hardening precedes fleet scale-out
 - [EPIC-004](archive/EPIC-004-conformance.md) — Conformance: the standard becomes checkable — closed 2026-08-23 · SPRINT-072 → SPRINT-080 (all five Closed-when `[x]`; 51 of 51 rules map to a check or carry a non-evaluated mark · ADR-027/028)
 - [EPIC-003](archive/EPIC-003-the-standard.md) — The Standard: a versioned spec, separable from the plugin — closed 2026-08-16 · SPRINT-069 → SPRINT-071 (all five Closed-when `[x]`; spec/ v0.3.0 · ADR-023/024/025)
