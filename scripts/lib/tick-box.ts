@@ -71,7 +71,7 @@ parts[at] = parts[at]!.replace(/^- \[ \]/, "- [x]") + ` \u2713 ${evidence}`;
 writeFileSync(file, parts.join(""));
 console.log(`tick-box: ${id} box ${box} ticked in ${file.slice(root.length + 1).split("\\").join("/")}`);
 
-const fm = /^sprint:\s*0*(\d+)\s*$/m.exec(text.split(/^---\s*$/m)[1] ?? "");
+const fm = /^sprint:\s*(?:SPRINT-)?0*(\d+)\s*$/m.exec(text.split(/^---\s*$/m)[1] ?? "");
 if (!fm) {
   console.log("tick-box: no sprint: stamp on the member -- freeze and layers checks skipped");
   process.exit(0);

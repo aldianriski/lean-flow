@@ -29,7 +29,7 @@ function git(cwd: string, ...a: string[]) {
 
 const MEMBER = `---
 id: TASK-901
-sprint: 901
+sprint: __STAMP__
 title: "fixture"
 ---
 
@@ -72,12 +72,12 @@ Body.
 ## Execution Log
 `;
 
-function fixture(crlf = false) {
+function fixture(crlf = false, stamp = "SPRINT-901") {
   const dir = mkdtempSync(join(tmpdir(), "tick-box-"));
   mkdirSync(join(dir, "docs/work/in_progress"), { recursive: true });
   mkdirSync(join(dir, "docs/sprint"), { recursive: true });
   const conv = (s: string) => (crlf ? s.replace(/\n/g, "\r\n") : s);
-  writeFileSync(join(dir, "docs/work/in_progress/TASK-901-fixture.md"), conv(MEMBER));
+  writeFileSync(join(dir, "docs/work/in_progress/TASK-901-fixture.md"), conv(MEMBER.replace("__STAMP__", stamp)));
   writeFileSync(join(dir, "docs/sprint/SPRINT-901-fixture.md"), SPRINT("0000000"));
   git(dir, "init", "-q");
   git(dir, "add", "-A");
@@ -103,7 +103,7 @@ try {
   check("must-FAIL: box stays ticked", /^- \[x\] first box ✓ edited `b\.md`/m.test(memberOf(d1)), memberOf(d1));
   check("must-FAIL: continuation line untouched", /\n {6}continued line\n/.test(memberOf(d1)), memberOf(d1));
 
-  const d2 = fixture();
+  const d2 = fixture(false, "901"); // numeric stamp form
   dirs.push(d2);
   const ok = tick(d2, "1", "reviewed, no file named");
   check("control: path-free evidence -> exit 0", ok.code === 0, `exit ${ok.code}\n${ok.out}`);
