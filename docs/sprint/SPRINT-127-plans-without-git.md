@@ -67,6 +67,7 @@ Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/refer
   · `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/triage/SKILL.md`
   · `scripts/lib/conformance-engine.sh` (the plan-frozen note string, and the gates-signed no-git date form)
   · `evals/run-gates-signed-fixtures.sh` · `README.md`
+  · `skills/lean-doc-generator/templates/SPRINT.md.template` · `docs/work/README.md`
   · `docs/work/todo/TASK-441-run-the-sprint-lifecycle-without-git.md`
   · `docs/work/in_progress/TASK-441-run-the-sprint-lifecycle-without-git.md`
 Depends-on: T1 (`orchestrator/SKILL.md`), T2
