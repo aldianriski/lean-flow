@@ -8,7 +8,7 @@ size: M
 risk: med
 autonomy: HITL
 class: execution
-tier: P
+tier: G
 authority: J1
 origin: decomposer
 state: ready
@@ -31,6 +31,8 @@ step. An adopter without git needs the same promote → execute → close to com
       git-required wording names the git case, never the only case.
 - [ ] The conformance engine's S9.PLANFROZEN "history unavailable" note names the promote-entry snapshot as where the frozen text
       lives — wording only, no verdict change.
+- [ ] S9.GATESWELLFORMED accepts `gates_signed: <GATE>[,…] @ <YYYY-MM-DD>` only when the repo has no git, with retained
+      must-FAIL fixtures for both sides; no git repo's verdict moves (owner ruling at G2, logged as a scope-change).
 - [ ] Exercised on a scratch repo with no `.git`: one sprint goes promote → tick → close by the shipped procedures, a deliberate
       edit to a frozen box is caught against the snapshot, and the close completes.
 

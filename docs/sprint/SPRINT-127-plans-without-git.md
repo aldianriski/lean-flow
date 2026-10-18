@@ -38,6 +38,7 @@ settings file · EPIC-022 S4 (planning-checker clusters) · TASK-322 · 366 · 3
 ### T1 — Record a G1/G2 sign-off on the task file `[size: M · risk: low · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/lean-doc-generator/templates/TASK.md.template`
   · `skills/task-decomposer/references/task-file.md` · `docs/work/README.md` · `README.md`
+  · `evals/run-v1-to-v2-fixtures.ts`
   · `docs/work/todo/TASK-439-record-g1-g2-sign-off-on-a-task-file.md`
   · `docs/work/in_progress/TASK-439-record-g1-g2-sign-off-on-a-task-file.md`
 Depends-on: none
@@ -64,7 +65,8 @@ unchanged.
 ### T3 — Run the sprint lifecycle without git `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/sprint-by-reference.md`
   · `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/triage/SKILL.md`
-  · `scripts/lib/conformance-engine.sh` (one note string)
+  · `scripts/lib/conformance-engine.sh` (the plan-frozen note string, and the gates-signed no-git date form)
+  · `evals/run-gates-signed-fixtures.sh` · `README.md`
   · `docs/work/todo/TASK-441-run-the-sprint-lifecycle-without-git.md`
   · `docs/work/in_progress/TASK-441-run-the-sprint-lifecycle-without-git.md`
 Depends-on: T1 (`orchestrator/SKILL.md`), T2
