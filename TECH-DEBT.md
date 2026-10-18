@@ -35,6 +35,12 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-125 promote (2026-10-18).** **131 of 133 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 125. Second route: 133 open − 2 filed at 124 (TD-249 · TD-250) = 131; nothing was filed at 123. **Newly aged since the
+> SPRINT-124 sweep, named for re-review:** TD-247 · TD-248 (filed at 122). No open row is `high`. Re-reviewed by routing: eleven
+> rows ride SPRINT-125 (EPIC-022 S1) — TD-078 · 093 · 118 · 137 · 160 · 187 · 214 · 217 · 220 · 229 · 230 — and four close as
+> stale or moved (TD-100 · 161 · 176 · 243). No §11 deletion is due (TD-168 resolved at 124; due at 127).
+>
 > **Aging sweep — SPRINT-124 promote (2026-10-11).** **130 of 132 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 124. Second route: 132 open − 2 filed at 122 (TD-247 · TD-248) = 130. **Newly aged since the SPRINT-121 sweep, named for
 > re-review:** TD-237 · TD-238 · TD-239 · TD-240 · TD-241 · TD-242 (filed at 120) · TD-243 · TD-244 · TD-245 · TD-246 (filed at
