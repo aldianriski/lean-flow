@@ -135,3 +135,12 @@ file) and a comment at `scripts/night-run.sh:184`. Both say EPIC-008 is `status:
 **Impact.** T4's `Layers:` gains `scripts/night-run.sh`, for that comment only. The script's behaviour is unchanged, and no member's
 `## Done when` changes.
 **Re-confirm G2.** This adds no scope: it corrects a status claim that this sprint's own T1 falsified.
+
+### 2026-10-18 | T2 | TASK-427 — tick tail goes on the box's first line (wording moves, checker unchanged); merged `8a69988a`
+dispatch.md rule 5 and sprint-by-reference.md step 4 (stated once, with two pointers) now name the placement. A retained pair guards
+it: `multiline-box-tail-on-first-line` PASSes and `multiline-box-tail-on-continuation` FAILs with `FREEZE-EDIT TASK-901`. The harness
+reads 149/0. A seeded tail-strip break reddened the PASS case; the checker hash was restored, and a8315bc9 = HEAD. Post-merge:
+prose-density 28/0, layers-observed PASS, freeze 10/0. This sprint's own ticks have used the first-line placement since wave A, so it
+is exercised on real input. TD-229 is resolved. The task is in `review/` until its Codex pass, which is batched with T3/T4.
+CHANGELOG (consumer): when a `## Done when` box wraps, append the ` ✓ <evidence>` tail to its first line, never to a continuation line
+or a line of its own; the freeze check treats those placements as edits.

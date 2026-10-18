@@ -512,7 +512,8 @@ status: current
     J2 task, so for a sprint like SPRINT-117 (one J2 member) the suggestion would end at `AUTHORITY_BOUNDARY` having done nothing.
   - Mitigation (hypothesis): name the unattended option only when at least one open member is AFK and J0/J1.
 
-- **TD-229** severity: low | status: open | created: Sprint-116 (close)
+- **TD-229** severity: low | status: resolved → SPRINT-125 T2 | created: Sprint-116 (close)
+  - Resolved (SPRINT-125 T2, `2fa73542`; owner ruling at G2: the wording moves, the checker does not): dispatch.md rule 5 and sprint-by-reference.md step 4 put the ✓ tail on the box's first line; a retained must-PASS/must-FAIL pair guards the placement and a seeded-checker run discriminated them.
   - Summary: **A tick on a multi-line `## Done when` box must put its ` ✓ <evidence>` on the box's FIRST line, and nothing says so.**
     `check-sprint-by-reference.ts` (`sameDoneWhen`) accepts a tick tail only on a box line, so evidence appended where the frozen text
     actually ends (its last continuation line) reads as `FREEZE-EDIT`. `references/sprint-by-reference.md` says the tail comes "after the

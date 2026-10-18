@@ -28,9 +28,9 @@ shipped wording, so either the wording or the checker is wrong. Which one change
 
 ## Done when
 
-- [ ] A ticked multi-line box whose ✓ tail sits where the shipped references say passes `check-sprint-by-reference.ts`, and a tail anywhere
+- [x] A ticked multi-line box whose ✓ tail sits where the shipped references say passes `check-sprint-by-reference.ts`, and a tail anywhere ✓ `2fa73542`: retained `multiline-box-tail-on-first-line` (PASS) + `multiline-box-tail-on-continuation` (FREEZE-EDIT TASK-901); `run-by-reference-fixtures.ts` 149/0; seeded tail-strip break reddened the PASS case, checker hash restored = HEAD
       else in the box still FAILs as a freeze edit: one retained case each.
-- [ ] `dispatch.md` § Tick and `sprint-by-reference.md` step 4 name the same placement the checker accepts: **the wording
+- [x] `dispatch.md` § Tick and `sprint-by-reference.md` step 4 name the same placement the checker accepts: **the wording ✓ `2fa73542`: dispatch.md rule 5 + sprint-by-reference.md step 4 (stated once, two pointers) say the box's first line; checker unchanged (hash a8315bc9)
       moves** to "on the box's first line" (owner ruling 2026-10-18), the checker is unchanged; TD-229 resolves with it.
 
 ## Tracker
