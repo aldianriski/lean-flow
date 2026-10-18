@@ -385,7 +385,18 @@ export function checkDodDelta(
  * Read through the shared Plan parser. A block with no `Cites:`, or none of them TASK-shaped, maps to `[]`. */
 export function parsePlanCites(content: string): Map<string, string[]> {
   const out = new Map<string, string[]>();
-  for (const b of parsePlan(content).blocks) if (b.tid !== "") out.set(b.tid, [...new Set(b.cites.lead)]);
+  // The FIRST `Cites:` anywhere in a Tn's region wins, as this reader always read it: a non-task `###` after
+  // the Tn (b.carry) does not end the region, so a Tn with no Cites: of its own takes the first one under it.
+  let seen = false;
+  for (const b of parsePlan(content).blocks) {
+    if (b.tid !== "") {
+      out.set(b.tid, [...new Set(b.cites.lead)]);
+      seen = b.text.Cites !== "";
+    } else if (b.carry !== "" && !seen && b.text.Cites !== "") {
+      out.set(b.carry, [...new Set(b.cites.lead)]);
+      seen = true;
+    }
+  }
   return out;
 }
 

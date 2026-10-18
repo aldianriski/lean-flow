@@ -1690,7 +1690,28 @@ const CASES: Case[] = [
     expect: ["scope-change-outside-layers T1 src/helper.ts"],
   },
   {
-    name: "scope-change-names-a-suffixed-Tn (must-FAIL: `### T2a` is a task block; src/helper.ts is undeclared there)",
+    name: "scope-change-cites-under-a-non-task-heading (control: `### Notes` resets -- TASK-777 under it attributes no Tn, so no finding)",
+    opts: { pre: (d) => edit(d, SPRINT, "### T2 — Deliver beta", "### Notes\nCites: `TASK-777`\n\n### T2 — Deliver beta") },
+    mutate: (d) => logEntry(d, "scope-change", "TASK-777 gains a helper", "Adds `src/helper.ts`."),
+    expect: [],
+  },
+  {
+    name: "freeze-edit-cites-under-a-non-task-heading (must-FAIL: the frozen reader resets at `### Notes`, so T1 does not govern TASK-901 cited there)",
+    opts: {
+      pre: (d) => {
+        edit(d, SPRINT, "Cites: `TASK-901`", "Cites: `TASK-902`");
+        edit(d, SPRINT, "### T2 — Deliver beta", "### Notes\nCites: `TASK-901`\n\n### T2 — Deliver beta");
+      },
+    },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "T1 gains a perf bar", "What broke: alpha needs a benchmark. G2 re-confirmed.");
+      commit(d, "edit + Tn entry");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-names-a-suffixed-Tn(must-FAIL: `### T2a` is a task block; src/helper.ts is undeclared there)",
     opts: { pre: (d) => edit(d, SPRINT, "### T2 — Deliver beta", "### T2a — Deliver beta") },
     mutate: (d) => logEntry(d, "scope-change", "T2a also touches the helper", "T2a edits `src/helper.ts`."),
     expect: ["scope-change-outside-layers T2a src/helper.ts"],

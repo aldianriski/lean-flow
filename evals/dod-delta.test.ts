@@ -751,6 +751,20 @@ describe("parsePlanCites -- a Cites: task id governs only in the LEADING run (TD
   });
 });
 
+describe("parsePlanCites -- a non-task heading does not end a Tn's region (Codex R1)", () => {
+  test("a Tn with no Cites: of its own takes the FIRST Cites: under the `### Notes` after it", () => {
+    const plan = ["## Plan", "### T1 -- a `[]`", "Layers: x", "", "### Notes", "Cites: `TASK-5`", "", "### T2 -- b `[]`", "Cites: `TASK-6`"].join("\n");
+    const m = parsePlanCites(plan);
+    expect(m.get("T1")).toEqual(["TASK-5"]);
+    expect(m.get("T2")).toEqual(["TASK-6"]);
+  });
+
+  test("control: a Tn's own Cites: wins over one under the Notes heading after it", () => {
+    const plan = ["## Plan", "### T1 -- a `[]`", "Cites: `TASK-1`", "", "### Notes", "Cites: `TASK-5`"].join("\n");
+    expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-1"]);
+  });
+});
+
 describe("parseDodSections -- a heading outside `## Plan` is not a task block (shared Plan parser)", () => {
   test("a ### T1 under another section yields no section; the same lines under ## Plan do", () => {
     const body = ["### T1 -- x `[]`", "**DoD:**", "- [ ] A"];

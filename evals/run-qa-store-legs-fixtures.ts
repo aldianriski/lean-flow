@@ -170,6 +170,20 @@ function v2(): string {
   check("cli counts: a later Cites: mention governs nothing (T1 delivered by TASK-971 alone) and T2a is its own unit, not folded into T2",
     x.code === 0 && x.out.includes("units 3 2\n") && x.out.includes("unit T1 delivered\nunit T2 open\nunit T2a delivered\n"), JSON.stringify(x.out));
 
+  // SPRINT-128 T2 (Codex R1): a non-task `###` heading between Tn blocks does not end the unit -- the Cites:
+  // under `### Notes` stay with T1 (this reader always read them so; the reaper's counts depend on it).
+  const SPRINT_NOTES = SPRINT.slice(0, SPRINT.indexOf("## Plan")) +
+    "## Plan\n\n### T1 — one `[size: S]`\nLayers: `a.md`\n\n### Notes\nCites: `TASK-971`\n\n" +
+    "### T2 — two `[size: S]`\nCites: `TASK-972`\n";
+  const r5 = tree({
+    "docs/sprint/SPRINT-970-fx.md": SPRINT_NOTES,
+    "docs/work/done/TASK-971-a.md": task("TASK-971", "SPRINT-970", DONE),
+    "docs/work/in_progress/TASK-972-b.md": task("TASK-972", "SPRINT-970", T),
+  });
+  x = cli(r5, "counts", s);
+  check("cli counts: a Cites: under a non-task `### Notes` stays with the preceding T1 (2 units; T1 delivered by TASK-971, T2 open)",
+    x.code === 0 && x.out.includes("units 2 1\n") && x.out.includes("unit T1 delivered\nunit T2 open\n"), JSON.stringify(x.out));
+
   // must-FAIL: a listed member that cannot be resolved is a named error, never a silent short list
   const rm = tree({
     "docs/sprint/SPRINT-970-fx.md": SPRINT,

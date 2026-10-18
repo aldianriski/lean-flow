@@ -64,7 +64,14 @@ export function doneWhenBoxes(text: string): { ticked: number; open: number } {
 /** `### Tn` blocks of the sprint's `## Plan` with the TASK ids that govern them: the leading run of the
  * `Cites:` declaration (owner ruling TD-199), read through the shared Plan parser. */
 export function planUnits(sprintText: string): { tn: string; cites: Set<string> }[] {
-  return parsePlan(sprintText).blocks.filter((b) => b.tid !== "").map((b) => ({ tn: b.tid, cites: new Set(b.cites.lead) }));
+  // A non-task `###` (e.g. `### Notes`) does not end the unit: its Cites: stay with the preceding Tn (b.carry),
+  // as this reader always read them -- the night-run reaper's counts depend on it.
+  const units: { tn: string; cites: Set<string> }[] = [];
+  for (const b of parsePlan(sprintText).blocks) {
+    if (b.tid !== "") units.push({ tn: b.tid, cites: new Set(b.cites.lead) });
+    else if (b.carry !== "") for (const id of b.cites.lead) units[units.length - 1]!.cites.add(id);
+  }
+  return units;
 }
 
 function sprintText(sprintFile: string): string {

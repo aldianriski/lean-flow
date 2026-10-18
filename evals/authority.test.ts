@@ -12,7 +12,7 @@
 // must fail these as loudly as one that reddens nothing) -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
 import { fileURLToPath } from "node:url";
-import { runCheckAuthority } from "../scripts/lib/check-authority.ts";
+import { parseCites, parseTaskRecords, runCheckAuthority } from "../scripts/lib/check-authority.ts";
 
 const FX = fileURLToPath(new URL("fixtures/authority/", import.meta.url));
 
@@ -242,6 +242,12 @@ describe("check-authority.ts -- retained fixtures", () => {
     const r = run("member-cites-leading-run/docs/sprint/SPRINT-919-fx.md");
     expect(r.text).toMatch(/^PASS {2}authority-member-declared: .* TASK-919 \(docs\/work\/todo\/TASK-919-alpha\.md\) authority: J2$/m);
     expect(r.text).not.toContain("T1 Plan declares J1, member docs/work/todo/TASK-919-alpha.md");
+  });
+
+  test("non-task heading (Codex R1): a Cites: under `### Notes` is dropped, not carried to the preceding T1 -- this reader always reset there", () => {
+    const plan = ["## Plan", "### T1 -- a `[J1]`", "Layers: `a.md`", "", "### Notes", "Cites: `TASK-5`", "", "### T2 -- b `[J1]`", "Cites: `TASK-6`"].join("\n");
+    expect([...parseCites(plan)].map(([k, v]) => [k, [...v]])).toEqual([["T2", ["TASK-6"]]]);
+    expect(parseTaskRecords(plan).map((r) => r.tid)).toEqual(["T1", "T2"]);
   });
 
   test("suffix case (must-FAIL): a classless ### T3a is a task block and is named, not silently skipped", () => {
