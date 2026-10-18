@@ -426,4 +426,42 @@ describe("parsePlan (the one Plan reader both Layers checkers use)", () => {
     expect(none.found).toBe(false);
     expect(none.blocks.filter((b) => b.tid !== "")).toEqual([]);
   });
+  test("P2: only a TOKEN-ONLY column-0 line continues a declaration; prose that starts with a backtick does not", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n`b.ts`, `c.ts` · `d.ts`\n\n### T2 -- t\nLayers: `a.ts`\n`README.md` describes this\n");
+    expect(q.anomalies.map((a) => [a.decl, a.line])).toEqual([["Layers", 5]]);
+  });
+  test("P1: a non-task `###` block has tid \"\" and carries the preceding task's tid", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n\n### Notes\nLayers: `n.ts`\n\n### T2 -- t\nLayers: `c.ts`\n");
+    expect(q.blocks.map((b) => [b.tid, b.carry])).toEqual([["", ""], ["T1", "T1"], ["", "T1"], ["T2", "T2"]]);
+  });
+});
+
+// --- SPRINT-128 T1 Codex R1: P1 -- a non-task `###` heading INSIDE the Plan ----------------------------
+// Completeness always dropped such a block: a Layers: beneath `### Notes` is not T1's, so T1 naming n.ts in
+// its DoD is still undeclared. (check-layers-observed keeps that Layers: with the preceding Tn -- its own test.)
+describe("notes-heading (retained must-FAIL fixture -- a non-task ### block is dropped, never merged into T1)", () => {
+  let r: Captured;
+  beforeAll(() => {
+    r = capture([posix.join(FIXTURES, "notes-heading.md")]);
+  });
+  test("T1 still FAILs: n.ts declared only under `### Notes` is undeclared for T1", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("### T1 Layers completeness: DoD/Acceptance implies n.ts, absent from Layers:");
+  });
+  test("sibling control: T2 stays clean and the Notes block is never checked itself", () => {
+    expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
+    expect(r.output).not.toContain("Notes");
+  });
+});
+
+// --- SPRINT-128 T1 Codex R1: P2 -- column-0 PROSE that starts with a backtick is not a wrap -------------
+describe("col0-prose (retained control -- not a declaration continuation)", () => {
+  let r: Captured;
+  beforeAll(() => {
+    r = capture([posix.join(FIXTURES, "col0-prose.md")]);
+  });
+  test("passes cleanly with no declaration-continuation finding", () => {
+    expect(r.output).not.toContain("declaration continuation");
+    expect(r.exitCode).toBe(0);
+  });
 });

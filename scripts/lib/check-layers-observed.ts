@@ -362,9 +362,10 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     // Tn -> the TASK ids its Cites: names (SPRINT-110 T2). A Tn with none is absent from the map.
     const cites = new Map<string, string[]>();
     for (const b of plan.blocks) {
-      if (b.tid === "") continue;
-      declsByTask.set(b.tid, [...(declsByTask.get(b.tid) ?? []), ...b.layers]);
-      if (b.cites.all.length > 0) cites.set(b.tid, [...(cites.get(b.tid) ?? []), ...b.cites.all]);
+      // Layers: under a non-task `###` stays with the preceding Tn (b.carry); Cites: under one is dropped
+      // (b.tid ""). The two old readers differed here and each keeps its own behaviour.
+      if (b.carry !== "") declsByTask.set(b.carry, [...(declsByTask.get(b.carry) ?? []), ...b.layers]);
+      if (b.tid !== "" && b.cites.all.length > 0) cites.set(b.tid, [...(cites.get(b.tid) ?? []), ...b.cites.all]);
     }
     const mySprint = fmv(fileLines, "sprint");
 

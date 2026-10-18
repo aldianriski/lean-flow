@@ -288,6 +288,10 @@ export interface PlanAnomaly {
 export interface PlanBlock {
   tid: string; // "T3", "T3a"; "" for text before the first heading or under a non-task `###`
   heading: string; // the `### ` line verbatim ("" before the first heading)
+  /** The tid of the nearest `### Tn` at or above this block: `tid` for a task block, the PRECEDING task for a
+   * non-task `###` block (e.g. `### Notes`), "" before any task. Observed attributes a Layers: under a
+   * non-task heading to this task (its old behaviour); completeness drops the block (tid ""). */
+  carry: string;
   line: number; // 1-based line of the heading (the first Plan line for the preamble)
   lines: PlanLine[]; // every line after the heading, classified
   /** backtick-delimited Layers: tokens, in order, not deduped; directory tokens keep their `/`. */
@@ -316,6 +320,9 @@ export interface ParsedPlan {
 }
 
 const PLAN_TASK_HEADING = /^### (T[0-9]+[a-z]?)\b/;
+// A column-0 line continues a declaration only when it is TOKEN-ONLY: backtick tokens separated by
+// whitespace, commas or `·`. Anything else at column 0 is ordinary prose that happens to start with a backtick.
+const COL0_TOKEN_ONLY = /^`[^`]+`(?:[ 	,·]+`[^`]+`)*[ 	,·]*$/;
 const PLAN_DECL_KEY = /^(Layers|Depends-on|Cites):[ \t]*/;
 
 function backtickTokens(text: string): string[] {
@@ -356,7 +363,7 @@ export function parsePlan(content: string): ParsedPlan {
   const blocks: PlanBlock[] = [];
   const open = (tid: string, heading: string, line: number): PlanBlock => {
     const b: PlanBlock = {
-      tid, heading, line, lines: [], layers: [],
+      tid, heading, line, carry: tid !== "" ? tid : (blocks[blocks.length - 1]?.carry ?? ""), lines: [], layers: [],
       cites: { tokens: [], all: [], lead: [], tids: [] },
       dependsOn: [], text: { Layers: "", Cites: "", "Depends-on": "" }, anomalies: [],
     };
@@ -377,7 +384,7 @@ export function parsePlan(content: string): ParsedPlan {
       cur.lines.push({ n, tag: decl, text: line.slice(key[0].length) });
     } else if (!hidden && decl !== null && /^[ \t]+[^ \t]/.test(line)) {
       cur.lines.push({ n, tag: decl, text: line.replace(/^[ \t]+/, "") });
-    } else if (!hidden && decl !== null && line.startsWith("`")) {
+    } else if (!hidden && decl !== null && COL0_TOKEN_ONLY.test(line)) {
       cur.anomalies.push({ kind: "column-0-continuation", decl, line: n, text: line });
       cur.lines.push({ n, tag: "P", text: line });
       decl = null;

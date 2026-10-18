@@ -273,6 +273,33 @@ describe("column-0 wrap is NAMED, not dropped (TD-138; completeness already FAIL
   });
 });
 
+describe("P2: column-0 PROSE starting with a backtick is not a wrap (control)", () => {
+  test("not named; the declaration it follows is still read", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts`\n`some note` describes this\nDepends-on: none\n");
+    const r = run(d);
+    expect(r.fail).toBe(false);
+    expect(r.out).not.toContain("declaration continuation");
+  });
+});
+
+describe("P1: Layers: under a non-task `### Notes` heading stays with the PRECEDING Tn (observed's old reading)", () => {
+  const plan =
+    "### T1 -- first [size: S]\nLayers: `src/a.ts`\nDepends-on: none\n\n### Notes\nLayers: `src/other.ts`\n\n### T2 -- second [size: S]\nLayers: `src/a.ts`\nDepends-on: none\n";
+  const d = planOnly(plan);
+  writeFile(d, "src/other.ts", "o2\n");
+  commitAll(d, "sprint(901) T1: edits the file declared under Notes");
+  writeFile(d, "src/other.ts", "o3\n");
+  commitAll(d, "sprint(901) T2: same file, T2 never declared it");
+  const r = run(d);
+  test("T2 touching it is named (not declared by T2)", () => {
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("changed by a task that never declared it: T2:src/other.ts");
+  });
+  test("MUST-FAIL if broken: T1 touching it is NOT named (the Notes Layers: belongs to T1)", () => {
+    expect(r.out).not.toContain("T1:src/other.ts");
+  });
+});
+
 describe("a `sprint(NNN) Tn:` subject attributes to Tn only for THIS sprint (TD-248)", () => {
   const d = planOnly(TWO_TASKS);
   writeFile(d, "src/a.ts", "a2\n");
