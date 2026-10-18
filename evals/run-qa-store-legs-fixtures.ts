@@ -2,7 +2,7 @@
 // TASK-392). Tier G (a guard: a false negative here is silent). Run by Bun:
 // `bun evals/run-qa-store-legs-fixtures.ts`  -- seconds, temp dirs, one `sh` spawn per leg case.
 //
-// WHAT IT COVERS. (1) scripts/lib/sprint-members-cli.ts, the argv wrapper over resolveMembers that the
+// WHAT IT COVERS. (1) scripts/lib/sprint-members-cli.ts, the argv wrapper over resolveMembersChecked that the
 // shell gates call (qa-check.sh leg 2g / leg 7, night-run.sh reap(), T3's conformance engine).
 // (2) qa-check.sh leg 3 (ownership fields) and the RETIRED legs 5 / 7 / 8. Their subject was TODO.md
 // (breadcrumb lint, TD aging, tracker: lint, plus TODO.md as one subject of leg 3); SPRINT-111 T3
@@ -194,6 +194,38 @@ function v2(): string {
     x.code === 2 && x.out === "" && /SPRINT-MEMBER-UNRESOLVED/.test(x.err) && x.err.includes("TASK-972"), `code ${x.code} err ${x.err}`);
   x = cli(rm, "counts", s);
   check("cli counts: same unresolved member -> exit 2 and no counts", x.code === 2 && x.out === "" && /SPRINT-MEMBER-UNRESOLVED/.test(x.err), `code ${x.code} out ${x.out}`);
+
+  // SPRINT-128 T3 (TD-188): any OTHER resolver anomaly is a named exit 2 too -- an ambiguous STAMPED id (two files for
+  // one id, no ## Members section to list it) used to leave the member set short and the sprint read as v1.
+  const STAMP_ONLY = "---\nsprint: 970\nstatus: active\n---\n\n## Plan\n\n### T1 — x\nCites: `TASK-973`\n";
+  const ramb = tree({
+    "docs/sprint/SPRINT-970-fx.md": STAMP_ONLY,
+    "docs/work/todo/TASK-973-a.md": task("TASK-973", "SPRINT-970", OPEN),
+    "docs/work/done/TASK-973-dup.md": task("TASK-973", "SPRINT-970", OPEN),
+  });
+  x = cli(ramb, "members", s);
+  check("cli members: an ambiguous STAMPED id -> exit 2, SPRINT-MEMBER-ANOMALY member-ambiguous naming TASK-973 and both paths, nothing on stdout",
+    x.code === 2 && x.out === "" && /SPRINT-MEMBER-ANOMALY: member-ambiguous: TASK-973/.test(x.err) &&
+      x.err.includes("docs/work/done/TASK-973-dup.md") && x.err.includes("docs/work/todo/TASK-973-a.md"), `code ${x.code} err ${x.err}`);
+  x = cli(ramb, "counts", s);
+  check("cli counts: same ambiguous stamped id -> exit 2 and no counts", x.code === 2 && x.out === "" && /member-ambiguous/.test(x.err), `code ${x.code} out ${x.out}`);
+  x = cli(ramb, "kind", s);
+  check("cli kind: an ambiguous stamped id is by-reference evidence -> v2, never v1", x.out === "v2\n", JSON.stringify(x.out));
+  const rmis = tree({
+    "docs/sprint/SPRINT-970-fx.md": STAMP_ONLY,
+    "docs/work/todo/TASK-973-a.md": task("TASK-973", "SPRINT-970", OPEN),
+    "docs/work/todo/sub/TASK-974-stray.md": task("TASK-974", null, OPEN),
+  });
+  x = cli(rmis, "members", s);
+  check("cli members: a task file nested below its folder -> exit 2, member-misplaced naming its path",
+    x.code === 2 && x.out === "" && /SPRINT-MEMBER-ANOMALY: member-misplaced: docs\/work\/todo\/sub\/TASK-974-stray\.md/.test(x.err), `code ${x.code} err ${x.err}`);
+  const rclean = tree({
+    "docs/sprint/SPRINT-970-fx.md": STAMP_ONLY,
+    "docs/work/todo/TASK-973-a.md": task("TASK-973", "SPRINT-970", OPEN),
+  });
+  x = cli(rclean, "members", s);
+  check("cli members: control -- the same sprint with one file per id resolves clean (exit 0, the one path)",
+    x.code === 0 && x.out === "docs/work/todo/TASK-973-a.md\n" && x.err === "", `code ${x.code} out ${x.out} err ${x.err}`);
 
   // a v1 sprint (no docs/work store) is not by-reference
   const r1 = tree({ "docs/sprint/SPRINT-970-fx.md": "---\nsprint: 970\nstatus: active\n---\n\n## Plan\n\n### T1 — x\n- [ ] a\n" });

@@ -342,7 +342,7 @@ export function runCheckAuthority(sprintFilePaths: readonly string[]): CheckAuth
     }
     // TASK-382 owner ruling B: `root` is `sp`'s grandparent-of-grandparent under the
     // `<root>/docs/sprint/<file>` convention every real sprint doc AND every member-shaped fixture
-    // (evals/fixtures/authority/<case>/docs/sprint/<file>) follows. resolveMembers() degrades to
+    // (evals/fixtures/authority/<case>/docs/sprint/<file>) follows. resolveMembersChecked() degrades to
     // [] when that root has no docs/work/ at all -- every PRE-EXISTING flat fixture (no docs/sprint
     // subdir), so this addition changes nothing for any input that predates this ruling.
     const root = dirname(dirname(dirname(sp)));

@@ -20,12 +20,11 @@
 // `plan_commit` resolution, the planned-vs-current diff, scope-change entries, `## Done when`
 // comparison, close-mode -- because that is freeze-specific, not "what are the members." This
 // file answers only "what is a member of this sprint in the LIVE working tree right now," which is
-// all `resolveMembers()` below does.
+// all `resolveMembersChecked()` below does.
 //
 // API (the whole surface a caller needs):
-//   resolveMembers(root, sprintFile) -> Member[]   -- id, path, folder, frontmatter, for every
-//                                                      CURRENT member, live-tree only (no git).
-//   resolveMembersChecked(root, sprintFile) -> {members, anomalies} -- the same members PLUS every
+//   resolveMembersChecked(root, sprintFile) -> {members, anomalies} -- id, path, folder, frontmatter for every
+//                                                      CURRENT member, live-tree only (no git), PLUS every
 //                                                      anomaly the resolver used to drop silently
 //                                                      (TD-188): an id matching 2+ files, an id with
 //                                                      no file, a task file outside docs/work/<folder>/.
@@ -33,7 +32,7 @@
 //   nowTree(root) / stampedIn(tree, sprintNo) / resolveId(paths, id) -- the building blocks, kept
 //                                                      exported so a caller needing raw paths
 //                                                      (rather than parsed Member rows) is not
-//                                                      forced through resolveMembers().
+//                                                      forced through resolveMembersChecked().
 // Degrades to [] (never throws) when `root` has no docs/work/ store at all -- the shape every
 // pre-existing flat authority/task-origin fixture has, so wiring a caller to this module adds zero
 // behaviour to any input that predates it.
@@ -316,11 +315,6 @@ export function resolveMembersChecked(root: string, sprintFile: string): MemberR
     members.push({ id, path, folder: path.split("/")[2] as Folder, frontmatter: parseFrontmatter(content) });
   }
   return { members, anomalies };
-}
-
-/** The members alone -- see `resolveMembersChecked` for the anomalies this leaves out. */
-export function resolveMembers(root: string, sprintFile: string): Member[] {
-  return resolveMembersChecked(root, sprintFile).members;
 }
 
 // --- the Plan parser (SPRINT-128 T1, TASK-443) -----------------------------------------------------

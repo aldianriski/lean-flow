@@ -19,7 +19,7 @@ import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import { runLayersCompleteness } from "../scripts/lib/check-layers-completeness.ts";
-import { anomalyFinding, memberAnomalyFinding, parsePlan, resolveMembers, resolveMembersChecked } from "../scripts/lib/sprint-members.ts";
+import { anomalyFinding, memberAnomalyFinding, parsePlan, resolveMembersChecked } from "../scripts/lib/sprint-members.ts";
 import { ANOMALY_CASES, EXPECTED, buildAnomalyTree, type AnomalyCase } from "./fixtures/member-anomalies/tree.ts";
 import {
   buildArchiveSelectionPair,
@@ -272,7 +272,7 @@ describe("space-token-wordsplit (retained must-FAIL fixture -- the oracle's IFS 
 // --- SPRINT-110 T1 (TASK-390): member task files on a by-reference (v2) sprint ---------------------
 // The Plan-shape checks above read a Plan's INLINE DoD; a v2 sprint's DoD lives in its member files, so
 // the guard used to pass without looking at any of it (Codex r1 F1). Each fixture below is a
-// self-contained `<root>/docs/sprint + docs/work` tree -- the shape resolveMembers() reads.
+// self-contained `<root>/docs/sprint + docs/work` tree -- the shape resolveMembersChecked() reads.
 //
 // member-mixed carries every VERDICT and varies the SELECTION (L-186): T1 cites TWO members (the second
 // wrapped onto a continuation line), T2 is covered by a Layers DIRECTORY, T3's member is reached ONLY by
@@ -509,7 +509,7 @@ describe("col0-prose (retained must-FAIL fixture -- remedy named; blank-line sib
 });
 
 // --- SPRINT-128 T3 (TASK-445, TD-188 / TD-190): the member resolver NAMES every anomaly ------------------
-// resolveMembers used to skip an id matching 0 or 2 files and nothing said so, so every caller silently
+// The resolver used to skip an id matching 0 or 2 files and nothing said so, so every caller silently
 // checked less. Each case below is a tree from evals/fixtures/member-anomalies/tree.ts; the clean case is the
 // control, and TASK-951 (clean) must be a member in EVERY case that does not make it ambiguous.
 describe("member resolver anomalies (retained must-FAIL fixtures -- member-ambiguous / member-missing / member-misplaced)", () => {
@@ -550,7 +550,7 @@ describe("member resolver anomalies (retained must-FAIL fixtures -- member-ambig
     }
   });
 
-  test("resolver API: the ambiguous id is NOT a member and names BOTH paths; resolveMembers() still returns the clean members only", () => {
+  test("resolver API: the ambiguous id is NOT a member and names BOTH paths; the clean members are untouched", () => {
     const { sprint } = roots.get("ambiguous")!;
     const root = posix.join(tmp, "ambiguous");
     const res = resolveMembersChecked(root, sprint);
@@ -559,7 +559,6 @@ describe("member resolver anomalies (retained must-FAIL fixtures -- member-ambig
       ["member-ambiguous", "TASK-951", ["docs/work/done/TASK-951-dup.md", "docs/work/todo/TASK-951-ok.md"]],
     ]);
     expect(memberAnomalyFinding(res.anomalies[0]!)).toContain("matches 2 task files");
-    expect(resolveMembers(root, sprint)).toEqual(res.members);
   });
 
   test("resolver API: a misplaced file is reported store-wide and never becomes a member", () => {

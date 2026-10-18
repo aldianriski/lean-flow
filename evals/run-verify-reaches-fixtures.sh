@@ -177,7 +177,7 @@ run_case_anywhere "member-must-fail" 1 "verify-does-not-reach-target: docs/work/
 run_case_anywhere "member-sibling-passes" 0 "1 claimed target(s) confirmed reachable" -- \
   bun "$checker" "$fx/member-sibling/docs/sprint/SPRINT-981-member-sibling.md"
 
-# case 20 (L-186, selection-varying): the member is reached ONLY through resolveMembers()' `sprint:`
+# case 20 (L-186, selection-varying): the member is reached ONLY through resolveMembersChecked()' `sprint:`
 # STAMP arm (no `## Members` listing at all) and sits in review/, not the todo/ every other case uses.
 run_case_anywhere "member-selection-stamp-arm-passes" 0 "1 claimed target(s) confirmed reachable" -- \
   bun "$checker" "$fx/member-selection-stamp-arm/docs/sprint/SPRINT-982-member-stamp-arm.md"

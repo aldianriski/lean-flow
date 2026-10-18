@@ -1,4 +1,4 @@
-// scripts/lib/sprint-members-cli.ts -- argv wrapper over resolveMembers() for SHELL callers
+// scripts/lib/sprint-members-cli.ts -- argv wrapper over resolveMembersChecked() for SHELL callers
 // (SPRINT-110 T4 · TASK-392). Run by Bun. Callers: scripts/qa-check.sh (leg 2g, leg 7),
 // scripts/night-run.sh reap(), scripts/lib/conformance-engine.sh (T3). Owner rule: executable logic is
 // TypeScript, so every count lives HERE and the shell call sites stay thin.
@@ -21,7 +21,9 @@
 //                     files whose frontmatter says `status: active` (archive/ and logs/ are not candidates).
 //
 //   Exit codes: 0 ok · 2 named error on stderr (`SPRINT-MEMBER-UNRESOLVED: <ids>` -- a listed member has no
-//   unique file, or `SPRINT-FILE-MISSING`) with NOTHING on stdout -- never a silent empty/short list ·
+//   unique file; `SPRINT-MEMBER-ANOMALY: <finding> | <finding>` -- any OTHER resolver anomaly, each by its shared
+//   name member-ambiguous / member-missing / member-misplaced (TD-188), on ONE line because callers read line 1;
+//   or `SPRINT-FILE-MISSING`) with NOTHING on stdout -- never a silent empty/short list ·
 //   3 `NOT-BY-REFERENCE` (members/counts on a v1 sprint) · 64 usage.
 //
 // Box grammar: a line `- [ ]` (open) or `- [x]`/`- [X]` (ticked) at column 0 inside the member's
@@ -32,8 +34,9 @@ import { join, resolve } from "node:path";
 import {
   frontmatterField,
   nowTree,
+  memberAnomalyFinding,
   parsePlan,
-  resolveMembers,
+  resolveMembersChecked,
   scanBlocks,
   section,
   sprintNumber,
@@ -85,17 +88,23 @@ function isV2(root: string, sprintFile: string): boolean {
   const tree = nowTree(root);
   if (tree.paths.length === 0) return false;
   if (taskIds(section(text, "Members")).size > 0) return true;
-  return resolveMembers(root, sprintFile).length > 0;
+  // A stamped id the resolver could not seat (two files, or a misplaced one) is membership evidence too: reading it
+  // as v1 would be the silent short answer this CLI exists to refuse.
+  const r = resolveMembersChecked(root, sprintFile);
+  return r.members.length > 0 || r.anomalies.length > 0;
 }
 
 function requireMembers(root: string, sprintFile: string) {
   if (!isV2(root, sprintFile)) throw new CliError(3, "NOT-BY-REFERENCE", `${sprintFile} lists and stamps no member under ${WORK}/ -- it is a v1 (inline Plan DoD) sprint`);
   const text = sprintText(sprintFile);
-  const members = resolveMembers(root, sprintFile);
+  const { members, anomalies } = resolveMembersChecked(root, sprintFile);
   const have = new Set(members.map((m) => m.id));
   const missing = [...taskIds(section(text, "Members"))].filter((id) => !have.has(id)).sort();
   if (missing.length > 0) {
     throw new CliError(2, "SPRINT-MEMBER-UNRESOLVED", `${missing.join(" ")} -- listed in ${sprintFile} ## Members but no unique ${WORK}/*/TASK-NNN-*.md file resolves`);
+  }
+  if (anomalies.length > 0) {
+    throw new CliError(2, "SPRINT-MEMBER-ANOMALY", anomalies.map(memberAnomalyFinding).join(" | "));
   }
   return { members, text };
 }

@@ -253,7 +253,7 @@ const TID_RE = /\bT[0-9]+\b/g;
 // --- SPRINT-110 T1 (TASK-390): member task files on a by-reference (v2) sprint --------------------
 // A v2 sprint keeps its DoD in member task files (docs/work/), not in the inline Plan, so the
 // Plan-shape checks above can pass without reading any of it (Codex r1 F1). For each member
-// (resolveMembers: `## Members` UNION `sprint:`-stamped, live tree) find the `### Tn` block(s) whose
+// (resolveMembersChecked: `## Members` UNION `sprint:`-stamped, live tree) find the `### Tn` block(s) whose
 // Cites: LEADING RUN names its TASK id (a later mention governs nothing, TD-199) -- that block's Layers/Cites are the declaration the member's `## Done when`
 // is checked against, by the SAME "implies file X" rule the Plan prose gets (backticked file tokens +
 // the TD-NNN "resolved" -> TECH-DEBT.md rule). A member NO block cites has no declaration to check
@@ -417,7 +417,7 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
     }
 
     // Member files (SPRINT-110 T1). root = the sprint file's grandparent-of-grandparent under the
-    // `<root>/docs/sprint/<file>` convention (same derivation as check-authority.ts); resolveMembers
+    // `<root>/docs/sprint/<file>` convention (same derivation as check-authority.ts); resolveMembersChecked
     // returns [] when that root has no docs/work/, so a v1 sprint adds nothing here.
     const { members, anomalies } = resolveMembersChecked(dirname(dirname(dirname(sp))), sp);
     for (const a of anomalies) emit.push({ kind: "line", text: `FAIL  layers-completeness: ${sp} ${memberAnomalyFinding(a)}` });

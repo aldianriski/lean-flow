@@ -20,7 +20,7 @@
 // on a v2 sprint it silently examined zero clauses and reported nothing wrong -- a vacuous PASS of
 // exactly the kind L-136 exists to catch, one level up. This file reads BOTH: the sprint file's own
 // Plan text (legacy, v1 -- unchanged semantics) AND every current member's `## Done when` section
-// (TASK-382's `resolveMembers`), and reports a NAMED, NON-ZERO-DENOMINATOR line either way (owner
+// (TASK-382's `resolveMembersChecked`), and reports a NAMED, NON-ZERO-DENOMINATOR line either way (owner
 // ruling B) -- "0 mechanical clauses" is reported, never silently skipped, because zero real clauses
 // and zero EXAMINED clauses must never look the same (L-156).
 //
