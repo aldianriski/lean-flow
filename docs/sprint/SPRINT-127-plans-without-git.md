@@ -71,7 +71,7 @@ Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/refer
   · `docs/work/todo/TASK-441-run-the-sprint-lifecycle-without-git.md`
   · `docs/work/in_progress/TASK-441-run-the-sprint-lifecycle-without-git.md`
 Depends-on: T1 (`orchestrator/SKILL.md`), T2
-Cites: `TASK-441` · ADR-054 (T2) · ADR-045 D6 (status moves)
+Cites: `TASK-441` · ADR-054 (T2) · ADR-045 D6 (status moves) · `night-run.md` · `migration-map.md` (named as out of scope, read only)
 
 Every shipped step that says `git mv`, `plan_commit` or `git show` names its git case, and states what to do when there is no git.
 
