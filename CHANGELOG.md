@@ -14,6 +14,28 @@ status: current
 
 ---
 
+## SPRINT-126 — Roadmap and Traceability (2026-10-18) — unreleased
+
+EPIC-022's second slice: a repo can write a phased delivery plan and see which rows nothing is delivering. **Spec 0.17.0.**
+
+**Consumer-facing:**
+- **New `roadmap.md.template`** for a phased delivery plan at `docs/product/roadmap.md`, created lazily when a delivery sequence
+  spans two or more sprints or epics. Each row of its table carries a `Status` (done · active · planned) and a `Covered by` cell
+  naming the tasks, the epic or the next slice that delivers it.
+- **Spec 0.17.0 — MINOR carrying MAJOR meaning (§15).** STANDARD §2 gains the `product/roadmap.md` row (legacy `docs/roadmap.md`,
+  matched second) and a **roadmap coverage** rule: an `active` row must be covered by an open task, an active epic or a named next
+  slice; `planned` rows are exempt. **Upgrade step:** with neither file in place, a `roadmap.md` elsewhere (outside `docs/product/`)
+  is now flagged by `S2.R-PLACEMENT` — move or rename it. A root `ROADMAP.md` is not flagged.
+- **`/prime`, `/triage` and the promote checklist report uncovered active rows** through the same procedure as epic coverage
+  (unmarked · stale task · epic not active). Promote warns for the owner to sign and never refuses on a roadmap row.
+- **`/task-decomposer --roadmap <row>`** decomposes a single row, reading its outcome, dependencies and acceptance evidence as
+  settled context, and tells you what to put in its `Covered by` cell — it never edits the roadmap. `/flow`, CONTEXT and README
+  name the roadmap as a feed source.
+
+**Maintainer-side:** EPIC-022 Closed-when 4 delivered. TASK-424 · TASK-425 pruned (§11).
+
+---
+
 ## v2.6.0 — conformance verdicts tighten (spec 0.16.0); shipped skills stop leaking lean-flow's scripts; the sprint log starts at promote (2026-10-18)
 
 **MINOR** — ships SPRINT-125 (Consumer Maturity and Cleanup) and SPRINT-124 (below). **Upgrade step:** spec 0.16.0 is MINOR carrying

@@ -105,3 +105,25 @@ takes the no-such-row path. Both were already exercised by the T3 builder (`f951
 only, not with the layers leg the gate runs. That is a sixth sighting of L-224, recorded for the Retro.
 **Impact.** T1's `Cites:` gains both as evidence-only paths, so promote-check reads 10/0. No `## Done when` change.
 **Re-confirm G2.** This adds no scope.
+
+### 2026-10-18 | merge | T2 + T3 merged `--no-ff` (disjoint files) at `fb2076f7`; wave-2 bases verified (`10784093`)
+After the merge, every roadmap mention has a reader: /prime and /triage carry the procedure that T3's CONTEXT and README text names.
+Cross-cutting legs: prose-density 28/0, layers-observed PASS, caps 0 FAIL, CONTEXT at 150 (cap).
+
+### 2026-10-18 | review | Codex (gpt-6-astra) over T2 + T3 — D2–D5 CLEAR; D1 no change; D6 fixed
+- D1 (P2): the procedure names four open folders, while STANDARD says "any folder except done/cancel". Census: the store has exactly
+  six fixed folders, so the two sets are identical, and the wording predates this sprint (epic path, `epic-coverage.md:33` at base).
+  No change.
+- D6 (P3): the promote checklist line was 567 chars. It was already over 400 and baselined, and T2 lengthened it. The coordinator
+  split it (`e048912e`, a T2 Layers file): lean-doc-generator SKILL.md is 140/140 and its long lines went from 11 to 10.
+
+### 2026-10-18 | T2 | TASK-436 — coverage reports for roadmap rows (`e76132c9`)
+`epic-coverage.md` is generalised in place, with Source A (epics, unchanged) and Source B (active roadmap rows). `/prime`'s one
+Coverage row counts both (138 lines), `/triage` lists rows in the epic line shape (133 lines), and promote gains `☐ roadmap coverage`
+(warn only). Exercised on a scratch roadmap of 5 rows: R2 · R3 · R5 uncovered, R1 covered, R4 exempt, 4 active = 1 + 3.
+
+### 2026-10-18 | T3 | TASK-437 — `--roadmap <row>` + wiring (`f9510f57`)
+The decomposer gains the input and resolution paragraph (130 lines). `/flow` Feed (62 lines), CONTEXT (150) and the README artifact
+row all name the roadmap. Box 3 was reworded by scope-change: `P2` resolves and drafts 3 row-scoped tasks, and `P2b` takes the
+no-such-row path. CHANGELOG SPRINT-126 block written. All boxes on TASK-436 and 437 ticked; tick tails carry no file paths, and
+promote-check (10/0) plus the freeze check (5/0) were re-run after the ticks (L-224).
