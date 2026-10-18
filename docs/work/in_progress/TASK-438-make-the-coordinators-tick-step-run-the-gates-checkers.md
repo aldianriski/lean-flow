@@ -28,7 +28,7 @@ A written rule the writer keeps skipping is a measured repeated failure (ADR-053
 - [ ] One tick step (this repo's own tooling — a TypeScript script run by Bun, no new `.sh`) ticks a named box with its evidence
       and then runs the freeze check and the layers-completeness check over the sprint, printing their verdict lines; a FAIL
       leaves the box ticked but names the finding and exits non-zero.
-- [ ] A retained must-FAIL case: a tick whose evidence names an undeclared path exits non-zero with `member-layers-incomplete`;
+- [x] A retained must-FAIL case: a tick whose evidence names an undeclared path exits non-zero with `member-layers-incomplete`; ✓ must-FAIL + control green in the new harness
       a sibling tick with path-free evidence passes.
 - [ ] `dispatch.md` rule 5 names the property (run the gate's own checkers after every tick), with lean-flow's script marked as
       its own reference implementation — no adopter-facing step depends on it (L-015).
