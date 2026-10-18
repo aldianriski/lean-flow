@@ -394,7 +394,7 @@ When one qualifies, write it **in full** against `templates/ADR.md.template` —
 Required sections: **Status** (`proposed | accepted | deprecated | superseded`) · **Deciders** (roles) ·
 **Context** (WHY — include a *measured blast radius* where scope drives the call, so it isn't a guess) ·
 **Decision** (stated, not hedged) · **Consequences** (**at least one Negative** — no decision is
-cost-free; "none" / "no negatives identified" is a denial, not a Negative) · **Alternatives considered** (with the reason each was rejected). Never invent a decision —
+cost-free; a bare "none" / "no negatives identified" is a denial, not a Negative) · **Alternatives considered** (with the reason each was rejected). Never invent a decision —
 record only what the user confirmed. WHY only, never HOW.
 
 For a genuinely high-stakes call, **pressure-test it before recording** — run `/council` (5 advisors +
@@ -413,7 +413,7 @@ decisions (the explicit no's matter) · deliberate deviations · constraints inv
 | `S4.APPEND` | Gated | mechanical *via git history* — a decided ADR is never edited; mark `deprecated`/`superseded` |
 | `S4.INDEX` | Structural | mechanical — `DECISIONS.md` exists and carries a row for every `docs/adr/ADR-NNN-<slug>.md`; a thin index, not a second copy of the decisions |
 | `S4.SECTIONS` | Structural | mechanical — Status · Deciders · Context · Decision · Consequences · Alternatives all present |
-| `S4.NEGATIVE` | Structural | mechanical — Consequences carries **at least one Negative**; a section whose every Negative mention is a denial (`Negative: none`, "no negatives identified") fails |
+| `S4.NEGATIVE` | Structural | mechanical — Consequences carries **at least one Negative**; a section whose every Negative mention is a bare denial (`Negative: none`, "no negatives identified", optionally "noted" / "found" …) fails; any other mention passes |
 | `S4.NOINVENT` | Gated | judgment-only — record only what was confirmed; never invent a decision |
 
 **7 rules.** Two statements in this section are deliberately **not** rules:

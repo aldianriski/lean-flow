@@ -489,6 +489,9 @@ for _id in TD-201 TD-202 TD-203 TD-204; do
   if printf '%s\n' "$_o" | grep -qF "$_id resolved at"; then
     echo "FAIL fixture(s11-td-shape-control-$_id): a recently resolved row fired -- a false positive"
     fail=1
+  elif printf '%s\n' "$_o" | grep -F "not judged:" | grep -qF "$_id"; then
+    echo "FAIL fixture(s11-td-shape-control-$_id): the recent row was listed as 'not judged' -- it was SKIPPED, so its silence proves nothing"
+    fail=1
   else
     echo "PASS fixture(s11-td-shape-control-$_id): the recent row of this shape stayed silent"
   fi

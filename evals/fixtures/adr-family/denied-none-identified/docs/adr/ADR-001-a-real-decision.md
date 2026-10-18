@@ -21,11 +21,9 @@ We chose the first option.
 
 ## Consequences
 
-**Positive:** it works, with no negatives identified in review of the happy path.
+**Positive:** it works.
 
-**Negative (trade-offs accepted):** slower to add things; there is no automated signal on growth, so a reviewer must watch it.
-
-**Negative — and this is the cost being bought, not a side effect.** The two copies can drift.
+Negative: None identified.
 
 ## Alternatives considered
 

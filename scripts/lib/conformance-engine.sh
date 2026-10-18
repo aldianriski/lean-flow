@@ -1490,15 +1490,21 @@ _adr_section() {
 # entire Negative was the word "none". Anything not provably a denial counts as real, so the rule fails closed to PASS.
 _adr_negative_class() {
   awk '
-    function denial(l) {
-      return (l ~ /(^|[^a-z])no ((significant|known|real|notable|major|material) )?negatives?( [a-z -]{0,40})?[ \t]*[.;!]*[ \t]*$/ \
-           || l ~ /negatives?[^:]{0,40}(:|-|—|–)[ \t]*(none|n\/a|nil|not applicable)[ \t]*[.;!)]*([ \t]+(identified|noted|known|at this time))?[ \t]*$/)
+    BEGIN {
+      # Qualifiers a denial may carry; ANY other trailing words ("except slower builds") make the line a real Negative.
+      Q = "(identified|noted|known|found|expected|anticipated|foreseen|at this time|to report)"
+      NONE = "(none|n/a|nil|not applicable)"
+      P = "[ \t]*[.;!)]*"
+      RPROSE = "(^|[^a-z])no ((significant|known|real|notable|major|material) )?negatives?( (consequences?|trade-?offs?|impacts?|effects?))?( (were |are |have been |has been )?" Q "| at this time| to report)*" P "[ \t]*$"
+      RLABEL = "negatives?[^:]{0,40}(:|-|—|–)[ \t]*" NONE "(" P "[ \t]+" Q ")*" P "[ \t]*$"
+      RNEXT = "^[ \t>-]*" NONE "(" P "[ \t]+" Q ")*" P "[ \t]*$"
     }
+    function denial(l) { return (l ~ RPROSE || l ~ RLABEL) }
     { l = tolower($0); gsub(/[*`_\r]/, "", l) }
     pend {
       if (l ~ /^[ \t]*$/) next
       pend = 0
-      if (l ~ /^[ \t>-]*(none|n\/a|nil|not applicable)[ \t]*[.;!)]*[ \t]*$/) den++; else real++
+      if (l ~ RNEXT) den++; else real++
     }
     l !~ /negative/ { next }
     l ~ /negatives?[^:]{0,40}:[ \t]*$/ { pend = 1; next }
