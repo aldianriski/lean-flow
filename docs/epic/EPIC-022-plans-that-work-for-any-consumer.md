@@ -41,7 +41,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-125](../sprint/archive/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | closed · `ff04f84` | Closed-when 1–3: the shipped surface stops naming lean-flow's scripts, two false-green conformance rules fixed (spec 0.16.0), migrate/prime/release-patch/templates fixed, platform epics retired; released as **2.6.0** |
-| [SPRINT-126](../sprint/archive/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | closed · `<close_commit>` | Closed-when 4: roadmap template + §2 row + coverage rule (spec 0.17.0), coverage reported by /prime · /triage · promote, `--roadmap <row>`; released as **2.7.0** |
+| [SPRINT-126](../sprint/archive/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | closed · `4ff484b` | Closed-when 4: roadmap template + §2 row + coverage rule (spec 0.17.0), coverage reported by /prime · /triage · promote, `--roadmap <row>`; released as **2.7.0** |
 
 ## Decisions
 
