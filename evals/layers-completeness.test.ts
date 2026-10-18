@@ -19,6 +19,7 @@ import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import { runLayersCompleteness } from "../scripts/lib/check-layers-completeness.ts";
+import { anomalyFinding, parsePlan } from "../scripts/lib/sprint-members.ts";
 import {
   buildArchiveSelectionPair,
   buildCaseVariantFixture,
@@ -110,7 +111,7 @@ describe("unindented-continuation (retained must-FAIL fixture)", () => {
   test("FAILs on a wrapped declaration line left at column 0", () => {
     expect(r.exitCode).toBe(1);
     expect(r.output).toContain(
-      "declaration continuation: a wrapped Layers line must be indented",
+      "declaration continuation: column-0 line 30 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
     );
   });
 });
@@ -329,5 +330,150 @@ describe("member-clean (sibling control -- every member governed and covered)", 
     expect(r.exitCode).toBe(0);
     expect(r.output).toContain(`PASS  member-layers-complete: ${dir} ### T1 member docs/work/todo/TASK-939-ok.md (TASK-939)`);
     expect(r.output.split("\n").filter((l) => l.startsWith("FAIL")).length).toBe(0);
+  });
+});
+
+// --- SPRINT-128 T1 (TASK-443): a Done-when BARE filename vs a full-path Layers: entry (TD-178 · TD-215) --
+// A bare `one.ts` is declared when EXACTLY ONE Layers: path ends in that basename. Two such paths make the
+// prose ambiguous (which one?), so it stays undeclared and the finding says so; none stays undeclared too.
+// The claim-bearing cases are T1 (one match -> PASS) and T2 (two -> ambiguous FAIL); T3 and T4 are the
+// controls that pin what the rule does NOT widen to (no match, and a partial path that is not bare).
+describe("member-basename (retained must-FAIL fixture -- bare filename matched by basename, exactly once)", () => {
+  let r: Captured;
+  const dir = posix.join(FIXTURES, "member-basename/docs/sprint/SPRINT-924-fx.md");
+  beforeAll(() => {
+    r = capture([dir]);
+  });
+  test("T1: a bare filename with exactly ONE basename match in Layers: is declared (PASS)", () => {
+    expect(r.output).toContain(`PASS  member-layers-complete: ${dir} ### T1 member docs/work/todo/TASK-940-one-match.md (TASK-940)`);
+    expect(r.output).not.toContain("TASK-940) Done when implies");
+  });
+  test("T2: a bare filename with TWO basename matches stays undeclared and is named ambiguous", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(
+      `FAIL  member-layers-incomplete: ${dir} ### T2 member docs/work/todo/TASK-941-two-matches.md (TASK-941) Done when implies dup.ts(ambiguous: 2 Layers: paths end in dup.ts), absent from that block's Layers:`,
+    );
+  });
+  test("control: no basename match is plainly undeclared, not ambiguous", () => {
+    expect(r.output).toContain("(TASK-942) Done when implies ghost.ts, absent from that block's Layers:");
+    expect(r.output).not.toContain("ghost.ts(ambiguous");
+  });
+  test("control: a partial path is compared literally, never by basename", () => {
+    expect(r.output).toContain("(TASK-943) Done when implies lib/one.ts, absent from that block's Layers:");
+  });
+});
+
+// --- SPRINT-128 T1: the column-0 wrap is NAMED, with a sibling that must stay clean -----------------
+describe("column-0 wrap named by the shared parser (retained must-FAIL fixture, completeness side)", () => {
+  let r: Captured;
+  beforeAll(() => {
+    r = capture([posix.join(FIXTURES, "unindented-continuation.md")]);
+  });
+  test("T1 (column-0 wrap) is named for the declaration it wrapped; T2 (indented wrap) is not", () => {
+    const stray = r.output.split("\n").filter((l) => l.includes("declaration continuation"));
+    expect(stray.length).toBe(1);
+    expect(stray[0]).toContain("### T1 declaration continuation: column-0 line ");
+    expect(stray[0]).toContain("after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose");
+    expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
+  });
+});
+
+// --- SPRINT-128 T1: the shared Plan parser itself (scripts/lib/sprint-members.ts parsePlan) -----------
+describe("parsePlan (the one Plan reader both Layers checkers use)", () => {
+  const doc = [
+    "# S",
+    "",
+    "## Plan",
+    "",
+    "### T1 -- first",
+    "Layers: `a.ts` · `dir/`",
+    "  `b.ts`",
+    "Depends-on: none",
+    "Cites: `TASK-901` · TASK-902 and `notes.md` `TASK-903`",
+    "",
+    "### T3a -- letter suffix",
+    "Layers: `c.ts`",
+    "`wrapped.ts`",
+    "",
+    "```",
+    "### T9 -- inside a fence",
+    "Layers: `fenced.ts`",
+    "```",
+    "",
+    "## Other",
+    "### T7 -- outside the Plan",
+    "",
+  ].join("\n");
+  const p = parsePlan(doc);
+  const byTid = (t: string) => p.blocks.find((b) => b.tid === t)!;
+
+  test("reads the Plan section only, with task headings incl. a letter suffix; fenced and out-of-Plan headings are not tasks", () => {
+    expect(p.blocks.map((b) => b.tid).filter(Boolean)).toEqual(["T1", "T3a"]);
+  });
+  test("Layers tokens include the indented continuation and keep a directory token's slash", () => {
+    expect(byTid("T1").layers).toEqual(["a.ts", "dir/", "b.ts"]);
+  });
+  test("Cites: all = every TASK id; lead = only the run that opens the declaration", () => {
+    expect(byTid("T1").cites.all).toEqual(["TASK-901", "TASK-902", "TASK-903"]);
+    expect(byTid("T1").cites.lead).toEqual(["TASK-901", "TASK-902"]);
+  });
+  test("a column-0 continuation is a named anomaly with its line number, and its tokens are not folded in", () => {
+    expect(p.anomalies).toEqual([{ kind: "column-0-continuation", decl: "Layers", line: 13, text: "`wrapped.ts`" }]);
+    expect(byTid("T3a").layers).toEqual(["c.ts"]);
+    expect(byTid("T1").anomalies).toEqual([]);
+  });
+  test("a document with no Plan section is { found: false } with no blocks of tasks, never a crash", () => {
+    const none = parsePlan("# S\n\n## Notes\nLayers: `x.ts`\n");
+    expect(none.found).toBe(false);
+    expect(none.blocks.filter((b) => b.tid !== "")).toEqual([]);
+  });
+  test("P2 (err loud): ANY backtick-led column-0 line directly after a declaration is an anomaly; a blank line ends it", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n`b.ts`, `c.ts` · `d.ts`\n\n### T2 -- t\nLayers: `a.ts`\n`README.md` describes this\n\n### T3 -- t\nLayers: `a.ts`\n\n`README.md` describes this\n");
+    expect(q.anomalies.map((a) => [a.decl, a.line])).toEqual([["Layers", 5], ["Layers", 9]]);
+    expect(anomalyFinding(q.anomalies[1]!)).toBe(
+      "declaration continuation: column-0 line 9 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
+  });
+  test("P1: a non-task `###` block has tid \"\" and carries the preceding task's tid", () => {
+    const q = parsePlan("## Plan\n\n### T1 -- t\nLayers: `a.ts`\n\n### Notes\nLayers: `n.ts`\n\n### T2 -- t\nLayers: `c.ts`\n");
+    expect(q.blocks.map((b) => [b.tid, b.carry])).toEqual([["", ""], ["T1", "T1"], ["", "T1"], ["T2", "T2"]]);
+  });
+});
+
+// --- SPRINT-128 T1 Codex R1: P1 -- a non-task `###` heading INSIDE the Plan ----------------------------
+// Completeness always dropped such a block: a Layers: beneath `### Notes` is not T1's, so T1 naming n.ts in
+// its DoD is still undeclared. (check-layers-observed keeps that Layers: with the preceding Tn -- its own test.)
+describe("notes-heading (retained must-FAIL fixture -- a non-task ### block is dropped, never merged into T1)", () => {
+  let r: Captured;
+  beforeAll(() => {
+    r = capture([posix.join(FIXTURES, "notes-heading.md")]);
+  });
+  test("T1 still FAILs: n.ts declared only under `### Notes` is undeclared for T1", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("### T1 Layers completeness: DoD/Acceptance implies n.ts, absent from Layers:");
+  });
+  test("sibling control: T2 stays clean and the Notes block is never checked itself", () => {
+    expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
+    expect(r.output).not.toContain("Notes");
+  });
+});
+
+// --- SPRINT-128 T1 owner ruling P2 (err loud): column-0 PROSE that starts with a backtick, directly after a
+// declaration, is named with the remedy -- the parser cannot tell it from a wrap (TD-138 was the silent drop).
+describe("col0-prose (retained must-FAIL fixture -- remedy named; blank-line sibling control)", () => {
+  let r: Captured;
+  beforeAll(() => {
+    r = capture([posix.join(FIXTURES, "col0-prose.md")]);
+  });
+  test("T1: prose directly after the declaration FAILs with the remedy text", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(
+      "### T1 declaration continuation: column-0 line 14 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
+  });
+  test("T2 control: the same prose after a blank line is NOT flagged", () => {
+    const hits = r.output.split("\n").filter((l) => l.includes("declaration continuation"));
+    expect(hits.length).toBe(1);
+    expect(r.output).toContain("### T2 Layers completeness (DoD-implied files all declared)");
   });
 });

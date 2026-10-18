@@ -254,3 +254,163 @@ export function resolveMembers(root: string, sprintFile: string): Member[] {
   }
   return members;
 }
+
+// --- the Plan parser (SPRINT-128 T1, TASK-443) -----------------------------------------------------
+// ONE reader of a sprint's `## Plan` for both Layers checkers (check-layers-completeness.ts,
+// check-layers-observed.ts). Before this, each carried its own `## Plan` extractor, `### Tn` heading
+// regex and `Layers:` token extractor, and the copies disagreed on a wrapped line (TD-138): completeness
+// FAILed a column-0 continuation, observed dropped it silently. The parser RETURNS that shape as a named
+// anomaly; what to do with it is the caller's.
+//
+// Reads: the `## Plan` section (exact heading, fence/comment-aware via scanBlocks -- a hidden line is
+// prose, never a heading or a declaration); `### Tn` headings with an optional letter suffix (`T3a`);
+// per block the `Layers:` / `Cites:` / `Depends-on:` declarations with their indented continuation lines.
+// A `### ` heading that is not task-shaped (and any text before the first heading) yields a block with
+// tid "" -- callers that only want tasks filter on `tid !== ""`.
+
+export type PlanDecl = "Layers" | "Cites" | "Depends-on";
+
+export interface PlanLine {
+  n: number; // 1-based line in the whole file
+  tag: PlanDecl | "P"; // P = prose (anything that is not part of a declaration)
+  text: string; // a declaration line: the value after its key / the continuation, left-trimmed
+}
+
+/** A column-0 line that STARTS with a backtick directly after a declaration line (not indented). Named,
+ * never dropped: whether it is a wrapped declaration or prose is a guess, so the caller reports it. */
+export interface PlanAnomaly {
+  kind: "column-0-continuation";
+  decl: PlanDecl;
+  line: number;
+  text: string;
+}
+
+export interface PlanBlock {
+  tid: string; // "T3", "T3a"; "" for text before the first heading or under a non-task `###`
+  heading: string; // the `### ` line verbatim ("" before the first heading)
+  /** The tid of the nearest `### Tn` at or above this block: `tid` for a task block, the PRECEDING task for a
+   * non-task `###` block (e.g. `### Notes`), "" before any task. Observed attributes a Layers: under a
+   * non-task heading to this task (its old behaviour); completeness drops the block (tid ""). */
+  carry: string;
+  line: number; // 1-based line of the heading (the first Plan line for the preamble)
+  lines: PlanLine[]; // every line after the heading, classified
+  /** backtick-delimited Layers: tokens, in order, not deduped; directory tokens keep their `/`. */
+  layers: string[];
+  cites: {
+    /** backtick-delimited tokens */
+    tokens: string[];
+    /** every `TASK-NNN` the declaration names */
+    all: string[];
+    /** the run of `TASK-NNN` ids that OPENS the declaration, before its first non-TASK token */
+    lead: string[];
+    /** every `Tn` the declaration names (the Cites: escape for a prose-referenced task) */
+    tids: string[];
+  };
+  dependsOn: string[]; // `Tn` / `TASK-NNN` ids named on Depends-on:
+  /** each declaration's joined value text (continuations included), "" when absent */
+  text: Record<PlanDecl, string>;
+  anomalies: PlanAnomaly[];
+}
+
+export interface ParsedPlan {
+  found: boolean; // a `## Plan` section exists
+  lines: string[]; // the section body, heading excluded (fenced/commented lines included)
+  blocks: PlanBlock[];
+  anomalies: PlanAnomaly[]; // every block's, in file order
+}
+
+const PLAN_TASK_HEADING = /^### (T[0-9]+[a-z]?)\b/;
+const PLAN_DECL_KEY = /^(Layers|Depends-on|Cites):[ \t]*/;
+
+function backtickTokens(text: string): string[] {
+  const out: string[] = [];
+  for (const line of text.split("\n")) for (const m of line.match(/`[^`]+`/g) ?? []) out.push(m.slice(1, -1));
+  return out;
+}
+
+/** The `TASK-NNN` ids at the START of a Cites value, skipping separators; stops at the first other token. */
+function leadTaskIds(text: string): string[] {
+  const out: string[] = [];
+  let rest = text;
+  for (;;) {
+    const m = /^[\s,;·•|&+`]*(?:and\s+)?(TASK-[0-9]+)(?![0-9])/.exec(rest);
+    if (!m) break;
+    out.push(m[1]!);
+    rest = rest.slice(m[0].length);
+  }
+  return out;
+}
+
+/** The one finding text for a column-0 anomaly, shared by both checkers. It errs LOUD (owner ruling,
+ * SPRINT-128 T1): a backtick-led column-0 line right after a declaration is either a wrapped declaration
+ * (silently dropping its paths was TD-138) or prose, and the parser cannot tell which -- so the author fixes it. */
+export function anomalyFinding(a: PlanAnomaly): string {
+  return `declaration continuation: column-0 line ${a.line} after the ${a.decl}: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose`;
+}
+
+export function parsePlan(content: string): ParsedPlan {
+  const body: { n: number; line: string; hidden: boolean }[] = [];
+  let inside = false;
+  let found = false;
+  scanBlocks(content).forEach(({ line, hidden }, i) => {
+    if (!hidden) {
+      const name = headingName(line);
+      if (name !== null) {
+        inside = name === "Plan";
+        found ||= inside;
+        return;
+      }
+    }
+    if (inside) body.push({ n: i + 1, line, hidden });
+  });
+
+  const blocks: PlanBlock[] = [];
+  const open = (tid: string, heading: string, line: number): PlanBlock => {
+    const b: PlanBlock = {
+      tid, heading, line, carry: tid !== "" ? tid : (blocks[blocks.length - 1]?.carry ?? ""), lines: [], layers: [],
+      cites: { tokens: [], all: [], lead: [], tids: [] },
+      dependsOn: [], text: { Layers: "", Cites: "", "Depends-on": "" }, anomalies: [],
+    };
+    blocks.push(b);
+    return b;
+  };
+  let cur = open("", "", body[0]?.n ?? 0);
+  let decl: PlanDecl | null = null;
+  for (const { n, line, hidden } of body) {
+    if (!hidden && line.startsWith("### ")) {
+      cur = open(PLAN_TASK_HEADING.exec(line)?.[1] ?? "", line, n);
+      decl = null;
+      continue;
+    }
+    const key = hidden ? null : PLAN_DECL_KEY.exec(line);
+    if (key) {
+      decl = key[1] as PlanDecl;
+      cur.lines.push({ n, tag: decl, text: line.slice(key[0].length) });
+    } else if (!hidden && decl !== null && /^[ \t]+[^ \t]/.test(line)) {
+      cur.lines.push({ n, tag: decl, text: line.replace(/^[ \t]+/, "") });
+    } else if (!hidden && decl !== null && line.startsWith("`")) {
+      cur.anomalies.push({ kind: "column-0-continuation", decl, line: n, text: line });
+      cur.lines.push({ n, tag: "P", text: line });
+      decl = null;
+    } else {
+      cur.lines.push({ n, tag: "P", text: line });
+      decl = null;
+    }
+  }
+
+  for (const b of blocks) {
+    for (const k of ["Layers", "Cites", "Depends-on"] as const) {
+      b.text[k] = b.lines.filter((l) => l.tag === k).map((l) => l.text).join(" ");
+    }
+    b.layers = backtickTokens(b.lines.filter((l) => l.tag === "Layers").map((l) => l.text).join("\n"));
+    const c = b.lines.filter((l) => l.tag === "Cites").map((l) => l.text).join("\n");
+    b.cites = {
+      tokens: backtickTokens(c),
+      all: c.match(/\bTASK-[0-9]+(?![0-9])/g) ?? [],
+      lead: leadTaskIds(c.replace(/\n/g, " ")),
+      tids: b.text.Cites.match(/\bT[0-9]+\b/g) ?? [],
+    };
+    b.dependsOn = b.text["Depends-on"].match(/\b(?:T[0-9]+|TASK-[0-9]+)\b/g) ?? [];
+  }
+  return { found, lines: body.map((b) => b.line), blocks, anomalies: blocks.flatMap((b) => b.anomalies) };
+}

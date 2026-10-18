@@ -52,7 +52,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { resolveMembers, section, type Member } from "./sprint-members.ts";
+import { anomalyFinding, parsePlan, resolveMembers, section, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151) ---------------------------------------
 // Ported from scripts/lib/archive-path.sh's lf_is_archived_path(). Two tests, in the SAME order:
@@ -102,128 +102,9 @@ export function isArchivedPath(p: string): boolean {
   return false;
 }
 
-// --- text extraction, ported from check-layers-completeness.sh + the layers_tokens() it shares
-// with check-layers-observed.sh (TD-142) ----------------------------------------------------------
-
-/** `awk '/^## Plan/{f=1;next} /^## /{f=0} f'` -- the "## Plan" section's body, header lines excluded. */
-export function extractPlanLines(content: string): string[] {
-  // \r is stripped here to match this repo's toolchain empirically: on this host, awk/grep/sed all
-  // silently drop \r from CRLF input (verified directly -- every sprint file in this repo is CRLF,
-  // core.autocrlf=true, and the oracle's own output carries zero 0x0D bytes). Normalizing at the one
-  // read site means every downstream regex below can assume LF-only text, exactly like the oracle's.
-  const lines = content.replace(/\r\n/g, "\n").split("\n");
-  let f = false;
-  const out: string[] = [];
-  for (const line of lines) {
-    if (/^## Plan/.test(line)) {
-      f = true;
-      continue;
-    }
-    if (/^## /.test(line)) {
-      f = false;
-      continue;
-    }
-    if (f) out.push(line);
-  }
-  return out;
-}
-
-export interface RawBlock {
-  /** e.g. "### T1" -- the FULL matched prefix, never just "T1" (ported verbatim: the oracle's own
-   *  `grep -oE '^### T[0-9]+'` captures the heading marker too, and every message prints this whole
-   *  string). A heading with a letter suffix (`### T2a`) yields "### T2" -- the digits-only class is
-   *  the oracle's own regex, not a simplification made here. */
-  tidFull: string;
-  text: string;
-}
-
-/** Splits "## Plan" body lines into per-`### `-heading blocks, mirroring the oracle's read loop.
- *  A `### ` heading that is not `### T<digits>...` yields tidFull="" and its whole block (including
- *  any task-shaped content it contains) is silently dropped -- never merged into a neighbour, never
- *  checked itself. Ported, not "fixed": this is the oracle's own behaviour for e.g. "### Retro". */
-export function extractBlocks(planLines: readonly string[]): RawBlock[] {
-  const blocks: RawBlock[] = [];
-  let tid = "";
-  let blk: string[] = [];
-  for (const line of planLines) {
-    if (line.startsWith("### ")) {
-      if (tid !== "") blocks.push({ tidFull: tid, text: blk.join("\n") });
-      const m = /^### T[0-9]+/.exec(line);
-      tid = m ? m[0] : "";
-      blk = [line];
-    } else {
-      blk.push(line);
-    }
-  }
-  if (tid !== "") blocks.push({ tidFull: tid, text: blk.join("\n") });
-  return blocks;
-}
-
-interface ClassifiedLine {
-  tag: string; // "Layers" | "Depends-on" | "Cites" | "STRAY" | "P"
-  text: string;
-}
-
-const DECL_KEY_RE = /^(Layers|Depends-on|Cites):[ \t]*/;
-
-/** Ports classify()'s awk script line-for-line, same rule order (each line matches exactly one
- *  branch, mirroring awk's `next`-terminated pattern-action list). */
-export function classify(blockText: string): ClassifiedLine[] {
-  const lines = blockText.split("\n");
-  const out: ClassifiedLine[] = [];
-  let cur = "";
-  for (const raw of lines) {
-    if (/^### /.test(raw)) {
-      cur = "";
-      continue;
-    }
-    const declMatch = DECL_KEY_RE.exec(raw);
-    if (declMatch) {
-      cur = declMatch[1]!;
-      out.push({ tag: cur, text: raw.slice(declMatch[0].length) });
-      continue;
-    }
-    if (cur !== "" && /^[ \t]+[^ \t]/.test(raw)) {
-      out.push({ tag: cur, text: raw.replace(/^[ \t]+/, "") });
-      continue;
-    }
-    if (cur !== "" && raw.startsWith("`")) {
-      out.push({ tag: "STRAY", text: cur });
-      cur = "";
-      out.push({ tag: "P", text: raw });
-      continue;
-    }
-    cur = "";
-    out.push({ tag: "P", text: raw });
-  }
-  return out;
-}
-
-/** declval(): joined value text for one declaration key, trailing space included when non-empty --
- *  ported verbatim from `sed -n "s/^$2|//p" | tr '\n' ' '`, whose trailing newline (re-added by the
- *  `printf '%s\n'` ahead of it) becomes a trailing space nothing downstream ever strips. */
-function declval(cls: readonly ClassifiedLine[], key: string): string {
-  const vals = cls.filter((c) => c.tag === key).map((c) => c.text);
-  return vals.length > 0 ? vals.join(" ") + " " : "";
-}
-
-function proseOf(cls: readonly ClassifiedLine[]): string {
-  return cls
-    .filter((c) => c.tag === "P")
-    .map((c) => c.text)
-    .join("\n");
-}
-
-function straysRaw(cls: readonly ClassifiedLine[]): string[] {
-  return cls.filter((c) => c.tag === "STRAY").map((c) => c.text);
-}
-
-/** layers_tokens(): every backtick-delimited span in `text`, backticks stripped, IN ORDER (dedup is
- *  the caller's job, exactly as in the shell -- callers pipe this through `sort -u`). */
-export function layersTokens(text: string): string[] {
-  const matches = text.match(/`[^`]+`/g) ?? [];
-  return matches.map((m) => m.slice(1, -1));
-}
+// The Plan is read by parsePlan() in sprint-members.ts -- the one parser both Layers checkers share
+// (SPRINT-128 T1). This file used to carry its own `## Plan` extractor, `### Tn` regex, classify() and
+// token extractor; they disagreed with check-layers-observed.ts on a wrapped line (TD-138).
 
 // --- the one batched subprocess: sort+dedup every group across the whole run in a single call ----
 
@@ -263,7 +144,7 @@ interface BlockCheckInputs {
   depsLine: string;
   citesLine: string;
   prose: string;
-  strays: string[]; // sorted, deduped
+  strays: string[]; // one finding text per column-0 anomaly, in file order
   citesToks: string[]; // sorted, deduped
   citesTids: string[]; // sorted, deduped
   layersToks: string[]; // sorted, deduped
@@ -284,12 +165,7 @@ function runCheckBlock(inp: BlockCheckInputs): { lines: string[]; anyFail: boole
   const { sp, tidFull, tshort, depsLine, prose, layersLine } = inp;
 
   // -- unindented continuation ----------------------------------------------------------------
-  const straysJoined = inp.strays.length > 0 ? inp.strays.join(" ") + " " : "";
-  if (straysJoined.trim() !== "") {
-    bad(
-      `${sp} ${tidFull} declaration continuation: a wrapped ${straysJoined}line must be indented to continue; at column 0 it reads as prose`,
-    );
-  }
+  for (const text of inp.strays) bad(`${sp} ${tidFull} ${text}`);
 
   const layersSet = new Set(inp.layersToks);
   const citesSet = new Set(inp.citesToks);
@@ -418,6 +294,17 @@ export function evaluateMemberLayers(
       let miss = "";
       for (const t of implied) {
         if (layers.has(t) || cites.has(t) || dirs.some((d) => t.startsWith(d))) continue;
+        // A bare filename (TD-178 / TD-215) is declared by a Layers: path whose basename it equals --
+        // when exactly ONE does. Two paths share the name: which one the prose means is a guess, so
+        // it stays undeclared and the finding says why.
+        if (!t.includes("/")) {
+          const same = [...layers].filter((p) => !p.endsWith("/") && p.slice(p.lastIndexOf("/") + 1) === t);
+          if (same.length === 1) continue;
+          if (same.length > 1) {
+            miss += ` ${t}(ambiguous: ${same.length} Layers: paths end in ${t})`;
+            continue;
+          }
+        }
         miss += " " + t;
       }
       if (/TD-[0-9]+/.test(doneWhen) && /resolved/i.test(doneWhen)) {
@@ -479,33 +366,34 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
     if (isArchivedPath(sp)) continue;
 
     const content = readFileSync(sp, "utf8");
-    const planLines = extractPlanLines(content);
-    const blocks = extractBlocks(planLines);
     const decls: BlockDecl[] = [];
 
-    for (const block of blocks) {
-      const tshortMatch = /T[0-9]+/.exec(block.tidFull);
-      const tshort = tshortMatch ? tshortMatch[0] : "";
-      const cls = classify(block.text);
+    for (const block of parsePlan(content).blocks) {
+      if (block.tid === "") continue; // text before the first heading / under a non-task `###`: never checked
+      const tidFull = `### ${block.tid}`;
+      const tshort = block.tid;
 
-      const layersLine = declval(cls, "Layers");
-      const depsLine = declval(cls, "Depends-on");
-      const citesLine = declval(cls, "Cites");
-      const prose = proseOf(cls);
+      const layersLine = block.text.Layers;
+      const depsLine = block.text["Depends-on"];
+      const citesLine = block.text.Cites;
+      const prose = block.lines
+        .filter((l) => l.tag === "P")
+        .map((l) => l.text)
+        .join("\n");
 
-      const citesTokItems = layersTokens(citesLine);
-      const citesTidItems = citesLine.match(TID_RE) ?? [];
-      const layersTokItems = layersTokens(layersLine);
+      const citesTokItems = block.cites.tokens;
+      const citesTidItems = block.cites.tids;
+      const layersTokItems = block.layers;
       const tokItems = (prose.match(FILE_TOKEN_RE) ?? []).map((m) => m.slice(1, -1));
       const strippedLayersLine = layersLine.replace(/`[^`]*`/g, "");
       const layersBareItems = strippedLayersLine.match(BARE_TOKEN_RE) ?? [];
       const oidItems = prose.match(TID_RE) ?? [];
-      const strayItems = straysRaw(cls);
+      const strayItems = block.anomalies.map(anomalyFinding);
 
       const index = pending.length;
       pending.push({
         sp,
-        tidFull: block.tidFull,
+        tidFull,
         tshort,
         layersLine,
         depsLine,
@@ -521,8 +409,8 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
       });
       emit.push({ kind: "block", index });
       decls.push({
-        tidFull: block.tidFull,
-        citedTasks: new Set(citesLine.match(/\bTASK-\d+\b/g) ?? []),
+        tidFull,
+        citedTasks: new Set(block.cites.all),
         layersToks: layersTokItems,
         citesToks: citesTokItems,
       });
@@ -543,11 +431,10 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
   // read them back by position.
   const groups: string[][] = [];
   const groupIdx: Record<
-    "strays" | "citesToks" | "citesTids" | "layersToks" | "toks" | "layersBare" | "oids",
+    "citesToks" | "citesTids" | "layersToks" | "toks" | "layersBare" | "oids",
     number[]
-  > = { strays: [], citesToks: [], citesTids: [], layersToks: [], toks: [], layersBare: [], oids: [] };
+  > = { citesToks: [], citesTids: [], layersToks: [], toks: [], layersBare: [], oids: [] };
   for (const p of pending) {
-    groupIdx.strays.push(groups.push(p.strayItems) - 1);
     groupIdx.citesToks.push(groups.push(p.citesTokItems) - 1);
     groupIdx.citesTids.push(groups.push(p.citesTidItems) - 1);
     groupIdx.layersToks.push(groups.push(p.layersTokItems) - 1);
@@ -580,7 +467,7 @@ export function runLayersCompleteness(args: readonly string[]): RunResult {
       depsLine: p.depsLine,
       citesLine: p.citesLine,
       prose: p.prose,
-      strays: sorted[groupIdx.strays[i]!]!,
+      strays: p.strayItems,
       citesToks: sorted[groupIdx.citesToks[i]!]!,
       citesTids: sorted[groupIdx.citesTids[i]!]!,
       layersToks: sorted[groupIdx.layersToks[i]!]!,

@@ -203,6 +203,132 @@ describe("atClose on a v2 sprint is derived from the members, not Plan checkboxe
   });
 });
 
+// --- SPRINT-128 T1 (TASK-443): the Plan path, now that the shared parser reads it ---------------------
+// check-layers-observed.sh's Plan-path cases were Shell-only and were retired with it (T4). These carry
+// them on the TS checker, in a v1 repo (no docs/work store, so no member leg runs).
+const planOnly = (plan: string) => build("plan-" + Math.random().toString(36).slice(2, 8), { plan }, []);
+const TWO_TASKS =
+  "### T1 -- first [size: S]\nLayers: `src/a.ts`\nDepends-on: none\n\n### T2 -- second [size: S]\nLayers: `src/other.ts`\nDepends-on: none\n";
+
+describe("Plan path: a Tn commit is checked against THAT Tn's Layers", () => {
+  const d = planOnly(TWO_TASKS);
+  writeFile(d, "src/other.ts", "o2\n");
+  commitAll(d, "sprint(901) T1: stray into T2's file");
+  writeFile(d, "src/other.ts", "o3\n");
+  commitAll(d, "sprint(901) T2: its own file");
+  const r = run(d);
+  test("MUST-FAIL: T1 touching a file only T2 declared is named", () => {
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("changed by a task that never declared it: T1:src/other.ts");
+  });
+  test("sibling control: T2 touching its own file is not named", () => {
+    expect(r.out).not.toContain("T2:src/other.ts");
+  });
+});
+
+describe("Plan path: declaration shapes the parser must read", () => {
+  test("an INDENTED continuation line is part of the declaration (PASS)", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts` ·\n  `src/other.ts`\nDepends-on: none\n");
+    writeFile(d, "src/other.ts", "o2\n");
+    commitAll(d, "sprint(901) T1: edit other");
+    const r = run(d);
+    expect(r.fail).toBe(false);
+    expect(r.out).not.toContain("declaration continuation");
+  });
+  test("a declared DIRECTORY token covers a file under it (PASS)", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/`\nDepends-on: none\n");
+    writeFile(d, "src/other.ts", "o2\n");
+    commitAll(d, "sprint(901) T1: edit other");
+    expect(run(d).fail).toBe(false);
+  });
+  test("MUST-FAIL: uncommitted work in a file NO task declared is named (WIP union leg)", () => {
+    const d = planOnly(TWO_TASKS);
+    writeFile(d, "docs/zz.md", "wip\n");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("changed but undeclared in any task's Layers:: docs/zz.md");
+  });
+  test("sibling control: uncommitted work in a file ANY task declared is only a WIP skip", () => {
+    const d = planOnly(TWO_TASKS);
+    writeFile(d, "src/other.ts", "o2\n");
+    const r = run(d);
+    expect(r.fail).toBe(false);
+    expect(r.out).toContain("[WIP, unattributed]");
+  });
+});
+
+describe("column-0 wrap is NAMED, not dropped (TD-138; completeness already FAILed it)", () => {
+  test("MUST-FAIL: a Layers: line wrapped at column 0 is named with its line, and never passes", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts` ·\n`src/other.ts`\nDepends-on: none\n");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain(
+      "declaration continuation: column-0 line 14 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
+    expect(r.out).not.toContain("PASS");
+  });
+  test("sibling control: the same declaration wrapped with an indent is clean", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts` ·\n  `src/other.ts`\nDepends-on: none\n");
+    const r = run(d);
+    expect(r.fail).toBe(false);
+    expect(r.out).not.toContain("declaration continuation");
+  });
+});
+
+describe("P2 (err loud): column-0 PROSE starting with a backtick directly after a declaration is named", () => {
+  test("MUST-FAIL: named with the remedy", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts`\n`some note` describes this\nDepends-on: none\n");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain(
+      "declaration continuation: column-0 line 14 after the Layers: declaration -- indent it to continue the declaration, or separate it with a blank line if it is prose",
+    );
+  });
+  test("control: the same prose separated by a blank line is not flagged", () => {
+    const d = planOnly("### T1 -- t [size: S]\nLayers: `src/a.ts`\n\n`some note` describes this\nDepends-on: none\n");
+    const r = run(d);
+    expect(r.fail).toBe(false);
+    expect(r.out).not.toContain("declaration continuation");
+  });
+});
+
+describe("P1: Layers: under a non-task `### Notes` heading stays with the PRECEDING Tn (observed's old reading)", () => {
+  const plan =
+    "### T1 -- first [size: S]\nLayers: `src/a.ts`\nDepends-on: none\n\n### Notes\nLayers: `src/other.ts`\n\n### T2 -- second [size: S]\nLayers: `src/a.ts`\nDepends-on: none\n";
+  const d = planOnly(plan);
+  writeFile(d, "src/other.ts", "o2\n");
+  commitAll(d, "sprint(901) T1: edits the file declared under Notes");
+  writeFile(d, "src/other.ts", "o3\n");
+  commitAll(d, "sprint(901) T2: same file, T2 never declared it");
+  const r = run(d);
+  test("T2 touching it is named (not declared by T2)", () => {
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("changed by a task that never declared it: T2:src/other.ts");
+  });
+  test("MUST-FAIL if broken: T1 touching it is NOT named (the Notes Layers: belongs to T1)", () => {
+    expect(r.out).not.toContain("T1:src/other.ts");
+  });
+});
+
+describe("a `sprint(NNN) Tn:` subject attributes to Tn only for THIS sprint (TD-248)", () => {
+  const d = planOnly(TWO_TASKS);
+  writeFile(d, "src/a.ts", "a2\n");
+  commitAll(d, "sprint(902) T1: another sprint's T1, same file T1 declares");
+  writeFile(d, "src/a.ts", "a3\n");
+  commitAll(d, "sprint(902) T1 fix: another sprint's qualified T1");
+  writeFile(d, "src/a.ts", "a4\n");
+  commitAll(d, "sprint(901) T1: this sprint's T1");
+  const r = run(d);
+  test("MUST-FAIL: another sprint's `sprint(902) Tn:` and `sprint(902) Tn <qualifier>:` attribute to no task", () => {
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("commit attributable to no task and not coordinator bookkeeping:");
+    expect(r.out.match(/:src\/a\.ts/g)?.length).toBe(2);
+  });
+  test("sibling control: this sprint's own `sprint(901) T1:` is attributed and covered", () => {
+    expect(r.out).not.toContain("changed by a task that never declared it");
+  });
+});
+
 // keep writeFileSync/mkdirSync imports honest for future fixtures
 void writeFileSync;
 void mkdirSync;

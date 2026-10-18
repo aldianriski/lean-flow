@@ -8,11 +8,10 @@
 // task_decls()/layers_tokens() invoked per line, each backed by a real awk/sed/grep/tr fork). Ruled
 // spawn-shaped and portable.
 //
-// scripts/lib/check-layers-observed.sh REMAINS THE ORACLE (D5) and is RETAINED, unmodified. This
-// file is the migrated implementation being checked AGAINST it, never the other way -- was verified
-// by evals/run-layers-observed-differential.ts (cut at SPRINT-113 T1, ADR-050) for the row-by-row
-// proof this port agrees with the oracle. Any divergence is a defect in THIS file; the fix is here,
-// never a "cleanup" of the shell.
+// scripts/lib/check-layers-observed.sh WAS THE ORACLE (D5) and was RETIRED at SPRINT-128 T4 (TASK-446):
+// this file is now the only implementation. It was verified against the oracle row-by-row by
+// evals/run-layers-observed-differential.ts (cut at SPRINT-113 T1, ADR-050) before that. The Plan is
+// read by parsePlan() in sprint-members.ts, shared with check-layers-completeness.ts (SPRINT-128 T1).
 //
 // PORTING PRINCIPLE, stated once: every `git` invocation below is a 1:1 copy of the oracle's own git
 // command line (same subcommand, same flags, same argument shape) -- git itself is not a spawn this
@@ -33,7 +32,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, posix } from "node:path";
-import { section, resolveMembers, type Member } from "./sprint-members.ts";
+import { section, resolveMembers, anomalyFinding, parsePlan, sprintNumber, type Member } from "./sprint-members.ts";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151), identical logic to the copy in
 // check-layers-completeness.ts -- both are independent, byte-identical ports of the SAME shell
@@ -92,127 +91,6 @@ export function fmv(lines: readonly string[], key: string): string {
     if (re.test(line)) return line.replace(stripRe, "");
   }
   return "";
-}
-
-/** `awk '/^## Plan/{f=1;next} /^## /{f=0} f'` -- the "## Plan" section's body, header lines excluded.
- *  Ported identically to check-layers-completeness.ts's own extractPlanLines (same oracle rule). */
-export function extractPlanLines(content: string): string[] {
-  const lines = content.replace(/\r\n/g, "\n").split("\n");
-  let f = false;
-  const out: string[] = [];
-  for (const line of lines) {
-    if (/^## Plan/.test(line)) {
-      f = true;
-      continue;
-    }
-    if (/^## /.test(line)) {
-      f = false;
-      continue;
-    }
-    if (f) out.push(line);
-  }
-  return out;
-}
-
-/** layers_tokens(): every backtick-delimited span, backticks stripped, extracted PER LINE -- the
- *  oracle's `grep -oE` processes line by line (POSIX grep never matches across a newline), so a
- *  multi-line input here must not let `[^\`]` in a JS regex silently span lines the oracle's grep
- *  never would. Safe for both a single already-isolated line (task_decls' per-line "rest" values)
- *  and a multi-line joined block (the plan-level Layers: union) -- both call sites in this file. */
-export function layersTokensMultiline(text: string): string[] {
-  const out: string[] = [];
-  for (const line of text.split("\n")) {
-    const matches = line.match(/`[^`]+`/g) ?? [];
-    for (const m of matches) out.push(m.slice(1, -1));
-  }
-  return out;
-}
-
-/** extractLayersLines(): the PLAN-LEVEL (all tasks combined) Layers: declaration lines, ported from:
- *  `awk '/^Layers:/{inl=1;print;next} inl && /^[ \t]+[^ \t]/{print;next} {inl=0}'`. Used only to
- *  build the all-task union (layersAll) consumed by the WIP/uncommitted leg. */
-export function extractLayersLines(planLines: readonly string[]): string[] {
-  const out: string[] = [];
-  let inl = false;
-  for (const line of planLines) {
-    if (/^Layers:/.test(line)) {
-      inl = true;
-      out.push(line);
-      continue;
-    }
-    if (inl && /^[ \t]+[^ \t]/.test(line)) {
-      out.push(line);
-      continue;
-    }
-    inl = false;
-  }
-  return out;
-}
-
-export interface TaskDecl {
-  task: string; // "T<n>" -- NOT prefixed with "### ", matching task_decls()'s own `cur` capture
-  token: string;
-}
-
-/** task_decls(): per-task declared Layers: tokens, one {task, token} pair per backtick-quoted token,
- *  ported from the awk + while-read pipeline described in the oracle's own comment above it. */
-export function taskDecls(planLines: readonly string[]): TaskDecl[] {
-  const out: TaskDecl[] = [];
-  let cur = "";
-  let inl = false;
-  for (const line of planLines) {
-    if (/^### T[0-9]+/.test(line)) {
-      const m = /T[0-9]+/.exec(line);
-      cur = m ? m[0] : "";
-      inl = false;
-      continue;
-    }
-    if (/^Layers:/.test(line)) {
-      inl = true;
-      const rest = line.replace(/^Layers:[ \t]*/, "");
-      for (const tok of layersTokensMultiline(rest)) out.push({ task: cur, token: tok });
-      continue;
-    }
-    if (inl && /^[ \t]+[^ \t]/.test(line)) {
-      const rest = line.replace(/^[ \t]+/, "");
-      for (const tok of layersTokensMultiline(rest)) out.push({ task: cur, token: tok });
-      continue;
-    }
-    inl = false;
-  }
-  return out;
-}
-
-/** SPRINT-110 T2 (TASK-391): `Tn` -> the TASK ids its `Cites:` line (plus indented continuation lines)
- *  names, read from the Plan's own `### Tn` blocks. Pattern: check-authority.ts parseCites. A Tn with
- *  no Cites: line, or none TASK-shaped, is absent from the map. */
-export function planCites(planLines: readonly string[]): Map<string, string[]> {
-  const map = new Map<string, string[]>();
-  let cur: string | null = null;
-  let inCites = false;
-  for (const line of planLines) {
-    const h = /^### (T[0-9]+)\b/.exec(line);
-    if (h) {
-      cur = h[1]!;
-      inCites = false;
-      continue;
-    }
-    if (/^#{1,3} /.test(line)) {
-      cur = null;
-      inCites = false;
-      continue;
-    }
-    if (cur === null) continue;
-    const isCites = /^Cites:/.test(line);
-    if (isCites || (inCites && /^[ \t]+[^ \t]/.test(line))) {
-      inCites = true;
-      const ids = [...line.matchAll(/\bTASK-[0-9]+(?![0-9])/g)].map((m) => m[0]);
-      if (ids.length > 0) map.set(cur, [...(map.get(cur) ?? []), ...ids]);
-      continue;
-    }
-    inCites = false;
-  }
-  return map;
 }
 
 /** v2 "at close", derived from the members (a by-reference Plan has no `- [ ]` boxes, so the v1 rule
@@ -278,11 +156,22 @@ export function isGovernanceCommit(files: readonly string[]): boolean {
 // numbered comment (Task: trailer, then subject forms, in order, then COORD, then GOVERNANCE, then
 // UNATTRIBUTED). The governance check is a thunk so it is evaluated lazily, exactly as the shell's
 // short-circuiting `&&` chain only calls is_governance_commit() when nothing earlier resolved. -----
-export function attribute(subject: string, trailerTask: string, isGovernance: () => boolean): string {
+export function attribute(
+  subject: string,
+  trailerTask: string,
+  isGovernance: () => boolean,
+  sprintNo: number | null = null,
+): string {
   if (/^T[0-9]/.test(trailerTask)) return trailerTask;
 
-  let m = /^sprint\([0-9]+\) +(T[0-9]+):/.exec(subject);
-  if (m) return m[1]!;
+  // TD-248: `sprint(NNN) Tn` names a task of sprint NNN. A commit of ANOTHER sprint that this sprint's
+  // plan_commit range happens to contain is not this sprint's Tn, so it attributes to no task (and
+  // falls through to the COORD / GOVERNANCE / UNATTRIBUTED rules). `sprintNo` null = the sprint under
+  // check is unknown: nothing to compare, the old behaviour.
+  const ownSprint = (s: string): boolean => sprintNo === null || Number(s) === sprintNo;
+
+  let m = /^sprint\(([0-9]+)\) +(T[0-9]+):/.exec(subject);
+  if (m && ownSprint(m[1]!)) return m[2]!;
   m = /^merge\([^)]*\): *(T[0-9]+)[^0-9]/.exec(subject);
   if (m) return m[1]!;
   // Rule 4, trailing parenthetical. The LEADING `.*` is load-bearing and mirrors the oracle's
@@ -299,10 +188,10 @@ export function attribute(subject: string, trailerTask: string, isGovernance: ()
 
   // Rule 2's qualifier widening (SPRINT-093 T7): `sprint(NN) T<n> <qualifier>: ...` where <qualifier>
   // is a space-then-letter-led run of [A-Za-z0-9 ] with NO embedded `T<digit>`.
-  const qm = /^sprint\([0-9]+\) +(T[0-9]+) +([A-Za-z][A-Za-z0-9 ]*):/.exec(subject);
-  if (qm) {
-    const qualifier = qm[2]!;
-    if (!/T[0-9]/.test(qualifier)) return qm[1]!;
+  const qm = /^sprint\(([0-9]+)\) +(T[0-9]+) +([A-Za-z][A-Za-z0-9 ]*):/.exec(subject);
+  if (qm && ownSprint(qm[1]!)) {
+    const qualifier = qm[3]!;
+    if (!/T[0-9]/.test(qualifier)) return qm[2]!;
   }
 
   if (/^sprint\([0-9]+\):/.test(subject)) return "COORD";
@@ -412,8 +301,8 @@ export interface RunResult {
 export function runLayersObserved(argv: readonly string[]): RunResult {
   // `--no-members` turns the member-aware legs OFF (v1 behaviour only). It existed for
   // evals/run-layers-observed-differential.ts (cut at SPRINT-113 T1, ADR-050), which compared
-  // this port to the shell oracle -- and the oracle is a Plan-path oracle that was deliberately
-  // not taught members (D1). qa-check.sh never passes it; its own test is now its only caller (TD-198).
+  // this port to the shell oracle -- a Plan-path oracle that was deliberately not taught members (D1)
+  // and was retired at SPRINT-128 T4. qa-check.sh never passes it; its own test is its only caller (TD-198).
   const noMembers = argv.includes("--no-members");
   const args = argv.filter((a) => a !== "--no-members");
   if (args.length === 0) {
@@ -466,15 +355,17 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
       continue;
     }
 
-    const planLines = extractPlanLines(content);
-    const layersLines = extractLayersLines(planLines);
-    const layersAll = layersTokensMultiline(layersLines.join("\n")).join(" ");
-    const decls = taskDecls(planLines);
+    const plan = parsePlan(content);
+    // layersAll is the all-task UNION for the WIP leg: every Layers: token in the Plan, wherever it sits.
+    const layersAll = plan.blocks.flatMap((b) => b.layers).join(" ");
     const declsByTask = new Map<string, string[]>();
-    for (const d of decls) {
-      const arr = declsByTask.get(d.task);
-      if (arr) arr.push(d.token);
-      else declsByTask.set(d.task, [d.token]);
+    // Tn -> the TASK ids its Cites: names (SPRINT-110 T2). A Tn with none is absent from the map.
+    const cites = new Map<string, string[]>();
+    for (const b of plan.blocks) {
+      // Layers: under a non-task `###` stays with the preceding Tn (b.carry); Cites: under one is dropped
+      // (b.tid ""). The two old readers differed here and each keeps its own behaviour.
+      if (b.carry !== "") declsByTask.set(b.carry, [...(declsByTask.get(b.carry) ?? []), ...b.layers]);
+      if (b.tid !== "" && b.cites.all.length > 0) cites.set(b.tid, [...(cites.get(b.tid) ?? []), ...b.cites.all]);
     }
     const mySprint = fmv(fileLines, "sprint");
 
@@ -515,13 +406,20 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     // block whose Cites: names it. `## Touches` stays prose -- never parsed. ---------------------
     const root = posix.dirname(posix.dirname(posix.dirname(sp.replace(/\\/g, "/"))));
     const members = noMembers ? [] : resolveMembers(root, sp);
-    const cites = planCites(planLines);
     const governing = (id: string): string[] => [...cites].filter(([, ids]) => ids.includes(id)).map(([t]) => t);
     const memberIds = new Set(members.map((m) => m.id));
-    let undeclaredMembers = false;
+    let earlyHit = false;
+    // A column-0 wrap of a declaration (TD-138) was read as nothing here while check-layers-completeness
+    // FAILed it: the wrapped paths silently left the declared set. Named now, never dropped.
+    for (const a of plan.anomalies) {
+      earlyHit = true;
+      bad(
+        `${sp} layers observed: ${anomalyFinding(a)}`,
+      );
+    }
     for (const m of members) {
       if (governing(m.id).length === 0) {
-        undeclaredMembers = true;
+        earlyHit = true;
         bad(
           `${sp} layers observed: member-layers-undeclared: ${m.id} (${m.path}) is cited by no ### Tn block's Cites: -- no Plan Layers govern it`,
         );
@@ -550,7 +448,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
         }
         continue;
       }
-      const who = attribute(subject, trailerTask, () => isGovernanceCommit(files));
+      const who = attribute(subject, trailerTask, () => isGovernanceCommit(files), sprintNumber(mySprint));
       const shortSha = who === "UNATTRIBUTED" ? gitRevParseShort(c) : "";
       const whoToks = who === "UNATTRIBUTED" || who === "COORD" || who === "GOVERNANCE" ? "" : (declsByTask.get(who) ?? []).join(" ");
 
@@ -568,7 +466,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     // ---- path 2: UNCOMMITTED work in progress -- unattributable, checked against the union --
     // v2 (members present): "at close" comes from the members -- the by-reference Plan has no boxes,
     // so the v1 rule is vacuously true there and applied close-time exclusions mid-execution.
-    const atClose = members.length > 0 ? membersClosed(root, members) : planLines.filter((l) => /^- \[ \]/.test(l)).length === 0;
+    const atClose = members.length > 0 ? membersClosed(root, members) : plan.lines.filter((l) => /^- \[ \]/.test(l)).length === 0;
     let miss = "";
     let nWip = 0;
     for (const f of wip()) {
@@ -577,7 +475,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
       if (!covers(layersAll, f)) miss += ` ${f}`;
     }
 
-    let hit = undeclaredMembers;
+    let hit = earlyHit;
     if (missMember !== "") {
       bad(`${sp} layers observed: member-out-of-layers: changed by a member outside its governing Tn's Layers:${missMember}`);
       hit = true;
