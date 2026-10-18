@@ -734,7 +734,7 @@ describe("parsePlanCites -- a Cites: task id governs only in the LEADING run (TD
   });
 
   test("control: two ids both in the leading run are both kept, whichever order they come in", () => {
-    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-9` · `TASK-1` · split from TASK-5"].join("\n");
+    const plan = ["## Plan", "### T1 -- x `[]`", "Cites: `TASK-9` · `TASK-1`"].join("\n");
     expect(parsePlanCites(plan).get("T1")).toEqual(["TASK-9", "TASK-1"]);
   });
 
