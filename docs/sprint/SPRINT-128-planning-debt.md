@@ -67,6 +67,7 @@ verdict-identical.
 ### T3 — The member resolver names anomalies `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/lib/sprint-members.ts` · `scripts/lib/check-authority.ts` · `scripts/lib/check-layers-completeness.ts`
   · `scripts/lib/check-layers-observed.ts` · `scripts/lib/check-verify-reaches.ts` · `scripts/lib/check-task-origin.sh`
+  · `scripts/lib/sprint-members-cli.ts`
   · `evals/`
   · `docs/work/todo/TASK-445-member-resolver-names-anomalies.md`
   · `docs/work/in_progress/TASK-445-member-resolver-names-anomalies.md`
