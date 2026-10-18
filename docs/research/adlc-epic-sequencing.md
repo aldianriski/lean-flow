@@ -30,6 +30,11 @@ guard into EPIC-008 D1 — an object with no observed event shape is excluded fr
 record format and a reader. Overlap is `spec/STANDARD.md` (§2 · §11) and `.claude/CONTEXT.md` → two lanes,
 **`spec/` owned by Lane 1** — the cross-stream rule applied before the collision, not after.
 
+**F4 — Phase C is unstarted, unblocked, absent from the backlog.** `docs/research/harness-delta.md` does not
+exist, and a census for its four candidate names returns zero hits across `docs/`, `spec/` and `skills/`;
+`harness-engineering-adaptation.md` predates the pack. Phase C feeds D, collides with nothing: the long pole.
+*(As of 2026-08-24; `harness-delta.md` has since been written, and Phase D = EPIC-008 is superseded → workdoo.)*
+
 **F5 — Phase E is mis-sequenced.** `03 § 5` requires *"at least 2 runtime **or workflow** variations prove
 abstraction pressure"* — workflow packs satisfy it, depend only on the closed Standard, and Phase E says to
 start from packs with real internal use, which the 14 skills are. Listing it after Phase D leaves a **gate
