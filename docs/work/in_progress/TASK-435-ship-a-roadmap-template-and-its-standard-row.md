@@ -25,18 +25,18 @@ progress lives in one prose line. Consumer evidence (ADR-053).
 
 ## Done when
 
-- [ ] A `roadmap.md.template` ships beside the other templates: the §3 ownership header, then Outcome · Delivery sequence
+- [x] A `roadmap.md.template` ships beside the other templates: the §3 ownership header, then Outcome · Delivery sequence ✓ `225fa9ad`: §3 header · Outcome · Delivery sequence (6-column table, Status done·active·planned, Covered by TASK/EPIC/next slice, vertical-slice rule) · Gates · Out of scope; Codex C2 CLEAR
       (a table `Row | Usable outcome | Depends on | Acceptance evidence | Status | Covered by`, Status ∈ done · active · planned,
       Covered by ∈ `TASK-NNN[, …]` · `EPIC-NNN` · `next slice: <name>`) · Gates · Out of scope, with the rule that each row is a
       reviewable vertical slice split into runnable tasks at promotion.
-- [ ] STANDARD §2 carries a `product/roadmap.md` row (created lazily when a delivery sequence spans ≥ 2 sprints or epics; cap
+- [x] STANDARD §2 carries a `product/roadmap.md` row (created lazily when a delivery sequence spans ≥ 2 sprints or epics; cap ✓ `225fa9ad`/`99f7f811`/`f16be427`: lazy row with legacy `docs/roadmap.md` + Roadmap coverage paragraph (stale only when nothing covers); 0.17.0 MINOR carrying MAJOR meaning + exact upgrade note; empirical pair: legacy tolerated, `docs/plans/roadmap.md` FAILs; Codex R2 C1 FIXED, C3 note fixed
       ~150 soft) and a "Roadmap coverage" rule: an `active` row is covered by an open task, an active epic or a named next slice;
       `planned` rows are exempt; `done` rows need nothing; a mark whose every id is done, cancelled or missing is stale. Spec
       0.17.0 (MINOR carrying MAJOR meaning under §15: the row names `docs/roadmap.md` as its legacy path, and a `roadmap.md`
       elsewhere under `docs/` is newly flagged by S2.R-PLACEMENT; no rule-table row), with its spec CHANGELOG block and upgrade note.
-- [ ] `/lean-doc-generator` creates it as an ordinary `<type> <subject>` doc, and every template count claim agrees
+- [x] `/lean-doc-generator` creates it as an ordinary `<type> <subject>` doc, and every template count claim agrees ✓ `225fa9ad`: bundled-assets bullet (139 lines); counts 34 + 2 = 36 in CLAUDE.md · CONTEXT.md · README · overview; `check-count-claims` 0 FAIL; census 35 → 36 on two globs
       (34 core + 2 non-core = 36).
-- [ ] Exercised on real input (L-007): workdoo's actual roadmap, re-expressed in the template on a scratch copy, keeps every one of
+- [x] Exercised on real input (L-007): workdoo's actual roadmap, re-expressed in the template on a scratch copy, keeps every one of ✓ workdoo's real roadmap re-expressed on a scratch copy (`scratchpad/workdoo-ro/roadmap-in-template.md`): 16/16 rows' cells byte-identical, Status + Covered by added; nothing written into workdoo
       its 16 rows' content and gains a Status and Covered-by cell each; nothing is written into workdoo.
 
 ## Touches

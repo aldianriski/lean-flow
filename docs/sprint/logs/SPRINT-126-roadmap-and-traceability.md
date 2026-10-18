@@ -69,3 +69,24 @@ is now flagged.
 **Impact.** TASK-435 box 2 is reworded to match. T1 takes one revise round, covering C3 plus C1: "stale" must apply only when no
 valid coverage remains, since a done task plus an active epic is covered. C6 (CONTEXT.md:104) is TD-252, already filed.
 **Re-confirm G2.** The owner confirmed by popup. This adds no new capability.
+
+### 2026-10-18 | T1 | TASK-435 — roadmap template + STANDARD §2 row + Roadmap coverage rule, spec 0.17.0; merged `6b28034c` (+ `f16be427`)
+**Builder (`225fa9ad`, base `d1da5d89` verified).** The template and the §2 row are in. Counts read 34 + 2 = 36 everywhere, and
+check-count-claims derives core itself, so it needed no edit. workdoo's 16 rows were converted on a scratch copy with their cells
+byte-identical. The branch checks passed before review: prose-density 28/0, caps, count-claims, store 42/0.
+**Codex R1** (gpt-6-astra): C2 · C4 · C5 CLEAR.
+- **C3 (high):** S2.R-PLACEMENT reads §2 dynamically, so the new row flags a `roadmap.md` outside `docs/product/`. Confirmed
+  empirically; the owner ruled legacy path + MAJOR meaning (scope-change above).
+- **C1 (medium):** the stale definition conflicted with mixed marks.
+- **C6:** pre-existing (TD-252).
+**Revise (`99f7f811`).** It added the `*(was docs/roadmap.md)*` legacy path, declared 0.17.0 MINOR carrying MAJOR meaning, and
+reworded stale to "only when no valid coverage remains". Empirical pair: `docs/roadmap.md` is matched second and tolerated, while
+`docs/plans/roadmap.md` FAILs `file-outside-canonical-placement`.
+**Codex R2 (cap):** C1 FIXED, nothing new. C3: the version class is correct, but the upgrade note overstated when the check fires.
+The coordinator corrected that one sentence (`f16be427`, a T1 Layers file) with no further builder round. This repo's conformance
+verdicts are unchanged against the baseline (A2). On `main`: prose-density 28/0, layers-observed PASS, count-claims 0 FAIL.
+CHANGELOG (consumer):
+- New `roadmap.md.template` for a phased delivery plan at `docs/product/roadmap.md`: each row carries a Status and a Covered-by link
+  to its tasks, epic or next slice.
+- Spec 0.17.0 (MINOR carrying MAJOR meaning) adds the row (legacy `docs/roadmap.md`) and the roadmap-coverage rule, which skills
+  enforce. A `roadmap.md` elsewhere is flagged by S2.R-PLACEMENT.
