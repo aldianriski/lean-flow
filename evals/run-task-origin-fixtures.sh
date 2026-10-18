@@ -148,9 +148,13 @@ run_case_anywhere "store-misplaced-root" 1 \
 run_case_anywhere "store-misplaced-unknown-folder" 1 \
   "member-misplaced: docs/work/parked/TASK-963-odd.md is outside docs/work/<folder>/" -- \
   sh "$checker" "$mis"
-run_case_anywhere "store-misplaced-sibling-control" 1 \
+# Clean control on its OWN tree (a store with no stray): exit 0 and its PASS line. It must stay green when the
+# stray scan is broken, so a break that reddens the three cases above cannot also redden the control (L-142).
+mkdir -p "$mis/ok/docs/work/todo"
+printf -- '---\nid: TASK-960-ok\norigin: manual\n---\n' > "$mis/ok/docs/work/todo/TASK-960-ok.md"
+run_case_anywhere "store-misplaced-sibling-control" 0 \
   "TASK-960 (store: docs/work/todo/) origin: manual" -- \
-  sh "$checker" "$mis"
+  sh "$checker" "$mis/ok"
 out=$(sh "$checker" "$mis" 2>&1)
 case "$out" in
   *"member-misplaced: docs/work/todo/TASK-960"*)
