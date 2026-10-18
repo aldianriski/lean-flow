@@ -5,6 +5,7 @@ epic: EPIC-022
 owner: Maintainer
 last_updated: 2026-10-18
 status: active
+plan_commit: a9887515
 update_trigger: sprint execute/close events
 ---
 
