@@ -16,7 +16,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const TEST_FILE = "evals/layers-observed.test.ts";
 
 // RAISE with the file: adding cases is fine, losing them is not.
-const MIN_CASES = 13;
+const MIN_CASES = 23;
 
 const r = spawnSync("bun", ["test", TEST_FILE], { cwd: ROOT, encoding: "utf8" });
 const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
