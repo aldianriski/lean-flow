@@ -14,6 +14,36 @@ status: current
 
 ---
 
+## v2.9.0 — one Plan parser; the member resolver names what it cannot resolve (2026-10-19)
+
+**MINOR** — ships SPRINT-128 (Planning Debt), and closes EPIC-022. **Upgrade step:** a task store with a duplicate task id, a listed
+member with no file, or a task file outside `docs/work/<folder>/` now FAILs by name (`member-ambiguous` · `member-missing` ·
+`member-misplaced`), where it was skipped silently. Run `sh conformance.sh <repo>` once and fix any it names. The standard is
+unchanged (spec 0.18.0). Restart the session after installing.
+
+### SPRINT-128 — Planning Debt (2026-10-19)
+
+EPIC-022's last slice: a Plan has one parser, and nothing that reads it drops what it cannot place.
+
+**Consumer-facing:**
+- **`conformance.sh` reads CRLF frontmatter itself.** Every Shell field reader strips a trailing CR, so a verdict no longer depends
+  on whether the host's awk folds Windows line endings.
+- **The members reader names store anomalies.** A duplicate id, a missing listed member or a misplaced task file is a named FAIL;
+  the CLI exits 2 with the anomaly after its unchanged first line.
+- **The dispatch preflight names a column-0 wrapped `Layers:` line** ("indent it, or separate prose with a blank line"), instead of
+  building the ownership map from the first line only.
+
+**Maintainer-side:**
+- One shared Plan parser (`parsePlan`) replaces about eight heading regexes and six `Cites:` readers; a `Cites:` task id governs a
+  member only in the leading run that opens the line.
+- The Shell twins of the layers-observed and authority checkers, and the reaper's v1 Plan counting, are retired.
+- `layers-token-matches-nothing` names a `Layers:` token that matched no file once its task is done; a member `## Done when` edit
+  is covered only by a scope-change logged before it.
+- TD-049 · 131 · 138 · 177 · 178 · 188 · 190 · 198 · 199 · 205 · 215 · 248 resolved; 8 rows closed at promote; TD-255 · 256 · 257 ·
+  258 filed. EPIC-022 closed (8 of 8).
+
+---
+
 ## v2.8.0 — a sprint without git; a task keeps its own sign-off (spec 0.18.0) (2026-10-18)
 
 **MINOR** — ships SPRINT-127 (Plans Without Git). Installing the release is enough; no upgrade step. Spec 0.18.0 is MINOR and moves
@@ -39,33 +69,5 @@ EPIC-022's third slice: an approval lives where the next reader finds it, and a 
   must-FAIL harness.
 - Exercised on workdoo itself: its roadmap rendered from the template (16 rows) and one task signed `G1,G2` without git.
 - EPIC-022 Closed-when 5 · 6 · 8 delivered (7 of 8). TD-253 · TD-254 filed.
-
----
-
-## v2.7.0 — a phased roadmap with row coverage (spec 0.17.0) (2026-10-18)
-
-**MINOR** — ships SPRINT-126 (Roadmap and Traceability). **Upgrade step:** spec 0.17.0 is MINOR carrying MAJOR meaning (§15): a
-`roadmap.md` outside `docs/product/` (with neither `docs/product/roadmap.md` nor the legacy `docs/roadmap.md` present) is now flagged
-by `S2.R-PLACEMENT` — re-run `sh conformance.sh <repo>` and move or rename it. Restart the session after installing.
-
-### SPRINT-126 — Roadmap and Traceability (2026-10-18)
-
-EPIC-022's second slice: a repo can write a phased delivery plan and see which rows nothing is delivering. **Spec 0.17.0.**
-
-**Consumer-facing:**
-- **New `roadmap.md.template`** for a phased delivery plan at `docs/product/roadmap.md`, created lazily when a delivery sequence
-  spans two or more sprints or epics. Each row of its table carries a `Status` (done · active · planned) and a `Covered by` cell
-  naming the tasks, the epic or the next slice that delivers it.
-- **Spec 0.17.0 — MINOR carrying MAJOR meaning (§15).** STANDARD §2 gains the `product/roadmap.md` row (legacy `docs/roadmap.md`,
-  matched second) and a **roadmap coverage** rule: an `active` row must be covered by an open task, an active epic or a named next
-  slice; `planned` rows are exempt. **Upgrade step:** with neither file in place, a `roadmap.md` elsewhere (outside `docs/product/`)
-  is now flagged by `S2.R-PLACEMENT` — move or rename it. A root `ROADMAP.md` is not flagged.
-- **`/prime`, `/triage` and the promote checklist report uncovered active rows** through the same procedure as epic coverage
-  (unmarked · stale task · epic not active). Promote warns for the owner to sign and never refuses on a roadmap row.
-- **`/task-decomposer --roadmap <row>`** decomposes a single row, reading its outcome, dependencies and acceptance evidence as
-  settled context, and tells you what to put in its `Covered by` cell — it never edits the roadmap. `/flow`, CONTEXT and README
-  name the roadmap as a feed source.
-
-**Maintainer-side:** EPIC-022 Closed-when 4 delivered. TASK-424 · TASK-425 pruned (§11).
 
 ---
