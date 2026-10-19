@@ -9,12 +9,16 @@ isolated pass starts from zero context and re-scans unless you scope it.
 Hand each review pass a brief, not the repo:
 - the `git diff` (the actual change),
 - the changed files,
-- their **direct callers / dependents** (the blast radius — one hop, not the transitive closure), and
+- their **direct callers / dependents** (the blast radius — one hop, not the transitive closure),
 - **the governing decision as logged** — when the change implements a ruling (an ADR, a G2 decision,
   an owner ruling in the Execution Log), the brief quotes it and it becomes the Spec comparand.
   Promoted rule (L-122, 2 sightings): in both, the *builder* carried the same ruling and still
   drifted; only the comparand-briefed reviewer caught it. The revise loop is this rule's matcher —
   a drift from the quoted ruling is a concrete violation, and the loop feeds it back.
+- the host repo's **standards docs** — the Standards comparand. The coordinator (who builds the brief)
+  finds the files that document how code should be written (CONTRIBUTING, coding-standards, style
+  guides, CLAUDE.md / AGENTS.md) and passes their paths plus the relevant excerpts; when there are
+  none, the brief says so. The reviewer never searches the repo for them.
 
 Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo.
 Report two independent axes — **Standards** (repo conventions) and **Spec** (builds the right thing) —
@@ -26,7 +30,8 @@ separately, never merged or re-ranked."* A reviewer with a bounded brief is both
 A review answers two independent questions, and a change can pass one while failing the other:
 
 - **Standards** — does the code obey the repo's conventions? (naming, structure, and the smell baseline —
-  duplicated code, feature envy, mysterious names, data clumps; documented repo standards override the baseline.)
+  duplicated code, feature envy, mysterious names, data clumps; documented repo standards override the baseline. The report names the standards docs it judged
+  against, or says none were supplied.)
 - **Spec** — does it build the *right thing*? (correctness against the **comparand ladder** below.)
 
 **The Spec comparand is the artifact that predates the task.** A `done-when` is written by the same
