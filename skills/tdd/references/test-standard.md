@@ -44,6 +44,5 @@ Tag each testable unit by risk, then match depth (from bmad-method's risk-based 
 
 ## Regression gate (at Review — a suggestion, not a gate)
 
-Before a task ticks done (bmad K3): its tests **match the risk tier** above, and **ALL existing tests
-still pass — zero regressions**. Surface this at Review; the owner enforces it in their CI.
-Per-slice rule while building → `/tdd` SKILL.md § Done = whole suite green.
+Before a task ticks done (bmad K3): its tests **match the risk tier** above, and the whole suite is
+green per `/tdd` SKILL.md § Done = whole suite green. Surface this at Review; the owner enforces it in their CI.
