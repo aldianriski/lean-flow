@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: [TASK-455]
+sprint: SPRINT-130
 ---
 
 # TASK-457 — Measure whether the `bun test` suite is still flaky, then close TD-135 or name the test

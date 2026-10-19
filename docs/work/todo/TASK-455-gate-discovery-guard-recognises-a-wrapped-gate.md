@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-130
 ---
 
 # TASK-455 — Make the gate-discovery guard recognise a wrapped gate invocation
