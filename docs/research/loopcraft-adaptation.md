@@ -62,7 +62,8 @@ factory loop, is the property Human-gated exists to refuse.
 
 - **Held, weak:** a one-table "loop ladder" in `docs/architecture/overview.md` naming each loop's exit
   and the record that holds it. It helps orientation and adds no machinery. It is held because no
-  consumer has asked, and CONTEXT.md (ADR-007 cap) is not the place for it.
+  consumer has asked, and CONTEXT.md (ADR-007 cap) is not the place for it. **Re-judged 2026-10-19:** filed as a
+  task kept only if a reader test shows it helps → [`reference-rejudge.md`](reference-rejudge.md).
 - **Rejected:** a "supervise once → turn the trajectory into a loop" rule (no ADR-053 evidence class)
   and consensus as an exit (`/council` is opt-in by design).
 - Re-check only if swyx publishes a written loopcraft method.

@@ -70,6 +70,8 @@ consumer-path gap rather than add machinery. Reject everything else listed above
   AskUserQuestion pickers because they "push toward pre-baked multiple choice". That cuts against our
   L-002 popup rule. No change: L-002 is a promoted rule with its own sightings, and every popup here
   carries an `Other` free-text answer. Revisit if a sighting shows a popup's options narrowed an answer.
+  **Re-judged 2026-10-19:** 3 of 14 answers that day came as "Other" and changed scope; an experiment (open questions
+  for discovery, pickers for decisions) is filed → [`reference-rejudge.md`](reference-rejudge.md).
 - Distribution: upstream now installs via Copilot's plugin marketplace; lean-flow ships no Copilot
   manifest. Outside the skill delta — noted only.
 - The cosmetic-change filter was heuristic; `wizard` and `teach` residue was not read (out of domain).

@@ -91,7 +91,7 @@ agree). K1 and K2 above both shipped. **Verdict: no new skill; 2 micro keepers +
 |---|---|---|---|
 | K3 | `requesting-code-review/code-reviewer.md` | The reviewer lists what it **declined to judge**, and treats spec silence as not-permission | `orchestrator/references/review-scoping.md` → **TASK-452** (mattpocock scan-5 K2, same file → TASK-451) |
 | K4 | `test-driven-development/SKILL.md` | **The project's suite defines green** — run it whole and name every failure, yours or not; and name the production change that would fail each new test | `/tdd`, once per slice before it is done (owner ruling) → **TASK-454**. Partial today: `test-standard.md` § Regression gate asks it only at Review, as a suggestion |
-| hold | `brainstorming/builder-check-prompt.md` | A fresh subagent reads an L design as a builder who cannot ask | G2 — **held**: adds a model call, and lean-flow has no sighting of an approved-but-unbuildable design |
+| hold | `brainstorming/builder-check-prompt.md` | A fresh subagent reads an L design as a builder who cannot ask | G2 — **held**, then **adopted 2026-10-19** on a replay that caught 3 of 4 later defects before the build → [`reference-rejudge.md`](reference-rejudge.md) |
 
 Also unmatched but **rejected**: implementers and reviewers may not spawn subagents (upstream saw
 duplicate reviews; we have no sighting).
