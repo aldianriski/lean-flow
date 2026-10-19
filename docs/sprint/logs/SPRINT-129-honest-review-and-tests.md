@@ -100,3 +100,16 @@ review · T4 · scoped-reviewer · behaviour:material · governance:low
 Re-run after the structured review lines were appended; the tree under test is the final integrated tree, every member merged.
 Off-host via a git bundle of the unpushed commits (owner-chosen; nothing pushed). Close proceeds: owner approved v2.10.0 MINOR,
 the §11 retention pass (archive + CHANGELOG rotation of v2.8.0) and removal of this sprint's worktrees only.
+
+### 2026-10-19 | close | 4 of 4 members in `done/` (close gate 10/0), PLAN_EXHAUSTED; released 2.10.0 (`5c462404`); Retro + buckets
+run · 14 of 14 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 301/0 on the VPS at `9f668645`, the final integrated tree; every commit after it is the release, a
+tick-box-checked tick, a member move, or this close. Release 2.10.0 MINOR: 4 manifests in lockstep (4/4), the README footer, the
+CHANGELOG, and v2.8.x rotated verbatim to `docs/changelog/CHANGELOG-2.8.0.md` (§11, owner-approved). Doc-freshness: no §2 trigger
+fired beyond the release files (the skill roster, the loop and CONTEXT are unchanged; the README's skill table needs no edit).
+Buckets: Shipped → CHANGELOG v2.10.0. Tech debt → a sighting on TD-246 (worktree accumulation); no new row; the ledger reads 126
+rows (106 open · 20 resolved). Follow-ups → none. Learnings → no new entry; sightings on L-151 (prose review records — a retrieval
+miss of L-225), L-020 (the unwired reviewer prompt) and L-186 (cmp exposed a CR-stripping mutation, twice: T3's exercise and this
+close's own first ledger edit, restored cmp-identical and redone with an EOL-preserving script).
+Handoff ledger: no `handoff` entry was taken this sprint. No epic is attached.
