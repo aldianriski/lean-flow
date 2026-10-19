@@ -24,8 +24,8 @@ against pristine; L-187). `/diagnose`, which consumers run, does not carry it.
 
 ## Done when
 
-- [ ] `/diagnose` Phase 5 states that a red forced by mutation, a fixture edit or a reverted fix counts only after a diff/`cmp` against a pristine copy shows the change landed, and that a landed change reddening nothing has tested nothing.
-- [ ] `/diagnose` SKILL.md stays within ~140 lines.
+- [x] `/diagnose` Phase 5 states that a red forced by mutation, a fixture edit or a reverted fix counts only after a diff/`cmp` against a pristine copy shows the change landed, and that a landed change reddening nothing has tested nothing. ✓ 8923beec (T3 ca892ea5); Codex pre-merge Spec CLEAR
+- [x] `/diagnose` SKILL.md stays within ~140 lines. ✓ check-doc-caps: skills/diagnose/SKILL.md 98 <= 140
 - [ ] Exercised once on a real forced red (L-007). CHANGELOG reflects the change.
 
 ## Touches

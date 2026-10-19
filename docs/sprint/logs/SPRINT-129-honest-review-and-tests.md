@@ -47,3 +47,28 @@ red/green cycle in an isolated worktree with the full `bun test` run; nothing fr
 Verification: line caps → `bun scripts/lib/check-doc-caps.ts` (EXISTS · RUNS · REACHES skills/diagnose|tdd/SKILL.md · PROVES the
 cap); wording boxes are judgment ticks backed by read-through + the Codex loop (D3); CHANGELOG boxes tick at the close release (D1).
 Dispatch preflight: CLEAR (base-ref = HEAD bed7b10f · waves T1=0 T2=1 T3=0 T4=0 · review-scoping.md owned T1 → T2).
+
+### 2026-10-19 | progress | wave 1 built (T1 · T3 · T4), worktree-base guard PASS ×3; pre-merge review next
+Worktree-base guard: PASS for all three wave-1 worktrees (each branched from coordinator HEAD 41bc1040). Thirteen older agent
+worktrees under `.claude/worktrees/` from earlier sessions are stale or divergent; not this sprint's, left untouched.
+T1 → `24164aed` (review-scoping.md +7/−2; lean-flow-path grep on the diff: empty). T3 → `ca892ea5` (diagnose SKILL.md +4, 98
+lines). Exercise: a `sed` mutation was caught by the `cmp` proof as having stripped every CR (collateral, discarded before the
+harness ran); an Edit-tool one-line mutation of `tick-box.ts` landed (cmp: byte 4990, line 103), reddened exactly the claim case
+(12 pass, 1 fail), restored with cmp-identical proof, 13/0. T4 → `20990007` (tdd SKILL.md +6, 104 lines; test-standard.md +1
+pointer). Exercise: a new `frontmatterValue` test was green at once (behaviour existed), so the name-the-break check was applied
+(removing the `---` stop failed it); whole `bun test` 429 pass · 1 fail · 2 errors, each named: the fail is TD-154 (reproduced on
+main by the coordinator, pre-existing), the two errors are the worktree's missing `node_modules` (typescript present on main).
+consequence · T1 · behaviour:low · governance:high
+consequence · T3 · behaviour:material · governance:low
+consequence · T4 · behaviour:material · governance:low
+
+### 2026-10-19 | progress | wave 1 reviewed and merged: T1 · T3 CLEAR first pass; T4 one finding, fixed in its one retry, re-review CLEAR
+Pre-merge review (Codex, scoped brief under T1's new wording — standards docs supplied as `.claude/CLAUDE.md` excerpts, each
+Standards axis named them: T1's real exercise). T1 Standards CLEAR · Spec CLEAR. T3 Standards CLEAR · Spec CLEAR. T4 Standards
+CLEAR · Spec FINDING: `test-standard.md` § Regression gate still restated the whole-suite pass rule beside the new pointer —
+duplicated against the owner's single-location ruling. Revise loop: one builder retry → `43c029bf` (the gate now defers to `/tdd`);
+re-review: CLEAR.
+Merge-back on integration worktree `integ-129`, `--no-ff`, ownership order: T1 `c4e8f78b` · T3 `8923beec` · T4 `730a8e1d`; no
+conflicts, no duplicate member id. Post-merge legs: doc-caps (diagnose 98 · tdd 104 ≤ 140) PASS, prose-density 28/0. main
+fast-forwarded to `730a8e1d`. Ticked via tick-box (both checkers pass): TASK-451 boxes 1–3 · TASK-453 boxes 1–2 · TASK-454
+boxes 1–3. Open: each member's exercise + CHANGELOG box, ticked at the close release (D1).

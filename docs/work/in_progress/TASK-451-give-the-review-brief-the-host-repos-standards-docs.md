@@ -24,9 +24,9 @@ seen. Our own repo puts its standards in CLAUDE.md, but adopters keep them elsew
 
 ## Done when
 
-- [ ] The step that builds the review brief finds the host repo's standards docs (CONTRIBUTING, coding standards, style guides, and CLAUDE.md/AGENTS.md) and puts them in the brief as the Standards comparand. When there are none, the brief says so.
-- [ ] The Standards axis of the reviewer's report names the standards docs it judged against.
-- [ ] Generic: works in a repo that has never installed lean-flow, with no lean-flow-specific path or file name required.
+- [x] The step that builds the review brief finds the host repo's standards docs (CONTRIBUTING, coding standards, style guides, and CLAUDE.md/AGENTS.md) and puts them in the brief as the Standards comparand. When there are none, the brief says so. ✓ c4e8f78b (T1 24164aed); Codex pre-merge Spec CLEAR
+- [x] The Standards axis of the reviewer's report names the standards docs it judged against. ✓ c4e8f78b; exercised: the wave-1 Codex brief carried .claude/CLAUDE.md excerpts and each Standards axis named it
+- [x] Generic: works in a repo that has never installed lean-flow, with no lean-flow-specific path or file name required. ✓ lean-flow-path grep on the T1 diff empty; Codex Standards CLEAR
 - [ ] Exercised once on a real review brief (L-007). README/CHANGELOG reflect the change.
 
 ## Touches
