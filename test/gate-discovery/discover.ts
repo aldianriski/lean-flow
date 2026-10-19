@@ -114,8 +114,18 @@ export function discoverGate(root: string): Discovery {
  * during a session that twice cited it.
  *
  * Shape, not substring: strip quoted spans so text inside them can never look like a command, split
- * on shell separators, and require some resulting segment to BEGIN with the declared command.
+ * on shell separators, and require some resulting segment to invoke the declared command by one of
+ * two rules:
+ *   1. the segment BEGINS with it (equal, or followed by a space) -- the bare form; or
+ *   2. it appears as a run of WHOLE tokens inside the segment and the segment's head token is not a
+ *      non-executing builtin (`echo` / `printf` / `:`). This is the wrapped form, e.g. this repo's
+ *      `bun scripts/qa-verdict.ts sh scripts/qa-check.sh`, where the gate is an argument of a
+ *      wrapper that runs it (TD-154: rule 1 alone reported that real script as `bypassed`).
+ * Rule 2 is still shape: whole-token boundaries keep `qa-check.sh.bak` out, and the builtin
+ * exclusion keeps an unquoted `echo sh scripts/qa-check.sh` out -- it prints the gate, never runs it.
  */
+const NON_EXECUTING_HEADS = new Set(["echo", "printf", ":"]);
+
 export function invokes(command: string, declared: string): boolean {
   // Replace quoted spans with a placeholder that cannot start a command. Done before splitting, so
   // a separator inside quotes cannot manufacture a segment that begins with the declared string.
@@ -123,7 +133,12 @@ export function invokes(command: string, declared: string): boolean {
   return unquoted
     .split(/&&|\|\||;|\||\n/)
     .map((seg) => seg.trim())
-    .some((seg) => seg === declared || seg.startsWith(`${declared} `));
+    .some(
+      (seg) =>
+        seg === declared ||
+        seg.startsWith(`${declared} `) ||
+        (!NON_EXECUTING_HEADS.has(seg.split(/\s+/)[0]!) && ` ${seg} `.includes(` ${declared} `)),
+    );
 }
 
 export function bypassesDeclaredGate(root: string): {

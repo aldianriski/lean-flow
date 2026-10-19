@@ -86,4 +86,22 @@ describe("gate discovery — mentioning the gate is not running it", () => {
   test("a prefix match is not an invocation — a different script that starts the same way", () => {
     expect(invokes("sh scripts/qa-check.sh.bak", "sh scripts/qa-check.sh")).toBe(false);
   });
+
+  test("a gate wrapped as an argument of another command is recognised — this repo's real script", () => {
+    const wrapped = "bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test";
+    expect(invokes(wrapped, "sh scripts/qa-check.sh")).toBe(true);
+  });
+
+  // MUST-FAIL (retained, TD-154). The wrapped-form rule must not reopen the echo trap: an UNQUOTED
+  // print of the gate has the declared command as whole tokens, so only the head-builtin exclusion
+  // keeps it out. Drop `echo` from NON_EXECUTING_HEADS and the first assertion goes red.
+  test("MUST-FAIL: an unquoted echo/printf/: of the declared command is not an invocation", () => {
+    expect(invokes("echo sh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(false);
+    expect(invokes("printf sh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(false);
+    expect(invokes(": sh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(false);
+  });
+
+  test("a wrapped prefix that is a different script is not an invocation", () => {
+    expect(invokes("bun scripts/qa-verdict.ts sh scripts/qa-check.sh.bak", "sh scripts/qa-check.sh")).toBe(false);
+  });
 });
