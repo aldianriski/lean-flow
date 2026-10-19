@@ -77,3 +77,16 @@ which is what the gate entry's per-task lines record. 27 questions is correct.
 consequence · T1 · behaviour:low · governance:high → one scoped reviewer (Codex, D3) + the adversarial floor if it returns 0 findings
 review · T1 · scoped-reviewer · Codex gpt-6-astra (static) · T-a.1–4 · T-b–T-f all OK · VERDICT: CLEAR (0 findings) → adversarial floor re-run dispatched
 consequence · T4 · behaviour:low · governance:low → self-review of the table diff; the reader-test record goes to Codex once before the verdict (D3)
+
+### 2026-10-19 | scope-change | TASK-460: the frozen "14 questions, 3 Other" premise is wrong; re-scoped to the census (owner ruling)
+**What broke:** the census of the 2026-10-19 main-thread AskUserQuestion questions (window 2026-10-18T17:00Z → 2026-10-19T12:18:22Z,
+the commit that wrote the research doc) finds **37 questions in 18 popups**: 4 in session 6986f732 and 33 in ae0243da. Two routes
+agree: tool_use matched to `answers` (37), and tool_result answer pairs counted separately (37 once both reply phrasings are
+read). Only **2** answers are free-text "Other": Q09 ("docs backlogtask and codex rescue for all we doit…") and Q36 ("how status of
+research please inform me about this first"). No answer carries a note. The "3 of 14" in `reference-rejudge.md` and in TASK-460's
+Done-when ("the three known Other answers" · "the other eleven") was written without a census, the same failure as a figure
+frozen into an artifact (L-143 family).
+**Impact (owner ruling):** measure all 37. The intent targets are Q09 and Q36; the clarity check covers the other 35. The
+verdict rule keeps its shape: gain = open intent sum > picker sum on the 2 targets AND clarity loss vs picker on ≤ 3 of 35 per
+reader (the same ~9% bar as 1 of 11); a tie is none. The research doc's "3 of 14" is corrected whatever the verdict. Done-when
+boxes 1–2 are ticked against this ruling, and their text is not edited.
