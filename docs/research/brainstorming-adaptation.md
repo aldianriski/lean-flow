@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-10
+last_updated: 2026-10-19
 update_trigger: The obra brainstorming skill changes, or a rejected row becomes a keeper against lean-flow's current surface
 status: current
 id: brainstorming-adaptation
@@ -66,3 +66,32 @@ ethos. **1 follow-up filed: TASK-058.**
 - **TASK-058** (P3) — fold K1 (+ K2) into `/orchestrator` G2 / CLAUDE.md anti-patterns. Small, additive,
   clears the useful+important+used bar (the "too simple" excuse is a real recurring failure). Nothing
   else from this skill is built.
+
+## Re-scan — the whole superpowers repo since this scan (2026-10-19)
+
+Baseline `d884ae04` (v6.1.1, the last commit before 07-10) → `main` at v7.0.0: 56 commits, releases
+v6.2.0 · v6.3.0 · v6.4.1 · v6.4.2 · v7.0.0. Corpus **14 → 15 `SKILL.md`** (tree API and contents API
+agree). K1 and K2 above both shipped. **Verdict: no new skill; 2 micro keepers + 1 weak hold.**
+
+- **New:** `diagnosing-superpowers` — transcript forensics with seven analyst prompts and an issue-filing
+  scrub pipeline. **Reject**: ~20 files aimed at plugin-maintainer bug reports; `/insights` and the
+  Retro own capture, and `.out-of-scope/run-event-log.md` already rejects no-consumer telemetry.
+- **Materially changed, all rejected as covered:** `brainstorming` (v7 rebuild — sizing the work →
+  orchestrator modes; chunked play-back → K2; stated defaults → G1 assumptions + the decomposer's
+  registry) · `subagent-driven-development` (resume-the-implementer fix loop → review-scoping's bounded
+  retry + ADR-053 round cap; ruling-instead-of-stalling is the *opposite* of J2 parking; cheaper
+  controller → ADR-010) · `executing-plans` native inline mode (dispatch is our deliberate default) ·
+  `writing-plans` decisions-not-code (→ WHY/WHERE, never HOW) · TDD's `writing-good-tests.md` (→ `/tdd`'s
+  tautological-test anti-pattern + `testability.md`) · `finishing-a-development-branch` (no equivalent
+  skill; owner pushes).
+- **Structural, not applicable:** `AGENTS.md` canonical (ours exists, `agents-md-adoption.md`) · new
+  harness manifests · SessionStart hook fixes (lean-flow ships no hooks).
+
+| # | Source | Idea | Where it lands |
+|---|---|---|---|
+| K3 | `requesting-code-review/code-reviewer.md` | The reviewer lists what it **declined to judge**, and treats spec silence as not-permission | `orchestrator/references/review-scoping.md` → **TASK-448** (with mattpocock scan-5 K2) |
+| K4 | `test-driven-development/SKILL.md` | **The project's suite defines green** — run it whole and name every failure, yours or not; and name the production change that would fail each new test | `/tdd` per-cycle step → **TASK-450**. Partial today: `test-standard.md` § Regression gate asks it only at Review, as a suggestion |
+| hold | `brainstorming/builder-check-prompt.md` | A fresh subagent reads an L design as a builder who cannot ask | G2 — **held**: adds a model call, and lean-flow has no sighting of an approved-but-unbuildable design |
+
+Also unmatched but **rejected**: implementers and reviewers may not spawn subagents (upstream saw
+duplicate reviews; we have no sighting).

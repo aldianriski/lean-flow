@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
+last_updated: 2026-10-19
 update_trigger: A new scan of mattpocock/skills runs, or a filed keeper ships
 status: current
 id: mattpocock-adaptation
@@ -16,6 +16,7 @@ related: [model-purpose]
 > **Scan 2 (2026-08-09, SPRINT-047 T2)** — 5 examined, 2 keepers. **Both shipped in SPRINT-048**: `grilling`'s frontier batching (T3) · `writing-for-agents`' disclosure test + completion-criteria sharpness (T4). Detail in git.
 > **Scan 3 (2026-08-09, SPRINT-050 T1)** — the `engineering/` remainder, 10 examined, **5 keepers, all micro**. § below.
 > **Scan 4 (2026-08-09, SPRINT-050 T3)** — `productivity/` · `in-progress/` · `misc/`, 13 examined, **0 keepers**. The corpus is now fully mapped.
+> **Scan 5 (2026-10-19, re-scan of changes)** — corpus 35 → **38** (4 new · 1 removed · ~10 changed), **2 micro keepers** → TASK-448 · TASK-449. Detail → [`mattpocock-scan5.md`](mattpocock-scan5.md).
 
 **Corpus: 35 `SKILL.md` files** — 18 `engineering/` · 7 `productivity/` · 6 `in-progress/` · 4 `misc/`.
 Counted deterministically (`gh api …/git/trees/main?recursive=1`), not read off a summary: a `WebFetch`
