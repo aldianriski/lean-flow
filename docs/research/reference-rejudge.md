@@ -100,7 +100,7 @@ Rule (fixed before the run): keep only if all 8 records are correct **and** the 
 **and** errors are no higher. The median ratio is 0.92, so the table is **removed**. The table as built (`d339763b`)
 had columns for loop · purpose · exit (completed vs stopped) · record · parent · defined-in link. The file stayed at
 147 ≤ 150 (cap PASS). Both checkouts had SPRINT-131's sprint, log, task and research files deleted, so neither arm could
-read the table's design. The revert (`9a35d692` · `d552c03d`) leaves `git diff 07113e12 HEAD -- docs/architecture/overview.md`
+read the table's design. The revert (`0afee584` · `09eba192`) leaves `git diff 07113e12 HEAD -- docs/architecture/overview.md`
 empty. Readers without
 the table found every record anyway, from the defining files the table would have linked. The means differ more than the
 medians (26.0 s vs 37.7 s) because two first-batch runs without the table took 75 s and 94 s; the rule reads the median.
@@ -128,7 +128,7 @@ inline wall clocks run from each agent's first record to its sprint's last CLEAR
 waited in one queue for a shared Codex reviewer, which counts against inline. S130's dispatch window also contains T3
 measurement time; its T3-only coordinator calls (1.63M tokens) are excluded from the cost.
 
-**The adjustment, fixed before any inline figure existed** (Execution Log, `efa851d4`). In the dispatch arm the coordinator
+**The adjustment, fixed before any inline figure existed** (Execution Log, `fc18fb45`). In the dispatch arm the coordinator
 is 80–86% of the cost. That is because each of its calls re-reads the session's carried context: a median of 318k tokens per
 call at S129's start and 510k at S130's. A fresh replay agent carries none of that, but real inline execution would run every
 one of its calls inside that context. The Done-when counts coordinator context, so each inline call is charged that carried

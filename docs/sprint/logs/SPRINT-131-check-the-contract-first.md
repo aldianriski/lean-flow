@@ -142,3 +142,13 @@ owner-ruling: review · T2 — accepted with caveat. Box 1 is ticked citing the 
 owner-ruling: review · T4 — accepted. The leakage evidence (`git status` of both checkouts) is recorded above.
 owner-ruling: TASK-461 — cancel (T3 found no gain under its fixed rule).
 owner-ruling: the live TD-154 quoted-head bypass and the review-scoping.md:241 duplicate are filed as TD rows at close, not fixed in this sprint.
+
+### 2026-10-19 | gate | system verify FAIL (2 attribution findings) → owner ruling: fixed-and-rerun; 4 commit subjects rewritten
+system-verify · FAIL(layers observed · dod-delta) · QA_FULL on the VPS at `55d581ff`: 298 pass, 2 fail, 113 s; `bun test` 441/0
+owner-ruling: system-verify — fixed-and-rerun. The two findings were commit attribution, not content: a combined `sprint(131) T3 + T4:` subject that no attribution arm reads, two `Revert …` subjects with no sprint attribution, and T2's commit writing the coordinator-owned `reference-rejudge.md` under a `T2:` subject that T2's Layers do not declare.
+Fix: `git filter-branch --msg-filter` over `e16397c8..main` (local, unpushed) rewrote 4 subjects only. Trees are byte-identical:
+HEAD^{tree} `6a4ce691` before and after. The old history is kept at `backup/sprint131-pre-rewrite`. Sha map (old → new), for
+every reference above: `9a35d692 → 0afee584` · `d552c03d → 09eba192` · `75b49a59 → 171a41f9` · `cf1a78ea → 555a28f9` ·
+`da1b5a2e → 4f5b203a` · `efa851d4 → fc18fb45` · `b6755a54 → 180f9a6b` · `e09cf26a → 0c9dd216` · `f968f871 → 30c4d7d7` ·
+`55d581ff → 69ad1edd`. The tick evidence in TASK-459 and TASK-462 cites the old shas, which resolve through this map.
+`reference-rejudge.md` is updated in place.
