@@ -36,3 +36,14 @@ Size check: 3 S, no `L`. All three members are `origin: decomposer`, so each G1 
 is the source for D2's facts: `invokes()`'s split-and-prefix rule, case 12's two `date` calls, and TD-135's suspect test gone.
 promote-check 10/0 after one fix: four member-implied files (`discovery-order.test.ts` bare, `package.json`, `qa-check.sh`,
 `TECH-DEBT.md`) added to the Cites: lines as read-only or coordinator-owned. Dispatch preflight: CLEAR (waves T1=0 T2=0 T3=1).
+
+### 2026-10-19 | gate | G1 + G2 signed by the owner (one popup round); attended sprint-bulk, waves T1 · T2 → T3
+G1: batch fast-path confirm, all three members `origin: decomposer`, scope unchanged since `plan_commit` 9c782185.
+G2: T1 — `invokes()` keeps its prefix rule and adds a whole-token trailing-run rule after an executing head (`echo` · `printf` ·
+`:` excluded), quotes still stripped first; tests add the wrapper as an invocation, an unquoted-echo must-FAIL and a wrapped
+`.bak` bypass. T2 — a `date` shell function inside case 12's subshell freezes both clock reads (elapsed exactly 1263, exact
+assertion kept); an empty capture prints a named harness-env FAIL; must-FAIL proven by a cmp-landed seed of the real ceiling
+block in a worktree, not committed. T3 — coordinator-run measurement after T1 merges (5× VPS via git bundle · 3× Windows).
+Verification: T1 → `bun test test/gate-discovery/discovery-order.test.ts`; T2 → `sh evals/run-qa-budget-fixtures.sh` + the
+seeded proof; T3 → a recorded measurement (judgment tick). Reviews logged as `review · Tn` lines from the start (L-151).
+Dispatch preflight: PASS base-ref: declared base matches live HEAD (9345cb17c980c5c857b671920eae6800b5634270) PASS wave-computation: T1=0 T2=0 T3=1 PREFLIGHT: CLEAR 
