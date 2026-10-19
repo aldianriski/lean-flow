@@ -28,7 +28,7 @@ test file.
 - [x] `/tdd` states that the focused test drives each red/green cycle, and that a slice is done or committed only when the project's whole suite **passes**. Every failure is named, whether this change caused it or not; a failure the change did not cause is reported to the owner, never counted as green. ✓ 730a8e1d (T4 20990007); Codex pre-merge Spec CLEAR
 - [x] The per-cycle checklist gains: name the production change that would fail this test; if only a deliberate decision could fail it, it is a change detector. ✓ 730a8e1d; Codex Spec CLEAR
 - [x] No duplicated rule: `/tdd` and `test-standard.md` § Regression gate point to one another rather than restating it. `/tdd` SKILL.md stays within ~140 lines. ✓ 43c029bf review fix: test-standard.md points to /tdd, Codex re-review CLEAR; check-doc-caps tdd SKILL.md 104 <= 140
-- [ ] Exercised once on a real cycle (L-007). CHANGELOG reflects the change.
+- [x] Exercised once on a real cycle (L-007). CHANGELOG reflects the change. ✓ exercised: frontmatterValue test + name-the-break, whole bun test 429/1/2 each failure named (TD-154 pre-existing; worktree node_modules); CHANGELOG v2.10.0 (5c462404)
 
 ## Touches
 
