@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-10
+last_updated: 2026-10-19
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -382,6 +382,18 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-260** severity: low | status: open | created: Sprint-131 (close; found by the T2 inline replay)
+  - Summary: **The whole-suite rule is still stated twice.** SPRINT-129's owner ruling put the per-slice whole-suite rule in one
+    place (`/tdd`), and `test-standard.md` now points to it. But `skills/orchestrator/references/review-scoping.md:241` (§ QA
+    suggestion) still restates it: "ALL existing tests still pass (zero regressions) before it ticks done".
+  - Fix direction: replace the clause with a pointer to `/tdd` § Workflow, as `test-standard.md` does.
+- **TD-259** severity: low | status: open | created: Sprint-131 (close; found by the T2 inline replay)
+  - Summary: **The TD-154 gate guard accepts a quoted excluded head.** `invokes()` in `test/gate-discovery/discover.ts` strips
+    quoted spans to a ` Q ` placeholder before the head check, so `"echo" sh scripts/qa-check.sh`, `'echo' …` and `e"ch"o …`
+    pass as gate invocations (probe: true ×3) while the shell runs `echo` and never the gate. That is an ADR-033 guard false
+    negative, reachable only by a deliberately odd manifest.
+  - Fix direction: the inline arm's fix is a ready reference (replay commit `290f70bf`, a no-space sentinel; reject a quoted or
+    backslashed head), with a retained must-FAIL per head form and a seeded proof.
 - **TD-258** severity: low | status: open | created: Sprint-128 (close; T3 · T5 proof gaps)
   - Summary: **Three hardened branches carry no discriminating proof.** `_att_fmv_stdin` (§13b) strips CR but has no CRLF fixture;
     `_own_scan` and `_own_governed_off` are covered by CRLF twins but were never seeded; the CLI half of TASK-445's empty-store fix

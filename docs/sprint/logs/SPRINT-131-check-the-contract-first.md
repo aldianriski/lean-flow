@@ -153,3 +153,16 @@ every reference above: `9a35d692 → 0afee584` · `d552c03d → 09eba192` · `75
 `55d581ff → 69ad1edd`. The tick evidence in TASK-459 and TASK-462 cites the old shas, which resolve through this map.
 `reference-rejudge.md` is updated in place.
 system-verify · PASS · QA_FULL on the VPS at `91502a86`, the final integrated tree after the rewrite: 300 pass, 0 fail, 112 s; `bun test` 441 pass, 0 fail
+
+### 2026-10-19 | close | 4 of 4 members in `done/`, PLAN_EXHAUSTED; released 2.11.0 MINOR; Retro + buckets
+run · 14 of 14 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 300/0 on the VPS at `91502a86`, the final integrated tree, after the owner-ruled fix-and-rerun of the
+first run (298/2, two attribution legs). Release 2.11.0 MINOR (owner): the four manifests (derived by
+`grep -l '"version"' .*-plugin/*.json`) and the README footer; v2.9.x rotated verbatim to `docs/changelog/` (§11, owner-approved).
+Doc-freshness (owner-approved): `.claude/CONTEXT.md` § Gates G2 row and the README G2 bullet name the builder check, with no
+line added; the CONTEXT density ratchet holds at 16 ≤ 16.
+Buckets: Shipped → CHANGELOG v2.11.0. Tech debt → TD-259 (quoted-head bypass in the live TD-154 guard) and TD-260
+(review-scoping.md:241 restates the whole-suite rule); the ledger reads 108 rows (105 open). Follow-ups → none; TASK-461 is
+cancelled (owner). Learnings → L-238 (commit-subject attribution for coordinator writes) and L-239 (an empty working
+directory for static reviewers); knowledge index regenerated. Handoff ledger: no `handoff` entry was taken. No epic is attached.

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-12
+last_updated: 2026-10-19
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-237**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-239**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -68,6 +68,22 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - **wiring → moved: docs/LEARNINGS.md` § Durable rules › wiring** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: L-020
 
 ❌ Shipping a new capability **without wiring it into the jobs that trigger/chain it** — a behaviour written only in its own file is half-shipped. Wire every trigger point + downstream consumer (entry routing · dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT) and verify it *fires* end-to-end. Shipping ≠ wiring (SPRINT-022 audit: dispatch · review-split · fog-mode all shipped half-connected → L-020).
+
+---
+
+## L-239 [tags: process] [status: active]: **A static reviewer run from inside the repository is not static: give it an empty working directory and say "do not run any command".** SPRINT-131 T2 replayed old tasks with the later findings hidden. The inline arm's checkout was a bundle clone ending at the old `plan_commit`. But the Codex adversarial review was launched from the main repository, ran `git show` and `git log --all` there, and read the dispatch arm's later fix commits. Its three findings were real in the replayed text, but its detection was no longer blind, and the record had to say so. Every later run, pinned to an empty directory with the instruction in its prompt, ran zero commands (counted from its log). A "static review from this text only" brief is a request, not an isolation: the reviewer's working directory is what it can read.
+- seen: 2026-10-19 (SPRINT-131 T2, inline-arm adversarial review)
+- count: 1
+- promoted: no
+- related: L-182 (evidence from a tree the builder's own tooling has written is not evidence)
+
+---
+
+## L-238 [tags: edit-safety] [status: active]: **A coordinator's commit subject is the attribution record, so a coordinator-owned write goes under `sprint(N):`, never under a task's `Tn:`.** SPRINT-131's system verify FAILed on two legs (`layers observed` · `dod-delta`) with no content defect. Four of the coordinator's own subjects could not be attributed: a combined `sprint(131) T3 + T4:` that no attribution arm reads, two `git revert --no-edit` subjects (`Revert "…"`) with no sprint at all, and a write to the coordinator-owned research doc under `sprint(131) T2:`, which T2's `Layers:` do not declare. The owner ruled fix-and-rerun, which cost a `filter-branch` message rewrite of 10 commits (trees byte-identical) and a second QA_FULL run. One task per subject; a write to a D1-owned shared file is `sprint(N):`; a revert gets a `sprint(N) Tn:` subject (`git revert --no-commit`, then commit).
+- seen: 2026-10-19 (SPRINT-131 close, system verify 298/2 → 300/0 after the rewrite)
+- count: 1
+- promoted: no
+- related: L-151 (a ruling the checker cannot read behaves as if never taken)
 
 ---
 

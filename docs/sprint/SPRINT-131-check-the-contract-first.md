@@ -3,7 +3,7 @@ sprint: 131
 slug: check-the-contract-first
 owner: Maintainer
 last_updated: 2026-10-19
-status: active
+status: closed
 plan_commit: 8fd58050
 gates_signed: G1,G2 @ 15d35c09
 update_trigger: sprint execute/close events
@@ -102,6 +102,46 @@ A navigation table earns its lines only if readers find the authoritative record
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/builder-check.md` (new) · `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/night-run.md` | T1 | G2 runs one fresh reader per task design (contradictions + factual/intent questions) before sign-off; a pre-signed overnight G2 needs the record; the entry path says "before the run is spawned" | Med | Codex CLEAR after the adversarial-floor retry; cap 140 ≤ 140; exercised on this sprint's 4 designs |
+| `docs/architecture/overview.md` | T4 | loop table added, then reverted by its reader-test rule (median ratio 0.92 > 0.75) | Low | 16 readers × 8 cases; `git diff 07113e12 HEAD` empty |
+| `docs/research/reference-rejudge.md` | T2 · T3 · T4 (coordinator) | the three experiment records; "3 of 14" corrected to the census | Low | Codex review per record |
+| `CHANGELOG.md` · `docs/changelog/CHANGELOG-2.9.0.md` · the four `*-plugin/*.json` · `README.md` · `.claude/CONTEXT.md` | close | release 2.11.0; v2.9.x rotated verbatim; the G2 summaries name the builder check | Low | doc caps + prose density PASS |
+| `TECH-DEBT.md` · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `docs/work/cancel/TASK-461-*` | close | TD-259 · TD-260 filed; L-238 · L-239 filed; TASK-461 cancelled | Low | system verify 300/0 |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->
+
+**Retrieval check: three misses, all of the "a number is a query result" family (CLAUDE.md cross-check rule).**
+- The "3 of 14" figure in TASK-460 and the research doc was frozen at intake without a census. The census found 37 questions
+  and 2 "Other" answers, which cost a `scope-change` and an owner re-scope.
+- The G2 popup reported 9 contradictions when the reports' own counts summed to 12. It was corrected in the log.
+- The retention popup said CHANGELOG rotation was not due while a MINOR was being cut. A second popup corrected it before
+  anything moved.
+
+**Cost.**
+- Builder check at G2: 245k tokens across 4 readers.
+- T1: built inline.
+- T3: census 110k, 4 readers 359k, judge 59k.
+- T4: builder 75k, cases 98k, 16 readers about 960k.
+- T2: baseline 126k, inline arms 3.49M + 4.24M raw (Opus), Codex wrapper 0.32M.
+- Codex reviewer for T1 · T3 · T4: about 0.13M.
+- Two QA_FULL runs on the VPS (113 s · 112 s).
+
+**Worked**
+- The builder check paid for itself on its first use. The four readers raised 12 contradictions; one was the T1 gap that
+  the pre-signed overnight G2 never reached the new line. Every design changed before sign-off, and the adversarial floor
+  still found two more in T1 (the "before any spawn" conflict, and no path for a host without sub-agents).
+- Pre-registering T2's coordinator-context rule before any inline figure existed kept a 0.21× raw result from reading as a pass.
+- Bundle clones ending at `plan_commit` gave the inline builders no route to later history.
+
+**Friction**
+- Commit subjects that attributed coordinator writes to a task FAILed system verify. The fix rewrote 10 commit messages (L-238).
+- One Codex review run from the main repo read later history, which breached T2's blinding for that review (L-239).
+- Judge strictness decided T3: two differently worded sprint names flipped the verdict.
+
+**Pattern candidates**
+- L-238 (new): commit-subject attribution for coordinator writes. L-239 (new): an empty working directory for static reviewers.
+
+**Owner actions**
+- Push `main` (release 2.11.0 is committed, not pushed).
+- Delete `backup/sprint131-pre-rewrite` once the old shas no longer need to resolve.
+- Twelve stale agent worktrees remain; four are locked by live sessions (pids 19916 · 29872).
