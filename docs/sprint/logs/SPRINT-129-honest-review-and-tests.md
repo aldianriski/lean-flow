@@ -36,3 +36,14 @@ Size check: 4 S, no `L`. All four members are `origin: decomposer` (re-decompose
 now in `cancel/`), so each G1 is the fast-path confirm.
 Same-day context: the members' source research is `docs/research/mattpocock-scan5.md` and `brainstorming-adaptation.md` §
 Re-scan, both Codex-reviewed to CLEAR before this promote.
+
+### 2026-10-19 | gate | G1 + G2 signed by the owner (one popup round); attended sprint-bulk, waves T1 · T3 · T4 → T2
+G1: batch fast-path confirm, all four members `origin: decomposer`, scope unchanged since `plan_commit` b1712732.
+G2: design per task as presented (T1 a fifth brief bullet + the Standards axis names its docs · T2 a declined-to-judge list +
+spec-silence rule · T3 a landed-mutation rule in Phase 5 · T4 whole-suite-passes before a slice is done + name-the-break
+checklist line + a pointer from test-standard.md § Regression gate). Real exercises: T1 on the T3/T4 review briefs · T2 on one
+scoped review of its own diff · T3 a seeded must-FAIL fixture in an isolated worktree, cmp landed and restored · T4 one genuine
+red/green cycle in an isolated worktree with the full `bun test` run; nothing from the exercises is committed.
+Verification: line caps → `bun scripts/lib/check-doc-caps.ts` (EXISTS · RUNS · REACHES skills/diagnose|tdd/SKILL.md · PROVES the
+cap); wording boxes are judgment ticks backed by read-through + the Codex loop (D3); CHANGELOG boxes tick at the close release (D1).
+Dispatch preflight: CLEAR (base-ref = HEAD bed7b10f · waves T1=0 T2=1 T3=0 T4=0 · review-scoping.md owned T1 → T2).

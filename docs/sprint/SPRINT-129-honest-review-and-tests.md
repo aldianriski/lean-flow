@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-10-19
 status: active
 plan_commit: b1712732
+gates_signed: G1,G2 @ bed7b10f
 update_trigger: sprint execute/close events
 ---
 
