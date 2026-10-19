@@ -123,3 +123,16 @@ calls inside that carried coordinator context. TASK-459's Done-when counts "coor
 · S130 510,392) and N is the inline agent's unique model calls. Review and Codex-wrapper agents stay as measured, as in the
 dispatch arm. The raw inline total is reported beside it, and the bias is named either way. The thresholds are unchanged
 (≤ 70% tokens · defects ≤ dispatch · elapsed ≤ 110%).
+
+### 2026-10-19 | progress | T2 measured: inline fails on cost (context-adjusted 1.01× and 2.00× vs the ≤0.70 bar); dispatch default stands
+Inline arm: one fresh Opus agent per sprint in a bundle clone ending at `plan_commit` (b1712732 · 9c782185), with the
+first-dispatch briefs as written. S129: 42 calls, 3.49M raw. S130: 49 calls, 4.24M raw. Codex wrapper: 0.11M · 0.21M. Reviews
+mirrored the dispatch arm: Codex first pass, adversarial floor on zero-finding passes, one retry by the inline agent, one
+re-review. All re-reviews were CLEAR. Defects at review: S129 had 2 (prompt wiring F1+F2 · whole-suite rule duplicated). S130
+had 3 (interior run · quoted-head bypass · empty-capture cause). Wall clock: 1117 s vs 1059 s, and 798 s vs 790 s.
+Adjusted per `efa851d4`: S129 16.96M vs 16.79M (1.01×), S130 29.46M vs 14.75M (2.00×), so **fail**. The raw ratios would pass
+(0.21× · 0.30×). The record is in `reference-rejudge.md` § Experiment results.
+review · T2 · scoped-reviewer · Codex gpt-6-astra · FINDINGS (4) → record retry → re-review FINDINGS (3) → still-open → owner: defect comparison not blind for S129 (its inline adversarial review ran git in the main repo); S130 elapsed confounded by T3 time; defects compared at review only. Claims narrowed in the record; the verdict rests on cost alone.
+Found by the replay, in the LIVE repo: (1) the TD-154 guard `invokes()` accepts `"echo" sh scripts/qa-check.sh`, `'echo' …` and
+`e"ch"o …` as gate invocations (probe output: true ×3); (2) `review-scoping.md:241` still restates the whole-suite rule, against
+SPRINT-129's one-place ruling. Both are TD candidates for close.
