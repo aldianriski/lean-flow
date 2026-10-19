@@ -71,6 +71,10 @@ exercises the real bug pattern at the call site). A too-shallow seam gives false
 flag it for Phase 6. When a seam exists: failing test (RED) → minimal fix (GREEN) → re-run the Phase 1
 loop against the original, un-minimised scenario → full suite still passes.
 
+A red you **force** — a mutation, a fixture edit, or the fix reverted to watch the test fail — counts
+only once a `diff`/`cmp` against a pristine copy shows the change landed; a landed change that
+reddens nothing has tested nothing. Prove the restore the same way.
+
 ## Phase 6 — Cleanup + post-mortem
 
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
