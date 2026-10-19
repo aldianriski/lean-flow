@@ -12,7 +12,7 @@ related: [mattpocock-adaptation, brainstorming-adaptation]
 # Research — mattpocock scan 5: what changed since 2026-08-09, and is any of it a delta?
 
 > **Question.** Of what mattpocock/skills added or changed after scan 4, what carries a delta over lean-flow's current surface (L-017)?
-> **Verdict.** No new skill. **2 micro keepers** (filed TASK-448 · TASK-449); everything else is a fast reject. One tension recorded, not adopted.
+> **Verdict.** No new skill. **2 micro keepers** (filed TASK-451 · TASK-453); everything else is a fast reject. One tension recorded, not adopted.
 
 ## Why this matters
 
@@ -51,17 +51,17 @@ agree: the git tree API at `main` (`truncated:false`) and a per-folder contents-
 - **K1 — forced-red proof.** A red produced by mutating code or a fixture, or by reverting the fix,
   counts only once a diff/`cmp` against a pristine copy proves the change landed. Upstream evidence:
   `skills/engineering/diagnosing-bugs/SKILL.md` at `f3fc5632` (closes their issue #955). Lands in
-  `/diagnose` Phase 5 (and `/tdd`'s RED step if the §10 placement test says both) → **TASK-449**.
+  `/diagnose` Phase 5 only — `/tdd`'s reds come from unwritten code, not a mutation (owner ruling) → **TASK-453**.
 - **K2 — the reviewer finds the standards docs.** The Standards pass is told to search the repo for
   every file that says how code should be written (CONTRIBUTING, style guides, coding standards) and
   read them. Upstream evidence: `skills/engineering/code-review/SKILL.md` at `3da8c011` (closes three
   observed-failure issues). Consumer-side gap (L-015): our own reviewer gets CLAUDE.md, adopters keep
-  standards elsewhere. Lands in `orchestrator/references/review-scoping.md` → **TASK-448** (bundled
-  with the superpowers keeper for the same file, `brainstorming-adaptation.md` § Re-scan).
+  standards elsewhere. Lands in `orchestrator/references/review-scoping.md`, with the coordinator
+  supplying the docs in the brief rather than the reviewer searching the repo (owner ruling) → **TASK-451**.
 
 ## Recommendation
 
-Adopt no new skill. Build K1 and K2 as the two micro tasks filed (TASK-449 · TASK-448); both close a
+Adopt no new skill. Build K1 and K2 as the two micro tasks filed (TASK-453 · TASK-451); both close a
 consumer-path gap rather than add machinery. Reject everything else listed above.
 
 ## Out of scope / open questions

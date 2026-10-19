@@ -39,3 +39,7 @@ skills/orchestrator/references/review-scoping.md · CHANGELOG (consumer-visible)
 ## Tracker
 
 - `docs/research/mattpocock-scan5.md` K2 · `docs/research/brainstorming-adaptation.md` § Re-scan K3
+
+## Amended 2026-10-19
+
+Superseded by TASK-451 + TASK-452: the same keeper re-decomposed through `/task-decomposer`'s intake grill (`origin: decomposer`). This hand-filed version is cancelled at /triage (owner-approved).

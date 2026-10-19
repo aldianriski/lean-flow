@@ -39,3 +39,7 @@ skills/diagnose/SKILL.md · possibly skills/tdd/SKILL.md · CHANGELOG (consumer-
 ## Tracker
 
 - `docs/research/mattpocock-scan5.md` K1 (upstream `diagnosing-bugs` at `f3fc5632`)
+
+## Amended 2026-10-19
+
+Superseded by TASK-453: the same keeper re-decomposed through `/task-decomposer`'s intake grill (`origin: decomposer`). This hand-filed version is cancelled at /triage (owner-approved).

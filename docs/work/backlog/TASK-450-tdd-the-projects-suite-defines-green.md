@@ -39,3 +39,7 @@ skills/tdd/SKILL.md · skills/tdd/references/test-standard.md · CHANGELOG (cons
 ## Tracker
 
 - `docs/research/brainstorming-adaptation.md` § Re-scan K4 (upstream `test-driven-development/SKILL.md`)
+
+## Amended 2026-10-19
+
+Superseded by TASK-454: the same keeper re-decomposed through `/task-decomposer`'s intake grill (`origin: decomposer`). This hand-filed version is cancelled at /triage (owner-approved).
