@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-128 — Planning Debt — closed 2026-10-19 · `d9139c4` · 5 of 5 members in `done/`, 22/22 DoD (released in `2.9.0`; orchestrator dispatch preflight + conformance engine + sprint-members changed) · **EPIC-022 member, closes it** — one Plan parser, a resolver that names every store anomaly, the Shell twins retired, CRLF-safe engine readers
 - SPRINT-127 — Plans Without Git — closed 2026-10-18 · `2c34f34` · 5 of 5 members in `done/`, 18/18 DoD (released in `2.8.0`; spec 0.18.0 + orchestrator/lean-doc-generator/triage/templates + conformance engine changed) · **EPIC-022 member** — a task keeps its own G1/G2 sign-off, a repo without git runs the sprint lifecycle (ADR-054), the tick step runs the gate's checkers; exercised on workdoo
 - SPRINT-126 — Roadmap and Traceability — closed 2026-10-18 · `4ff484b` · 3 of 3 members in `done/` (released in `2.7.0`; spec 0.17.0 + templates/prime/triage/lean-doc-generator/task-decomposer/flow changed) · **EPIC-022 member** — a repo can write a phased roadmap and see which active rows nothing delivers
 - SPRINT-125 — Consumer Maturity and Cleanup — closed 2026-10-18 · `ff04f84` · 9 of 9 members in `done/` (released in `2.6.0`; spec 0.16.0 + orchestrator/prime/lean-doc-generator/release-patch/templates/handoff + conformance engine changed) · **EPIC-022 member** — the shipped surface stops naming lean-flow's scripts, two false-green rules fixed, platform epics retired

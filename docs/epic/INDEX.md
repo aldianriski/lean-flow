@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 update_trigger: An epic is opened, or closed and archived (STANDARD §11)
 status: current
 ---
@@ -20,7 +20,7 @@ are closed — superseded → workdoo** (EPIC-010 · 013 closed earlier, merged 
 EPIC-022 D1), closed in place with their Closed-when unticked: not delivered here. Still open on lean-flow's roadmap: **EPIC-005** (Fleet) and
 **EPIC-007** (Workflow Packs), both `proposed`. The register, not the file, is the gate: a destination written down is not work admitted.
 
-- [EPIC-022](EPIC-022-plans-that-work-for-any-consumer.md) — Plans That Work for Any Consumer: plan from a phased roadmap down to sprint tasks, with or without git, every plan row traceable and every G2 sign-off recorded — **active** 2026-10-18 · four sprints, S1 consumer maturity first (owner ruling 2026-10-18) · driven by workdoo's consumer evidence · id derived across both repos (the old workdoo holds EPIC-021, TD-245)
+- [EPIC-022](archive/EPIC-022-plans-that-work-for-any-consumer.md) — Plans That Work for Any Consumer: plan from a phased roadmap down to sprint tasks, with or without git, every plan row traceable and every G2 sign-off recorded — closed 2026-10-19 · SPRINT-125 → SPRINT-128 (all eight Closed-when `[x]`) · consumer maturity, the roadmap, git-less plans (ADR-054) and the planning-checker debt
 - EPIC-020 → **moved to workdoo** [`docs/epic/EPIC-020`](https://github.com/aldianriski/workdoo/blob/main/docs/epic/EPIC-020-governed-agents-follow-the-lean-flow-loop.md) (2026-10-10, ADR-052) — Governed Agents Follow the Lean-Flow Loop: one sentence → clarify rounds → approved proposals → build → independent review (Codex, read-only) → keep, with one policy table — **proposed** 2026-10-06 · member sprints are **workdoo** sprints · after EPIC-019, before EPIC-018
 - EPIC-019 → **moved to workdoo** [`docs/epic/EPIC-019`](https://github.com/aldianriski/workdoo/blob/main/docs/epic/EPIC-019-workdoo-works-like-a-work-management-tool.md) (2026-10-10, ADR-052) — workdoo Works Like a Work-Management Tool: the whole loop runs from one work-item screen in the DESIGN.md v0.2.0 "Gate Track" design, both themes, no separate approvals page — **proposed** 2026-10-06 · member sprints are **workdoo** sprints · after workdoo SPRINT-009, ahead of EPIC-018
 - EPIC-018 → **moved to workdoo** [`docs/epic/EPIC-018`](https://github.com/aldianriski/workdoo/blob/main/docs/epic/EPIC-018-projects-span-repositories.md) (2026-10-10, ADR-052) — Projects Span Repositories, End to End: an operator adds a GitHub repo to a Project from the workdoo dashboard, and one work item delivers across several repos, all-or-nothing — **proposed** 2026-10-06 · member sprints are **workdoo** sprints (like EPIC-016) · sequenced after workdoo SPRINT-009
