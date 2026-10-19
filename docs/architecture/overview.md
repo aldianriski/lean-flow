@@ -90,9 +90,9 @@ repo and both land in the consumer's cache verbatim (verified against a real ins
 consumer-facing check (L-015) is therefore *usable surface*, not presence on disk — and for the conformance engine that surface is now
 deliberate rather than incidental. `evals/` guards behaviour that ships inside a skill, and is the one that stays ours alone.
 
-The zero-API `evals/` harnesses run inside `qa-check.sh`: always-on ones
-on every run, the slow selftests under `QA_FULL=1` (TD-016).
-The paid behavioural fixtures stay a manual step (`evals/README.md`).
+The zero-API `evals/` harnesses run inside `qa-check.sh` — always-on ones on every run, the slow selftests
+under `QA_FULL=1`
+(TD-016); the paid behavioural fixtures stay a manual step (`evals/README.md`).
 
 ## The loop
 
