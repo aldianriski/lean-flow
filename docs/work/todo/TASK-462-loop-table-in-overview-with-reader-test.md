@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-131
 ---
 
 # TASK-462 — Add a loop table to the architecture overview, kept only if a reader test shows it helps

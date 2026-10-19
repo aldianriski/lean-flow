@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-131
 ---
 
 # TASK-458 — Add a fresh-reader builder check to the G2 design gate
