@@ -101,6 +101,15 @@ describe("gate discovery — mentioning the gate is not running it", () => {
     expect(invokes(": sh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(false);
   });
 
+  test("a wrapped gate is recognised across any whitespace, not only a literal space", () => {
+    expect(invokes("bun scripts/qa-verdict.ts\tsh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(true);
+  });
+
+  test("an INTERIOR run is not an invocation — the gate must be the segment's trailing arguments", () => {
+    expect(invokes("grep sh scripts/qa-check.sh notes.txt", "sh scripts/qa-check.sh")).toBe(false);
+    expect(invokes("bun scripts/qa-verdict.ts sh scripts/qa-check.sh extra", "sh scripts/qa-check.sh")).toBe(false);
+  });
+
   test("a wrapped prefix that is a different script is not an invocation", () => {
     expect(invokes("bun scripts/qa-verdict.ts sh scripts/qa-check.sh.bak", "sh scripts/qa-check.sh")).toBe(false);
   });

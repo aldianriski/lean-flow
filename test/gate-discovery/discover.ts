@@ -117,8 +117,8 @@ export function discoverGate(root: string): Discovery {
  * on shell separators, and require some resulting segment to invoke the declared command by one of
  * two rules:
  *   1. the segment BEGINS with it (equal, or followed by a space) -- the bare form; or
- *   2. it appears as a run of WHOLE tokens inside the segment and the segment's head token is not a
- *      non-executing builtin (`echo` / `printf` / `:`). This is the wrapped form, e.g. this repo's
+ *   2. the segment ENDS with it as whole (whitespace-delimited) tokens, after at least one wrapper
+ *      token, and the segment's head token is not a non-executing builtin (`echo` / `printf` / `:`). This is the wrapped form, e.g. this repo's
  *      `bun scripts/qa-verdict.ts sh scripts/qa-check.sh`, where the gate is an argument of a
  *      wrapper that runs it (TD-154: rule 1 alone reported that real script as `bypassed`).
  * Rule 2 is still shape: whole-token boundaries keep `qa-check.sh.bak` out, and the builtin
@@ -137,8 +137,17 @@ export function invokes(command: string, declared: string): boolean {
       (seg) =>
         seg === declared ||
         seg.startsWith(`${declared} `) ||
-        (!NON_EXECUTING_HEADS.has(seg.split(/\s+/)[0]!) && ` ${seg} `.includes(` ${declared} `)),
+        endsWithTokens(seg, declared),
     );
+}
+
+// Rule 2: the declared command is the segment's trailing argument list, behind a wrapper that
+// is not a non-executing builtin. Tokens split on any whitespace, so a tab is a boundary too.
+function endsWithTokens(seg: string, declared: string): boolean {
+  const toks = seg.split(/\s+/);
+  const want = declared.trim().split(/\s+/);
+  if (toks.length <= want.length || NON_EXECUTING_HEADS.has(toks[0]!)) return false;
+  return want.every((t, i) => toks[toks.length - want.length + i] === t);
 }
 
 export function bypassesDeclaredGate(root: string): {
