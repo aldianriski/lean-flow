@@ -24,7 +24,7 @@ test file.
 
 ## Done when
 
-- [ ] `/tdd` states that the focused test drives each red/green cycle, and that the project's whole suite runs before a slice is called done or committed, with every failure named, whether this change caused it or not.
+- [ ] `/tdd` states that the focused test drives each red/green cycle, and that a slice is done or committed only when the project's whole suite **passes**. Every failure is named, whether this change caused it or not; a failure the change did not cause is reported to the owner, never counted as green.
 - [ ] The per-cycle checklist gains: name the production change that would fail this test; if only a deliberate decision could fail it, it is a change detector.
 - [ ] No duplicated rule: `/tdd` and `test-standard.md` § Regression gate point to one another rather than restating it. `/tdd` SKILL.md stays within ~140 lines.
 - [ ] Exercised once on a real cycle (L-007). CHANGELOG reflects the change.
