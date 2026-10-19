@@ -78,6 +78,11 @@ Only once GREEN — **never refactor while RED**. Extract duplication, move comp
 interfaces, apply patterns where natural (candidate list → `${CLAUDE_SKILL_DIR}/references/testability.md`). Run the
 tests after each refactor step.
 
+### Done = whole suite green
+The focused test drives each RED/GREEN cycle. A slice is done — or committed — only when the project's
+**whole suite passes**, run once per slice (not every cycle). Name every failure, whether this change
+caused it or not; a failure the slice did not cause is reported to the owner, never counted as green.
+
 ## Per-cycle checklist
 
 ```
@@ -85,6 +90,7 @@ tests after each refactor step.
 [ ] Test uses the public interface only
 [ ] Test would survive an internal refactor
 [ ] Expected value comes from an independent source — not recomputed the way the code does
+[ ] Named the production change that would fail this test — if only a deliberate decision could, it is a change detector
 [ ] Code is minimal for this test — no speculative features
 ```
 
