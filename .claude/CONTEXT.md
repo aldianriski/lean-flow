@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
@@ -53,7 +53,7 @@ re-implements one. **Bug intake** — a bug (`BUG.md.template`) enters at `/tria
 | Gate | Name | Where | Checks |
 |---|---|---|---|
 | G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (**L splits — but `promote` size-checks first, since G1 runs after the Plan is frozen and splitting then costs a `scope-change`**) · files/blast-radius · out-of-scope named · assumptions confirmed · decomposer-approved task → fast-path confirm (scope unchanged?) |
-| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks (each notes its mechanical check where one exists; that check's FAIL blocks a *silent* tick — owner override recorded, ADR-021) · ADR if hard-to-reverse · `risk:high` on auth/input/secrets/data → one-line abuse-case sketch · **overlap-ownership map** (shared files → single owner + commit order, before first task) · residual grill until unambiguous |
+| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks (each notes its mechanical check where one exists; that check's FAIL blocks a *silent* tick — owner override recorded, ADR-021) · ADR if hard-to-reverse · `risk:high` on auth/input/secrets/data → one-line abuse-case sketch · **overlap-ownership map** (shared files → single owner + commit order) · fresh-reader builder check · residual grill until unambiguous |
 
 Humans approve gates — the skill never self-approves; G1/G2 are inline, human-approved checklists. Review may dispatch an isolated built-in or ad-hoc subagent (`/code-review` et al.) — lean-flow ships no custom agent definitions.
 

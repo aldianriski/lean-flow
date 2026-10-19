@@ -225,7 +225,7 @@ security → `/security-review`. `/council` is the one skill that orchestrates s
 
 **Gates** — humans approve; the skill never self-approves:
 - **G1 Scope** (all modes) — goal restated as one verifiable sentence · size S/M/L (an **L splits**) · files / blast-radius · out-of-scope named · assumptions confirmed.
-- **G2 Design** (`mvp` · `sprint-bulk`) — approach + one-line WHY · verifiable micro-tasks · an ADR only if the decision is hard-to-reverse **and** surprising **and** a real trade-off · residual grill until the goal is unambiguous (the detailed grill already ran at intake, in `/task-decomposer`).
+- **G2 Design** (`mvp` · `sprint-bulk`) — approach + one-line WHY · verifiable micro-tasks · an ADR only if the decision is hard-to-reverse **and** surprising **and** a real trade-off · a fresh-reader builder check before sign-off (contradictions with the Done-when, open questions) · residual grill until the goal is unambiguous (the detailed grill already ran at intake, in `/task-decomposer`).
 
 Before any **parallel wave**, `sprint-bulk` also runs a mechanical **pre-dispatch preflight** — cycle ·
 shared-file single-owner · declared-base-vs-HEAD · wave computation — all derived from tokens your sprint
@@ -529,7 +529,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-10-19 · status: current · v2.10.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-10-19 · status: current · v2.11.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

@@ -29,7 +29,7 @@ wording loosening a frozen Done-when (L-237), which no current G2 step can see.
 - [x] The coordinator resolves factual questions itself; a contradiction is settled before sign-off (fix the design, or a recorded owner ruling on the Done-when); only intent questions go to the owner, inside the G2 popup. ✓ builder-check.md § Procedure step 3: coordinator answers factual questions; a contradiction is fixed in the design or by a scope-change + owner ruling; only intent questions reach the G2 popup
 - [x] The reader prompt lives in the orchestrator's `references/` (uncounted, ADR-006); the orchestrator SKILL.md stays within ~140 lines. ✓ prompt in skills/orchestrator/references/builder-check.md (uncounted); PASS cap skills/orchestrator/SKILL.md (140 <= 140)
 - [x] Wiring: the check fires wherever G2 runs — `/orchestrator` mvp and sprint-bulk, the `/flow` conductor, and the overnight run's pre-signed G2 — not only in its own file (L-020). ✓ SKILL.md § G2 line (mvp + sprint-bulk share it); flow/SKILL.md:36 → sprint-bulk G1/G2; night-run.md pre-flight G2 item requires the builder-check lines, entry step 4 routes back; Codex CLEAR after the adversarial-floor retry (2e1c9eef)
-- [ ] Exercised once on a real design before its sign-off (L-007); CHANGELOG reflects the change.
+- [x] Exercised once on a real design before its sign-off (L-007); CHANGELOG reflects the change. ✓ exercised on SPRINT-131's own four designs before their G2 sign-off (4 builder-check lines in the Execution Log); CHANGELOG v2.11.0 block
 
 ## Touches
 
