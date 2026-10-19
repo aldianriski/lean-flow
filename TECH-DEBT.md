@@ -1956,6 +1956,9 @@ status: current
     particular freeze.
 
 - **TD-090** severity: medium | status: open | created: Sprint-084 | `high` (085 close) → `medium` (086 close) → **`high` again, same day, by its own re-raise condition** → **`medium`** (2026-10-06, Round 22, owner)
+  - **Route (SPRINT-129 promote, 2026-10-19, owner):** `TASK-322` was cancelled (superseded by ADR-051), so this row is re-routed
+    to `TASK-367`, whose open line asks for the Windows default-profile gate re-measure. Data point: a default-profile run on the
+    Windows host that day truncated at 720 s against the 520 s budget (one sample, under concurrent load — not a measurement).
   - Summary: **`qa-check.sh` leg 12 (eval harnesses) is now the gate's dominant cost** — 396.3s of a
     492s run, ~81%.
   - Evidence: `docs/research/logs/qa-gate-timing.md` § Round 4, measured post-fix. It was never the
