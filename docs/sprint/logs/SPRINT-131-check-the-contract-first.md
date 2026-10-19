@@ -109,3 +109,17 @@ with the table vs 24.5 s without (ratio 0.92 > 0.75), so it is **removed**: reve
 the session trailers.
 review · T4 · scoped-reviewer · Codex gpt-6-astra · FINDINGS (1) (Done-when item 1 evidence) → record retry → re-review FINDINGS (1): leakage deletions asserted, not shown → still-open → owner
   evidence since: `git status --short` in both reader checkouts lists ` D` for reference-rejudge.md · SPRINT-131 sprint + log · TASK-462 (4 files each)
+
+### 2026-10-19 | decision | T2: how the inline arm counts coordinator context, fixed before any inline figure exists
+Dispatch-arm baseline (from the 2026-10-19 transcript, deduped by message id; Codex's own tokens are unmetered and excluded from
+both arms). S129 (06:00:16Z → 06:16:23Z, elapsed 967 s, owner wait 0): coordinator 12.40M · builders 2.55M · retries 0.45M ·
+Codex wrapper 0.22M = **15.61M**, 3 material defects. S130 (09:18:22Z → 09:31:33Z, 790 s, owner wait 0, T3-only calls 1.63M
+excluded): coordinator 12.65M · builders 1.23M · retries 0.61M · wrapper 0.26M = **14.75M**, 3 material defects. The
+coordinator is 79–86% of each arm. It made 36 and 27 calls, each re-reading the session's carried context: a median of 318k
+tokens per call at the S129 window's start and 510k at S130's.
+**The bias:** the replay's inline agent starts with a fresh, small context. Real inline execution would run every one of its
+calls inside that carried coordinator context. TASK-459's Done-when counts "coordinator context", so the verdict reads the
+**context-adjusted** inline total: `inline_raw + N_inline_calls × C0`, where C0 is the first-five-call median above (S129 318,088
+· S130 510,392) and N is the inline agent's unique model calls. Review and Codex-wrapper agents stay as measured, as in the
+dispatch arm. The raw inline total is reported beside it, and the bias is named either way. The thresholds are unchanged
+(≤ 70% tokens · defects ≤ dispatch · elapsed ≤ 110%).
