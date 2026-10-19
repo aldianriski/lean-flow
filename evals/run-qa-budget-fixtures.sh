@@ -235,10 +235,11 @@ out12=$(sh -c '
   QA_CEILING_SECONDS=600
   eval "$1"
   printf "RESULT pass=%s fail=%s\n" "$pass" "$fail"
-' _ "$qc_block" 2>&1)
-# An empty capture is the host failing to fork/allocate, not a mismatch -- name it distinctly.
+' _ "$qc_block" 2>&1); rc12=$?
+# An empty capture is named distinctly from a mismatch, with the exit status and NO asserted cause:
+# a host fork/memory failure and a block that exits before printing both look like this.
 if [ -z "$out12" ]; then
-  echo "FAIL harness-env(case-12-empty-capture): the case subshell printed nothing -- a fork/memory failure of the host, not an assertion mismatch"; fail=1
+  echo "FAIL harness-env(case-12-empty-capture): the case subshell printed nothing (exit $rc12) -- cause unknown: a host fork/memory failure, or a block that exits before printing; not an assertion mismatch"; fail=1
 elif printf '%s\n' "$out12" | grep -q '^INFO  qa-runtime-over-ceiling: this run took 1263s' \
   && printf '%s\n' "$out12" | grep -q '^RESULT pass=0 fail=0$'; then
   echo "PASS fixture(over-ceiling-run-prints-info-and-fail-stays-0): $(printf '%s\n' "$out12" | tail -1)"
