@@ -18,7 +18,7 @@ related: [model-purpose]
 > **Scan 4 (2026-08-09, SPRINT-050 T3)** — `productivity/` · `in-progress/` · `misc/`, 13 examined, **0 keepers**. The corpus is now fully mapped.
 > **Scan 5 (2026-10-19, re-scan of changes)** — corpus 35 → **38** (4 new · 1 removed · ~10 changed), **2 micro keepers** → TASK-448 · TASK-449. Detail → [`mattpocock-scan5.md`](mattpocock-scan5.md).
 
-**Corpus: 35 `SKILL.md` files** — 18 `engineering/` · 7 `productivity/` · 6 `in-progress/` · 4 `misc/`.
+**Corpus at scan 4 (`84fdeffd`): 35 `SKILL.md` files** (scan 5: 38 — 20 · 7 · 7 · 4) — 18 `engineering/` · 7 `productivity/` · 6 `in-progress/` · 4 `misc/`.
 Counted deterministically (`gh api …/git/trees/main?recursive=1`), not read off a summary: a `WebFetch`
 summary of the same endpoint reported 32 while listing 35, its headline counts disagreeing with its
 own lists. The previous figure recorded here (34) was wrong.
@@ -102,8 +102,8 @@ Sources, evidence and the full argument for both → [`mattpocock-tensions.md`](
 ## Not scanned
 
 **None.** The corpus is fully mapped: 12 (scans 1–2) + 10 (scan 3, `engineering/`) + 13 (scan 4,
-`productivity/` · `in-progress/` · `misc/`) = **35**. A future scan is a re-scan of changed or added
-skills, not a remainder.
+`productivity/` · `in-progress/` · `misc/`) = **35** at scan 4. A future scan is a re-scan of changed or added
+skills, not a remainder — scan 5 was one ([`mattpocock-scan5.md`](mattpocock-scan5.md)).
 
 > **A boundary entry leaves this list by a written verdict, never by an assumption of coverage.**
 > Scan 2's list silently omitted `diagnosing-bugs` · `prototype` · `tdd` · `triage` · `handoff`

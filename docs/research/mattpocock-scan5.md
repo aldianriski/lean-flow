@@ -31,7 +31,7 @@ agree: the git tree API at `main` (`truncated:false`) and a per-folder contents-
 - **Materially changed:** `diagnosing-bugs` · `code-review` · `tdd` · `grilling` · `implement`; smaller: `to-tickets` · `wayfinder` · `handoff` · `ask-matt`.
 - **Repo-wide:** `CONTEXT.md` → `GLOSSARY.md`; a top-level `SCOPE.md` (admission bar = an observed failure that fits the philosophy) and six new `.out-of-scope/` records, one of which closes the repo to new skills.
 
-## Delta map (changed or added only)
+## Findings — delta map (changed or added only)
 
 | Item | lean-flow equivalent | Verdict |
 |---|---|---|
@@ -58,6 +58,11 @@ agree: the git tree API at `main` (`truncated:false`) and a per-folder contents-
   observed-failure issues). Consumer-side gap (L-015): our own reviewer gets CLAUDE.md, adopters keep
   standards elsewhere. Lands in `orchestrator/references/review-scoping.md` → **TASK-448** (bundled
   with the superpowers keeper for the same file, `brainstorming-adaptation.md` § Re-scan).
+
+## Recommendation
+
+Adopt no new skill. Build K1 and K2 as the two micro tasks filed (TASK-449 · TASK-448); both close a
+consumer-path gap rather than add machinery. Reject everything else listed above.
 
 ## Out of scope / open questions
 

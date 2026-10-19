@@ -36,7 +36,7 @@ data module (`loops.js`) plus `/nested` · `/ladder` · `/human` · `/curves` ·
   building bottom-up leaves you as the "connective tissue between uncertain loops".
 - The human-life, stress-curve and summit pages are rhetoric and event content, with no method in them.
 
-## Concept map (L-017: delta over our surface)
+## Findings — concept map (L-017: delta over our surface)
 
 | Loopcraft | lean-flow equivalent | Verdict |
 |---|---|---|
