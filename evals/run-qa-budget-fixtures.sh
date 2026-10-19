@@ -226,13 +226,20 @@ out12=$(sh -c '
   ok()   { pass=$((pass + 1)); printf "PASS  %s\n" "$1"; }
   bad()  { fail=$((fail + 1)); printf "FAIL  %s\n" "$1"; }
   pass=0; fail=0
+  # Frozen clock: a fixture whose input is a clock is not a fixture (TD-167). START_TS below and
+  # the lib ceiling check own `date +%s` both read this shadow, so elapsed is exactly 1263 and a
+  # second boundary between the two reads cannot make it 1264.
+  date() { echo 2000000000; }
   START_TS=$(( $(date +%s) - 1263 ))
   QA_BUDGET_SECONDS=900
   QA_CEILING_SECONDS=600
   eval "$1"
   printf "RESULT pass=%s fail=%s\n" "$pass" "$fail"
 ' _ "$qc_block" 2>&1)
-if printf '%s\n' "$out12" | grep -q '^INFO  qa-runtime-over-ceiling: this run took 1263s' \
+# An empty capture is the host failing to fork/allocate, not a mismatch -- name it distinctly.
+if [ -z "$out12" ]; then
+  echo "FAIL harness-env(case-12-empty-capture): the case subshell printed nothing -- a fork/memory failure of the host, not an assertion mismatch"; fail=1
+elif printf '%s\n' "$out12" | grep -q '^INFO  qa-runtime-over-ceiling: this run took 1263s' \
   && printf '%s\n' "$out12" | grep -q '^RESULT pass=0 fail=0$'; then
   echo "PASS fixture(over-ceiling-run-prints-info-and-fail-stays-0): $(printf '%s\n' "$out12" | tail -1)"
 else
