@@ -85,22 +85,28 @@ repository, reached through the root `conformance.sh`, and their exit code is a 
 adopter may gate CI on — while lean-flow still ships no workflow file and owns no pipeline. The rest of
 `scripts/` (qa-check · gen-index · night-run) remains this repo's own tooling.
 
-Neither directory is absent from an install: `plugin.json` declares no file manifest, so
-`plugin install` copies the whole repo and both land in the consumer's cache verbatim (verified
-against a real install, SPRINT-042). The distinction that matters for a
-consumer-facing check (L-015) is therefore *usable surface*, not presence on disk — and for the
-conformance engine that surface is now deliberate rather than incidental. `evals/` guards behaviour
-that ships inside a skill, and is the one that stays ours alone.
+Neither directory is absent from an install: `plugin.json` declares no file manifest, so `plugin install` copies the whole
+repo and both land in the consumer's cache verbatim (verified against a real install, SPRINT-042). The distinction that matters for a
+consumer-facing check (L-015) is therefore *usable surface*, not presence on disk — and for the conformance engine that surface is now
+deliberate rather than incidental. `evals/` guards behaviour that ships inside a skill, and is the one that stays ours alone.
 
-The zero-API `evals/` harnesses run inside `qa-check.sh` — always-on ones
-on every run, the slow selftests under `QA_FULL=1` (TD-016); the paid behavioural fixtures stay a
-manual step (`evals/README.md`).
+The zero-API `evals/` harnesses run inside `qa-check.sh` — always-on ones on every run, the slow selftests
+under `QA_FULL=1`
+(TD-016); the paid behavioural fixtures stay a manual step (`evals/README.md`).
 
 ## The loop
 
 `/prime → /lean-doc-generator → /orchestrator → repeat`, with the **gates** (G1 Scope · G2 Design,
 human-approved) and **§10 governance** (Sprint-Close Retro routes to CHANGELOG / `TD-NNN` /
 `TASK-NNN` / `LEARNINGS.md`; promote-time review). `/flow` conducts it end-to-end.
+
+| Loop | Purpose | Exit — completed vs stopped | Authoritative record | Parent | Defined in |
+|---|---|---|---|---|---|
+| task | one unit of work to done | **completed**: every `## Done when` box ticked · **stopped**: `cancel/`, or back to `backlog/` with a `scope-change` log entry | its status folder (`docs/work/done/`) | sprint | [dispatch.md § Members by reference](../../skills/orchestrator/references/dispatch.md) |
+| sprint | a bounded set of tasks, closed with a Retro | **completed**: every member in `done/`/`cancel/` and the sprint closed · **stopped**: not closed, members still open | sprint file `status:` + move to `docs/sprint/archive/` | epic (when it serves one) | [dispatch.md § Members by reference](../../skills/orchestrator/references/dispatch.md) · [`/lean-doc-generator close`](../../skills/lean-doc-generator/SKILL.md) |
+| epic | an outcome spanning sprints | **completed**: every `## Closed when` item ticked · **stopped**: `status:` not `closed` | epic file `status:` + `## Closed when` | roadmap row (if any) | [`EPIC.md.template`](../../skills/lean-doc-generator/templates/EPIC.md.template) |
+| overnight run | an unattended sprint-bulk pass | **completed**: `PLAN_EXHAUSTED` (DELIVERED) · **stopped**: `AUTHORITY_BOUNDARY` · `BUDGET_STOP` · `USER_STOP` (PARTIAL), `HARD_FAILURE` (FAILED) | rollup terminal state + `outcome ·` line in the sprint Execution Log | sprint | [night-run.md Part 0b](../../skills/orchestrator/references/night-run.md) · Part 4 |
+| review revise loop | review findings fixed or escalated | **completed**: re-review CLEAR after at most one bounded retry · **stopped**: still open after the retry, handed to the owner | `review · Tn` lines + any `owner-ruling` line in the Execution Log | task | [review-scoping.md § The revise loop](../../skills/orchestrator/references/review-scoping.md) |
 
 ## Key integration points
 
@@ -124,14 +130,8 @@ Ruled at SPRINT-054 T1. Each row below is an **exemption with a reason**, not an
 of writing them down is that a future reader (or `init` run) can tell the two apart. Substrate-gated
 rows are excluded: they are skipped, not owed (STANDARD §6), and are not listed here.
 
-> **The two `docs/product/` rulings live in [`.conformance-exempt`](../../.conformance-exempt), which
-> is where the engine reads them** (§6's reasoned exemption · [ADR-031](../adr/ADR-031-reasoned-doc-exemptions-are-declared.md)).
-> Until SPRINT-081 T2 they lived *only* in this table, and a conformance run cannot read a prose table
-> in an architecture doc — so the ruling behaved exactly as if it had never been taken, and capped this
-> repository at `level: none` for a decision it had already made (TD-077 · L-151). The rows below are
-> kept as the **narrative** of why; the declaration file is the SSOT the tool parses, and a change of
-> mind belongs there first. The two `§2`-gated rows are different in kind — they need no declaration,
-> because the *standard's own* condition never fires for a single-maintainer repo.
+> **The `docs/product/` rulings live in [`.conformance-exempt`](../../.conformance-exempt) — the SSOT the engine parses** (§6 ·
+> [ADR-031](../adr/ADR-031-reasoned-doc-exemptions-are-declared.md)); the rows below are the narrative. The two `§2`-gated rows need no declaration.
 
 | Absent | Why | Revisit when |
 |---|---|---|
