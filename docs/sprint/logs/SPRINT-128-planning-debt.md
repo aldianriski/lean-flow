@@ -200,3 +200,16 @@ Review: Codex R1 found 2 merge-commit gaps. Ordering could take an old DoD from 
 dead-token scan skipped merge diffs. Both are live here, since every task merges `--no-ff`. Fixed in `1ad6227e`; R2 CLEAR.
 Builder residuals for close: `_att_fmv_stdin` (§13b) strips CR but has no CRLF fixture; `_own_scan` / `_own_governed_off` are covered
 by twins but were not seeded. Ticks via `tick-box` (5/5).
+
+### 2026-10-19 | close | 5 of 5 members in `done/` (close gate 12/0), PLAN_EXHAUSTED; released 2.9.0 (`b0081f93`); EPIC-022 closed; Retro + buckets
+run · 22 of 22 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 304/0 on the VPS at `5bdc3131`, the final integrated tree; every commit after it is a tick-box-checked
+tick or this log. Release 2.9.0 MINOR: 4 manifests in lockstep, the README footer, the CHANGELOG (upgrade note: a store anomaly now
+FAILs by name), and v2.7.x rotated verbatim to `docs/changelog/` (§11, owner-approved). Doc-freshness (owner-approved):
+`docs/QA.md` names the TS layers-observed checker.
+Buckets: Shipped → CHANGELOG v2.9.0. Tech debt → 12 rows resolved by this sprint (TD-049 · 131 · 138 · 177 · 178 · 188 · 190 · 198 ·
+199 · 205 · 215 · 248), with TD-255 · 256 · 257 · 258 filed for the residuals; the ledger reads 126 rows (106 open · 20 resolved).
+Follow-ups → none. Learnings → L-236 new (shared `/tmp` in dispatch briefs), with sightings bumped on L-224 (count 8) and L-186.
+EPIC-022: Closed-when 7 ticked, so 8 of 8 are `[x]` and every member sprint is closed. The epic closes; its open question is marked
+answered by ADR-054. Handoff ledger: no `handoff` entry was taken this sprint.

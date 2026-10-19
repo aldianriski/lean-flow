@@ -2,8 +2,8 @@
 epic: 022
 slug: plans-that-work-for-any-consumer
 owner: Maintainer
-last_updated: 2026-10-18
-status: active
+last_updated: 2026-10-19
+status: closed
 member_sprints: [SPRINT-125, SPRINT-126, SPRINT-127, SPRINT-128]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -43,7 +43,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 | [SPRINT-125](../sprint/archive/SPRINT-125-consumer-maturity-and-cleanup.md) | Consumer Maturity and Cleanup | closed · `ff04f84` | Closed-when 1–3: the shipped surface stops naming lean-flow's scripts, two false-green conformance rules fixed (spec 0.16.0), migrate/prime/release-patch/templates fixed, platform epics retired; released as **2.6.0** |
 | [SPRINT-126](../sprint/archive/SPRINT-126-roadmap-and-traceability.md) | Roadmap and Traceability | closed · `4ff484b` | Closed-when 4: roadmap template + §2 row + coverage rule (spec 0.17.0), coverage reported by /prime · /triage · promote, `--roadmap <row>`; released as **2.7.0** |
 | [SPRINT-127](../sprint/archive/SPRINT-127-plans-without-git.md) | Plans Without Git | closed · `2c34f34` | Closed-when 5, 6, 8: task-level `gates_signed`; the git-less freeze (ADR-054, spec 0.18.0) through every lifecycle step; exercised on workdoo itself (its roadmap from the template, TASK-046 signed without git); the tick tool |
-| [SPRINT-128](../sprint/SPRINT-128-planning-debt.md) | Planning Debt | active | — (filled at close) |
+| [SPRINT-128](../sprint/SPRINT-128-planning-debt.md) | Planning Debt | closed · `<close_commit>` | Closed-when 7: one shared Plan parser every TS reader uses, `Cites:` governed by its leading run, a resolver that names every store anomaly, the Shell twins and the reaper's v1 counting retired, CRLF-safe engine readers; closes the epic (8 of 8) |
 
 ## Decisions
 
@@ -57,7 +57,7 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
 ## Open questions
 
 - Git-less freeze shape: a stored snapshot copy · a content hash · or no freeze with a named
-  warning? → S3 G2, `/council` if the fork stays close, then the ADR (D3).
+  warning? → S3 G2, `/council` if the fork stays close, then the ADR (D3). → **answered:** a verbatim snapshot in the promote entry (ADR-054, SPRINT-127).
 
 ## Closed when
 
@@ -80,9 +80,9 @@ EPIC-005 Fleet and EPIC-007 Workflow Packs (they stay `proposed`) · any workdoo
       → TASK-439 — closed SPRINT-127
 - [x] A repo without git can promote, freeze and close a sprint, under an ADR.
       → TASK-440, TASK-441 — closed SPRINT-127
-- [ ] The planning-checker clusters are retired: one shared `Layers:` parser, a member resolver
+- [x] The planning-checker clusters are retired: one shared `Layers:` parser, a member resolver
       that names anomalies instead of dropping them, and the freeze-checker edge cases.
-      → TASK-443, TASK-444, TASK-445, TASK-446, TASK-447
+      → TASK-443, TASK-444, TASK-445, TASK-446, TASK-447 — closed SPRINT-128
 - [x] Exercised on the real consumer: workdoo writes its roadmap from the template and runs one task
       through G1/G2 → done with a persisted gate record, without git (L-007); a git-less sprint is proven on a
       scratch repo (reworded at SPRINT-127 promote, owner ruling 2026-10-18 — workdoo runs one-off tasks, not sprints). → TASK-442 — closed SPRINT-127

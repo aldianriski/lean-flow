@@ -374,6 +374,25 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-258** severity: low | status: open | created: Sprint-128 (close; T3 · T5 proof gaps)
+  - Summary: **Three hardened branches carry no discriminating proof.** `_att_fmv_stdin` (§13b) strips CR but has no CRLF fixture;
+    `_own_scan` and `_own_governed_off` are covered by CRLF twins but were never seeded; the CLI half of TASK-445's empty-store fix
+    (`isV2`) has no seed that reddens, because `requireMembers` re-checks the directory itself.
+  - Fix direction: one CRLF twin for the attestation reader and one seed per unseeded branch, at the next sprint touching them.
+- **TD-257** severity: low | status: open | created: Sprint-128 (close; T1 residuals of TD-178 · TD-248)
+  - Summary: **Two declaration/attribution leftovers.** The completeness checker's Plan-prose "implies" leg still compares a bare
+    filename literally (TD-178 fixed the member leg only), and `check-layers-observed` still ignores N in the trailing
+    `(SPRINT-N Tn)` subject form (TD-248 fixed the `sprint(NNN) Tn:` forms only).
+  - Fix direction: apply the exactly-one basename rule to the prose leg, and the own-sprint test to the parenthetical form.
+- **TD-256** severity: low | status: open | created: Sprint-128 (close; T4 builder finding)
+  - Summary: **The reaper with no `bun`, on a v1 sprint, reports zero counts with no line.** The bun-unavailable message fires only
+    for a sprint with `## Members`, so a v1 sprint (unsupported since 2.0) gets silent zeros. Census: no v1 sprint exists in a v2 tree.
+  - Fix direction: name the missing bun whatever the sprint's shape; re-open on the first sighting.
+- **TD-255** severity: low | status: open | created: Sprint-128 (close; T1/T2 parser residuals, census 0 of 505 blocks)
+  - Summary: **`parsePlan` shapes no real Plan contains.** A block with two `Cites:` lines takes the leading run of their
+    concatenation, which is neither the old CLI's union nor dod-delta's first line; a backtick span split across a line break no
+    longer joins; a combined `### T1+T2` heading keys as T1. Each is 0 of 505 real task blocks (two-route census at SPRINT-128).
+  - Fix direction: on the first real sighting, define the rule in the parser and pin it with a fixture; until then a TD, not a round.
 - **TD-254** severity: low | status: open | created: Sprint-127 (close; owner ruling at intake)
   - Summary: **No conformance rule reads the git-less freeze.** Without git, the frozen text is the promote entry's snapshot
     (ADR-054), and `S9.PLANFROZEN` / `S9.SCOPECHANGE` only report "history unavailable". The freeze holds only if the procedure is
@@ -414,7 +433,7 @@ status: current
     filename. Routed here under the review stop rule (cap 2 reached, census-zero shape → TD), not into a third builder round.
   - Fix direction (not a ruling): `-z` output for (3) needs NUL handling that POSIX awk does not promise (ADR-043 keeps mawk in scope).
     Re-open on the first real sighting.
-- **TD-248** severity: low | status: open | created: Sprint-122 (T2, the vehicle's layers-observed)
+- **TD-248** severity: low | status: resolved → TASK-443 (`sprint(NNN) Tn:` forms; trailing parenthetical → TD-257) (SPRINT-128) | created: Sprint-122 (T2, the vehicle's layers-observed)
   - Summary: **`check-layers-observed.ts` attributes `sprint(NNN) Tn:` commits to Tn whatever NNN is.** Its subject rules match
     `sprint([0-9]+)` (`check-layers-observed.ts:302-309`). When two sprints are active and their commit ranges overlap, one
     sprint's `Tn` commits are charged to the other sprint's `Tn`. SPRINT-122 T2's reaper commits (`27d75a78` · `39787db8` ·
@@ -611,7 +630,7 @@ status: current
     lists. Census 2026-10-03: the excluded list is empty after TASK-398, so the gap is moot today (census-zero → TD, owner rule).
   - Mitigation (hypothesis): one loop over the excluded names asserting each file exists, with a must-FAIL fixture (ADR-050 maintainer-only bar).
 
-- **TD-215** severity: low | status: open | created: Sprint-113 (T4 / system-verify)
+- **TD-215** severity: low | status: resolved → TASK-443 (SPRINT-128) | created: Sprint-113 (T4 / system-verify)
   - Summary: **The Shell and TS `check-layers-completeness` disagree on a member Done-when's bare filename.** The Shell matches a bare
     `migration-map.md` against a full-path Layers entry by basename and PASSes; the TS port (the one the gate runs) compares literally and FAILs
     `member-layers-incomplete`, a false positive on a declared file. Worked around in SPRINT-113 by naming the bare token on `Cites:`. Its
@@ -651,7 +670,7 @@ status: current
     `docs/work/anything/TASK-1.md` from the ownership-header check. Census 2026-09-30: 0 non-status folders.
   - Mitigation (hypothesis): enumerate the six status folders (backlog · todo · in_progress · review · done · cancel), as ADR-045 names them.
 
-- **TD-205** severity: low | status: open | created: Sprint-110 (T3 outside review)
+- **TD-205** severity: low | status: resolved → TASK-447 (SPRINT-128) | created: Sprint-110 (T3 outside review)
   - Summary: **The ordering half of S9.SCOPECHANGE is lost for member-file edits.** The owner accepted the split: the member freeze
     lives in S9.PLANFROZEN, through check-sprint-by-reference.ts. That checker only requires a scope-change entry "NEW since baseline",
     not one that precedes the edit, while SCOPECHANGE's ordering walk covers § Plan only. A member `## Done when` edit logged after
@@ -684,7 +703,7 @@ status: current
     0 of 29 task files. CRLF files parse correctly.
   - Mitigation (hypothesis): a member with zero boxes is a named finding, as TASK-360's schema already requires a Done-when box.
 
-- **TD-199** severity: low | status: open | created: Sprint-110 (T1 outside review)
+- **TD-199** severity: low | status: resolved → TASK-444 (SPRINT-128) | created: Sprint-110 (T1 outside review)
   - Summary: **A task id merely MENTIONED on a `Cites:` line makes that block govern the member.** `Cites: split from TASK-991`
     counts as citing 991, which masks `member-layers-undeclared` for it. It yields a false PASS only when the mentioning block's
     Layers happen to cover 991's Done-when files. Census 2026-09-29: 0 (every live `Cites:` names only its own task's id).
@@ -692,7 +711,7 @@ status: current
   - Mitigation (hypothesis): count a cited id as governing only as a leading backticked TASK-NNN token, not anywhere in the line's prose.
     One rule for all three readers (L-186).
 
-- **TD-198** severity: low | status: open | created: Sprint-110 (T2 outside review)
+- **TD-198** severity: low | status: resolved → TASK-445 (SPRINT-128) | created: Sprint-110 (T2 outside review)
   - Summary: **`--no-members` turns off check-layers-observed's member legs without printing anything.** It exists so the
     differential keeps v1 parity with the `.sh` oracle (D1), and its only caller is `evals/run-layers-observed-differential.ts`
     (not qa-check.sh, not night-run.sh). A future caller could bypass the member legs with no trace in the output.
@@ -749,7 +768,7 @@ status: current
   - Mitigation (hypothesis): recognise `.ts` (and `bun <path>`) methods with the same EXISTS/REACHES semantics. A must-FAIL fixture
     naming an absent `.ts` (L-058).
 
-- **TD-190** severity: low | status: open | created: Sprint-109 (T3 outside review)
+- **TD-190** severity: low | status: resolved → TASK-445 (SPRINT-128) | created: Sprint-109 (T3 outside review)
   - Summary: **`check-task-origin.sh` and `sprint-members.ts` disagree on what "the store" is.** The origin guard
     globs `docs/work/<folder>/TASK-*.md` one level deep, while `nowTree()` walks `docs/work/` recursively ("a nested subfolder is not a
     different population"). So `docs/work/todo/2026-09/TASK-980-x.md` with no `origin:` goes unnoticed: `skip (no task entries …)`, exit 0.
@@ -766,7 +785,7 @@ status: current
     in that shape (L-186).
   - Resolved (SPRINT-128 promote, owner-approved): 0 letter-suffixed `### T` headings in 127 plans and 47 task files. TASK-444 makes suffix handling uniform anyway. Re-open on the first real sighting.
 
-- **TD-188** severity: medium | status: open | created: Sprint-109 (T3 outside review)
+- **TD-188** severity: medium | status: resolved → TASK-445 (SPRINT-128) | created: Sprint-109 (T3 outside review)
   - Summary: **`resolveMembers` drops an ambiguous member silently.** An id that resolves to two files (a
     stray duplicate mid-`git mv`) is skipped (`matches.length !== 1 → continue`), so `check-authority` never sees the member,
     and with no `### Tn` blocks it prints `skip`, exit 0. `check-sprint-by-reference` reports resolution failures itself, but
@@ -840,7 +859,7 @@ status: current
     discipline applies to the fixture itself.
   - **Re-file fresh if** the gate starts pinning a UTF-8 locale for every harness.
 
-- **TD-178** severity: low | status: open | created: Sprint-104
+- **TD-178** severity: low | status: resolved → TASK-443 (member leg; Plan-prose leg → TD-257) (SPRINT-128) | created: Sprint-104
   - Summary: **layers-completeness reads a bare filename in DoD prose as undeclared when `Layers:` names
     the same file by path.** Prose `qa-verdict.ts` vs `Layers:` `scripts/qa-verdict.ts` is an
     exact-string miss. SPRINT-104's own Plan carried **six** such findings from `plan_commit` to close
@@ -858,7 +877,7 @@ status: current
     name, a bare reference path and a bare script name). Cleared by rewording the evidence into prose,
     which is the third workaround shape: say it without the token.
 
-- **TD-177** severity: medium | status: open | created: Sprint-104
+- **TD-177** severity: medium | status: resolved → TASK-447 (SPRINT-128) | created: Sprint-104
   - Summary: **A `Layers:` token that matches no file is indistinguishable from a correct one.** `covers()`
     takes an exact path or a trailing-slash directory prefix and supports **no globs**, so SPRINT-104
     T2's `scripts/lib/check-*.sh` and T3's `scripts/lib/*.ts|sh` each covered **zero** of the files
@@ -1471,7 +1490,7 @@ status: current
     and a one-sided change closes the row without closing the gap.
   - Resolved (SPRINT-128 promote, owner-approved): `layers_tokens` is the single extractor (`check-layers-observed.sh:63`, sourced by `check-layers-completeness.sh:91`) and matching is exact (`grep -qxF`; `check-layers-completeness.ts:313`). The two-parser claim no longer holds; the remaining consolidation is TASK-443.
 
-- **TD-138** severity: medium | status: open | created: Sprint-095
+- **TD-138** severity: medium | status: resolved → TASK-443 + TASK-447 (SPRINT-128) | created: Sprint-095
   - Summary: **A `Layers:` declaration that wraps at column 0 is silently dropped by the dispatch
     preflight, so the shared-file ownership map is built from each task's FIRST LINE ONLY.** The
     parser treats an INDENTED line as continuing a declaration and resets `cur` on a column-0 line;
@@ -1681,7 +1700,7 @@ status: current
   - **Re-file fresh if** anyone normalises Markdown checkbox parsing anywhere else in the gate — the
     fix belongs with that, not as a local patch here.
 
-- **TD-131** severity: medium | status: open | created: Sprint-094
+- **TD-131** severity: medium | status: resolved → TASK-447 (SPRINT-128) | created: Sprint-094
   - Summary: **`fmv()` returns empty for every key on a CRLF file, and it only works in this
     repository by accident of the host's awk build.** Its first-line guard is
     `NR==1 && $0!="---" {exit}`; on CRLF the first record is `"---\r"`, which is not `"---"`, so it
@@ -2500,7 +2519,7 @@ status: current
     EPIC-004's engine. SPRINT-073 edits `spec/STANDARD.md`, not skill prose, so it neither vehicles
     this row nor widens it.
 
-- **TD-049** severity: minor | status: open | created: Sprint-059
+- **TD-049** severity: minor | status: resolved → TASK-446 (SPRINT-128) | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
     `### Tn` headings itself, duplicating logic `scripts/lib/check-*.sh` already owns. A third parser
     of the same format now exists (the dispatch-preflight snippet is the second — TD-045).
