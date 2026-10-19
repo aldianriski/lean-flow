@@ -4,7 +4,7 @@ slug: check-the-contract-first
 owner: Maintainer
 last_updated: 2026-10-19
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 8fd58050
 update_trigger: sprint execute/close events
 ---
 
