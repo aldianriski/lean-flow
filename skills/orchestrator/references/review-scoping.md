@@ -51,10 +51,16 @@ homework. Take the first rung that exists, in order:
 `done-when` is the **fallback**, not the default. When the axis falls back to it, the report says so —
 an unremarked fallback reads as an external check that never happened.
 
+**Spec silence is no licence.** Behaviour the spec does not mention is not thereby allowed, and an implied input the
+change does not handle is a Spec finding — absence from the spec never clears it.
+
 Report the two axes **separately — never merge or re-rank them into one list**. Perfect code that builds
 the wrong feature, and the right feature that violates every convention, are *different* failures; folding
 them into a single ranking lets a strong showing on one axis mask a defect on the other. Close with the
 single worst finding **per axis**, kept apart. (mattpocock/skills → code-review, the separation principle.)
+
+Beside the axes — in neither — the report carries a **Declined to judge** list: each item the reviewer set aside, with a
+one-line reason. An empty list is stated ("none"), never omitted.
 
 ## The revise loop — one bounded retry (attended modes only)
 
