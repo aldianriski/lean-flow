@@ -72,3 +72,16 @@ Merge-back on integration worktree `integ-129`, `--no-ff`, ownership order: T1 `
 conflicts, no duplicate member id. Post-merge legs: doc-caps (diagnose 98 · tdd 104 ≤ 140) PASS, prose-density 28/0. main
 fast-forwarded to `730a8e1d`. Ticked via tick-box (both checkers pass): TASK-451 boxes 1–3 · TASK-453 boxes 1–2 · TASK-454
 boxes 1–3. Open: each member's exercise + CHANGELOG box, ticked at the close release (D1).
+
+### 2026-10-19 | progress | wave 2: T2 reviewed CLEAR; adversarial floor found a wiring gap across T1 + T2, fixed in one retry, CLEAR; merged
+T2 → `69e07ceb` (review-scoping.md: a Spec-silence paragraph + a Declined-to-judge list beside the axes). Pre-merge review
+(Codex) in T2's own report shape — Standards · Spec · Declined to judge — returned it, with one declined item and its reason:
+T2's real exercise. Standards CLEAR · Spec CLEAR.
+Adversarial floor (T1 · T2 · T3 each had 0 findings → one assume-guilty pass): T3 no real flaw. **F1, shared by T1 + T2:** the
+quoted reviewer prompt in § Scope every pass ("Tell the pass explicitly: …") carried neither the standards-attribution rule nor
+the spec-silence and Declined-to-judge rules, though the file itself says injecting into that prompt "is what makes the split
+actually fire" — a brief-only reviewer could omit all three. Shipping ≠ wiring (L-020) caught by the floor, not by first review.
+Retry → `77a5ad3c` (the prompt carries all three); re-review CLEAR.
+Merge-back: T2 `ab096d79` on `integ-129`, `--no-ff`, no conflict; main fast-forwarded. Ticked TASK-452 boxes 1–2 via tick-box.
+consequence · T2 · behaviour:low · governance:high
+Every member is now built and reviewed; open boxes are each member's exercise + CHANGELOG box, ticked at the close release (D1).
