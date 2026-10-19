@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,37 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+
+## v2.10.0 — the reviewer judges against your repo's own standards and says what it skipped; a forced red must prove it landed (2026-10-19)
+
+**MINOR** — ships SPRINT-129 (Honest Review and Tests). Installing the release is enough; no upgrade step. The standard is unchanged
+(spec 0.18.0). Restart the session after installing.
+
+### SPRINT-129 — Honest Review and Tests (2026-10-19)
+
+Four keepers from the 2026-10-19 reference re-scans (mattpocock/skills scan 5 · obra/superpowers re-scan), each closing a gap on
+the consumer path.
+
+**Consumer-facing:**
+- **The review brief carries your repo's standards docs.** The coordinator finds CONTRIBUTING, coding standards and style guides
+  (and CLAUDE.md / AGENTS.md) and hands their paths and excerpts to the reviewer as the Standards comparand; the reviewer still
+  gets a brief, never the repo. The Standards axis names the docs it judged against, or says none were supplied.
+- **The reviewer lists what it declined to judge**, beside the Standards and Spec axes, with a one-line reason each ("none" when
+  empty). Spec silence is no licence: an implied input the change leaves unhandled is a Spec finding. All three rules ride in the
+  injected reviewer prompt, not only in the coordinator's text.
+- **`/diagnose`: a forced red counts only once it is proven landed.** A mutation, fixture edit or reverted fix is diffed against a
+  pristine copy first; a landed change that reddens nothing has tested nothing; the restore is proven the same way.
+- **`/tdd`: a slice is done only when the whole suite passes.** The focused test drives each cycle and the whole suite runs once per
+  slice; every failure is named, and one the slice did not cause goes to the owner, never counted as green. The per-cycle checklist
+  adds "name the production change that would fail this test". `test-standard.md`'s regression gate points to the rule instead of
+  restating it.
+
+**Maintainer-side:**
+- Research: mattpocock scan 5 (35 → 38 skills), the superpowers re-scan (14 → 15), and a loopcraft delta (nothing to adopt).
+- TASK-322 and TASK-448–450 cancelled as superseded; TD-090 re-routed to TASK-367; §11 store prune of TASK-435–437.
+- The adversarial-floor review pass caught the new reviewer rules missing from the injected prompt (L-020), fixed before merge.
 
 ---
 
@@ -44,30 +75,3 @@ EPIC-022's last slice: a Plan has one parser, and nothing that reads it drops wh
 
 ---
 
-## v2.8.0 — a sprint without git; a task keeps its own sign-off (spec 0.18.0) (2026-10-18)
-
-**MINOR** — ships SPRINT-127 (Plans Without Git). Installing the release is enough; no upgrade step. Spec 0.18.0 is MINOR and moves
-no git repository's verdict (only a git-less tree's dated `gates_signed:` moves, fail → pass). Restart the session after installing.
-
-### SPRINT-127 — Plans Without Git (2026-10-18)
-
-EPIC-022's third slice: an approval lives where the next reader finds it, and a repo without git can run the lifecycle.
-**Spec 0.18.0 · ADR-054.**
-
-**Consumer-facing:**
-- **A task records its own G1/G2 sign-off.** `/orchestrator` `quick` and `mvp` write `gates_signed: G1[,G2] @ <sha>` (a date with no
-  git) on the task file the moment you approve, by popup or plan-mode exit, plus an `## Approved design` paragraph at G2. Absent means
-  not signed. You may set Claude Code's `plansDirectory` to keep plan mode's own file; lean-flow never edits a settings file.
-- **A repo without git can run a sprint.** When `git rev-parse --git-dir` fails, promote copies each member's `## Done when` into the
-  promote log entry and sets `plan_commit: none (no git)`. Tick and close compare against that snapshot, moves are plain file moves,
-  and sign-off and close carry dates (`close_commit: none (no git) · closed <date>`).
-- **`conformance.sh`: `S9.GATESWELLFORMED` accepts `@ YYYY-MM-DD` only in a tree with no git.** In a git repository a date is still
-  malformed. The `S9.PLANFROZEN` note now names the snapshot as where the frozen text lives.
-
-**Maintainer-side:**
-- `scripts/lib/tick-box.ts`: the coordinator's tick step runs the gate's own checkers after the write (L-224 ×6), with an always-on
-  must-FAIL harness.
-- Exercised on workdoo itself: its roadmap rendered from the template (16 rows) and one task signed `G1,G2` without git.
-- EPIC-022 Closed-when 5 · 6 · 8 delivered (7 of 8). TD-253 · TD-254 filed.
-
----

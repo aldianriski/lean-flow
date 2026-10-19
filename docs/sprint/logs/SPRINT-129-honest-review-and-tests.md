@@ -95,3 +95,8 @@ review · T1 · scoped-reviewer · behaviour:low · governance:high
 review · T2 · scoped-reviewer · behaviour:low · governance:high
 review · T3 · scoped-reviewer · behaviour:material · governance:low
 review · T4 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-19 | progress | system verify GREEN: QA-CHECK 301 pass, 0 fail (VPS, 9f668645, QA_FULL=1, 111 s)
+Re-run after the structured review lines were appended; the tree under test is the final integrated tree, every member merged.
+Off-host via a git bundle of the unpushed commits (owner-chosen; nothing pushed). Close proceeds: owner approved v2.10.0 MINOR,
+the §11 retention pass (archive + CHANGELOG rotation of v2.8.0) and removal of this sprint's worktrees only.
