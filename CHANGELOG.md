@@ -14,6 +14,23 @@ status: current
 
 ---
 
+## SPRINT-130 — A Gate You Can Trust (2026-10-19)
+
+**Unreleased — no version bump.** `skills/`, the four `*-plugin/*.json` manifests, `README.md`, `spec/`, `scripts/` and
+`conformance.sh` are untouched (derived from `git diff --name-only 9c782185..HEAD`, not judged): every change is this repo's own
+test and fixture code. No consumer-visible change ⇒ nothing to release. Spec unchanged at 0.18.0. **10 of 10 DoD `[x]`.**
+
+**Maintainer-side:**
+- **ADR-035's guard is green again (TD-154).** The gate-discovery guard recognises a wrapped gate: a segment invokes the declared
+  command when it begins with it, or ends with it as whole whitespace-delimited tokens behind a head that is not `echo` · `printf`
+  · `:`. An unquoted `echo` of the gate stays a bypass (retained must-FAIL).
+- **The qa-budget ceiling case reads a frozen clock (TD-167).** Case 12 shadows `date`, so its exact `1263s` assertion no longer
+  reddens a busy host; an empty capture is a named `harness-env` FAIL with the child's exit status and no asserted cause.
+- **The `bun test` flake is closed as not reproduced (TD-135):** eight runs on two hosts, all `441 pass, 0 fail`.
+- TD-117 routed to TASK-367 beside TD-090; §11 store prune of TASK-439–442. L-237 filed.
+
+---
+
 ## v2.10.0 — the reviewer judges against your repo's own standards and says what it skipped; a forced red must prove it landed (2026-10-19)
 
 **MINOR** — ships SPRINT-129 (Honest Review and Tests). Installing the release is enough; no upgrade step. The standard is unchanged

@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-236**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-237**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -71,6 +71,13 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-237 [tags: process] [status: active]: **A G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.** SPRINT-130 T1: the Done-when said the declared command must be the segment's TRAILING argument list; the coordinator's G2 text said "ending the segment or followed by a space", the owner signed it, and the builder implemented the looser reading — an interior run counted as invoking the gate. Only the review, briefed with the Done-when as its Spec comparand, caught it. The frozen text governs; a design paraphrase of a criterion is a second copy that can drift from it in the same hour.
+- seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry)
+- count: 1
+- promoted: no
+- related: L-122 (the comparand-briefed reviewer catches what the builder carried) · L-088 (do not reinterpret a frozen DoD)
+
+---
 ## L-236 [tags: edit-safety] [status: active]: **A dispatched builder shares the host's `/tmp` with every other project, so a brief must give it a unique temp prefix and forbid deleting anything it did not create.** SPRINT-128 T3's builder deleted a stale `/tmp/edit1.py` that belonged to another project, a recruitment-intake test patch, before reusing the name for its own edit script. Its brief banned tree-wide git state ops and coordinator-owned files, and said nothing about the shared temp directory, which is outside every worktree and every `Layers:` declaration. The file is unrecoverable from the session. **Durable form (candidate): every dispatch brief names a temp prefix unique to the task and states that the agent never deletes or overwrites a file it did not create.**
 - seen: 2026-10-19 (SPRINT-128 T3, first round; flagged to the owner in the T3 log entry)
 - count: 1

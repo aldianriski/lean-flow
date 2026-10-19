@@ -3,7 +3,7 @@ sprint: 130
 slug: a-gate-you-can-trust
 owner: Maintainer
 last_updated: 2026-10-19
-status: active
+status: closed
 plan_commit: 9c782185
 gates_signed: G1,G2 @ 9345cb17
 update_trigger: sprint execute/close events
@@ -95,6 +95,34 @@ fix task.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `test/gate-discovery/discover.ts` · `test/gate-discovery/discovery-order.test.ts` | T1 | `invokes()` sees a wrapped gate (trailing whole tokens, non-executing heads excluded); ADR-035's guard green again | Low | gate-discovery 15/0; seeded must-FAIL red then restored |
+| `evals/run-qa-budget-fixtures.sh` | T2 | case 12 reads a frozen clock; an empty capture is named with its exit status | Low | harness PASS; seeded ceiling-FAIL and both empty shapes fire, restores cmp-identical |
+| `TECH-DEBT.md` · `docs/LEARNINGS.md` · `CHANGELOG.md` | close | TD-154 · 167 · 135 resolved, TD-117 routed; L-237; an unreleased CHANGELOG block | Low | system verify 299/0 |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->
+
+**Retrieval check** — no miss. L-151's lesson from SPRINT-129 held: every review was logged as a `review · Tn` line the moment
+it fired (D3), and system verify went green first time. L-187/L-186 held too: both seeded breaks and both empty-capture seeds were
+cmp-proven landed and restored.
+
+**Cost** — coordinator + 2 Sonnet builders (T1, T2, each with one bounded retry) + 1 Explore recon at intake + 1 Codex reviewer over
+5 rounds (`gpt-6-astra`). Builder spend ≈ 140k tokens (T1 72k · T2 71k) + recon 68k for 3 S members; T3 was coordinator-run. Eight
+`bun test` runs (5 VPS, 3 Windows) and one `QA_FULL` system verify on the VPS (299/0, 111 s).
+
+**Worked**
+- The adversarial floor earned its keep for the second sprint running: T2's first review was clean, and the assume-guilty pass found
+  the empty-capture line asserting a cause a code regression also produces — fixed, and both empty shapes seeded and fire.
+- The Spec comparand caught the coordinator's own drift: the G2 wording loosened TASK-455's frozen "trailing" to "ending or followed
+  by a space"; the review, briefed with the Done-when, caught the interior-run hole (L-237).
+- Recon before the grill turned TD-135 from a worry into a measurement: the suspect test was gone and the ledger's impact line was
+  wrong, so the task measured instead of chasing a ghost.
+
+**Friction**
+- The coordinator's G2 paraphrase of a frozen criterion (above) cost one review round.
+- A `cd` into a builder worktree moved the session's working directory mid-review; recovered by absolute paths from then on.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- L-237 (new, count 1): a G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.
+
+**Owner actions**
+- Push `main` (release 2.10.0, SPRINT-129 and this sprint are committed, not pushed).

@@ -74,3 +74,15 @@ corrected in the ledger (`bun test` is `package.json`'s second stage, outside `q
 consequence · T3 · behaviour:low · governance:low
 review · T3 · self-review · behaviour:low · governance:low
 TASK-456 boxes 1–4 and TASK-457 boxes 1–3 ticked via tick-box. All three members built and verified.
+
+### 2026-10-19 | close | 3 of 3 members in `done/` (close gate 8/0), PLAN_EXHAUSTED; unreleased (no consumer-visible change); Retro + buckets
+run · 10 of 10 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 299/0 on the VPS at `8b1d207f`, the final integrated tree (111 s; no truncation, all 59 declared harnesses
+run; two fewer passes than SPRINT-129's 301 because some checks run once per member, and this sprint has 3 to its 4). No release:
+`git diff --name-only 9c782185..HEAD` touches only `test/`, `evals/`, the ledgers and the sprint's own files — `skills/`, the
+manifests, README, `spec/`, `scripts/` and `conformance.sh` are untouched, so CHANGELOG carries an unreleased SPRINT-130 block.
+Doc-freshness: no §2 trigger fired (roster, loop and CONTEXT unchanged).
+Buckets: Shipped → the unreleased CHANGELOG block. Tech debt → TD-154 · TD-167 · TD-135 resolved by this sprint, TD-117 routed to
+TASK-367 at promote; no new row; the ledger reads 126 rows (103 open · 23 resolved). Follow-ups → none. Learnings → L-237 new
+(a G2 paraphrase loosened a frozen Done-when). Handoff ledger: no `handoff` entry was taken. No epic is attached.
