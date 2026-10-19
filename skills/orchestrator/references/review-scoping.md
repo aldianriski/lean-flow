@@ -22,7 +22,9 @@ Hand each review pass a brief, not the repo:
 
 Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo.
 Report two independent axes — **Standards** (repo conventions) and **Spec** (builds the right thing) —
-separately, never merged or re-ranked."* A reviewer with a bounded brief is both cheaper and sharper.
+separately, never merged or re-ranked. Name the standards docs you judged against, or say none were supplied.
+Spec silence is no licence: an implied input the change leaves unhandled is a Spec finding. Beside the axes, list
+what you **declined to judge**, each with a one-line reason ("none" if empty)."* A reviewer with a bounded brief is both cheaper and sharper.
 (The two axes are defined below; injecting them here is what makes the split actually fire.)
 
 ## Two axes — Standards vs Spec (report separately)
