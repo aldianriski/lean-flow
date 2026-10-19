@@ -4,7 +4,7 @@ slug: honest-review-and-tests
 owner: Maintainer
 last_updated: 2026-10-19
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: b1712732
 update_trigger: sprint execute/close events
 ---
 
