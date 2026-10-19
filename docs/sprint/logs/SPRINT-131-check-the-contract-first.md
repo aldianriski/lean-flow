@@ -136,3 +136,9 @@ review · T2 · scoped-reviewer · Codex gpt-6-astra · FINDINGS (4) → record 
 Found by the replay, in the LIVE repo: (1) the TD-154 guard `invokes()` accepts `"echo" sh scripts/qa-check.sh`, `'echo' …` and
 `e"ch"o …` as gate invocations (probe output: true ×3); (2) `review-scoping.md:241` still restates the whole-suite rule, against
 SPRINT-129's one-place ruling. Both are TD candidates for close.
+
+### 2026-10-19 | owner-ruling | T2 accepted with caveat; T4 accepted; TASK-461 cancelled at close; the two live defects filed as TD at close
+owner-ruling: review · T2 — accepted with caveat. Box 1 is ticked citing the disclosed blinding breach in one review; the cost verdict does not depend on that review.
+owner-ruling: review · T4 — accepted. The leakage evidence (`git status` of both checkouts) is recorded above.
+owner-ruling: TASK-461 — cancel (T3 found no gain under its fixed rule).
+owner-ruling: the live TD-154 quoted-head bypass and the review-scoping.md:241 duplicate are filed as TD rows at close, not fixed in this sprint.

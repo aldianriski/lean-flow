@@ -25,7 +25,7 @@ Adopting it on argument would be the same mistake as rejecting it on argument.
 
 ## Done when
 
-- [ ] The inline arm replays SPRINT-129's four tasks and SPRINT-130's two built tasks from their `plan_commit` trees in disposable checkouts, with the same design inputs, the same review and verification obligations, and the later findings hidden.
+- [x] The inline arm replays SPRINT-129's four tasks and SPRINT-130's two built tasks from their `plan_commit` trees in disposable checkouts, with the same design inputs, the same review and verification obligations, and the later findings hidden. ✓ bundle clones at plan_commit (b1712732 · 9c782185), first-dispatch briefs, the same Codex review pattern; caveat: S129's inline adversarial review could see later commits (owner ruling: accepted)
 - [x] Total cost (tokens, counting coordinator context, retries and reviews), material defects and elapsed time to accepted completion are recorded for the inline arm and set against the logged dispatch arm. ✓ reference-rejudge.md § Experiment results: tokens (raw + context-adjusted, coordinator context counted), defects at review, wall clock for both arms; dispatch arm from the 2026-10-19 transcript
 - [x] The verdict applies the thresholds fixed before the run — at least 30% lower total cost, no additional material defect, and no more than 10% more elapsed time — and is written into `docs/research/reference-rejudge.md`; a change to the dispatch default is filed as a separate task only if it passes. ✓ thresholds frozen at 8fd58050, adjustment pre-registered efa851d4; cost 1.01x and 2.00x > 0.70 -> fail; no dispatch-default task filed; written into reference-rejudge.md
 
