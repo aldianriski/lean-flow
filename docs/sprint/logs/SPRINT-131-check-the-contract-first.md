@@ -65,3 +65,15 @@ Shared files: `docs/research/reference-rejudge.md` · CHANGELOG · the sprint fi
 Live concurrency noted: two other Claude sessions (pids 19916 · 29872) hold locks on 4 of the 12 stale worktrees, so none is
 touched. Shared files are staged per path and `git diff --cached` is read before each commit.
 Dispatch preflight: PASS base-ref: declared base matches live HEAD (15d35c0907d7abf6792c772ed5c95b3773ff1499) PASS wave-computation: T1=0 T2=0 T3=0 T4=0 PREFLIGHT: CLEAR
+
+### 2026-10-19 | progress | T1 built inline (`b88e89c8`); T3 census and T4 table builder dispatched in parallel
+T1: `references/builder-check.md` is new: the procedure plus the prompt exercised at this sprint's G2, generic (the grep for
+`scripts/|docs/sprint|lean-flow|TASK-|L-[0-9]` prints nothing). SKILL.md § G2 gains one line, PASS cap 140 ≤ 140. The prose-density
+check reports SKILL.md at 13 ≤ 13. night-run.md's pre-flight G2 item adds one clause: a G2 counts as signed only with its
+`builder-check · Tn` lines. Wiring citations: `skills/flow/SKILL.md:36` (stage 4 → `/orchestrator sprint-bulk` through G1 / G2)
+· `night-run.md:210` (entry step 4 → `sprint-bulk` steps 1–2) · SKILL.md `### mvp` step 4 → the same § G2.
+Correction to the G2 popup: it said "9 contradictions or near-contradictions". The four reports' own counts are 1 + 2 + 5 + 4 = 12,
+which is what the gate entry's per-task lines record. 27 questions is correct.
+consequence · T1 · behaviour:low · governance:high → one scoped reviewer (Codex, D3) + the adversarial floor if it returns 0 findings
+review · T1 · scoped-reviewer · Codex gpt-6-astra (static) · T-a.1–4 · T-b–T-f all OK · VERDICT: CLEAR (0 findings) → adversarial floor re-run dispatched
+consequence · T4 · behaviour:low · governance:low → self-review of the table diff; the reader-test record goes to Codex once before the verdict (D3)
