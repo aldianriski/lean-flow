@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-129
 ---
 
 # TASK-453 — In `/diagnose`, count a forced red only once the mutation is proven to have landed

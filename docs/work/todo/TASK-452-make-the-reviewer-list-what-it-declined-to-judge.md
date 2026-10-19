@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-129
 ---
 
 # TASK-452 — Make the reviewer list what it declined to judge, and treat spec silence as no licence
