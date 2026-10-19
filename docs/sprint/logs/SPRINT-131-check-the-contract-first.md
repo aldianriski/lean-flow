@@ -152,3 +152,4 @@ every reference above: `9a35d692 → 0afee584` · `d552c03d → 09eba192` · `75
 `da1b5a2e → 4f5b203a` · `efa851d4 → fc18fb45` · `b6755a54 → 180f9a6b` · `e09cf26a → 0c9dd216` · `f968f871 → 30c4d7d7` ·
 `55d581ff → 69ad1edd`. The tick evidence in TASK-459 and TASK-462 cites the old shas, which resolve through this map.
 `reference-rejudge.md` is updated in place.
+system-verify · PASS · QA_FULL on the VPS at `91502a86`, the final integrated tree after the rewrite: 300 pass, 0 fail, 112 s; `bun test` 441 pass, 0 fail
