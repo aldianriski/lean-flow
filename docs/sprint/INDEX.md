@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-129 — Honest Review and Tests — closed 2026-10-19 · `e3c8c90` · 4 of 4 members in `done/`, 14/14 DoD (released in `2.10.0`; orchestrator review-scoping + `/diagnose` + `/tdd` changed) · **standalone, no `epic:` stamp** — the reviewer gets the host repo's standards docs and lists what it declined to judge; a forced red must prove it landed; a `/tdd` slice is done only when the whole suite passes
 - SPRINT-128 — Planning Debt — closed 2026-10-19 · `d9139c4` · 5 of 5 members in `done/`, 22/22 DoD (released in `2.9.0`; orchestrator dispatch preflight + conformance engine + sprint-members changed) · **EPIC-022 member, closes it** — one Plan parser, a resolver that names every store anomaly, the Shell twins retired, CRLF-safe engine readers
 - SPRINT-127 — Plans Without Git — closed 2026-10-18 · `2c34f34` · 5 of 5 members in `done/`, 18/18 DoD (released in `2.8.0`; spec 0.18.0 + orchestrator/lean-doc-generator/triage/templates + conformance engine changed) · **EPIC-022 member** — a task keeps its own G1/G2 sign-off, a repo without git runs the sprint lifecycle (ADR-054), the tick step runs the gate's checkers; exercised on workdoo
 - SPRINT-126 — Roadmap and Traceability — closed 2026-10-18 · `4ff484b` · 3 of 3 members in `done/` (released in `2.7.0`; spec 0.17.0 + templates/prime/triage/lean-doc-generator/task-decomposer/flow changed) · **EPIC-022 member** — a repo can write a phased roadmap and see which active rows nothing delivers
