@@ -25,10 +25,10 @@ that reddens at random trains people to re-run until green.
 
 ## Done when
 
-- [ ] Case 12's elapsed value is deterministic: `date` is shadowed inside the case's subshell so the ceiling block computes exactly 1263 s, and the exact assertion is kept.
-- [ ] The must-FAIL property holds: with the ceiling block seeded to count the run as a FAIL, case 12 reddens; the seed is shown landed (`cmp` against pristine) and the restore proven the same way, while the sibling control stays green.
-- [ ] An empty capture from the case's subshell prints a named harness-environment FAIL, distinct from an output mismatch.
-- [ ] One full run of the harness on the real gate block recorded, and TD-167 marked resolved with that evidence.
+- [x] Case 12's elapsed value is deterministic: `date` is shadowed inside the case's subshell so the ceiling block computes exactly 1263 s, and the exact assertion is kept. ✓ acccc165 (T2 3dc85e47 + retry f3a6e64e); date shadowed in case 12's subshell, delta=0 across sleep 2; exact 1263s assertion kept
+- [x] The must-FAIL property holds: with the ceiling block seeded to count the run as a FAIL, case 12 reddens; the seed is shown landed (`cmp` against pristine) and the restore proven the same way, while the sibling control stays green. ✓ seeded bad in the real ceiling block (cmp: byte 104699 line 1612) -> case 12 red, case 13 green; restored cmp-identical, hash == HEAD blob
+- [x] An empty capture from the case's subshell prints a named harness-environment FAIL, distinct from an output mismatch. ✓ named harness-env FAIL with exit status, no asserted cause; both shapes seeded and fire (out12 empty: exit 0; block exits early: exit 1)
+- [x] One full run of the harness on the real gate block recorded, and TD-167 marked resolved with that evidence. ✓ full harness green on integ-130 after the merge; TD-167 resolved in TECH-DEBT.md
 
 ## Touches
 

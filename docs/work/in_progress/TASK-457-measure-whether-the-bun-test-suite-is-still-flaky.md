@@ -24,9 +24,9 @@ should either become a named defect or close on evidence. Its impact line is als
 
 ## Done when
 
-- [ ] The full `bun test` suite is run 5 times on the VPS gate host and 3 times on the Windows host against one recorded commit, each run's own summary line recorded verbatim, never a wrapper's status or a piped tail.
-- [ ] Any disagreement names the failing test and is filed as a fix task; if all runs agree, TD-135 is closed as not reproduced with that evidence.
-- [ ] TD-135's impact line is corrected: `bun test` is the second stage of `package.json`'s `test` script, outside `qa-check.sh`.
+- [x] The full `bun test` suite is run 5 times on the VPS gate host and 3 times on the Windows host against one recorded commit, each run's own summary line recorded verbatim, never a wrapper's status or a piped tail. ✓ 8 runs at 896e3ab9: VPS 5/5 and Windows 3/3 each 441 pass 0 fail across 11 files (own summary lines, logged)
+- [x] Any disagreement names the failing test and is filed as a fix task; if all runs agree, TD-135 is closed as not reproduced with that evidence. ✓ all 8 agree: TD-135 resolved as not reproduced, with the evidence
+- [x] TD-135's impact line is corrected: `bun test` is the second stage of `package.json`'s `test` script, outside `qa-check.sh`. ✓ TD-135 correction recorded: bun test is package.json test's second stage, outside qa-check.sh
 
 ## Touches
 

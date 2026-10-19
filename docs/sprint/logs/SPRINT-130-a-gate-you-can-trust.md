@@ -61,3 +61,16 @@ a seeded empty capture beforehand; the finding is about its diagnosis, not its f
 consequence · T1 · behaviour:low · governance:low
 review · T1 · scoped-reviewer · behaviour:low · governance:low
 consequence · T2 · behaviour:low · governance:low
+
+### 2026-10-19 | progress | T2 reviewed (adversarial finding, one retry, CLEAR) and merged; T3 measured 8/8 agreeing; every member done
+T2: retry → `f3a6e64e` — the empty-capture line now states the child's exit status and no asserted cause; both empty shapes
+seeded and fire (`out12` blanked: exit 0; a block exiting before it prints: exit 1, case 13 green), restores cmp-identical;
+re-review CLEAR. Merged `acccc165` on `integ-130`; harness PASS on the merged tree; main fast-forwarded. TD-167 resolved.
+review · T2 · scoped-reviewer · behaviour:low · governance:low
+T3 (coordinator-run measurement, inline by design: it uses the owner's VPS route and changes no code) at `896e3ab9`:
+VPS 5/5 `441 pass, 0 fail` across 11 files (6.78–6.92 s); Windows 3/3 `441 pass, 0 fail` (67.18–73.66 s). Each read from the run's
+own summary line, rc 0 each, no `(fail)` line. All eight agree → TD-135 resolved as not reproduced; its wrong impact line
+corrected in the ledger (`bun test` is `package.json`'s second stage, outside `qa-check.sh`).
+consequence · T3 · behaviour:low · governance:low
+review · T3 · self-review · behaviour:low · governance:low
+TASK-456 boxes 1–4 and TASK-457 boxes 1–3 ticked via tick-box. All three members built and verified.

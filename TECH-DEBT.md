@@ -958,7 +958,12 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-167** severity: medium | status: open | created: Sprint-102
+- **TD-167** severity: medium | status: resolved → TASK-456 (SPRINT-130) | created: Sprint-102
+  - **Resolved (SPRINT-130 T2, `acccc165`):** a `date` shell function inside case 12's subshell freezes both clock reads, so
+    elapsed is exactly 1263 s and the exact assertion stays. Must-FAIL kept: the real ceiling block seeded to call `bad` reddens
+    case 12 (cmp-proven landed and restored; case 13 green). An empty capture now prints a named `harness-env` FAIL with the
+    child's exit status and no asserted cause — the adversarial review showed a code regression (a block exiting before it
+    prints) also yields one; both shapes were seeded and fire. No `now` seam was added to the library (owner ruling).
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
     output **exactly**. The block computes `now - START_TS`, so if the clock ticks a second during
@@ -1649,7 +1654,12 @@ status: current
   - **Re-file fresh if** the archive gains a retroactive log backfill, or a sprint is ever expected to
     carry a handoff record without a paired log.
 
-- **TD-135** severity: medium | status: open | created: Sprint-094
+- **TD-135** severity: medium | status: resolved → TASK-457 (SPRINT-130), not reproduced | created: Sprint-094
+  - **Resolved, not reproduced (SPRINT-130 T3):** eight full `bun test` runs against `896e3ab9`, each read by its own summary
+    line — VPS 5/5 and Windows 3/3 at `441 pass, 0 fail` across 11 files (6.8 s per run on the VPS, 67–74 s on Windows). The
+    hypothesised flaky test is gone (ADR-051), and the suite has shrunk from 39 files to 11. **Correction:** the Impact line
+    below is wrong — `qa-check.sh` does not run `bun test`; it is the second stage of `package.json`'s `test` script
+    (`… qa-check.sh && bun test`), outside the gate leg. **Re-file fresh if** a run disagrees with its twin and names the test.
   - Summary: **The full `bun test` suite is flaky — two consecutive runs over the same unchanged tree
     disagreed.** A gate that disagrees with itself is worse than a red one, because neither result can
     be acted on.
