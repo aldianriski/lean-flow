@@ -312,7 +312,9 @@ All items must pass or the night-run does not fire:
       so the run re-runs both gates, reaches for `AskUserQuestion` — **unregistered headless** — and
       parks every task having done zero work. A sign-off the run cannot read is a sign-off that did not
       happen (L-099). **An absent field means NOT signed**, never "assume it was fine": the safe
-      default is the one that costs a parked run, not the one that executes an ungated Plan.
+      default is the one that costs a parked run, not the one that executes an ungated Plan. A G2
+      counts as signed only with its builder check recorded — one `builder-check · Tn` line per task
+      in the Execution Log (`builder-check.md`); a G2 signed without them goes back through the ordered entry path's step 4.
 - [ ] Zero open `assumes:` / `needs-info` tasks in the run (read from each member file's
       `## Assumes`) — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
