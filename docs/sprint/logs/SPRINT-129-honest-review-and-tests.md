@@ -85,3 +85,13 @@ Retry → `77a5ad3c` (the prompt carries all three); re-review CLEAR.
 Merge-back: T2 `ab096d79` on `integ-129`, `--no-ff`, no conflict; main fast-forwarded. Ticked TASK-452 boxes 1–2 via tick-box.
 consequence · T2 · behaviour:low · governance:high
 Every member is now built and reviewed; open boxes are each member's exercise + CHANGELOG box, ticked at the close release (D1).
+
+### 2026-10-19 | surprise | system verify (VPS, 69ef053d) 300 pass · 4 fail: the review records were prose, not the structured line
+The full gate ran off-host (the local run was killed for low memory; owner chose the VPS via a git bundle): 112 s, `QA-CHECK:
+300 pass, 4 fail`. All four are `review-depth-*-absent` for T1–T4: each task's independent review is recorded above in prose, but
+the whole-line record `check-review-depth.sh` reads (night-run.md Part 4) was never appended, and silence is not a clean record.
+The reviews did fire (Codex, scoped, pre-merge; plus the adversarial floor), so the records are added now, not invented:
+review · T1 · scoped-reviewer · behaviour:low · governance:high
+review · T2 · scoped-reviewer · behaviour:low · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:low
+review · T4 · scoped-reviewer · behaviour:material · governance:low
