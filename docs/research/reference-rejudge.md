@@ -50,11 +50,60 @@ defects, one of them caused by a cropped code excerpt in the probe document itse
 |---|---|---|---|
 | Builder check (superpowers) | ADAPT → adopt if the replay meets its criterion | met (above) | **adopt, adapted**: also ask for contradictions between design and Done-when |
 | Inline execution (superpowers) | **RADICAL** — stop dispatching every task by default | 4 S prose tasks ≈260k builder tokens + worktrees, merges, 12 stale worktrees; T3 ran inline fine | **experiment**: replay today's 6 tasks both ways |
-| Question style (mattpocock rejects pickers) | ADAPT — open questions for discovery, pickers for decisions | 3 of 14 answers today came as "Other" and changed scope | **experiment**; L-002's visibility rule stays |
+| Question style (mattpocock rejects pickers) | ADAPT — open questions for discovery, pickers for decisions | 3 of 14 answers today came as "Other" and changed scope — **corrected by the census: 2 of 37** (below) | **experiment**; L-002's visibility rule stays |
 | Loop table (loopcraft) | ADOPT, then test | no recorded failure from its absence | **task with a reader test** |
 | Rolling frontier (mattpocock) | reject now; measure | no idle time measured; T3 effectively rolled | stays rejected |
 | Workers may not spawn agents | reject | no duplicate reviews seen | stays rejected |
 | Software factory (loopcraft) | ADAPT as a finite portfolio checkpoint | overlaps triage and epics | not now |
+
+## Experiment results (SPRINT-131)
+
+**Question style — open vs picker (TASK-460): no coverage gain.** The census found 37 owner questions in 18 popups on 2026-10-19,
+before this doc was written, with 2 answers in free-text "Other" (Q09 · Q36). The figure "3 of 14" above had no census behind
+it. Two routes agree on the count. The task was re-scoped to the census by owner ruling. Each question was rebuilt as a
+self-contained packet holding what the owner saw, with the real answer hidden. Four fresh Sonnet readers with no
+repository access played the owner: two answered the open form, and two the picker form, which carried the original options
+plus "Other". A blind Sonnet judge scored every response against the verbatim answer.
+
+| Measure | open r1 | open r2 | picker r1 | picker r2 |
+|---|---|---|---|---|
+| Q09 intent (Codex double-check of everything) | yes | yes | yes | yes |
+| Q36 intent (tell me the research status first) | yes | no | no | no |
+| clarity loss on the other 35 | 2 | 6 | 0 | 1 |
+| loss where the paired picker reader had none | 2 | 5 | — | — |
+
+Rule (fixed before the run): gain = open intent sum > picker sum **and** relative clarity loss ≤ 3 of 35 per reader. Intent
+sums are open 3 vs picker 2, which passes, but the margin is one reader on one question. Open r2 lost clarity on 5 of 35, which
+fails. **Verdict: none**, so TASK-461 is proposed for cancellation. Caveats: the readers are proxies, not the owner. Blinding
+was partial, because option-label answers reveal the picker form. **The verdict is judge-sensitive.** Open r2's losses
+include two different sprint names (Q18 · Q32). Discounting those leaves 3 relative losses, and the rule would then read
+gain. The rule is applied as fixed, not refitted, and the owner rules on TASK-461 at close knowing this. All four Q09
+responses, both picker responses included, carried its scope-changing intent.
+
+**Loop table in the overview (TASK-462): removed by its rule.** A 5-row table (task · sprint · epic · overnight run · review
+revise loop) went into `docs/architecture/overview.md` with a net-zero trim. Then 8 cases from real artifacts were answered
+by fresh Sonnet readers, one per case per arm, in two scratch checkouts: with the table (`3e43cdf1`) and without it
+(`07113e12`). The cases were a budget stop with work left, a task done while its sprint was open, a closed sprint under an
+unfinished epic, a closed-but-superseded epic, two revise loops, a cancelled task and a delivered run. Each batch ran both
+arms of the same cases together.
+
+| Measure | with table | without |
+|---|---|---|
+| authoritative record correct | 8 of 8 | 8 of 8 |
+| completed/stopped errors | 0 | 0 |
+| median duration | 22.5 s | 24.5 s |
+| mean tool calls | 5.4 | 5.9 |
+
+Rule (fixed before the run): keep only if all 8 records are correct **and** the median is ≤ 75% of the median without
+**and** errors are no higher. The median ratio is 0.92, so the table is **removed**. The table as built (`d339763b`)
+had columns for loop · purpose · exit (completed vs stopped) · record · parent · defined-in link. The file stayed at
+147 ≤ 150 (cap PASS). Both checkouts had SPRINT-131's sprint, log, task and research files deleted, so neither arm could
+read the table's design. The revert (`9a35d692` · `d552c03d`) leaves `git diff 07113e12 HEAD -- docs/architecture/overview.md`
+empty. Readers without
+the table found every record anyway, from the defining files the table would have linked. The means differ more than the
+medians (26.0 s vs 37.7 s) because two first-batch runs without the table took 75 s and 94 s; the rule reads the median.
+One case exposed a gap in the table itself: its epic row had no rule for an epic closed with its conditions unmet
+(superseded), and that reader settled it from the epic's own note.
 
 ## Recommendation
 

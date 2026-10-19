@@ -90,3 +90,22 @@ frozen into an artifact (L-143 family).
 verdict rule keeps its shape: gain = open intent sum > picker sum on the 2 targets AND clarity loss vs picker on ≤ 3 of 35 per
 reader (the same ~9% bar as 1 of 11); a tie is none. The research doc's "3 of 14" is corrected whatever the verdict. Done-when
 boxes 1–2 are ticked against this ruling, and their text is not edited.
+
+### 2026-10-19 | progress | T1 adversarial retry CLEAR; T3 verdict none (TASK-461 proposed for cancellation); T4 table removed by its rule
+T1: the adversarial floor (Codex, assume-guilty) found 2 issues, and both were fixed in the one retry, `2e1c9eef`. F1: night-run's
+entry path said "before any spawn" while its G2 step now spawns readers, so it now says "before the run is spawned". F2: there
+was no path for a host without sub-agents; now a fresh session is the reader, and failing that the line records `not run` in the
+popup. Re-review CLEAR. TASK-458 boxes 1–4 ticked; box 5 (CHANGELOG) waits for close.
+review · T1 · adversarial-floor · Codex gpt-6-astra · FINDINGS (2) → retry 2e1c9eef → re-review CLEAR
+T3 (TASK-460): 37 packets; 4 Sonnet owner-proxies (2 open, 2 picker with "Other"); a blind Sonnet judge (148 lines). Intent: open 3
+vs picker 2, passing. Relative clarity loss: open r1 2/35 and open r2 5/35, so r2 fails the ≤3 bar. **Verdict: none.** The verdict
+is judge-sensitive: discounting Q18 · Q32 (sprint names) flips it to gain, and the record says so. TASK-461 gains a note proposing
+cancellation, and the owner rules at close. Cost: census 110k · readers 88k + 84k + 95k + 92k · judge 59k tokens.
+review · T3 · scoped-reviewer · Codex gpt-6-astra · FINDINGS (2) (an overclaim on Q09; reader freshness not stated) → record retry → re-review CLEAR
+T4 (TASK-462): the table was built (`d339763b`, net-zero 147, cap PASS), and 8 real-artifact cases ran × 2 arms (16 Sonnet readers,
+leakage files deleted from both checkouts). Records were 8/8 correct in both arms, with 0 classification errors. Median 22.5 s
+with the table vs 24.5 s without (ratio 0.92 > 0.75), so it is **removed**: reverts `9a35d692` · `d552c03d`, and
+`git diff 07113e12 HEAD -- docs/architecture/overview.md` is empty. The revert commits were made by `git revert --no-edit` and lack
+the session trailers.
+review · T4 · scoped-reviewer · Codex gpt-6-astra · FINDINGS (1) (Done-when item 1 evidence) → record retry → re-review FINDINGS (1): leakage deletions asserted, not shown → still-open → owner
+  evidence since: `git status --short` in both reader checkouts lists ` D` for reference-rejudge.md · SPRINT-131 sprint + log · TASK-462 (4 files each)

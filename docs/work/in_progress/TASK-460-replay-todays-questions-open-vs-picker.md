@@ -25,9 +25,9 @@ to how questions are asked.
 
 ## Done when
 
-- [ ] Today's 14 question contexts are reconstructed from the session's records and re-posed twice to fresh readers playing the owner from the context available then, once open-ended and once as the original picker, with the real answers hidden.
-- [ ] The result records, per question, whether the open form elicits the scope-changing intent of the three known "Other" answers, and whether it costs material clarity on the other eleven.
-- [ ] A verdict — coverage gain or none — is written into `docs/research/reference-rejudge.md`, and TASK-461 is unblocked (gain) or proposed for cancellation (none).
+- [x] Today's 14 question contexts are reconstructed from the session's records and re-posed twice to fresh readers playing the owner from the context available then, once open-ended and once as the original picker, with the real answers hidden. ✓ 37 questions (census; the scope-change re-scoped it from 14) rebuilt as self-contained packets; 2 open + 2 picker fresh Sonnet owner-proxies; answers hidden
+- [x] The result records, per question, whether the open form elicits the scope-changing intent of the three known "Other" answers, and whether it costs material clarity on the other eleven. ✓ reference-rejudge.md § Experiment results: Q09/Q36 intent per reader; clarity loss per reader on the other 35 (owner re-scope of 'three'/'eleven')
+- [x] A verdict — coverage gain or none — is written into `docs/research/reference-rejudge.md`, and TASK-461 is unblocked (gain) or proposed for cancellation (none). ✓ verdict none written into reference-rejudge.md; TASK-461 note proposes cancellation (owner rules at close); Codex re-review CLEAR
 
 ## Touches
 

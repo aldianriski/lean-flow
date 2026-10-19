@@ -24,9 +24,9 @@ table worth adopting, but only if it measurably helps a reader. No recorded fail
 
 ## Done when
 
-- [ ] One table in `docs/architecture/overview.md` lists each loop with its purpose, its exit or stopping condition, the authoritative record and its parent loop, linking to the defining text rather than copying it, and distinguishes *stopped* from *completed*; an equal number of lines is trimmed elsewhere in the file so it stays within its 150-line cap.
-- [ ] A reader test is recorded: fresh readers answer 8 cases drawn from real task files, sprint logs, an epic and night-run fixtures (including a budget stop with work left, a task done before its sprint closes, and a closed sprint whose epic is unfinished), once with the table and once without.
-- [ ] The table is kept only if every authoritative record is identified correctly and median lookup is at least 25% faster without more classification errors; otherwise it is removed, and the result is written into `docs/research/reference-rejudge.md` either way.
+- [x] One table in `docs/architecture/overview.md` lists each loop with its purpose, its exit or stopping condition, the authoritative record and its parent loop, linking to the defining text rather than copying it, and distinguishes *stopped* from *completed*; an equal number of lines is trimmed elsewhere in the file so it stays within its 150-line cap. ✓ table built in d339763b (5 rows: purpose · exit completed/stopped · record · parent · link), net-zero 147 <= 150; then reverted under box 3's rule
+- [x] A reader test is recorded: fresh readers answer 8 cases drawn from real task files, sprint logs, an epic and night-run fixtures (including a budget stop with work left, a task done before its sprint closes, and a closed sprint whose epic is unfinished), once with the table and once without. ✓ 8 real-artifact cases (incl. budget stop, task done in open sprint, closed sprint under open epic) x 2 arms, 16 fresh Sonnet readers; recorded in reference-rejudge.md
+- [x] The table is kept only if every authoritative record is identified correctly and median lookup is at least 25% faster without more classification errors; otherwise it is removed, and the result is written into `docs/research/reference-rejudge.md` either way. ✓ records 8/8 both arms, errors 0/0, median ratio 0.92 > 0.75 -> removed (9a35d692 · d552c03d; diff vs 07113e12 empty); result in reference-rejudge.md
 
 ## Touches
 

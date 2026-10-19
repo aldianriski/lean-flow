@@ -36,3 +36,5 @@ docs/research/reference-rejudge.md · the sprint Execution Logs where the questi
 ## Tracker
 
 - `docs/research/reference-rejudge.md` (I6) · L-002
+
+> **2026-10-19 (SPRINT-131 T3):** TASK-460 recorded **no coverage gain** under its fixed rule, so this task is **proposed for cancellation**. The owner rules at the SPRINT-131 close. The verdict is judge-sensitive: discounting two sprint-name answers would flip it to gain (`reference-rejudge.md` § Experiment results).
