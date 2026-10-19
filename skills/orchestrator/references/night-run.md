@@ -200,7 +200,8 @@ that to the launch half is the failure this part exists to stop: a background ru
 approved Plan, and the guard that would catch it (`sprint-bulk` step 0) lives *inside* the spawned
 process, where there is no ask channel to halt into.
 
-**Ordered entry path** — do these interactively, in order, before any spawn:
+**Ordered entry path** — do these interactively, in order, before the run is spawned (step 4's G2 readers are
+interactive sub-agents, not the run):
 
 | # | If… | Then run | Gate |
 |---|---|---|---|

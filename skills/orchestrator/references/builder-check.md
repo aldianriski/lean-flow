@@ -8,7 +8,9 @@ what they meant. A reader who cannot ask the author has only the text.
 ## Procedure
 
 1. **One reader per task design**, each a fresh sub-agent with no session context, on the `execution` tier
-   (`dispatch.md`). In sprint-bulk, spawn every reader in one message so they run in parallel.
+   (`dispatch.md`). In sprint-bulk, spawn every reader in one message so they run in parallel. On a host with no
+   sub-agents, a fresh session given only the reader file is the reader. With neither, record the line as
+   `not run (no fresh reader)` and say so in the G2 popup: the owner signs knowing the check did not run.
 2. **Hand it three things:** the design text for that task (sprint-bulk: the coordinator's G2 design for that `Tn`;
    mvp: the drafted design), the task's frozen `## Done when` read from its own file, and the paths of the code or text
    the design touches. Write them to one file and point the reader at it with the prompt below.
