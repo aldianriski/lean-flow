@@ -3,7 +3,7 @@ sprint: 130
 slug: a-gate-you-can-trust
 owner: Maintainer
 last_updated: 2026-10-19
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
