@@ -1200,7 +1200,12 @@ status: current
     declared `Layers:`.
   - **Re-file fresh if** the chain is changed, or the gate stops truncating on ordinary hosts.
 
-- **TD-154** severity: medium | status: open | created: Sprint-099
+- **TD-154** severity: medium | status: resolved → TASK-455 (SPRINT-130) | created: Sprint-099
+  - **Resolved (SPRINT-130 T1, `b64ff9c0`):** `invokes()` keeps its prefix rule and adds a second: the segment ENDS with the
+    declared command as whole whitespace-delimited tokens, after a head that is not `echo` · `printf` · `:`. Real-artifact run:
+    `bun test test/gate-discovery/` 15 pass, 0 fail on this repository, the rung-1 test included. Retained must-FAIL: an unquoted
+    `echo sh scripts/qa-check.sh` stays a bypass (seeded removal of `echo` reddens exactly that test). Known limit, by design: a
+    printing head other than those three, in trailing position, still counts as an invocation.
   - Summary: **`test/gate-discovery/discovery-order.test.ts` fails: the rung-1 command is reported as
     BYPASSING the gate `.gate-command` declares.** `bypassesDeclaredGate(REPO)` returns
     `bypassed: true` where the test asserts `false`.

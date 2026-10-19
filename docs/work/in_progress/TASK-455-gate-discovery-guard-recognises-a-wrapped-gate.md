@@ -24,9 +24,9 @@ command, so it reports the gate as bypassed when it is run. A guard that is alwa
 
 ## Done when
 
-- [ ] A command segment counts as invoking the declared gate when the declared command is its trailing argument list and the segment's head is not a non-executing builtin (`echo`, `printf`, `:`); `test/gate-discovery/discovery-order.test.ts` passes on this repository.
-- [ ] A new retained must-FAIL fixture: an unquoted `echo sh scripts/qa-check.sh` segment still reports the gate as bypassed. The existing negatives (the quoted-echo mention, the `.bak` prefix) still report bypassed, and the control still passes.
-- [ ] One run on the real artifact (this repository's `package.json` + `.gate-command`) recorded, and TD-154 marked resolved with that evidence.
+- [x] A command segment counts as invoking the declared gate when the declared command is its trailing argument list and the segment's head is not a non-executing builtin (`echo`, `printf`, `:`); `test/gate-discovery/discovery-order.test.ts` passes on this repository. ✓ b64ff9c0 (T1 1e0d443a + review fix 1da1259b); gate-discovery 15/0 on this repo incl. the rung-1 test; Codex re-review CLEAR
+- [x] A new retained must-FAIL fixture: an unquoted `echo sh scripts/qa-check.sh` segment still reports the gate as bypassed. The existing negatives (the quoted-echo mention, the `.bak` prefix) still report bypassed, and the control still passes. ✓ unquoted echo/printf/: MUST-FAIL retained; seeded drop of echo reddens exactly it (14/1), restored 15/0; quoted-echo and .bak negatives stay red
+- [x] One run on the real artifact (this repository's `package.json` + `.gate-command`) recorded, and TD-154 marked resolved with that evidence. ✓ real-artifact run bun test test/gate-discovery/ 15/0 on integ-130; TD-154 resolved in TECH-DEBT.md
 
 ## Touches
 

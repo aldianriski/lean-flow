@@ -47,3 +47,17 @@ block in a worktree, not committed. T3 — coordinator-run measurement after T1 
 Verification: T1 → `bun test test/gate-discovery/discovery-order.test.ts`; T2 → `sh evals/run-qa-budget-fixtures.sh` + the
 seeded proof; T3 → a recorded measurement (judgment tick). Reviews logged as `review · Tn` lines from the start (L-151).
 Dispatch preflight: PASS base-ref: declared base matches live HEAD (9345cb17c980c5c857b671920eae6800b5634270) PASS wave-computation: T1=0 T2=0 T3=1 PREFLIGHT: CLEAR 
+
+### 2026-10-19 | progress | T1 reviewed (two Spec findings, one retry, CLEAR) and merged; T2 in its retry
+Worktree-base guard: PASS for both wave-1 worktrees (branched from 1af49c44). T1 → `1e0d443a`; pre-merge Codex review:
+Standards CLEAR · Spec F1 (the wrapped match accepted an INTERIOR token run — the frozen Done-when says TRAILING; the coordinator's
+G2 wording "or followed by a space" was looser, and the Done-when governs) · F2 (only a literal space was a token boundary).
+Retry → `1da1259b` (`endsWithTokens`: the last N whitespace-split tokens equal the declared tokens, behind a non-builtin head);
+re-review CLEAR. Merged `b64ff9c0` (`integ-130`, `--no-ff`); main fast-forwarded; gate-discovery 15/0 on the merged tree.
+TD-154 resolved. TASK-455 boxes 1–3 ticked via tick-box.
+T2 → `3dc85e47`; first review CLEAR (0 findings) → adversarial floor: the empty-capture line asserted a cause (a host fork/memory
+failure) that a code regression also produces (a block exiting before it prints). The coordinator had exercised that branch with
+a seeded empty capture beforehand; the finding is about its diagnosis, not its firing. In its one retry now.
+consequence · T1 · behaviour:low · governance:low
+review · T1 · scoped-reviewer · behaviour:low · governance:low
+consequence · T2 · behaviour:low · governance:low
