@@ -464,9 +464,9 @@ status: current
     `git worktree list` should show none before a dispatch (stale-branch reuse on an agent-id collision, harness issue #51596). Nothing
     removes them, and a locked one may belong to a live session, so the coordinator cannot safely sweep them unasked.
   - Mitigation (hypothesis): a close-time step that lists merged, unlocked agent worktrees and proposes their removal (propose→approve).
-  - **Sighting (SPRINT-129 close, 2026-10-19):** 13 older agent worktrees present at dispatch (the base guard reads each one:
+  - **Sighting (SPRINT-129 close, 2026-10-19):** 12 older agent worktrees present at dispatch (first written as 13, a miscount; 12 remain after cleanup, two routes agree) (the base guard reads each one:
     stale by 24–992 commits or divergent). The mitigation was applied by hand: this sprint's 4 builder worktrees and its integration
-    worktree were proposed for removal at close and removed on owner approval; the 13 older ones were left for review.
+    worktree were proposed for removal at close and removed on owner approval; the 12 older ones were left for review.
 
 - **TD-245** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
   - Summary: **Epic ids now span two repositories and nothing derives the next one across both.** EPIC-016 to 020 live in workdoo

@@ -137,7 +137,7 @@ after the local run was killed for low memory.
 **Friction**
 - Review records written as prose (above) cost one extra VPS gate run.
 - The local system verify was reaped for low memory; the VPS route via a git bundle worked without pushing.
-- Thirteen older agent worktrees remain under `.claude/worktrees/` from earlier sessions (TD-246).
+- Twelve older agent worktrees remain under `.claude/worktrees/` from earlier sessions (TD-246).
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
 - No new entry. Sightings: L-151 (prose review records, its L-225 family) · L-020 (unwired prompt, caught by the floor) · L-187 (cmp
