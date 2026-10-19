@@ -34,3 +34,7 @@ state note: /triage, SPRINT-094: HELD, and the unblocking fact is named so it ca
 ## Tracker
 
 - SPRINT-092 T4 Round 13 §5 · TD-090
+
+## Amended 2026-10-19
+
+Superseded by ADR-051 (SPRINT-116 T1, `1a7361fd`): the TypeScript port this task converts into was retired, and the Shell §4 harness (`run-adr-family-fixtures.sh`) is always-on again carrying the full S4.APPEND work. No ported leg remains to measure against Round 12's ceiling. Cancelled at /triage (owner-approved).

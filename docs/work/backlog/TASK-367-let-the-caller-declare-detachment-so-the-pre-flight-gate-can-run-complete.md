@@ -1,7 +1,7 @@
 ---
 id: TASK-367
 title: "Let the caller declare detachment, so the pre-flight gate can run complete"
-priority: P2
+priority: P3
 size: M
 risk: high
 autonomy: HITL
@@ -39,6 +39,7 @@ state note: the detachment signal's shape is the open question
 
 - that a complete pre-flight is worth its wall-clock at all. UNCONFIRMED — the alternative is that the launcher should keep refusing on a bounded gate and the completeness problem belongs to the gate's cost, not to the launcher. Rule that before building; `TD-090` and `TASK-357` (carried from SPRINT-104 T4) own the cost side.
 - **open:** the shape of the detachment signal (the open question — see Done when (a)).
+- **open:** re-measure the Windows default-profile gate total after Round 24 (engine −67%; VPS `QA_FULL=1` is 105–109 s, Round 22) — if it completes under the 520 s budget, the launcher already gets a complete verdict and this task may be moot.
 
 ## Tracker
 
