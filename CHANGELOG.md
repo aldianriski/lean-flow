@@ -14,6 +14,36 @@ status: current
 
 ---
 
+## v2.12.0 — workflow packs: a proven procedure any agent can follow from one file, with nothing installed (2026-10-20)
+
+**MINOR** — ships SPRINT-132 (Expertise Without the Plugin), the first slice of EPIC-007. Installing the release is enough; no
+upgrade step. The standard is unchanged (spec 0.18.0). Restart the session after installing.
+
+### SPRINT-132 — Expertise Without the Plugin (2026-10-20)
+
+**Consumer-facing:**
+- **`packs/`, a new top-level tree (ADR-055).** A workflow pack is one proven procedure, written so that any capable agent, or
+  a person, can follow it from its single file. Nothing is installed and no model is assumed; you take one by copying its file.
+  `packs/CONTRACT.md` sets out the eight fields every pack declares: purpose · inputs · procedure · capabilities · output
+  contract · verification · escalation · risk policy. Each field has a checklist line a reader can tick. Routing is by role
+  (decision · execution · mechanical-ingest), never by model.
+- **The first pack, `packs/software-implementation.md`**, extracted from `/tdd`. It covers test-first behaviour in vertical
+  slices, with the whole suite gated on the runner's exit code. A fresh agent with no lean-flow plugin loaded followed it in a
+  scratch repository to its declared output.
+- **`/tdd`: a new test that passes on its first run is not RED.** It is recorded as *already covered*, naming the production
+  change that would fail it, and the next behaviour proceeds. This applies to the tracer bullet too. The no-plugin exercise
+  found the gap.
+
+**Maintainer-side:**
+- The contract is domain-neutral by construction: a non-software skeleton (supplier shortlist) passes a strict fresh reader's
+  checklist.
+- The first pack was switched from `/diagnose` to `/tdd`: an EPIC-007 D1 census found no recorded run of `/diagnose`, and 10
+  dispatched runs of `/tdd`.
+- The G2 builder check ran on all three designs: 15 contradictions and 18 questions, all settled before sign-off.
+- EPIC-007 conditions 1, 3 and 6 are delivered; conditions 2, 4 and 5 are the next slice.
+
+---
+
 ## v2.11.0 — a fresh reader checks every design against its Done-when before you sign G2 (2026-10-19)
 
 **MINOR** — ships SPRINT-131 (Check the Contract First). Installing the release is enough; no upgrade step. The standard is

@@ -1,7 +1,7 @@
 # Workflow pack — software implementation
 
 - **Name:** software implementation · **Family:** software-implementation
-- **Source:** extracted from lean-flow's `/tdd` skill (procedure v0.1.0, plugin 2.11.0)
+- **Source:** extracted from lean-flow's `/tdd` skill (procedure v0.1.0, plugin 2.12.0)
 - **Internal use:** used as the build procedure in 10 dispatched builder runs in lean-flow's own sprints, 2026-09-28 → 2026-10-11
   (SPRINT-109 T2–T4, SPRINT-110 T2–T4, three runs on 2026-10-03, SPRINT-124 T1)
 

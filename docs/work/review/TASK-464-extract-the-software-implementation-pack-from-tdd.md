@@ -28,7 +28,7 @@ EPIC-007 D1 admits only packs extracted from procedures with real internal use. 
 - [x] A software-implementation pack declares all eight contract fields from `/tdd`'s procedure and names the internal use that qualified it under D1. ✓ packs/software-implementation.md: 8 fields from /tdd's procedure (every SKILL.md rule inline); internal-use line names the 10 recorded runs (aa318083)
 - [x] The pack names no model: its routing is by ADR-010 role (`decision` · `execution` · `mechanical-ingest`), and a search of the pack for model names finds none. ✓ routing per step by role (decision · execution); model/vendor grep prints nothing (seed-proven)
 - [x] A fresh reader validates the declaration against TASK-463's checklist, with every field ticked or a recorded finding. ✓ strict fresh reader vs packs/CONTRACT.md: 2 findings recorded and fixed in the one retry, then ALL TICKED (8 fields + Routing + Header)
-- [ ] README tells a consumer that packs exist and how to take one; CHANGELOG reflects it.
+- [x] README tells a consumer that packs exist and how to take one; CHANGELOG reflects it. ✓ README 'Workflow packs' passage (b39371c3); CHANGELOG v2.12.0 block
 
 ## Touches
 
