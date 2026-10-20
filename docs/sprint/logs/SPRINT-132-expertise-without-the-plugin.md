@@ -164,3 +164,4 @@ owner-ruling: system-verify — fixed-and-rerun. T1 declared `spec/packs/` as a 
 **What broke:** T1's Layers named two candidate trees so that whichever one G2 ruled would already be declared. G2 ruled
 `packs/`. The other token, `spec/packs/`, matches no path, which the `layers observed` leg FAILs by design.
 **Impact:** § Plan T1's `Layers:` loses `spec/packs/`. Nothing else changes; no member's Done-when is touched.
+system-verify · PASS · QA_FULL on the VPS at `3d6e8265`, the final integrated tree after the fix: 304 pass, 0 fail, 114 s (`bun test` 441/0 on the first run)
