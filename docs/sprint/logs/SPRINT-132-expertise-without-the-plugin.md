@@ -55,3 +55,30 @@ Touches and Tracker name `/tdd` in place of `/diagnose`. TASK-465's exercise bec
 a seeded defect. Both files are renamed to match their titles. § Plan's T1 and T2 Layers name `skills/tdd/` in place of
 `skills/diagnose/`, and its Scope, D2 and Members follow. The task ids, the dependency chain and EPIC-007's coverage marks are
 unchanged. Re-confirm G2: the G2 being drafted now uses `/tdd`.
+
+### 2026-10-20 | gate | G2 signed by the owner after the builder check; T1 → T2 → T3 sequential
+G2 ran the builder check from the repo's own `skills/orchestrator/references/builder-check.md`; the installed plugin is still
+2.10.0 (A3). Three fresh Sonnet readers ran in parallel, one per task design, each given the design, the member's frozen
+`## Done when` and the touched paths. Before that, a probe settled T3's no-plugin premise: `claude -p --setting-sources local
+--disable-slash-commands` from an empty directory loads only the 3 built-in plugins, with `skills: []` and `slash_commands: []`.
+builder-check · T1 · 4 contradictions · 6 questions · fixed: the procedure checklist line accepts named steps with their outputs; findings go in this log; greps take ids and word boundaries; Tier P; README/CHANGELOG/epic-scope edits assigned
+builder-check · T2 · 5 contradictions · 6 questions · fixed: the pack inlines all of /tdd's rules and names no lean-flow skill, path or id; verification and the output contract are defined exactly; a finding gets one fix and re-read; the approval step goes in escalation; routing is per step
+builder-check · T3 · 6 contradictions · 6 questions · fixed: the file count is asserted before the run and hashes are compared before and after; the init lists are the mechanical proof; the output-contract walk reads the pack's own field; test-first uses tool-call order; all 8 fields are walked
+Totals: 15 contradictions and 18 questions (4 + 5 + 6 · 6 + 6 + 6).
+Owner rulings at G2:
+- **Placement:** a top-level `packs/` tree at Layer E (contract + packs + examples), recorded as ADR-055.
+- **T3:** binary, one run. A harness fault is fixed and re-run once. An agent miss is recorded as a fail and left for the owner's ruling.
+Approved designs:
+- **T1** (inline, decision class): `packs/CONTRACT.md`, eight fields each with a checklist line, a domain-neutral required set,
+  and routing by role; `packs/examples/non-software-skeleton.md`; ADR-055 and a DECISIONS row.
+- **T2** (a dispatched Sonnet builder after T1 merges): `packs/software-implementation.md`, carrying all of /tdd's rules
+  inline, the internal-use line (10 runs) and per-step routing; one README passage.
+- **T3** (run by the coordinator as a separate `claude -p` process): a printf-built scratch Node repo with its file count
+  asserted; the pack's text inline in the prompt; proof from the init lists, hashes both sides, the output-contract walk and
+  the 8-field walk; the record in `docs/research/logs/workflow-pack-exercises.md`.
+Verification:
+- T1: the domain and id greps, plus a fresh-reader skeleton validation.
+- T2: the model/id greps, plus a fresh-reader validation.
+- T3: a recorded run (judgment tick, plus the mechanical sub-checks).
+- System verify after the final merge.
+consequence · T1 · behaviour:low · governance:high → scoped Codex + the adversarial floor (D3); Codex from an empty directory (L-239)
