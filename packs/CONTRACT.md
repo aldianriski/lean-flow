@@ -23,8 +23,8 @@ that domain's words in its own text, but nothing here requires them.
    - [ ] Lists ordered steps, each naming what it produces and its role. A declaration-only skeleton may name its steps and
      their outputs without writing them out, and says so in its header; a usable pack writes them out.
 
-4. **`capabilities`** — what the agent must be able to do: read, write, run a command, ask a person. Stated as capabilities,
-   never as a product, tool brand or model.
+4. **`capabilities`** — what the agent must be able to do: read, write, use a tool the procedure names, ask a person. Stated
+   as capabilities, never as a product, tool brand or model.
    - [ ] Every capability the steps rely on is listed, and none names a product, vendor or model.
 
 5. **`output contract`** — the artifacts the procedure leaves behind, and the evidence that each is complete.

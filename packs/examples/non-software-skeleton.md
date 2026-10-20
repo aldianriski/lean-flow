@@ -8,9 +8,10 @@
 
 1. **`purpose`** — Produce a ranked shortlist of up to three suppliers for a stated need, with the reason for each ranking. Not
    for negotiating terms or signing anything.
-2. **`inputs`** — The need, stated as requirements and a budget ceiling; the candidate suppliers; and a requester who can rank
-   conflicting requirements. A missing budget ceiling or unranked requirements: ask the requester before scoring. No
-   candidates: stop and report that there is nothing to shortlist.
+2. **`inputs`** — The need, stated as requirements and a budget ceiling; the candidate suppliers; each candidate's published
+   material (catalogue, price list, terms); and a requester who can rank conflicting requirements. A missing budget ceiling or
+   unranked requirements: ask the requester before scoring. No candidates: stop and report that there is nothing to shortlist.
+   A candidate with no published material: score its criteria as unknown and say so in the shortlist.
 3. **`procedure`**
    1. Restate the need as scoring criteria with weights → a criteria table (decision).
    2. Gather each candidate's published facts against the criteria → a facts sheet per candidate (mechanical-ingest).
