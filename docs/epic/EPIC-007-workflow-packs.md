@@ -47,9 +47,10 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 (Phase H, demand-gated by design) · model identity — a pack must not own it (`01` Layer E).
 
 ## Member sprints
-<!-- Contribution rows live in docs/epic/logs/EPIC-007-workflow-packs.md per ADR-030. -->
 
-→ [`logs/EPIC-007-workflow-packs.md`](logs/EPIC-007-workflow-packs.md) — appended at each member close.
+| Sprint | Theme | Status | What it contributed to the outcome |
+|---|---|---|---|
+| [SPRINT-132](../sprint/archive/SPRINT-132-expertise-without-the-plugin.md) | Expertise Without the Plugin | closed · `8eb2871` | Conditions 1, 3, 6: the eight-field contract with a reader checklist and a domain-neutral skeleton (ADR-055, `packs/`); the first pack, software-implementation from `/tdd` (1 of 3–5, condition 2 open); an agent with no lean-flow installed followed it to its output contract (met in substance) |
 
 ## Decisions
 

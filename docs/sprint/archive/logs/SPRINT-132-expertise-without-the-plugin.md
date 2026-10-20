@@ -184,3 +184,8 @@ Buckets:
 - Learnings → L-240 (prune the losing candidate Layers tokens at G2) and L-241 (test "without the plugin" with a separate
   headless process); the knowledge index is regenerated.
 Handoff ledger: no `handoff` entry was taken.
+
+### 2026-10-20 | gate | post-close: the final-tree gate FAILed `epic-state` → owner ruling: the row goes inline, plus TD-261
+system-verify · FAIL(epic-state) · QA_FULL on the VPS at `09306e16` (after the archive): 293 pass, 1 fail. EPIC-007 had its
+SPRINT-132 row in `docs/epic/logs/` (per ADR-030), but the checker reads only the epic file's own § Member sprints.
+owner-ruling: system-verify — fixed-and-rerun. The member-sprint table moved inline into EPIC-007 (as the template and EPIC-022 have it), the now-empty epic log was removed, and TD-261 was filed for the ADR-030 ↔ checker mismatch.

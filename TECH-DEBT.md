@@ -382,6 +382,13 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-261** severity: low | status: open | created: Sprint-132 (close; final gate, `epic-state`)
+  - Summary: **ADR-030 and the epic-state checker disagree about where member-sprint rows live.** ADR-030 puts the rows in
+    `docs/epic/logs/EPIC-NNN-<slug>.md`. `scripts/lib/check-epic-archive.ts` reads only the epic file's own § Member sprints, as
+    `EPIC.md.template` and EPIC-022 do. No epic had used the log split until EPIC-007 at SPRINT-132. Its row was then moved
+    inline (owner ruling) and the log removed.
+  - Fix direction: teach the checker to read the log when the epic points to one, or amend ADR-030 to keep the rows inline.
+    Decide before an epic nears its 200-line cap, which is the case ADR-030 was written for.
 - **TD-260** severity: low | status: open | created: Sprint-131 (close; found by the T2 inline replay)
   - Summary: **The whole-suite rule is still stated twice.** SPRINT-129's owner ruling put the per-slice whole-suite rule in one
     place (`/tdd`), and `test-standard.md` now points to it. But `skills/orchestrator/references/review-scoping.md:241` (§ QA
