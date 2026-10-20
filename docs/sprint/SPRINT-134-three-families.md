@@ -5,6 +5,7 @@ epic: EPIC-007
 owner: Maintainer
 last_updated: 2026-10-20
 status: active
+gates_signed: G1,G2 @ 66a6de28
 plan_commit: 1384dd75
 update_trigger: sprint execute/close events
 ---

@@ -31,3 +31,20 @@ Promote governance checklist, signed by the owner by popup:
 - ☑ roadmap coverage: no roadmap. ☑ handoff ledger: none.
 Epic: SPRINT-134 appended to § Member sprints and `member_sprints:`. The coverage marks now name tasks, not "next slice".
 Size check: 2 M + 1 S, no `L`. All three are `origin: decomposer` (decomposed 2026-10-20, `87a94c6b`; D1 census at intake).
+
+### 2026-10-20 | gate | batch G1 (fast-path) and G2 signed by popup; T1 ∥ T2 in worktrees, then T3 inline
+G1: all three members are `origin: decomposer` and the scope is unchanged since intake (`87a94c6b`).
+G2: T1 writes the verification pack and T2 the solution-analysis pack. Two dispatched writers run in parallel in isolated
+worktrees, and the coordinator merges each file back. The coordinator rewords the README sentence and commits it T1 then T2 (D1).
+T3 runs inline after both land, ending in the owner's ruling. Verify: a model-name search that prints nothing; one fresh reader
+per pack for the contract checklist plus the Spec and Standards axes; a README search. DoD 1 and 3 stay judgment ticks.
+T1's design was corrected after its builder check, matching its source in five places. The retry fires only on a concrete
+violation. The depth table is included. The Spec axis uses the comparand ladder, falls back to the acceptance criteria and says
+so. The whole check is discovered in a fixed order, and the "none found" and "unreadable declaration" cases are covered. Internal
+use is cited sprint by sprint and re-derived by two routes.
+builder-check · T1 · 5 contradictions · 3 questions · design fixed against the source (all five); counts re-derived by the builder; the "no requester" branch goes under escalation (a source extraction, not an intent question)
+builder-check · T2 · 0 contradictions · 4 minor (factual) · builder instructions: the steps are derived from the template; the search is spelled out; the coordinator does the README; no lean-flow names in the body
+builder-check · T3 · 0 contradictions · 3 questions · runs after T1 and T2; the roadmap's copy of the gate box is not touched (not in the Done-when); the recommendation is formed from evidence at ruling time
+consequence · T1 · behaviour:low · governance:high
+consequence · T2 · behaviour:low · governance:high
+consequence · T3 · behaviour:low · governance:high
