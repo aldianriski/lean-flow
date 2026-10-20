@@ -71,11 +71,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
-## L-242 [tags: process] [status: active]: **The TECH-DEBT aging-sweep note is a convention no procedure names, so promotes skip it.** Each promote's governance review ages the ledger and records the result in the sprint log. Separately, the custom is to add an "Aging sweep — SPRINT-NNN promote" note at the top of `TECH-DEBT.md` § Tech Debt. The promote procedure never mentions that note. It was skipped at the SPRINT-129, 130 and 132 promotes; the 131 note recorded the first two as "a miss", and the 133 note recorded the third. Every time, the aging itself was done and logged. Only the note was missing. Either write the note into the promote procedure, or drop it, since the sprint log already holds the record (§10 placement test). A step that lives only in custom keeps getting skipped (L-151's sibling).
-- seen: 2026-10-19 (SPRINT-131 promote: the 129 and 130 promotes wrote no note) · 2026-10-20 (SPRINT-133 promote: the 132 promote wrote none)
-- count: 3
-- promoted: no
-- related: L-151 (a decision recorded where its reader cannot reach it) · TD aging (§10 promote review)
+## L-242 [tags: process] [status: promoted]: **The TECH-DEBT aging-sweep note is a convention no procedure names, so promotes skip it.** Each promote's governance review ages the ledger and records the result in the sprint log. Separately, the custom is to add an "Aging sweep — SPRINT-NNN promote" note at the top of `TECH-DEBT.md` § Tech Debt. The promote procedure never mentions that note. It was skipped at the SPRINT-129, 130 and 132 promotes; the 131 note recorded the first two as "a miss", and the 133 note recorded the third. Every time, the aging itself was done and logged. Only the note was missing. Either write the note into the promote procedure, or drop it, since the sprint log already holds the record (§10 placement test). A step that lives only in custom keeps getting skipped (L-151's sibling).
+- **L-242 → promoted: `TECH-DEBT.md` § Tech Debt, the line atop the aging-sweep notes** · disposition: replace — the custom is dropped. The promote log entry, which every promote already writes, is the one record of a TD aging sweep from SPRINT-134 on (owner ruling, SPRINT-134 promote). Count 3: the 129, 130 and 132 promotes. Body: git.
 
 ---
 
@@ -103,12 +100,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
-## L-238 [tags: edit-safety] [status: active]: **A coordinator's commit subject is the attribution record, so a coordinator-owned write goes under `sprint(N):`, never under a task's `Tn:`.** SPRINT-131's system verify FAILed on two legs (`layers observed` · `dod-delta`) with no content defect. Four of the coordinator's own subjects could not be attributed: a combined `sprint(131) T3 + T4:` that no attribution arm reads, two `git revert --no-edit` subjects (`Revert "…"`) with no sprint at all, and a write to the coordinator-owned research doc under `sprint(131) T2:`, which T2's `Layers:` do not declare. The owner ruled fix-and-rerun, which cost a `filter-branch` message rewrite of 10 commits (trees byte-identical) and a second QA_FULL run. One task per subject; a write to a D1-owned shared file is `sprint(N):`; a revert gets a `sprint(N) Tn:` subject (`git revert --no-commit`, then commit).
-- seen: 2026-10-19 (SPRINT-131 close, system verify 298/2 → 300/0 after the rewrite)
-- seen: 2026-10-20 (SPRINT-133 close: a coordinator `in_progress → done` move committed under `sprint(133) T1:`; `layers observed` 292/1, fixed by a Layers scope-change)
-- count: 2
-- promoted: no
-- related: L-151 (a ruling the checker cannot read behaves as if never taken)
+## L-238 [tags: edit-safety] [status: promoted]: **A coordinator's commit subject is the attribution record, so a coordinator-owned write goes under `sprint(N):`, never under a task's `Tn:`.** SPRINT-131's system verify FAILed on two legs (`layers observed` · `dod-delta`) with no content defect. Four of the coordinator's own subjects could not be attributed: a combined `sprint(131) T3 + T4:` that no attribution arm reads, two `git revert --no-edit` subjects (`Revert "…"`) with no sprint at all, and a write to the coordinator-owned research doc under `sprint(131) T2:`, which T2's `Layers:` do not declare. The owner ruled fix-and-rerun, which cost a `filter-branch` message rewrite of 10 commits (trees byte-identical) and a second QA_FULL run. One task per subject; a write to a D1-owned shared file is `sprint(N):`; a revert gets a `sprint(N) Tn:` subject (`git revert --no-commit`, then commit).
+- **L-238 → promoted: `.claude/CONTEXT.md` § Sprint model, the commit-subject attribution bullet** · disposition: merge — a coordinator write (a status move the task's `Layers:` do not declare, a Log or sprint-file edit, a shared file) commits as bare `sprint(NNN):`, never under a task's `Tn:`. Count 2: SPRINT-131 close (298/2) and SPRINT-133 close (292/1). Body: git.
 
 ---
 

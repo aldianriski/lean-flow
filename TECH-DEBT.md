@@ -35,6 +35,10 @@ status: current
 
 ## Tech Debt
 
+> **From SPRINT-134 on, each promote's TD aging sweep is recorded only in that sprint's promote log entry.** No more notes are
+> added here. The notes below are history. The custom was named by no procedure and was skipped three times (L-242, owner
+> ruling at the SPRINT-134 promote).
+>
 > **Aging sweep — SPRINT-133 promote (2026-10-20).** **103 of 106 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 133. Second route: 109 rows − 3 resolved = 106 open; the 3 not aged are TD-259 · 260 (filed at 131) and TD-261 (132).
 > **Newly aged:** none, because no row was filed at 130. The SPRINT-132 promote aged the ledger in its log but wrote no sweep here.
