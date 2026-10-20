@@ -155,3 +155,12 @@ and `skills: []`. Before the run: 3 files, 0 identical. After: 2 modified, 0 ide
 Behaviour 1 shows RED → code → GREEN. Behaviours 2–4 are each recorded as already covered.
 review · T3 · run-3 record · Codex · FINDINGS (4): behaviour 3's note names no definite failing change (`Math.ceil` still passes); behaviour 4's padding example is wrong (its capping example holds); "no code ahead of a test" was misworded; "every field followed" overreached → record corrected to the evidence (b2c8ed22), verdict "not established" → owner
 owner-ruling: review · T3 — met in substance. The agent followed the pack end to end and applied the new rule to all three already-covered behaviours; one note is imprecise, not absent or false. Box 1 is ticked with the caveat, and a follow-up asks the pack for a concrete change in each note.
+
+### 2026-10-20 | gate | system verify FAIL (layers-token-matches-nothing) → owner ruling: fixed-and-rerun
+system-verify · FAIL(layers observed) · QA_FULL on the VPS at `fa214454`: 303 pass, 1 fail, 114 s; `bun test` 441/0
+owner-ruling: system-verify — fixed-and-rerun. T1 declared `spec/packs/` as a candidate placement before G2. The G2 ruling (`packs/`, ADR-055) left it unused, so the token matches nothing.
+
+### 2026-10-20 | scope-change | § Plan T1 Layers: drop the unused candidate token `spec/packs/` (owner ruling above)
+**What broke:** T1's Layers named two candidate trees so that whichever one G2 ruled would already be declared. G2 ruled
+`packs/`. The other token, `spec/packs/`, matches no path, which the `layers observed` leg FAILs by design.
+**Impact:** § Plan T1's `Layers:` loses `spec/packs/`. Nothing else changes; no member's Done-when is touched.
