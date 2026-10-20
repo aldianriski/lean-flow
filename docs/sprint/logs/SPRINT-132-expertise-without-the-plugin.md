@@ -145,3 +145,13 @@ RED-per-behaviour evidence could not be met by an honest follower.
   `version: "0.1.0"` has not been bumped on its earlier edits (SPRINT-051 · 129), so the plugin version is the reliable marker.
 - **TASK-465:** the exercise is re-run once (same setup, same prompt, binary rule), and the record appends run 3.
 - **Frozen Done-when text:** unchanged. TASK-464's boxes 1–3 stay ticked, and the change is reviewed once by Codex.
+
+### 2026-10-20 | progress | T2's already-covered rule (scope-change 282a127c) reviewed CLEAR; T3 run 3 → owner ruling: met in substance
+T2 addendum: `/tdd` and the pack gain one rule (`33493a73`). A new test that passes on its first run is recorded as *already
+covered*, naming the production change that would fail it; the output contract accepts that in place of a RED run.
+review · T2 · scoped-reviewer · Codex · FINDINGS (1): the tracer bullet still demanded RED unconditionally → retry b541a4f2 (rule extended to the tracer bullet, both files) → re-review CLEAR
+T3 run 3 (fresh scratch repository, same request, the updated pack; 16 turns, 36 s, $0.12): the init event shows 3 built-ins
+and `skills: []`. Before the run: 3 files, 0 identical. After: 2 modified, 0 identical. `npm test` gives 5/5, exit 0.
+Behaviour 1 shows RED → code → GREEN. Behaviours 2–4 are each recorded as already covered.
+review · T3 · run-3 record · Codex · FINDINGS (4): behaviour 3's note names no definite failing change (`Math.ceil` still passes); behaviour 4's padding example is wrong (its capping example holds); "no code ahead of a test" was misworded; "every field followed" overreached → record corrected to the evidence (b2c8ed22), verdict "not established" → owner
+owner-ruling: review · T3 — met in substance. The agent followed the pack end to end and applied the new rule to all three already-covered behaviours; one note is imprecise, not absent or false. Box 1 is ticked with the caveat, and a follow-up asks the pack for a concrete change in each note.

@@ -24,9 +24,9 @@ the plugin has used it. The owner ruled (2026-10-19) that "reusable without the 
 
 ## Done when
 
-- [ ] A fresh agent with no lean-flow skills loaded, in a scratch repository that never installed lean-flow, is given only the pack file and a small feature to build, and reaches the pack's declared output contract.
-- [ ] No lean-flow file is copied into the scratch repository; this is asserted the way EPIC-004's foreign-repo harness asserts it, and the check's output is recorded.
-- [ ] The run is recorded (inputs, the agent's output against the output contract, and any field the agent could not follow) where EPIC-007's log or research record keeps it.
+- [x] A fresh agent with no lean-flow skills loaded, in a scratch repository that never installed lean-flow, is given only the pack file and a small feature to build, and reaches the pack's declared output contract. ✓ run 3 (after the owner-ruled already-covered rule): a fresh claude -p, 3 built-in plugins + skills [], given only the pack text, reached the output contract — owner ruling: met in substance (behaviour 3's note imprecise; follow-up filed)
+- [x] No lean-flow file is copied into the scratch repository; this is asserted the way EPIC-004's foreign-repo harness asserts it, and the check's output is recorded. ✓ printf-built 3-file repo, count asserted before the run; content hashes vs lean-flow before/after: 0 identical (control: a seeded copy is caught as 1 match)
+- [x] The run is recorded (inputs, the agent's output against the output contract, and any field the agent could not follow) where EPIC-007's log or research record keeps it. ✓ docs/research/logs/workflow-pack-exercises.md: runs 1-3, the inputs, output contract item by item, the eight-field walk
 
 ## Touches
 
