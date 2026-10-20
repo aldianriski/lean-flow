@@ -2,6 +2,7 @@
 id: TASK-468
 title: "Extract the solution-analysis pack from decision research, and declare it against the contract"
 epic: EPIC-007
+sprint: SPRINT-134
 priority: P2
 size: M
 risk: low

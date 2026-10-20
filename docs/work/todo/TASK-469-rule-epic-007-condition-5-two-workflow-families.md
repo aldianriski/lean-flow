@@ -2,6 +2,7 @@
 id: TASK-469
 title: "Rule EPIC-007 condition 5: do two workflow families satisfy the decision gate?"
 epic: EPIC-007
+sprint: SPRINT-134
 priority: P2
 size: S
 risk: low

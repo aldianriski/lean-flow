@@ -4,7 +4,7 @@ slug: workflow-packs
 owner: Maintainer
 last_updated: 2026-10-20
 status: active
-member_sprints: [SPRINT-132, SPRINT-133]
+member_sprints: [SPRINT-132, SPRINT-133, SPRINT-134]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -52,6 +52,7 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 |---|---|---|---|
 | [SPRINT-132](../sprint/archive/SPRINT-132-expertise-without-the-plugin.md) | Expertise Without the Plugin | closed · `8eb2871` | Conditions 1, 3, 6: the eight-field contract with a reader checklist and a domain-neutral skeleton (ADR-055, `packs/`); the first pack, software-implementation from `/tdd` (1 of 3–5, condition 2 open); an agent with no lean-flow installed followed it to its output contract (met in substance) |
 | [SPRINT-133](../sprint/archive/SPRINT-133-name-the-failing-edit.md) | Name the Failing Edit | closed · `e01e549` | Condition 3 follow-up: `/tdd` and the first pack now require an already-covered note to name one concrete edit, checked against the test's inputs, that fails the test. The SPRINT-132 exercise exposed the gap. No condition changed state; 2, 4 and 5 remain the next slice |
+| [SPRINT-134](../sprint/SPRINT-134-three-families.md) | Three Families | active | — (rolled up at close; conditions 2 · 4 · 5: the verification and solution-analysis packs, and the decision-gate ruling) |
 
 ## Decisions
 
@@ -104,12 +105,12 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 ## Closed when
 
 - [x] A pack declaration contract exists with all eight fields, and a pack declaration is checkable → TASK-463, TASK-464 · closed by SPRINT-132 (`packs/CONTRACT.md`; checkable by a reader, D6)
-- [ ] 3–5 packs are extracted, each naming the internal use that qualified it under D1 → TASK-464 · next slice: packs 2–3
+- [ ] 3–5 packs are extracted, each naming the internal use that qualified it under D1 → TASK-464, TASK-467, TASK-468
 - [x] At least one pack is exercised end-to-end **with no lean-flow plugin present** — the consumer path,
       asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016) → TASK-465 · closed by SPRINT-132 (owner ruling: met in substance; `docs/research/logs/workflow-pack-exercises.md`)
-- [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464 · next slice: each later pack
+- [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464, TASK-467, TASK-468
 - [ ] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
-      as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → next slice: gate-condition ruling
+      as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → TASK-469
 - [x] **The pack contract is domain-neutral: no software-specific field is mandatory unless the pack
       itself is a software workflow.** `repo` · `commit` · `branch` · `tests` · `PR` may appear in a
       software pack and must not appear in the contract's required set. **Verified by construction, not

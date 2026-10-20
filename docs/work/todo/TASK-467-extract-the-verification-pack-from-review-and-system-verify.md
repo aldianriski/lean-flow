@@ -2,6 +2,7 @@
 id: TASK-467
 title: "Extract the verification pack from the scoped review and system verify, and declare it against the contract"
 epic: EPIC-007
+sprint: SPRINT-134
 priority: P2
 size: M
 risk: low
