@@ -14,6 +14,11 @@ status: current
 
 ---
 
+## v2.12.1 — an already-covered test names the one edit that would fail it (2026-10-20)
+
+**PATCH** — ships SPRINT-133 (Name the Failing Edit), a follow-up to EPIC-007. Installing the release is enough; no upgrade step.
+The standard is unchanged (spec 0.18.0). Restart the session after installing.
+
 ### SPRINT-133 — Name the Failing Edit (2026-10-20)
 
 **Consumer-facing:**
