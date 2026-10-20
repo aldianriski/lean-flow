@@ -32,7 +32,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Write the domain-neutral pack contract `[size: M · risk: med · class: decision · HITL · J1]`
-Layers: `packs/` · `spec/packs/` · `skills/tdd/` · `docs/adr/` · `docs/DECISIONS.md`
+Layers: `packs/` · `skills/tdd/` · `docs/adr/` · `docs/DECISIONS.md`
   · `docs/work/todo/TASK-463-write-the-domain-neutral-pack-contract.md`
   · `docs/work/in_progress/TASK-463-write-the-domain-neutral-pack-contract.md`
 Depends-on: none
