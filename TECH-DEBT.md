@@ -387,6 +387,13 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-263** severity: low | status: open | created: Sprint-133 (close; system verify, `scope-change layers`)
+  - Summary: **The scope-change leg reads a backticked prose fragment as a repo path.** `repoPath()` in
+    `scripts/lib/check-sprint-by-reference.ts` accepts any span ending in a slash. So a fragment like the one in SPRINT-133's
+    scope-change heading must be declared verbatim, even when the full path beneath it is already in the task's Layers.
+    The log is append-only, so the only fix is to declare the fragment in Cites, a declaration that names no real file.
+  - Fix direction: treat a relative directory fragment as declared when a declared path contains it as a segment run, or
+    require a path to resolve at HEAD or in the range. Tier G: a guard change takes the full bar.
 - **TD-262** severity: low | status: open | created: Sprint-133 (close; promote doc-aging, TASK-438)
   - Summary: **§11's "live citation" counts only `.md` files, and a code citation does not count.** At the SPRINT-133 promote
     TASK-438 had no live `.md` citation, so the rule made it prunable, but `scripts/lib/tick-box.ts`,

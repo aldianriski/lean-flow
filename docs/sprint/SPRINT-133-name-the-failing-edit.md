@@ -33,7 +33,8 @@ Layers: `skills/tdd/SKILL.md` · `packs/software-implementation.md`
   · `docs/work/in_progress/TASK-466-already-covered-notes-name-a-concrete-change.md`
   · `docs/work/done/TASK-466-already-covered-notes-name-a-concrete-change.md`
 Depends-on: none
-Cites: `TASK-466` · EPIC-007 condition 3 · ADR-055 · `docs/research/logs/workflow-pack-exercises.md`
+Cites: `TASK-466` · EPIC-007 condition 3 · ADR-055 · `docs/research/logs/workflow-pack-exercises.md` · `done/` (a log-heading
+  fragment, TD-263)
 
 A wording change in two files that must stay alike. The pack must still name no lean-flow skill, path or id outside its header.
 
@@ -79,7 +80,8 @@ one QA_FULL run on the VPS. One member delivered: one S task, two DoD.
 - The TECH-DEBT aging-sweep note was missing again, from the SPRINT-132 promote (L-242, count 3).
 - System verify failed 292/1 on `layers observed`. A coordinator done-move was committed under a task's `T1:` subject (L-238,
   now count 2). This is the third close in a row to fail on bookkeeping rather than content (131 · 132 · 133). Fixed by a
-  Layers scope-change and a rerun.
+  Layers scope-change and a rerun. That scope-change's own heading then tripped `scope-change layers`: it read a backticked
+  prose fragment as a path. Fixed by a Cites edit and a second rerun (TD-263). Two QA_FULL reruns for one done-move.
 
 **Pattern candidate**
 - L-242: a step that lives only in custom keeps getting skipped. It is due at the next promote (count 3).
