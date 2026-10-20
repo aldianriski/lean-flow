@@ -70,3 +70,27 @@ for the owner's ruling.
 run, because the code written for an earlier behaviour already covers it. Two searches of `skills/tdd/` (265 lines), one for "already"/"passes immediately"/"goes green" and one for "if the test passes"/"passes on first"/"does not fail", find no such rule.
 The pack's checklist holds a natural answer ("name the production change that would fail this test"). Its output contract still
 asks for a RED run that this ordering cannot produce.
+
+**Run 3 — after the fix, re-run once (owner ruling).** The pack and `/tdd` gained one rule: a new test that passes on its
+first run, the tracer bullet's included, is not RED. It is recorded as *already covered*, naming the production change that
+would fail it, and the output contract accepts that record in place of a RED run. Same setup, same request, a fresh scratch
+repository. It took 16 turns, 36 s and $0.12.
+
+| Check | Result |
+|---|---|
+| No lean-flow plugin or skill loaded (init event) | plugins: the 3 built-ins only; `skills: []`; `slash_commands: []` |
+| No lean-flow file (count before; hashes before and after) | before: exactly 3 files, 0 identical; after: 2 files modified, none added, 0 identical |
+| Whole suite (`npm test` after the run) | 5 tests, 5 pass, 0 fail, exit 0 |
+
+Output contract, item by item:
+- **Behaviour list, stated because nobody could confirm it:** met (3723 · 0 · 3600 · 360000).
+- **Per behaviour, either a RED run before its code or an already-covered note:** met for all four.
+  - Behaviour 1: the test failed (`# fail 1`, not exported), then the code was written, then GREEN.
+  - Behaviours 2–4: each passed first time and is recorded as already covered, with the change that would fail it: dropping
+    the zero-padding · a different hours division · capping or padding the hours.
+- **The code:** met.
+- **A final whole-suite run that exits 0:** met.
+
+Fields: every field followed, except one `procedure` deviation the agent reported itself: behaviours 3 and 4 were added in a
+single edit instead of one at a time. Both passed first time, so no code was written ahead of a test.
+**Verdict under the owner's binary rule: met.**
