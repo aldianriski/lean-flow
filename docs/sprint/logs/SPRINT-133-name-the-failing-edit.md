@@ -3,7 +3,7 @@ sprint: 133
 slug: name-the-failing-edit
 owner: Maintainer
 last_updated: 2026-10-20
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -68,3 +68,13 @@ owner-ruling: system-verify — Cites edit and rerun. The previous scope-change 
 ### 2026-10-20 | scope-change | § Plan T1 Cites: add the fragment `done/` (owner ruling above)
 **What broke:** the previous scope-change heading's fragment is read as an undeclared path for T1.
 **Impact:** § Plan T1's `Cites:` gains it. Layers, Done-when and G2 are unchanged.
+system-verify · PASS · QA_FULL on the VPS at `5ccb4c23`, the final tree after both rulings: 293 pass, 0 fail
+
+### 2026-10-20 | close | 1 of 1 member in done/, PLAN_EXHAUSTED; Retro + buckets; EPIC-007 rolled up (stays active)
+run · 2 of 2 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 293/0 on the VPS at `5ccb4c23`, after two owner-ruled reruns (a Layers path, then a Cites fragment).
+Buckets: Shipped → CHANGELOG § SPRINT-133 · Tech debt → TD-262 (§11 live citation counts only `.md` files), TD-263 (the
+scope-change leg reads a prose fragment as a path) · Follow-ups → none · Learnings → L-242 (count 3), L-238 bumped to count 2.
+Both are due at the next promote. Handoff reconciliation: no handoff entry. Doc-freshness: no §2 trigger fired.
+Release: `skills/` changed, so this is PATCH 2.12.1 through `/release-patch` after the archive.

@@ -4,7 +4,7 @@ slug: name-the-failing-edit
 epic: EPIC-007
 owner: Maintainer
 last_updated: 2026-10-20
-status: active
+status: closed
 plan_commit: 594bf15e
 update_trigger: sprint execute/close events
 ---
