@@ -96,3 +96,19 @@ review · T1 · scoped-reviewer · Codex gpt-6-astra (empty cwd, 0 commands) · 
 Strict re-read after the retry: FINDINGS (1). The skeleton did not cover a missing need or the absence of a requester (a
 declaration gap; the field is satisfiable). Fixed at `9fe44d9b`; the final strict re-read is ALL TICKED, with "(a) no field
 requires a software concept".
+
+### 2026-10-20 | progress | T2 built (dispatched Sonnet), reviewed (Codex 4 Spec + reader 2, one retry, both CLEAR), merged
+T2 (TASK-464): `packs/software-implementation.md`, 48 lines. It has the header (source "/tdd, procedure v0.1.0, plugin 2.11.0";
+internal use: the 10 runs), all eight fields, every /tdd SKILL.md rule inline, and routing per step (planning is decision;
+the cycles are execution). README gains a "Workflow packs" passage (`b39371c3`).
+Verification: the model/vendor grep prints nothing; the name/path/id grep matches only the header's source line; both are
+proven to fire on a seeded line.
+review · T2 · scoped-reviewer · Codex gpt-6-astra (empty cwd, 0 commands) · Standards CLEAR · Spec FINDINGS (4): F1 the source gave no procedure version · F2 no rule for absent code · F3 the commit half of the whole-suite gate was dropped · F4 change-detector classification turned into a ban
+Coordinator ruling on F4: the risk-policy prohibition is in the owner-signed G2 design and stays. Only the procedure
+checklist's added "rewrite or drop it" exceeded the source and was softened.
+Fresh reader (DoD 3), strict, in parallel: FINDINGS (2). `inputs` lacked absent code and the optional spec; the `output
+contract` lacked RED-run evidence and the behaviour list. Folded into the same single retry → `2df2f4c5`.
+review · T2 · re-review · Codex · F1–F3 OK, F4 OK under the ruling, no new defect · VERDICT: CLEAR
+Strict re-read: ALL TICKED (8 fields + Routing + Header). Merged (`aa318083`); 3 over-long lines re-wrapped by the
+coordinator (whitespace only; the word-diff is empty). The duplicate-id check prints nothing.
+consequence · T2 · behaviour:low · governance:low → the scoped Codex review (D3) plus the reader validation; no adversarial floor (the first pass had findings)
