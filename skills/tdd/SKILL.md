@@ -73,8 +73,8 @@ This proves the path works end-to-end.
 For each remaining behaviour: **RED** (write the next test, it fails) → **GREEN** (minimal code to
 pass). One test at a time. Only enough code to pass the current test. Don't anticipate future tests. Any
 new test, the tracer bullet's included, that passes on its first run is not RED: the code already covers
-it. Record it as *already covered*, name the production change that would fail it, and move to the next
-behaviour.
+it. Record it as *already covered*, name one concrete edit, checked against the test's inputs, that would
+fail it (a specific expression or value, not a class of edits), and move to the next behaviour.
 
 ### 4. Refactor
 Only once GREEN — **never refactor while RED**. Extract duplication, move complexity behind simple
