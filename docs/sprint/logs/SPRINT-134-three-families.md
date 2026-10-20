@@ -3,7 +3,7 @@ sprint: 134
 slug: three-families
 owner: Maintainer
 last_updated: 2026-10-20
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -75,3 +75,15 @@ with the ruling.
 system-verify · FAIL(review depth) · QA_FULL on the VPS at `81f55bcd`: 297 pass, 1 fail. T3's consequence line recorded `governance:high` and no review line followed. The review was owed, so it was dispatched (SPRINT-103 precedent: answer the finding with the missing review, never by downgrading the classification).
 review · T3 · scoped-sonnet · behaviour:low · governance:high · Spec: met (both places agree; the three families match `packs/`) · Standards: 2 medium → fixed in the one retry (the epic's Why claimed packs "satisfy the workflow half" and "buy a gate condition", contradicting the ruling) · 1 low → fixed (condition 5 vs roadmap item 6 numbering) · still-open → owner: the epic's Outcome sentence ("the ADLC abstraction is under real pressure from more than one workflow family") states a goal the ruling says is not yet met; rewording the outcome is the owner's call
 system-verify · PASS · QA_FULL on the VPS at `e862bd50`, the final integrated tree after the owed T3 review: 298 pass, 0 fail
+
+### 2026-10-20 | close | 3 of 3 members in done/, PLAN_EXHAUSTED; Retro + buckets; EPIC-007 closes (6 of 6), Outcome reworded (owner)
+run · 10 of 10 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 298/0 on the VPS at `e862bd50`, after the owed T3 review (the first run was 297/1, review depth).
+Buckets: Shipped → CHANGELOG § v2.13.0 / SPRINT-134 · Tech debt → none · Follow-ups → none (the Outcome question was ruled at
+close instead of filed) · Learnings → L-243 filed; L-108 sixteenth sighting recorded.
+EPIC-007 rollup: conditions 2 and 4 ticked (three packs, each with its internal-use line; none names a model). All six are now
+met, so the epic closes. Owner ruling at close: the Outcome's "under real pressure" clause is reworded to "can be tested
+against", what was delivered; the roadmap's gate item 6 stays open. Handoff reconciliation: no handoff entry. Doc-freshness:
+README was updated in-sprint; no other §2 trigger fired.
+Release: 2.13.0 MINOR by hand (two new packs), owner-approved; §11 archive pass and CHANGELOG rotation owner-approved.

@@ -14,6 +14,30 @@ status: current
 
 ---
 
+## v2.13.0 — three workflow packs: verification and solution analysis join software implementation (2026-10-20)
+
+**MINOR** — ships SPRINT-134 (Three Families), the final slice of EPIC-007, which closes with it. Installing the release is
+enough; no upgrade step. The standard is unchanged (spec 0.18.0). Restart the session after installing.
+
+### SPRINT-134 — Three Families (2026-10-20)
+
+**Consumer-facing:**
+- **`packs/verification.md`**, extracted from lean-flow's scoped review and its close-time whole check. It covers review depth
+  chosen by consequence, Spec and Standards axes reported separately, a zero-finding pass re-run once, and one bounded retry
+  on a concrete violation. A whole check runs once after integration and is judged by the verdict line it prints itself.
+- **`packs/solution-analysis.md`**, extracted from the decision-research practice. It takes one decision-driving question
+  through options, sourced findings and a recommendation, and produces a decision record only when the choice is hard to
+  reverse, surprising and a real trade-off.
+- Both follow `packs/CONTRACT.md` and name no model. README § Workflow packs lists all three packs.
+
+**Maintainer-side:**
+- EPIC-007 closed with all six conditions met. Condition 5 (does a second workflow family satisfy the roadmap's
+  platform gate?) was ruled **not satisfied by packs alone**: three families fit one contract unchanged on a single runtime,
+  which shows fit, not pressure.
+- L-238 and L-242 promoted; L-243 filed; L-108's sixteenth sighting (a run census that counted mentions).
+
+---
+
 ## v2.12.1 — an already-covered test names the one edit that would fail it (2026-10-20)
 
 **PATCH** — ships SPRINT-133 (Name the Failing Edit), a follow-up to EPIC-007. Installing the release is enough; no upgrade step.

@@ -4,7 +4,7 @@ slug: three-families
 epic: EPIC-007
 owner: Maintainer
 last_updated: 2026-10-20
-status: active
+status: closed
 gates_signed: G1,G2 @ 66a6de28
 plan_commit: 1384dd75
 update_trigger: sprint execute/close events
@@ -89,5 +89,31 @@ The owner rules; the agent assembles the evidence and the options, never the ver
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `packs/verification.md` | T1 | second pack, from the scoped review and the close-time whole check | Low | contract reader, model grep |
+| `packs/solution-analysis.md` | T2 | third pack, from decision research | Low | contract reader, model grep |
+| `README.md` | T1, T2 | § Workflow packs lists all three | Low | link search |
+| `docs/epic/EPIC-007-workflow-packs.md` | T3 | condition 5 ruled; Why aligned with the ruling | Low | scoped review |
 
 ## Retro
+
+**Retrieval check** — yes, once. The intake run census counted mentions as runs (L-108's sixteenth sighting). The writer's
+position-anchored count disagreed, and the pack cites the anchored figures.
+
+**Cost** — coordinator inline plus 13 dispatched `sonnet` agents: 1 census, 3 builder checks, 2 worktree writers, 2 contract
+readers, 1 re-review, 1 owed T3 review, and three earlier at intake and promote. Two QA_FULL runs on the VPS. Three members
+delivered, 10 DoD.
+
+**Worked**
+- The builder check paid for itself on T1. It found 5 places where the design simplified its source (the retry trigger, the
+  depth table, the Spec ladder, how the whole check is discovered, citing runs by sprint) before anyone built against it.
+- Two packs were written in parallel worktrees with the coordinator owning the README, so there was no conflict.
+- The L-238 rule (a coordinator write commits as bare `sprint(N):`) held. `layers observed` passed on the first run.
+
+**Friction**
+- T3's owed review was skipped and system verify failed 297/1 (L-243). The review then caught the epic contradicting its
+  own ruling.
+- A local wait command was stopped by Claude Code under memory pressure. The gate on the VPS was unaffected, and the rerun waited
+  remotely instead.
+
+**Pattern candidate**
+- L-243: when a ruling lands in a document, review the whole document for claims it has just made false.

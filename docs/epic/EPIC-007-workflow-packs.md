@@ -3,7 +3,7 @@ epic: 007
 slug: workflow-packs
 owner: Maintainer
 last_updated: 2026-10-20
-status: active
+status: closed
 member_sprints: [SPRINT-132, SPRINT-133, SPRINT-134]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -12,7 +12,11 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 > **Outcome:** lean-flow's proven procedures are expressed as model-independent Expert Workflow Packs
 > with a declared contract, so expertise is reusable without taking the plugin — and the ADLC
-> abstraction is under real pressure from more than one workflow family.
+> abstraction can be tested against more than one workflow family.
+>
+> *(Amended 2026-10-20 at close, owner ruling: the outcome read "is under real pressure from more than one workflow family".
+> Condition 5 ruled that three families fitting one contract shows fit, not pressure, so the sentence now states what was
+> delivered. The roadmap's gate item 6 stays open.)*
 
 ## Why this, why now
 
@@ -53,7 +57,7 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 |---|---|---|---|
 | [SPRINT-132](../sprint/archive/SPRINT-132-expertise-without-the-plugin.md) | Expertise Without the Plugin | closed · `8eb2871` | Conditions 1, 3, 6: the eight-field contract with a reader checklist and a domain-neutral skeleton (ADR-055, `packs/`); the first pack, software-implementation from `/tdd` (1 of 3–5, condition 2 open); an agent with no lean-flow installed followed it to its output contract (met in substance) |
 | [SPRINT-133](../sprint/archive/SPRINT-133-name-the-failing-edit.md) | Name the Failing Edit | closed · `e01e549` | Condition 3 follow-up: `/tdd` and the first pack now require an already-covered note to name one concrete edit, checked against the test's inputs, that fails the test. The SPRINT-132 exercise exposed the gap. No condition changed state; 2, 4 and 5 remain the next slice |
-| [SPRINT-134](../sprint/SPRINT-134-three-families.md) | Three Families | active | — (rolled up at close; conditions 2 · 4 · 5: the verification and solution-analysis packs, and the decision-gate ruling) |
+| [SPRINT-134](../sprint/SPRINT-134-three-families.md) | Three Families | closed · `CLOSE_SHA` | Conditions 2, 4, 5: the verification pack (scoped review + whole check) and the solution-analysis pack (decision research) make three families; every pack names no model; the owner ruled the platform gate not satisfied by packs alone. The epic closes |
 
 ## Decisions
 
@@ -106,10 +110,10 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 ## Closed when
 
 - [x] A pack declaration contract exists with all eight fields, and a pack declaration is checkable → TASK-463, TASK-464 · closed by SPRINT-132 (`packs/CONTRACT.md`; checkable by a reader, D6)
-- [ ] 3–5 packs are extracted, each naming the internal use that qualified it under D1 → TASK-464, TASK-467, TASK-468
+- [x] 3–5 packs are extracted, each naming the internal use that qualified it under D1 → TASK-464, TASK-467, TASK-468 · closed by SPRINT-134 (three packs: software-implementation · verification · solution-analysis, each with its internal-use line)
 - [x] At least one pack is exercised end-to-end **with no lean-flow plugin present** — the consumer path,
       asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016) → TASK-465 · closed by SPRINT-132 (owner ruling: met in substance; `docs/research/logs/workflow-pack-exercises.md`)
-- [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464, TASK-467, TASK-468
+- [x] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464, TASK-467, TASK-468 · closed by SPRINT-134 (every pack routes by role; a model/vendor search of each prints nothing, and a fresh reader ticked the contract's Routing line for each)
 - [x] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
       as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → TASK-469 · closed by SPRINT-134
       (owner ruling 2026-10-20: **not satisfied by packs alone**. Three workflow families (software-implementation ·
