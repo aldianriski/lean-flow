@@ -32,3 +32,14 @@ Epic: `epic: EPIC-007` set; SPRINT-133 appended to § Member sprints and `member
 Size check: 1 S, no `L`. The member is `origin: close-retro`, so G1 takes the full checklist (no fast-path).
 Skill freshness: the installed copy is 2.11.0 and the repo is 2.12.0. `lean-doc-generator/SKILL.md` and both sprint templates are
 byte-identical between the two, so this promote ran the current procedure.
+
+### 2026-10-20 | gate | T1 G1 (full checklist, `origin: close-retro`) and G2 signed by popup; one owner ruling
+G1: size S; files `skills/tdd/SKILL.md:76` and `packs/software-implementation.md:26-27, :44`. Out of scope: the per-cycle "name the
+production change" check (`tdd:96` · `pack:37`), a version bump, the pack's Source line, a new exercise run (A1), and a checker.
+G2: one shared phrase at all three sites, in one commit (D1), implemented inline because a three-sentence edit costs less than a
+dispatch brief. Verify: DoD1 is a judgment tick plus a grep showing the phrase at 3 of 3 sites; DoD2 compares the sentences by
+eye, plus a body scan (`awk 'NR>6'` over the pack for lean-flow ids) that is clean at baseline and fires on header line 6.
+Owner ruling: the phrase adds "checked against the test's inputs", because a concrete edit can still pass the test
+(`Math.round` gives 1 for 3600, as `Math.ceil` did).
+builder-check · T1 · 0 contradictions · 0 missed sites · 1 fact settled (parentheses, not a dash, at all three sites) · 1 intent question → owner ruling above
+consequence · T1 · behaviour:low · governance:high
