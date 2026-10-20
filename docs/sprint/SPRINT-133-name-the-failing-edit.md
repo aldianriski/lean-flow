@@ -31,6 +31,7 @@ gate-condition ruling (next slices) · any mechanical check of note wording (ADR
 Layers: `skills/tdd/SKILL.md` · `packs/software-implementation.md`
   · `docs/work/todo/TASK-466-already-covered-notes-name-a-concrete-change.md`
   · `docs/work/in_progress/TASK-466-already-covered-notes-name-a-concrete-change.md`
+  · `docs/work/done/TASK-466-already-covered-notes-name-a-concrete-change.md`
 Depends-on: none
 Cites: `TASK-466` · EPIC-007 condition 3 · ADR-055 · `docs/research/logs/workflow-pack-exercises.md`
 
@@ -56,5 +57,30 @@ the test, in matching words.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/tdd/SKILL.md` | T1 | step 3: an already-covered note names one concrete edit, checked against the test's inputs | Low | phrase count, review |
+| `packs/software-implementation.md` | T1 | the same phrase at step 3 and in the output contract | Low | phrase count, body scan, review |
 
 ## Retro
+
+**Retrieval check** — yes, once, and it was caught. A phrase count read 0 because of CRLF line endings. It was re-run rather than
+trusted, and a second route agreed (L-130's family; SPRINT-124 hit the same Git Bash trap). Nothing was missed.
+
+**Cost** — inline coordinator plus three dispatched `sonnet` agents (builder check about 60k tokens, scoped review about 54k) and
+one QA_FULL run on the VPS. One member delivered: one S task, two DoD.
+
+**Worked**
+- The G2 builder check earned its cost even on an S wording task. It showed that a concrete edit can still pass (`Math.round`
+  gives 1 for 3600), and that became the owner's "checked against the test's inputs" ruling.
+- One shared phrase made "worded alike" checkable by a count instead of by eye.
+
+**Friction**
+- §11's live-citation rule counts only `.md` files. TASK-438 is cited from code and was retained against the letter of the rule
+  (TD-262).
+- The TECH-DEBT aging-sweep note was missing again, from the SPRINT-132 promote (L-242, count 3).
+- System verify failed 292/1 on `layers observed`. A coordinator done-move was committed under a task's `T1:` subject (L-238,
+  now count 2). This is the third close in a row to fail on bookkeeping rather than content (131 · 132 · 133). Fixed by a
+  Layers scope-change and a rerun.
+
+**Pattern candidate**
+- L-242: a step that lives only in custom keeps getting skipped. It is due at the next promote (count 3).
+- L-238: a coordinator's commit subject is the attribution record. It is due at the next promote (count 2).
