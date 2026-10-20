@@ -20,14 +20,15 @@ This is roadmap **Phase E** (Layer E in `01-ADLC-PLATFORM-ARCHITECTURE.md`), and
 after Phase D. That ordering is wrong on the roadmap's own evidence, which is why it opens now instead.
 
 `03 § 5`'s platform decision gate requires *"at least 2 runtime **or workflow** variations prove
-abstraction pressure."* Workflow packs satisfy the workflow half of that clause. They depend only on the
+abstraction pressure."* Workflow packs are the evidence toward the workflow half of that clause. The owner ruled at
+SPRINT-134 that they do not satisfy it alone (§ Closed when, condition 5). They depend only on the
 Standard, which closed with EPIC-003 at `spec/` v0.9.0 — **nothing in Phase E needs the protocol.**
 Leaving it after Phase D leaves a gate condition blocking that has no blocker of its own
 (`docs/research/adlc-epic-sequencing.md` F5).
 
 `03` Phase E also says to *"start with 3–5 workflow packs that already have real internal use"* — and
 lean-flow has fourteen skills that are exactly that. This is extraction from proven procedure, not
-invention, which is the cheapest possible way to buy a gate condition.
+invention, which is the cheapest possible way to gather evidence toward a gate condition.
 
 It spans sprints because each pack must declare eight contract fields and be *verified* against real
 use rather than asserted, because the pack's placement is a §2 decision, and because the last exit
@@ -94,7 +95,7 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 - Does the pack *contract* belong to Layer A (the Standard) or Layer E (beside it)? `01` separates them,
   but conformance must be able to check a pack declaration and the engine reads spec rules — so the
   clean layering and the checkability pull opposite ways. → same G2; `/council` if genuinely balanced.
-- ~~Does a workflow pack **alone** satisfy decision-gate condition 6, or does the clause's *"runtime or
+- ~~Does a workflow pack **alone** satisfy decision-gate condition 6 (the roadmap's sixth gate item; this epic's condition 5), or does the clause's *"runtime or
   workflow"* require a second runtime as well?~~ **Answered by the owner's ruling at SPRINT-134 (2026-10-20): not satisfied by
   packs alone.** Three families fit one contract unchanged on a single runtime, which shows fit, not pressure; it stays open
   until a second runtime, or a family that forces a contract change, appears (§ Closed when, condition 5).
