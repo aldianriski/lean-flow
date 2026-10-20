@@ -2,7 +2,7 @@
 
 - **Name:** verification · **Family:** verification
 - **Source:** extracted from lean-flow's `/orchestrator` review procedure and its close-time system verify
-  (procedure v0.2.0, plugin 2.12.1)
+  (procedure v0.2.0, plugin 2.13.0)
 - **Internal use:** 111 scoped-review runs in 28 of lean-flow's own sprints (SPRINT-082 · 086 · 087 · 088 · 089 · 090 · 091 ·
   096 · 099 · 100 · 101 · 103 · 104 · 109 · 110 · 114 · 116 · 117 · 118 · 119 · 120 · 121 · 123 · 129 · 130 · 131 · 132 ·
   133), and 13 close-time whole-check runs in 7 (SPRINT-067 · 068 · 082 · 090 · 131 · 132 · 133), counted from the archived

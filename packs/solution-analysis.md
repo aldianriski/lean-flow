@@ -1,7 +1,7 @@
 # Workflow pack — solution analysis
 
 - **Name:** solution analysis · **Family:** solution-analysis
-- **Source:** extracted from lean-flow's decision-research template (the `lean-doc-generator` RESEARCH template; plugin 2.12.1).
+- **Source:** extracted from lean-flow's decision-research template (the `lean-doc-generator` RESEARCH template; plugin 2.13.0).
   The template has no procedure section of its own, so the steps below are derived from its sections and from the skill's
   research guidance (a decision-driving question, options, evidence, a recommendation that can feed a decision record).
 - **Internal use:** the docs in `docs/research/` that follow the template's shape: 24 by one route (a recommendation heading
