@@ -60,3 +60,11 @@ owner-ruling: system-verify — Layers scope-change and rerun. The `in_progress 
 T1's `Layers:` do not declare, so the `layers observed` leg fails it.
 **Impact:** § Plan T1's `Layers:` gains that exact path. Nothing else changes; no member's Done-when is touched. G2 is unaffected,
 because it is a bookkeeping path, not a design change.
+
+### 2026-10-20 | gate | system verify rerun FAIL (scope-change layers) → owner ruling: add the fragment to T1 Cites, file TD-263, rerun
+system-verify · FAIL(scope-change layers) · QA_FULL on the VPS at `e4950dc1`: 292 pass, 1 fail. The `layers observed` leg now passes
+owner-ruling: system-verify — Cites edit and rerun. The previous scope-change heading names the prose fragment `done/` in backticks. The leg reads any backticked span ending in a slash as a repo path, and only an exact token or a prefix declares it. The log is append-only, so T1's Cites (which the dead-token check does not read) gains `done/`, the fix the finding itself names. TD-263 records the false positive.
+
+### 2026-10-20 | scope-change | § Plan T1 Cites: add the fragment `done/` (owner ruling above)
+**What broke:** the previous scope-change heading's fragment is read as an undeclared path for T1.
+**Impact:** § Plan T1's `Cites:` gains it. Layers, Done-when and G2 are unchanged.
