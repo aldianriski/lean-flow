@@ -215,8 +215,9 @@ promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates ·
 ### Workflow packs
 
 `packs/` holds workflow packs: lean-flow procedures written to [`packs/CONTRACT.md`](packs/CONTRACT.md) so that any agent can
-follow one from its single file, with nothing installed. Take one by copying its file. The first is
-[`packs/software-implementation.md`](packs/software-implementation.md).
+follow one from its single file, with nothing installed. Take one by copying its file. The packs so far are
+[`packs/software-implementation.md`](packs/software-implementation.md) and
+[`packs/verification.md`](packs/verification.md).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
