@@ -70,3 +70,7 @@ runtime: that shows fit, not pressure. The roadmap gate guards against speculati
 second runtime, or a family that forces a contract change, appears. Recorded on EPIC-007 § Closed when condition 5 (ticked:
 the condition asks for the ruling, either way) and on open question 3. The roadmap's own gate box stays unticked, which agrees
 with the ruling.
+
+### 2026-10-20 | gate | system verify FAIL (review-depth-governance-absent) → the owed T3 review was run, not the classification downgraded
+system-verify · FAIL(review depth) · QA_FULL on the VPS at `81f55bcd`: 297 pass, 1 fail. T3's consequence line recorded `governance:high` and no review line followed. The review was owed, so it was dispatched (SPRINT-103 precedent: answer the finding with the missing review, never by downgrading the classification).
+review · T3 · scoped-sonnet · behaviour:low · governance:high · Spec: met (both places agree; the three families match `packs/`) · Standards: 2 medium → fixed in the one retry (the epic's Why claimed packs "satisfy the workflow half" and "buy a gate condition", contradicting the ruling) · 1 low → fixed (condition 5 vs roadmap item 6 numbering) · still-open → owner: the epic's Outcome sentence ("the ADLC abstraction is under real pressure from more than one workflow family") states a goal the ruling says is not yet met; rewording the outcome is the owner's call
