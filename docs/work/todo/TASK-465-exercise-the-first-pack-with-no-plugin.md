@@ -1,6 +1,6 @@
 ---
 id: TASK-465
-title: "Exercise the verification pack end-to-end with no lean-flow plugin present"
+title: "Exercise the first pack end-to-end with no lean-flow plugin present"
 epic: EPIC-007
 priority: P2
 size: S
@@ -15,7 +15,7 @@ depends-on: [TASK-464]
 sprint: SPRINT-132
 ---
 
-# TASK-465 — Exercise the verification pack end-to-end with no lean-flow plugin present
+# TASK-465 — Exercise the first pack end-to-end with no lean-flow plugin present
 
 ## Why
 
@@ -24,7 +24,7 @@ the plugin has used it. The owner ruled (2026-10-19) that "reusable without the 
 
 ## Done when
 
-- [ ] A fresh agent with no lean-flow skills loaded, in a scratch repository that never installed lean-flow, is given only the pack file and a seeded defect, and reaches the pack's declared output contract.
+- [ ] A fresh agent with no lean-flow skills loaded, in a scratch repository that never installed lean-flow, is given only the pack file and a small feature to build, and reaches the pack's declared output contract.
 - [ ] No lean-flow file is copied into the scratch repository; this is asserted the way EPIC-004's foreign-repo harness asserts it, and the check's output is recorded.
 - [ ] The run is recorded (inputs, the agent's output against the output contract, and any field the agent could not follow) where EPIC-007's log or research record keeps it.
 
