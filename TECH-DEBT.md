@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-19
+last_updated: 2026-10-20
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -35,6 +35,11 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-133 promote (2026-10-20).** **103 of 106 open rows** are ≥3 sprints unaddressed, counted against
+> sprint 133. Second route: 109 rows − 3 resolved = 106 open; the 3 not aged are TD-259 · 260 (filed at 131) and TD-261 (132).
+> **Newly aged:** none, because no row was filed at 130. The SPRINT-132 promote aged the ledger in its log but wrote no sweep here.
+> No open row is `high`. **§11 deletion** (owner-approved): TD-135 · 154 · 167 (resolved at 130); their ids stay retired.
+>
 > **Aging sweep — SPRINT-131 promote (2026-10-19).** **103 of 103 open rows** are ≥3 sprints unaddressed, counted against
 > sprint 131. Second route: 126 rows − 23 resolved = 103 open, every one filed at 128 or earlier. **Newly aged, named for the
 > first time:** TD-253 · TD-254 (filed at 127, aged at 130) and TD-255 · 256 · 257 · 258 (filed at 128). The SPRINT-129 and
@@ -857,39 +862,6 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-167** severity: medium | status: resolved → TASK-456 (SPRINT-130) | created: Sprint-102
-  - **Resolved (SPRINT-130 T2, `acccc165`):** a `date` shell function inside case 12's subshell freezes both clock reads, so
-    elapsed is exactly 1263 s and the exact assertion stays. Must-FAIL kept: the real ceiling block seeded to call `bad` reddens
-    case 12 (cmp-proven landed and restored; case 13 green). An empty capture now prints a named `harness-env` FAIL with the
-    child's exit status and no asserted cause — the adversarial review showed a code regression (a block exiting before it
-    prints) also yields one; both shapes were seeded and fire. No `now` seam was added to the library (owner ruling).
-  - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
-    The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
-    output **exactly**. The block computes `now - START_TS`, so if the clock ticks a second during
-    execution it emits `took 1264s` and the exact-match assertion fails. Observed once in a real
-    full-profile gate run (`214 pass, 1 fail`) and **not reproducible standalone** — six consecutive
-    `QA_FULL=1` runs in isolation all passed. It only trips when the machine is busy, which is
-    precisely when a gate runs.
-  - **Why this matters more than one flaky case.** A Tier G fixture that reddens at random trains the
-    reader to re-run until green, and a gate people re-run on faith is how a *genuine* red gets
-    waved through. That is the same failure this repo spent SPRINT-100 removing (a finding untrue of
-    its own subject) arriving from the other direction: here the finding is untrue of the CODE, and
-    the code is fine.
-  - Fix direction (**not a ruling**): assert on the *shape* rather than the exact figure — that the
-    line is `INFO` (uncounted) and that `RESULT pass=0 fail=0` — or freeze the elapsed value the
-    block reads instead of deriving it from wall-clock inside the fixture. The second is preferable:
-    a fixture whose input is a clock is not a fixture. Weigh against ADR-029 — this harness is Tier
-    **G**, so whatever replaces it takes the retained must-FAIL bar, and the replacement must still
-    redden if the ceiling branch ever goes back to counting the run as a FAIL (which is what case 12
-    exists to prevent, ADR-042).
-  - Discovered at the TASK-355 profiling run, not by the fixture's own authors — it has presumably
-    been latent since SPRINT-102 T1 shipped it, and passed every attended run until a busy one.
-  - **Seen again at SPRINT-104 T1 (2026-09-22), with a new symptom:** `over-ceiling-run-prints-info-and-fail-stays-0`
-    reported `FAIL … got:` with an **empty** capture during a gate run at 0.41 GB free, then passed
-    standalone. An empty capture on a must-FAIL case would read green, so the risk is wider than the
-    timing race itself. Cause not verified.
-  - **Seen again at SPRINT-108 close (2026-09-26):** the same empty `got:` inside the `QA_FULL=1` system-verify
-    run (`276 pass, 2 fail`), then PASS standalone on the Windows host. Third sighting.
 - **TD-165** severity: medium | status: open | created: Sprint-102
   - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
     discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that
@@ -1104,29 +1076,6 @@ status: current
     declared `Layers:`.
   - **Re-file fresh if** the chain is changed, or the gate stops truncating on ordinary hosts.
 
-- **TD-154** severity: medium | status: resolved → TASK-455 (SPRINT-130) | created: Sprint-099
-  - **Resolved (SPRINT-130 T1, `b64ff9c0`):** `invokes()` keeps its prefix rule and adds a second: the segment ENDS with the
-    declared command as whole whitespace-delimited tokens, after a head that is not `echo` · `printf` · `:`. Real-artifact run:
-    `bun test test/gate-discovery/` 15 pass, 0 fail on this repository, the rung-1 test included. Retained must-FAIL: an unquoted
-    `echo sh scripts/qa-check.sh` stays a bypass (seeded removal of `echo` reddens exactly that test). Known limit, by design: a
-    printing head other than those three, in trailing position, still counts as an invocation.
-  - Summary: **`test/gate-discovery/discovery-order.test.ts` fails: the rung-1 command is reported as
-    BYPASSING the gate `.gate-command` declares.** `bypassesDeclaredGate(REPO)` returns
-    `bypassed: true` where the test asserts `false`.
-  - Evidence (2026-09-13): **pre-existing, and verified so** — the same test fails at this sprint's
-    own `plan_commit` `a43d1e6` in a clean worktree (9 pass, 1 fail), before any SPRINT-099 change.
-    None of `package.json`, `.gate-command` or `test/gate-discovery/` was touched this sprint.
-  - Likely cause, **not verified**: `.gate-command` declares `sh scripts/qa-check.sh` while rung 1
-    now runs it *wrapped* in `bun scripts/qa-verdict.ts` (SPRINT-097 T4, TD-143's cheap half), and
-    the discovery check may compare the command textually rather than asking whether the declared
-    gate is reached. Re-derive before building on this (L-091).
-  - Impact: ADR-033's own guard is red, so the mechanism that decides *what System verify runs* is
-    currently unattested. Filed rather than fixed because diagnosing it is its own task.
-  - **Re-file fresh if** the wrapper is removed, or rung-1 discovery is re-specified.
-  - **Re-found at SPRINT-104 T1 (2026-09-22), still failing, cause traced to `3404422`** (SPRINT-097
-    T4): `invokes()` splits on `&& || ; |` and needs a segment equal to the declared command; wrapping
-    it as `bun scripts/qa-verdict.ts sh scripts/qa-check.sh` made it an argument. The Log wrote it up
-    as a new candidate without searching the ledger first — a retrieval miss, caught at close.
 
 - **TD-153** severity: medium | status: open | created: Sprint-098
   - Tracker: none — found by the coordinator's population probe at SPRINT-098 T3, then independently
@@ -1435,35 +1384,6 @@ status: current
   - **Re-file fresh if** the archive gains a retroactive log backfill, or a sprint is ever expected to
     carry a handoff record without a paired log.
 
-- **TD-135** severity: medium | status: resolved → TASK-457 (SPRINT-130), not reproduced | created: Sprint-094
-  - **Resolved, not reproduced (SPRINT-130 T3):** eight full `bun test` runs against `896e3ab9`, each read by its own summary
-    line — VPS 5/5 and Windows 3/3 at `441 pass, 0 fail` across 11 files (6.8 s per run on the VPS, 67–74 s on Windows). The
-    hypothesised flaky test is gone (ADR-051), and the suite has shrunk from 39 files to 11. **Correction:** the Impact line
-    below is wrong — `qa-check.sh` does not run `bun test`; it is the second stage of `package.json`'s `test` script
-    (`… qa-check.sh && bun test`), outside the gate leg. **Re-file fresh if** a run disagrees with its twin and names the test.
-  - Summary: **The full `bun test` suite is flaky — two consecutive runs over the same unchanged tree
-    disagreed.** A gate that disagrees with itself is worse than a red one, because neither result can
-    be acted on.
-  - Evidence (SPRINT-094, coordinator, integrated tree at `324b489`): run 1 printed `496 pass, 1 fail`
-    across 497 tests in 39 files, 524 s; run 2 printed **`497 pass, 0 fail`**. **No test code changed
-    between them** — the only commits in between touched `TECH-DEBT.md` and the sprint Execution Log.
-    The failing test was never identified: run 1 was piped through `tail -40` and the tail was flooded
-    by git CRLF warnings from fixture writes, so the failure detail scrolled past; run 2 filtered those
-    warnings and had no failure left to name.
-  - **Leading hypothesis, explicitly NOT asserted:** `TD-127` already records
-    `s4-append-shallow-reachability.test.ts` as network-dependent (it clones this repo's real remote as
-    an L-166 reachability proof) and reachable only from a bare `bun test`, which is exactly the run
-    that flaked. That fits, and it stays a hypothesis — the failing test's identity was lost, so
-    attributing it would be a guess wearing evidence's clothes.
-  - Impact: `bun test` is invoked by `package.json`'s test script, which `qa-check.sh` runs (ADR-035),
-    so this flake sits inside the gate. It also means **no single full-suite run is sufficient evidence
-    for a close**, which directly affects sprint-bulk step 6's system-verify.
-  - **A second, cheaper defect exposed alongside it:** run 1 exited **0 while a test was failing**,
-    because a pipeline's status is its last command's. That is L-120/L-057 demonstrated live on this
-    repo's own suite, in the coordinator's own hands, minutes after quoting the rule. Any wrapper
-    running `bun test` through a pipe inherits it.
-  - **Re-file fresh if** the flake is reproduced with the failing test named — that turns this row into
-    a fixable defect rather than a measurement.
 
 - **TD-136** severity: minor | status: open | created: Sprint-094
   - Summary: **`evals/fixtures/compat/rule-ids-v0.10.0.txt` — ADR-034's frozen semantic-compatibility
