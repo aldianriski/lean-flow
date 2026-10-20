@@ -112,3 +112,22 @@ review · T2 · re-review · Codex · F1–F3 OK, F4 OK under the ruling, no new
 Strict re-read: ALL TICKED (8 fields + Routing + Header). Merged (`aa318083`); 3 over-long lines re-wrapped by the
 coordinator (whitespace only; the word-diff is empty). The duplicate-id check prints nothing.
 consequence · T2 · behaviour:low · governance:low → the scoped Codex review (D3) plus the reader validation; no adversarial floor (the first pass had findings)
+
+### 2026-10-20 | progress | T3 run by the coordinator: no-plugin proof and no-copy proof hold; the output contract is partly met (RED 1 of 4) → owner
+T3 (TASK-465), coordinator-run as a separate `claude -p` process (the stated reason: a sub-agent would inherit the plugin).
+- **Run 1** was a harness fault: the scratch repository sat under `.claude/`, so all 5 edits were refused as sensitive. Re-run
+  once (owner rule), with the repository in the system temp directory.
+- **Run 2** took 17 turns, 50 s and $0.12.
+  - `system/init` lists only the 3 built-in plugins, with `skills: []`.
+  - The pre-run tree is exactly 3 files, 0 identical to lean-flow; the post-run tree is 2 files modified, 0 identical. The hash
+    control was seed-proven.
+  - `npm test` gives 5/5, exit 0.
+- **Output contract:** the behaviour list was met in substance. Behaviour 1 has its RED run, then its code, then GREEN.
+  Behaviours 2–4 first ran GREEN after the tracer code that covers them, so their RED evidence is missing. Under the binary
+  rule: **not met**.
+- **Finding:** neither the pack nor `/tdd` has a rule for a new test that passes on its first run. Two searches of
+  `skills/tdd/` find none.
+- **Record:** `docs/research/logs/workflow-pack-exercises.md`.
+review · T3 · scoped-reviewer · Codex gpt-6-astra (empty cwd, 0 commands) · FINDINGS (4): the "at the top" claim, proof limits, run-1 cause, the finding overstated → record retry → re-review FINDINGS (1): the absence claim rests on one search → still-open → owner
+  Since then the coordinator ran a second, wider search (no match) and narrowed the wording to what both searches establish.
+consequence · T3 · behaviour:low · governance:low → the record reviewed once by Codex (D3)

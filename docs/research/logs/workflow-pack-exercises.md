@@ -67,6 +67,6 @@ test had run.
 for the owner's ruling.
 
 **Finding (in the pack and in its source).** Neither the pack nor `/tdd` says what to do when a new test passes on its first
-run, because the code written for an earlier behaviour already covers it. A search of `skills/tdd/` for such a rule finds none.
+run, because the code written for an earlier behaviour already covers it. Two searches of `skills/tdd/` (265 lines), one for "already"/"passes immediately"/"goes green" and one for "if the test passes"/"passes on first"/"does not fail", find no such rule.
 The pack's checklist holds a natural answer ("name the production change that would fail this test"). Its output contract still
 asks for a RED run that this ordering cannot produce.
