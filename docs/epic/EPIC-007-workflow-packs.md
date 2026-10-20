@@ -37,7 +37,7 @@ condition is a consumer-path exercise (L-016) that cannot run until at least one
 
 **In:** a pack declaration contract (`purpose` · `inputs` · `procedure` · `capabilities` · `output
 contract` · `verification` · `escalation` · `risk policy`) · 3–5 packs extracted from procedures with
-demonstrated internal use · a conformance mark or check for a pack declaration · one pack exercised
+demonstrated internal use · a reader checklist for a pack declaration (D6; first written as "a conformance mark or check") · one pack exercised
 without the plugin present.
 
 **Out (explicitly not):** **an agent zoo** — `00-ADLC-NORTH-STAR.md § 7` and `03 § 4` both name it, and
@@ -101,16 +101,16 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 
 ## Closed when
 
-- [ ] A pack declaration contract exists with all eight fields, and a pack declaration is checkable → TASK-463, TASK-464
+- [x] A pack declaration contract exists with all eight fields, and a pack declaration is checkable → TASK-463, TASK-464 · closed by SPRINT-132 (`packs/CONTRACT.md`; checkable by a reader, D6)
 - [ ] 3–5 packs are extracted, each naming the internal use that qualified it under D1 → TASK-464 · next slice: packs 2–3
-- [ ] At least one pack is exercised end-to-end **with no lean-flow plugin present** — the consumer path,
-      asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016) → TASK-465
+- [x] At least one pack is exercised end-to-end **with no lean-flow plugin present** — the consumer path,
+      asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016) → TASK-465 · closed by SPRINT-132 (owner ruling: met in substance; `docs/research/logs/workflow-pack-exercises.md`)
 - [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464 · next slice: each later pack
 - [ ] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
       as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → next slice: gate-condition ruling
-- [ ] **The pack contract is domain-neutral: no software-specific field is mandatory unless the pack
+- [x] **The pack contract is domain-neutral: no software-specific field is mandatory unless the pack
       itself is a software workflow.** `repo` · `commit` · `branch` · `tests` · `PR` may appear in a
       software pack and must not appear in the contract's required set. **Verified by construction, not
       by inspection** — a non-software pack skeleton (declaration only, no procedure) validates against
       the contract with every required field satisfiable; if it cannot, the contract is software-shaped
-      and the finding names the field → TASK-463
+      and the finding names the field → TASK-463 · closed by SPRINT-132 (a supplier-shortlist skeleton passes a strict reader)

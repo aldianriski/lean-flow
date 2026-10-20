@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-20
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -22,6 +22,7 @@ status: current
 spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.18.0) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
+packs/            CONTRACT.md · <family>.md · examples/ — workflow packs any agent follows alone (ADR-055)
 skills/           14 skills (auto-discovered at root)
   flow/                                                  opt-in conductor
   prime/ lean-doc-generator/ orchestrator/ task-decomposer/ triage/

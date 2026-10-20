@@ -4,7 +4,7 @@ slug: expertise-without-the-plugin
 epic: EPIC-007
 owner: Maintainer
 last_updated: 2026-10-20
-status: active
+status: closed
 plan_commit: 1edfdb8b
 gates_signed: G1,G2 @ c730cddf
 update_trigger: sprint execute/close events
@@ -95,6 +95,44 @@ A recorded run, not a retained guard: no new checker or gate leg (ADR-053).
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `packs/CONTRACT.md` · `packs/examples/non-software-skeleton.md` · `docs/adr/ADR-055-*` · `docs/DECISIONS.md` | T1 | the eight-field pack contract (a reader checklist; routing by role) and its domain-neutral proof; the placement ruled at G2 | Med | domain and id greps (seed-proven); a strict fresh reader ALL TICKED; Codex CLEAR after one retry |
+| `packs/software-implementation.md` · `README.md` · `skills/tdd/SKILL.md` | T2 | the first pack, extracted from `/tdd` and readable alone; README names `packs/`; the already-covered rule in `/tdd` and the pack (scope-change) | Med | model and id greps; a strict reader ALL TICKED; Codex CLEAR (two reviews, one retry each) |
+| `docs/research/logs/workflow-pack-exercises.md` | T3 | the no-plugin exercise record: runs 1–3 | Low | init lists; file count and content hashes before and after (control: a seeded copy is caught); `npm test` 5/5 |
+| `docs/research/logs/reference-rejudge-experiments.md` · `docs/research/reference-rejudge.md` | promote | the §2 soft cap: experiment records moved verbatim | Low | diff-proven verbatim |
+| `CHANGELOG.md` · `docs/changelog/CHANGELOG-2.10.0.md` · the four `*-plugin/*.json` · `docs/architecture/overview.md` · EPIC-007 files · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `docs/work/backlog/TASK-466-*` | close | release 2.12.0; v2.10.x rotated; the `packs/` line; the epic rollup; L-240 · L-241; follow-up TASK-466 | Low | system verify 304/0 |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->
+
+**Retrieval check: one hit, one miss.**
+- **Hit:** L-238 (commit-subject attribution) held. Every coordinator write to a shared file went under `sprint(132):`, and
+  attribution never failed.
+- **Miss:** L-240's class, the coordinator's own bookkeeping failing system verify, recurred for a second sprint running. This
+  time it was a candidate Layers token nobody pruned after G2 ruled.
+- **Precaution that worked:** L-239's empty working directory kept every Codex review static. All runs used 0 commands.
+
+**Cost.**
+- G2 builder check: 3 readers, about 185k tokens.
+- T1: inline, plus 3 fresh-reader passes (about 170k).
+- T2: one Sonnet builder (about 75k) and 2 reader passes (about 120k).
+- T3: three headless `claude -p` runs on Sonnet, about $0.33 in all.
+- Codex reviewer wrapper: 10 runs.
+- Two QA_FULL runs on the VPS (114 s each).
+
+**Worked**
+- The builder check paid again: 15 contradictions and 18 questions settled before sign-off. The probe it prompted, a headless
+  run with no plugin, is what made T3 possible at all.
+- Checking D1 against the transcripts, not memory, overturned the first-pack pick. `/diagnose` had 0 recorded runs; `/tdd` had 10.
+- The no-plugin exercise found a real gap in both the pack and its source skill (a test that passes on its first run). It was
+  fixed in both and proven by a re-run.
+
+**Friction**
+- T3's first run was lost to a harness fault: a scratch repository under `~/.claude/` is "sensitive" (L-241).
+- Codex reviews of records keep asking for evidence a record cites but does not quote. Quoting it up front would save a round.
+
+**Pattern candidates**
+- L-240 (new): prune losing candidate Layers tokens when G2 rules. L-241 (new): test "without the plugin" with a separate
+  headless process, proven from its init event.
+
+**Owner actions**
+- Push `main` (release 2.12.0 is committed, not pushed). Reinstall the plugin so G2's builder check runs from the installed skill.
+- TASK-466 (a concrete change in each already-covered note) is in the backlog, `state: ready`.

@@ -165,3 +165,22 @@ owner-ruling: system-verify — fixed-and-rerun. T1 declared `spec/packs/` as a 
 `packs/`. The other token, `spec/packs/`, matches no path, which the `layers observed` leg FAILs by design.
 **Impact:** § Plan T1's `Layers:` loses `spec/packs/`. Nothing else changes; no member's Done-when is touched.
 system-verify · PASS · QA_FULL on the VPS at `3d6e8265`, the final integrated tree after the fix: 304 pass, 0 fail, 114 s (`bun test` 441/0 on the first run)
+
+### 2026-10-20 | close | 3 of 3 members in `done/`, PLAN_EXHAUSTED; released 2.12.0 MINOR; EPIC-007 conditions 1 · 3 · 6 delivered; Retro + buckets
+run · 11 of 11 DoD ticked
+terminal · PLAN_EXHAUSTED
+System verify: QA_FULL 304/0 on the VPS at `3d6e8265`, after the owner-ruled fix-and-rerun of the first run (303/1, an unused
+Layers token).
+Release 2.12.0 MINOR (owner): the four manifests (derived by `grep -l '"version"' .*-plugin/*.json`), the README footer and the
+pack's source line. v2.10.x is rotated verbatim to `docs/changelog/` (§11, owner-approved).
+EPIC-007 rollup (owner-approved): conditions 1 (the contract, checkable by a reader), 3 (the no-plugin exercise, met in
+substance) and 6 (domain-neutral) are ticked, each naming SPRINT-132. Conditions 2, 4 and 5 stay open (next slice), so the epic
+stays `active`. The Scope line is amended to D6, and the epic log row is completed at the archive commit.
+Doc-freshness (owner-approved): the architecture overview gains the `packs/` line (148 ≤ 150).
+Buckets:
+- Shipped → CHANGELOG v2.12.0.
+- Tech debt → none new; the ledger is unchanged at 108 rows (105 open).
+- Follow-ups → TASK-466 (`origin: close-retro`): an already-covered note names one concrete failing change.
+- Learnings → L-240 (prune the losing candidate Layers tokens at G2) and L-241 (test "without the plugin" with a separate
+  headless process); the knowledge index is regenerated.
+Handoff ledger: no `handoff` entry was taken.

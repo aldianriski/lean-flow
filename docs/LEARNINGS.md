@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-19
+last_updated: 2026-10-20
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-239**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-241**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -68,6 +68,22 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - **wiring → moved: docs/LEARNINGS.md` § Durable rules › wiring** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: L-020
 
 ❌ Shipping a new capability **without wiring it into the jobs that trigger/chain it** — a behaviour written only in its own file is half-shipped. Wire every trigger point + downstream consumer (entry routing · dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT) and verify it *fires* end-to-end. Shipping ≠ wiring (SPRINT-022 audit: dispatch · review-split · fog-mode all shipped half-connected → L-020).
+
+---
+
+## L-241 [tags: process] [status: active]: **"Without the plugin" cannot be tested from a sub-agent. Use a separate headless process, and prove it from the run's own init event.** A sub-agent inherits the host session's plugins and the working repository's CLAUDE.md, so it can never be the "agent with no lean-flow installed" that EPIC-007's consumer-path condition asks for. SPRINT-132 T3 used `claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, which skips the user settings that enable plugins. Its `system/init` event listed only the three built-in plugins and `skills: []`: a mechanical proof, not the agent's own report. Two traps cost a run. A scratch repository under `~/.claude/` makes every edit fail as "a sensitive file", so put it in the system temp directory. And a run that is not given stdin waits 3 s and warns, so redirect `< /dev/null`.
+- seen: 2026-10-20 (SPRINT-132 T3, runs 1–3)
+- count: 1
+- promoted: no
+- related: L-239 (the working directory decides what a reviewer can read) · L-016 (the consumer path)
+
+---
+
+## L-240 [tags: process] [status: active]: **A Layers token declared for an undecided G2 choice must be pruned once G2 rules, or system verify fails at close.** SPRINT-132 T1 declared both candidate trees (`packs/` and `spec/packs/`) so that whichever placement G2 ruled would already be in its Layers. G2 ruled `packs/`; the unused token stayed in the frozen Plan, and the `layers observed` leg failed it at close (`layers-token-matches-nothing`), costing a ruling, a scope-change and a second QA_FULL run. When G2 rules between declared candidates, log the scope-change that drops the losers in the same G2 entry. This is the second close in a row that failed on the coordinator's own bookkeeping rather than on content (L-238).
+- seen: 2026-10-20 (SPRINT-132 close, system verify 303/1 → 304/0)
+- count: 1
+- promoted: no
+- related: L-238 (commit-subject attribution)
 
 ---
 
