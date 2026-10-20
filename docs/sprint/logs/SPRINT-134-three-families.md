@@ -63,3 +63,10 @@ Both packs: the model/vendor search prints nothing; the bodies (from `purpose` o
 README § Workflow packs lists all three packs, committed T1 then T2 (D1).
 review · T1 · scoped fresh reader (contract checklist + Spec/Standards) · behaviour:low · governance:high · Spec: 2 minor → fixed · Standards: nits → fixed · retry 1 → re-review all FIXED
 review · T2 · scoped fresh reader (contract checklist + Spec/Standards) · behaviour:low · governance:high · Spec: 1 minor → fixed · Standards: none
+
+### 2026-10-20 | progress | T3 ruled by the owner; condition 5 closed as not satisfied by packs alone
+owner-ruling: condition 5 — **not satisfied by packs alone.** Three workflow families fit one contract unchanged, on a single
+runtime: that shows fit, not pressure. The roadmap gate guards against speculative platform work, so it stays open until a
+second runtime, or a family that forces a contract change, appears. Recorded on EPIC-007 § Closed when condition 5 (ticked:
+the condition asks for the ruling, either way) and on open question 3. The roadmap's own gate box stays unticked, which agrees
+with the ruling.
