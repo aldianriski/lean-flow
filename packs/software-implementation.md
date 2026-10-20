@@ -21,8 +21,9 @@
    2. Tracer bullet. Write ONE test for the first behaviour and run it; it must fail (RED). Write the minimal code that passes
       it (GREEN). This proves the path works end to end → one test and its minimal code (execution).
    3. Incremental loop. For each remaining behaviour: write the next test and see it fail (RED), then write only enough code
-      to pass it (GREEN). One test at a time; never write code for a test that does not exist yet → one test and its code
-      per behaviour (execution).
+      to pass it (GREEN). One test at a time; never write code for a test that does not exist yet. A new test that passes on
+      its first run is not RED, because the code already covers it: record it as *already covered*, name the production change
+      that would fail it, and move on → one test and its code per behaviour, or an already-covered note (execution).
    4. Refactor, only while GREEN. Extract duplication, move complexity behind simple interfaces, and run the tests after each
       step → cleaned code with the tests still green (execution).
    5. Close the slice. Run the project's WHOLE test suite once → the exit code and a list of any failing tests (execution).
@@ -38,7 +39,8 @@
 4. **`capabilities`** — Read and write project files; run the project's test command; ask the requester a question.
 5. **`output contract`** — The behaviour list, confirmed by the requester or, when no one could confirm, stated at the top of
    the output. For each behaviour on the list: a test written before its code, with the failing (RED) run of that test
-   recorded before its code is written, and the code that makes it pass. At the end, a whole-suite run whose exit code is 0; or,
+   recorded before its code is written, and the code that makes it pass; or, when the test passed on its first run, an
+   *already covered* note naming the production change that would fail it. At the end, a whole-suite run whose exit code is 0; or,
    if it is not 0, each failing test listed with whether this change caused it.
 6. **`verification`** — Run the whole suite once per slice, not every cycle, and gate on the test runner's exit code, never on
    filtered or trimmed output, which can hide a failure. Name every failing test, whether or not this change caused it. A slice
