@@ -86,11 +86,18 @@ Output contract, item by item:
 - **Behaviour list, stated because nobody could confirm it:** met (3723 · 0 · 3600 · 360000).
 - **Per behaviour, either a RED run before its code or an already-covered note:** met for all four.
   - Behaviour 1: the test failed (`# fail 1`, not exported), then the code was written, then GREEN.
-  - Behaviours 2–4: each passed first time and is recorded as already covered, with the change that would fail it: dropping
-    the zero-padding · a different hours division · capping or padding the hours.
+  - Behaviours 2–4: each passed first time and is recorded as already covered. The named changes:
+    - Behaviour 2: dropping the zero-padding. **Valid**: it fails `0h 00m 00s`.
+    - Behaviour 3: "something other than `Math.floor(seconds / 3600)`" for the hours. **Not definite**: `Math.ceil` still
+      gives 1 for 3600, so that test would pass.
+    - Behaviour 4: capping or padding the hours. **Half valid**: a cap fails `100h`, but two-digit padding leaves `100`
+      unchanged.
+  - The order of events is from the transcript. "Nobody could confirm" and "not exported" are the agent's own reports.
 - **The code:** met.
 - **A final whole-suite run that exits 0:** met.
 
-Fields: every field followed, except one `procedure` deviation the agent reported itself: behaviours 3 and 4 were added in a
-single edit instead of one at a time. Both passed first time, so no code was written ahead of a test.
-**Verdict under the owner's binary rule: met.**
+Fields, as far as the transcript shows: `procedure` deviated once, as the agent reported: behaviours 3 and 4 were added in a
+single edit, and the refactor step was skipped as not needed. The tracer code preceded tests 2–4, which the already-covered
+rule permits.
+**Verdict under the owner's binary rule: not established.** The output contract holds for behaviours 1, 2 and 4 (by the
+capping example), but behaviour 3's note names no definite failing change. This is left for the owner's ruling.
