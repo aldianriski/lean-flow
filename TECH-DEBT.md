@@ -387,6 +387,13 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-262** severity: low | status: open | created: Sprint-133 (close; promote doc-aging, TASK-438)
+  - Summary: **§11's "live citation" counts only `.md` files, and a code citation does not count.** At the SPRINT-133 promote
+    TASK-438 had no live `.md` citation, so the rule made it prunable, but `scripts/lib/tick-box.ts`,
+    `evals/run-tick-box-fixtures.ts` and `scripts/qa-check.sh` cite it in comments. The owner retained it. The rule and the
+    ruling now disagree, and the next promote will find the same file due again.
+  - Fix direction: widen the definition to every tracked file (a code comment pointing at a task is a reader), or record that
+    code citations do not count and prune. Rule it at a promote, in the spec's §11 text, not in a sprint log.
 - **TD-261** severity: low | status: open | created: Sprint-132 (close; final gate, `epic-state`)
   - Summary: **ADR-030 and the epic-state checker disagree about where member-sprint rows live.** ADR-030 puts the rows in
     `docs/epic/logs/EPIC-NNN-<slug>.md`. `scripts/lib/check-epic-archive.ts` reads only the epic file's own § Member sprints, as

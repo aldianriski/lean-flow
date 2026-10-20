@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-19
+last_updated: 2026-10-20
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,20 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+
+### SPRINT-133 — Name the Failing Edit (2026-10-20)
+
+**Consumer-facing:**
+- **`/tdd` and the `software-implementation` pack: an *already covered* note names one concrete edit, checked against the
+  test's inputs, that would fail the test.** It must be a specific expression or value, not a class of edits. "Anything other
+  than `Math.floor`" names a class, and some edits in it still pass: `Math.ceil` and `Math.round` both give 1 hour for 3600 s.
+  The rule is worded the same at `/tdd` step 3 and at the pack's step 3 and output contract.
+
+**Maintainer-side:**
+- §11 promote retention: TD-135 · 154 · 167 deleted; 9 closed task files pruned; TASK-438 retained (cited from code, TD-262).
+- EPIC-007: a condition-3 follow-up; conditions 2, 4 and 5 are still the next slice. L-242 filed.
 
 ---
 

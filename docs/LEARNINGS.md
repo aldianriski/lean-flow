@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-241**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-242**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -71,6 +71,14 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-242 [tags: process] [status: active]: **The TECH-DEBT aging-sweep note is a convention no procedure names, so promotes skip it.** Each promote's governance review ages the ledger and records the result in the sprint log. Separately, the custom is to add an "Aging sweep — SPRINT-NNN promote" note at the top of `TECH-DEBT.md` § Tech Debt. The promote procedure never mentions that note. It was skipped at the SPRINT-129, 130 and 132 promotes; the 131 note recorded the first two as "a miss", and the 133 note recorded the third. Every time, the aging itself was done and logged. Only the note was missing. Either write the note into the promote procedure, or drop it, since the sprint log already holds the record (§10 placement test). A step that lives only in custom keeps getting skipped (L-151's sibling).
+- seen: 2026-10-19 (SPRINT-131 promote: the 129 and 130 promotes wrote no note) · 2026-10-20 (SPRINT-133 promote: the 132 promote wrote none)
+- count: 3
+- promoted: no
+- related: L-151 (a decision recorded where its reader cannot reach it) · TD aging (§10 promote review)
+
+---
+
 ## L-241 [tags: process] [status: active]: **"Without the plugin" cannot be tested from a sub-agent. Use a separate headless process, and prove it from the run's own init event.** A sub-agent inherits the host session's plugins and the working repository's CLAUDE.md, so it can never be the "agent with no lean-flow installed" that EPIC-007's consumer-path condition asks for. SPRINT-132 T3 used `claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, which skips the user settings that enable plugins. Its `system/init` event listed only the three built-in plugins and `skills: []`: a mechanical proof, not the agent's own report. Two traps cost a run. A scratch repository under `~/.claude/` makes every edit fail as "a sensitive file", so put it in the system temp directory. And a run that is not given stdin waits 3 s and warns, so redirect `< /dev/null`.
 - seen: 2026-10-20 (SPRINT-132 T3, runs 1–3)
 - count: 1
@@ -97,7 +105,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ## L-238 [tags: edit-safety] [status: active]: **A coordinator's commit subject is the attribution record, so a coordinator-owned write goes under `sprint(N):`, never under a task's `Tn:`.** SPRINT-131's system verify FAILed on two legs (`layers observed` · `dod-delta`) with no content defect. Four of the coordinator's own subjects could not be attributed: a combined `sprint(131) T3 + T4:` that no attribution arm reads, two `git revert --no-edit` subjects (`Revert "…"`) with no sprint at all, and a write to the coordinator-owned research doc under `sprint(131) T2:`, which T2's `Layers:` do not declare. The owner ruled fix-and-rerun, which cost a `filter-branch` message rewrite of 10 commits (trees byte-identical) and a second QA_FULL run. One task per subject; a write to a D1-owned shared file is `sprint(N):`; a revert gets a `sprint(N) Tn:` subject (`git revert --no-commit`, then commit).
 - seen: 2026-10-19 (SPRINT-131 close, system verify 298/2 → 300/0 after the rewrite)
-- count: 1
+- seen: 2026-10-20 (SPRINT-133 close: a coordinator `in_progress → done` move committed under `sprint(133) T1:`; `layers observed` 292/1, fixed by a Layers scope-change)
+- count: 2
 - promoted: no
 - related: L-151 (a ruling the checker cannot read behaves as if never taken)
 
