@@ -48,3 +48,18 @@ builder-check · T3 · 0 contradictions · 3 questions · runs after T1 and T2; 
 consequence · T1 · behaviour:low · governance:high
 consequence · T2 · behaviour:low · governance:high
 consequence · T3 · behaviour:low · governance:high
+
+### 2026-10-20 | progress | T1 and T2 built in parallel worktrees, merged back, reviewed; all 8 Done-when ticked
+T1 (`93308c5c`): `packs/verification.md`, 75 lines. Its internal use was re-derived by the writer with position-anchored routes:
+111 review runs in 28 sprints and 13 close-time verify runs in 7. The intake census said 129 in 33 and 19 in 9 because it also
+counted prose mentions. The pack cites the anchored figures; TASK-467's Why keeps the intake numbers (not frozen DoD). The fresh
+reader found 2 contract findings (inputs, capabilities) and 2 Spec minors (a ruling as the first comparand rung; each revise
+outcome names its evidence). All were fixed in the one coordinator retry, and a single re-review returned all FIXED, both items
+TICK, no regressions.
+T2 (`8e5185bd`): `packs/solution-analysis.md`, 54 lines. 24 template-shaped docs, dated 2026-06-22 → 2026-10-20 (the design's
+08-10 start came from a tail-only read). Every contract item ticked. One minor fixed: "23 also carry a verdict" became "all 24",
+because two routes (a line-start match and an anywhere match) both found a verdict line in 24 of 24.
+Both packs: the model/vendor search prints nothing; the bodies (from `purpose` on) carry no lean-flow id; no line exceeds 130.
+README § Workflow packs lists all three packs, committed T1 then T2 (D1).
+review · T1 · scoped fresh reader (contract checklist + Spec/Standards) · behaviour:low · governance:high · Spec: 2 minor → fixed · Standards: nits → fixed · retry 1 → re-review all FIXED
+review · T2 · scoped fresh reader (contract checklist + Spec/Standards) · behaviour:low · governance:high · Spec: 1 minor → fixed · Standards: none

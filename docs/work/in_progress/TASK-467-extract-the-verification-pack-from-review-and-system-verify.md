@@ -26,13 +26,13 @@ first candidate, has no recorded run. Condition 4 (no pack owns a model identity
 
 ## Done when
 
-- [ ] A verification pack declares all eight contract fields from the orchestrator's review procedure (the Spec and Standards
+- [x] A verification pack declares all eight contract fields from the orchestrator's review procedure (the Spec and Standards ✓ 93308c5c: 8 fields from the review procedure and the close-time whole check; internal use 111 review + 13 verify runs cited by sprint (two routes)
   axes, and the one bounded retry) and the close-time whole-suite verify, and names the internal use that qualified it under D1
   (the logged review and verify runs, cited by sprint).
-- [ ] The pack names no model: its routing is by ADR-010 role, and a search of the pack for model and vendor names finds none.
-- [ ] A fresh reader validates the declaration against `packs/CONTRACT.md`'s checklist, with every field ticked or a recorded
+- [x] The pack names no model: its routing is by ADR-010 role, and a search of the pack for model and vendor names finds none. ✓ model/vendor grep prints nothing; every step names a role
+- [x] A fresh reader validates the declaration against `packs/CONTRACT.md`'s checklist, with every field ticked or a recorded ✓ fresh reader on CONTRACT.md: 2 findings (inputs, capabilities) fixed in the one retry, re-review all TICK
   finding.
-- [ ] README § Workflow packs lists the pack.
+- [x] README § Workflow packs lists the pack. ✓ README § Workflow packs links packs/verification.md
 
 ## Touches
 

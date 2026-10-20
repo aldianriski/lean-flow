@@ -26,13 +26,13 @@ not qualify, and security-review has no lean-flow procedure (D1 census, 2026-10-
 
 ## Done when
 
-- [ ] A solution-analysis pack declares all eight contract fields from the RESEARCH template's procedure (question → options →
+- [x] A solution-analysis pack declares all eight contract fields from the RESEARCH template's procedure (question → options → ✓ 8e5185bd: 8 fields from the RESEARCH template's sections; internal use 24 docs 2026-06-22 → 10-20, six cited by name and date
   findings → recommendation, feeding a decision record) and names the internal use that qualified it under D1 (template-shaped
   decision-research docs, cited by name and date).
-- [ ] The pack names no model: its routing is by ADR-010 role, and a search of the pack for model and vendor names finds none.
-- [ ] A fresh reader validates the declaration against `packs/CONTRACT.md`'s checklist, with every field ticked or a recorded
+- [x] The pack names no model: its routing is by ADR-010 role, and a search of the pack for model and vendor names finds none. ✓ model/vendor grep prints nothing; every step names a role
+- [x] A fresh reader validates the declaration against `packs/CONTRACT.md`'s checklist, with every field ticked or a recorded ✓ fresh reader on CONTRACT.md: every item TICK; one minor (verdict count 23 → 24, re-derived by two routes) fixed
   finding.
-- [ ] README § Workflow packs lists the pack.
+- [x] README § Workflow packs lists the pack. ✓ README § Workflow packs links packs/solution-analysis.md
 
 ## Touches
 
