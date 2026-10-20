@@ -212,6 +212,12 @@ promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates ·
 > own job. The pipeline and routing are the *optimal composition*, not a dependency graph. The only
 > inherent ordering is the sprint lifecycle (you can't `close` a sprint you didn't `promote`).
 
+### Workflow packs
+
+`packs/` holds workflow packs: lean-flow procedures written to [`packs/CONTRACT.md`](packs/CONTRACT.md) so that any agent can
+follow one from its single file, with nothing installed. Take one by copying its file. The first is
+[`packs/software-implementation.md`](packs/software-implementation.md).
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
