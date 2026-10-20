@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-132
 ---
 
 # TASK-463 — Write the eight-field workflow-pack contract, domain-neutral, with a reader checklist

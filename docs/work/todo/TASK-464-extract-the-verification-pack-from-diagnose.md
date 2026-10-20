@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: [TASK-463]
+sprint: SPRINT-132
 ---
 
 # TASK-464 — Extract the verification pack from /diagnose and declare it against the contract

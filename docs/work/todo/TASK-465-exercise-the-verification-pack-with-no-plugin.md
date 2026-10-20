@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: [TASK-464]
+sprint: SPRINT-132
 ---
 
 # TASK-465 — Exercise the verification pack end-to-end with no lean-flow plugin present

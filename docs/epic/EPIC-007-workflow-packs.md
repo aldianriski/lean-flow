@@ -2,9 +2,9 @@
 epic: 007
 slug: workflow-packs
 owner: Maintainer
-last_updated: 2026-08-24
-status: proposed
-member_sprints: []
+last_updated: 2026-10-20
+status: active
+member_sprints: [SPRINT-132]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -63,6 +63,8 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
   depend on one vendor, which `01` Layer A forbids.
 - **D3** — Runs in **Lane 2, behind EPIC-006**, because both edit `skills/`. Named here as a sequencing
   fact so the overlap is planned rather than discovered mid-sprint (`adlc-epic-sequencing.md` F3).
+  *(Amended 2026-10-20: EPIC-006 closed as superseded → workdoo on 2026-10-18 (EPIC-022 D1), so the Lane-2
+  sequencing is moot; no other open epic edits `skills/`.)*
 - **D4** — Tier under ADR-029 is declared per member task at G2, not assumed epic-wide. The pack
   *contract check* is Tier **G** if it gates conformance; the pack documents themselves are Tier **P**.
   Default up when unsure.
@@ -74,6 +76,12 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
   non-software workflow to prove the point** — that is Phase H's job and inventing one here would be
   the imagination move the roadmap warns against. It proves the weaker, sufficient thing: the contract
   does not *force* software terminology (exit condition below).
+- **D6 — "Checkable" means a reader can check it.** The contract carries a field-by-field checklist that a fresh
+  reader ticks against a declaration. No checker or `qa-check.sh` leg is built: ADR-053 freezes new governance
+  machinery, and no admission reason exists today. A mechanical check waits for an adopter who asks. Owner ruling 2026-10-19.
+- **D7 — "Reusable without the plugin" means readable alone by any agent.** A fresh agent with no lean-flow skills,
+  in a repository that never installed lean-flow, follows the pack file to its declared output. Owner ruling
+  2026-10-19; it answers the fourth open question below.
 
 ## Open questions
 
@@ -87,22 +95,22 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
   workflow"* require a second runtime as well? → a **judgement call**, so it closes by ruling (L-094).
   Rule it before claiming the condition met, never after — a gate condition claimed on a reading nobody
   ruled is L-088's move.
-- What does "reusable without the plugin" mean concretely for the exit condition — readable by a human,
-  or executable by another runtime? → resolve before the last exit condition is written into a Plan; a
-  criterion resting on an undecided ruling is L-111's trap.
+- ~~What does "reusable without the plugin" mean concretely for the exit condition — readable by a human,
+  or executable by another runtime?~~ **Answered by D7**, before the last exit condition entered a Plan (a criterion
+  resting on an undecided ruling is L-111's trap).
 
 ## Closed when
 
-- [ ] A pack declaration contract exists with all eight fields, and a pack declaration is checkable
-- [ ] 3–5 packs are extracted, each naming the internal use that qualified it under D1
+- [ ] A pack declaration contract exists with all eight fields, and a pack declaration is checkable → TASK-463, TASK-464
+- [ ] 3–5 packs are extracted, each naming the internal use that qualified it under D1 → TASK-464 · next slice: packs 2–3
 - [ ] At least one pack is exercised end-to-end **with no lean-flow plugin present** — the consumer path,
-      asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016)
-- [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed
+      asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016) → TASK-465
+- [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464 · next slice: each later pack
 - [ ] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
-      as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason
+      as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → next slice: gate-condition ruling
 - [ ] **The pack contract is domain-neutral: no software-specific field is mandatory unless the pack
       itself is a software workflow.** `repo` · `commit` · `branch` · `tests` · `PR` may appear in a
       software pack and must not appear in the contract's required set. **Verified by construction, not
       by inspection** — a non-software pack skeleton (declaration only, no procedure) validates against
       the contract with every required field satisfiable; if it cannot, the contract is software-shaped
-      and the finding names the field
+      and the finding names the field → TASK-463
