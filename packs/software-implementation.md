@@ -12,8 +12,8 @@
    test command; and a requester who can say which behaviours matter. No stated behaviour: stop and ask for one. Interface
    unclear: read the code, and ask the requester if it is still unclear. No existing code yet: the first test defines the
    public interface, and step 1 confirms it with the requester. Optional: a spec or worked examples from the requester;
-   without one, expected values come from known-good literals or examples worked by hand. No test command: find how the project runs its
-   tests; if there is none, stop and ask. No requester at all: see `escalation`.
+   without one, expected values come from known-good literals or examples worked by hand. No test command: find how the project
+   runs its tests; if there is none, stop and ask. No requester at all: see `escalation`.
 3. **`procedure`**
    1. Plan. Confirm the public interface that changes. List the behaviours to test (not implementation steps) in priority
       order. Not everything can be tested, so keep the critical paths and the complex logic, not every edge case → the
@@ -38,11 +38,12 @@
 4. **`capabilities`** — Read and write project files; run the project's test command; ask the requester a question.
 5. **`output contract`** — The behaviour list, confirmed by the requester or, when no one could confirm, stated at the top of
    the output. For each behaviour on the list: a test written before its code, with the failing (RED) run of that test
-   recorded before its code is written, and the code that makes it pass. At the end, a whole-suite run whose exit code is 0; or, if it is not 0, each failing test listed with whether this change
-   caused it.
+   recorded before its code is written, and the code that makes it pass. At the end, a whole-suite run whose exit code is 0; or,
+   if it is not 0, each failing test listed with whether this change caused it.
 6. **`verification`** — Run the whole suite once per slice, not every cycle, and gate on the test runner's exit code, never on
    filtered or trimmed output, which can hide a failure. Name every failing test, whether or not this change caused it. A slice
-   is neither called done nor committed until the whole-suite exit code is 0; a failure the slice did not cause is reported, never counted as green.
+   is neither called done nor committed until the whole-suite exit code is 0; a failure the slice did not cause is reported,
+   never counted as green.
 7. **`escalation`** — Before writing any code, confirm the behaviour list with the requester. If no one can answer, state the
    planned list at the top of the output and proceed with it. A failure this change did not cause goes to the requester. So
    does a behaviour that cannot be tested.
