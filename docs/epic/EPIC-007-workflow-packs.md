@@ -4,7 +4,7 @@ slug: workflow-packs
 owner: Maintainer
 last_updated: 2026-10-20
 status: active
-member_sprints: [SPRINT-132]
+member_sprints: [SPRINT-132, SPRINT-133]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -51,6 +51,7 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-132](../sprint/archive/SPRINT-132-expertise-without-the-plugin.md) | Expertise Without the Plugin | closed · `8eb2871` | Conditions 1, 3, 6: the eight-field contract with a reader checklist and a domain-neutral skeleton (ADR-055, `packs/`); the first pack, software-implementation from `/tdd` (1 of 3–5, condition 2 open); an agent with no lean-flow installed followed it to its output contract (met in substance) |
+| [SPRINT-133](../sprint/SPRINT-133-name-the-failing-edit.md) | Name the Failing Edit | active | — (rolled up at close; condition 3 follow-up: an already-covered note names one concrete failing edit) |
 
 ## Decisions
 

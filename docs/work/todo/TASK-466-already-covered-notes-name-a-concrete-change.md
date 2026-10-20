@@ -2,6 +2,7 @@
 id: TASK-466
 title: "Make an already-covered note name one concrete change that would fail the test"
 epic: EPIC-007
+sprint: SPRINT-133
 priority: P3
 size: S
 risk: low
