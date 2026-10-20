@@ -17,11 +17,11 @@ that domain's words in its own text, but nothing here requires them.
 
 2. **`inputs`** — what must exist before the procedure starts: the work item, the material it acts on, and who can answer
    questions about it.
-   - [ ] Lists every input the procedure reads, and says what to do when one is missing.
+   - [ ] Lists every input the procedure reads and, for each one, what to do when it is missing.
 
 3. **`procedure`** — the ordered steps. Each step names the action, what it produces, and the role it needs (see *Routing*).
    - [ ] Lists ordered steps, each naming what it produces and its role. A declaration-only skeleton may name its steps and
-     their outputs without writing them out; a usable pack writes them out.
+     their outputs without writing them out, and says so in its header; a usable pack writes them out.
 
 4. **`capabilities`** — what the agent must be able to do: read, write, run a command, ask a person. Stated as capabilities,
    never as a product, tool brand or model.

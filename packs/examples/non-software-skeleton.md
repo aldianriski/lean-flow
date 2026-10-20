@@ -9,7 +9,8 @@
 1. **`purpose`** — Produce a ranked shortlist of up to three suppliers for a stated need, with the reason for each ranking. Not
    for negotiating terms or signing anything.
 2. **`inputs`** — The need, stated as requirements and a budget ceiling; the candidate suppliers; and a requester who can rank
-   conflicting requirements. If the budget ceiling is missing, ask before scoring.
+   conflicting requirements. A missing budget ceiling or unranked requirements: ask the requester before scoring. No
+   candidates: stop and report that there is nothing to shortlist.
 3. **`procedure`**
    1. Restate the need as scoring criteria with weights → a criteria table (decision).
    2. Gather each candidate's published facts against the criteria → a facts sheet per candidate (mechanical-ingest).
@@ -18,7 +19,8 @@
 4. **`capabilities`** — Read the candidates' published material; write a document; ask the requester a question.
 5. **`output contract`** — The criteria table with weights; one facts sheet per candidate; the scored table with assumptions
    marked; a shortlist of at most three, each with one reason a second reader can trace to the scored table.
-6. **`verification`** — Re-derive each score from its facts sheet; a score that cannot be re-derived is a failure.
+6. **`verification`** — After step 3 and before ranking, re-derive each score from its facts sheet; a score that cannot be
+   re-derived is a failure.
 7. **`escalation`** — Stop and ask the requester when two weighted criteria conflict. If the requester cannot be reached, rank
    on the higher-weighted criterion and say so at the top of the shortlist.
 8. **`risk policy`** — Never contact a supplier or disclose the budget ceiling. Score only from published facts, never from a
