@@ -18,8 +18,9 @@
    1. Plan. Confirm the public interface that changes. List the behaviours to test (not implementation steps) in priority
       order. Not everything can be tested, so keep the critical paths and the complex logic, not every edge case → the
       behaviour list, confirmed by the requester (decision).
-   2. Tracer bullet. Write ONE test for the first behaviour and run it; it must fail (RED). Write the minimal code that passes
-      it (GREEN). This proves the path works end to end → one test and its minimal code (execution).
+   2. Tracer bullet. Write ONE test for the first behaviour and run it; it must fail (RED), unless the code already covers it
+      (see the already-covered rule in step 3). Write the minimal code that passes it (GREEN). This proves the path works end to
+      end → one test and its minimal code (execution).
    3. Incremental loop. For each remaining behaviour: write the next test and see it fail (RED), then write only enough code
       to pass it (GREEN). One test at a time; never write code for a test that does not exist yet. A new test that passes on
       its first run is not RED, because the code already covers it: record it as *already covered*, name the production change
