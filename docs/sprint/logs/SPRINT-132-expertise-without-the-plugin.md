@@ -131,3 +131,17 @@ T3 (TASK-465), coordinator-run as a separate `claude -p` process (the stated rea
 review · T3 · scoped-reviewer · Codex gpt-6-astra (empty cwd, 0 commands) · FINDINGS (4): the "at the top" claim, proof limits, run-1 cause, the finding overstated → record retry → re-review FINDINGS (1): the absence claim rests on one search → still-open → owner
   Since then the coordinator ran a second, wider search (no match) and narrowed the wording to what both searches establish.
 consequence · T3 · behaviour:low · governance:low → the record reviewed once by Codex (D3)
+
+### 2026-10-20 | scope-change | TASK-464 and TASK-465: one rule for a test that passes on its first run, in the pack and in /tdd; T3 re-run once (owner ruling)
+**What broke:** T3's no-plugin run met the output contract only in part. Behaviours 2–4 first ran GREEN because the tracer code
+already covered them. Neither the pack nor its source procedure, `/tdd`, says what to do then, so the contract's
+RED-per-behaviour evidence could not be met by an honest follower.
+**Impact (owner ruling):**
+- **TASK-464 (the pack) and `/tdd` gain one rule.** A new test that passes on its first run is not a RED run. It is recorded as
+  "already covered", naming the production change that would fail it, and the next behaviour proceeds. The output contract
+  accepts either a RED run or that record for each behaviour.
+- **The change lives in T2's Layers** (`packs/` · `skills/tdd/`) and is attributed to T2, with `/tdd` and the pack changed in
+  one commit so they stay in step. The source line's plugin version is set to the release version at close. `/tdd`'s own
+  `version: "0.1.0"` has not been bumped on its earlier edits (SPRINT-051 · 129), so the plugin version is the reliable marker.
+- **TASK-465:** the exercise is re-run once (same setup, same prompt, binary rule), and the record appends run 3.
+- **Frozen Done-when text:** unchanged. TASK-464's boxes 1–3 stay ticked, and the change is reviewed once by Codex.
