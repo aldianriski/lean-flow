@@ -50,3 +50,13 @@ of edits)" is at `/tdd` step 3 and at the pack's step 3 and output contract. Two
 stripped (1 + 2) and a per-line count. A first count read 0 because of CRLF line endings; it was re-run, not trusted. The pack body
 scan is clean and its control fires. `tdd/SKILL.md` stays at 107 lines (cap 140).
 review · T1 · scoped-sonnet · behaviour:low · governance:high · Spec: none · Standards: none (only the line wrap differs between the files)
+
+### 2026-10-20 | gate | system verify FAIL (layers observed) → owner ruling: Layers scope-change and rerun
+system-verify · FAIL(layers observed) · QA_FULL on the VPS at `8a393ea5`: 292 pass, 1 fail. The pass count reconciles with SPRINT-132's 304: minus 9 `task-origin` lines for the pruned task files, minus 2 for fewer members (304 − 9 − 2 = 293)
+owner-ruling: system-verify — Layers scope-change and rerun. The `in_progress → done` move of TASK-466 was committed under `sprint(133) T1:`, so it is attributed to T1, whose `Layers:` declare only the `todo/` and `in_progress/` paths. SPRINT-132 committed its done-moves under a bare `sprint(132):` subject (COORD). This is L-238's class, so its count goes to 2.
+
+### 2026-10-20 | scope-change | § Plan T1 Layers: add the `done/` path of TASK-466 (owner ruling above)
+**What broke:** T1's done-move commit touched `docs/work/done/TASK-466-already-covered-notes-name-a-concrete-change.md`, which
+T1's `Layers:` do not declare, so the `layers observed` leg fails it.
+**Impact:** § Plan T1's `Layers:` gains that exact path. Nothing else changes; no member's Done-when is touched. G2 is unaffected,
+because it is a bookkeeping path, not a design change.
