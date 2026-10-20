@@ -40,3 +40,18 @@ record the intake rulings; open question 4 is answered by D7; the INDEX row is u
 is created with this sprint's row.
 Size check: 2 M + 1 S, no `L`. All three members are `origin: decomposer` (decomposed 2026-10-19, `cc77da66`).
 promote-check 10/0 after one fix: T3's prose named `qa-check.sh` (to say no leg is added). A Cites: entry did not satisfy the prose leg, which compares the bare filename literally (TD-257), so the prose was reworded. Dispatch preflight: PASS base-ref · waves T1=0 T2=1 T3=2 · `packs/` and `skills/diagnose/` owned in order T1 → T2 · PREFLIGHT: CLEAR.
+
+### 2026-10-20 | gate | G1 signed (batch fast-path); one owner ruling before G2
+G1: batch fast-path confirm, all three members `origin: decomposer`, scope unchanged since `plan_commit` 1edfdb8b.
+
+### 2026-10-20 | scope-change | TASK-464 and TASK-465: the first pack is /tdd, not /diagnose — D1 disqualified /diagnose (owner ruling)
+**What broke:** EPIC-007 D1 admits a pack only when its procedure has real internal use. Three routes over every main-thread and
+sub-agent transcript in this project found **0** runs of `/diagnose`: Skill-tool invocations 0, slash invocations 0, sub-agent
+files 0. Its archived-log mentions are all edits to the skill itself (SPRINT-050 · 051 · 129). TASK-464's frozen Done-when ("names
+the internal use that qualified it under D1") could not be met honestly. `/tdd` ran as the procedure skill in **10** dispatched
+builder runs (SPRINT-109 T2–T4 · SPRINT-110 T2–T4 · three on 2026-10-03 · SPRINT-124 T1).
+**Impact (owner ruling):** the first pack is **software-implementation ← `/tdd`**. TASK-464's title, Why, first Done-when line,
+Touches and Tracker name `/tdd` in place of `/diagnose`. TASK-465's exercise becomes a small feature built test-first instead of
+a seeded defect. Both files are renamed to match their titles. § Plan's T1 and T2 Layers name `skills/tdd/` in place of
+`skills/diagnose/`, and its Scope, D2 and Members follow. The task ids, the dependency chain and EPIC-007's coverage marks are
+unchanged. Re-confirm G2: the G2 being drafted now uses `/tdd`.
