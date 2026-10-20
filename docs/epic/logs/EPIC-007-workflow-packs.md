@@ -12,4 +12,4 @@ status: active
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-132](../../sprint/SPRINT-132-expertise-without-the-plugin.md) | Expertise Without the Plugin | active | (completed at close) |
+| [SPRINT-132](../../sprint/archive/SPRINT-132-expertise-without-the-plugin.md) | Expertise Without the Plugin | closed · `8eb2871` | Conditions 1, 3, 6: the eight-field contract with a reader checklist and a domain-neutral skeleton (ADR-055, `packs/`); the first pack, software-implementation from `/tdd` (1 of 3–5, condition 2 open); an agent with no lean-flow installed followed it to its output contract (met in substance) |

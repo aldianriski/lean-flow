@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-19
+last_updated: 2026-10-20
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-132 — Expertise Without the Plugin — closed 2026-10-20 · `8eb2871` · 3 of 3 members in `done/`, 11/11 DoD (released **2.12.0** MINOR) · **EPIC-007** (first member) — `packs/`: the eight-field workflow-pack contract and the software-implementation pack from `/tdd`, followed by an agent with no lean-flow installed; conditions 1 · 3 · 6 delivered
 - SPRINT-131 — Check the Contract First — closed 2026-10-19 · `b18aa5d` · 4 of 4 members in `done/`, 14/14 DoD (released **2.11.0** MINOR) · **standalone, no `epic:` stamp** — G2 runs a fresh-reader builder check before sign-off; the three measured experiments (inline execution · open questions · a loop table) each failed their preset rule
 - SPRINT-130 — A Gate You Can Trust — closed 2026-10-19 · `f2afc09` · 3 of 3 members in `done/`, 10/10 DoD (unreleased; **no version bump** — only `test/`, `evals/` and the ledgers changed, derived from `git diff --name-only 9c782185..HEAD`) · **standalone, no `epic:` stamp** — ADR-035's gate-discovery guard green again (TD-154); the qa-budget ceiling case reads a frozen clock (TD-167); the `bun test` flake closed as not reproduced, 8/8 runs agreeing (TD-135)
 - SPRINT-129 — Honest Review and Tests — closed 2026-10-19 · `e3c8c90` · 4 of 4 members in `done/`, 14/14 DoD (released in `2.10.0`; orchestrator review-scoping + `/diagnose` + `/tdd` changed) · **standalone, no `epic:` stamp** — the reviewer gets the host repo's standards docs and lists what it declined to judge; a forced red must prove it landed; a `/tdd` slice is done only when the whole suite passes
