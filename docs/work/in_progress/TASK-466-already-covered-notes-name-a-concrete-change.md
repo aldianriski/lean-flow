@@ -35,8 +35,8 @@ still pass (`Math.round` gives 1 for 3600, as `Math.ceil` did).
 
 ## Done when
 
-- [ ] `/tdd` and `packs/software-implementation.md` both say an already-covered note names one concrete edit (a specific expression or value) that would make the test fail, not a class of edits.
-- [ ] The two files stay worded alike, and the pack still names no lean-flow skill, path or id outside its header.
+- [x] `/tdd` and `packs/software-implementation.md` both say an already-covered note names one concrete edit (a specific expression or value) that would make the test fail, not a class of edits. ✓ `97775f05`: the phrase at 3 of 3 sites (joined-text count 1 + 2, agreeing with a per-line count); scoped sonnet review, Spec: none
+- [x] The two files stay worded alike, and the pack still names no lean-flow skill, path or id outside its header. ✓ identical parenthetical at all three sites (review, Standards: none); pack body scan `awk 'NR>6'` clean, control `NR>5` fires on header line 6
 
 ## Touches
 

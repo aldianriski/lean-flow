@@ -43,3 +43,10 @@ Owner ruling: the phrase adds "checked against the test's inputs", because a con
 (`Math.round` gives 1 for 3600, as `Math.ceil` did).
 builder-check · T1 · 0 contradictions · 0 missed sites · 1 fact settled (parentheses, not a dash, at all three sites) · 1 intent question → owner ruling above
 consequence · T1 · behaviour:low · governance:high
+
+### 2026-10-20 | progress | T1 built (`97775f05`), reviewed clean, both Done-when ticked
+The phrase "name one concrete edit, checked against the test's inputs, that would fail it (a specific expression or value, not a class
+of edits)" is at `/tdd` step 3 and at the pack's step 3 and output contract. Two counting routes agree: a joined-text count with CR
+stripped (1 + 2) and a per-line count. A first count read 0 because of CRLF line endings; it was re-run, not trusted. The pack body
+scan is clean and its control fires. `tdd/SKILL.md` stays at 107 lines (cap 140).
+review · T1 · scoped-sonnet · behaviour:low · governance:high · Spec: none · Standards: none (only the line wrap differs between the files)
