@@ -26,9 +26,9 @@ two pack families, so the question can be ruled on real evidence.
 
 ## Done when
 
-- [ ] EPIC-007 § Closed when condition 5 is ticked either as satisfied or as not-satisfied-by-packs-alone, with the owner's
+- [x] EPIC-007 § Closed when condition 5 is ticked either as satisfied or as not-satisfied-by-packs-alone, with the owner's ✓ owner ruling by popup 2026-10-20: not satisfied by packs alone, with its reason and the three families, recorded on condition 5 (closed by SPRINT-134)
   ruling and its reason, citing the pack families that exist when it is ruled.
-- [ ] The epic's open question on decision-gate condition 6 records the same answer, so the two never disagree.
+- [x] The epic's open question on decision-gate condition 6 records the same answer, so the two never disagree. ✓ open question 3 struck through and answered with the same ruling; the phrase appears in both places (joined-text count 2)
 
 ## Touches
 

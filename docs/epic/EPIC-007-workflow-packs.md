@@ -94,10 +94,10 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 - Does the pack *contract* belong to Layer A (the Standard) or Layer E (beside it)? `01` separates them,
   but conformance must be able to check a pack declaration and the engine reads spec rules — so the
   clean layering and the checkability pull opposite ways. → same G2; `/council` if genuinely balanced.
-- Does a workflow pack **alone** satisfy decision-gate condition 6, or does the clause's *"runtime or
-  workflow"* require a second runtime as well? → a **judgement call**, so it closes by ruling (L-094).
-  Rule it before claiming the condition met, never after — a gate condition claimed on a reading nobody
-  ruled is L-088's move.
+- ~~Does a workflow pack **alone** satisfy decision-gate condition 6, or does the clause's *"runtime or
+  workflow"* require a second runtime as well?~~ **Answered by the owner's ruling at SPRINT-134 (2026-10-20): not satisfied by
+  packs alone.** Three families fit one contract unchanged on a single runtime, which shows fit, not pressure; it stays open
+  until a second runtime, or a family that forces a contract change, appears (§ Closed when, condition 5).
 - ~~What does "reusable without the plugin" mean concretely for the exit condition — readable by a human,
   or executable by another runtime?~~ **Answered by D7**, before the last exit condition entered a Plan (a criterion
   resting on an undecided ruling is L-111's trap).
@@ -109,8 +109,12 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 - [x] At least one pack is exercised end-to-end **with no lean-flow plugin present** — the consumer path,
       asserted mechanically the way EPIC-004's foreign-repo harness asserts no file was copied in (L-016) → TASK-465 · closed by SPRINT-132 (owner ruling: met in substance; `docs/research/logs/workflow-pack-exercises.md`)
 - [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed → TASK-464, TASK-467, TASK-468
-- [ ] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
-      as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → TASK-469
+- [x] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
+      as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason → TASK-469 · closed by SPRINT-134
+      (owner ruling 2026-10-20: **not satisfied by packs alone**. Three workflow families (software-implementation ·
+      verification · solution-analysis) fit one contract unchanged, on a single runtime. That proves the abstraction fits; it
+      does not show variation pressuring it. The gate guards against speculative platform work, so it stays open until a second
+      runtime, or a family that forces a contract change, appears. Re-rule then.)
 - [x] **The pack contract is domain-neutral: no software-specific field is mandatory unless the pack
       itself is a software workflow.** `repo` · `commit` · `branch` · `tests` · `PR` may appear in a
       software pack and must not appear in the contract's required set. **Verified by construction, not
