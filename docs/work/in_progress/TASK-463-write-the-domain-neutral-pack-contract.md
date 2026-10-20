@@ -25,10 +25,10 @@ freeze. No checker is built. The contract must not quietly become software-shape
 
 ## Done when
 
-- [ ] A pack contract states the eight fields (`purpose` · `inputs` · `procedure` · `capabilities` · `output contract` · `verification` · `escalation` · `risk policy`), each with what it must say and a checklist line a reader can tick against a declaration.
-- [ ] The contract's required set names no software-specific concept (`repo` · `commit` · `branch` · `tests` · `PR`), and no field may name a model; routing is by ADR-010 role.
-- [ ] Domain-neutral by construction: a non-software pack skeleton (declaration only, no procedure) is validated against the checklist by a fresh reader, and every required field is satisfiable. A field that is not satisfiable is a recorded finding naming it.
-- [ ] Where packs and the contract live, and whether the contract is Layer A (the Standard) or Layer E, is ruled at G2 and recorded as an ADR if it adds a §2 row or a new tree.
+- [x] A pack contract states the eight fields (`purpose` · `inputs` · `procedure` · `capabilities` · `output contract` · `verification` · `escalation` · `risk policy`), each with what it must say and a checklist line a reader can tick against a declaration. ✓ packs/CONTRACT.md: 8 fields, each with what it must say + a checklist line (7b167d27, tightened a07406ea/17fbc646)
+- [x] The contract's required set names no software-specific concept (`repo` · `commit` · `branch` · `tests` · `PR`), and no field may name a model; routing is by ADR-010 role. ✓ domain grep (\b-bounded) over the 8-field section + model/vendor grep print nothing (seed-proven); routing by role (decision · execution · mechanical-ingest) in plain words
+- [x] Domain-neutral by construction: a non-software pack skeleton (declaration only, no procedure) is validated against the checklist by a fresh reader, and every required field is satisfiable. A field that is not satisfiable is a recorded finding naming it. ✓ packs/examples/non-software-skeleton.md: strict fresh reader ALL TICKED after 9fe44d9b; one interim finding (inputs coverage) recorded and fixed — a declaration gap, every field satisfiable
+- [x] Where packs and the contract live, and whether the contract is Layer A (the Standard) or Layer E, is ruled at G2 and recorded as an ADR if it adds a §2 row or a new tree. ✓ ruled at G2 (owner): top-level packs/, Layer E; ADR-055 + DECISIONS row (new tree, no §2 row)
 
 ## Touches
 

@@ -82,3 +82,17 @@ Verification:
 - T3: a recorded run (judgment tick, plus the mechanical sub-checks).
 - System verify after the final merge.
 consequence · T1 · behaviour:low · governance:high → scoped Codex + the adversarial floor (D3); Codex from an empty directory (L-239)
+
+### 2026-10-20 | progress | T1 built inline, reviewed (Codex 2 Spec findings, one retry, CLEAR); the strict fresh reader ticks all 8 lines
+T1 (TASK-463), coordinator-built because it is decision class: `packs/CONTRACT.md` (eight fields, each a checklist line;
+routing by role in plain words; a header with source and internal use), `packs/examples/non-software-skeleton.md` (supplier
+shortlist, declaration only), ADR-055 and its DECISIONS row (`7b167d27`).
+Verification:
+- The greps over the eight-field section (domain words, `\b` bounded) and over both files (model/vendor names; lean-flow
+  ids/paths) print nothing. Each was proven to fire on a seeded line, and the section it reads is 31 lines.
+- First fresh reader: ALL TICKED, with 4 ambiguity notes; two were fixed (a rule per missing input; a skeleton says so) at
+  `a07406ea`.
+review · T1 · scoped-reviewer · Codex gpt-6-astra (empty cwd, 0 commands) · Standards CLEAR · Spec FINDINGS (2): F1 "run a command" is software-flavoured; F2 the skeleton read material its inputs did not declare → retry 17fbc646 → re-review CLEAR
+Strict re-read after the retry: FINDINGS (1). The skeleton did not cover a missing need or the absence of a requester (a
+declaration gap; the field is satisfiable). Fixed at `9fe44d9b`; the final strict re-read is ALL TICKED, with "(a) no field
+requires a software concept".
