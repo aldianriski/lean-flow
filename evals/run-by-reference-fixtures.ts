@@ -1629,6 +1629,24 @@ const CASES: Case[] = [
     expect: [],
   },
   {
+    name: "close-fired-then-model-rollup (must-FAIL: SPRINT-119 before the reaper ran -- untagged terminal lines are the run's own, TD-232)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-fired-model-rollup.md");
+    },
+    expect: ["CLOSE-FIRED-UNREAPED"],
+  },
+  {
+    name: "close-fired-sprint-119-full (control: the full archived SPRINT-119 log ends with the reaper's [derived] terminal line)",
+    close: true,
+    mutate: (d) => {
+      CLOSE_ALL(d);
+      logFragment(d, "log-fired-sprint-119-full.md");
+    },
+    expect: [],
+  },
+  {
     name: "close-never-fired (control: a log with no fired line owes no rollup)",
     close: true,
     mutate: (d) => {

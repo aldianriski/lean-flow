@@ -668,6 +668,8 @@ A small wrapper the OS scheduler runs alongside Part 2's `claude -p` call — no
 The first thing the morning human reads, appended as the run's last Execution Log entry — written by
 the run itself on a clean finish, or by the watchdog's `/handoff` on a stall.
 
+The rollup goes under the entry header `### <YYYY-MM-DD> | run-complete | <summary>` — the only header `check-night-run-rollup.ts` reads.
+
 **The block is emitted at every exit, and it opens with a count.** Not only when something went
 wrong — *always*, headed by the line that says how much of the Plan is actually done:
 

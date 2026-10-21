@@ -170,10 +170,14 @@ function scopeChangeEntries(log: string, from = 0): string[] {
 // the `terminal · ` line, and the same shape check-authority.ts anchors on.
 const FIRED_RE = /^fired · \S+ · \S/;
 const TERMINAL_RE = /^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · /;
+// TD-232: reap() prints `terminal · <STATE> · <reason>  [derived]`; a run's own Part-4 rollup is untagged.
+const REAPED_TAG_RE = /\[derived\]\s*$/;
 
 /**
- * True when the LAST `fired · ` line (fenced / commented regions hidden) has no `terminal · ` line after
- * it. A fired line quoted in a fence is an example, not a launch.
+ * True when the LAST `fired · ` line (fenced / commented regions hidden) has no reaper-tagged `terminal · `
+ * line after it. A terminal line counts only if it ends with reap()'s `[derived]` tag (TD-232): SPRINT-119's
+ * model-written rollup carried an untagged terminal line and satisfied the check without the reaper running.
+ * A fired line quoted in a fence is an example, not a launch.
  *
  * The terminal line needs one carve-out the fired line does not: reap() writes its rollup INSIDE a bare
  * fence (`run · … / terminal · …` between ``` lines, under a `### date | run-complete | …` heading), so
@@ -196,7 +200,7 @@ function firedUnreaped(log: string): boolean {
       reaped = false; // only a terminal line AFTER the latest launch answers it
       continue;
     }
-    if (fired && TERMINAL_RE.test(line) && (!hidden || inRollup)) reaped = true;
+    if (fired && TERMINAL_RE.test(line) && REAPED_TAG_RE.test(line) && (!hidden || inRollup)) reaped = true;
   }
   return fired && !reaped;
 }
