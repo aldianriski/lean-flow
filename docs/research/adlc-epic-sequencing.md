@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-21
 update_trigger: A roadmap phase closes, an epic is opened or gated, or a measurement changes a lane assignment
 status: current
 id: adlc-epic-sequencing
@@ -55,7 +55,7 @@ since 2026-10-18 the platform gate itself is workdoo's to argue (ADR-052), so on
 ## Lanes
 
 ```text
-Lane 1   EPIC-005 Fleet           (admitted when EPIC-015 closed — it has, 2026-10-12)
+Lane 1   EPIC-005 Fleet           (admitted when EPIC-015 closed — it has, 2026-10-12; parked 2026-10-21 under ADR-053's freeze until consumer evidence or an L-NNN ×2)
 Lane 2   EPIC-007 Workflow Packs  (EPIC-006 ahead of it was superseded → workdoo; nothing now precedes it)
 workdoo  EPIC-016 · 018 · 019 · 020 (+ the superseded 006 · 008 · 009 · 010 · 011 · 012 · 013 remainders)
 ```
