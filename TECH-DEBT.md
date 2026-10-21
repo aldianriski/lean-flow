@@ -391,7 +391,7 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-263** severity: low | status: open | created: Sprint-133 (close; system verify, `scope-change layers`)
+- **TD-263** severity: low | status: resolved → TASK-472 (SPRINT-135), a non-resolving fragment corroborated in the same entry is excused | created: Sprint-133 (close; system verify, `scope-change layers`)
   - Summary: **The scope-change leg reads a backticked prose fragment as a repo path.** `repoPath()` in
     `scripts/lib/check-sprint-by-reference.ts` accepts any span ending in a slash. So a fragment like the one in SPRINT-133's
     scope-change heading must be declared verbatim, even when the full path beneath it is already in the task's Layers.
