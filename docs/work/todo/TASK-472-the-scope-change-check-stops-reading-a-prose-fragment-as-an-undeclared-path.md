@@ -1,6 +1,7 @@
 ---
 id: TASK-472
 title: "The scope-change check stops reading a prose fragment as an undeclared path"
+sprint: SPRINT-135
 priority: P2
 size: S
 risk: med

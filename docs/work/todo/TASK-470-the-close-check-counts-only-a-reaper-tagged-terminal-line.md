@@ -1,6 +1,7 @@
 ---
 id: TASK-470
 title: "The close check counts only a reaper-tagged terminal line"
+sprint: SPRINT-135
 priority: P2
 size: S
 risk: med

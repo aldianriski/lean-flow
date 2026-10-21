@@ -1,6 +1,7 @@
 ---
 id: TASK-471
 title: "The review-depth check fails an out-of-vocabulary consequence line"
+sprint: SPRINT-135
 priority: P2
 size: S
 risk: med

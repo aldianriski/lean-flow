@@ -1,6 +1,7 @@
 ---
 id: TASK-473
 title: "§11 counts only .md files as live citations"
+sprint: SPRINT-135
 priority: P2
 size: S
 risk: low
