@@ -4,6 +4,7 @@ slug: checks-that-mean-it
 owner: Maintainer
 last_updated: 2026-10-21
 status: active
+gates_signed: G1,G2 @ 0fd8c5fd
 plan_commit: 2016abf7
 update_trigger: sprint execute/close events
 ---
