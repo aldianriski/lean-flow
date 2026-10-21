@@ -573,7 +573,7 @@ status: current
   - Mitigation (hypothesis): have the reaper map exit 124 and the harness's budget-exceeded result to `BUDGET_STOP`, or reword the
     template's stop-condition guidance.
 
-- **TD-233** severity: medium | status: open | created: Sprint-118 (T2 run)
+- **TD-233** severity: medium | status: resolved → TASK-470 (SPRINT-135), Part 4 names the `run-complete` header; the class vocabulary was already at review-scoping.md's consequence block | created: Sprint-118 (T2 run)
   - Summary: **The unattended run's bookkeeping drifted from two schemas, because nothing the run reads names them.** (1) It logged
     `review · T1 · self-review · behaviour:none · governance:none`, and `none` is not a class, so the gate reports
     `review-depth-unclassified` ×2 (kept verbatim by owner ruling, ADR-021 at close). (2) Its first rollup sat under a `rollup` header that
@@ -582,7 +582,7 @@ status: current
   - Mitigation (hypothesis): name the class values and the `run-complete` event where the run reads them (the orchestrator's review
     step and night-run.md Part 4's entry template), not only in the checkers.
 
-- **TD-232** severity: medium | status: open | created: Sprint-118 (T2 run)
+- **TD-232** severity: medium | status: resolved → TASK-470 (SPRINT-135), only a `[derived]`-tagged terminal line answers a fired line | created: Sprint-118 (T2 run)
   - Summary: **A model-written, unfenced `terminal ·` line satisfies `CLOSE-FIRED-UNREAPED`, so the TD-122 guarantee holds only while the
     run does not write its own rollup.** SPRINT-119's run wrote its own rollup under a `run-complete` header with an unfenced
     `terminal ·` line, and `--close` passed before the reaper ran. A run that writes its rollup and then dies before `reap()` would
