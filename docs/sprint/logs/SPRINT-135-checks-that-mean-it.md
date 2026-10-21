@@ -117,3 +117,14 @@ system-verify · PASS · QA_FULL=1 sh scripts/qa-check.sh
 Rerun on the VPS against `dd559921` (git bundle, clean detached checkout, 125 s): `QA-CHECK: 299 pass, 0 fail`, exit 0.
 Cross-check of the totals: both runs printed 299 PASS lines. The first run's 300 was 299 + the one FAIL line, because the
 prose-density leg prints nothing for a clean file that has no baseline row, so no leg dropped out between the runs.
+
+### 2026-10-21 | close | Checks That Mean It — 4 of 4 members in done/, 14 of 14 DoD, PLAN_EXHAUSTED
+All four members are in the done folder, and `check-sprint-by-reference --close` passes 10/0. System verify passed 299/0
+(`dd559921`) after one owner-ruled rerun. No handoff entry exists, so nothing needs reconciling.
+Retro buckets, auto-filed:
+- Shipped → root CHANGELOG at the PATCH release (fixes only: TD-232 · 233 · 244 · 262 · 263; spec 0.18.1).
+- Tech debt → TD-264 (review-depth: bullet-prefixed records, CR strip, untested branches) and TD-265 (fragment check: the
+  ls-files buffer, `./`, Windows case, an undecided clause), both routed by census at review.
+- Learnings → L-244 (check ADR-053 per task at intake, not the epic's admission) · L-245 (a deleting Done-when vs the
+  citations promote writes) · L-108's seventeenth sighting (a severity census from a truncated listing).
+- Follow-ups → none. TASK-438 falls due at SPRINT-136's §11 prune, by the scope-change above.

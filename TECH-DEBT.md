@@ -391,6 +391,24 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-265** severity: low | status: open | created: Sprint-135 (T3 review, census-routed)
+  - Summary: **`fragmentCorroborated()` has three untested edges and one size limit.** (1) `git ls-files -z` runs under the
+    default 1 MB exec buffer; this repo's output is 110,306 bytes (1,729 files), so a repo roughly ten times larger would crash
+    the `--scope-change` leg instead of giving a verdict. (2) A leading `./` in a fragment never matches a tracked path. (3) On
+    Windows the on-disk test is case-insensitive while the tracked test is not. (4) No fixture makes the tracked-beneath clause
+    the deciding condition: the `docs/` control is blocked by its on-disk existence alone.
+  - Fix direction: one `git ls-files -z -- <p>` per fragment (a pathspec keeps the output small), normalise `./`, and add a
+    fixture whose directory is tracked but absent on disk. Other G.
+
+- **TD-264** severity: low | status: open | created: Sprint-135 (T2 review, census-routed)
+  - Summary: **`review-depth-consequence-vocab` reads only bare record lines.** A bullet-prefixed `- consequence · T1 · …`
+    escapes both the vocabulary loop and the absence check. Census at review: 3 bullet-prefixed records in all of history, all
+    archived, against 219 bare ones. The normalisation awk also does not strip a trailing CR (it passed on this MSYS host;
+    unverified on another awk), and no fixture covers a missing field (`<missing>`), trailing text, both axes bad on one line,
+    or two bad lines in one log.
+  - Fix direction: accept an optional `^[-*] ` prefix in both loops, or state in review-scoping.md that only a bare line is a
+    record; add `gsub(/\r/, "", line)`; add the missing fixtures. Other G.
+
 - **TD-263** severity: low | status: resolved → TASK-472 (SPRINT-135), a non-resolving fragment corroborated in the same entry is excused | created: Sprint-133 (close; system verify, `scope-change layers`)
   - Summary: **The scope-change leg reads a backticked prose fragment as a repo path.** `repoPath()` in
     `scripts/lib/check-sprint-by-reference.ts` accepts any span ending in a slash. So a fragment like the one in SPRINT-133's

@@ -3,7 +3,7 @@ sprint: 135
 slug: checks-that-mean-it
 owner: Maintainer
 last_updated: 2026-10-21
-status: active
+status: closed
 gates_signed: G1,G2 @ 0fd8c5fd
 plan_commit: 2016abf7
 update_trigger: sprint execute/close events
@@ -108,5 +108,37 @@ Tier P. The ruling matches what the engine already scans, so no checker verdict 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-sprint-by-reference.ts` | T1, T3 | only a `[derived]`-tagged terminal answers a fired line; a corroborated non-resolving fragment is excused | Med | by-reference fixtures 164/0, seeded revert |
+| `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/` | T1, T3 | SPRINT-119 pre-reaper and full logs; four scope-change cases | Low | the runner itself |
+| `skills/orchestrator/references/night-run.md` | T1 | Part 4 names the `run-complete` header | Low | outside review T-d |
+| `scripts/lib/check-review-depth.sh` | T2 | an out-of-vocabulary consequence class FAILs by name | Med | review-depth fixtures 23 green, SPRINT-121 replay |
+| `evals/run-review-depth-fixtures.sh` · `evals/fixtures/review-depth/` | T2 | three vocab cases | Low | the runner itself |
+| `spec/STANDARD.md` · `spec/CHANGELOG.md` | T4 | §11: only tracked `.md` files cite; spec 0.18.1 PATCH | Low | spec reader 100/100, scoped review |
+| `docs/architecture/overview.md` | coord | names spec v0.18.1 | Low | read back |
+| `docs/epic/EPIC-005-fleet.md` | coord | park note re-wrapped under 400 chars (system verify ruling) | Low | prose-density PASS |
+| `TECH-DEBT.md` | T1–T4 | TD-232 · 233 · 244 · 262 · 263 resolved; TD-264 · 265 filed | Low | read back |
 
 ## Retro
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. One miss: at intake, the epic's own admission line was read
+as admission while ADR-053 still froze the slice (L-244). Codex caught it before `approve`.
+
+**Cost** — coordinator inline plus 13 dispatched agents: 2 Codex reviews at intake (one failed on an unsupported default
+model and was rerun with an explicit one), 4 builder checks, 3 worktree builders, 1 worktree-isolated outside review, and 3
+scoped reviews (one re-run at the adversarial floor). Two QA_FULL runs on the VPS (122 s, 125 s). Four members, 14 DoD, one
+review retry.
+
+**Worked**
+- Codex review before `approve` stopped a frozen epic slice from reaching the backlog, and then tightened the TD sprint.
+- The G2 builder check found T4's unsatisfiable prune box before the build (L-245).
+- Censusing a review finding before spending a retry (ADR-053 §5) sent two should-fix findings to TD with measured reasons.
+- The outside reviewer independently re-ran the seeded revert and matched the builder's result.
+
+**Friction**
+- System verify failed once on the coordinator's own pre-sprint park note, a single 636-char line. A prose-density run on
+  every doc edit outside a member's Layers would have caught it locally.
+- A triage figure ("three medium rows") came from a truncated listing (L-108's seventeenth sighting).
+
+**Pattern candidate**
+- L-244: check ADR-053 per task at intake, not the epic's admission line.
+- L-245: a Done-when that deletes a file must be checked against the citations promote itself writes.
