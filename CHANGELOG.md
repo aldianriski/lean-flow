@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-20
+last_updated: 2026-10-21
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,32 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+
+## v2.13.1 — three checks stop passing what they exist to catch; §11 says only `.md` files cite (2026-10-21)
+
+**PATCH** — ships SPRINT-135 (Checks That Mean It), a fixes-only sprint. Installing the release is enough; no upgrade step.
+The standard moves to spec **0.18.1** (PATCH: wording only, no verdict moves). Restart the session after installing.
+
+### SPRINT-135 — Checks That Mean It (2026-10-21)
+
+**Consumer-facing:**
+- **`/orchestrator`'s unattended-run reference (night-run.md Part 4) names the rollup's entry header:**
+  `### <YYYY-MM-DD> | run-complete | <summary>`, the only header the rollup checker reads. A run that wrote its rollup under
+  another header had to restate it.
+- **Spec 0.18.1, §11:** only tracked `.md` files count as live citations for pruning. A task id in a code comment, a script
+  or a non-markdown fixture never keeps a closed task file, because the id still resolves through git history.
+
+**Maintainer-side:**
+- The close check counts a terminal line as the run's outcome only when it carries the reaper's `[derived]` tag, so a run's
+  own rollup no longer satisfies it (TD-232).
+- The review-depth check fails a consequence line whose class is outside the vocabulary (`governance:med`), naming the token,
+  even when the task has a review record (TD-244).
+- The scope-change check excuses a prose fragment such as `done/` when it resolves to no path and a full path in the same
+  entry contains it; a real directory still fails (TD-263).
+- EPIC-005 (Fleet) is parked under ADR-053's freeze until consumer evidence or a repeated learning admits its machinery.
+- TD-232 · 233 · 244 · 262 · 263 resolved; TD-264 · 265 filed; L-244 · L-245 filed; L-108's seventeenth sighting.
 
 ---
 
