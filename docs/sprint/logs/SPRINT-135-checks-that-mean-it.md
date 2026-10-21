@@ -76,3 +76,17 @@ consequence · T4 · behaviour:low · governance:high
 review · T4 · scoped-reviewer · behaviour:low · governance:high
 Review (scoped): Spec 0 findings, so the adversarial floor re-ran it once: still clean, one nit taken as the retry. Standards
 worst = nit (the overview's stale version), fixed in `e363ff8c`. TASK-438 waits for SPRINT-136's prune (scope-change above).
+
+### 2026-10-21 | progress | T1 (TASK-470) done: the close check counts only a reaper-tagged terminal line
+Built in an isolated worktree on base `9da30d9a` (verified at spawn), cherry-picked as `5ca2c00e`; TD-232 and TD-233 resolved in
+`0f873e52`. `firedUnreaped()` now needs the end-anchored `[derived]` tag that only `reap()` prints. Fixtures: SPRINT-119's log
+before the reaper's entry (must-FAIL `CLOSE-FIRED-UNREAPED`) and the full archived log (must-PASS). Part 4 names the
+`### <YYYY-MM-DD> | run-complete | <summary>` header that check-night-run-rollup.ts reads. Coordinator re-ran on main: the
+close-fired subset is 7 pass, 0 fail.
+Consequential-G bar. The builder seeded the rejected design (a 1-line revert): only `close-fired-then-model-rollup` reddened, 6
+siblings stayed green; each new expect was flipped and reddened; restored, and `git hash-object` = HEAD blob `5bc82655`.
+consequence · T1 · behaviour:material · governance:high
+review · T1 · code-review · behaviour:material · governance:high
+Outside review (worktree-isolated, threat model T-a..T-d, one round). All four hold; it independently re-seeded the revert
+(6 pass, 1 fail, only the claim-bearing case) and restored to the same hash. Worst Spec = nit, worst Standards = nit. Residual,
+accepted by TD-232's own mitigation: the tag is provenance, not a signature, so a model that types `[derived]` would still pass.
