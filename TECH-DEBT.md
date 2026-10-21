@@ -398,7 +398,7 @@ status: current
     The log is append-only, so the only fix is to declare the fragment in Cites, a declaration that names no real file.
   - Fix direction: treat a relative directory fragment as declared when a declared path contains it as a segment run, or
     require a path to resolve at HEAD or in the range. Tier G: a guard change takes the full bar.
-- **TD-262** severity: low | status: open | created: Sprint-133 (close; promote doc-aging, TASK-438)
+- **TD-262** severity: low | status: resolved → TASK-473 (SPRINT-135), §11 says only tracked `.md` files cite; TASK-438 falls to SPRINT-136's prune | created: Sprint-133 (close; promote doc-aging, TASK-438)
   - Summary: **§11's "live citation" counts only `.md` files, and a code citation does not count.** At the SPRINT-133 promote
     TASK-438 had no live `.md` citation, so the rule made it prunable, but `scripts/lib/tick-box.ts`,
     `evals/run-tick-box-fixtures.ts` and `scripts/qa-check.sh` cite it in comments. The owner retained it. The rule and the
