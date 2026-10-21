@@ -1824,6 +1824,43 @@ const CASES: Case[] = [
     mutate: (d) => logEntry(d, "scope-change", "T1 also touches the helper", "**Impact:** T1 edits `src/alpha.ts` and `src/helper.ts`."),
     expect: [],
   },
+  // --- SPRINT-135 T3 (TASK-472, TD-263): a non-resolving `dir/` fragment corroborated in the same entry is prose ---
+  {
+    name: "scope-change-fragment-in-heading-beside-its-full-declared-path (SPRINT-133's real shape: heading names `done/`, body the declared path -- PASS, no Cites workaround)",
+    scope: true,
+    mutate: (d) => {
+      edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `docs/work/done/TASK-901-alpha.md`");
+      logEntry(d, "scope-change", "T1 moves to `done/`", "T1 closes: `docs/work/done/TASK-901-alpha.md` leaves todo.");
+    },
+    expect: [],
+  },
+  {
+    name: "scope-change-real-directory-not-excused-by-a-file-beneath-it (must-FAIL: `docs/` resolves, so only 'resolves' blocks the exemption)",
+    scope: true,
+    mutate: (d) => {
+      edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `docs/work/done/TASK-901-alpha.md`");
+      logEntry(d, "scope-change", "T1 touches `docs/`", "T1 edits `docs/work/done/TASK-901-alpha.md`.");
+    },
+    expect: ["scope-change-outside-layers T1 docs/"],
+  },
+  {
+    name: "scope-change-uncorroborated-fragment (must-FAIL: `zz-orphan/` resolves to nothing and no path in the entry contains it)",
+    scope: true,
+    mutate: (d) => {
+      edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `docs/work/done/TASK-901-alpha.md`");
+      logEntry(d, "scope-change", "T1 touches `zz-orphan/`", "T1 edits `docs/work/done/TASK-901-alpha.md`.");
+    },
+    expect: ["scope-change-outside-layers T1 zz-orphan/"],
+  },
+  {
+    name: "scope-change-prefix-is-not-a-segment-run (must-FAIL: `do/` is non-resolving beside `docs/work/done/...`, a prefix of `done/`, not a run)",
+    scope: true,
+    mutate: (d) => {
+      edit(d, SPRINT, "Layers: `src/alpha.ts`", "Layers: `src/alpha.ts` · `docs/work/done/TASK-901-alpha.md`");
+      logEntry(d, "scope-change", "T1 touches `do/`", "T1 edits `docs/work/done/TASK-901-alpha.md`.");
+    },
+    expect: ["scope-change-outside-layers T1 do/"],
+  },
   {
     name: "scope-change-names-no-Tn-in-its-heading (not attributable, so not checked; a Tn in the body does not count)",
     mutate: (d) => logEntry(d, "scope-change", "a member is dropped", "T1 would have touched `src/zzz.ts`."),

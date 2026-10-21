@@ -237,6 +237,16 @@ function planDecls(sprintText: string): Map<string, { paths: Set<string>; ids: S
 const declares = (decl: Set<string>, p: string): boolean =>
   [...decl].some((d) => d === p || (d.endsWith("/") && p.startsWith(d)) || (!p.includes("/") && d.split("/").pop() === p));
 
+/** TD-263. A trailing-slash fragment `p` that no declaration covers is prose, not an undeclared path, when
+ * (a) it resolves to nothing at `root` (not on disk, no tracked file beneath it -- so a real directory such as
+ * `docs/` is never excused by one declared file under it) and (b) another path in the SAME entry contains it as
+ * a segment run (`done/` in `docs/work/done/TASK-1-x.md`; `do/` is a prefix, not a run). That other path is
+ * judged on its own by the caller's loop. SPRINT-133's heading named `done/` beside the full declared path. */
+function fragmentCorroborated(p: string, entryPaths: Iterable<string>, root: string, tracked: () => string[]): boolean {
+  if (!p.endsWith("/") || existsSync(join(root, p)) || tracked().some((t) => t.startsWith(p))) return false;
+  return [...entryPaths].some((q) => q !== p && ("/" + q).includes("/" + p));
+}
+
 function commitTree(root: string, commit: string): Tree {
   const paths = git(root, ["ls-tree", "-r", "-z", "--name-only", commit, "--", WORK])
     .split("\0")
@@ -453,6 +463,8 @@ function main(argv: string[]) {
     let checked = 0;
     let unattributed = 0;
     const failedBefore = fail;
+    let trackedAll: string[] | null = null; // one `git ls-files` per run, read only if a fragment needs it
+    const tracked = () => (trackedAll ??= git(root, ["ls-files", "-z"]).split("\0").filter(Boolean));
     for (const [, text] of liveSources) {
       for (const entry of scopeChangeEntries(body(text))) {
         const head = entry.split("\n")[0]!;
@@ -466,8 +478,9 @@ function main(argv: string[]) {
         checked++;
         const decl = new Set(tns.flatMap((t) => [...live.get(t)!.paths]));
         const was = new Set(tns.flatMap((t) => [...(frozen.get(t)?.paths ?? [])]));
-        for (const p of new Set(pathsIn(entry))) {
-          if (!declares(decl, p) && !declares(was, p)) {
+        const entryPaths = new Set(pathsIn(entry));
+        for (const p of entryPaths) {
+          if (!declares(decl, p) && !declares(was, p) && !fragmentCorroborated(p, entryPaths, root, tracked)) {
             bad(`scope-change-outside-layers ${tns.join("+")} ${p}`, `"${head.slice(4, 100)}" names ${p}, absent from ${tns.join("/")} Layers:/Cites: in the Plan -- edit Layers: (or Cites: if it is only read)`);
           }
         }
