@@ -30,7 +30,12 @@ roadmap-last.)*
 
 > **Admission (owner ruling 2026-10-07):** EPIC-015 must be closed — every § Closed-when `[x]`, including its re-armed freeze. EPIC-014's clause is dropped: ADR-051 retired it and the Shell engine is never deleted.
 >
-> **Parked (owner ruling 2026-10-21):** EPIC-015 has closed, but every Closed-when needs new governance machinery (an engine pin check and a fleet eval leg), which ADR-053 freezes. None of its five conditions holds: no adopter that is not us has asked for a pin (workdoo records none, and is ours), and no `L-NNN` names version drift. The slice-1 intake draft was reviewed by Codex (RESLICE: freeze admission, a manifest-vs-own-history criterion conflict, the §14 count claim) and not written. **Unblock condition:** consumer evidence from an adopter that is not us, or an `L-NNN` at count ≥2, named in the first member task's `## Why`.
+> **Parked (owner ruling 2026-10-21):** EPIC-015 has closed, but every Closed-when needs new governance machinery
+> (an engine pin check and a fleet eval leg), which ADR-053 freezes. None of its five conditions holds: no adopter
+> that is not us has asked for a pin (workdoo records none, and is ours), and no `L-NNN` names version drift. The
+> slice-1 intake draft was reviewed by Codex (RESLICE: freeze admission, a manifest-vs-own-history criterion
+> conflict, the §14 count claim) and not written. **Unblock condition:** consumer evidence from an adopter that is
+> not us, or an `L-NNN` at count ≥2, named in the first member task's `## Why`.
 
 ## Scope
 

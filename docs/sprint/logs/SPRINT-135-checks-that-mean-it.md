@@ -104,3 +104,10 @@ and could crash on a large repo. Measured before any retry: this repo's output i
 the limit, and `--scope-change` is a maintainer-only leg. Not reachable today, so no retry; routed to TD at close with the nits
 (a leading `./`, case on Windows, and the tracked-beneath clause never being the deciding condition in a fixture). Standards
 worst = nit.
+
+### 2026-10-21 | gate | system verify FAIL (prose-density) → owner ruling: split the line and rerun
+`QA_FULL=1 sh scripts/qa-check.sh` on the VPS against `143c565c` (git bundle, clean detached checkout), 122 s:
+`QA-CHECK: 299 pass, 1 fail`. The one FAIL is `prose-density: docs/epic/EPIC-005-fleet.md has 1 line(s) over 400 chars and no
+baseline row -- lines 33`. That is the coordinator's own pre-sprint park note (`67db3238`), a single 636-char line; no member
+task caused it. owner-ruling: system-verify — split + rerun (popup, 2026-10-21). The blockquote is re-wrapped with its wording
+unchanged, as a bare `sprint(135):` coordinator commit, and the gate is rerun once.
