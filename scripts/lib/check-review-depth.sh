@@ -97,6 +97,14 @@
 #   consequence line records low/low and no review line                -> nothing to verify (correct;
 #                                                                          the cheap path earned it).
 #
+# --- TD-244: a record-shaped line outside the vocabulary --------------------------------------------
+#   consequence · Tn · behaviour:med · ...   (any `consequence · T<digits> · ` line not matching the
+#   strict schema)                       -> FAIL review-depth-consequence-vocab, naming each bad token
+#                                            (`behaviour:med`, `governance:<missing>`, ...). The strict
+#                                            whole-line anchors below silently dropped such a line, so a
+#                                            governance-high task with a misspelled class owed no review.
+#                                            No `review ·` shortcut: a malformed record fails regardless.
+#
 # --- Ruling: the archive-skip half (TD-085's other named gap) -------------------------------------
 # RULED: archived paths stay unread by this checker; recording a review INTO an archived log is what's
 # forbidden, not the skip itself. `*/archive/*` is a shared convention across three checkers
@@ -136,6 +144,50 @@ for lg in "$@"; do
 
   filefail=0
 
+  # TD-244 vocabulary check: a record-shaped line (`consequence · T<digits> · `) that is NOT the strict
+  # schema is a classification that was written down and then silently dropped by the whole-line
+  # anchors below -- a governance-high task with a misspelled class read as owing no review. Own loop,
+  # no `review ·` shortcut (a review line for the task must not excuse a malformed record), runs on the
+  # normalised lines. Prose that mentions the schema uses a literal `Tn`, never `T<digits>`, so it
+  # cannot match the record shape. Each offending token is named; trailing text is named by its first
+  # non-vocabulary token.
+  cnorm=$(awk '{
+    line = $0
+    gsub(/^[ \t]+/, "", line)
+    gsub(/[ \t]+$/, "", line)
+    gsub(/[ \t]+/, " ", line)
+    gsub(/[Bb][Ee][Hh][Aa][Vv][Ii][Oo][Uu][Rr]/, "behaviour", line)
+    gsub(/[Gg][Oo][Vv][Ee][Rr][Nn][Aa][Nn][Cc][Ee]/, "governance", line)
+    print line
+  }' "$lg" 2>/dev/null)
+  while IFS= read -r vline; do
+    [ -n "$vline" ] || continue
+    printf '%s\n' "$vline" | grep -qE '^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$' && continue
+    vtid=$(printf '%s' "$vline" | sed -E 's/^consequence · (T[0-9]+) · .*/\1/')
+    vtoks=$(printf '%s\n' "$vline" | awk '{
+      rest = $0; sub(/^consequence · T[0-9]+ · /, "", rest)
+      n = split(rest, a, " · "); out = ""
+      split("behaviour governance", nm, " ")
+      split("low|material low|high", ok, " ")
+      for (i = 1; i <= 2; i++) {
+        t = (i <= n) ? a[i] : ""
+        split(t, w, " ")
+        if (t == "" || w[1] !~ ("^" nm[i] ":")) tok = nm[i] ":<missing>"
+        else if (w[1] !~ ("^" nm[i] ":(" ok[i] ")$")) tok = w[1]
+        else if (w[2] != "") tok = w[2]
+        else tok = ""
+        if (tok != "") out = out (out == "" ? "" : " ") tok
+      }
+      if (n > 2) { split(a[3], w, " "); out = out (out == "" ? "" : " ") w[1] }
+      print out
+    }')
+    [ -n "$vtoks" ] || vtoks="<malformed>"
+    bad "review-depth-consequence-vocab: $lg $vtid out-of-vocabulary token(s): $vtoks -- a consequence line must read exactly 'consequence · Tn · behaviour:(low|material) · governance:(low|high)'; a misspelled class is silently dropped by the absence check, so the review it owed would never be demanded"
+    filefail=1
+  done <<EOF
+$(printf '%s\n' "$cnorm" | grep -E '^consequence · T[0-9]+ · ')
+EOF
+
   # TD-085 absence check: a task's own rollup line can record `governance:high` /
   # `behaviour:material` while no `review ·` line was ever appended for it -- review owed, and the
   # record is silent rather than clean. Runs for every task with a rollup line, whether or not the
@@ -171,15 +223,6 @@ EOF
   # `governance` field-name casing folded to lower) BEFORE the anchor is applied. The anchor itself
   # does not loosen -- normalisation cannot turn a longer sentence that merely mentions the schema
   # into an exact whole-line match, so prose about the format still cannot trip it (L-108).
-  cnorm=$(awk '{
-    line = $0
-    gsub(/^[ \t]+/, "", line)
-    gsub(/[ \t]+$/, "", line)
-    gsub(/[ \t]+/, " ", line)
-    gsub(/[Bb][Ee][Hh][Aa][Vv][Ii][Oo][Uu][Rr]/, "behaviour", line)
-    gsub(/[Gg][Oo][Vv][Ee][Rr][Nn][Aa][Nn][Cc][Ee]/, "governance", line)
-    print line
-  }' "$lg" 2>/dev/null)
   while IFS= read -r cline; do
     [ -n "$cline" ] || continue
     ctid=$(printf '%s' "$cline" | sed -E 's/^consequence · (T[0-9]+) ·.*/\1/')

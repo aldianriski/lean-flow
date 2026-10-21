@@ -153,6 +153,17 @@ run_case_anywhere "codex-clear-no-review-line-fails" 1 "review-depth-governance-
 # Differs from case 19 in exactly that one line; an external reviewer records as `scoped-reviewer`.
 run_case_anywhere "codex-clear-with-review-line-passes" 0 "examined and cleared on consequence" --   sh "$checker" "$fx/codex-clear-with-review-line-passes/docs/sprint/logs/SPRINT-966-codex-clear.md"
 
+# --- cases 21-23: TD-244 -- a record-shaped consequence line outside the vocabulary -> FAIL, named ----
+# The strict whole-line anchors dropped `behaviour:med` / `governance:med` silently, so a governance-high
+# task with a misspelled class owed no review. The governance case carries a `review ·` line for the same
+# task to prove the vocabulary loop has no review shortcut; the valid-line case is the control.
+run_case_anywhere "vocab-behaviour-med-fails" 1 "behaviour:med" -- \
+  sh "$checker" "$fx/vocab-behaviour-med/docs/sprint/logs/SPRINT-967-vocab-behaviour-med.md"
+run_case_anywhere "vocab-governance-med-fails" 1 "governance:med" -- \
+  sh "$checker" "$fx/vocab-governance-med/docs/sprint/logs/SPRINT-968-vocab-governance-med.md"
+run_case_anywhere "vocab-valid-passes" 0 "nothing to verify" -- \
+  sh "$checker" "$fx/vocab-valid-passes/docs/sprint/logs/SPRINT-969-vocab-valid.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVIEW-DEPTH FIXTURES: all green"; else echo "REVIEW-DEPTH FIXTURES: at least one FAIL"; fi
 exit $fail
