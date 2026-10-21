@@ -19,7 +19,7 @@ status: current
 ## Directory structure
 
 ```
-spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.18.0) · CHANGELOG.md
+spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.18.1) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 packs/            CONTRACT.md · <family>.md · examples/ — workflow packs any agent follows alone (ADR-055)
