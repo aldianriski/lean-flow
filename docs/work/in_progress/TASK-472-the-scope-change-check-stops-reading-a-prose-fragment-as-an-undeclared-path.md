@@ -27,11 +27,11 @@ G2 review-round cap: 2.
 
 ## Done when
 
-- [ ] A backticked fragment that resolves to no repo path counts as declared only when a full path **in the same entry** contains
+- [x] A backticked fragment that resolves to no repo path counts as declared only when a full path **in the same entry** contains ✓ c3019f02: fragmentCorroborated() -- a fragment resolving to no root-relative path is excused only as a segment run of a path in the same entry; case scope-change-fragment-in-heading-beside-its-full-declared-path (SPRINT-133's shape, no Cites workaround) PASSes
       it as a segment run. SPRINT-133's real heading shape passes without the Cites workaround.
-- [ ] Retained must-FAIL controls, each failing by name: a real directory (e.g. `docs/`) is not authorized by one declared file
+- [x] Retained must-FAIL controls, each failing by name: a real directory (e.g. `docs/`) is not authorized by one declared file ✓ must-FAIL cases real-directory-not-excused (docs/), uncorroborated-fragment (zz-orphan/), prefix-is-not-a-segment-run (do/) each FAIL scope-change-outside-layers by name; scope subset 42/0, full runner 164/0
       beneath it; an uncorroborated fragment; a prefix that is not a segment run (e.g. `do/`).
-- [ ] TD-263 marked resolved in `TECH-DEBT.md`.
+- [x] TD-263 marked resolved in `TECH-DEBT.md`. ✓ a8faa7d6: TD-263 status: resolved -> TASK-472 (SPRINT-135)
 
 ## Touches
 
