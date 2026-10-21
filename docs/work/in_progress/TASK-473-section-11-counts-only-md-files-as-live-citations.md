@@ -25,9 +25,9 @@ matches what the engine already scans, so no checker verdict moves.
 
 ## Done when
 
-- [ ] Spec §11's text states that only tracked `.md` files count as live citations for pruning, and why. The spec bump is
+- [x] Spec §11's text states that only tracked `.md` files count as live citations for pruning, and why. The spec bump is ✓ 52a35620 + d8ea3be1: §11 'Only tracked .md files cite' with the git-history reason; spec 0.18.1 PATCH by §15 (engine scans .md only); scoped review + adversarial re-run clean
       classified on its own stream by §15's pass→fail test (PATCH: no verdict moves).
-- [ ] TD-262 marked resolved in `TECH-DEBT.md`.
+- [x] TD-262 marked resolved in `TECH-DEBT.md`. ✓ d8ea3be1: TD-262 status: resolved -> TASK-473 (SPRINT-135)
 
 ## Touches
 

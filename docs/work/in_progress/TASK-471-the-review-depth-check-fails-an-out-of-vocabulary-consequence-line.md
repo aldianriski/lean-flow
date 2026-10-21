@@ -27,12 +27,12 @@ G2 review-round cap: 2.
 
 ## Done when
 
-- [ ] A `consequence · Tn · …` line whose behaviour token is outside `low|material`, or whose governance token is outside
+- [x] A `consequence · Tn · …` line whose behaviour token is outside `low|material`, or whose governance token is outside ✓ ae27947f: review-depth-consequence-vocab FAILs naming the bad token; the vocab loop runs before the review-line shortcut (fixture vocab-governance-med carries a review line and still FAILs)
       `low|high`, FAILs with a finding naming the bad token. The token check runs **before** the existing-review shortcut, so a
       task that also has a review record is still caught.
-- [ ] SPRINT-121's archived log, replayed at a non-archive path, FAILs naming `governance:med` and `behaviour:med`.
-- [ ] A retained must-FAIL fixture per bad axis, plus a valid sibling that stays green.
-- [ ] TD-244 marked resolved in `TECH-DEBT.md`.
+- [x] SPRINT-121's archived log, replayed at a non-archive path, FAILs naming `governance:med` and `behaviour:med`. ✓ SPRINT-121 replayed at a non-archive path: 3 FAILs -- T1, T2 governance:med; T5 behaviour:med
+- [x] A retained must-FAIL fixture per bad axis, plus a valid sibling that stays green. ✓ fixtures vocab-behaviour-med, vocab-governance-med (must-FAIL) + vocab-valid-passes; run-review-depth-fixtures.sh: all green (23 cases)
+- [x] TD-244 marked resolved in `TECH-DEBT.md`. ✓ TD-244 status: resolved -> TASK-471 (SPRINT-135)
 
 ## Touches
 
