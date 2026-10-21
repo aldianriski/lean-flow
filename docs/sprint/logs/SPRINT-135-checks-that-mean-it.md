@@ -111,3 +111,9 @@ worst = nit.
 baseline row -- lines 33`. That is the coordinator's own pre-sprint park note (`67db3238`), a single 636-char line; no member
 task caused it. owner-ruling: system-verify — split + rerun (popup, 2026-10-21). The blockquote is re-wrapped with its wording
 unchanged, as a bare `sprint(135):` coordinator commit, and the gate is rerun once.
+
+### 2026-10-21 | gate | system verify PASS 299/0 (VPS, dd559921)
+system-verify · PASS · QA_FULL=1 sh scripts/qa-check.sh
+Rerun on the VPS against `dd559921` (git bundle, clean detached checkout, 125 s): `QA-CHECK: 299 pass, 0 fail`, exit 0.
+Cross-check of the totals: both runs printed 299 PASS lines. The first run's 300 was 299 + the one FAIL line, because the
+prose-density leg prints nothing for a clean file that has no baseline row, so no leg dropped out between the runs.
