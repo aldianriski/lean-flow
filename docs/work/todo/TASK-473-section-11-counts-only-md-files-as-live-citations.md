@@ -27,7 +27,6 @@ matches what the engine already scans, so no checker verdict moves.
 
 - [ ] Spec §11's text states that only tracked `.md` files count as live citations for pruning, and why. The spec bump is
       classified on its own stream by §15's pass→fail test (PATCH: no verdict moves).
-- [ ] TASK-438 is pruned in its own commit; the code comments citing it keep the id.
 - [ ] TD-262 marked resolved in `TECH-DEBT.md`.
 
 ## Touches
