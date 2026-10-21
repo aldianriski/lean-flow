@@ -90,3 +90,17 @@ review · T1 · code-review · behaviour:material · governance:high
 Outside review (worktree-isolated, threat model T-a..T-d, one round). All four hold; it independently re-seeded the revert
 (6 pass, 1 fail, only the claim-bearing case) and restored to the same hash. Worst Spec = nit, worst Standards = nit. Residual,
 accepted by TD-232's own mitigation: the tag is provenance, not a signature, so a model that types `[derived]` would still pass.
+
+### 2026-10-21 | progress | T3 (TASK-472) done: the scope-change check stops reading a prose fragment as a path
+Built in an isolated worktree on base `9f87eda9` (verified at spawn), cherry-picked as `c3019f02`; TD-263 resolved in `a8faa7d6`.
+`fragmentCorroborated()` excuses a trailing-slash fragment only when it resolves to no root-relative path (not on disk, nothing
+tracked beneath it) and is a segment run of another path in the same entry. Four cases: SPRINT-133's heading shape passes with no
+Cites workaround; `docs/`, `zz-orphan/` and `do/` each FAIL by name. Coordinator re-ran on main: scope subset 42/0, close-fired
+subset 7/0, and this sprint passes `--scope-change` (6/0). The builder's full runner: 164 pass, 0 fail.
+consequence · T3 · behaviour:material · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:high
+Review (scoped, one round): Spec rules met as frozen. Worst = should-fix: `git ls-files -z` runs under the default 1 MB buffer
+and could crash on a large repo. Measured before any retry: this repo's output is 110,306 bytes (1,729 files), about 10% of
+the limit, and `--scope-change` is a maintainer-only leg. Not reachable today, so no retry; routed to TD at close with the nits
+(a leading `./`, case on Windows, and the tracked-beneath clause never being the deciding condition in a fixture). Standards
+worst = nit.
