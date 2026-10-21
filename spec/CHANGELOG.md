@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-21
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,16 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.18.1 — 2026-10-21
+
+**PATCH (§15) — wording only: §11 states that only `.md` files cite. No verdict moves.** §15's test (could a repository that
+conformed now fail?) answers no. The **Live citation** definition already read "any tracked `.md` file", and the engine already
+scans `.md` files only. The new sentence makes the consequence explicit: a task id in a code comment, a script or a non-markdown
+fixture never keeps a closed task file, because the id still resolves through git history. Owner ruling 2026-10-21 (SPRINT-135
+T4; TASK-473 · TD-262).
+
+Rule ids, levels, marks and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
 
 ## 0.18.0 — 2026-10-18
 

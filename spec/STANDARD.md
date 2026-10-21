@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-18
+last_updated: 2026-10-21
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.18.0
+version: 0.18.1
 status: current
 ---
 
@@ -780,8 +780,10 @@ themselves (`docs/work/done/`, `docs/work/cancel/`), every `archive/` directory 
 `docs/epic/archive/`, `docs/research/archive/`), `docs/changelog/`, root `CHANGELOG.md`, `docs/adr/`,
 `docs/LEARNINGS.md`, `TECH-DEBT.md`, the archive indexes `docs/sprint/INDEX.md` and `docs/epic/INDEX.md`, and
 the generated `docs/knowledge-index.md` (matched case-insensitively); a worktree copy under
-`.claude/worktrees/` is not the repository. This defines "live" for task files only; the `docs/research/` row
-keeps its own reading (ADR-020).
+`.claude/worktrees/` is not the repository. **Only `.md` files cite.** A task id in any other tracked file — a
+code comment, a script, a non-markdown fixture — never keeps a closed task file: the id still resolves through
+git history, so the comment keeps working as a pointer after the file is pruned. This defines "live" for task
+files only; the `docs/research/` row keeps its own reading (ADR-020).
 
 **When it runs** — close-time triggers (sprint archive) execute during `close`; a member's move to
 `done/` or `cancel/` is a status change (§2), not retention. Scan-based triggers (TD deletion ·
