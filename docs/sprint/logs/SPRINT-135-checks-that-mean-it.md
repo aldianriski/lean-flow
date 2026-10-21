@@ -53,3 +53,26 @@ whole-word id in any non-history `.md` file as a live citation, and this sprint'
 TASK-438. Both stay live until SPRINT-135 is archived, and T4 must reach the done folder before the sprint can close.
 Impact: T4 keeps the §11 sentence and TD-262. TASK-438 falls due at SPRINT-136's §11 doc-aging, once nothing live cites it. T4
 stays S. owner-ruling: G2 popup, 2026-10-21 — "Move to next promote". G2 re-confirmed in the same popup.
+
+### 2026-10-21 | progress | T2 (TASK-471) done: the review-depth check names an out-of-vocabulary class
+Built in an isolated worktree on base `9da30d9a` (verified at spawn), cherry-picked as `ae27947f`; TD-244 resolved in `bb7f2bae`.
+check-review-depth.sh gains a vocabulary loop on the normalised lines, before both absence loops and with no review-line
+shortcut: a `consequence · T<n> · ` line outside the schema FAILs `review-depth-consequence-vocab` naming each bad token.
+Coordinator re-ran on main: `run-review-depth-fixtures.sh` all green (23 cases, the drift and attended verdicts unchanged); the
+SPRINT-121 replay at a non-archive path FAILs 3 times (T1 and T2 `governance:med`, T5 `behaviour:med`).
+consequence · T2 · behaviour:material · governance:high
+review · T2 · scoped-reviewer · behaviour:material · governance:high
+Review (scoped, one round): Spec worst = should-fix, a bullet-prefixed record line (`- consequence · …`) escapes both loops.
+Census before any retry (ADR-053 §5): 3 bullet-prefixed records in all of history, all archived, against 219 bare ones. The
+documented format is the bare line, so this is silence in the spec, not a violation: no retry, routed to TD at close with the
+CRLF-strip nit and the untested `<missing>` / trailing-text / both-axes branches. Standards worst = nit (tier evidence: T2 is
+other G as signed, so a must-FAIL fixture and one real-artifact run are its bar, both met).
+
+### 2026-10-21 | progress | T4 (TASK-473) done: §11 says only tracked `.md` files cite; spec 0.18.1
+`52a35620` adds the sentence and the PATCH block (no verdict moves: the engine scans `.md` only; the reader reconciles 100/100).
+`e363ff8c` bumps overview's spec version (coordinator, a sibling reference). `d8ea3be1` is the one review retry ("Only tracked
+`.md` files cite") and resolves TD-262. Done inline by the coordinator: one sentence carrying the owner's ruling.
+consequence · T4 · behaviour:low · governance:high
+review · T4 · scoped-reviewer · behaviour:low · governance:high
+Review (scoped): Spec 0 findings, so the adversarial floor re-ran it once: still clean, one nit taken as the retry. Standards
+worst = nit (the overview's stale version), fixed in `e363ff8c`. TASK-438 waits for SPRINT-136's prune (scope-change above).
