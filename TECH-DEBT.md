@@ -512,7 +512,7 @@ status: current
     next id can collide with a workdoo epic, and nothing rejects a duplicate EPIC id (L-143 shape).
   - Mitigation (hypothesis): name the sibling repository in the epic INDEX and make id derivation read both; or reserve a range per repo.
 
-- **TD-244** severity: medium | status: open | created: Sprint-121 (system verify)
+- **TD-244** severity: medium | status: resolved → TASK-471 (SPRINT-135), `review-depth-consequence-vocab` names the bad token | created: Sprint-121 (system verify)
   - Summary: **The review-depth check silently ignores a `consequence ·` line with an out-of-vocabulary class, so the review-owed check
     cannot fire on it.** SPRINT-121 wrote `governance:med` and `behaviour:med` (valid: `low|material` · `low|high`). The strict regex
     skipped those lines without a finding. Only a malformed `self-review` line was caught (`review-depth-unclassified`). A governance-high
