@@ -29,15 +29,15 @@ Tier G, **consequential**: the orchestrator skill names this check as the host's
 
 ## Done when
 
-- [ ] `--close` FAILs `CLOSE-FIRED-UNREAPED` when the last `fired ·` line is followed only by a `terminal ·` line without the
+- [x] `--close` FAILs `CLOSE-FIRED-UNREAPED` when the last `fired ·` line is followed only by a `terminal ·` line without the ✓ 5ca2c00e: firedUnreaped() needs the end-anchored [derived] tag; close-fired subset 7/0 on main (close-fired-then-model-rollup FAILs, close-fired-then-reaped PASSes)
       reaper's trailing `[derived]` tag; a reaper-tagged terminal line still PASSes.
-- [ ] A retained must-FAIL fixture shaped from SPRINT-119's log as it stood **before** the reaper ran (the unfenced `terminal ·`
+- [x] A retained must-FAIL fixture shaped from SPRINT-119's log as it stood **before** the reaper ran (the unfenced `terminal ·` ✓ fixtures log-fired-model-rollup (SPRINT-119 before line 98, must-FAIL) + log-fired-sprint-119-full (must-PASS)
       under `run-complete`), with the full archived log as the passing control.
-- [ ] Full consequential-G bar: each assertion seeded or broken in turn (`cmp` seed vs pristine, parses, assertion count kept,
+- [x] Full consequential-G bar: each assertion seeded or broken in turn (`cmp` seed vs pristine, parses, assertion count kept, ✓ builder seed + break-each + cmp + same-hash restore; isolated outside review re-seeded independently: only the claim-bearing case reddened, T-a..T-d hold
       ±1 line), exactly the claim-bearing cases redden while the sibling stays green, restored under one hash convention; plus a
       worktree-isolated outside review.
-- [ ] The unattended run's Part 4 entry template names the `### <date> | run-complete | …` header the rollup checker reads.
-- [ ] TD-232 and TD-233 marked resolved in `TECH-DEBT.md`.
+- [x] The unattended run's Part 4 entry template names the `### <date> | run-complete | …` header the rollup checker reads. ✓ 5ca2c00e: night-run.md Part 4 names ### <YYYY-MM-DD> | run-complete | <summary>, matching check-night-run-rollup.ts:63
+- [x] TD-232 and TD-233 marked resolved in `TECH-DEBT.md`. ✓ 0f873e52: TD-232 and TD-233 status: resolved -> TASK-470 (SPRINT-135)
 
 ## Touches
 
