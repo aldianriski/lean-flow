@@ -29,3 +29,27 @@ Intake: decomposed 2026-10-21 (`383979a1`) after EPIC-005 was parked. The Codex 
 APPROVE WITH FIXES, and all five fixes were folded in before `approve`. TD-262 was settled by an owner ruling first: only `.md`
 files count as live citations.
 Size check: 4 S, no `L`. All four are `origin: decomposer`. No epic.
+
+### 2026-10-21 | gate | G1 + G2 signed by the owner by popup; four builder checks settled; one Done-when ruling
+G1: fast path. All four members are `origin: decomposer` and their scope is unchanged since `approve` (`383979a1`).
+G2: designs as settled below. T1 and T2 run in parallel, T3 runs after T1 (same checker, D1), and T4 is independent. Review
+cap is 2 rounds each. T1 takes the full consequential-G bar and a worktree-isolated outside review.
+builder-check · T1 · 1 contradictions · 3 questions · fixed: the full SPRINT-119 log is retained as a passing fixture beside the
+truncated must-FAIL one. Facts: no fixture or archived log passes on an untagged terminal line (census of every `terminal ·`
+line in by-reference fixtures and the SPRINT-119/123 logs: all tagged). The tag can still be typed by hand, which is the
+residual TD-232's own mitigation accepts. TD-233's vocabulary half is met (review-scoping.md:167, night-run.md:806).
+builder-check · T2 · 0 contradictions · 2 questions · nothing important left. The drift fixtures keep their verdicts (the new
+check runs on the normalised lines). A malformed line with extra text is named by its first non-vocabulary token.
+builder-check · T3 · 2 contradictions · 3 questions · design aligned to the Done-when: the same-entry full path need not itself
+be declared (it is judged on its own); "resolves" means root-relative, tracked at HEAD or present on disk; each must-FAIL
+control is built so that only its own condition blocks it. A fragment without a trailing slash is not a path shape for
+`repoPath()`, so it is never flagged.
+builder-check · T4 · 1 contradictions · 3 questions · owner ruling: the TASK-438 prune moves out of TASK-473 (scope-change
+below). This sprint's own Plan and promote entry cite TASK-438, so it stays live until SPRINT-135 is archived.
+
+### 2026-10-21 | scope-change | T4 (TASK-473): drop the TASK-438 prune box; the prune falls to SPRINT-136's promote
+What broke: TASK-473's Done-when box "TASK-438 is pruned in its own commit" cannot be ticked inside this sprint. §11 counts a
+whole-word id in any non-history `.md` file as a live citation, and this sprint's own Plan (T4 Layers) and promote entry name
+TASK-438. Both stay live until SPRINT-135 is archived, and T4 must reach the done folder before the sprint can close.
+Impact: T4 keeps the §11 sentence and TD-262. TASK-438 falls due at SPRINT-136's §11 doc-aging, once nothing live cites it. T4
+stays S. owner-ruling: G2 popup, 2026-10-21 — "Move to next promote". G2 re-confirmed in the same popup.
