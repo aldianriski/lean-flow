@@ -1,6 +1,7 @@
 ---
 id: TASK-478
 title: "live epic index rows carry no member-sprint state"
+sprint: SPRINT-137
 priority: P2
 size: S
 risk: low

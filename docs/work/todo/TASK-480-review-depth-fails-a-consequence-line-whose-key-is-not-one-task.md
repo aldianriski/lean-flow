@@ -1,6 +1,7 @@
 ---
 id: TASK-480
 title: "review-depth fails a consequence line whose key is not one task"
+sprint: SPRINT-137
 priority: P2
 size: S
 risk: low

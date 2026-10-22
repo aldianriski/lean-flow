@@ -1,6 +1,7 @@
 ---
 id: TASK-481
 title: "epic-archive: unbalanced annotation, suffix anchor, member list read from frontmatter only"
+sprint: SPRINT-137
 priority: P2
 size: S
 risk: low
