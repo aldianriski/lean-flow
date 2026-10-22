@@ -106,3 +106,11 @@ Built in an isolated worktree on base `40569940`, cherry-picked as `f256c46f`; T
 8 hits, all in the harness, none under `scripts/`. Runner output diff-empty before and after (137 lines each, exit 0, all
 green). The harness re-runs at system verify.
 consequence · T4 · behaviour:low · governance:low
+
+### 2026-10-22 | gate | system verify PASS 301/0 (VPS, f2aa13c9)
+system-verify · PASS · QA_FULL=1 sh scripts/qa-check.sh
+Run on the VPS against `f2aa13c9` (git bundle, clean detached checkout): `QA-CHECK: 301 pass, 0 fail`, exit 0. The legs for every
+touched checker ran and passed: run-epic-archive-fixtures.sh, run-doc-caps-fixtures.sh, run-doc-caps-differential.ts,
+run-verify-reaches-fixtures.sh, run-sprint-family-fixtures.sh (T4's rename, re-run here rather than locally). The total is two
+above SPRINT-135's 299; the two legs were not attributed, because that run's log is gone. No leg FAILed or dropped to silence
+on this run. Plan exhausted: 4 of 4 members in done/, 14 of 14 DoD ticked, PLAN_EXHAUSTED.
