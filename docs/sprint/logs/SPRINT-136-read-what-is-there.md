@@ -62,3 +62,40 @@ What broke: TASK-475's first Done-when box allowed only `soft` or `hard` after t
 today's rows). Impact: the grammar becomes `~`? integer, an optional `soft`, `hard` or `each`, and an optional parenthetical;
 any other cell carrying digits is a named finding. T2 stays S. owner-ruling: G2 popup, 2026-10-22 — "Strict + `each`". G2
 re-confirmed in the same popup.
+
+### 2026-10-22 | progress | T3 (TASK-476) done: verify-reaches reads a TypeScript checker as mechanical
+Built in an isolated worktree on base `40569940` (verified at spawn), cherry-picked as `fe5dc392`; TD-191 resolved in `87227227`.
+`clauseScripts()` takes `.sh` and `.ts`, so `bun <path>.ts` needs no special case; a `.ts` method strips line-start `//`, `/*`,
+`*` comments, and `.sh` keeps its `#` strip. RED: the old checker passed all five new fixtures as judgment ticks. Coordinator
+re-ran on main: harness 27 PASS / 0 FAIL (22 prior cases unchanged). Replay of TD-191's verbatim clause in a non-archived temp
+sprint: NOTE mechanical count 0 → 1.
+consequence · T3 · behaviour:material · governance:low
+review · T3 · scoped-reviewer · behaviour:material · governance:low
+Review (scoped, one round): Spec worst = clear. Standards worst = should-fix: a target in a trailing `//` comment or on an
+unprefixed block-comment line reads as reached, and a `.ts` named as a target beside a `.sh` method becomes a second method.
+Census before any retry (ADR-053 §5): 0 live `Verify:` clauses name a `.ts` method, and the `.sh` strip has the same trailing gap,
+so no retry: filed as TD-266 (`87227227`).
+
+### 2026-10-22 | progress | T1 (TASK-474) done: epic checks read every box form; an empty member list is named at archive
+Built in an isolated worktree on base `40569940`, cherry-picked as `6a51a673`; TD-130 resolved and TD-148 narrowed in `87227227`.
+One shared box predicate serves the open, total and attribution readers (`[X]` closed, indented boxes counted, an indented box
+starts its own attribution block). Direction (a) FAILs an archived epic with no member entry the parser can read. RED: 7 of the
+new inline cases failed on the old code; GREEN 48/0; differential 34/0 (shell twin frozen, divergence documented in the code).
+Real run: exit 0, 17 verdicts byte-identical before and after (9 archived epics, not the 7 the design stated: its census grep
+was truncated by a `head`, and the builder's run covered all 9).
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+Review (scoped, one round): Spec worst = must-fix, TD-130/148 not yet marked, which is the coordinator's write (done in
+`87227227`). Standards worst = nit: a nested ticked sub-box without its own SPRINT-NNN is now flagged, which is the intent.
+
+### 2026-10-22 | progress | T2 (TASK-475) done: doc-caps reads the cap only from the start of the cell
+Built in an isolated worktree on base `40569940`, cherry-picked as `d69ff70f`; TD-062 resolved in `39b7fa34`. `parseCapCell()`
+implements the owner-ruled grammar; one table walk feeds `deriveRows` (unchanged type and rows) and `malformedCapCells`, which
+FAILs `cap-cell-unparsed`. Behavioural RED, run by the coordinator: today's checker reads `see row 3; 120` as cap **3** and
+passes; the fixed one FAILs it by name. `deriveRows(spec/STANDARD.md)` JSON identical before and after (28 rows); tests 63/0;
+differential 26/26; prose-density 10/0; real run exit 0, no `cap-cell-unparsed` line.
+consequence · T2 · behaviour:material · governance:low
+review · T2 · scoped-reviewer · behaviour:material · governance:low
+Review (scoped, one round): Spec worst = should-fix, TD-062 not yet marked (the coordinator's write). Standards worst = nit:
+`~ 100` and `120soft` parse (harmless), and an all-malformed table hits the "derived 0 rows" FAIL first, so it FAILs without
+naming the cell. That is unreachable on the real table (28 valid rows), so no retry and no TD.
