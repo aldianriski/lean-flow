@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-21
+last_updated: 2026-10-22
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,29 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+
+## v2.13.2 — three checkers read input they used to skip or misread (2026-10-22)
+
+**PATCH** — ships SPRINT-136 (Read What Is There), a fixes-only sprint. Installing the release is enough; no upgrade step.
+The standard is unchanged (spec 0.18.1). Restart the session after installing.
+
+### SPRINT-136 — Read What Is There (2026-10-22)
+
+**Consumer-facing:** none. Every change is in lean-flow's own checkers and fixture harnesses.
+
+**Maintainer-side:**
+- The epic-archive check reads `[X]` and indented boxes as boxes in all three of its readers, and FAILs an archived epic
+  with no member sprint it can read (an empty list, a missing key, a block sequence) instead of calling every member
+  closed (TD-130; TD-148 item 1).
+- The doc-caps check reads a cap only from the start of its cell (`~`, an integer, then `soft`, `hard` or `each`, then one
+  parenthetical). A cell whose digits do not lead, such as `see row 3; 120`, FAILs `cap-cell-unparsed` instead of being read
+  as a cap of 3 (TD-062).
+- The verify-reaches check reads a `Verify:` clause naming a `.ts` checker, or `bun <path>.ts`, as mechanical, and strips
+  TypeScript comments before asking whether it reaches its target (TD-191).
+- The sprint-family fixture harness no longer defines `learn_entry()` twice (TD-172).
+- TD-130 · 062 · 191 · 172 resolved; TD-148 narrowed; TD-266 filed; L-246 filed; L-108's eighteenth sighting; L-136's fifth.
 
 ---
 
