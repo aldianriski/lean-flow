@@ -99,3 +99,10 @@ review · T2 · scoped-reviewer · behaviour:material · governance:low
 Review (scoped, one round): Spec worst = should-fix, TD-062 not yet marked (the coordinator's write). Standards worst = nit:
 `~ 100` and `120soft` parse (harmless), and an all-malformed table hits the "derived 0 rows" FAIL first, so it FAILs without
 naming the cell. That is unreachable on the real table (28 valid rows), so no retry and no TD.
+
+### 2026-10-22 | progress | T4 (TASK-477) done: one name per helper in the sprint-family harness
+Built in an isolated worktree on base `40569940`, cherry-picked as `f256c46f`; TD-172 resolved. The second `learn_entry()` is
+`learn_entry_body()` at its definition and three calls; the first and its calls are byte-identical (4+/4-, one file). Census:
+8 hits, all in the harness, none under `scripts/`. Runner output diff-empty before and after (137 lines each, exit 0, all
+green). The harness re-runs at system verify.
+consequence · T4 · behaviour:low · governance:low
