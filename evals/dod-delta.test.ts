@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -1195,4 +1195,62 @@ describe("check-dod-delta CLI -- ruled exemption through a real plan_commit..HEA
       rmSync(dir, { recursive: true, force: true });
     }
   });
+});
+
+// TD-165 / SPRINT-137 T2: the pass-count parse every bun-test harness shares. Bun colours its summary
+// (an ESC/CSI byte precedes the digits), so a parse that does not strip ANSI first silently counts 0 and the
+// min_tests floor reads as a pass (SPRINT-102 T2). Population = every evals/run-*.sh that parses a `bun test`
+// pass count, selected by the assignment/invocation -- never by the strip token, so a harness that loses its
+// strip stays in the population and goes red.
+describe("harness pass-count parse (TD-165)", () => {
+  const EVALS = fileURLToPath(new URL("./", import.meta.url));
+  const harnesses = readdirSync(EVALS).filter((f) => /^run-.*\.sh$/.test(f)).sort();
+  const body = (f: string) => readFileSync(join(EVALS, f), "utf8").split(/\r?\n/);
+  const live = (l: string) => !/^\s*#/.test(l);
+  const PARSE = /^\s*n_pass=\$\(.*\[0-9\]\+ pass'/;
+  // S1: a live line invokes `bun test`.  S2: a live n_pass=$(...) greps a "<N> pass" count (not run-attestation's ^PASS count).
+  const s1 = harnesses.filter((f) => body(f).some((l) => live(l) && /\bbun test\b/.test(l)));
+  const s2 = harnesses.filter((f) => body(f).some((l) => live(l) && PARSE.test(l)));
+  const parseLines = (f: string) => body(f).filter((l) => live(l) && PARSE.test(l)).map((l) => l.trim());
+
+  // Captured 2026-10-22 with bun 1.3.14: `FORCE_COLOR=1 bun test evals/dod-delta.test.ts > f 2>&1`, summary tail kept
+  // (lines carrying " pass", " fail", "Ran N tests"). Bun emits no colour when output is not a TTY on this host unless
+  // FORCE_COLOR is set, so colour was forced to get the shape other hosts emit into `out=$(bun test ... 2>&1)`.
+  const SAMPLE =
+    "\x1b[0m\x1b[32m 97 pass\x1b[0m\n" +
+    "\x1b[0m\x1b[2m 0 fail\x1b[0m\n" +
+    " 181 expect() calls\n" +
+    "Ran 97 tests across 1 file. \x1b[0m\x1b[2m[\x1b[1m12.10s\x1b[0m\x1b[2m]\x1b[0m\n";
+  const TRUE_COUNT = "97";
+  const STRIP = "sed 's/\\x1b\\[[0-9;]*m//g' | ";
+  const evalLine = (line: string) =>
+    spawnSync("sh", ["-c", `${line}\nprintf '%s' "$n_pass"`], {
+      encoding: "utf8",
+      env: { ...process.env, out: SAMPLE, nrr_out: SAMPLE },
+    }).stdout;
+
+  test("sample carries ANSI escapes (cannot silently lose its colour)", () => {
+    expect(SAMPLE).toContain("\x1b[");
+  });
+
+  test("population: both selectors agree, >= 6 harnesses, one parse line each", () => {
+    expect(s1.length).toBeGreaterThanOrEqual(6);
+    expect(s2).toEqual(s1);
+    for (const f of s1) expect(parseLines(f).length, f).toBe(1);
+  });
+
+  for (const f of s1) {
+    test(`${f}: parse line yields the true pass count over the ANSI sample`, () => {
+      const [line] = parseLines(f);
+      expect(line).toContain(STRIP);
+      expect(evalLine(line)).toBe(TRUE_COUNT);
+    });
+
+    test(`${f}: control -- the same parse without the ANSI strip yields the wrong count`, () => {
+      const [line] = parseLines(f);
+      const stripless = line.replace(STRIP, "");
+      expect(evalLine(stripless)).not.toBe(TRUE_COUNT);
+      expect(evalLine(stripless)).toBe("");
+    });
+  }
 });
