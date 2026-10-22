@@ -88,14 +88,20 @@ function sectionLines(content: string, headingPrefix: string): string[] {
   return out;
 }
 
-/** Unticked "- [ ]" lines under "## Closed when". */
+/** The one checkbox predicate (TD-130): a box is "- [ ]", "- [x]" or "- [X]", optionally indented.
+ * Capture 1 is the mark; " " = open, x/X = closed. All three readers share it so they cannot drift. */
+const BOX = /^[ \t]*- \[([ xX])\]/;
+
+/** Unticked "- [ ]" lines (indented or not) under "## Closed when". */
 export function openConditions(content: string): number {
-  return sectionLines(content, "## Closed when").filter((l) => l.startsWith("- [ ]")).length;
+  return sectionLines(content, "## Closed when").filter((l) => BOX.exec(l)?.[1] === " ").length;
 }
 
-/** Every "- [ ]"/"- [x]" line under "## Closed when" (lowercase x only, matching the .sh char class). */
+/** Every "- [ ]"/"- [x]"/"- [X]" line, indented or not, under "## Closed when". This DIVERGES from the
+ * frozen shell twin (check-epic-archive.sh: column-0, lowercase x only) on purpose -- the twin is frozen
+ * and the differential oracle's fixtures contain no such shapes (TASK-474). */
 export function totalConditions(content: string): number {
-  return sectionLines(content, "## Closed when").filter((l) => /^- \[[ x]\]/.test(l)).length;
+  return sectionLines(content, "## Closed when").filter((l) => BOX.test(l)).length;
 }
 
 /** Directory listing filtered by regex, sorted -- glob-equivalent with a graceful missing-dir degrade
@@ -360,13 +366,14 @@ export function tickedUnattributed(content: string, membersStr: string): string[
     }
     if (fence) continue;
     if (/^[ \t]*<!--/.test(line)) continue;
-    if (line.startsWith("- [x]")) {
+    const box = BOX.exec(line)?.[1];
+    if (box === "x" || box === "X") {
       flush();
       open = true;
       blk = line;
       continue;
     }
-    if (line.startsWith("- [ ]")) {
+    if (box === " ") {
       flush();
       continue;
     }
@@ -410,6 +417,10 @@ export function checkEpicArchive(root: string): CheckResult {
     } else if (opn !== 0) {
       bad(
         `epic-archive: ${rel} archived with ${opn} § Closed when condition(s) still open -- an epic whose exit conditions are unmet is unfinished, and archiving it hides that`,
+      );
+    } else if (parseMemberEntries(content).length === 0) {
+      bad(
+        `epic-archive: ${rel} archived with no member sprint this checker can read (an empty list, a missing member_sprints: key, or a block sequence, which this parser does not read) -- §11's member half is vacuously true, so it was NOT verified`,
       );
     } else {
       const om = openMembers(root, content);

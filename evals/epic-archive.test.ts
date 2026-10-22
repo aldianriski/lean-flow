@@ -12,6 +12,9 @@
 // comparison, which is the acceptance proof that this file's expectations still match the live
 // oracle's behaviour.
 import { describe, expect, test } from "bun:test";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkEpicArchive } from "../scripts/lib/check-epic-archive.ts";
 
@@ -89,4 +92,104 @@ describe("check-epic-archive.ts fixtures", () => {
   );
   assertCase("s-unknown-counted", `${FX}/s-unknown-counted`, 0, "every LOCAL member sprint closed -- but 1 member(s) could not be resolved");
   assertCase("s-epic-state-narrowed", `${FXS}/s-foreign-collision`, 0, "rollup current for every LOCAL member -- but 1 member(s) could not be resolved");
+});
+
+// --- TASK-474 (TD-130, TD-148 item 1): box shapes and the empty-member archive hole ---------------
+// Inline fixtures, written to a temp dir at test time -- deliberately NOT new directories under
+// evals/fixtures/, so the frozen Shell/TypeScript differential population does not grow.
+function withRepo(files: Record<string, string>, fn: (root: string) => void): void {
+  const root = mkdtempSync(join(tmpdir(), "epic-archive-t474-"));
+  try {
+    for (const [rel, body] of Object.entries(files)) {
+      const abs = join(root, rel);
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, body);
+    }
+    fn(root);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+const SPRINT_CLOSED = "---\nsprint: 950\nslug: m\nlast_updated: 2026-02-01\nstatus: closed\nclose_commit: abc1234\n---\n\n# SPRINT-950\n";
+const archivedEpic = (members: string, closedWhen: string) =>
+  `---\nepic: 950\nslug: f\nstatus: closed\n${members}---\n\n# EPIC-950\n\n## Closed when\n\n${closedWhen}\n`;
+const activeEpic = (closedWhen: string) =>
+  "---\nepic: 950\nslug: f\nlast_updated: 2026-02-02\nstatus: active\nmember_sprints: [SPRINT-950]\n---\n\n# EPIC-950\n\n" +
+  "## Member sprints\n\n| Sprint | Theme | Status | Contributed |\n|---|---|---|---|\n" +
+  "| [SPRINT-950](x.md) | M | closed 2026-02-01 · `abc1234` | did it |\n\n" +
+  `## Closed when\n\n${closedWhen}\n`;
+
+function runCase(label: string, files: Record<string, string>, wantExit: number, wantFind: string, notFind?: string): void {
+  test(label, () => {
+    withRepo(files, (root) => {
+      const { lines, exitCode } = checkEpicArchive(root);
+      const out = lines.join("\n");
+      expect(exitCode, `exit code -- output:\n${out}`).toBe(wantExit);
+      expect(out).toContain(wantFind);
+      if (notFind !== undefined) expect(out).not.toContain(notFind);
+    });
+  });
+}
+
+describe("check-epic-archive.ts TASK-474 box shapes + empty members", () => {
+  const sprint = { "docs/sprint/archive/SPRINT-950-m.md": SPRINT_CLOSED };
+  const arch = "docs/epic/archive/EPIC-950-f.md";
+  const live = "docs/epic/EPIC-950-f.md";
+
+  // [X] closed + indented open box: the total/open readers must both see it.
+  runCase(
+    "indented-open-box (must-FAIL)",
+    { ...sprint, [arch]: archivedEpic("member_sprints: [SPRINT-950]\n", "- [X] a\n  - [ ] b") },
+    1,
+    "archived with 1 § Closed when condition(s) still open",
+  );
+  runCase(
+    "indented-closed-box (sibling control)",
+    { ...sprint, [arch]: archivedEpic("member_sprints: [SPRINT-950]\n", "- [X] a\n  - [x] b") },
+    0,
+    "archived correctly (2 condition(s)",
+  );
+
+  // Attribution reader: an indented [X] box starts its own block, so its missing attribution is seen.
+  runCase(
+    "indented-X-unattributed (must-FAIL)",
+    { ...sprint, [live]: activeEpic("- [x] ships SPRINT-950\n  - [X] second thing") },
+    1,
+    "has a ticked § Closed-when condition naming no member sprint",
+  );
+  runCase(
+    "indented-X-attributed (sibling control)",
+    { ...sprint, [live]: activeEpic("- [x] ships SPRINT-950\n  - [X] second thing SPRINT-950") },
+    0,
+    "rollup current",
+    "naming no member sprint",
+  );
+  runCase(
+    "indented-open-box-flushes (sibling control)",
+    { ...sprint, [live]: activeEpic("- [x] ships SPRINT-950\n  - [ ] open sub-item mentioning nothing") },
+    0,
+    "rollup current",
+    "naming no member sprint",
+  );
+
+  // Archive branch: no member sprint this checker can read must be named, not vacuously passed.
+  const NAMED = "archived with no member sprint this checker can read";
+  const cw = "- [x] a\n- [x] b";
+  runCase("members-empty-list (must-FAIL)", { [arch]: archivedEpic("member_sprints: []\n", cw) }, 1, NAMED);
+  runCase("members-missing-key (must-FAIL)", { [arch]: archivedEpic("", cw) }, 1, NAMED);
+  runCase("members-empty-block (must-FAIL)", { [arch]: archivedEpic("member_sprints:\n", cw) }, 1, NAMED);
+  runCase(
+    "members-block-sequence (must-FAIL)",
+    { ...sprint, [arch]: archivedEpic("member_sprints:\n  - SPRINT-950\n", cw) },
+    1,
+    NAMED,
+  );
+  runCase(
+    "members-one-closed (sibling control)",
+    { ...sprint, [arch]: archivedEpic("member_sprints: [SPRINT-950]\n", cw) },
+    0,
+    "archived correctly (2 condition(s)",
+    NAMED,
+  );
 });
