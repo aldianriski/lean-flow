@@ -718,7 +718,7 @@ status: current
   - Summary: **The engine's task-file exemption accepts any folder name as a status.** `docs/work/*/TASK-*.md` exempts
     `docs/work/anything/TASK-1.md` from the ownership-header check. Census 2026-09-30: 0 non-status folders.
   - Mitigation (hypothesis): enumerate the six status folders (backlog · todo · in_progress · review · done · cancel), as ADR-045 names them.
-- **TD-204** severity: medium | status: open | created: Sprint-110 (T4, owner ruling; ADR-049)
+- **TD-204** severity: medium | status: resolved → accepted, documented dependency: TASK-372/373 consumer parity (SPRINT-114) and README § Upgrading to 2.x name the `bun` requirement (owner ruling, SPRINT-136 promote re-review, 2026-10-22, owner-signed) | created: Sprint-110 (T4, owner ruling; ADR-049)
   - Summary: **`night-run.sh`'s v2 `reap()` needs `bun` on the adopter's machine.** It reads members through
     `sprint-members-cli.ts`. Without `bun` the rollup adds a `warnings` line, and unreadable members end `HARD_FAILURE`
     (loud, not silent). ADR-049 takes the same requirement for `conformance.sh` at 2.0.0. This row keeps the night-run half
@@ -763,6 +763,7 @@ status: current
     author knows to write the paths out. A fixture for each arm (L-186).
 
 - **TD-194** severity: medium | status: open | created: Sprint-109 (close)
+  - **Narrowed (SPRINT-136 promote re-review, 2026-10-22, owner-signed):** the post-merge half is done (dispatch.md § Review two-tier runs the gate's cross-cutting legs, typecheck included, after each merge). What stays open is the worktree half: a builder or reviewer worktree still cannot resolve `tsc`.
   - Summary: **A dispatched worktree cannot run the `typecheck` leg, and nothing says so.** The builder and reviewer worktrees
     have no `node_modules/.bin/tsc`, so a TS error a task introduces is invisible to every check its builder and reviewer can run.
     At SPRINT-109, T3's `Tree.commit` → optional left a call site on `!== null` (TS2345). Every per-task check and an outside
@@ -832,7 +833,7 @@ status: current
   - Mitigation: match with `.*` (or the literal dash) instead of `.`. It is one line, and Tier G
     discipline applies to the fixture itself.
   - **Re-file fresh if** the gate starts pinning a UTF-8 locale for every harness.
-- **TD-173** severity: medium | status: open | created: Sprint-104
+- **TD-173** severity: medium | status: resolved → `TODO.md` is retired and task-file.md roots id derivation at `docs/work/` only, so neither fixture block is reachable (SPRINT-136 promote re-review, 2026-10-22, owner-signed) | created: Sprint-104
   - Summary: **Two synthetic id blocks exist; only one is documented.** `TODO.md`'s standing-facts
     block tells a deriver to exclude `.claude/worktrees/` and `evals/fixtures/`'s git-tracked
     **900-block** when computing an id maximum (L-170 · L-204). There is a **second** reserved block:
@@ -1180,7 +1181,7 @@ status: current
     overclaims is worse than one whose limits are written down.
   - Re-file fresh if: a retry-firing choke point lands but the ceiling check is not re-pointed at
     it — the guard would then read the old advisory line while a real record existed beside it.
-- **TD-149** severity: medium | status: open | created: Sprint-097
+- **TD-149** severity: medium | status: resolved → TASK-409, the engine prunes `.claude/worktrees` (conformance-engine.sh `-path ./.claude/worktrees -prune`; SPRINT-136 promote re-review, 2026-10-22, owner-signed) | created: Sprint-097
   - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
   - Summary: **`conformance-engine.sh` scans `.claude/worktrees/`, so a repo copy created by an
     isolated dispatch is read as this repository's own content.** During SPRINT-097 T5 the engine
@@ -1259,7 +1260,7 @@ status: current
     whose own field says `(active)` is a finding the checker currently cannot make. Not a defect
     today — the round-3 narrowing means such an epic is reported as unverified rather than as
     verified-closed — but the fact is sitting in the field the parser already reads.
-- **TD-144** severity: medium | status: open | created: Sprint-097
+- **TD-144** severity: medium | status: resolved → the TS port of check-epic-archive handles a foreign-scope member and never verifies it against a same-numbered local Plan (SPRINT-136 promote re-review, 2026-10-22, owner-signed) | created: Sprint-097
   - Summary: **The epic-state checker resolves a member sprint's number against THIS repository's
     archive, so an epic whose members live elsewhere is checked against local sprints that merely
     share a number.** `scripts/lib/check-epic-archive.sh`'s `member_plan()` globs
@@ -1491,7 +1492,7 @@ status: current
   - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
 
-- **TD-125** severity: medium | status: open | created: Sprint-093
+- **TD-125** severity: medium | status: resolved → ADR-040, check-layers-observed.ts reads the sibling `archive/` when building its trusted-sibling list (SPRINT-136 promote re-review, 2026-10-22, owner-signed) | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`
     window is still active — doing so turns the gate red, and the failure appears against the
     *sibling*, not the sprint that moved.** Archiving SPRINT-093 removed `093` from SPRINT-092's
@@ -1574,6 +1575,7 @@ status: current
 
 
 - **TD-099** severity: medium | status: open | created: Sprint-087
+  - **Narrowed (SPRINT-136 promote re-review, 2026-10-22, owner-signed):** a `T<digits>` key with an out-of-vocabulary class now FAILs by name (`review-depth-consequence-vocab`, TASK-471). What stays open is a key that is not `T<digits>` (SPRINT-087's `pre-T1`), which is still skipped silently.
   - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
     it, so a `governance:high` declaration its parser cannot read passes GREEN.** The classification is
     matched with an anchored full-line pattern — `^consequence · T[0-9]+ · behaviour:(low|material) ·
