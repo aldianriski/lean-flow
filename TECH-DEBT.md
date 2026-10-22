@@ -861,7 +861,7 @@ status: current
     and it cannot fall behind a new block.
   - **Re-file fresh if** a third reserved range appears.
 
-- **TD-172** severity: medium | status: open | created: Sprint-103
+- **TD-172** severity: medium | status: resolved → TASK-477 (SPRINT-136 T4, `f256c46f`): the second helper is `learn_entry_body()`, so each name has one definition; runner output identical before and after (137 lines) | created: Sprint-103
   - Summary: **`evals/run-sprint-family-fixtures.sh` defines `learn_entry()` twice** — line 300
     (`<dir> <count> <heading-status>`) and line 512 (`<dir> <heading-tail> [body-lines...]`) — two
     *different* signatures under one name, in a Tier G harness carrying 68 cases.
