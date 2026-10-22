@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import {
   type HeadlessUsage,
   parseHeadlessUsage,
+  parseCapCell,
   parseTokenBudget,
   resolveArgs,
   runCheckDocCaps,
@@ -444,5 +445,42 @@ describe("check-doc-caps.ts -- .cap-dispositions (TASK-384)", () => {
     expect(text).toContain("FAIL  doc-caps: disposition-malformed: soft.md -- a TAB inside the path or kind (ret<TAB>ain)");
     expect(text).not.toContain("disposition-kind-unknown");
     expect(text).not.toContain("retained:");
+  });
+});
+
+describe("check-doc-caps.ts -- Cap cell grammar (TASK-475, TD-062)", () => {
+  test("must-FAIL: a Cap cell whose digits do not lead is named, never read as a cap", () => {
+    const r = run("cap-cell-digits-not-leading", "none.txt");
+    const out = r.lines.join("\n");
+    expect(r.exitCode).toBe(1);
+    expect(out).toContain("FAIL  doc-caps: cap-cell-unparsed:");
+    expect(out).toContain("`other.md`");
+    expect(out).toContain("see row 3; 120");
+  });
+
+  test("sibling control: the `120` row with an under-cap file still PASSes", () => {
+    const out = run("cap-cell-digits-not-leading", "none.txt").lines.join("\n");
+    expect(out).toContain("PASS  cap tiny.md (3 <= 120)");
+    expect(out).not.toContain("FAIL  cap tiny.md");
+  });
+
+  test.each([
+    ["120", { kind: "cap", capn: 120, soft: false }],
+    ["~100", { kind: "cap", capn: 100, soft: true }],
+    ["~ 100", { kind: "cap", capn: 100, soft: true }],
+    ["12 (ADR-015)", { kind: "cap", capn: 12, soft: false }],
+    ["320 soft (ADR-019)", { kind: "cap", capn: 320, soft: true }],
+    ["400 hard", { kind: "cap", capn: 400, soft: false }],
+    ["100 each", { kind: "cap", capn: 100, soft: false }],
+    ["—", { kind: "none" }],
+    ["append-only", { kind: "none" }],
+    ["**no numeric cap** — ruled", { kind: "none" }],
+    ["no hard cap¹", { kind: "none" }],
+    ["see row 3; 120", { kind: "malformed" }],
+    ["no numeric cap (ADR-026)", { kind: "malformed" }],
+    ["120 per file", { kind: "malformed" }],
+    ["120 (a) (b)", { kind: "malformed" }],
+  ] as const)("parseCapCell(%j)", (cell, want) => {
+    expect(parseCapCell(cell)).toEqual(want);
   });
 });

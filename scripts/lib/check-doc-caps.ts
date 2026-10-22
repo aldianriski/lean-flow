@@ -34,18 +34,37 @@ export interface DerivedRow {
   readonly soft: boolean;
 }
 
+export type CapCell =
+  | { readonly kind: "cap"; readonly capn: number; readonly soft: boolean }
+  | { readonly kind: "none" }
+  | { readonly kind: "malformed" };
+
 /**
- * Ports the awk state machine at the top of check-doc-caps.sh: walk §2's three tables, tracking
- * which prefix marker was last seen, and emit one row per table line that states a numeric cap.
- * A row whose Cap cell has an integer but whose File cell yields no path is retained with path=""
- * (a named FAIL downstream), never silently dropped -- the whole point of deriving rather than
- * hand-listing (L-058).
+ * Cap-cell grammar (TASK-475, TD-062), on the trimmed cell: optional `~`, a LEADING integer, optionally one
+ * of `soft`/`hard`/`each`, optionally ONE parenthetical, then end of cell. No ASCII digit anywhere = `none`
+ * (states no cap); a digit that does not match the grammar = `malformed` (named downstream, never guessed --
+ * the old first-digit-anywhere read took `3` out of `see row 3; 120`). Soft detection is unchanged.
  */
-export function deriveRows(guideContent: string): DerivedRow[] {
+export function parseCapCell(cell: string): CapCell {
+  const t = cell.trim();
+  if (!/[0-9]/.test(t)) return { kind: "none" };
+  const m = t.match(/^~?\s*([0-9]+)(?:\s*(?:soft|hard|each))?(?:\s*\([^()]*\))?$/);
+  if (!m) return { kind: "malformed" };
+  return { kind: "cap", capn: parseInt(m[1] as string, 10), soft: t.includes("~") || t.includes("soft") };
+}
+
+interface CapTableRow {
+  readonly pfx: string;
+  readonly file: string;
+  readonly cap: string;
+}
+
+/** The shared §2 table walk: every data row of the three tables with its prefix, File cell and Cap cell. */
+function walkCapTables(guideContent: string): CapTableRow[] {
   const lines = guideContent.split(/\r?\n/);
   let in2 = false;
   let pfx = "";
-  const rows: DerivedRow[] = [];
+  const out: CapTableRow[] = [];
 
   for (const line of lines) {
     if (/^## §2/.test(line)) {
@@ -75,20 +94,42 @@ export function deriveRows(guideContent: string): DerivedRow[] {
       if (/^\|[-| ]*\|$/.test(line)) continue; // separator row
       const parts = line.split("|");
       if (parts.length < 4) continue;
-      const file = parts[1] ?? "";
       // Cap column is the 4th cell (parts[3]) for root/.claude tables, 5th (parts[4]) for the docs
       // tree table (it carries an extra Tier column) -- same offsets check-doc-caps.sh's awk uses.
-      const cap = pfx === "docs/" ? (parts[4] ?? "") : (parts[3] ?? "");
-      const capMatch = cap.match(/[0-9]+/);
-      if (!capMatch) continue; // no integer in the Cap cell -- states no numeric cap
-      const capn = parseInt(capMatch[0], 10);
-      const soft = cap.includes("~") || cap.includes("soft");
-      const pathMatch = file.match(/`[^`]+`/);
-      const path = pathMatch ? pathMatch[0].slice(1, -1) : "";
-      rows.push({ pfx, path, capn, soft });
+      out.push({ pfx, file: parts[1] ?? "", cap: pfx === "docs/" ? (parts[4] ?? "") : (parts[3] ?? "") });
     }
   }
+  return out;
+}
+
+function filePath(file: string): string {
+  const pathMatch = file.match(/`[^`]+`/);
+  return pathMatch ? pathMatch[0].slice(1, -1) : "";
+}
+
+/**
+ * Ports the awk state machine at the top of check-doc-caps.sh: walk §2's three tables and emit one row
+ * per table line whose Cap cell parses as a cap. A row whose Cap cell is a cap but whose File cell yields
+ * no path is retained with path="" (a named FAIL downstream), never silently dropped -- the whole point of
+ * deriving rather than hand-listing (L-058). A malformed Cap cell yields no row here; see malformedCapCells.
+ */
+export function deriveRows(guideContent: string): DerivedRow[] {
+  const rows: DerivedRow[] = [];
+  for (const r of walkCapTables(guideContent)) {
+    const c = parseCapCell(r.cap);
+    if (c.kind !== "cap") continue;
+    rows.push({ pfx: r.pfx, path: filePath(r.file), capn: c.capn, soft: c.soft });
+  }
   return rows;
+}
+
+/** One entry per §2 row whose Cap cell carries a digit but does not match the grammar: `<File cell> -> <Cap cell>`. */
+export function malformedCapCells(guideContent: string): string[] {
+  const out: string[] = [];
+  for (const r of walkCapTables(guideContent)) {
+    if (parseCapCell(r.cap).kind === "malformed") out.push(`${r.file.trim()} -> ${r.cap.trim()}`);
+  }
+  return out;
 }
 
 // --- grandfather list (pure) ------------------------------------------------------------------------
@@ -1017,6 +1058,9 @@ export function runCheckDocCaps(
     };
   }
 
+  const malformed = malformedCapCells(guideContent);
+  for (const m of malformed) lines.push(`FAIL  doc-caps: cap-cell-unparsed: ${m}`);
+
   const gfRaw = loadGrandfatherRaw(gfFilePath);
   const dispositions = loadDispositions(root);
   const rowResult = evaluateRows(rows, { root, gfRaw, dispositions });
@@ -1027,7 +1071,7 @@ export function runCheckDocCaps(
   const skillResult = evaluateSkillCaps(root);
   lines.push(...skillResult.lines);
 
-  let anyFail = rowResult.anyFail || skillResult.anyFail || dispLines.length > 0;
+  let anyFail = rowResult.anyFail || skillResult.anyFail || dispLines.length > 0 || malformed.length > 0;
 
   if (tokenBudgetPath !== undefined) {
     const tb = evaluateTokenBudget(root, tokenBudgetPath);
