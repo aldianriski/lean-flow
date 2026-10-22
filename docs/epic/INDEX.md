@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-20
+last_updated: 2026-10-22
 update_trigger: An epic is opened, or closed and archived (STANDARD §11)
 status: current
 ---
@@ -9,6 +9,12 @@ status: current
 
 One line per epic (newest first). Active epics live here; closed ones move to
 [`archive/`](archive/) once every member sprint has closed and been archived (§11).
+
+**What a row may hold** (TD-163). A live row, one whose epic file is in `docs/epic/` and not `archive/`, holds the epic's
+status (e.g. proposed · parked · closed in place) and a pointer to its file. It never holds a member-sprint pointer or a
+tick count: progress lives in the epic file, and nothing updates this index when a member sprint is promoted or closes. An
+archived row is a record frozen at archive; a "moved to workdoo" row is a record frozen at transfer, so any sprint state it
+names is history, not a live claim.
 
 An **epic** is a multi-sprint outcome with its own decision set — too big for one 400-line Plan,
 outliving any single sprint file. Work that fits in one sprint is a sprint, not an epic; work whose
