@@ -136,8 +136,13 @@ export interface MemberEntry {
 }
 
 export function parseMemberEntries(content: string): MemberEntry[] {
-  const lines = splitLines(content);
-  const line = lines.find((l) => l.startsWith("member_sprints:"));
+  // Frontmatter only (TD-148 item 5): a body or fenced `member_sprints:` line is ignored, and an
+  // unterminated block reads as "no key". INTENTIONAL divergence from the frozen .sh, which scans the
+  // whole file; no differential root has the key outside frontmatter.
+  const all = splitLines(content);
+  const end = all[0] === "---" ? all.indexOf("---", 1) : -1;
+  if (end < 0) return [];
+  const line = all.slice(1, end).find((l) => l.startsWith("member_sprints:"));
   if (line === undefined) return [];
 
   let rest = line.replace(/^member_sprints:[ \t]*/, "");
@@ -154,6 +159,12 @@ export function parseMemberEntries(content: string): MemberEntry[] {
     entry = entry.replace(/^[ \t]+|[ \t]+$/g, "");
     if (entry === "") {
       // Emptied only by stripping parens -- e.g. "[(closed), (active)]" -- is reported, not dropped.
+      out.push({ scope: "unparsed", value: raw.replace(/[ \t]+/g, "_") });
+      continue;
+    }
+    // An unbalanced paren survives the balanced strip above: the annotation is malformed, so the
+    // entry is unparsed, never guessed into a foreign repo (TD-148 item 2; same class as TD-062).
+    if (/[()]/.test(entry)) {
       out.push({ scope: "unparsed", value: raw.replace(/[ \t]+/g, "_") });
       continue;
     }

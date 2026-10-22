@@ -193,3 +193,56 @@ describe("check-epic-archive.ts TASK-474 box shapes + empty members", () => {
     NAMED,
   );
 });
+
+// --- TASK-481 (TD-148 items 2, 4, 5): unbalanced annotation, both suffix anchors, frontmatter-only ---
+// Inline fixtures again (no new directories under evals/fixtures/). INTENTIONAL DIVERGENCE from the
+// frozen scripts/lib/check-epic-archive.sh: the Shell oracle still classes an unbalanced-paren entry as
+// a foreign repo and reads member_sprints: from anywhere in the file; the differential's 32 fixture
+// roots and the real root contain neither shape, so it stays green.
+describe("check-epic-archive.ts TASK-481 unbalanced annotation, suffix anchors, frontmatter-only", () => {
+  const sprint = { "docs/sprint/archive/SPRINT-801-m.md": SPRINT_CLOSED.replace("950", "801") };
+  const liveClosed = (members: string) =>
+    `---\nepic: 950\nslug: f\nstatus: closed\nmember_sprints: ${members}\n---\n\n# EPIC-950\n\n## Closed when\n\n- [x] a\n- [x] b\n`;
+  const live = "docs/epic/EPIC-950-f.md";
+  const STILL = "still sits in docs/epic/";
+  const FOREIGN = "lives outside this repository";
+  const UNPARSED = "has a member_sprints entry naming no sprint number";
+
+  // Item 2: an unbalanced annotation is unparsed, never a foreign repo (no foreign exemption).
+  runCase("unbalanced-open-paren (must-FAIL)", { ...sprint, [live]: liveClosed("[SPRINT-801, (closed 802]") }, 1, STILL, FOREIGN);
+  runCase("unbalanced-open-paren-note", { ...sprint, [live]: liveClosed("[SPRINT-801, (closed 802]") }, 1, UNPARSED, FOREIGN);
+  runCase("unbalanced-close-paren (must-FAIL)", { ...sprint, [live]: liveClosed("[SPRINT-801, closed 802)]") }, 1, STILL, FOREIGN);
+  runCase("balanced-annotation (sibling control)", { ...sprint, [live]: liveClosed("[SPRINT-801, SPRINT-801 (closed)]") }, 1, STILL, UNPARSED);
+  runCase(
+    "real-foreign-entry (sibling control)",
+    { ...sprint, [live]: liveClosed("[SPRINT-801, workdoo SPRINT-802]") },
+    0,
+    "reported rather than required",
+  );
+
+  // Item 4: each suffix anchor decides its own verdict. SPRINT-91 must never match SPRINT-910.
+  const s91 = { "docs/sprint/archive/SPRINT-91-m.md": SPRINT_CLOSED.replace("950", "91") };
+  const epic91 = (row: string, tick: string) =>
+    "---\nepic: 950\nslug: f\nlast_updated: 2026-02-02\nstatus: active\nmember_sprints: [SPRINT-91]\n---\n\n# EPIC-950\n\n" +
+    `## Member sprints\n\n| Sprint | Theme | Status | Contributed |\n|---|---|---|---|\n${row}\n\n## Closed when\n\n- [x] ${tick}\n`;
+  const row = (n: string) => `| [SPRINT-${n}](x.md) | M | closed 2026-02-01 · \`abc1234\` | did it |`;
+  runCase("anchor-member-id-cell (must-FAIL)", { ...s91, [live]: epic91(row("910"), "ships SPRINT-91") }, 1, "SPRINT-91 is closed but has NO row in § Member sprints");
+  runCase("anchor-member-id-cell (sibling control)", { ...s91, [live]: epic91(row("91"), "ships SPRINT-91") }, 0, "rollup current", "NO row");
+  runCase("anchor-closed-when (must-FAIL)", { ...s91, [live]: epic91(row("91"), "ships SPRINT-910") }, 1, "naming no member sprint");
+  runCase("anchor-closed-when (sibling control)", { ...s91, [live]: epic91(row("91"), "ships SPRINT-91") }, 0, "rollup current", "naming no member sprint");
+
+  // Item 5: member_sprints: is read from the frontmatter only.
+  const bodyOnly =
+    "---\nepic: 950\nslug: f\nstatus: closed\n---\n\n# EPIC-950\n\n```yaml\nmember_sprints: [SPRINT-950]\n```\n\n## Closed when\n\n- [x] a\n- [x] b\n";
+  const NAMED = "archived with no member sprint this checker can read";
+  runCase("members-in-body-fence (must-FAIL)", { ...{ "docs/sprint/archive/SPRINT-950-m.md": SPRINT_CLOSED }, ["docs/epic/archive/EPIC-950-f.md"]: bodyOnly }, 1, NAMED);
+  runCase(
+    "members-in-frontmatter (sibling control)",
+    { "docs/sprint/archive/SPRINT-950-m.md": SPRINT_CLOSED, ["docs/epic/archive/EPIC-950-f.md"]: archivedEpic("member_sprints: [SPRINT-950]\n", "- [x] a\n- [x] b") },
+    0,
+    "archived correctly (2 condition(s)",
+    NAMED,
+  );
+  const unterminated = "---\nepic: 950\nstatus: closed\nmember_sprints: [SPRINT-950]\n\n## Closed when\n\n- [x] a\n- [x] b\n";
+  runCase("members-unterminated-frontmatter (must-FAIL)", { "docs/epic/archive/EPIC-950-f.md": unterminated }, 1, NAMED);
+});
