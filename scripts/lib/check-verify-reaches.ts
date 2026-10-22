@@ -158,7 +158,7 @@ function extractClause(line: string): string | null {
 
 function clauseScripts(clause: string): string[] {
   const toks = clause.replace(/`/g, "").split(/\s+/).filter(Boolean);
-  return [...new Set(toks.filter((t) => /^[A-Za-z0-9_./-]+\.sh$/.test(t)))];
+  return [...new Set(toks.filter((t) => /^[A-Za-z0-9_./-]+\.(sh|ts)$/.test(t)))];
 }
 
 /** Path-like tokens anywhere on the WHOLE line (not just the clause), minus the clause's own named
@@ -214,7 +214,11 @@ export function checkClauseLine(root: string, sourceLabel: string, line: string)
     }
     // Comments stripped before matching -- a script's prose can NAME a path its code never touches
     // (L-108), which is exactly the gap this check exists to find.
-    const codeLines = content.split(/\r?\n/).filter((l) => !/^\s*#/.test(l));
+    // A `.ts` method (TD-191) strips line-start `//`, `/*`, `*`, `*/` instead; `.sh` stays `#`-only.
+    const isComment = resolved.endsWith(".ts")
+      ? (l: string) => /^\s*(\/\/|\/\*|\*)/.test(l)
+      : (l: string) => /^\s*#/.test(l);
+    const codeLines = content.split(/\r?\n/).filter((l) => !isComment(l));
 
     for (const tgt of targets) {
       const tgtCore = tgt.replace(/\/+$/, "");

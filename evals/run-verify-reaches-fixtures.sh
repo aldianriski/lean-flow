@@ -194,6 +194,30 @@ run_case_anywhere "member-v2-no-clauses-not-vacuous" 0 "2 member(s), 0 mechanica
 run_case_anywhere "member-resolution-empty-fails" 1 "verify-member-resolution-empty" -- \
   bun "$checker" "$fx/member-resolution-empty/docs/sprint/SPRINT-984-resolution-empty.md"
 
+# =====================================================================================================
+# SPRINT-136 T3 (TASK-476, TD-191): a `.ts` method / `bun <path>.ts` invocation is read as mechanical,
+# with the same EXISTS/REACHES semantics as `.sh`. Comment strip for `.ts` is line-start only
+# (`//`, `/*`, `*`, `*/`); case 23 is the must-FAIL that holds the missing-method half in place.
+# =====================================================================================================
+
+# case 23: an ABSENT `.ts` checker -> FAIL, named (before the fix: read as a judgment tick, silent pass).
+run_case_anywhere "ts-absent-fails" 1 "verify-method-absent" -- \
+  bun "$checker" "$fx/ts-absent/docs/sprint/SPRINT-985-ts-absent.md"
+
+# case 24: a present `.ts` whose CODE examines the claimed target -> PASS, non-zero denominator.
+run_case_anywhere "ts-present-reaches-passes" 0 "1 claimed target(s) confirmed reachable" -- \
+  bun "$checker" "$fx/ts-present-reaches/docs/sprint/SPRINT-986-ts-reaches.md"
+
+# case 25/26: the target appears only in a `//` comment / only on a JSDoc ` * ` line -> FAIL, named.
+run_case_anywhere "ts-present-unreachable-fails" 1 "verify-does-not-reach-target" -- \
+  bun "$checker" "$fx/ts-present-unreachable/docs/sprint/SPRINT-987-ts-unreachable.md"
+run_case_anywhere "ts-present-unreachable-jsdoc-fails" 1 "verify-does-not-reach-target" -- \
+  bun "$checker" "$fx/ts-present-unreachable-jsdoc/docs/sprint/SPRINT-988-ts-unreachable-jsdoc.md"
+
+# case 27: the `bun <path>.ts` form is mechanical -- zero judgment-method clauses, one confirmed target.
+run_case_anywhere "bun-form-mechanical-passes" 0 "1 claimed target(s) confirmed reachable, 0 judgment-method clause(s)" -- \
+  bun "$checker" "$fx/bun-form/docs/sprint/SPRINT-989-bun-form.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "VERIFY-REACHES FIXTURES: all green"; else echo "VERIFY-REACHES FIXTURES: at least one FAIL"; fi
 exit $fail
