@@ -2016,7 +2016,7 @@ status: current
     still wants its own task rather than a rider on a coverage sprint. But the count is now five and
     the growth is not slowing — each new rule family that needs a §2 column adds one.
 
-- **TD-062** severity: medium | status: open | created: Sprint-073
+- **TD-062** severity: medium | status: resolved → TASK-475 (SPRINT-136 T2, `d69ff70f`): `parseCapCell()` reads the cap only as `~`? integer, optional soft/hard/each, optional parenthetical; any other digit-bearing cell FAILs `cap-cell-unparsed` (owner ruling, G2 2026-10-22) | created: Sprint-073
   - Summary: **`check-doc-caps.sh` takes the first digit run anywhere in a §2 `Cap` cell as the cap
     number, so any incidental digits become the limit.** Line 69 is
     `if (match(cap, /[0-9]+/)) capn = substr(cap, RSTART, RLENGTH)`. Found live at SPRINT-073 T2: a cell
