@@ -24,9 +24,9 @@ rename, tier X.
 
 ## Done when
 
-- [ ] One of the two helpers is renamed at its definition and every one of its call sites, so each name has one definition.
-- [ ] The harness's case list and verdicts are unchanged (runner output diffed before and after).
-- [ ] TD-172 marked resolved in `TECH-DEBT.md`.
+- [x] One of the two helpers is renamed at its definition and every one of its call sites, so each name has one definition. ✓ `f256c46f`: second helper renamed learn_entry_body() + its 3 calls; census 8 hits, one file, one definition per name
+- [x] The harness's case list and verdicts are unchanged (runner output diffed before and after). ✓ runner output diff-empty before/after (137 lines each), exit 0, all green
+- [x] TD-172 marked resolved in `TECH-DEBT.md`. ✓ `4d1f89d6`: TD-172 resolved
 
 ## Touches
 
