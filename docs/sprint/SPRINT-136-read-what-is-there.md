@@ -4,7 +4,7 @@ slug: read-what-is-there
 owner: Maintainer
 last_updated: 2026-10-22
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: eb7974d6
 update_trigger: sprint execute/close events
 ---
 
