@@ -573,7 +573,7 @@ assert_finding "s11-backlog-v1-names-the-retirement" "$d" "no docs/work/ store -
 
 
 # --- S11.LEARNINGS: a promoted entry still carrying its body, with no exception recorded ---------
-learn_entry() {  # <dir> <heading-tail> [body-lines...]
+learn_entry_body() {  # <dir> <heading-tail> [body-lines...]
   shift_dir=$1; shift
   printf '\n## L-002 [tags: tooling] [status: promoted]: %s\n' "$1" >> "$shift_dir/docs/LEARNINGS.md"
   shift
@@ -581,7 +581,7 @@ learn_entry() {  # <dir> <heading-tail> [body-lines...]
 }
 
 d="$work/learnings"; mkdir -p "$d"; ledger_repo "$d"
-learn_entry "$d" '**A full record still sitting where a pointer belongs.** Several sentences of evidence that the durable rule is supposed to have replaced, kept verbatim.' '- count: 2' '- promoted: yes → CLAUDE.md § Anti-Patterns'
+learn_entry_body "$d" '**A full record still sitting where a pointer belongs.** Several sentences of evidence that the durable rule is supposed to have replaced, kept verbatim.' '- count: 2' '- promoted: yes → CLAUDE.md § Anti-Patterns'
 assert_finding "s11-promoted-not-collapsed" "$d" "promoted-learning-not-collapsed"
 
 # Control (a): the heading IS the pointer -- the shorter of the two stored forms.
@@ -593,13 +593,13 @@ assert_absent "s11-promoted-not-collapsed-control-form-a" "$d" "promoted-learnin
 # form 39 conformant entries in THIS repository use, and the form the first draft of the check
 # reported as a violation -- which is why it is retained rather than treated as a fixed bug (L-140).
 d="$work/learnings-ok-b"; mkdir -p "$d"; ledger_repo "$d"
-learn_entry "$d" 'a one-line gist of the durable rule.' '- **L-002 → promoted: `CLAUDE.md` § Anti-Patterns** --- the durable rule is the record now (§11 collapse).' '- count: 2'
+learn_entry_body "$d" 'a one-line gist of the durable rule.' '- **L-002 → promoted: `CLAUDE.md` § Anti-Patterns** --- the durable rule is the record now (§11 collapse).' '- count: 2'
 assert_absent "s11-promoted-not-collapsed-control-form-b" "$d" "promoted-learning-not-collapsed"
 
 # Control (c): uncollapsed ON PURPOSE, with §11's exception recorded. The markers are read out of the
 # spec, so this control also pins that the clause and the checker still agree.
 d="$work/learnings-ok-c"; mkdir -p "$d"; ledger_repo "$d"
-learn_entry "$d" '**A full record deliberately held back.** The durable rule has not taken hold yet and the body is the evidence a later entry cites.' '- count: 3' '- promoted: yes → CLAUDE.md § Anti-Patterns' '- **§11 collapse deliberately NOT applied** --- ruled on the record. **Re-collapse when** the recurrence has a durable home.'
+learn_entry_body "$d" '**A full record deliberately held back.** The durable rule has not taken hold yet and the body is the evidence a later entry cites.' '- count: 3' '- promoted: yes → CLAUDE.md § Anti-Patterns' '- **§11 collapse deliberately NOT applied** --- ruled on the record. **Re-collapse when** the recurrence has a durable home.'
 assert_absent "s11-promoted-not-collapsed-control-exception" "$d" "promoted-learning-not-collapsed"
 
 # Control (d): an ACTIVE entry whose narrative quotes the promoted marker. This is the case that was
