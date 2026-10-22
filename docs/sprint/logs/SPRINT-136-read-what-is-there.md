@@ -114,3 +114,13 @@ touched checker ran and passed: run-epic-archive-fixtures.sh, run-doc-caps-fixtu
 run-verify-reaches-fixtures.sh, run-sprint-family-fixtures.sh (T4's rename, re-run here rather than locally). The total is two
 above SPRINT-135's 299; the two legs were not attributed, because that run's log is gone. No leg FAILed or dropped to silence
 on this run. Plan exhausted: 4 of 4 members in done/, 14 of 14 DoD ticked, PLAN_EXHAUSTED.
+
+### 2026-10-22 | close | Read What Is There — 4 of 4 members in done/, 14 of 14 DoD, PLAN_EXHAUSTED
+All four members are in the done folder, and `check-sprint-by-reference --close` passes 10/0. System verify passed 301/0
+(`f2aa13c9`). No handoff entry exists, so nothing needs reconciling.
+Retro buckets, auto-filed:
+- Shipped → root CHANGELOG at the PATCH release (fixes only: TD-130 · 062 · 191 · 172; TD-148 narrowed).
+- Tech debt → TD-266 (verify-reaches `.ts` looseness), filed at T3's review by census. Nothing else surfaced unfiled.
+- Learnings → L-246 (a RED from a missing export is not a behavioural RED) · L-108's eighteenth sighting (7 archived epics
+  from a truncated census; there are 9) · L-136's fifth firing (T2's frozen grammar against the live `100 each` cell).
+- Follow-ups → none.

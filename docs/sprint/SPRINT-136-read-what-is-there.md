@@ -3,7 +3,7 @@ sprint: 136
 slug: read-what-is-there
 owner: Maintainer
 last_updated: 2026-10-22
-status: active
+status: closed
 plan_commit: eb7974d6
 gates_signed: G1,G2 @ 861b428e
 update_trigger: sprint execute/close events
@@ -105,5 +105,33 @@ Tier X: a behaviour-preserving rename.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-epic-archive.ts` | T1 | one box predicate (`[X]`, indented) for all three readers; archive FAILs an unreadable member list | Med | epic-archive tests 48/0, differential 34/0, real run byte-identical |
+| `evals/epic-archive.test.ts` | T1 | inline regression cases (no new fixture dirs, so the frozen differential population does not grow) | Low | the suite itself |
+| `scripts/lib/check-doc-caps.ts` | T2 | the cap is read from the cell's start; digits that do not lead FAIL `cap-cell-unparsed` | Med | doc-caps tests 63/0, `deriveRows` dump identical, differential 26/26 |
+| `evals/doc-caps.test.ts` · `evals/fixtures/doc-caps/cap-cell-digits-not-leading/` | T2 | must-FAIL `see row 3; 120` beside a passing sibling | Low | the suite itself |
+| `scripts/lib/check-verify-reaches.ts` | T3 | `.ts` paths and `bun <path>` are mechanical; a `.ts` method strips TS comments | Med | harness 27/0, TD-191 replay 0 → 1 |
+| `evals/run-verify-reaches-fixtures.sh` · `evals/fixtures/verify-reaches/` | T3 | five `.ts` cases and their stand-in checkers | Low | the runner itself |
+| `evals/run-sprint-family-fixtures.sh` | T4 | the second `learn_entry()` is `learn_entry_body()` | Low | runner output diff-empty |
+| `TECH-DEBT.md` | coord | TD-130 · 062 · 191 · 172 resolved; TD-148 narrowed; TD-266 filed | Low | read back |
 
 ## Retro
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. Two old misses recurred: a figure written into T1's design from
+a truncated listing (L-108, eighteenth sighting), and T2's frozen grammar contradicting the live table it governs (L-136,
+fifth firing). The G2 builder check caught the second before the build.
+
+**Cost** — coordinator inline plus 12 dispatched agents: 1 Codex review at intake, 4 builder checks, 4 worktree builders, and 3
+scoped reviews (T4 took self-review). One QA_FULL run on the VPS. Four members, 14 DoD, no review retry.
+
+**Worked**
+- The builder check settled T2's grammar against all 67 live Cap cells, so the conflict became a one-popup ruling, not a retry.
+- All four builds ran in parallel worktrees with `TECH-DEBT.md` held by the coordinator (D1). Merge-back needed no conflict fix.
+- Censusing T3's should-fix before any retry (ADR-053 §5) sent it to TD-266 with a measured reason.
+- Each real-artifact run diffed before and after, so "verdicts unchanged" was a byte comparison, not a reading.
+
+**Friction**
+- T2's builder RED failed only on a missing import. The coordinator had to run the old checker on the new fixture (L-246).
+- The gate total rose 299 → 301 and the two lines could not be attributed, because SPRINT-135's gate log was not kept.
+
+**Pattern candidate**
+- L-246: a RED from a missing export proves the test is new, not that the old code is wrong.
