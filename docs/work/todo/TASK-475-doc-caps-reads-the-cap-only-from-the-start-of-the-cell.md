@@ -1,6 +1,7 @@
 ---
 id: TASK-475
 title: "doc-caps reads the cap only from the start of the cell"
+sprint: SPRINT-136
 priority: P2
 size: S
 risk: low

@@ -1,6 +1,7 @@
 ---
 id: TASK-476
 title: "verify-reaches recognises a TypeScript checker"
+sprint: SPRINT-136
 priority: P2
 size: S
 risk: low
