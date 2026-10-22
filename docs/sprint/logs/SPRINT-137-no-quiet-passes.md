@@ -29,3 +29,27 @@ every non-`Tn` key, TD-148 items 2, 4, 5, TD-194 left out. The read-only Codex r
 blockers were folded in before `approve`; its fifth (TASK-480 as consequential G) was put to the owner, who kept other G as
 TASK-471 was.
 Size check: 4 S, no `L`. All four are `origin: decomposer`. No epic.
+
+### 2026-10-22 | gate | G1 + G2 signed by the owner by popup; four builder checks settled; preflight ruling
+G1: fast path. All four members are `origin: decomposer` and their scope is unchanged since `approve` (`737af78a`); promote
+added only the `sprint:` stamp. G2: designs as settled below. T2–T4 run in parallel, worktree-isolated (no `Depends-on:`,
+disjoint code files); T1 is a one-paragraph docs edit the coordinator makes inline. Review cap is 2 rounds each.
+Assumptions: A1 confirmed (0 non-`Tn` consequence keys in live logs; the only live log is this one). A2 confirmed (the six
+parse lines are one line once indentation is trimmed and `$nrr_out` is read as `$out`). A3 confirmed by a route that is not
+the checker: all 17 epics carry exactly one `member_sprints:` line, inside frontmatter, with balanced parens; the checker's
+own baseline is 17 verdict lines, exit 0.
+builder-check · T1 · 1 contradictions · 3 questions · design fixed: the read-back targets the INDEX lines, not the epic files;
+"live" is defined by file location (six of the eight are closed in place); transferred workdoo rows are described as records
+frozen at transfer; the paragraph bans only member-sprint state and claims nothing wider.
+builder-check · T2 · 0 contradictions · 2 questions · settled: the stripless control asserts "empty or not the true count"
+(the `|| n_pass=0` fallback is a separate line); the seeded revert is restored before anything is staged.
+builder-check · T3 · 0 contradictions · 5 questions · settled: the selector is `^consequence ·( |$)` over the normalised line,
+the key runs to the next ` · ` or end of line, a bad key gives one finding and skips the token check, the live run covers
+every non-archived log, and the 24-line census is reconciled line by line (never rounded). Changelog wording is the
+coordinator's at release.
+builder-check · T4 · 1 contradictions · 4 questions · design fixed: there is no block-sequence reader to keep (the zero-entry
+FAIL from SPRINT-136 T1 names that case); no or unterminated frontmatter reads as no key; tests add the `)`-only case and
+assert the foreign NOTE is absent; the two anchor sites are named for the seeded removal.
+owner-ruling (G2 popup, 2026-10-22): the dispatch preflight's six `shared-file-unowned` FAILs, all on `TECH-DEBT.md`, are
+accepted under D1. Builders must not touch `TECH-DEBT.md` (diff-checked at merge-back); the coordinator writes each resolution
+serially as a bare `sprint(137):` commit. Base-ref PASS at `8bdbb627`; waves T1=0 T2=0 T3=0 T4=0.
