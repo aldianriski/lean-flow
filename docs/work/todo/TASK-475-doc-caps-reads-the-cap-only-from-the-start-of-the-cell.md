@@ -25,7 +25,7 @@ wrongly (the SPRINT-073 defect). Valid cells today include `120`, `150 soft`, `4
 
 ## Done when
 
-- [ ] The cap is read only from the start of the cell: an optional `~`, a leading integer, then an optional `soft` or `hard`
+- [ ] The cap is read only from the start of the cell: an optional `~`, a leading integer, then an optional `soft`, `hard` or `each`
       and an optional parenthetical. A cell with no digits states no cap, as today. A cell whose digits do not lead is a named
       finding, not a guessed cap. Only real file-table Cap cells are validated.
 - [ ] The real §2 tables yield exactly the rows the checker yields today (diffed before and after), and a retained must-FAIL
