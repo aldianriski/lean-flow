@@ -163,6 +163,16 @@ for lg in "$@"; do
   while IFS= read -r vline; do
     [ -n "$vline" ] || continue
     printf '%s\n' "$vline" | grep -qE '^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$' && continue
+    # TD-099 key check: the record's key (text from the first ` · ` to the next ` · ` or end of line)
+    # must be exactly one `T<digits>`. `pre-T1` / `T2,T3` / `T1-T5` / `close` / empty were dropped by the
+    # T<digits>-only selectors (here and in the absence check, which looks up `review · Tn`). One finding
+    # per line: the key finding only, since the token check below assumes a `T<digits>` key.
+    vkey=$(printf '%s\n' "$vline" | awk '{ rest = $0; sub(/^consequence ·( |$)/, "", rest); i = index(rest, " · "); print (i ? substr(rest, 1, i - 1) : rest) }')
+    if ! printf '%s\n' "$vkey" | grep -qE '^T[0-9]+$'; then
+      bad "review-depth-consequence-vocab: $lg key '$vkey' is not one task id -- a consequence line must read exactly 'consequence · Tn · behaviour:(low|material) · governance:(low|high)'; a record keyed by anything but one T<digits> is invisible to the absence check, so the review it owed would never be demanded"
+      filefail=1
+      continue
+    fi
     vtid=$(printf '%s' "$vline" | sed -E 's/^consequence · (T[0-9]+) · .*/\1/')
     vtoks=$(printf '%s\n' "$vline" | awk '{
       rest = $0; sub(/^consequence · T[0-9]+ · /, "", rest)
@@ -185,7 +195,7 @@ for lg in "$@"; do
     bad "review-depth-consequence-vocab: $lg $vtid out-of-vocabulary token(s): $vtoks -- a consequence line must read exactly 'consequence · Tn · behaviour:(low|material) · governance:(low|high)'; a misspelled class is silently dropped by the absence check, so the review it owed would never be demanded"
     filefail=1
   done <<EOF
-$(printf '%s\n' "$cnorm" | grep -E '^consequence · T[0-9]+ · ')
+$(printf '%s\n' "$cnorm" | grep -E '^consequence ·( |$)')
 EOF
 
   # TD-085 absence check: a task's own rollup line can record `governance:high` /

@@ -164,6 +164,14 @@ run_case_anywhere "vocab-governance-med-fails" 1 "governance:med" -- \
 run_case_anywhere "vocab-valid-passes" 0 "nothing to verify" -- \
   sh "$checker" "$fx/vocab-valid-passes/docs/sprint/logs/SPRINT-969-vocab-valid.md"
 
+# --- cases 24-25: TD-099 -- a consequence line whose key is not exactly one task id -> FAIL, named ---
+# The T<digits>-only selector dropped `pre-T1` / `T2,T3` silently. The second case carries a `review ·`
+# line to prove the key check has no review shortcut; vocab-valid-passes above is the sibling control.
+run_case_anywhere "vocab-key-pre-t1-fails" 1 "key 'pre-T1' is not one task" -- \
+  sh "$checker" "$fx/vocab-key-pre-t1/docs/sprint/logs/SPRINT-970-vocab-key-pre-t1.md"
+run_case_anywhere "vocab-key-multi-with-review-fails" 1 "key 'T2,T3' is not one task" -- \
+  sh "$checker" "$fx/vocab-key-multi-with-review/docs/sprint/logs/SPRINT-971-vocab-key-multi-with-review.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVIEW-DEPTH FIXTURES: all green"; else echo "REVIEW-DEPTH FIXTURES: at least one FAIL"; fi
 exit $fail
