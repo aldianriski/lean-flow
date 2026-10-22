@@ -26,14 +26,14 @@ G2 review-round cap: 2.
 
 ## Done when
 
-- [ ] The total, open-conditions and attribution readers all treat `[X]` as closed and count indented boxes. A retained
+- [x] The total, open-conditions and attribution readers all treat `[X]` as closed and count indented boxes. A retained ✓ `6a51a673`: one BOX predicate in all three readers; inline must-FAIL (`[X]` + indented open) RED on old code, 48/0 green
       fixture pairing a recognised closed box with an indented open box FAILs today's checker and passes the fixed one.
-- [ ] On the archive branch only, an empty `member_sprints:` (an empty list, a missing key, or an empty block sequence) no longer
+- [x] On the archive branch only, an empty `member_sprints:` (an empty list, a missing key, or an empty block sequence) no longer ✓ archive branch FAILs zero readable members (4 shapes tested); real run exit 0, 17 verdicts byte-identical (9 archived, 8 live)
       earns "every member sprint closed"; it is named. The 8 live epic files carrying `[]` keep their current verdicts, and the
       gate's epic-archive leg over the repository stays green (run once, verdicts quoted).
-- [ ] The regression cases live in the TypeScript test suite, not as new fixture directories, so the frozen Shell/TypeScript
+- [x] The regression cases live in the TypeScript test suite, not as new fixture directories, so the frozen Shell/TypeScript ✓ cases inline in evals/epic-archive.test.ts (mkdtemp); no new fixture dir; differential 34/0
       differential population does not grow.
-- [ ] TD-130 marked resolved and TD-148 narrowed to its remaining items in `TECH-DEBT.md`.
+- [x] TD-130 marked resolved and TD-148 narrowed to its remaining items in `TECH-DEBT.md`. ✓ `87227227`: TD-130 resolved, TD-148 narrowed (item 1)
 
 ## Touches
 
