@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-20
+last_updated: 2026-10-22
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-136 — Read What Is There — closed 2026-10-22 · `31682fa` · 4 of 4 members in `done/`, 14/14 DoD (released **2.13.2** PATCH; spec unchanged at 0.18.1) · no epic (EPIC-005 parked under ADR-053) — fixes only: epic checks read `[X]` and indented boxes and name an archived epic with no readable member, doc-caps reads the cap from the cell's start, verify-reaches reads a TypeScript checker as mechanical, one harness helper per name; system verify 301/0 (TD-266 · L-246)
 - SPRINT-135 — Checks That Mean It — closed 2026-10-21 · `93b13ef` · 4 of 4 members in `done/`, 14/14 DoD (released **2.13.1** PATCH; spec 0.18.1) · no epic (EPIC-005 parked under ADR-053) — fixes only: the close check keys on the reaper's tag, the review-depth check names an out-of-vocabulary class, the scope-change check excuses a corroborated prose fragment, §11 says only tracked `.md` files cite; system verify 299/0 after one owner-ruled rerun (L-244 · L-245)
 - SPRINT-134 — Three Families — closed 2026-10-20 · `af753b7` · 3 of 3 members in `done/`, 10/10 DoD (released **2.13.0** MINOR) · **EPIC-007** (last member; the epic closes 6/6) — the verification pack (scoped review + whole check) and the solution-analysis pack (decision research) make three families; the owner ruled the platform gate not satisfied by packs alone; system verify 298/0 after the owed T3 review (L-243)
 - SPRINT-133 — Name the Failing Edit — closed 2026-10-20 · `e01e549` · 1 of 1 member in `done/`, 2/2 DoD (PATCH **2.12.1** to follow via `/release-patch`) · **EPIC-007** (condition-3 follow-up) — `/tdd` and the first pack require an already-covered note to name one concrete edit, checked against the test's inputs, that fails the test; system verify 293/0 after two owner-ruled bookkeeping reruns (TD-263 · L-238 ×2)
