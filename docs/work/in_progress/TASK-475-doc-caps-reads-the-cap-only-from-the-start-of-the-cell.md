@@ -25,12 +25,12 @@ wrongly (the SPRINT-073 defect). Valid cells today include `120`, `150 soft`, `4
 
 ## Done when
 
-- [ ] The cap is read only from the start of the cell: an optional `~`, a leading integer, then an optional `soft`, `hard` or `each`
+- [x] The cap is read only from the start of the cell: an optional `~`, a leading integer, then an optional `soft`, `hard` or `each` ✓ `d69ff70f`: parseCapCell (owner-ruled grammar incl. each); no-digit cell = none; other digit cells FAIL cap-cell-unparsed; only walked file-table rows
       and an optional parenthetical. A cell with no digits states no cap, as today. A cell whose digits do not lead is a named
       finding, not a guessed cap. Only real file-table Cap cells are validated.
-- [ ] The real §2 tables yield exactly the rows the checker yields today (diffed before and after), and a retained must-FAIL
+- [x] The real §2 tables yield exactly the rows the checker yields today (diffed before and after), and a retained must-FAIL ✓ deriveRows(STANDARD.md) JSON cmp identical, 28 rows; `see row 3; 120` FAILs cap-cell-unparsed (old checker read cap 3, PASS); differential 26/26
       cell such as `see row 3; 120` FAILs by name.
-- [ ] TD-062 marked resolved in `TECH-DEBT.md`.
+- [x] TD-062 marked resolved in `TECH-DEBT.md`. ✓ `39b7fa34`: TD-062 resolved
 
 ## Touches
 
