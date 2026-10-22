@@ -974,7 +974,7 @@ status: current
     fixture that varies the **selection** and not only the verdict (L-186), since the bug class here
     is exactly a population/scope property.
 
-- **TD-163** severity: medium | status: open | created: Sprint-101
+- **TD-163** severity: medium | status: resolved → TASK-478 (SPRINT-137 T1, `83882f79`): the epic index header now says a live row holds only status and a pointer, never member-sprint state; archived and moved-to-workdoo rows are frozen records; `update_trigger` unchanged (owner ruling) | created: Sprint-101
   - Summary: **`docs/epic/INDEX.md`'s `update_trigger` cannot fire for the content its rows carry.**
     The trigger reads *"An epic is opened, or closed and archived (STANDARD §11)"* — an epic-lifecycle
     event. But each row's text carries **member-sprint** state, which changes far more often than the
