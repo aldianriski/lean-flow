@@ -391,6 +391,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-266** severity: low | status: open | created: Sprint-136 (T3 review, census-routed)
+  - Summary: **verify-reaches' `.ts` support has two known looseness shapes.** (1) The `.ts` comment strip is line-start only,
+    so a target named only in a trailing `code // path` comment, or on an unprefixed line inside a `/* … */` block, reads as
+    reached (the `.sh` `#` strip has the same trailing-comment gap). (2) Every `.ts` token in a clause is now a method, so a
+    `.ts` file named as a target beside a `.sh` method becomes a second method and leaves the target list (TD-087's two-method
+    limit, extended). Census at SPRINT-136: 0 live `Verify:` clauses name a `.ts` method, so neither shape is reachable today.
+  - Fix direction: strip trailing `//` and track `/* */` block state for `.ts`; treat only the token after `bun`, or the first
+    script token, as the method. Other G.
+
 - **TD-265** severity: low | status: open | created: Sprint-135 (T3 review, census-routed)
   - Summary: **`fragmentCorroborated()` has three untested edges and one size limit.** (1) `git ls-files -z` runs under the
     default 1 MB exec buffer; this repo's output is 110,306 bytes (1,729 files), so a repo roughly ten times larger would crash
@@ -785,7 +794,7 @@ status: current
   - Mitigation (hypothesis): resolve `Cites:` from the sprint doc at that commit via `git show <sha>:<path>`, not from the diff,
     and print a NOTE, not a PASS, when nothing is compared (the TD-042 rule).
 
-- **TD-191** severity: medium | status: open | created: Sprint-109 (T4 outside review)
+- **TD-191** severity: medium | status: resolved → TASK-476 (SPRINT-136 T3, `fe5dc392`): `clauseScripts()` takes `.sh` and `.ts`, so `bun <path>.ts` is mechanical; a `.ts` method strips line-start `//`, `/*`, `*` comments. Residuals → TD-266 | created: Sprint-109 (T4 outside review)
   - Summary: **verify-reaches treats a `.ts` method as a judgment tick.** `clauseScripts()` matches
     `^[A-Za-z0-9_./-]+\.sh$` only, so `*Verify: bun scripts/lib/check-dod-delta.ts …*` yields no script, counts as
     `judgment`, and reports nothing. Every guard SPRINT-109 touched is now `.ts`, so the next author who names one in a
@@ -1207,6 +1216,7 @@ status: current
     wherever file discovery happens, not only in this one sweep.
 
 - **TD-148** severity: medium | status: open | created: Sprint-097
+  - **Narrowed (SPRINT-136 T1, TASK-474, `6a51a673`):** item 1 is done: an archived epic with no member entry the parser can read (an empty list, a missing key, a block sequence) now FAILs by name instead of earning "every member sprint closed". Items 2-6 stay open.
   - Tracker: none — the residue of five review rounds on SPRINT-097 T5, deferred at an explicit acceptance boundary rather than chased. Group with `TASK-338` (the checker-accuracy cluster): same file, same family.
   - Summary: **Seven findings on `check-epic-archive.sh` that the T5 acceptance boundary
     deliberately left open.** T5's boundary was: the original bug fixed, the promised cases working,
@@ -1443,7 +1453,7 @@ status: current
   - **Re-file fresh if** T3's detector is extended past the TS module graph, or a compat harness leg is
     added — the fix belongs with either.
 
-- **TD-130** severity: medium | status: open | created: Sprint-094
+- **TD-130** severity: medium | status: resolved → TASK-474 (SPRINT-136 T1, `6a51a673`): one shared box predicate in check-epic-archive.ts counts `[X]` and indented boxes in the open, total and attribution readers; the frozen shell twin intentionally diverges | created: Sprint-094
   - Summary: **`check-epic-archive.sh`'s checkbox anchors miss `- [X]` (uppercase) and any indented
     checkbox, so a § Closed-when condition written either way is invisible to every direction of the
     checker** — it is not counted as open, not counted as total, and not examined for attribution.
