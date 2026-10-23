@@ -391,6 +391,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-267** severity: low | status: open | created: Sprint-137 (T1 tick, layers-completeness leg)
+  - Summary: **`check-layers-completeness.ts` reads a task id inside a hyphenated token as a task reference.** Its Depends-on
+    completeness scan matches `T<digits>` in a Plan block's DoD/Acceptance prose with no left boundary, so the record key
+    `pre-T1` in SPRINT-137 T3's Acceptance read as "references T1, absent from Depends-on" and FAILed the gate leg. Worked
+    around by rewording the Acceptance (scope-change, owner ruling 2026-10-23). Census at SPRINT-137: that one sighting; the
+    other live Plan prose carries no `<word>-T<digits>` token.
+  - Fix direction: require a non-word, non-hyphen character (or line start) before `T<digits>`, with a must-FAIL fixture
+    holding `pre-T1` beside a real `T1` reference that still FAILs. Other G.
+
 - **TD-266** severity: low | status: open | created: Sprint-136 (T3 review, census-routed)
   - Summary: **verify-reaches' `.ts` support has two known looseness shapes.** (1) The `.ts` comment strip is line-start only,
     so a target named only in a trailing `code // path` comment, or on an unprefixed line inside a `/* … */` block, reads as
