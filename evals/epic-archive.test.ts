@@ -211,7 +211,7 @@ describe("check-epic-archive.ts TASK-481 unbalanced annotation, suffix anchors, 
   // Item 2: an unbalanced annotation is unparsed, never a foreign repo (no foreign exemption).
   runCase("unbalanced-open-paren (must-FAIL)", { ...sprint, [live]: liveClosed("[SPRINT-801, (closed 802]") }, 1, STILL, FOREIGN);
   runCase("unbalanced-open-paren-note", { ...sprint, [live]: liveClosed("[SPRINT-801, (closed 802]") }, 1, UNPARSED, FOREIGN);
-  runCase("unbalanced-close-paren (must-FAIL)", { ...sprint, [live]: liveClosed("[SPRINT-801, closed 802)]") }, 1, STILL, FOREIGN);
+  runCase("unbalanced-close-paren (must-FAIL)", { ...sprint, [live]: liveClosed("[SPRINT-801, closed) 802]") }, 1, STILL, FOREIGN);
   runCase("balanced-annotation (sibling control)", { ...sprint, [live]: liveClosed("[SPRINT-801, SPRINT-801 (closed)]") }, 1, STILL, UNPARSED);
   runCase(
     "real-foreign-entry (sibling control)",
