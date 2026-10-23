@@ -71,7 +71,7 @@ Cites: `TASK-480` · TD-099 · TD-244 · `skills/orchestrator/references/review-
 
 Other G, as TASK-471 on this checker (owner ruling at intake, over Codex's consequential-G reading).
 
-**Acceptance:** `consequence · pre-T1 · …` FAILs by name, and every well-formed record keeps its verdict.
+**Acceptance:** TD-099's `pre-`-keyed consequence line FAILs by name, and every well-formed record keeps its verdict.
 
 ### T4 — Epic-archive reads three more inputs correctly `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/lib/check-epic-archive.ts` · `evals/epic-archive.test.ts` · `TECH-DEBT.md`
