@@ -25,11 +25,11 @@ ruling: remove the content the trigger cannot cover rather than widen the trigge
 template carries an epic-index row shape).
 
 ## Done when
-- [ ] The index's own header states that a live epic's row holds its status and a pointer to the epic file, never a member-sprint
+- [x] The index's own header states that a live epic's row holds its status and a pointer to the epic file, never a member-sprint ✓ `83882f79`: header paragraph "What a row may hold" -- live row = status + pointer, never member-sprint pointer or tick count; archived and moved-to-workdoo rows frozen
       pointer or a tick count, because progress lives in the epic file; an archived row is a record frozen at archive.
-- [ ] Every live row (the epics in `docs/epic/`, not `archive/`) is read back and carries no member-sprint pointer or tick count;
+- [x] Every live row (the epics in `docs/epic/`, not `archive/`) is read back and carries no member-sprint pointer or tick count; ✓ read back the 8 live rows (8 row lines = 8 files in docs/epic/): 0 SPRINT-NNN pointers, 0 "N of M" counts; nothing reworded; update_trigger unchanged
       any that does is reworded to status + pointer. The `update_trigger` is unchanged.
-- [ ] TD-163 marked resolved in `TECH-DEBT.md`.
+- [x] TD-163 marked resolved in `TECH-DEBT.md`. ✓ `43023612`: TD-163 resolved
 
 ## Touches
 `docs/epic/INDEX.md` · `TECH-DEBT.md`
