@@ -79,3 +79,15 @@ main: dod-delta harness PASS at 111 tests; review-depth fixtures all green, live
 consequence · T2 · behaviour:material · governance:low
 consequence · T3 · behaviour:material · governance:low
 consequence · T4 · behaviour:material · governance:low
+
+### 2026-10-23 | progress | T2, T3, T4 reviewed (scoped, one round each); one retry, one nit folded
+review · T2 · scoped-reviewer · behaviour:material · governance:low
+review · T3 · scoped-reviewer · behaviour:material · governance:low
+review · T4 · scoped-reviewer · behaviour:material · governance:low
+T2: Spec clear (the two selectors are independent: a lost strip, a reworded parse or a changed invocation each fails
+loudly). Standards worst = nit: the test-count floor trailed the real count by 8 (inherited), folded as `7fc4e154` (111).
+T3: Spec clear (24 key findings over all archived logs, matched by a second route). Standards worst = nit: the key text in two
+degenerate shapes (`consequence · T1 ·`, an empty slot) reads oddly; the verdict is right, so no retry and no TD.
+T4: Spec worst = should-fix: the `)`-only case did not discriminate (the old code already read it as unparsed). One bounded
+builder retry, `14b0b15c`: input `closed) 802`, which goes red with the guard removed; restored hash matches `ccc138a2`.
+Standards worst = nit (BOM or `--- ` reads as no frontmatter, consistent with `frontmatterValue`). Suite 60/0 after merge.
