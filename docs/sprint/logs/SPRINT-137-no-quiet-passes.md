@@ -62,3 +62,20 @@ the check); the leg would have reddened system verify.
 Impact: T3's Acceptance wording changes, its meaning does not: "TD-099's `pre-`-keyed consequence line FAILs by name, and every
 well-formed record keeps its verdict." No member Done-when changes. The checker defect is filed as TD-267, not fixed here.
 owner-ruling: popup, 2026-10-23 — "Reword, file TD", over adding T1 to T3's Cites (a citation that is not real). G2 stands.
+
+### 2026-10-23 | progress | T1 (TASK-478) done: the epic index says what a live row may hold
+Inline by the coordinator (one header paragraph, no code), `83882f79`; TD-163 resolved in `43023612`. A live row holds its
+status and a pointer, never a member-sprint pointer or a tick count; archived and moved-to-workdoo rows are frozen records;
+`update_trigger` unchanged. Read-back: 8 live row lines for the 8 files in `docs/epic/`, each with 0 sprint pointers and 0
+"N of M" counts, so nothing was reworded. prose-density 28/0, doc-caps exit 0. Self-review: the paragraph claims nothing
+beyond member-sprint state (builder check).
+consequence · T1 · behaviour:low · governance:low
+
+### 2026-10-23 | progress | T2, T3, T4 built in parallel worktrees and merged; review dispatched
+All three verified base `68b34da9` at spawn and touched only their declared files (no `TECH-DEBT.md`, D1 held). Cherry-picked
+as `e4eb536e` (T2), `7f56266e` (T3), `9d762603` (T4); TD rows written by the coordinator in `8f8b5425`. Coordinator re-ran on
+main: dod-delta harness PASS at 111 tests; review-depth fixtures all green, live log green; epic-archive suite 60/0, real run
+`cmp`-identical to the G2 baseline (17 lines, exit 0), fixture harness green.
+consequence · T2 · behaviour:material · governance:low
+consequence · T3 · behaviour:material · governance:low
+consequence · T4 · behaviour:material · governance:low
