@@ -53,3 +53,12 @@ assert the foreign NOTE is absent; the two anchor sites are named for the seeded
 owner-ruling (G2 popup, 2026-10-22): the dispatch preflight's six `shared-file-unowned` FAILs, all on `TECH-DEBT.md`, are
 accepted under D1. Builders must not touch `TECH-DEBT.md` (diff-checked at merge-back); the coordinator writes each resolution
 serially as a bare `sprint(137):` commit. Base-ref PASS at `8bdbb627`; waves T1=0 T2=0 T3=0 T4=0.
+
+### 2026-10-23 | scope-change | T3 (TASK-480): § Plan T3's Acceptance reworded so the layers-completeness leg stops reading `pre-T1` as task T1
+What broke: `check-layers-completeness.ts` FAILs "### T3 Depends-on completeness: DoD/Acceptance references T1, absent from
+Depends-on". T3's frozen Acceptance quotes the record key `pre-T1`, and the checker's task-reference match has no left boundary,
+so it reads the `T1` inside `pre-T1` as a task. T3 neither depends on nor cites T1. Found while ticking T1 (tick-box re-runs
+the check); the leg would have reddened system verify.
+Impact: T3's Acceptance wording changes, its meaning does not: "TD-099's `pre-`-keyed consequence line FAILs by name, and every
+well-formed record keeps its verdict." No member Done-when changes. The checker defect is filed as TD-267, not fixed here.
+owner-ruling: popup, 2026-10-23 — "Reword, file TD", over adding T1 to T3's Cites (a citation that is not real). G2 stands.
