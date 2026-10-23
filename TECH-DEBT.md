@@ -918,6 +918,7 @@ status: current
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
 - **TD-165** severity: medium | status: open | created: Sprint-102
+  - **Narrowed (SPRINT-137 T2, TASK-479, `e4eb536e`):** the pass-count parse is done: a retained test in the dod-delta suite runs every harness's parse line (six, found by two agreeing selectors) over an ANSI-coloured sample, with a stripless control per harness; a seeded strip revert reddened exactly its harness. What stays open is the SPRINT-103 clock-input sighting below.
   - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
     discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that
     left `run-dod-delta-fixtures.sh`, `run-s4-ts-evaluators.sh` and `run-s4-differential-parity.sh`
@@ -1225,6 +1226,7 @@ status: current
     wherever file discovery happens, not only in this one sweep.
 
 - **TD-148** severity: medium | status: open | created: Sprint-097
+  - **Narrowed again (SPRINT-137 T4, TASK-481, `9d762603`):** items 2, 4 and 5 are done in the TypeScript checker: an unbalanced annotation is `unparsed` and earns no foreign exemption, both suffix anchors have a test each (seeded removal reddens only its own), and `member_sprints:` is read from frontmatter only. Items 3, 6 and 7 stay open.
   - **Narrowed (SPRINT-136 T1, TASK-474, `6a51a673`):** item 1 is done: an archived epic with no member entry the parser can read (an empty list, a missing key, a block sequence) now FAILs by name instead of earning "every member sprint closed". Items 2-6 stay open.
   - Tracker: none — the residue of five review rounds on SPRINT-097 T5, deferred at an explicit acceptance boundary rather than chased. Group with `TASK-338` (the checker-accuracy cluster): same file, same family.
   - Summary: **Seven findings on `check-epic-archive.sh` that the T5 acceptance boundary
@@ -1593,7 +1595,7 @@ status: current
     stops being load-bearing.
 
 
-- **TD-099** severity: medium | status: open | created: Sprint-087
+- **TD-099** severity: medium | status: resolved → TASK-480 (SPRINT-137 T3, `7f56266e`): any `consequence ·` line whose key is not exactly one `T<digits>` FAILs `review-depth-consequence-vocab` naming the key, review or not; the 24 archived non-`Tn` records reconcile 24/24 | created: Sprint-087
   - **Narrowed (SPRINT-136 promote re-review, 2026-10-22, owner-signed):** a `T<digits>` key with an out-of-vocabulary class now FAILs by name (`review-depth-consequence-vocab`, TASK-471). What stays open is a key that is not `T<digits>` (SPRINT-087's `pre-T1`), which is still skipped silently.
   - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
     it, so a `governance:high` declaration its parser cannot read passes GREEN.** The classification is
