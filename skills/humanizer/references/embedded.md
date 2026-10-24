@@ -13,14 +13,14 @@ How another skill (or any caller) runs the humanizer pass on prose it generated,
 The caller dispatches ONE sub-agent, with no model override (it inherits the session model). The brief:
 
 1. Names the humanizer skill: invoke it with the Skill tool when available, else read its `SKILL.md` (the sibling skill directory `../humanizer/`, relative to the caller's own skill directory).
-2. Says to read `references/patterns-en.md` in full, plus `references/patterns-id.md` in full when any of the text is Indonesian.
+2. Says to read BOTH catalogs in full, `references/patterns-en.md` and `references/patterns-id.md`, whatever the language of the text: an embedded pass cannot ask, so it never skips one.
 3. Passes the text, the voice sample and the format, and says to apply the voice sample.
 4. Says to return ONLY the final text, nothing else.
 5. Carries this line verbatim: "Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record."
 
 ## Inline fallback
 
-When the runtime cannot start a sub-agent, the caller runs the same pass itself after reading both catalogs in full (Indonesian one only when the text needs it), and prints exactly:
+When the runtime cannot start a sub-agent, the caller runs the same pass itself after reading both catalogs in full, and prints exactly:
 
 `humanizer: ran inline (no sub-agent available)`
 
