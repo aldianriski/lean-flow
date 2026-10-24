@@ -107,3 +107,12 @@ consequence · T6 · behaviour:low · governance:low
 ### 2026-10-24 | progress | correction to the T6 entry: the TD-246 commit is `5d2bca69`
 The T6 entry above cites "`9f1b2a4e`'s parent commit". That is a placeholder that was never substituted (the line wrapped, so
 the replacement missed it), and no such commit exists. TD-246's one-time-cleanup record landed in `5d2bca69`.
+
+### 2026-10-24 | gate | dispatch preflight HALT accepted under D1 (owner ruling); wave 0 = T1 · T4 · T7
+Preflight at `a4ca93ee`: base-ref PASS; waves T1=0 T2=1 T3=2 T4=0 T5=0 T6=0 T7=0. 16 `shared-file-unowned` FAILs. 15 are on
+`TECH-DEBT.md`, `README.md` and `CHANGELOG.md`, which D1 makes coordinator-only. 1 is `.claude/CONTEXT.md` in T1 and T5,
+which the coordinator sequences: T5 dispatches only after T1 merges.
+owner-ruling (popup, 2026-10-24): accepted under D1, as at SPRINT-137. Builders must not touch those three files; each
+merge-back diff is checked against the builder's own declared files. 10 agent worktrees remain (1 locked and 9 dirty, kept at T6),
+against dispatch.md's leftover guardrail (harness #51596, stale-branch reuse on an agent-id collision). Each spawn is
+base-checked against the declared base, which catches a reused stale branch.
