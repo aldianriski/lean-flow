@@ -140,3 +140,26 @@ Exercise 2, file mode, on a copy of `docs/architecture/overview.md` lines 1–24
 *sequences* the loop … never re-implements a stage. À la carte **or** conducted." After: "**/flow** …: it *sequences* the
 loop … and never re-implements a stage. Use the skills à la carte or conducted." YAML, the fence content and every inline-code
 span, extracted from both versions, are `cmp`-identical; four prose lines changed.
+
+### 2026-10-25 | progress | T2 (TASK-490): file-mode exercise, the complete before/after (the entry above abridged it)
+Codex round 2 asked for the full text: every changed prose line, unabridged. `diff ex-before.md ex-file.md` on the copy:
+
+```diff
+10,11c10
+< > **Style:** a Claude Code **plugin** — a skill library + one conductor. Not a layered application;
+< > the "architecture" is how the skills *compose* into a loop. Curated, not copied (ADR-001).
+---
+> > **Style:** a Claude Code **plugin**: a skill library plus one conductor. Its architecture is how the skills *compose* into a loop, since there are no application layers. Curated, not copied (ADR-001).
+15,16c14,15
+< - **Stage-skills are standalone** — each completes its own job when invoked cold. Cross-references between them are routing/handoff *suggestions* (`→ /X`), never requirements (ADR-005).
+< - **`/flow` is the only component allowed to depend on the others** — it *sequences* the loop (calling each standalone skill), never re-implements a stage. À la carte **or** conducted.
+---
+> - **Stage-skills are standalone**: each completes its own job when invoked cold. Cross-references between them are routing/handoff *suggestions* (`→ /X`), never requirements (ADR-005).
+> - **`/flow` is the only component allowed to depend on the others**: it *sequences* the loop (calling each standalone skill) and never re-implements a stage. Use the skills à la carte or conducted.
+```
+
+Facts checked one by one: the plugin is a skill library plus one conductor; no application layers; the architecture is how
+the skills compose into a loop; curated, not copied (ADR-001); stage-skills complete their job invoked cold; cross-refs are
+routing suggestions, never requirements (ADR-005); `/flow` alone depends on the others, sequences the loop by calling each
+skill, never re-implements a stage; use is à la carte or conducted. All present after; nothing added. Changes are §8 dashes
+(three), §1 "Not X; the Y" contrast (one), and §19 bold on "or" (one). Code, YAML and inline code are `cmp`-identical.
