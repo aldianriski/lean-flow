@@ -74,7 +74,7 @@ Each pattern names the English section it shares. The English problem statements
 
 **ID-16 Daftar bernomor "Pertama, Kedua, Ketiga" dan "Kesimpulan".** Watch for: "Pertama, ... Kedua, ... Ketiga, ..." for three points that need no order, and a closing "Kesimpulannya", "Singkatnya", "Secara keseluruhan" paragraph that repeats the text. Same tell as §6 and §2.
 > Sebelum: Pertama, build lebih cepat. Kedua, bundle lebih kecil. Ketiga, deploy lebih mudah. Kesimpulannya, migrasi ini bermanfaat.
-> Sesudah: Migrasi ini mempercepat build, memperkecil bundle, dan mempermudah deploy.
+> Sesudah: Migrasi ini bermanfaat: build lebih cepat, bundle lebih kecil, dan deploy lebih mudah.
 
 **ID-17 Hiasan "yang".** Watch for: "hal yang perlu diperhatikan adalah bahwa", "merupakan sebuah ... yang", "sebuah ... yang sangat". Cut the scaffolding, keep the claim.
 > Sebelum: Hal yang perlu diperhatikan adalah bahwa token merupakan sebuah kredensial yang kedaluwarsa setelah 24 jam.
