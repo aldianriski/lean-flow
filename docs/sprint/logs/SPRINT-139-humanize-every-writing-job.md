@@ -38,3 +38,61 @@ The read-only Codex intake review returned NOT CLEAR, then NOT CLEAR, then CLEAR
 `approve`. TASK-497 was filed at this promote (`38b85834`).
 Size check: 4 S, 4 M, no `L`. Seven members are `origin: decomposer`; TASK-497 is `origin: manual` (filed from governance, not
 grilled at intake). No epic.
+
+### 2026-10-24 | gate | G1 + G2 signed by the owner by popup; eight builder checks settled; four owner rulings
+G1: seven members passed the fast-path (`origin: decomposer`, scope unchanged since `approve`). TASK-497 (`origin: manual`)
+took the full checklist: done when every lean-flow agent brief forbids opening secret files · size S · touches the five brief
+sites below · out of scope: a hook or guard (ADR-053), any permission change. Preflight CLEAR on `873a765f`: no cycle, every
+shared file ordered, eight sequential waves (T1=0 … T8=7). Execution is sequential in the main tree.
+Owner rulings:
+- **R1 (T5 tier):** the embedded sub-agent inherits the session model (not Sonnet). Quality first.
+- **R2 (T5 failure):** if the pass fails, the caller writes the original text and prints one warning line naming the failure.
+  A humanizer problem never blocks a doc, commit or release.
+- **R3 (T5 voice sample):** in embedded mode the host template or existing doc is the voice sample, so `—`, `→` and bold
+  labels survive; standalone mode keeps upstream force. Signed with the design.
+- **R4 (T8):** the MINOR (2.15.0) is bumped by hand, since release-patch is PATCH-only. The consumer proof loads a zip of the
+  release commit with `--plugin-dir`, in a headless session in a throwaway repo; the owner's installed plugin is untouched.
+  TASK-496's fourth box is reworded under the scope-change below.
+Defaults signed with the design: T3's builder writes the AI-styled Indonesian sample and marks doubtful terms for the owner;
+T4 translates on any explicit request naming a target language, translates only the other-language spans of mixed text, and
+gives text already in the target language a clean pass only.
+Settled facts (coordinator, from the builder checks):
+- CHANGELOG has no `[Unreleased]` section. T1 opens `## [Unreleased]` at the top, T2–T7 add to it, and T8 turns it into the
+  `v2.15.0` block in house format. The 2.13.x rotation happens at close, as at v2.14.0.
+- Upstream is pinned to `8c307f367c91bd974002f10f2be2965d642c13df`. A failed fetch stops T2; no fallback copy is used (D4).
+  `patterns-en.md` keeps upstream text verbatim for every kept pattern. An `adapt` row adds a separate lean-flow note beside
+  the pattern and never edits upstream text. The 26-row review is shown to the owner before the catalog commit.
+- T2's eval edit is the array at `evals/run-layout-fixtures.ts:358`, plus the comment at :349.
+- T3's section tags match upstream numbering (§1 contrast · §2 closers · §3 sayings · §4 run-up · §12 words · §13 inflation
+  · §22 chatbot residue), read from the pinned SKILL.md.
+- T6's handoff has no template, so its voice sample is the skill's "What goes in" outline. release-patch's pass covers the
+  changelog-only path as well as step 4, and never changes version lines, headings or bump lines.
+- T7: only `skills/diagnose/SKILL.md` composes a PR message, so the PR-body exercise is diagnose's wired step. The
+  lean-doc-generator close-commit exercise runs in a throwaway clone (promote and close a one-task sprint). Commit prefixes and
+  `Co-Authored-By` trailers stay verbatim. Census sites outside `Layers:` go through a scope-change at build.
+- Codex gauntlet: the coordinator runs it after each builder commit (D3). Builders return their log text and before/after
+  evidence in their report; the coordinator writes the log.
+builder-check · T1 · 4 contradictions · 4 questions · census finalised at G2 (five sites, two selectors reconciled, below); per-site grep replaces "five hits"; census copied into TASK-497; L-247 pointer names the sites
+builder-check · T2 · 2 contradictions · 2 questions · eval array :358 named; "8 sites" count dropped; review-before-commit order and verbatim-plus-note rule set; pinned sha + stop-on-fetch-failure
+builder-check · T3 · 2 contradictions · 5 questions · four italics exclusions copied from Done when; tags checked against upstream; detection = model judgment, Indonesian or mixed reads both catalogs; sample + doubtful terms by default (signed)
+builder-check · T4 · 3 contradictions · 4 questions · EN→ID runs the term policy and the ID catalog on output, ID→EN the EN catalog; triggers and mixed-text rule by default (signed); log owned by coordinator
+builder-check · T5 · 4 contradictions · 6 questions · tier R1, failure R2; verify adds a structure + house-style diff of the doc, same doc on both paths; CONTEXT note goes in humanizer's roster row; `--disallowedTools` confirmed in the CLI
+builder-check · T6 · 4 contradictions · 4 questions · voice sample = "What goes in" outline; pass covers the changelog-only path; structure untouched; dry run in a throwaway clone with a code diff
+builder-check · T7 · 3 contradictions · 4 questions · diagnose is the PR-body site (scope-change at build); close-commit exercise in a throwaway clone; orchestrator SKILL.md stays net-zero lines; trailers verbatim
+builder-check · T8 · 2 contradictions · 6 questions · `[Unreleased]` opened by T1; rotation at close; R4; README/CONTEXT re-check is a read, and drift goes through a scope-change
+
+### 2026-10-24 | scope-change | T1 (TASK-497): `Layers:` gain the three brief sites the G2 census found
+What broke: the census (selector A, wording grep for sub-agent / dispatch / reviewer / reader / Explore / advisor; selector
+B, a read of each skill's spawn steps) finds five brief sites, but T1's `Layers:` named two. The five are
+`skills/orchestrator/references/dispatch.md`, `skills/orchestrator/references/review-scoping.md`,
+`skills/orchestrator/references/builder-check.md`, `skills/task-decomposer/SKILL.md` (recon) and
+`skills/council/references/prompts.md` (research, advisor, reviewer, chairman). Excluded, with reason: `night-run.md` and
+`night-run-checks.md` dispatch through `dispatch.md`'s briefs and add none of their own; orchestrator `SKILL.md` names the
+routing, not a brief; refactor-advisor's "Explore" is a phase, not an agent; diagnose, flow, prototype and prime spawn no
+briefed agent. Impact: three paths are added to T1's `Layers:`; the Done when is unchanged. G2 re-confirmed in the gate entry above.
+
+### 2026-10-24 | scope-change | T8 (TASK-496): box 4 rewords the push stop for a hand-bumped MINOR
+What broke: TASK-496's fourth box reads "release-patch stops before push; the owner pushes", but release-patch is PATCH-only
+and this release is a MINOR, bumped by hand as at v2.14.0. Owner ruling R4: the box becomes "The MINOR is bumped by hand
+(release-patch is PATCH-only); nothing is pushed; the owner pushes." Impact: one box reworded; the outcome (no push by the
+agent) is unchanged.
