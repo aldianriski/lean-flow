@@ -647,7 +647,7 @@ status: current
   - done-when: a checked ceiling on tracked path length (or slug length), with headroom stated against MAX_PATH, plus a must-FAIL fixture;
     or a documented `core.longpaths` prerequisite in the README install section.
 
-- **TD-222** severity: low | status: open | created: Sprint-114 (close retro, T5 effectiveness probe R1)
+- **TD-222** severity: low | status: resolved → TASK-486 (SPRINT-138 T5, `e90f1ec2`): CONTEXT § Task entry shape and CLAUDE.md.template § Session Workflow each name `docs/work/backlog/`; R1 re-run scored a literal hit in both (lean-flow files, and a template-only scaffold) | created: Sprint-114 (close retro, T5 effectiveness probe R1)
   - Summary: **No always-loaded doc says where a NEW task lands.** The "after" measurement's probe R1 ("where does a new TASK get written
     today?", key `docs/work/backlog/`) was a retrieval miss. `.claude/CONTEXT.md` § Task entry shape gives `docs/work/<status>/` and § roster
     names `/triage`'s `docs/work/backlog/`, but nothing joins the two into "a new task is born in `backlog/`". The answer is reachable only by
