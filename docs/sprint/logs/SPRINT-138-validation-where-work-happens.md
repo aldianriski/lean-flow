@@ -159,3 +159,14 @@ consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped-reviewer · behaviour:material · governance:low
 Round 1 (scoped sonnet): Spec worst = should-fix (rc-file and 255 gaps, shared fixed paths, no timeouts); Standards nit. One bounded
 retry (`69d33787`). Round 2: Spec none, Standards nit; the leftover nits are filed as TD-268 (review cap, not a third round).
+
+### 2026-10-24 | progress | T5 (TASK-486) built and merged; Codex CLEAR at round 1; both R1 probes score a literal hit
+Builder in a worktree (base `06765938` verified at spawn) touched only its two files. Cherry-picked as `e90f1ec2`. It extended
+CONTEXT's § Task entry shape sentence in place (150/150 lines kept) and added one host-generic line to CLAUDE.md.template's
+§ Session Workflow (not a [CUSTOMIZE] section). Probe R1, by the EPIC-017 method: fresh Haiku readers with FILES READ lines. Over
+lean-flow's CLAUDE.md + CONTEXT.md: `docs/work/backlog/`, quoting the new CONTEXT line. Over a verbatim template copy as `.claude/CLAUDE.md`
+(what `init` writes): `docs/work/backlog/`, quoting the new template line. Both literal hits. TD-222 resolved (`ade27483`).
+The CHANGELOG line (box 3) is written with the sprint's other shipped changes. Post-merge legs on `main` are all green.
+consequence · T5 · behaviour:low · governance:high
+review · T5 · codex · behaviour:low · governance:high
+Codex round 1: CLEAR on all four items (answers R1 unambiguously; host-generic; Session Workflow is the right section; 150 kept).
