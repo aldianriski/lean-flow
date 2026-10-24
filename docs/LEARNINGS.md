@@ -71,6 +71,13 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-247 [tags: edit-safety] [status: active]: **A read-only agent brief must name secret files as off-limits: "read-only" was read as "may read anything", and two agents opened `.env` files.** SPRINT-138's recon agent opened lean-flow's root `.env` to report its keys (it recorded no values), and T7's research builder opened workdoo's `.env` to read a version pin. Both briefs said read-only and neither forbade secret files; the pin was available from a host record by another route. Briefs from then on said "never its `.env` or any secret file", and no further opening occurred.
+- seen: 2026-10-24 (SPRINT-138 intake recon; SPRINT-138 T7 build)
+- count: 2
+- promoted: no
+- related: L-239 (a "static" reviewer run from inside the repo is not static) · TD-270
+
+---
 ## L-246 [tags: tooling] [status: active]: **A RED that fails because the new function does not exist yet proves the test is new, not that the old code is wrong, so run the old code on the new input.** SPRINT-136 T2's builder reported RED for its doc-caps cases, but every case failed on importing `parseCapCell`, which the old module does not export. That says nothing about the defect TD-062 names. The coordinator then ran the unchanged checker over the new fixture: it read `see row 3; 120` as a cap of 3 and passed it, which is the behavioural RED the must-FAIL bar asks for. T1 and T3 showed their REDs through the old code's own entry points; only a test that imports a new export can produce the empty kind.
 - seen: 2026-10-22 (SPRINT-136 T2, coordinator re-run)
 - count: 1
@@ -266,6 +273,9 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ## L-220 [tags: process] [status: promoted]: **A design ruling that changes what a shipped entry point requires is checked against that entry point's own ADR before it is recommended. A recommendation is a query result too.** At SPRINT-110 G2 the coordinator recommended R3: the conformance engine should call a new Bun CLI for its member lookup, and the owner signed it. `conformance.sh` is the adopter-facing entry to that engine, and ADR-043 records exactly one irreversible property for it: it needs only `sh`, and adding a runtime is a decision of its own. The coordinator had not read ADR-043. It surfaced only while writing T3's brief, a sprint-day later and before any build. The owner then took the requirement deliberately (ADR-049). The cost was one extra ruling round, not a shipped break, but it was luck of sequencing: had T3 been dispatched at rank 1, the brief that caught it would never have been written first. **Durable form: before recommending a design that adds a dependency, a runtime or a file to anything an adopter runs, grep `docs/adr/` for that entry point's name and read what it promises.** The tell is a recommendation phrased as plumbing ("the engine calls the CLI") whose subject is a shipped surface.
 - **L-220 → promoted: `skills/orchestrator/SKILL.md` — a G2 checklist line (read the ADR of a shipped entry point before offering a ruling that changes it) + a red flag** — placed where rulings are offered, not CLAUDE.md (at cap). count 2: SPRINT-110 R3 · SPRINT-111 T3 (ADR-034). · disposition: retain — a new G2 line + red flag in a skill (not the always-loaded set); promoted before ADR-050 clause 2, so it names no retirement. The durable rule is the record now (§11 collapse, SPRINT-112 promote).
+- seen: 2026-10-24 (SPRINT-138, two events, both **holds**: a scope-change entry named `scripts/` and `scripts/promote-check.ts`, absent
+  from T1/T3, caught by the immediate `--scope-change` re-run; and a tick's evidence named workdoo's `bun.lock` as a T2 file, caught by
+  `tick-box.ts` at the write. Both cost seconds instead of a red close: the re-check this rule asks for, run at the write.)
 
 ---
 
@@ -280,6 +290,9 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - promoted: yes
 - **L-219 → promoted: skills/orchestrator/references/dispatch.md § Worktree dispatch protocol** · disposition: move-to-reference — family G (×5): inspect a worktree with `git -C`, never `cd`; run nothing host-heavy while a timing task measures (SPRINT-122 promote, owner).
 - related: L-055 (declared base) · L-216 (a background job owns the tree it rewrites) · L-067 (a result across an environment boundary) · TD-054
+- seen: 2026-10-24 (SPRINT-138, a **failure**: the coordinator ran `cd <worktree> && …` to probe T1's command, and the harness adopted
+  the worktree as the session's checkout. Noticed from the environment notice; moved back before any dispatch; later probes used a subshell
+  or `--cwd`.)
 
 ---
 
@@ -287,6 +300,9 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - **L-218 → promoted: `skills/orchestrator/references/dispatch.md` § Merge-back queue, the post-merge line** · disposition: merge — sharpens the existing "post-merge smoke check per wave" into "the host gate's cross-cutting legs after each merge (typecheck included), and system verify on the final tree", rather than adding a rule. count 2: SPRINT-109 close · SPRINT-112 close (SPRINT-111's `18330a1`). The durable rule is the record now (§11 collapse, SPRINT-113 promote).
 - seen: 2026-10-24 (SPRINT-137 close: the merge-back re-ran T2's harness only; two `noUncheckedIndexedAccess` errors in
   `evals/dod-delta.test.ts` reached system verify, fixed in `e98a7e34`) · count: 3
+- seen: 2026-10-24 (SPRINT-138, **holds**: T1's real gate run found emitter-column and doc-caps FAILs before merge; the post-merge
+  legs found T7's undeclared research log at its merge. The new `scripts/merge-check.ts` replaced the hand-run legs from T3 on;
+  system verify was then green on its first run, 311/0, for the first time in 8 sprints.)
 
 ---
 
@@ -314,6 +330,9 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - count: 1
 - promoted: merged into L-219 (SPRINT-121 T4)
 - related: L-067 / L-081 (an environment is inherited by children it was never meant to reach) · L-120 (the verdict line is the signal) · L-142 (the seeded pass needs guarding)
+- seen: 2026-10-24 (SPRINT-138, two **failures** of the host environment leaking into a result: Git Bash rewrote `LF_GATE_DIR=/home/…`
+  into `C:/Program Files/Git/home/…` for a native Bun process, failing remote setup twice; and checkers run from a PowerShell PATH
+  without Git's `usr/bin` reported 25 misleading FAILs and a Bun crash (TD-270). Both were found by diffing the two environments.)
 
 ---
 - **L-215 → promoted: merged into L-219** · disposition: merge — family G (isolation/environment leakage); the sighting is counted on L-219, this entry's text stays as the record.
@@ -803,6 +822,9 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ---
 
 ## L-143 [tags: process] [status: promoted]: → promoted: .claude/CLAUDE.md § Behavioral Guidelines + CONTEXT.md § Gates
+- seen: 2026-10-24 (SPRINT-138, two **failures**: a probe used a full SHA typed from memory, so its 'Not a valid object name' proved
+  nothing until the SHA was derived; and a log entry was committed citing a placeholder SHA whose `sed` substitution had silently missed a
+  wrapped line, corrected by an appended entry.)
 
 ---
 
@@ -1010,6 +1032,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ## L-107 [tags: process] [status: promoted]: a hypothesis about where cost goes names the component that is *legible*, not the one that dominates — the enumerable list gets blamed and the undifferentiated blob beside it is never suspected.
 - **L-107 → promoted: root `TECH-DEBT.md` header block, beside L-091** — the durable rule is the record now (§11 collapse, SPRINT-061 promote). Body: git; TD-046 recorded the gate at ~126s and blamed the eval harnesses on a suspicion that proved to be two of fourteen costing ~10s, both deliberate zero-coverage guards whose live input is the entire point. Measured (SPRINT-058 T2): harnesses ~34%, the unnamed inline sections ~66% and never measured by anyone; SPRINT-060 T3 measured them and filed TD-050. What made the harnesses the suspect is **shape**, not evidence — a named list you can count and point at can have a hypothesis phrased about it, an unnameable blob cannot be accused. Placed by §10's test: both sightings arose while filing and acting on a debt row, and the header is what every flow that files (close), ages (promote) or acts on a row reads — the honest enumeration, rather than the wider "any cost attribution" that would also claim `/diagnose`, where it has never yet been seen. seen Sprint-058/060, count 2 — **third sighting Sprint-061**, inside the sprint that promoted it: TD-050's proposed split named *freshness vs dangling refs vs completeness*, which is how section 4's own header names itself, while the boundaries the code actually has are its four loops. The legible decomposition was the section's title all along.
 - related: L-091 (its parent — a `Mitigation:` is the filer's guess) · L-097 (a number in a criterion is remembered, not measured) · L-102 (run it live to find out what is true) · TD-046 · TD-050
+- seen: 2026-10-24 (SPRINT-138, a **failure**, nineteenth sighting: a coordinator cross-check grepped gate headings for `red` and counted
+  S128, whose only hit was the `red` inside `undeclared`. Caught only because the two routes named different sprints.)
 
 ---
 
