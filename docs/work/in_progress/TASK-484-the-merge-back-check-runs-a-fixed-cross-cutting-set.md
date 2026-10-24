@@ -36,7 +36,7 @@ discovery order) when none is documented, and tick at acceptance. lean-flow's co
 - [x] `dispatch.md`: the post-merge line requires the host's documented merge-back check and its agreed fixed set (replacing "never ✓ `1efdd16e` + `f7a642be`: the post-merge line requires the host's documented merge-back check (fixed set agreed by the host maintainer, recorded in its docs), falling back to the discovered gate (repo-wide over unit-only); rule 5 ticks at merge-back acceptance in the same session; lean-flow only as the example. Codex round 2 CLEAR
       a hand-picked subset"), falling back to the discovered gate when the host documents none. Rule 5 (Tick) says verified boxes are
       ticked at merge-back acceptance, in the same session. lean-flow's command and five legs appear only as the example.
-- [ ] Used at every merge-back from its availability through the validation sprint's close, observed at least once (logged). A
+- [x] Used at every merge-back from its availability through the validation sprint's close, observed at least once (logged). A ✓ merge-check ran at every merge-back once available: `f7a642be` (T3, 5/5) and the system-verify tree `ffce25bc` (5/5); system verify on `ffce25bc` passed 311/0 on its first run, so no FAIL in the five legs needed investigating
       cross-cutting FAIL that system verify finds in one of the five legs on the same revision is investigated, and any wrapper
       defect fixed, before this task is accepted.
 - [x] Consumer path: applied read-only to workdoo, which documents no merge-back check, the wording resolves to its discovered gate. ✓ workdoo (read-only) documents no merge-back check, so the wording falls to the discovered gate, and "repo-wide over unit-only" picks its `verify` script over `test` (bun test)
