@@ -29,13 +29,13 @@ task is exactly the record it cannot verify. Tier G (other), as TASK-471 on this
 own logs in lean-flow's own gate; no adopter runs it. G2 review-round cap: 2.
 
 ## Done when
-- [ ] A consequence line whose key is not exactly one `T<digits>` (`pre-T1`, `T2,T3`, `T1-T5`, `close`) FAILs
+- [x] A consequence line whose key is not exactly one `T<digits>` (`pre-T1`, `T2,T3`, `T1-T5`, `close`) FAILs ✓ `7f56266e`: non-`Tn` key FAILs review-depth-consequence-vocab naming the key, review or not (fixtures vocab-key-pre-t1, vocab-key-multi-with-review)
       `review-depth-consequence-vocab`, naming the key, whether or not a review record exists. A well-formed line behaves as today.
-- [ ] Retained must-FAIL fixture carrying TD-099's own line `consequence · pre-T1 · behaviour:low · governance:high` FAILs by name,
+- [x] Retained must-FAIL fixture carrying TD-099's own line `consequence · pre-T1 · behaviour:low · governance:high` FAILs by name, ✓ SPRINT-970 fixture FAILs by name beside a green sibling; REVIEW-DEPTH FIXTURES: all green (prior cases unchanged)
       beside a well-formed sibling case that stays green; every prior review-depth case keeps its verdict.
-- [ ] Real-artifact run: SPRINT-087's archived log, copied to a non-archived temp path, FAILs by name on its `pre-T1` lines (before
+- [x] Real-artifact run: SPRINT-087's archived log, copied to a non-archived temp path, FAILs by name on its `pre-T1` lines (before ✓ copied to a non-archived temp path: pre-fix checker PASS (exit 0), fixed checker exit 1 naming `pre-T1` x5 (= its 5 lines) + `pre-close` x3; live log PASS (3 review records), re-verified 2026-10-24
       the fix: PASS); the gate's review-depth leg over the live tree stays green.
-- [ ] TD-099 marked resolved in `TECH-DEBT.md`.
+- [x] TD-099 marked resolved in `TECH-DEBT.md`. ✓ `8f8b5425`: TD-099 status resolved -> TASK-480
 
 ## Touches
 the review-depth checker · its fixture harness and fixtures · `TECH-DEBT.md`

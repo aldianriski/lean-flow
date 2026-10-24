@@ -27,16 +27,16 @@ parse. Host: the existing dod-delta test suite, the harness TD-165 names, so no 
 list and nothing to retire (ADR-050 §2). G2 review-round cap: 2.
 
 ## Done when
-- [ ] A retained TypeScript test finds every `evals/run-*` harness that parses a `bun test` pass count, selected by the pass-count
+- [x] A retained TypeScript test finds every `evals/run-*` harness that parses a `bun test` pass count, selected by the pass-count ✓ `e4eb536e`: dod-delta suite, two selectors (live `bun test` call · live n_pass parse) agree on 6 harnesses, one parse line each, run via `sh` over a captured ANSI summary (true count 97); cross-checked by grep: 6 = 6
       assignment, not by the ANSI-strip token (six today; the test FAILs if it finds fewer than it finds `bun test` calls feeding a
       count, or none), extracts each parse line (indentation trimmed), and runs it through `sh` over a captured ANSI-coloured
       `bun test` summary, asserting the true pass count.
-- [ ] Must-FAIL: the same parse with the ANSI strip removed yields the wrong count over the same sample, and the test's control
+- [x] Must-FAIL: the same parse with the ANSI strip removed yields the wrong count over the same sample, and the test's control ✓ stripless control per harness; seeded strip revert in run-authority-fixtures.sh -> 110 pass / 1 fail naming that harness, restored (hash-object == HEAD), re-verified 2026-10-24
       catches it by name; one seeded revert of the strip in a real harness reddens the test, restored byte-identical
       (`git hash-object <p>` == `git rev-parse HEAD:<p>`).
-- [ ] The test lives in the dod-delta test suite and runs in the gate through `run-dod-delta-fixtures.sh` (no new `.sh`, no new
+- [x] The test lives in the dod-delta test suite and runs in the gate through `run-dod-delta-fixtures.sh` (no new `.sh`, no new ✓ runs through run-dod-delta-fixtures.sh (no new .sh/harness, list unchanged); `min_tests=111` = real count (`7fc4e154`), harness PASS 111/0
       harness, no change to the harness list); its `min_tests` floor is raised by the new cases in the same commit, as its header requires.
-- [ ] TD-165 narrowed in `TECH-DEBT.md`: the pass-count parse is resolved; its SPRINT-103 clock-input sighting stays open.
+- [x] TD-165 narrowed in `TECH-DEBT.md`: the pass-count parse is resolved; its SPRINT-103 clock-input sighting stays open. ✓ `8f8b5425`: pass-count parse narrowed out; SPRINT-103 clock-input sighting stays open
 
 ## Touches
 the dod-delta TypeScript test suite and its harness's test-count floor · `TECH-DEBT.md`

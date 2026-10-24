@@ -26,15 +26,15 @@ fences included; `frontmatterValue` is frontmatter-scoped but unused here. Laten
 frontmatter.
 
 ## Done when
-- [ ] An entry whose annotation leaves an unbalanced parenthesis is not classed as a foreign repo; it is reported by the existing
+- [x] An entry whose annotation leaves an unbalanced parenthesis is not classed as a foreign repo; it is reported by the existing ✓ `9d762603` + retry `14b0b15c`: `(closed 802` and `closed) 802` read as unparsed, no foreign NOTE, direction-(b) verdict reported -> FAIL; the `)` case reddens with the guard removed
       `unparsed` NOTE arm and earns no foreign exemption. A case asserts the direction-(b) verdict moves from reported to FAIL.
-- [ ] Tests assert the suffix anchor at each site separately (member id cell, Closed-when attribution): `SPRINT-91` does not
+- [x] Tests assert the suffix anchor at each site separately (member id cell, Closed-when attribution): `SPRINT-91` does not ✓ seeded removal re-verified 2026-10-24: id-cell anchor -> only anchor-member-id-cell fails; Closed-when anchor -> only anchor-closed-when fails (59/1 each), restored (hash-object == HEAD)
       match `SPRINT-910`; removing either anchor reddens its own test.
-- [ ] `member_sprints:` is read from the frontmatter only; a body or fenced `member_sprints:` line is ignored. Real run over the
+- [x] `member_sprints:` is read from the frontmatter only; a body or fenced `member_sprints:` line is ignored. Real run over the ✓ body/fenced key ignored (suite); real run over the repo's epics before (`9d762603^`) vs after: 17 lines each, exit 0, byte-identical
       repo's epics: verdicts byte-identical before and after, exit 0.
-- [ ] The regression cases live in the TypeScript test suite, not as new fixture directories, so the frozen differential's
+- [x] The regression cases live in the TypeScript test suite, not as new fixture directories, so the frozen differential's ✓ cases in evals/epic-archive.test.ts (60/0), no new fixture directory; differential untouched
       population does not grow (it stays 34/0).
-- [ ] TD-148 narrowed to items 3, 6 and 7 in `TECH-DEBT.md`.
+- [x] TD-148 narrowed to items 3, 6 and 7 in `TECH-DEBT.md`. ✓ `8f8b5425`: items 2, 4, 5 done; 3, 6, 7 open
 
 ## Touches
 the epic-archive checker (TypeScript) · its TypeScript test suite · `TECH-DEBT.md`
