@@ -127,7 +127,7 @@ ask which flows can hit the failure, place it where all of them read (a skill re
 
 ## Task entry shape
 
-One file per task, `docs/work/<status>/TASK-NNN-<slug>.md` — status is the folder, never a field. Full schema → `skills/task-decomposer/references/task-file.md`.
+One file per task, `docs/work/<status>/TASK-NNN-<slug>.md` — status is the folder, never a field; a new task is born in `docs/work/backlog/` (`/task-decomposer` writes it there; promote moves it to `todo/`). Full schema → `skills/task-decomposer/references/task-file.md`.
 
 ```
 ---

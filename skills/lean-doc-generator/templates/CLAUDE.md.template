@@ -19,6 +19,7 @@ The lean-flow loop for any AI-driven session:
 2. `/lean-doc-generator` — align docs to the current code state (WHY/WHERE only)
 3. `/orchestrator` — execute the next task through the G1/G2 gates
 4. Repeat.
+New tasks are born in `docs/work/backlog/` (written there by `/task-decomposer`; promote moves them to `todo/`).
 
 ## File Structure [CUSTOMIZE]
 ```
