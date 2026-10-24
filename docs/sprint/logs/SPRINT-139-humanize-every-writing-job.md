@@ -100,3 +100,23 @@ agent) is unchanged.
 ### 2026-10-24 | scope-change | T8 (TASK-496): correction, the reworded push box is box 5, not box 4
 The entry above names "box 4". TASK-496's `## Done when` has five boxes, and the push box ("release-patch stops before push;
 the owner pushes") is the fifth. The ruling and the new wording are unchanged.
+
+### 2026-10-25 | progress | T1 (TASK-497) done: every agent brief keeps out of secret files; L-247 promoted; Codex CLEAR at an owner-authorised round 4
+A Sonnet builder in the main tree (`e2865e83`) put the secret-files rule at every brief site: `dispatch.md` (builder brief,
+worktree protocol), `review-scoping.md`, `builder-check.md`'s reader prompt, task-decomposer's `Explore` recon clause, and
+the council's research, advisor, reviewer, chairman and fact-check prompts. It collapsed L-247 to its pointer
+(`disposition: move-to-reference`) and opened CHANGELOG `## [Unreleased]`. No hook, guard or checker was added (ADR-053).
+Exercised on two real briefs: this sprint's T1 builder dispatch, and an `Explore` recon for T2 briefed per the edited text.
+consequence · T1 · behaviour:material · governance:high
+review · T1 · codex · behaviour:material · governance:high
+Codex round 1: NOT CLEAR, because the council moderator prompt was the one brief without the rule; fixed inline in `eda9b5a6`
+(a one-sentence edit), and an awk pass over every fenced block confirmed the rest. Round 2: NOT CLEAR, because the census
+lived in the log, not the task; added to TASK-497 (`d70586f5`). The owner authorised a narrow round 3, which found the census
+count said ten for eleven briefs; fixed in `fc5439c8`. Two routes agree at 11 (case-insensitive grep hits; table cells, with a
+5-row control). A first table count returned 13 because of a bug in the query (the file was passed to the second awk too),
+not in the file. The owner authorised round 4 on the count alone: CLEAR.
+Gate: a local full `qa-check` reached 294 pass, 2 fail. (1) The 520 s budget stopped it at harness 23, leaving 11 harnesses
+unrun; this host's known limit, so the full gate runs off-host at close. (2) The scope-change leg found the T1 entry naming
+`night-run.md` and `night-run-checks.md` (its exclusion list) without a `Layers:`/`Cites:` home; they were added to T1
+`Cites:` (`3c22c536`), and the leg re-run alone passes 10/0. The learnings legs and doc-caps pass; task-decomposer is at
+130/140.

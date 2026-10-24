@@ -23,15 +23,15 @@ ruled that the promotion lands as this task, the sprint's first member, so the e
 the rule.
 
 ## Done when
-- [ ] A census lists every lean-flow procedure that writes a brief for a subagent (builder, reviewer, recon, measurement,
+- [x] A census lists every lean-flow procedure that writes a brief for a subagent (builder, reviewer, recon, measurement, ✓ census in § Census, two selectors + block-level third route, 11 briefs (d70586f5, fc5439c8)
       advisor). It is derived by two different selectors that agree, and is listed in this task.
-- [ ] Each brief site names secret files as off-limits in host-generic words (`.env`, `.env.*`, key and credential files,
+- [x] Each brief site names secret files as off-limits in host-generic words (`.env`, `.env.*`, key and credential files, ✓ rule at 11 briefs across 5 sites (e2865e83 + moderator eda9b5a6); case-insensitive git grep 11 = table 11
       anything the host's ignore rules mark secret) and says a needed value is read from a non-secret record or asked
       for, never opened.
-- [ ] SKILL.md caps hold; branch-specific wording sits in `references/` behind a read pointer.
-- [ ] Exercised: one real brief from orchestrator dispatch and one from task-decomposer recon carry the line.
-- [ ] L-247 is marked `promoted: yes → <where>` with `disposition: move-to-reference`, then collapsed per §11.
-- [ ] CHANGELOG line; Codex gauntlet review clean.
+- [x] SKILL.md caps hold; branch-specific wording sits in `references/` behind a read pointer. ✓ task-decomposer 130/140, orchestrator untouched 140; check-doc-caps PASS; detail lives in orchestrator/council references
+- [x] Exercised: one real brief from orchestrator dispatch and one from task-decomposer recon carry the line. ✓ real T1 builder dispatch brief + real Explore recon brief (T2 checks) both carried the line
+- [x] L-247 is marked `promoted: yes → <where>` with `disposition: move-to-reference`, then collapsed per §11. ✓ L-247 [status: promoted] + pointer naming the sites, disposition: move-to-reference (e2865e83); qa learnings legs PASS
+- [x] CHANGELOG line; Codex gauntlet review clean. ✓ CHANGELOG [Unreleased] bullet (e2865e83); Codex CLEAR at round 4 (R3 + R4 owner-authorised)
 
 ## Census (brief sites, settled at G2 and re-checked at Codex round 1)
 
