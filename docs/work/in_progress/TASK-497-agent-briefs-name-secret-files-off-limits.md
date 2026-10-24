@@ -36,7 +36,7 @@ the rule.
 ## Census (brief sites, settled at G2 and re-checked at Codex round 1)
 
 Selector A: a wording grep across `skills/` for sub-agent · dispatch · reviewer · reader · Explore · advisor. Selector B: a
-read of each skill's steps that spawn an agent. They agree on five sites, ten prompts:
+read of each skill's steps that spawn an agent. They agree on five sites, eleven briefs:
 
 | Site | Brief(s) carrying the rule |
 |---|---|
