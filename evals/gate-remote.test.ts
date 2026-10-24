@@ -5,7 +5,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { runGateRemote, scpArgv, sshArgv, type Reply, type Transport } from "../scripts/gate-remote.ts";
+import { dirProblem, runGateRemote, scpArgv, sshArgv, type Reply, type Transport } from "../scripts/gate-remote.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SCRIPT = "scripts/gate-remote.ts";
@@ -300,6 +300,23 @@ describe("launch refusals as real child processes", () => {
     expect(r.status).toBe(2);
     expect(`${r.stdout}${r.stderr}`).toContain("--no-env-file");
     expect(`${r.stdout}${r.stderr}`).not.toContain("is not set");
+  });
+
+  test("a drive-letter LF_GATE_DIR (MSYS path rewrite) is refused (exit 2) naming cause and fix, before any spawn", () => {
+    for (const bad of ["C:/Program Files/Git/home/ubuntu/lf-gate", "c:\\x"]) {
+      const r = run(["--no-env-file"], { ...env, LF_GATE_DIR: bad });
+      const out = `${r.stdout}${r.stderr}`;
+      expect(r.status).toBe(2);
+      expect(out).toContain("LF_GATE_DIR");
+      expect(out).toContain("MSYS_NO_PATHCONV=1");
+      expect(out).toContain("//home/");
+    }
+  });
+
+  test("a POSIX absolute LF_GATE_DIR passes the guard; a relative one is refused", () => {
+    expect(dirProblem("/home/ubuntu/lf-gate")).toBeNull();
+    expect(dirProblem("C:/Program Files/Git/home")).not.toBeNull();
+    expect(dirProblem("home/ubuntu")).not.toBeNull();
   });
 
   for (const name of ["LF_GATE_HOST", "LF_GATE_KEY", "LF_GATE_DIR"]) {

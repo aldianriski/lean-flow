@@ -259,7 +259,8 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
     test: (f) =>
       f === "scripts/qa-check.sh" || f === "scripts/gen-index.sh" ||
       f === "scripts/night-run.sh" || f === "scripts/qa-verdict.ts" ||
-      f === "scripts/promote-check.ts", // SPRINT-115 T5: relays layers-completeness + prose-density findings
+      f === "scripts/promote-check.ts" || // SPRINT-115 T5: relays layers-completeness + prose-density findings
+      f === "scripts/gate-remote.ts", // SPRINT-138 T1: prints the remote gate's FAIL lines; consumes findings, emits none of its own
     why: "the gate and its tooling: they CONSUME findings, nothing column-keyed reads them",
   },
 ];

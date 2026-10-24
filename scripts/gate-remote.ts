@@ -45,6 +45,17 @@ const AUTH = [
 export const sshArgv = (c: Cfg, cmd: string) => ["-i", c.key, ...AUTH, "--", c.host, cmd];
 export const scpArgv = (c: Cfg, src: string, dest: string) => ["-i", c.key, ...AUTH, "--", src, `${c.host}:${dest}`];
 
+/** LF_GATE_DIR must be a POSIX absolute path on the remote; Git Bash on Windows rewrites `/x` to `C:/Program Files/Git/x`. */
+export function dirProblem(dir: string): string | null {
+  if (/^[A-Za-z]:[\\/]/.test(dir)) {
+    return (
+      `LF_GATE_DIR='${dir}' is a drive-letter path -- Git Bash on Windows rewrote the POSIX value before Bun saw it. ` +
+      `Set MSYS_NO_PATHCONV=1 for this call, or pass //home/... (double leading slash)`
+    );
+  }
+  return dir.startsWith("/") ? null : `LF_GATE_DIR='${dir}' must be an absolute POSIX path (start with /)`;
+}
+
 const RUN_TIMEOUT_MS = 900_000;
 
 const sh = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
@@ -171,5 +182,10 @@ if (import.meta.main) {
     return v;
   };
   const cfg: Cfg = { host: need("LF_GATE_HOST"), key: need("LF_GATE_KEY"), dir: need("LF_GATE_DIR") };
+  const problem = dirProblem(cfg.dir);
+  if (problem !== null) {
+    console.error(`gate-remote: ${problem}`);
+    process.exit(2);
+  }
   process.exit(runGateRemote(cfg, realTransport(cfg), (l) => console.log(l)));
 }
