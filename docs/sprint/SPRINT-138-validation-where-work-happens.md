@@ -45,6 +45,7 @@ Layers: `scripts/gate-remote.ts` · `evals/gate-remote.test.ts` · `.claude/CONT
   · `docs/work/done/TASK-482-one-command-runs-the-full-gate-off-host.md`
 Depends-on: none
 Cites: `TASK-482` · ADR-053 · `scripts/qa-verdict.ts` · `evals/run-typecheck-population-fixtures.ts`
+  · `scripts/promote-check.ts` · `scripts/`
 
 Other G. A wrapper around the existing gate: no new check, verdict format or run state. Review cap 2.
 
