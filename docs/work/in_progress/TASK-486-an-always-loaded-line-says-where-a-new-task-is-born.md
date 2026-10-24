@@ -22,9 +22,9 @@ because no always-loaded doc joins the two facts that answer it. Defect fix.
 Consumer: the scaffolded CONTEXT template carries no task-store line, so a repo set up with `init` has the same gap.
 
 ## Done when
-- [ ] One line in `.claude/CONTEXT.md` § Task entry shape names `docs/work/backlog/` as where a new task is born, and probe R1, re-run
+- [x] One line in `.claude/CONTEXT.md` § Task entry shape names `docs/work/backlog/` as where a new task is born, and probe R1, re-run ✓ `e90f1ec2`: CONTEXT § Task entry shape line now ends "a new task is born in `docs/work/backlog/`" (150/150 lines kept); probe R1 re-run by the EPIC-017 method (fresh Haiku, only CLAUDE.md + CONTEXT.md, FILES READ both): literal hit `docs/work/backlog/`, quoting the new line
       by the EPIC-017 effectiveness method, scores a literal hit.
-- [ ] A fresh `init` scaffold answers R1 from an always-loaded file it creates (which template carries the line is G2's choice).
+- [x] A fresh `init` scaffold answers R1 from an always-loaded file it creates (which template carries the line is G2's choice). ✓ `e90f1ec2`: CLAUDE.md.template § Session Workflow gains "New tasks are born in `docs/work/backlog/` …"; fresh Haiku reader given only a verbatim template copy as `.claude/CLAUDE.md` (what init writes): literal hit, quoting that line. Codex CLEAR (r1)
 - [ ] TD-222 resolved; CHANGELOG notes the template line.
 
 ## Touches
