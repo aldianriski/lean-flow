@@ -101,3 +101,11 @@ FAILs the fixed one on `pre-T1` ×5 (its 5 lines) and `pre-close` ×3; the live 
 `9d762603` and after is byte-identical (17 lines, exit 0). Population cross-check by a second route: 6 harnesses with a live
 `bun test` call = 6 with a live `n_pass` parse. Moves in their own commits: `1a009e69`, `f158099d`, `5267a0f4`.
 `check-sprint-by-reference --close`: 10 pass, 0 fail.
+
+### 2026-10-24 | scope-change | T3 (TASK-480): § Plan T3 Cites: gains the layers-completeness checker the 2026-10-23 entry names
+What broke: system verify on the VPS (`8bbf0229`, `QA_FULL=1`) FAILs `scope-change-outside-layers`: the 2026-10-23 T3 entry
+names `scripts/lib/check-layers-completeness.ts`, which is in no T3 `Layers:`/`Cites:` (L-229). The file is genuinely read by
+T3: its Acceptance was reworded to satisfy that checker. The same leg also tags that entry T1, reading the `T1` inside the
+record key in its heading as a task (TD-267's defect, at a second site; TD-267 is widened, not fixed here).
+Impact: T3's `Cites:` gains one path; no `Layers:`, Acceptance or member Done-when changes. G2 stands.
+owner-ruling: popup, 2026-10-24 — "Cite it in T3", over an ADR-021 override or a checker change; TD-267 widened.
