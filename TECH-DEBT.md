@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-20
+last_updated: 2026-10-24
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -430,20 +430,6 @@ status: current
   - Fix direction: accept an optional `^[-*] ` prefix in both loops, or state in review-scoping.md that only a bare line is a
     record; add `gsub(/\r/, "", line)`; add the missing fixtures. Other G.
 
-- **TD-263** severity: low | status: resolved → TASK-472 (SPRINT-135), a non-resolving fragment corroborated in the same entry is excused | created: Sprint-133 (close; system verify, `scope-change layers`)
-  - Summary: **The scope-change leg reads a backticked prose fragment as a repo path.** `repoPath()` in
-    `scripts/lib/check-sprint-by-reference.ts` accepts any span ending in a slash. So a fragment like the one in SPRINT-133's
-    scope-change heading must be declared verbatim, even when the full path beneath it is already in the task's Layers.
-    The log is append-only, so the only fix is to declare the fragment in Cites, a declaration that names no real file.
-  - Fix direction: treat a relative directory fragment as declared when a declared path contains it as a segment run, or
-    require a path to resolve at HEAD or in the range. Tier G: a guard change takes the full bar.
-- **TD-262** severity: low | status: resolved → TASK-473 (SPRINT-135), §11 says only tracked `.md` files cite; TASK-438 falls to SPRINT-136's prune | created: Sprint-133 (close; promote doc-aging, TASK-438)
-  - Summary: **§11's "live citation" counts only `.md` files, and a code citation does not count.** At the SPRINT-133 promote
-    TASK-438 had no live `.md` citation, so the rule made it prunable, but `scripts/lib/tick-box.ts`,
-    `evals/run-tick-box-fixtures.ts` and `scripts/qa-check.sh` cite it in comments. The owner retained it. The rule and the
-    ruling now disagree, and the next promote will find the same file due again.
-  - Fix direction: widen the definition to every tracked file (a code comment pointing at a task is a reader), or record that
-    code citations do not count and prune. Rule it at a promote, in the spec's §11 text, not in a sprint log.
 - **TD-261** severity: low | status: open | created: Sprint-132 (close; final gate, `epic-state`)
   - Summary: **ADR-030 and the epic-state checker disagree about where member-sprint rows live.** ADR-030 puts the rows in
     `docs/epic/logs/EPIC-NNN-<slug>.md`. `scripts/lib/check-epic-archive.ts` reads only the epic file's own § Member sprints, as
@@ -551,14 +537,6 @@ status: current
     next id can collide with a workdoo epic, and nothing rejects a duplicate EPIC id (L-143 shape).
   - Mitigation (hypothesis): name the sibling repository in the epic INDEX and make id derivation read both; or reserve a range per repo.
 
-- **TD-244** severity: medium | status: resolved → TASK-471 (SPRINT-135), `review-depth-consequence-vocab` names the bad token | created: Sprint-121 (system verify)
-  - Summary: **The review-depth check silently ignores a `consequence ·` line with an out-of-vocabulary class, so the review-owed check
-    cannot fire on it.** SPRINT-121 wrote `governance:med` and `behaviour:med` (valid: `low|material` · `low|high`). The strict regex
-    skipped those lines without a finding. Only a malformed `self-review` line was caught (`review-depth-unclassified`). A governance-high
-    task whose consequence line is misspelled reads as having no review owed.
-  - Mitigation (hypothesis): FAIL any `^consequence · ` line that does not match the vocabulary, naming the bad token.
-
-
 - **TD-242** severity: minor | status: open | created: Sprint-120 (T5 build)
   - Summary: **The conformance-engine harness counts differently by host: 97 PASS on Windows, 98 on Linux, at the same commit (`bcb283f7`).** Both are
     all green, so no verdict is wrong, but one case is skipped or merged on one host, and nobody has said which.
@@ -611,22 +589,6 @@ status: current
     distinguishes.
   - Mitigation (hypothesis): have the reaper map exit 124 and the harness's budget-exceeded result to `BUDGET_STOP`, or reword the
     template's stop-condition guidance.
-
-- **TD-233** severity: medium | status: resolved → TASK-470 (SPRINT-135), Part 4 names the `run-complete` header; the class vocabulary was already at review-scoping.md's consequence block | created: Sprint-118 (T2 run)
-  - Summary: **The unattended run's bookkeeping drifted from two schemas, because nothing the run reads names them.** (1) It logged
-    `review · T1 · self-review · behaviour:none · governance:none`, and `none` is not a class, so the gate reports
-    `review-depth-unclassified` ×2 (kept verbatim by owner ruling, ADR-021 at close). (2) Its first rollup sat under a `rollup` header that
-    `check-night-run-rollup.ts` cannot read, so it had to restate the block under `run-complete`. Both vocabularies live in checker code
-    and night-run.md Part 4, and neither is in the procedure the run follows.
-  - Mitigation (hypothesis): name the class values and the `run-complete` event where the run reads them (the orchestrator's review
-    step and night-run.md Part 4's entry template), not only in the checkers.
-
-- **TD-232** severity: medium | status: resolved → TASK-470 (SPRINT-135), only a `[derived]`-tagged terminal line answers a fired line | created: Sprint-118 (T2 run)
-  - Summary: **A model-written, unfenced `terminal ·` line satisfies `CLOSE-FIRED-UNREAPED`, so the TD-122 guarantee holds only while the
-    run does not write its own rollup.** SPRINT-119's run wrote its own rollup under a `run-complete` header with an unfenced
-    `terminal ·` line, and `--close` passed before the reaper ran. A run that writes its rollup and then dies before `reap()` would
-    still pass the close check.
-  - Mitigation (hypothesis): count only a terminal line carrying the reaper's `[derived]` tag. Only `reap()` writes the provenance tags.
 
 - **TD-231** severity: low | status: open | created: Sprint-118 (T1 build)
   - Summary: **`check-authority.ts`'s `terminal ·` unattended signal has never matched real reaper output.** `reap()` writes its
