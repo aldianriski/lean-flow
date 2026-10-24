@@ -243,3 +243,11 @@ review · T3 · codex · behaviour:material · governance:high
 Scoped round 1: Spec should-fix (a checker's SKIP counted green; layers-observed and tsc arguments unpinned), Standards should-fix (the
 post-merge sentence lost its connective). Codex round 1 on dispatch.md: FIX (connective; repo-wide over unit-only fallback; who
 agrees the fixed set). One bounded retry, then round 2: scoped Spec nit (TD-269), Codex CLEAR.
+
+### 2026-10-24 | gate | system verify PASS 311/0 on the first run (VPS, ffce25bc, via `scripts/gate-remote.ts`)
+`MSYS_NO_PATHCONV=1 … bun --no-env-file scripts/gate-remote.ts` against `ffce25bc` (all seven members merged, README written):
+`gate-remote: ran ffce25bc…`, `remote rc: 0`, `QA-CHECK: 311 pass, 0 fail`, exit 0. The remote log, read separately over ssh, shows
+the same last verdict line, rc file `0` and 0 FAIL lines. merge-check on the same tree just before: 5/5 green. This is the first
+close in 8 sprints whose system verify was green on its first run (T7 baseline: 7 of the last 10 were red at first run). One
+observation, not a trend; T7's C2 effect test is the measure. Remaining before close: CHANGELOG with the owner's release decision
+(T2 box 5, T3 box 7, T4 box 3, T5 box 3), then the member moves.
