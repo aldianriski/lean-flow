@@ -72,7 +72,7 @@ parks to `/handoff`.** Procedure · tier table · allowlist → `${CLAUDE_SKILL_
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `STANDARD.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
-7. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first — see § Bundled + cited assets); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
+7. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first — see § Bundled + cited assets); pass the generated prose through `/humanizer` embedded mode (template or existing doc = voice sample) → `${CLAUDE_SKILL_DIR}/references/humanize-pass.md`; then enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
 8. **Close** — open with one line carrying the verdict (what was delivered or decided) and the next step, then docs delivered + headers to verify, then exactly one `Next:` line; every confirmation popup this skill raises leads with its decision the same way.
 
 ## Creates vs consumes (the boundary)
@@ -112,8 +112,7 @@ Shipped → `CHANGELOG.md` (root; legacy `docs/`) · Tech debt → `TD-NNN` in r
 **Unattended** — close splits: the Retro, the four-bucket auto-file, and `close_commit` are **additive → they run**; §11 retention (archive · move · prune · compact) and the doc-freshness propose→approve are **lossy or approval-bound → they park** for the morning. Never approve your own retention pass to "finish the close".
 **Handoff reconciliation gates close (STANDARD §12(b)).** Sweep the Execution Log for any `handoff`
 entry not yet `spent`; route each item to a durable home (or rule it needs none) and append a
-`spent` entry sharing its `handoff-path` — a close-time check FAILs over one still `live`/`consumed`.
-Full protocol → `references/handoff-reconciliation.md`.
+`spent` entry sharing its `handoff-path` — a close-time check FAILs over one still `live`/`consumed`. Full protocol → `references/handoff-reconciliation.md`.
 
 **Governance review at promote** — before planning, run the scan and **emit it as a checklist the owner signs off on**, never silent prose:
 `☐ L-promotion (count≥2, promoted:no; each with a disposition): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed): <findings|none>` · `☐ doc-aging — §11 retention (TD deletion · CHANGELOG rotation · LEARNINGS pointer-collapse) **+ every §2 cap breach**: <findings|none>`.
