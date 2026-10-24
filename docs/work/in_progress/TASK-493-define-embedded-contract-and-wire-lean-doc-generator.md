@@ -21,7 +21,7 @@ The first wired caller defines the contract every later caller reuses (TASK-494,
 context so the caller's context stays clean while the subagent reads both catalogs in full (owner: no quality loss).
 
 ## Done when
-- [ ] G2 decisions recorded **before implementation**: (a) in embedded mode the host template / existing doc is the voice
+- [x] G2 decisions recorded **before implementation**: (a) in embedded mode the host template / existing doc is the voice ✓ R3 voice-sample rule + R1 tier (inherit session model) recorded in the G2 gate entry (3e156e9a), before any T5 edit
       sample (upstream Voice rule), so lean-flow house style (`—`, `→`, bold labels) survives, while standalone mode applies
       upstream rules at full force; (b) the subagent's model tier.
 - [ ] Embedded mode in the humanizer skill: input = text + voice sample + target format (rendered Markdown or plain text);
