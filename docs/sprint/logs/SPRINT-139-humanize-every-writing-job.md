@@ -168,3 +168,12 @@ skill, never re-implements a stage; use is à la carte or conducted. All present
 D3 caps Codex at two rounds. Owner ruling by popup: from T2 on, when round 2 leaves only items already fixed, the coordinator
 runs one narrow round 3 on exactly those items without asking. A new finding at round 3, or any need for a round 4, still goes
 to the owner.
+
+### 2026-10-25 | progress | T2 (TASK-490) done: 7 of 7 boxes; Codex CLEAR at a narrow round 3 (R5)
+consequence · T2 · behaviour:material · governance:low
+review · T2 · codex · behaviour:material · governance:low
+Codex round 1: NOT CLEAR on three items. (1) Step 6 tolerated a lost claim "unless a pattern calls for cutting it", so it now
+cuts only the dressing a pattern names, never a factual claim. (2) README's opening line omitted the writing utility; fixed.
+Both in `019faff3`. (3) The exercise evidence was not in the log; added. Round 2: (1) and (2) OK, no regressions, but the
+file-mode excerpt was abridged. It is now logged in full. Narrow round 3 under R5: CLEAR. Re-run by the coordinator before
+ticking: count-claims 15 = disk 15 in all three files, layout-fixtures 41/0, doc-caps exit 0 (SKILL.md 69/140).

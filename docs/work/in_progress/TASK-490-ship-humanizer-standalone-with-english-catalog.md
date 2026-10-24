@@ -25,17 +25,17 @@ English catalog based on Wikipedia's "Signs of AI writing". The owner chose to v
 ## Done when
 - [x] Per-pattern review table (26 rows: keep / adapt + reason against "useful + important + used") approved at G2 **before** ✓ § Pattern review, 26 rows, keep all; owner-approved by popup (fa689e3b) before any catalog commit
       the catalog is committed (ADR-001).
-- [ ] `skills/humanizer/SKILL.md` ≤140 lines; its first step reads `skills/humanizer/references/patterns-en.md` in full; modes: pasted text
+- [x] `skills/humanizer/SKILL.md` ≤140 lines; its first step reads `skills/humanizer/references/patterns-en.md` in full; modes: pasted text ✓ SKILL.md 69/140 (check-doc-caps PASS); step 1 reads patterns-en.md in full; pasted + file modes (c86fcb6e, 019faff3)
       (default) and file. Embedded mode is TASK-493's.
-- [ ] `skills/humanizer/references/patterns-en.md` holds every approved upstream pattern with its examples verbatim; its header names the
+- [x] `skills/humanizer/references/patterns-en.md` holds every approved upstream pattern with its examples verbatim; its header names the ✓ committed blob from line 35 cmp-identical to upstream 8c307f36 from line 17 (LF both); header: URL, 3.1.0, sha, MIT text
       upstream repo, v3.1.0, commit `8c307f3`, and the MIT notice.
-- [ ] Exercised on real input: pasted mode on one AI-drafted English text, and file mode on one real Markdown file (code,
+- [x] Exercised on real input: pasted mode on one AI-drafted English text, and file mode on one real Markdown file (code, ✓ pasted + file mode, full before/after in the log (T2 entries); facts checked; Codex CLEAR R3
       paths, YAML untouched); before/after in the sprint log; no fact added or dropped.
-- [ ] Roster 14 → 15: `.claude/CONTEXT.md` roster + entry routing, README roster + capability section, `.claude/CLAUDE.md`
+- [x] Roster 14 → 15: `.claude/CONTEXT.md` roster + entry routing, README roster + capability section, `.claude/CLAUDE.md` ✓ count-claims 15 = disk 15 x3; layout-fixtures 41/0 (manifest legs see humanizer); README :8/:9/:185/:473/:555, overview, CLAUDE, CONTEXT
       count, `docs/architecture/overview.md` directory map, the skill list and "14 skills" prose in
       `evals/run-layout-fixtures.ts`; that eval passes.
-- [ ] `/flow` decision recorded in CONTEXT.md: whether the conductor names humanizer (it is a utility, not a stage).
-- [ ] Consumer check: self-contained, no repo-specific path; CHANGELOG `[Unreleased]` entry; Codex gauntlet review clean.
+- [x] `/flow` decision recorded in CONTEXT.md: whether the conductor names humanizer (it is a utility, not a stage). ✓ CONTEXT /humanizer row: utility, not a stage; /flow does not name it
+- [x] Consumer check: self-contained, no repo-specific path; CHANGELOG `[Unreleased]` entry; Codex gauntlet review clean. ✓ no scripts/TASK/SPRINT/L-ids under skills/humanizer; [Unreleased] bullet; Codex CLEAR at R3 (R5)
 
 ## Pattern review (ADR-001, drafted by the coordinator for owner approval)
 
