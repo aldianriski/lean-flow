@@ -177,3 +177,11 @@ cuts only the dressing a pattern names, never a factual claim. (2) README's open
 Both in `019faff3`. (3) The exercise evidence was not in the log; added. Round 2: (1) and (2) OK, no regressions, but the
 file-mode excerpt was abridged. It is now logged in full. Narrow round 3 under R5: CLEAR. Re-run by the coordinator before
 ticking: count-claims 15 = disk 15 in all three files, layout-fixtures 41/0, doc-caps exit 0 (SKILL.md 69/140).
+
+### 2026-10-25 | gate | T3 (TASK-491): the owner reviewed the Indonesian draft; term table and slop list approved with rulings
+The phase-A draft (uncommitted: 17 slop patterns ID-1..17 mapped to English §, 24 coinages, a keep-Indonesian list, the
+italics rule) went to the owner by popup with its 12 doubtful points. Rulings: all eight doubtful coinages switch to English
+(laman → page, daring/luring → online/offline, gawai → device, peramban → browser, pustaka → library, kerangka kerja →
+framework, templat → template, peretas → hacker); every draft rule stays (ID-15 "Anda", the ID-6 extras, ID-13/14/16/17);
+the keep-list stands as drafted; every foreign term is italicized at first use in a rendered doc, never in commits, code,
+identifiers, paths or URLs. The coordinator recommended keeping laman and peretas Indonesian; the owner ruled otherwise.
