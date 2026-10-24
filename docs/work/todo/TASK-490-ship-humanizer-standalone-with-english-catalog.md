@@ -1,6 +1,7 @@
 ---
 id: TASK-490
 title: "Ship /humanizer standalone with the vendored English catalog"
+sprint: SPRINT-139
 priority: P2
 size: M
 risk: med
@@ -24,9 +25,9 @@ English catalog based on Wikipedia's "Signs of AI writing". The owner chose to v
 ## Done when
 - [ ] Per-pattern review table (26 rows: keep / adapt + reason against "useful + important + used") approved at G2 **before**
       the catalog is committed (ADR-001).
-- [ ] `skills/humanizer/SKILL.md` ≤140 lines; its first step reads `references/patterns-en.md` in full; modes: pasted text
+- [ ] `skills/humanizer/SKILL.md` ≤140 lines; its first step reads `skills/humanizer/references/patterns-en.md` in full; modes: pasted text
       (default) and file. Embedded mode is TASK-493's.
-- [ ] `references/patterns-en.md` holds every approved upstream pattern with its examples verbatim; its header names the
+- [ ] `skills/humanizer/references/patterns-en.md` holds every approved upstream pattern with its examples verbatim; its header names the
       upstream repo, v3.1.0, commit `8c307f3`, and the MIT notice.
 - [ ] Exercised on real input: pasted mode on one AI-drafted English text, and file mode on one real Markdown file (code,
       paths, YAML untouched); before/after in the sprint log; no fact added or dropped.

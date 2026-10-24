@@ -1,6 +1,7 @@
 ---
 id: TASK-497
 title: "Every agent brief a lean-flow skill writes names secret files as off-limits (promote L-247)"
+sprint: SPRINT-139
 priority: P2
 size: S
 risk: low

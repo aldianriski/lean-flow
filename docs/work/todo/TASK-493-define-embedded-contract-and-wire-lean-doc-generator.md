@@ -1,6 +1,7 @@
 ---
 id: TASK-493
 title: "Define the /humanizer embedded child-context contract and wire lean-doc-generator"
+sprint: SPRINT-139
 priority: P2
 size: M
 risk: high

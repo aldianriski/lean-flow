@@ -1,6 +1,7 @@
 ---
 id: TASK-491
 title: "Add the Indonesian slop and term-policy catalog to /humanizer"
+sprint: SPRINT-139
 priority: P2
 size: M
 risk: med

@@ -1,6 +1,7 @@
 ---
 id: TASK-492
 title: "Add an on-request EN↔ID translate mode to /humanizer"
+sprint: SPRINT-139
 priority: P2
 size: S
 risk: low

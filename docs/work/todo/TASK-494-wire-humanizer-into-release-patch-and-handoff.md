@@ -1,6 +1,7 @@
 ---
 id: TASK-494
 title: "Wire /humanizer into release-patch CHANGELOG entries and handoff docs"
+sprint: SPRINT-139
 priority: P2
 size: S
 risk: med

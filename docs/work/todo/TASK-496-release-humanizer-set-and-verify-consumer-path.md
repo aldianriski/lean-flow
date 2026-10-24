@@ -1,6 +1,7 @@
 ---
 id: TASK-496
 title: "Release the /humanizer set and verify it on the consumer path"
+sprint: SPRINT-139
 priority: P2
 size: S
 risk: med
