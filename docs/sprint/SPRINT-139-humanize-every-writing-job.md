@@ -4,6 +4,7 @@ slug: humanize-every-writing-job
 owner: Maintainer
 last_updated: 2026-10-24
 status: active
+gates_signed: G1,G2 @ 3e156e9a
 plan_commit: 31c0b32a
 update_trigger: sprint execute/close events
 ---
