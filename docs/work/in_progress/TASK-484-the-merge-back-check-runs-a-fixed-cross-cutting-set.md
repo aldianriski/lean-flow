@@ -40,7 +40,7 @@ discovery order) when none is documented, and tick at acceptance. lean-flow's co
       cross-cutting FAIL that system verify finds in one of the five legs on the same revision is investigated, and any wrapper
       defect fixed, before this task is accepted.
 - [x] Consumer path: applied read-only to workdoo, which documents no merge-back check, the wording resolves to its discovered gate. ✓ workdoo (read-only) documents no merge-back check, so the wording falls to the discovered gate, and "repo-wide over unit-only" picks its `verify` script over `test` (bun test)
-- [ ] README and CHANGELOG describe the merge-back and tick change.
+- [x] README and CHANGELOG describe the merge-back and tick change. ✓ README § How it works (`ffce25bc`) and CHANGELOG v2.14.0 (`d7252dd0`) describe the merge-back check and the tick at acceptance
 
 ## Touches
 a new `scripts/` TypeScript command · its test · `skills/orchestrator/references/dispatch.md` · README · CHANGELOG

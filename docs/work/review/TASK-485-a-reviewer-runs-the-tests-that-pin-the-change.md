@@ -29,7 +29,7 @@ Consumer: every adopter's reviewer gets the step, and it reads the host's own te
 - [x] Exercised three ways. Applied to one SPRINT-111 break's diff, the procedure names the test that caught it by hand. One real ✓ A: on SPRINT-111 T3 break `d75d861` the procedure names all three red test files (one only by file name); B: T3's scoped review (2026-10-24) reported a Pinning tests section per the new bullet: searched by path, file name and exported names, ran 7 harnesses, named excluded hits with reasons; C: workdoo `180d5b7` (read-only) names 10 test files, 4 outside the diff
       SPRINT-138 review reports the section. Applied read-only to one workdoo diff, it names that repo's pinning tests (or reports
       that none were found).
-- [ ] TD-212 resolved (or narrowed, naming what stays open); README and CHANGELOG describe the review change.
+- [x] TD-212 resolved (or narrowed, naming what stays open); README and CHANGELOG describe the review change. ✓ TD-212 resolved (all three exercises passed); README § How it works (`ffce25bc`) and CHANGELOG v2.14.0 (`d7252dd0`) describe the Pinning tests section
 
 ## Touches
 `skills/orchestrator/references/review-scoping.md` · `TECH-DEBT.md` · README · CHANGELOG

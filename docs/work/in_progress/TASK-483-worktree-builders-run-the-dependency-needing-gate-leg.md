@@ -35,7 +35,7 @@ Consumer: any adopter whose gate needs installed dependencies (Node, Python, Bun
 - [x] Peak memory and wall-clock of the in-worktree typecheck on this host are recorded, whichever branch ran. ✓ native tsc.exe (TypeScript 7; the .bin shim resolves to it), peak working set 122 MB (polled every 20 ms), 0.3 s, with 0.57 GB free
 - [x] Consumer path: applied read-only to workdoo, the wording resolves to that repo's own install command and gate leg, with no ✓ workdoo read-only: its bun lockfile + its package.json `"typecheck": "tsc --noEmit && tsc --noEmit -p apps/web"` → the wording resolves to `bun install --frozen-lockfile` + `bun run typecheck`, no lean-flow path required
       lean-flow path in it.
-- [ ] README and CHANGELOG describe the worktree change; TD-194 resolved in `TECH-DEBT.md`.
+- [x] README and CHANGELOG describe the worktree change; TD-194 resolved in `TECH-DEBT.md`. ✓ README § How it works (`ffce25bc`) and CHANGELOG v2.14.0 (`d7252dd0`) describe the worktree dependency step; TD-194 resolved
 
 ## Touches
 `skills/orchestrator/references/dispatch.md` · `TECH-DEBT.md` · README · CHANGELOG
