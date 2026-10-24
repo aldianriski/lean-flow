@@ -760,7 +760,7 @@ status: current
   - Mitigation (hypothesis): expand `{a,b}` before building the overlap map, or FAIL `layers-brace-shorthand` by name so the
     author knows to write the paths out. A fixture for each arm (L-186).
 
-- **TD-194** severity: medium | status: open | created: Sprint-109 (close)
+- **TD-194** severity: medium | status: resolved → TASK-483 (SPRINT-138 T2, `b64dde5b` + `77fe54b8`): the worktree brief installs dev dependencies by the host's procedure and runs the dependent leg before reporting; a real probe reported a seeded TS2322 before merge-back (native tsc, 122 MB, 0.3 s) | created: Sprint-109 (close)
   - **Narrowed (SPRINT-136 promote re-review, 2026-10-22, owner-signed):** the post-merge half is done (dispatch.md § Review two-tier runs the gate's cross-cutting legs, typecheck included, after each merge). What stays open is the worktree half: a builder or reviewer worktree still cannot resolve `tsc`.
   - Summary: **A dispatched worktree cannot run the `typecheck` leg, and nothing says so.** The builder and reviewer worktrees
     have no `node_modules/.bin/tsc`, so a TS error a task introduces is invisible to every check its builder and reviewer can run.
