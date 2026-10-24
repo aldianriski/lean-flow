@@ -40,9 +40,11 @@ SPRINT-121 T4 folds and every promotion since); 145 carry none, all ≤ L-186 an
 (L-217, L-219) · replace 1 (L-242) · retain 1 (L-220) · automate-into-check 0 as a first disposition (1 as a re-check
 line, L-229).
 
-Home of the 114 promotions whose pointer is not DUP98 (54 own + 60 fold, fold read through its head): 13 land on an
-adopter-visible surface (`skills/**`, `spec/**`: 9 own + 4 folded into L-219/L-224), 101 on a repo-private one
-(`.claude/CLAUDE.md` 35 own + folds of L-009/L-020/L-045/L-130/L-166/L-186/L-217, `.claude/CONTEXT.md`, TD).
+Home of the 114 promotions whose pointer is not DUP98 (54 own + 60 fold, fold read through its head): **16 target an
+adopter-visible surface** (`skills/**`, `spec/**`): 12 own (L-224 L-220 L-219 L-218 L-182 L-106 L-097 L-092 L-091 L-088 L-087
+L-086) + 4 folded into L-219/L-224; 98 target a repo-private one (`.claude/CLAUDE.md`, `.claude/CONTEXT.md`, TD, ADR).
+That a surface is adopter-visible says nothing about installation or exposure. (A first-match classification gave 13; see
+Round 7 for the disagreement.)
 
 ### Inventory (225 rows; `home` = where the rule says it lives; `count` = max `count N` in the entry, case-insensitive)
 
@@ -274,45 +276,87 @@ adopter-visible surface (`skills/**`, `spec/**`: 9 own + 4 folded into L-219/L-2
 | L-002 | promoted | process | CLAUDE | DUP98 | - | 1 |
 | L-001 | promoted | docs | CLAUDE | DUP98 | - | 1 |
 
-## Round 2 — Cohort and control traces (docs/LEARNINGS.md + Retros S128–S137, 2026-10-24)
+## Round 2 — Cohort and control traces (docs/LEARNINGS.md + Retros S128–S137, 2026-10-24; revised in retry)
 
 **Cohort selector.** A promoted entry enters when a dated sighting bullet (`- seen:` or a `…sighting` bullet) names a
-sprint later than the entry's own promote sprint (`SPRINT-N promote` in the pointer, else `- promoted:` line). Run over
-the 206 promoted entries with a parseable promote sprint: 17 hit; L-198 added by hand (its `seen` line says "after
-promotion"; promote sprint not parseable); the other 6 unparseable (L-238 L-143 L-142 L-111 L-086 L-058) read by eye:
-none has a later sighting. **Cohort = 18 of 213.** SPRINT-121 T4 "fold of L-NNN: SPRINT-M" bullets were excluded as
-sightings (they re-date older entries) and counted separately in Round 2b.
+sprint STRICTLY later than the entry's promote sprint (`SPRINT-N promote` in the pointer, else the `- promoted:` line).
+Over the 206 promoted entries with a parseable promote sprint: 17 hit; L-198 added by hand (its `seen` line says "after
+promotion"); the other 6 unparseable (L-238 L-143 L-142 L-111 L-086 L-058) show no later-dated sighting. **Cohort = 18 of
+213, a lower bound**: a same-sprint sighting is excluded by the strict test (L-010: S047 "the rule was promoted, in
+context, and still broken", same sprint as its promotion). SPRINT-121 T4 "fold of L-NNN" bullets are not sightings here
+(Round 2b). **Counting units differ by entry and are stated per case**: a *count field* may count events, sprints or
+numbered sightings, and may include pre-promotion ones.
 
-Ladder per entry: **A**vailable (written where the flow reads) · **R**eached (loaded in the context that hit the
-failure) · **Ac**ted on · **E**ffective (the failure stopped). `?` = no artifact records it; it is never read as yes.
+Status vocabulary: **A**vailable (rule written where the flow reads) · **R**eached (loaded in the failing context) ·
+**Ac** acted on · **E**ffective (failure stopped). *observed* = an artifact says so (cited); *unknown* = no artifact
+records it. A recorded sighting is a failure unless marked "hold".
 
-| L | promoted (sprint · home · disposition) | act it governs → required action | A | R | Ac | E | sightings after promotion | update route used |
-|---|---|---|---|---|---|---|---|---|
-| 108 | S61 · CONTEXT § Gates; widened S64 to CLAUDE § Behavioral Guidelines · none | any count/grep acted on at once → a second query that varies the SELECTION | yes | entry says "in context the whole time" at the 4th, 7th, 12th–14th; ? for the rest | no (18 of 18) | no | 15 (4th–18th) in 11 sprints: 62 63 64 75 79 82 83 102 134 135 136 | bullets appended; placement widened once (S64); rule text lengthened in place; no re-check |
-| 218 | S113 · dispatch.md § Merge-back queue · merge | each merge-back → run the cross-cutting legs incl. typecheck | yes | ? | no (S137: harness only) | no | 1 (S137), after 2 before | seen bullet; S138 T3 builds the command 25 sprints later |
-| 224 | S114 · dispatch.md rule 5 (Tick) · merge | any write a sprint checker reads → re-run the gate's own checker in its mode | yes | ? | S128 yes (caught by the re-run); S125 ×3, 126, 127, 137 no | no | 7 events in 5 sprints (125 126 127 128 137); 6 failures + 1 hold | count line + pointer line edited; TASK-438 (S126) automates the tick path only |
-| 229 | S117 · CONTEXT § Sprint model Layers bullet · merge | widening a task's files → edit the Plan's `Layers:` too | yes | "loaded and reached none of the three" (entry) | no (S118 ×3) | after S120's `automate-into-check` (TASK-411): own shape 0 recorded over 40 scope-change entries; the gate now fails it late | 3 (S118) | the one disposition re-check in the ledger (S120); then folded into L-151 |
-| 238 | S134 · CONTEXT § Sprint model · merge | a coordinator write → bare `sprint(N):` subject | yes | yes: each plan's D1 cites it (S134–S138) | yes | yes in 4 sprints | **0** (sightings S131, S133 are before promotion) | none needed: **control, not cohort** |
+### Named cases (inspectable: every claim names its source)
 
-Other cohort entries (promote sprint → sprints with a later sighting): L-009 47 → 74 · L-020 47 → 74, 129 · L-045 47 → 122,
-124 · L-060 47 → 94 · L-100 56 → 75, 83 · L-120 73 → 75, 84, 94 · L-130 76 → 121, 122, 124, 126 · L-144 78 → 78, 84 ·
-L-151 81 → 102, 121, 122, 129 · L-166 87 → 122, 124, 127 · L-170 96 → 101 · L-186 96 → 124, 128, 129 · L-198 → 120 ·
-L-219 122 → 127. L-120's 5th sighting is recorded as "the promoted rule did NOT hold"; L-144's is "and it recurred
-anyway" (its home is `TD-066`, i.e. a measurement, not a rule).
+**L-108** — *decision:* promoted at the SPRINT-61 promote (owner sign-off) into `.claude/CONTEXT.md` § Gates; S64 T2
+widened it to `.claude/CLAUDE.md` § Behavioral Guidelines (entry bullet "Fifth and sixth sightings"). *Owner of home:*
+Maintainer; read by every session (CLAUDE.md auto-loads). *Trigger → action:* a count or grep whose result is acted on at once
+→ a second query that varies the selection. *Window:* S62–S136 (75 sprints). *Counting units:* **×18 = numbered
+sightings, 3 of them (S59) before promotion**; after promotion **15 numbered sightings (4th–18th) in 11 sprints** (62 63 64
+75 79 82 83 102 134 135 136); the S131 ×3 and S133 misses named in Retros are on neither this entry nor L-130. *A:* observed
+(CLAUDE.md). *R:* observed for 5 sightings (4th "in context the whole time"; 7th "loaded in context"; 12th–14th "a session that
+cited this rule twice in its own commit messages"), unknown for 10. *Ac:* the 5 observed: no. *E:* every recorded sighting
+is a failure and each was caught by a disagreeing second number (entry text); how often it held is **unknown**. *Opportunities:*
+**not recorded** (no census of derived numbers exists). *Update route:* bullets appended; placement widened once (S64); no
+disposition re-check recorded.
 
-**Control set** (promoted, no later sighting, with a recorded link from rule to act):
+**L-218** — *decision:* promoted at the SPRINT-113 promote, disposition merge, into `skills/orchestrator/references/dispatch.md`
+§ Merge-back queue (post-merge line). *Trigger → action:* each merge-back → run the host gate's cross-cutting legs incl.
+typecheck. *Count field 3 = events:* S109 close, S112 close (before), S137 close (after). *Window:* S114–S137 (24 sprints);
+**proxy opportunities** 21 sprints whose log mentions worktree dispatch (selector: the word "worktree" in the sprint log;
+merge counts unknown). *A:* observed. *R:* unknown. *Ac:* S137: no (Retro: the merge-back re-ran T2's harness, not typecheck).
+*E:* 1 recorded failure in ≤21 proxy sprints; holds unknown. *Update route:* a `seen` bullet; the re-tiering (S138 T3, TASK-484)
+came 25 sprints after promotion.
 
-| L | exposure | evidence the rule reached the act |
+**L-224** — *decision:* promoted at the SPRINT-114 promote, disposition merge, `dispatch.md` § Members by reference, rule 5
+(Tick). *Trigger → action:* a write to a file a sprint checker reads → re-run the gate's own checker in its own mode.
+*Counting units:* **×9 = events** (count field): 2 before promotion (S113 plan lock, S113 close) + **7 after**: S125 ×3 (close,
+and 2 via L-235), S126, S127, S128, S137. Of the 7, **6 are failures and 1 is a hold** (S128 T3: the immediate `--scope-change`
+re-run caught it, i.e. Ac and E observed). The Retro's "ninth sighting" uses the same ×9. *Window:* S115–S137 (23 sprints);
+**proxy opportunities** 59 scope-change log entries in 18 sprints (selector: `### … | scope-change` headings), failures in 4
+sprints (125 126 127 137). *A:* observed. *R:* unknown. *Ac:* 1 observed yes (S128), 6 no. *E:* not effective in the 4 sprints;
+effective once. *Update route:* count and pointer line edited; TASK-438 (S126) automates the tick path only, not the log-write path.
+
+**L-229** — *decision:* promoted at the SPRINT-117 promote, disposition merge, `.claude/CONTEXT.md` § Sprint model (`Layers:`
+bullet); re-dispositioned to `automate-into-check` at the SPRINT-120 promote (owner), TASK-411; later folded into L-151.
+*Trigger → action:* widening a task's files → edit the Plan's `Layers:` too. *Count field 3 = sprints* (S115, S116, S118).
+*After promotion:* S118, 3 runs (entry: "the promoted CONTEXT.md bullet was loaded and reached none of the three" → **R observed,
+Ac no, E no**). *Windows:* S118–S120 prose only (11 scope-change entries: S118 4, S120 7); S121–S137 automated (40
+entries). Own shape recorded again: **0** in the second window; the gate now FAILs the shape, so a miss shows as a red close,
+not a ledger line (S127/S128/S137 reds are filed under L-224). Whether prevention or detection: **unknown**.
+
+**L-238** — *decision:* promoted at the SPRINT-134 promote, disposition merge, `.claude/CONTEXT.md` § Sprint model. *Trigger →
+action:* a coordinator write → bare `sprint(N):` subject. *Count field 2 = events* (S131, S133 closes; both before). *Window:*
+plans S134–S138. *A:* observed. *R:* observed: each plan's D1 cites it (S134–S137 plans and the S138 plan). *Ac:* observed
+(attribution findings 0 in the S134–S137 closes, 2 in S131–S133). *E:* no failure recorded in 4 closes; coordinator-write
+count (the denominator) unknown. **Control, not cohort.**
+
+**Other cohort entries** (promote sprint → sprints with a later sighting; counting unit = the sprints named in the entry's
+own bullets): L-009 47 → 74 · L-020 47 → 74, 129 · L-045 47 → 122, 124 · L-060 47 → 94 · L-100 56 → 75, 83 · L-120 73 →
+75, 84, 94 · L-130 76 → 121, 122, 124, 126 · L-144 78 → 78, 84 · L-151 81 → 102, 121, 122, 129 · L-166 87 → 122, 124,
+127 · L-170 96 → 101 · L-186 96 → 124, 128, 129 · L-198 → 120 · L-219 122 → 127. R/Ac/E: L-120's 5th sighting is recorded
+as "the promoted rule did NOT hold" (R unknown, Ac no); L-144's "recurred anyway" (home is `TD-066`, a measurement); the rest
+unknown. Opportunities for all of these: **not recorded**.
+
+**Control set** (promoted, no recorded later sighting, with a recorded link from rule to act):
+
+| L | exposure (observed) | evidence the rule reached and was acted on |
 |---|---|---|
-| 242 | promotes at S135, S136, S137 (3 of 3) | each promote log writes "TD aging (recorded here, per L-242)"; no aging-sweep note after S133 |
-| 238 | plans S134–S138 | D1 line in every plan cites it; `layers observed` attribution findings 0 in S134–S137, 2 in S131–S133 |
+| 242 | promotes at S135, S136, S137: 3 of 3 | each promote log writes "TD aging (recorded here, per L-242)"; no aging-sweep note after S133 |
+| 238 | plans S134–S138 | D1 line in every plan cites it; attribution findings 0 in S134–S137, 2 in S131–S133 |
 | 217 | G2 of S135, S136, S138 | Retros: "censusing a review finding before spending a retry (ADR-053 §5)"; plans declare "Review cap 2" |
 
-Common shape of the three: the rule is written **at the step that performs the act** and the actor **writes a trace
-of it into the artifact** they are already producing. The cohort rules live in a reference read at session or dispatch
-start, and the act comes later in another phase, with no prompt and no trace. The rest of the promoted corpus (195
-non-cohort) is 97 DUP98 pointers · 58 folds (their sightings counted on the head) · 40 own-pointer entries: for the 40,
-"no sighting recorded" is the only datum and is not evidence that the placement works (opportunities are not recorded).
+Common shape of the three: the rule is written **at the step that performs the act** and the actor **writes a trace of it
+into an artifact they already produce**. The cohort rules live in a reference read at session or dispatch start; the act
+comes later, in another phase, with no prompt and no trace. Of the 195 non-cohort promoted entries: 97 DUP98 pointers · 58
+folds (sightings counted on the head) · 40 own-pointer: for the 40, "no sighting recorded" is the only datum and is not
+evidence of effect (opportunities are not recorded).
+
 
 ### Round 2b — Re-filed recurrences (SPRINT-121 T4 folds)
 
@@ -355,7 +399,14 @@ check, guard, harness, parser or gate) and **19 distinct TD rows** were resolved
 232 233 244 262 263 130 148 062 191 172 163 165 099). Of the 13 TD rows filed in the window, 11 name a defect or proof gap
 in a checker, guard, harness or reaper (selector: the row's Summary; the two that do not are TD-260, a rule stated twice,
 and TD-262, §11 wording). All 13 are severity low. Gap: the TD ledger records no per-leg catch count,
-and the logs record a red only when the coordinator wrote a gate entry (S137's two reds are in the Retro alone).
+and no field records a red per leg; reds are read from gate entries (S137's three runs are all in its gate entry body).
+
+**Second route for 17 of 35 (path, not subject).** For each sprint's members, the files of every `sprint(N) Tn:` commit
+(`git show --name-only`): a member counts when any file is under `scripts/`, `evals/` or `test/`. Result 17 of the 32
+members that have such a commit (3 members have none: S130 T3, S131 T2, S131 T3 are coordinator-run or tickless), per sprint
+128 5 · 130 2 · 135 3 · 136 4 · 137 3 and 0 elsewhere. The two routes agree on 17; they are not independent of each other's
+members, and "touches scripts/evals/test" is a looser class than "checker defect" (S128 T4 and T5 also change skills).
+The 19 TD ids are a consistency check on the subject route, not a reproduction of the 17.
 
 ## Round 4 — Extraction (b): ceremony and review cost, S128–S137 (pre-change baseline, boundary `ade5c5c3`)
 
@@ -374,10 +425,12 @@ comparable**: only 6 give any token figure, and what is counted differs.
 | 134 | 3 · 10 | 13 agents, no tokens | 2 / 2 | 1 | 3 | 0 |
 | 135 | 4 · 14 | 13 agents, no tokens | 2 / 2 | 1 | 4 | 1 |
 | 136 | 4 · 14 | 12 agents, no tokens | 1 / 1 | 0 | 3 | 1 |
-| 137 | 4 · 16 | 12 dispatches, no tokens | 3 / 1 logged | 2 | 3 | 2 |
+| 137 | 4 · 16 | 12 dispatches, no tokens | 3 / 3 | 2 | 3 | 2 |
 
-Totals: QA_FULL runs 21 by the Cost lines, **24** by logs and commits (S132 +1, S133 +2, S137 reds unlogged); red runs
-10; first-run red in 7 of 10 closes (log: 6, commits: 6, Retro adds S137). Reviews 32 in 9 sprints. **Findings:** no
+Totals: QA_FULL runs 21 by the Cost lines, **24** by logs and commits. Per sprint the two agree except S132 (Cost 2, log 3: FAIL, PASS 304/0, post-close `epic-state`
+FAIL) and S133 (Cost 1, log 3: FAIL, FAIL, PASS 293/0); S137's gate entry body lists all three (299/3, 301/1, 302/0). Red runs
+10; first-run red in 7 of 10 closes (gate headings 6, commit subjects 6; S137 confirmed from its gate entry body, "Two earlier
+runs were red"). Reviews 32 in 9 sprints. **Findings:** no
 sprint reports tokens on a common scope, so a cost-per-sprint series cannot be built from the Cost lines; the only
 quantities comparable across all 10 are members, DoD, QA_FULL runs, reds and reviews. The Cost line undercounts runs in
 2 of 10 Retros. SPRINT-138's own Theme says "at least 5 of the last 8 sprints" were red: S130–S137 gives 6 of 8.
@@ -418,9 +471,9 @@ none (S130, S136 with a bump, S137). The 2.13.2 PATCH carried no adopter-visible
   flakes (TD-049) or environment. lean-flow: 24 runs, 10 red (42%), 1 content defect.
 - **Retro "Retrieval check"** is present in 7 of 12 archived Retros (S001 S004 S005 S009 S010 S011 S012); S009–S012 state
   promoted rules that held ("L-002 held on every task") or recurred; S009: "recurred and was not consulted".
-- **Pin.** `LEANFLOW_PLUGIN_VERSION_PIN=2.0.0` in workdoo's `.env` (VPS copy `lean-flow-2.0.0`); lean-flow is at 2.13.2.
-  S127 and S128 Retros list "workdoo: bump its pinned lean-flow" as an owner action (to 2.8.0, then 2.9.0); S129 to S137
-  Retros do not list it. Which install (worker pin or user-scope) F2 meant is not stated; not resolvable from the repos.
+- **Pin.** The worker pin is `2.0.0` (a host record, confirmed independently by the coordinator; workdoo's env/secret files were not
+  opened in this round); lean-flow is at 2.13.2. S127 and S128 Retros list "workdoo: bump its pinned lean-flow" as an owner action
+  (to 2.8.0, then 2.9.0); S129 to S137 Retros do not list it. Which install F2 meant (worker pin or user-scope) is not stated.
 - **Upstream path.** lean-flow task `origin:` over `docs/work/` (49 files): decomposer 32 · close-retro 10 · manual 7 ·
   no adopter value exists. TD rows whose Summary comes from workdoo: 2 (TD-253, SPRINT-127 T5 "finding F1" of a
   read-only exercise; TD-245, epic ids spanning two repos), both found by a lean-flow sprint exercising workdoo, none by
@@ -428,14 +481,54 @@ none (S130, S136 with a bump, S137). The 2.13.2 PATCH carried no adopter-visible
   rolled up in that repository by hand, because no checker in either repo can see across the boundary". The SPRINT-009 log
   rules lean-flow follow-ups "outside workdoo… workdoo gets no record".
 
-## Round 7 — Cross-check routes (second queries, run before each figure entered the doc)
+## Round 7 — Cross-check routes (second queries; what each validates, and what it does not)
 
-| figure | route 1 | route 2 (different selector) | agree |
+| figure | route 1 | route 2 (different selector) | what the pair validates |
 |---|---|---|---|
-| 225 headers: 11/213/1 | position-anchored status token | `246 max id − 21 retired ids`; sum of pointer classes 54+60+98+1 = 213 | yes |
-| 98 DUP98 pointers | pointer text key, first 160 chars | `git show c52496fd:docs/LEARNINGS.md \| grep -c` = 98 (0 before) | yes |
-| first-run red 7 of 10 | Retro Cost/Friction text | log gate headings 6 · commit subjects 6 | 6 vs 7 (S137 Retro-only) |
-| QA_FULL runs | Cost lines 21 | log gate entries + commit subjects 24 | no: S132, S133 undercounted |
-| cohort 18 | parsed promote sprint vs sprint in sighting bullets | Retros' named recurrences (Round 2c) hit the same entries for S128–S137 | yes (10 of 15) |
-| 42 folds after head promotion | fold-bullet sprint > head promote sprint | head ids by SPRINT-121 T4 families | same set |
-| 17 of 35 members | commit subjects | 19 TD ids named in those subjects | consistent |
+| 225 headers: 11/213/1 | position-anchored status token | `246 max id − 21 retired ids`; pointer classes 54+60+98+1 = 213 | full population |
+| 98 DUP98 pointers | pointer text as a key | `git show c52496fd:docs/LEARNINGS.md \| grep -c` = 98 (0 at `c52496fd^`) | full population |
+| first-run red 7 of 10 | Retro Cost and Friction text | gate headings 6 · commit subjects 6 · S137 gate entry body ("Two earlier runs were red", 299/3 then 301/1) | 7 confirmed; S137 is no longer Retro-only |
+| QA_FULL runs 21 vs 24 | Cost lines | gate entries + commit subjects | per sprint they agree except S132 (2 vs 3) and S133 (1 vs 3); Round 4 lists the entries |
+| **cohort 18** | strict later-sprint test over 206 parseable entries (+L-198 by hand) | (i) Retro-named recurrences, 10 of 15: reach only the 6 entries active in S128–S137 (L-224 L-186 L-151 L-020 L-108 L-218); (ii) keyword route on "after promotion / did not hold / reached none…": 9 hits, 5 in the cohort (recall 5 of 18), 1 same-sprint boundary (L-010), 3 false positives | **partial**: the 12 entries outside S128–S137 rest on route 1 alone; 18 is a lower bound |
+| 42 folds after head promotion | fold-bullet sprint > head promote sprint | the ten family heads named by SPRINT-121 T4 | same set; membership is T4's judgement |
+| 17 of 35 checker members | commit subject names a check, guard, harness, parser or gate | files of each member's `sprint(N) Tn:` commits under `scripts/` `evals/` `test/`: 17 of the 32 members with such a commit | agree on 17; the path class is looser; 3 members have no `Tn:` commit |
+| 19 TD ids | `(TD-NNN)` in those subjects | — | consistency only; it does not reproduce 17 |
+| **16 of 114 shipped homes** | first-match classification of the pointer text (13: 9 own + 4 folded) | literal shipped path before the em dash: 12 own (L-224 L-220 L-219 L-218 L-182 L-106 L-097 L-092 L-091 L-088 L-087 L-086) + 4 folded into L-219/L-224 | **disagree by 3**: route 1 let `CLAUDE.md` mentioned inside a pointer win (L-220); route 2 reads the named path and is used: 16 (14%) |
+| **35 L-ids in shipped skills** | `grep -r` over `skills/` | `git ls-files skills` (74 files) read and matched: 35 distinct ids, 71 references (SKILL.md 12, templates 12, references 47); 31 ids resolve to a ledger header, 4 resolve to none | agree on 35 |
+
+## Round 8 — Evidence to ranking (retry; the doc carries the compact form)
+
+Ruled order: recurrence × consequence, ties by lower operating cost. **Recurrence** = recorded events in the stated window
+(not a sprint count; units differ per row). **Consequence** class: 3 = red close · 2 = wrong figure acted on or signed ·
+1 = none observed (a potential escape to an adopter, class 4, is not observed for any row and is not scored).
+
+| # | candidate | recurrence (unit · window) | source | consequence | score | operating cost (tie-break) |
+|---|---|---|---|---|---|---|
+| 1 | promoted-rule recurrence as an event | 15 Retro-named recurrences · S128–S137 | R2c | 3 (S129 and S137 reds name a promoted rule; S131 scope-change and re-scope) | 45 | one selector per promote; two skill edits |
+| 2 | delete prose a tool carries | 10 failures of L-224 (6), L-218 (1), L-229 (3) · S115–S137 | R2 | 3 (S137 red; earlier closes) | 30 | one edit, Codex loop |
+| 3 | effect test | 7 first-run reds · S128–S137 | R3, R4 | 3 (10 red runs, 5 with an owner ruling) | 21 | a Cost-line sentence, one log round per 10 sprints |
+| 4 | repair pointers | 1 bulk edit · 2026-08-29 to this research (56 days; earlier detection not excluded) | R1 | 2 (the 213 is in the signed S137 promote checklist) | 2 | one M task |
+| 5 | adopter route | 1 owner action dropped · S129–S137 | R6 | 1 (none observed) | 1 | a few lines |
+
+**98 corrupted rows are not 98 recurrences.** Row 4 counts one event (one commit) however many rows it touched; the 96 count-1
+entries contribute no sighting to any other row. **Priority vs execution:** the rank is by score; C4 runs before C1 because C1's
+selector reads counts that C4 corrects; C3 starts at S139 and C2 waits on C3 and S138 T3.
+
+**Reversal assessed per candidate (not "reversible by git").** C1: ships in a release to adopters; a wrong clause needs another release
+and adopters who copied it keep it; sightings can accrete on entries as L-108's did, a cost paid at every promote. C2: a wrong
+deletion shows as a red close at the next merge-back or scope-change; restoring prose is cheap but the red is not. C3: nothing
+persistent. C4: statuses change, so the census drops from 213 and any outside citation of it breaks; originals stay in git. C5:
+one wording edit and a recorded decision. None is both hard to reverse and surprising, so no ADR candidate.
+
+**What would establish effectiveness (C2, C3, C5).** A zero-sighting count proves nothing without opportunities and exposure.
+C2/C3: log the merge-backs and scope-change entries per sprint (the R2 proxies are selectors, not records), record which legs
+the command ran and on which revision, and count a red as a miss only when the leg had run and passed on that revision;
+exposure ≥ 10 sprints after S138 T3. C5: workdoo's worker pin shown in a run's init record, the releases it spans, and workdoo
+promotes run on it, with workdoo's Retro-named recurrences against its ledger entries as in Round 6 (baseline 3 of 8, S009–S012).
+
+**Adopter route, stated.** Submission: the README's "Report a bug" link (GitHub issues); reader: the maintainer at `/triage`
+bug-intake, which files `origin: triage-bug` tasks; none of the 49 task files present carries it, so the route is unexercised
+(older `done/` files are pruned). A skill-procedure failure belongs in the shipped plugin; a repo-specific failure in the
+adopter's own ledger. An `origin: manual` task with the adopter named in `## Why` records storage after receipt, not submission.
+The 35 repo-private L-ids (71 references) are deferred: 31 resolve only to the unshipped ledger and 4 to nothing; cleaning them is
+consumer-facing skill work (unfrozen), separate from C5.
