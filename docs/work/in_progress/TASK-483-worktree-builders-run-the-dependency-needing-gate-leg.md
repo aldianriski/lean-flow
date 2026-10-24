@@ -24,16 +24,16 @@ branch below.
 Consumer: any adopter whose gate needs installed dependencies (Node, Python, Bun…) has the same blind worktree; the fix ships to them.
 
 ## Done when
-- [ ] `dispatch.md` § Worktree dispatch protocol says: when the host's gate has a leg that needs installed dev dependencies, the
+- [x] `dispatch.md` § Worktree dispatch protocol says: when the host's gate has a leg that needs installed dev dependencies, the ✓ `b64dde5b` + Codex retry `77fe54b8`: § Worktree dispatch protocol paragraph — the brief has each builder/reviewer install by the host's own dependency-install procedure before dependent work, run the leg and quote its result (failures/blockers reported too), and the coordinator checks the report; host-generic examples; no install or leg may overlap any task's wall-clock run. Codex round 2 CLEAR
       brief has each builder/reviewer install them first in its worktree by the host's own install procedure, then run that leg
       and report its result in the host's format before reporting, and the coordinator checks that the report quotes the install
       and the leg's result. Host-generic, and reconciled with the existing "run nothing host-heavy while a task measures
       wall-clock" line.
-- [ ] Exercised, either branch: (a) the in-worktree typecheck runs on this host, and a seeded TypeScript error is reported by the
+- [x] Exercised, either branch: (a) the in-worktree typecheck runs on this host, and a seeded TypeScript error is reported by the ✓ branch (a): a real worktree probe briefed with the paragraph verbatim (round-1 text; the retry changed wording only, not the install → leg → report path) installed (0.9 s), ran tsc clean, reported a seeded `error TS2322` (exit 1) before merge-back, removed it, left `git status` empty
       builder before merge-back, then removed; or (b) a recorded local resource failure, followed by the same check, seeded error
       included, run remotely on the EXACT worktree commit through TASK-482's command. A local failure alone does not satisfy this box.
-- [ ] Peak memory and wall-clock of the in-worktree typecheck on this host are recorded, whichever branch ran.
-- [ ] Consumer path: applied read-only to workdoo, the wording resolves to that repo's own install command and gate leg, with no
+- [x] Peak memory and wall-clock of the in-worktree typecheck on this host are recorded, whichever branch ran. ✓ native tsc.exe (TypeScript 7; the .bin shim resolves to it), peak working set 122 MB (polled every 20 ms), 0.3 s, with 0.57 GB free
+- [x] Consumer path: applied read-only to workdoo, the wording resolves to that repo's own install command and gate leg, with no ✓ workdoo read-only: its bun lockfile + its package.json `"typecheck": "tsc --noEmit && tsc --noEmit -p apps/web"` → the wording resolves to `bun install --frozen-lockfile` + `bun run typecheck`, no lean-flow path required
       lean-flow path in it.
 - [ ] README and CHANGELOG describe the worktree change; TD-194 resolved in `TECH-DEBT.md`.
 
