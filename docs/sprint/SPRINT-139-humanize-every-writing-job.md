@@ -42,6 +42,8 @@ with upstream · any new gate leg, checker, ledger or ledger field · TASK-367 a
 
 ### T1 — Agent briefs name secret files off-limits `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/references/dispatch.md` · `skills/task-decomposer/SKILL.md` · `docs/LEARNINGS.md` · `CHANGELOG.md`
+  · `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/references/builder-check.md`
+  · `skills/council/references/prompts.md`
   · `docs/work/todo/TASK-497-agent-briefs-name-secret-files-off-limits.md`
   · `docs/work/in_progress/TASK-497-agent-briefs-name-secret-files-off-limits.md`
   · `docs/work/done/TASK-497-agent-briefs-name-secret-files-off-limits.md`

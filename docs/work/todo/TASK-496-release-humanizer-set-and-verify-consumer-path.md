@@ -27,7 +27,7 @@ Shipping is not wiring: the set is done only when an installed copy fires in a r
 - [ ] `/flow` chain demonstrated per the TASK-490 decision: one `/flow` run on the installed copy shows humanizer firing where
       that decision says it fires (a named step, or through the wired writing stages).
 - [ ] README capability section and CONTEXT.md re-checked against the shipped roster.
-- [ ] release-patch stops before push; the owner pushes.
+- [ ] The MINOR is bumped by hand (release-patch is PATCH-only); nothing is pushed; the owner pushes.
 
 ## Touches
 `.*-plugin/*.json` manifests · README footer · CHANGELOG
