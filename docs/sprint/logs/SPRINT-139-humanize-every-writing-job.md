@@ -185,3 +185,26 @@ italics rule) went to the owner by popup with its 12 doubtful points. Rulings: a
 framework, templat → template, peretas → hacker); every draft rule stays (ID-15 "Anda", the ID-6 extras, ID-13/14/16/17);
 the keep-list stands as drafted; every foreign term is italicized at first use in a rendered doc, never in commits, code,
 identifiers, paths or URLs. The coordinator recommended keeping laman and peretas Indonesian; the owner ruled otherwise.
+
+### 2026-10-25 | progress | T3 (TASK-491) built: Indonesian catalog with the owner's rulings; exercised on an AI-drafted Indonesian text
+The phase-B builder (`13eee801`) applied the owner's rulings: eight coinages moved to English, every rule kept, first-use
+italics with no borderline class. `skills/humanizer/references/patterns-id.md` has 127 lines: slop patterns ID-1..17 (ten
+mapped to English §1, 2, 3, 4, 5, 12–13, 15, 16/18, 22, 23; seven Indonesian-only), a 24-row term table, a keep-Indonesian
+list, the mixed-affix rule (di-*deploy*, men-*cache*), and the italics rule. SKILL.md step 1 also reads it in full for
+Indonesian or mixed text (71/140). No `(?)` marks remain, and no repo-specific strings appear.
+Exercise (builder; both catalogs read in full). Before, verbatim:
+"Mari kita selami DeployKit, tool deploy yang tidak hanya mempercepat rilis, tetapi juga mengurangi risiko. Tool ini memainkan
+peran krusial dalam lanskap DevOps modern. Setiap deploy dijalankan terlebih dahulu di peladen staging. Pendekatan ini sangkil
+karena galat konfigurasi ketahuan sebelum menyentuh production. Selain itu, rollback bisa dilakukan dengan satu perintah. Lebih
+lanjut, DeployKit mendukung dry run. Jika terjadi galat saat build, log lengkap ditampilkan. Semoga membantu!"
+Final, verbatim:
+"DeployKit adalah *tool* untuk *deploy* yang mempercepat rilis dan mengurangi risikonya. Setiap deploy dijalankan dulu di
+*server* *staging*, dan pendekatan ini *efficient* karena *error* konfigurasi ketahuan sebelum menyentuh *production*.
+*Rollback* cukup dengan satu perintah, dan DeployKit mendukung *dry run*. Kalau *build* gagal dengan error, *log* lengkap
+ditampilkan."
+Terms: galat → error (twice), peladen → server, sangkil → efficient. Italics at first use only. Nine facts on both sides:
+deploy tool · faster releases · less risk · staging first · the approach is efficient · because config errors surface before
+production · one-command rollback · dry run · a failed build shows the full log. Cut as dressing: "Mari kita selami", "memainkan
+peran krusial dalam lanskap DevOps modern", "tidak hanya … tetapi juga", the stacked connectors, "Semoga membantu!".
+The coordinator caught the first final dropping the "sangkil" claim, a step-6 error, and had it redone. The log carries only
+the corrected run.
