@@ -35,3 +35,59 @@ research integrated end to end with the existing learning loop, a target archite
 direction to check every task from the adopter's side. The read-only Codex intake review returned APPROVE WITH FIXES; all
 seven fix groups were folded in before `approve`, including the split of TD-246's cleanup into TASK-487.
 Size check: 5 S, 2 M, no `L`. All seven are `origin: decomposer`. No epic.
+
+### 2026-10-24 | gate | G1 + G2 signed by the owner by popup; seven builder checks settled; three rulings
+G1: fast path. All seven members are `origin: decomposer`, and their scope is unchanged since `approve` (`e28d236e`); promote
+added only the `sprint:` stamp. G2: designs settled as below. Order: T6 first, inline, before any dispatch (J2, owner picks per
+row) → T1 · T4 · T7 in parallel worktrees → T2 (after T1) and T5 (after T1, `.claude/CONTEXT.md`) → T3 (after T2,
+`dispatch.md`). `TECH-DEBT.md`, `README.md` and `CHANGELOG.md` stay with the coordinator (D1). Review cap 2 rounds each.
+Assumptions: A1 confirmed (the VPS clone ran SPRINT-137's gate today, dev dependencies reinstalled). A6 confirmed (workdoo:
+`bun.lock`, a `verify` script, 29 learnings, 13 archived sprints). A3 stays open by design (T2 measures it, either branch).
+builder-check · T1 · 5 contradictions · 5 questions · design fixed: every exit case through the stubbed transport with a green
+control; the verdict judged by `scripts/qa-verdict.ts`'s own `judgeOutput`; refuses unless launched `bun --no-env-file`; remote
+setup is its own step and exit; the gate rc read from its file, never ssh's exit; real run accepted by a log line first.
+builder-check · T2 · 5 contradictions · 4 questions · design fixed (probe briefed with the new wording verbatim; branch (b) runs
+T1's command inside the worktree; memory on the working process, not a shim); actor wording → owner ruling, scope-change below.
+builder-check · T3 · 5 contradictions · 5 questions · design fixed: the scope-change leg on `status: active` sprints only, with
+the gate's skip text; repo root for prose-density; a missing checker FAILs; skips counted apart from green; the wiring test
+compares path and argument expression against the gate; peak memory on every cost run; README and CHANGELOG cover the tick.
+builder-check · T4 · 4 contradictions · 5 questions · settled: exercise B is a later SPRINT-138 review, so T4 waits in review/
+until one reports; exercise A uses TD-212's TS-assertion break; evidence goes in this log; a static reviewer names the commands
+and the coordinator runs them; TD-212 resolved only when all three exercises pass.
+builder-check · T5 · 2 contradictions · 5 questions · settled: run 1 uses the EPIC-017 input set (CLAUDE.md + CONTEXT.md);
+run 2 a verbatim CLAUDE.md.template copy, as init writes it; the line in § Session Workflow, never a [CUSTOMIZE] section; the
+CONTEXT line extends the generic `docs/work/<status>/` sentence; a miss fails, one wording fix and one re-run allowed.
+builder-check · T6 · 1 contradictions · 6 questions · settled: "merged" = `git cherry main <branch>` shows no `+` (merge-backs
+are cherry-picked, so ancestry never holds); per-row approval; main and current worktrees excluded; `-D` only on cherry-clean
+rows the owner approves; the disposition in this log and on TD-246, which stays open.
+builder-check · T7 · 7 contradictions · 6 questions · settled: the coordinator cross-checks each recommendation-driving finding
+by a different route; candidate fields verbatim from the Done when; inventory by every `## L-NNN` header reconciled to the
+total; workdoo gate verdicts and the upstream path added; baseline archived SPRINT-128…137, boundary `ade5c5c3`; the
+coordinator proposes any ADR after Codex round 2; ranking → owner ruling.
+owner-ruling (G2 popup, 2026-10-24): R1 register one thin harness for T1/T3's retained tests (scope-change below) · T2's
+Done-when reworded to the agent-installs-per-brief form (scope-change below) · T7 ranks candidates by evidenced recurrence ×
+consequence, ties broken by the lower operating cost.
+
+### 2026-10-24 | scope-change | T1, T3: one registered harness gates their retained tests; § Scope's Out line amended
+What broke: a bare `*.test.ts` never reaches the gate; `scripts/qa-check.sh` runs a suite only through a harness listed in
+`eval_harnesses_always` (the registration rule in `evals/run-typecheck-population-fixtures.ts`'s header). § Scope's Out line
+excluded any change to `scripts/qa-check.sh`, which would have left T1's and T3's must-FAIL tests unrun.
+Impact: one thin `evals/run-workflow-command-fixtures.ts` with a test-count floor runs both test files, registered always-on by
+one token in `scripts/qa-check.sh`. T1 creates it; T3 adds its file (T1 then T3, already ordered). T1 and T3 `Layers:` gain both
+paths. No member Done-when changes. Covered by T1's and T3's admissions, cap 2.
+owner-ruling: popup, 2026-10-24 — "Register one harness", over hosting in an existing gated suite or `bun test` only. G2 stands.
+
+### 2026-10-24 | scope-change | T2 (TASK-483): the first Done-when box says who installs, as dispatch can actually do it
+What broke: TASK-483's first box says "the coordinator installs them in each builder/reviewer worktree", but a harness-created
+worktree exists only once its agent starts, so the coordinator cannot install into it first.
+Impact: box 1 now reads that the brief has each builder/reviewer install them first, by the host's own procedure, and the
+coordinator checks that its report quotes the install and the leg's result. Same outcome; no other box changes. `dispatch.md`
+is already in T2's `Layers:`.
+owner-ruling: popup, 2026-10-24 — "Reword", over keeping the literal wording. G2 stands.
+
+### 2026-10-24 | scope-change | T5 (TASK-486): its templates token narrows to the one file G2 chose
+What broke: nothing; G2 ruled the deferred choice. `init` scaffolds `.claude/CLAUDE.md` (auto-loaded) and `.claude/CONTEXT.md`
+(not auto-loaded, and the CLAUDE template does not import it), so the line goes in
+`skills/lean-doc-generator/templates/CLAUDE.md.template`.
+Impact: T5's `Layers:` directory token narrows to that file (L-240: a token for an undecided choice is pruned once G2 rules).
+No member Done-when changes.
