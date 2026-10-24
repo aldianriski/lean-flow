@@ -391,6 +391,29 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-271** severity: low | status: open | created: Sprint-138 (T3 consumer reading on workdoo)
+  - Summary: **`dispatch.md` § System verify's rung 1 does not rank `test` · `check` · `verify`.** It says "a `test` / `check` /
+    `verify` script … stop at the first hit", and an adopter with both `test` (`bun test`, unit only) and `verify` (its real
+    gate) gets whichever is read first, which can be the unit-only script. SPRINT-138 T3 worked around it in the post-merge
+    sentence ("choose the repo-wide gate over a unit-only script when both exist"), but System verify's own discovery order still
+    carries the ambiguity for every consumer.
+  - Fix direction: rank rung 1 explicitly (a repo-wide gate script over a unit-only one), with a discovery fixture holding both.
+    Consumer-facing skill work.
+
+- **TD-270** severity: low | status: open | created: Sprint-138 (T3 cost measurement, PowerShell PATH)
+  - Summary: **Some gate checkers fail misleadingly when Git's POSIX tools are not on PATH.** Run with bun from a PowerShell PATH
+    lacking Git's `usr/bin`, prose-density reported 25 baseline FAILs ("… not in the examined population") and layers-completeness
+    crashed Bun. Neither said a tool was missing. With Git's tools on PATH for the call, all five merge-check legs passed. The gate
+    itself runs under `sh`, so it is unaffected; a direct checker call or `merge-check` from PowerShell is not.
+  - Fix direction: each checker that shells out to a POSIX tool checks for it first and FAILs naming the missing tool. Other G.
+
+- **TD-269** severity: trivial | status: open | created: Sprint-138 (T3 scoped review round 2, review-cap routed)
+  - Summary: **`evals/merge-check.test.ts`'s wiring check has two blind spots.** (1) It matches each leg's invocation inside its
+    qa-check.sh block with `toContain`, so a gate-side argument appended after the checked text (`bun "$lc_script" $lc_files
+    --strict`) goes unnoticed. (2) If a gate block loses its column-0 `fi`, the block reader runs past the real block; the
+    `toBeGreaterThan` guards do not catch it.
+  - Fix direction: assert the invocation as a whole trimmed line (allowing the trailing `2>&1`); fail when a block has no closing `fi`.
+
 - **TD-268** severity: trivial | status: open | created: Sprint-138 (T1 scoped review round 2, review-cap routed)
   - Summary: **`scripts/gate-remote.ts` has three nits the capped review routed here, not to a third round.** (1) The verdict
     is read from the FIRST `QA-CHECK:` line (`judgeOutput` and the FAIL listing both take the first match). A nested harness
