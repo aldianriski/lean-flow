@@ -227,3 +227,19 @@ consequence · T7 · behaviour:low · governance:high
 review · T7 · codex · behaviour:low · governance:high
 Codex round 1: FIX (7 items). Round 2: 8 of 9 applied, item 5 still blocking (no named reader of open assigned work). The owner
 authorised a narrow round 3, which came back CLEAR (VERDICT-T7); its one nit was applied at merge.
+
+### 2026-10-24 | progress | T3 (TASK-484) built and merged; scoped review and Codex both CLEAR at round 2; merge-check's first real run green
+Builder in a worktree (base `c0c904e2` verified; it installed dev dependencies and typechecked per T2's new rule) touched only its
+five declared files. Merged as `3ccfa36f` (command + tests + harness + emitter rule), `1efdd16e` (dispatch.md), `f7a642be` (review
+retry). Its own merge-back is the command's first use, replacing the five hand-run legs:
+merge-check · f7a642be · 5/5 green (0 skipped, 0 failed), 23 s, 1.16 GB free.
+Consumer (workdoo, read-only): no merge-back check is documented, so the wording falls to the discovered gate, and "repo-wide over
+unit-only" picks `verify` over `test`. The unranked rung itself is filed as TD-271. T3's scoped review was the sprint's first to
+report a Pinning tests section, which satisfies T4's exercise B (box 2 ticked, TD-212 resolved). Boxes 5 (every merge-back through
+close, investigated against system verify) and 7 (README/CHANGELOG) stay open until the close steps.
+consequence · T3 · behaviour:material · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:high
+review · T3 · codex · behaviour:material · governance:high
+Scoped round 1: Spec should-fix (a checker's SKIP counted green; layers-observed and tsc arguments unpinned), Standards should-fix (the
+post-merge sentence lost its connective). Codex round 1 on dispatch.md: FIX (connective; repo-wide over unit-only fallback; who
+agrees the fixed set). One bounded retry, then round 2: scoped Spec nit (TD-269), Codex CLEAR.
