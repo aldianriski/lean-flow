@@ -26,7 +26,7 @@ Consumer: every adopter's reviewer gets the step, and it reads the host's own te
 - [x] `review-scoping.md`'s brief requires finding the host's existing tests and harnesses that reference each changed artifact (by ✓ `329f4ca5` + Codex retry `a0a03bb2`: brief bullet requires searching by path, file name and exported/defined names, running all hits (excluded hits named with a reason), a separate Pinning tests section in the host format, per-file "no pinning test found" with the searches run; lean-flow paths only as a marked example. Codex round 2 CLEAR
       path and by the names it exports or defines), running them, and reporting each result in the host's format, in a section
       separate from the Standards/Spec axes. Finding none is reported as "no pinning test found", never left silent. Host-generic.
-- [ ] Exercised three ways. Applied to one SPRINT-111 break's diff, the procedure names the test that caught it by hand. One real
+- [x] Exercised three ways. Applied to one SPRINT-111 break's diff, the procedure names the test that caught it by hand. One real ✓ A: on SPRINT-111 T3 break `d75d861` the procedure names all three red test files (one only by file name); B: T3's scoped review (2026-10-24) reported a Pinning tests section per the new bullet: searched by path, file name and exported names, ran 7 harnesses, named excluded hits with reasons; C: workdoo `180d5b7` (read-only) names 10 test files, 4 outside the diff
       SPRINT-138 review reports the section. Applied read-only to one workdoo diff, it names that repo's pinning tests (or reports
       that none were found).
 - [ ] TD-212 resolved (or narrowed, naming what stays open); README and CHANGELOG describe the review change.
