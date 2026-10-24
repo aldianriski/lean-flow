@@ -14,7 +14,7 @@ SSOT for the loop, roster, gates, modes, tiers, and sprint model. README and CLA
 `/prime → (/task-decomposer → /triage →) /lean-doc-generator promote → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) → next `/prime` reads it.
 Every skill works standalone; the loop is just the order they reward most together. (Diagram → README.)
 
-## Skill roster (14 — 12 stage-skills · 1 conductor · 1 decision aid)
+## Skill roster (15 — 12 stage-skills · 1 conductor · 1 decision aid · 1 writing utility)
 
 | Skill | Role | One-line purpose |
 |---|---|---|
@@ -32,6 +32,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/handoff` | continuity | compact the conversation → temp-dir doc for the next session |
 | `/insights` | learn | anytime — a friction → an `L-NNN` candidate in `LEARNINGS` (or bump a match's `count`); complements the Sprint-Close Retro |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
+| `/humanizer` | utility | rewrite AI-sounding prose in place (pasted text or a file); EN catalog vendored from blader/humanizer (MIT). Not a stage, so `/flow` does not name it; it fires through the writing stages wired later |
 
 **Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2). Both run **by frontier round** — batch every question whose prerequisites are settled into one popup, serialise only dependents (dependency is the discriminator, not count); facts are the agent's job to resolve, never the user's. **Implement routing** (`/orchestrator`):
 new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct. `/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
@@ -44,9 +45,7 @@ lean-flow ships **no custom agent definitions and no hooks today** — both are 
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements; each completes its job
 invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole exception** — it *sequences* the stages, never
-re-implements one. **Bug intake** — a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`.
-
-**Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
+re-implements one. **Bug intake** — a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`. **Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
 
 ## Gates
 

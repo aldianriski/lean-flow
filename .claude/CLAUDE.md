@@ -12,7 +12,7 @@ status: current
 - **Type**: Claude Code plugin · lean skill library
 - **Stack**: Markdown · Claude Code skills system
 - **Architecture**: Plugin-first — components at repo root per the Claude Code plugin spec.
-  Roster today: **14 skills** (incl. `/lean-doc-generator init`, which *does* scaffold a fresh
+  Roster today: **15 skills** (incl. `/lean-doc-generator init`, which *does* scaffold a fresh
   repo) · **no hooks** · **no agent definitions** — the loop dispatches Claude's built-ins
   (`Explore` · `/code-review` · `/verify` · `/security-review`), and `/council` orchestrates
   sub-agents internally.
@@ -27,7 +27,7 @@ status: current
 ## File Structure
 → **`docs/architecture/overview.md` § Directory structure** — the where-things-live map, and the only one.
 A second tree here is a hand-maintained codemap, which § Orientation of CONTEXT.md rules out (it rots — LAW 3).
-Shape: **14 SKILL.md** auto-discovered at root · **34 canonical doc templates** + 2 non-core (DESIGN · QA-TESTCASE) **= 36 total**.
+Shape: **15 SKILL.md** auto-discovered at root · **34 canonical doc templates** + 2 non-core (DESIGN · QA-TESTCASE) **= 36 total**.
 
 ## The loop
 `/prime → /lean-doc-generator → /orchestrator → repeat`. `/handoff` ends a session; `/prime`

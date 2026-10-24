@@ -346,7 +346,7 @@ for (const [dir, expected, nTodo, nStore, who] of CENSUS_CASES) {
 
 // --- (e) runtime manifests: Codex + Kimi resolve the plugin's skills (SPRINT-114 T3 (c)) ------------
 // Both runtimes read `<plugin_root>/.<runtime>-plugin/plugin.json` and follow its `skills` path.
-// Asserted: the manifest parses, `skills` resolves to a directory, and every one of the 14 skills
+// Asserted: the manifest parses, `skills` resolves to a directory, and every one of the 15 skills
 // has a SKILL.md there. (Live runtime proof is retained in the sprint log, not re-run here.)
 for (const rt of ["codex", "kimi"]) {
   const mpath = join(REPO_ROOT, `.${rt}-plugin`, "plugin.json");
@@ -355,7 +355,7 @@ for (const rt of ["codex", "kimi"]) {
   try {
     const m = JSON.parse(readFileSync(mpath, "utf8"));
     const dir = join(REPO_ROOT, String(m.skills ?? ""));
-    const missing = SKILLS.concat(["council", "diagnose", "insights", "prototype", "refactor-advisor", "release-patch", "tdd"])
+    const missing = SKILLS.concat(["council", "diagnose", "humanizer", "insights", "prototype", "refactor-advisor", "release-patch", "tdd"])
       .filter((s) => !existsSync(join(dir, s, "SKILL.md")));
     ok = m.name === "lean-flow" && typeof m.skills === "string" && missing.length === 0;
     detail = `name=${m.name} skills=${m.skills} missing=[${missing}]`;

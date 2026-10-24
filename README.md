@@ -6,7 +6,7 @@
 # lean-flow
 
 **A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, and an opt-in decision council.
-<br />**14 skills · a repo scaffolder (`/lean-doc-generator init`) · no hooks and no agent definitions in the roster today.** Drop it into any repo and adapt.
+<br />**15 skills · a repo scaffolder (`/lean-doc-generator init`) · no hooks and no agent definitions in the roster today.** Drop it into any repo and adapt.
 
 [![MIT License][license-shield]][license-url]
 [![Claude Code][claude-shield]][claude-url]
@@ -182,7 +182,7 @@ by hand) — same artifacts either way.
 
 ## The skills
 
-One conductor + twelve standalone stages + an opt-in decision council. `/flow` conducts; the twelve
+One conductor + twelve standalone stages + an opt-in decision council + a writing utility (`/humanizer`). `/flow` conducts; the twelve
 stage-skills each also run **standalone** (none require another); `/council` is for hard forks.
 
 | Stage | Skill | Use it for |
@@ -201,6 +201,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |
 | **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
 | **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → a calibrated `verdict-<slug>.md` (pre-mortem · confidence+dissent · optional gated fact-verify) → feed an ADR (uses sub-agents) |
+| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) |
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
 promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates · modes →
@@ -469,7 +470,7 @@ Full map — composition rule, the loop, integration points, boundaries →
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 .codex-plugin/    plugin.json                           (Codex CLI manifest, lockstep version)
 .kimi-plugin/     plugin.json                           (Kimi Code CLI manifest, lockstep version)
-skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
+skills/           15 skills — /flow conductor + 12 stages + /council + /humanizer (auto-discovered)
   lean-doc-generator/
     references/   STANDARD.md · migration-map.md · ADR-example.md
     templates/    34 canonical doc templates (core, incl. EPIC · SPRINT · ADR · RESEARCH ·
@@ -481,6 +482,7 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
   refactor-advisor/references/ deepening.md
   prototype/references/       logic.md · ui.md
   council/                    opt-in agent decision aid
+  humanizer/references/       patterns-en.md (vendored from blader/humanizer, MIT)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
 docs/             architecture/ · development/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
 
@@ -550,7 +552,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 [license-url]: LICENSE
 [claude-shield]: https://img.shields.io/badge/Claude_Code-plugin-8A63D2?style=for-the-badge
 [claude-url]: https://claude.com/claude-code
-[skills-shield]: https://img.shields.io/badge/skills-14-blue?style=for-the-badge
+[skills-shield]: https://img.shields.io/badge/skills-15-blue?style=for-the-badge
 [skills-url]: #the-skills
 [website-shield]: https://img.shields.io/badge/website-aldianrizki.com-orange?style=for-the-badge
 [website-url]: https://aldianrizki.com/
