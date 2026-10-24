@@ -120,3 +120,23 @@ unrun; this host's known limit, so the full gate runs off-host at close. (2) The
 `night-run.md` and `night-run-checks.md` (its exclusion list) without a `Layers:`/`Cites:` home; they were added to T1
 `Cites:` (`3c22c536`), and the leg re-run alone passes 10/0. The learnings legs and doc-caps pass; task-decomposer is at
 130/140.
+
+### 2026-10-25 | progress | T2 (TASK-490) built: /humanizer standalone, English catalog vendored verbatim, roster 15
+A Sonnet builder in the main tree (`c86fcb6e`) fetched upstream fresh at `8c307f36` (MIT, Copyright (c) 2025 Siqi Chen),
+wrote `skills/humanizer/references/patterns-en.md` (header with source, version, full sha and the MIT text, then upstream's
+body), and a 68-line procedure-only SKILL.md with pasted and file modes. Verbatim proof by the coordinator on the committed
+blobs, not working copies: from line 35 on it is `cmp`-identical to upstream from line 17 on, both LF. A working-copy `cmp`
+first showed a byte-38 difference: Windows CRLF in the checkout, which git normalises. Roster 14 → 15 in CLAUDE.md,
+CONTEXT.md (merged two paragraphs, nothing lost, 149/150), README, overview.md and the layout eval (41/0; runtime-manifest legs
+see humanizer). Ownership headers refreshed (`525db83d`).
+Exercise 1, pasted mode (builder; catalog read in full first). Before: "Great question! Here is an overview of our new caching
+layer. It's not just a speed boost, it's a fundamental shift in how we serve data. The layer is fast, reliable, and easy to
+maintain. It cuts median latency from 120 ms to 45 ms, a crucial improvement — and the team shipped it in March. That is the
+real win. I hope this helps! Let me know if you'd like me to expand on any section." Tells marked: §22 ×2, §1, §6, §12, §8,
+§2. Final: "The new caching layer cuts median latency from 120 ms to 45 ms. It shipped in March, and it is reliable and easy
+to maintain." Facts kept: 120 → 45 ms, March, reliable, easy to maintain; "fast" is carried by the latency figure. Cut as
+dressing: the "fundamental shift" contrast, the closer, the chatbot wrapper. Nothing added.
+Exercise 2, file mode, on a copy of `docs/architecture/overview.md` lines 1–24 plus a code fence. Before: "**/flow** … — it
+*sequences* the loop … never re-implements a stage. À la carte **or** conducted." After: "**/flow** …: it *sequences* the
+loop … and never re-implements a stage. Use the skills à la carte or conducted." YAML, the fence content and every inline-code
+span, extracted from both versions, are `cmp`-identical; four prose lines changed.
