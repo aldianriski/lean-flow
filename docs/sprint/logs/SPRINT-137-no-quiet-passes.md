@@ -118,3 +118,14 @@ and the third was the scope-change leg (cleared by the entry above). On `f5a807a
 (`e4eb536e`): two `noUncheckedIndexedAccess` violations at its parse-line destructures, fixed in `e98a7e34` with the file's own
 `[0]!` idiom (a missing line still fails loudly, so the control cannot pass vacuously). The coordinator's merge-back re-run
 exercised T2's harness but not the typecheck leg, which is why it surfaced only at system verify.
+
+### 2026-10-24 | close | No Quiet Passes — 4 of 4 members in done/, 16 of 16 DoD, PLAN_EXHAUSTED
+All four members are in the done folder, and `check-sprint-by-reference --close` passes 10/0. System verify passed 302/0
+(`e98a7e34`). No handoff entry exists, so nothing needs reconciling.
+Retro buckets, auto-filed:
+- Shipped → root CHANGELOG only if the owner rules a release at retention (fixes only: TD-163 · 099 resolved; TD-165 · 148
+  narrowed; no `skills/`, `spec/`, manifest or README path in the diff).
+- Tech debt → TD-267 (filed at the 10-23 scope-change) widened to its second site at system verify. Nothing else surfaced unfiled.
+- Learnings → L-224's ninth sighting (a scope-change entry never re-run through `--scope-change`) · L-218's third (merge-back
+  skipped the typecheck leg). No new entry.
+- Follow-ups → none.

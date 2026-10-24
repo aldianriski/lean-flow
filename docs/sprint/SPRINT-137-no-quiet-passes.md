@@ -2,8 +2,8 @@
 sprint: 137
 slug: no-quiet-passes
 owner: Maintainer
-last_updated: 2026-10-22
-status: active
+last_updated: 2026-10-24
+status: closed
 plan_commit: df202bb6
 gates_signed: G1,G2 @ 8b5bb8e4
 update_trigger: sprint execute/close events
@@ -112,5 +112,33 @@ read from frontmatter only.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/epic/INDEX.md` | T1 | the header says a live row holds status and a pointer, never member-sprint state | Low | read back 8 live rows |
+| `evals/dod-delta.test.ts` · `evals/run-dod-delta-fixtures.sh` | T2 | every harness's pass-count parse runs over a captured ANSI sample, with a stripless control; floor 111 | Low | harness 111/0; seeded strip revert 110/1 |
+| `scripts/lib/check-review-depth.sh` | T3 | a consequence key that is not one `T<digits>` FAILs `review-depth-consequence-vocab` | Med | fixtures green; SPRINT-087 log PASS → FAIL ×8 |
+| `evals/run-review-depth-fixtures.sh` · `evals/fixtures/review-depth/` | T3 | must-FAIL `pre-T1` and `T2,T3` cases beside a green sibling | Low | the runner itself |
+| `scripts/lib/check-epic-archive.ts` · `evals/epic-archive.test.ts` | T4 | unbalanced annotation is unparsed; both suffix anchors tested; `member_sprints:` from frontmatter only | Med | suite 60/0; real run byte-identical; seeded anchor removals 59/1 each |
+| `TECH-DEBT.md` | coord | TD-163 · 099 resolved; TD-165 · 148 narrowed; TD-267 filed and widened | Low | read back |
 
 ## Retro
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. Two promoted rules recurred. The 10-23 scope-change entry named
+a checker outside T3's `Cites:` and was never re-run through the gate's `--scope-change` mode (L-224, ninth sighting). The
+merge-back re-ran each task's harness but not the typecheck leg, so T2's two `noUncheckedIndexedAccess` errors reached system
+verify (L-218, third sighting). Both were caught only by the close's full gate.
+
+**Cost** — per the log: 1 Codex review at intake, 4 builder checks, 3 worktree builders (T1 inline), 3 scoped reviews and 1
+bounded retry (T4). The close session dispatched nothing. Three QA_FULL runs on the VPS, two red: one on the run's own
+environment (`git clean -x` removed the clone's dev dependencies), one on a real defect. Four members, 16 DoD.
+
+**Worked**
+- Every tick was re-proved on main before it was written: harnesses re-run, three seeded reverts restored to the `HEAD` hash,
+  and SPRINT-087's log run through both the old and the new checker.
+- T2's population came out the same by two selection rules (live `bun test` call vs live `n_pass` parse: 6 = 6), and T3's
+  SPRINT-087 FAIL count matched its own 5 `pre-T1` lines.
+- The `TECH-DEBT.md` single-owner rule (D1) held again: no merge-back conflict.
+
+**Friction**
+- T2–T4 sat merged and reviewed with every box unticked across a session boundary. Prime reported 13 open DoD for finished work.
+- The `pre-T1` record key misled two checkers. TD-267 now names both sites.
+
+**Pattern candidate** — none new; both misses are recurrences of promoted rules, recorded as sightings.
