@@ -255,3 +255,7 @@ with one command." Facts are now seven: the Postgres 16 migration · for this pr
 backed up first · no data lost · one-command rollback on error. (2) Term-table compliance for exercise 1, shown by the
 coordinator: the 24 coinages in `patterns-id.md`'s table (split on "/"), word-matched against the EN→ID final, give 0 hits. A
 seeded control sentence with peladen, peramban, kerangka kerja and daring gives 4 hits, so the scan fires.
+
+### 2026-10-25 | progress | T4 (TASK-492) done: 5 of 5 boxes; Codex CLEAR at round 2
+consequence · T4 · behaviour:material · governance:low
+review · T4 · codex · behaviour:material · governance:low
