@@ -39,7 +39,7 @@ review of the 78 low/minor/trivial rows (a separate triage pass) · TASK-367 and
 
 ### T1 — Run the full gate off-host in one command `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/gate-remote.ts` · `evals/gate-remote.test.ts` · `.claude/CONTEXT.md`
-  · `evals/run-workflow-command-fixtures.ts` · `scripts/qa-check.sh`
+  · `evals/run-workflow-command-fixtures.ts` · `scripts/qa-check.sh` · `evals/run-emitter-column-fixtures.ts`
   · `docs/work/todo/TASK-482-one-command-runs-the-full-gate-off-host.md`
   · `docs/work/in_progress/TASK-482-one-command-runs-the-full-gate-off-host.md`
   · `docs/work/done/TASK-482-one-command-runs-the-full-gate-off-host.md`
@@ -65,6 +65,7 @@ Tier P, shipped skill: the Codex review loop applies. T1 is its remote route if 
 ### T3 — A fixed merge-back check, and tick at acceptance `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/merge-check.ts` · `evals/merge-check.test.ts` · `skills/orchestrator/references/dispatch.md`
   · `README.md` · `CHANGELOG.md` · `evals/run-workflow-command-fixtures.ts` · `scripts/qa-check.sh`
+  · `evals/run-emitter-column-fixtures.ts`
   · `docs/work/todo/TASK-484-the-merge-back-check-runs-a-fixed-cross-cutting-set.md`
   · `docs/work/in_progress/TASK-484-the-merge-back-check-runs-a-fixed-cross-cutting-set.md`
   · `docs/work/done/TASK-484-the-merge-back-check-runs-a-fixed-cross-cutting-set.md`
