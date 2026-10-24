@@ -19,6 +19,12 @@ Hand each review pass a brief, not the repo:
   finds the files that document how code should be written (CONTRIBUTING, coding-standards, style
   guides, CLAUDE.md / AGENTS.md) and passes their paths plus the relevant excerpts; when there are
   none, the brief says so. The reviewer never searches the repo for them.
+- the host's **pinning tests** — for each changed file, the existing tests and harnesses that reference it, found by its
+  path and by the names it exports or defines (a `git grep` over the host's test and harness files). Run them and report
+  a **Pinning tests** section, separate from Standards and Spec: each command with its result in the host's own format.
+  None found → the section says "no pinning test found" and names the search it ran; never leave it silent. A reviewer that
+  cannot run commands names them, and the coordinator runs them into the same section. (lean-flow's own: tests live under
+  `evals/` and `test/`, gated through their `evals/run-*` harnesses — an example, not a requirement a host must meet.)
 
 Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo.
 Report two independent axes — **Standards** (repo conventions) and **Spec** (builds the right thing) —
