@@ -11,42 +11,44 @@ Each pattern names the English section it shares. The English problem statements
 ### Shared with the English catalog
 
 **ID-1 (§1) Bukan X, melainkan Y.** Watch for: "Tidak hanya X, tetapi juga Y", "Bukan sekadar X, melainkan Y", "Bukan hanya X, namun Y", "Ini bukan tentang X, ini tentang Y", and the split form "Ini bukan berarti X. Ini berarti Y."
-> Sebelum: Fitur ini bukan sekadar cache, melainkan lapisan yang mempercepat seluruh aplikasi.
-> Sesudah: Fitur ini men-cache hasil query, jadi halaman load lebih cepat.
+> Sebelum: Fitur ini bukan sekadar cache, melainkan lapisan yang menyimpan hasil query selama 60 detik.
+> Sesudah: Fitur ini menyimpan hasil query selama 60 detik.
 
 **ID-2 (§2) Penutup satu kalimat.** Watch for: "Itulah kuncinya.", "Itulah yang membuatnya istimewa.", "Dan itu penting.", "Hasilnya? Luar biasa.", a row of fragments ("Tanpa ribet. Tanpa drama.").
 > Sebelum: Retry menutupi gangguan singkat. Itulah kuncinya.
 > Sesudah: Retry menutupi gangguan singkat.
 
 **ID-3 (§3) Ungkapan yang terdengar dalam.** Watch for: "Pada intinya", "Pada hakikatnya", "Hakikatnya", "Sejatinya", "Esensinya", "Yang terpenting", "Inti dari permasalahannya".
-> Sebelum: Pada intinya, yang terpenting adalah kesiapan tim.
-> Sesudah: Yang menentukan adalah apakah tim siap mengubah kebiasaannya.
+> Sebelum: Pada intinya, rilis tertunda karena tim belum siap.
+> Sesudah: Rilis tertunda karena tim belum siap.
 
 **ID-4 (§4) Pengantar sebelum poin.** Watch for: "Mari kita selami", "Mari kita bahas", "Mari kita bedah", "Mari kita eksplorasi", "Berikut yang perlu Anda ketahui", "Tanpa basa-basi lagi", "Yuk, kita mulai".
-> Sebelum: Mari kita selami cara kerja caching di Next.js. Berikut yang perlu Anda ketahui.
-> Sesudah: Next.js men-cache data di beberapa lapisan: request memoization, data cache, dan router cache.
+> Sebelum: Mari kita selami cara kerja caching di Next.js. Berikut yang perlu Anda ketahui: Next.js men-cache data di tiga lapisan.
+> Sesudah: Next.js men-cache data di tiga lapisan.
 
 **ID-5 (§5) Membantah yang tidak ada.** Watch for: "Perlu dicatat bahwa", "Perlu diingat bahwa", "Jangan salah paham", "Bukan berarti ... tidak penting", "Mungkin Anda berpikir ... tetapi".
-> Sebelum: Perlu diingat bahwa ini bukan soal panjang prompt. Jangan salah paham, dokumentasi tetap penting.
-> Sesudah: Yang menentukan adalah apakah agent bisa memakai instruksinya saat bertindak.
+> Sebelum: Perlu diingat bahwa build gagal karena versi Node yang salah. Jangan salah paham, ini bukan soal ukuran bundle.
+> Sesudah: Build gagal karena versi Node yang salah, bukan karena ukuran bundle.
 
 **ID-6 (§12, §13) Kata AI dan inflasi makna.** Watch for: krusial, esensial, signifikan (figuratif), lanskap (kiasan), memainkan peran penting/kunci/vital, di era digital ini, di tengah pesatnya perkembangan, tonggak sejarah, menjadi bukti nyata, berperan sebagai katalis, ekosistem (kiasan), holistik, komprehensif, mumpuni, seamless (kalau dipakai sebagai kata hias), "masa depan yang cerah", "semakin relevan". Keep the fact, drop the significance.
-> Sebelum: Di era digital ini, observability memainkan peran krusial dalam lanskap rekayasa perangkat lunak.
-> Sesudah: Tanpa log dan metrik, tim sulit tahu kenapa service lambat.
+> Sebelum: Di era digital ini, log memainkan peran krusial dalam lanskap rekayasa perangkat lunak: tim memakai log untuk melacak service yang lambat.
+> Sesudah: Tim memakai log untuk melacak service yang lambat.
 
 **ID-7 (§15) Penunjang "-nya".** Watch for: ", menjadikannya ...", ", sehingga memastikan ...", ", yang mencerminkan ...", ", menyoroti pentingnya ...", ", yang pada akhirnya berkontribusi pada ...". Keep the rider only if the source supports it.
 > Sebelum: Modul ini dipisah per domain, menjadikannya mudah dirawat dan mencerminkan komitmen pada kualitas.
 > Sesudah: Modul ini dipisah per domain, jadi lebih mudah dirawat.
 
 **ID-8 (§16, §18) Bahasa promosi dan kata kerja berputar.** Watch for: "menawarkan", "menghadirkan", "hadir dengan", "berfungsi sebagai", "merupakan", "mampu", "solusi inovatif", "pengalaman yang tak tertandingi", "luar biasa". Use *adalah*, *punya*, *ada*.
-> Sebelum: Dashboard ini hadir sebagai solusi inovatif yang menawarkan pengalaman luar biasa.
-> Sesudah: Dashboard ini menampilkan error rate dan latency per endpoint.
+> Sebelum: Dashboard ini hadir sebagai solusi inovatif yang menawarkan pengalaman luar biasa dan menampilkan error rate per endpoint.
+> Sesudah: Dashboard ini menampilkan error rate per endpoint.
 
 **ID-9 (§22) Sisa chatbot.** Watch for: "Tentu saja!", "Tentu!", "Pertanyaan yang bagus!", "Anda benar sekali", "Semoga membantu!", "Semoga bermanfaat!", "Jangan ragu untuk bertanya", "Silakan beri tahu saya jika ...", "Apakah Anda ingin saya ...?", "Berikut adalah ...". Remove the wrapper, keep the content.
 > Sebelum: Tentu saja! Berikut penjelasannya. Index dipakai untuk mempercepat pencarian. Semoga membantu! Jangan ragu untuk bertanya lagi.
 > Sesudah: Index mempercepat pencarian.
 
 **ID-10 (§23) Batas pengetahuan dan tebakan.** Watch for: "Berdasarkan informasi yang tersedia", "Sejauh pengetahuan saya", "Per tanggal ...", "diyakini bahwa", "kemungkinan besar". State what the source does not show, or cut.
+> Sebelum: Sejauh pengetahuan saya, library ini dirilis pada 2019.
+> Sesudah: Library ini dirilis pada 2019. (If the source does not confirm the year, say that instead of guessing.)
 
 ### Indonesian-only tells
 
@@ -71,8 +73,12 @@ Each pattern names the English section it shares. The English problem statements
 > Sesudah: Jalankan perintah ini untuk melihat log.
 
 **ID-16 Daftar bernomor "Pertama, Kedua, Ketiga" dan "Kesimpulan".** Watch for: "Pertama, ... Kedua, ... Ketiga, ..." for three points that need no order, and a closing "Kesimpulannya", "Singkatnya", "Secara keseluruhan" paragraph that repeats the text. Same tell as §6 and §2.
+> Sebelum: Pertama, build lebih cepat. Kedua, bundle lebih kecil. Ketiga, deploy lebih mudah. Kesimpulannya, migrasi ini bermanfaat.
+> Sesudah: Migrasi ini mempercepat build, memperkecil bundle, dan mempermudah deploy.
 
 **ID-17 Hiasan "yang".** Watch for: "hal yang perlu diperhatikan adalah bahwa", "merupakan sebuah ... yang", "sebuah ... yang sangat". Cut the scaffolding, keep the claim.
+> Sebelum: Hal yang perlu diperhatikan adalah bahwa token merupakan sebuah kredensial yang kedaluwarsa setelah 24 jam.
+> Sesudah: Token adalah kredensial yang kedaluwarsa setelah 24 jam.
 
 ## B. Term policy
 
