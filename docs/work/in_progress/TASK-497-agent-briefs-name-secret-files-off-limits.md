@@ -33,6 +33,24 @@ the rule.
 - [ ] L-247 is marked `promoted: yes → <where>` with `disposition: move-to-reference`, then collapsed per §11.
 - [ ] CHANGELOG line; Codex gauntlet review clean.
 
+## Census (brief sites, settled at G2 and re-checked at Codex round 1)
+
+Selector A: a wording grep across `skills/` for sub-agent · dispatch · reviewer · reader · Explore · advisor. Selector B: a
+read of each skill's steps that spawn an agent. They agree on five sites, ten prompts:
+
+| Site | Brief(s) carrying the rule |
+|---|---|
+| `skills/orchestrator/references/dispatch.md` | builder brief · worktree dispatch protocol |
+| `skills/orchestrator/references/review-scoping.md` | reviewer brief |
+| `skills/orchestrator/references/builder-check.md` | reader prompt |
+| `skills/task-decomposer/SKILL.md` | `Explore` recon (step 1) |
+| `skills/council/references/prompts.md` | research · advisor · reviewer · chairman · moderator · fact-check |
+
+Excluded, with reason: `night-run.md` and `night-run-checks.md` dispatch through `dispatch.md`'s briefs; orchestrator
+`SKILL.md` names the routing, not a brief; refactor-advisor's "Explore" is a phase, not an agent; diagnose, flow, prototype
+and prime spawn no briefed agent; the council's verdict-file block is an output format, not a brief. A third route, an awk
+pass over every fenced block in `prompts.md`, found the moderator missing at Codex round 1; it was fixed in `eda9b5a6`.
+
 ## Touches
 `skills/orchestrator/references/dispatch.md` · `skills/task-decomposer/SKILL.md` (or its references) · other brief sites
 the census finds · `docs/LEARNINGS.md` · CHANGELOG
