@@ -222,3 +222,26 @@ consequence · T3 · behaviour:material · governance:low
 review · T3 · codex · behaviour:material · governance:low
 The coordinator's ID-16 fix recorded above as `HEAD` is `97867184`. Round 2 cleared the example pairs, the exercise and
 regressions. The owner's linguistic rulings were held out of the review's scope.
+
+### 2026-10-25 | progress | T4 (TASK-492) built: translate mode, on explicit request only
+The builder (`50d5f623`) added a Translate mode to `skills/humanizer/SKILL.md` (+16 lines, 87/140, purely additive). It runs
+only on a request naming a target language; default and file modes never translate. It translates meaning, then cleans in the
+target language with its catalog: EN→ID reads both catalogs, applies the term table and first-use italics, and checks the ID
+slop list; ID→EN checks the EN catalog. Mixed text translates only other-language spans; same-language text gets a clean pass
+with a note. Code, paths, YAML, data, link targets and proper names stay.
+Exercise 1, EN→ID, on `README.md` lines 229–232 verbatim: "A gated loop: you give intent → it becomes tasks → executes with
+human checkpoints → ships. The gates are **inline checklists** (lean-flow ships no agent definitions of its own), and the loop
+dispatches Claude's **built-in** agents where they help — recon → `Explore`, review → `/code-review`, verify → `/verify`,
+security → `/security-review`. `/council` is the one skill that orchestrates sub-agents internally." Final: "Sebuah *loop*
+ber-*gate*: kamu memberi tujuan, tujuan itu jadi *task*, dikerjakan dengan *checkpoint* manusia, lalu di-*ship*. Gate-nya
+berupa *checklist* *inline* (lean-flow tidak membawa definisi *agent* sendiri), dan loop men-*dispatch* agent bawaan Claude
+bila membantu: *recon* → `Explore`, *review* → `/code-review`, *verify* → `/verify`, keamanan → `/security-review`.
+`/council` adalah satu-satunya *skill* yang mengorkestrasi *sub-agent* secara internal." No term-table word occurred; the
+English terms were kept with first-use italics. Six facts on both sides; the inline code is unchanged.
+Exercise 2, ID→EN. Source (written as an AI-styled note): "Selain itu, migrasi basis data ke Postgres 16 memainkan peran
+krusial dalam proyek ini. Migrasi dijalankan pada Sabtu malam dan memakan waktu 40 menit. Lebih lanjut, peladen di-backup
+terlebih dahulu, sehingga tidak ada data yang hilang. Jika terjadi galat, rollback bisa dilakukan dengan satu perintah. Semoga
+membantu!" Final: "The database migration to Postgres 16 ran on Saturday night and took 40 minutes. The server was backed up
+first, so no data was lost. If an error occurs, you can roll back with one command." Six facts on both sides (Postgres 16
+migration · Saturday night · 40 minutes · server backed up first · no data lost · one-command rollback on error). Cut as
+dressing: Selain itu, Lebih lanjut (ID-11), "memainkan peran krusial" (ID-6, the §13 significance), and "Semoga membantu!" (ID-9).
