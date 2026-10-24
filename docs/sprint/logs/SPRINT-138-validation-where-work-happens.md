@@ -91,3 +91,15 @@ What broke: nothing; G2 ruled the deferred choice. `init` scaffolds `.claude/CLA
 `skills/lean-doc-generator/templates/CLAUDE.md.template`.
 Impact: T5's `Layers:` directory token narrows to that file (L-240: a token for an undecided choice is pruned once G2 rules).
 No member Done-when changes.
+
+### 2026-10-24 | progress | T6 (TASK-487) done: 12 agent worktrees and 6 empty orphan directories removed, owner-approved
+Inline by the coordinator before any dispatch (J2). Census by two routes: `git worktree list` showed 22 agent worktrees (24
+entries, less main and `D:/Project/lean-flow-rc1`, which sits outside `.claude/worktrees/`), and 28 directories were on disk,
+of which 6 were empty orphans git no longer tracked. The triage figure of 23 had counted rc1; this is the corrected one.
+Classes: 12 clean, unlocked and fully applied (`git cherry main <branch>` shows no `+`) · 1 locked · 9 dirty, two of them with
+one commit not in main. The owner approved per class by popup: the 12 removed (`git worktree remove`, no `--force`; branches
+`-D` on the cherry proof, each re-checked just before removal) and the 6 empty orphans removed with `rmdir`. The two stray files
+`qa-t4.out` and `red.txt` were left for the owner. After: 10 registered, 10 directories. TD-246 updated and still open, in
+`9f1b2a4e`'s parent commit (`sprint(138): TECH-DEBT -- TD-246 …`). Ticks were re-checked with the gate's checkers
+(by-reference 8/0, layers-observed PASS, prose-density 28/0).
+consequence · T6 · behaviour:low · governance:low
