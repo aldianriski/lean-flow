@@ -163,3 +163,8 @@ the skills compose into a loop; curated, not copied (ADR-001); stage-skills comp
 routing suggestions, never requirements (ADR-005); `/flow` alone depends on the others, sequences the loop by calling each
 skill, never re-implements a stage; use is à la carte or conducted. All present after; nothing added. Changes are §8 dashes
 (three), §1 "Not X; the Y" contrast (one), and §19 bold on "or" (one). Code, YAML and inline code are `cmp`-identical.
+
+### 2026-10-25 | gate | owner ruling R5: a standing narrow Codex round 3 for the rest of this sprint
+D3 caps Codex at two rounds. Owner ruling by popup: from T2 on, when round 2 leaves only items already fixed, the coordinator
+runs one narrow round 3 on exactly those items without asking. A new finding at round 3, or any need for a round 4, still goes
+to the owner.
