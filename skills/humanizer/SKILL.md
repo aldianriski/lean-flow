@@ -23,7 +23,7 @@ Not for: code, data, config or logs · writing something new from scratch · tex
 
 ## Procedure
 
-1. **Read the catalog in full.** Read `references/patterns-en.md` end to end before touching the
+1. **Read the catalog in full.** Read `references/patterns-en.md` end to end (first line to last, no offset) before touching the
    text. If the text is Indonesian or mixed Indonesian-English (judge sentence by sentence), also
    read `references/patterns-id.md` end to end. No skimming and no working from memory; the pattern
    numbers, the "weak alone" marks and the "When not to act" list decide every edit.
