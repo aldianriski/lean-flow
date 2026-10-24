@@ -239,6 +239,13 @@ shared-file single-owner · declared-base-vs-HEAD · wave computation — all de
 Plan already carries, so there is nothing extra to maintain. A failure halts that wave with a *named*
 finding. Not a human gate (nothing to approve); it just refuses to fan out work whose ordering is unsafe.
 
+**Validation runs where the work happens**, not only at close. A worktree builder or reviewer installs your
+dependencies by your own install procedure and runs the leg that needs them (a typecheck, usually) before it
+reports, so a type error surfaces before merge-back. After each merge the coordinator runs your documented
+**merge-back check**, a fixed set of cross-cutting legs (or your discovered gate, the repo-wide one over a unit-only
+script), and ticks verified boxes in that same session. A review also runs the existing tests that pin what the
+change touches, searched by path, file name and exported names, and reports them in their own section.
+
 **Plan-mode approvals** — `quick`/`mvp` record the owner's G1/G2 approval on the task file (`gates_signed:` + `## Approved design`). You MAY set Claude Code's `plansDirectory` setting to a repo folder so plan mode's own plan file is kept; the task's record then cites that file. lean-flow never edits a settings file.
 
 **Modes** (`/orchestrator <mode>`) — three: `quick` (single small low-risk task, G1 only) · `mvp`
