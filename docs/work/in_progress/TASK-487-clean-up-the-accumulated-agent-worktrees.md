@@ -23,8 +23,8 @@ deletes, and the disposition is the owner's.
 Consumer: none shipped. An adopter's worktrees are theirs; this is lean-flow's own tree.
 
 ## Done when
-- [ ] Every agent worktree is listed with its clean / merged / locked state; only clean, merged, unlocked ones are proposed for removal.
-- [ ] The owner's disposition (removed · declined · none eligible) is recorded with the before/after count, and TD-246 is updated.
+- [x] Every agent worktree is listed with its clean / merged / locked state; only clean, merged, unlocked ones are proposed for removal. ✓ 22 registered (= 28 dirs on disk − 6 empty orphans, two routes); 12 clean + unlocked + fully applied (`git cherry` no `+`) proposed; 1 locked and 9 dirty listed with why they stay
+- [x] The owner's disposition (removed · declined · none eligible) is recorded with the before/after count, and TD-246 is updated. ✓ removed 12 (owner popup 2026-10-24, per class) + 6 empty orphan dirs; 22 → 10 registered, 28 → 10 dirs; TD-246 updated (`5d2bca69`), stays open
 
 ## Touches
 `.claude/worktrees/` (git worktree state) · `TECH-DEBT.md`
