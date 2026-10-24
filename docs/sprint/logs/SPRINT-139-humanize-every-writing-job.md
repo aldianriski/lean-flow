@@ -96,3 +96,7 @@ What broke: TASK-496's fourth box reads "release-patch stops before push; the ow
 and this release is a MINOR, bumped by hand as at v2.14.0. Owner ruling R4: the box becomes "The MINOR is bumped by hand
 (release-patch is PATCH-only); nothing is pushed; the owner pushes." Impact: one box reworded; the outcome (no push by the
 agent) is unchanged.
+
+### 2026-10-24 | scope-change | T8 (TASK-496): correction, the reworded push box is box 5, not box 4
+The entry above names "box 4". TASK-496's `## Done when` has five boxes, and the push box ("release-patch stops before push;
+the owner pushes") is the fifth. The ruling and the new wording are unchanged.
