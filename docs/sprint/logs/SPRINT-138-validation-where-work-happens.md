@@ -184,3 +184,12 @@ review · T2 · codex · behaviour:low · governance:high
 Codex round 1 (VERDICT-T2): FIX, four wording changes (install before dependent work under the timing rule; the host's
 dependency-install procedure; failure and blocker reporting; no install or leg overlapping any task's wall-clock run). One retry;
 round 2 CLEAR.
+
+### 2026-10-24 | gate | T7: owner authorises one narrow third Codex round past the 2-round cap (item 5 + two nits)
+Codex round 2 (final under the cap) on T7's research doc: items 1–4 and 6–9 APPLIED, no new blocking finding. Item 5 remains
+BLOCKING: C1's next-promote selector re-reads only newer sightings, so an assigned change with no later sighting drops out, and no
+existing reader of outstanding assigned work is named. Two nits: R2c's 16-event enumeration should visibly exclude the S128 L-224
+hold, and F2's "effective unknown everywhere" should acknowledge that one hold was observed. Box 6 requires the second round to
+leave no blocking finding, so it is unmet.
+owner-ruling (popup, 2026-10-24): "One narrow extra round". A third builder retry limited to item 5 and the two nits; Codex
+re-reviews only those. An owner-authorised exception to ADR-053 §5's default cap, not a new default.
