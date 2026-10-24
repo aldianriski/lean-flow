@@ -204,3 +204,10 @@ Surprise, recorded for debt: the first measurement ran from a PowerShell PATH wi
 prose-density reported 25 misleading baseline FAILs ("… not in the examined population") and layers-completeness crashed Bun.
 Neither said that a tool was missing. With Git's tools on PATH for that call only (edit-safety (d): diff the environments before
 the code), all five legs passed. Those first-run checker figures are void; the typecheck figure stands.
+
+### 2026-10-24 | scope-change | T7 (TASK-488): `Layers:` gain the research measurement log the brief allowed
+What broke: the post-merge legs on `main` after T7's merge: `layers observed` FAILs, "changed by a task that never declared it:
+T7:docs/research/logs/learning-loop-architecture.md". The coordinator's brief allowed bulky evidence in that §2 `research/logs/`
+sibling, but the Plan's T7 `Layers:` named only the doc and the index.
+Impact: T7 `Layers:` gain `docs/research/logs/learning-loop-architecture.md`. No member Done-when changes. A Layers correction,
+logged before the Plan edit (L-100 · L-229), and caught by the post-merge legs rather than at close.
