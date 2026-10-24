@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-02
+last_updated: 2026-10-25
 update_trigger: Project shape, anti-patterns, or conventions changed
 status: current
 ---

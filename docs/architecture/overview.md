@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-24
+last_updated: 2026-10-25
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
