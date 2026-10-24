@@ -60,6 +60,22 @@ the file. Change prose only. Keep code blocks, inline code, commands, paths, YAM
 and link targets unchanged. Then give the user a short summary of what changed. Do not print the
 draft or the remaining-patterns list.
 
+**Translate (explicit request only).** Runs only when the user names a target language ("translate
+to English", "terjemahkan ke bahasa Indonesia", "in English please", "to ID"). The default and file
+modes never translate, even for mixed-language text; without such a request, clean in place.
+
+- Translate the meaning, then run the full clean pass (steps 2 to 7) in the **target** language with
+  its catalog. EN to ID: read both catalogs in full, use the English term from the term table (no
+  KBBI coinage), italicize each foreign term at first use when the output is rendered Markdown, and
+  check the result against the Indonesian slop list. ID to EN: check it against the English catalog
+  in full. Never add or drop a fact (step 6).
+- Mixed text: translate only the spans not already in the target language. Text already fully in
+  the target language gets a clean pass only; say no translation was needed.
+- Keep code blocks, inline code, commands, paths, YAML, data, link targets and proper names unchanged.
+- Return: for pasted text, the translation as the final, plus for EN to ID a short list of term
+  substitutions. For a named file, write the translation only if the user asked to translate the
+  file; otherwise return it.
+
 ## Rules
 
 - Leave a watched phrase alone inside a quotation, a title, a proper name, or a passage that
