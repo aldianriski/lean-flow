@@ -72,6 +72,7 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze; with no git the frozen text is the promote entry's snapshot, and the entry must come after it). Then re-run the
    checker **the gate itself runs** over every file just written: the evidence suffix is content that
    checker reads, and a sibling implementation's PASS or a pre-write PASS is not its verdict (L-224). A host may make tick and re-check one step with a tick tool that runs the gate's own checkers right after the write, where the host has one (lean-flow's own: `scripts/lib/tick-box.ts`); without one, the re-run above is the step.
+   Verified boxes are ticked at merge-back acceptance, in the same session, so a handoff inherits current records.
 6. **Transitions** — `todo/` → `in_progress/` when the task starts · → `review/` when its work is
    committed and awaits review or merge-back · → `done/` once every box is ticked and review accepted.
    Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/` in **its own commit**, never
@@ -628,8 +629,8 @@ allowlist derivation in `night-run.md` Part 1; that list is built from this sect
 here is a step to add there.
 
 Review two-tier: **pre-merge** — full scoped review of each branch's diff, against that task's own
-branch (the primary pass). **Post-merge** — after each merge, run the host gate's **cross-cutting legs** on the merged tree
-(typecheck · lint · the repo-wide checkers), never a hand-picked subset or only the task's own harness, catching what per-branch
+branch (the primary pass). **Post-merge** — after each merge, run the host's documented **merge-back check** — its agreed, fixed set of cross-cutting legs (lean-flow's own: `bun scripts/merge-check.ts`, five legs) — on the merged tree, or the discovered gate (§ System verify) where it documents none
+never only the task's own harness, catching what per-branch
 review can't: cross-task interaction. System verify then runs on the **final** integrated tree, never on a trial merge taken before
 the last fix (L-218 ×2: a `typecheck` red sat on `main` through a sprint because each merge re-ran only its own harness).
 
