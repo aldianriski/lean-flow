@@ -4,6 +4,7 @@ slug: validation-where-work-happens
 owner: Maintainer
 last_updated: 2026-10-24
 status: active
+plan_commit: ade5c5c3
 update_trigger: sprint execute/close events
 ---
 
