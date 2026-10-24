@@ -140,3 +140,22 @@ in a per-task check, so both were invisible until the real run (L-218's class, c
 Impact: T1 and T3 `Layers:` gain `evals/run-emitter-column-fixtures.ts` (one rule entry each, on the precedent of
 `scripts/qa-verdict.ts` and `scripts/promote-check.ts`, which consume findings). The CONTEXT sentence is folded into the existing
 QA_FULL bullet without adding a line. No member Done-when changes. A Layers correction, logged before the Plan edit (L-100 · L-229).
+
+### 2026-10-24 | progress | T1 (TASK-482) done: the off-host gate runs in one command; accepted on its real run, 310/0
+Builder in a worktree (base `cf275631` verified at spawn); every commit touched only its declared files. Merged as `8ad4169c`
+(build), `69d33787` (review retry), `d62eb03b` (real-run fixes). Retained tests: 38 through a stubbed transport, gated by
+`evals/run-workflow-command-fixtures.ts` (floor 38, registered always-on).
+The real run was the step that found the defects. Run 1 exited 5 at remote setup with no cause shown, because the transport
+discarded stderr; that was fixed in the retry. Run 2 printed the cause: Git Bash rewrote `LF_GATE_DIR=/home/ubuntu/lf-gate` into
+`C:/Program Files/Git/home/ubuntu/lf-gate` before Bun saw it. Run 3 (path conversion disabled for that one call) returned
+`QA-CHECK: 307 pass, 2 fail`: `emitter-column(POPULATION-scope)` did not cover `scripts/gate-remote.ts`, and `.claude/CONTEXT.md`
+was at 151 of 150. Both were fixed in `d62eb03b`, which also makes a drive-letter `LF_GATE_DIR` a named refusal. Neither leg is in
+a per-task check or in T3's five-leg set; recorded for T7.
+gate-remote · d62eb03b · accepted — remote rc 0, `QA-CHECK: 310 pass, 0 fail`, the same line read separately from the remote log
+over ssh. T2 and T3 may rely on the command from here.
+A3 data point: in the T1 worktree, `bun install --frozen-lockfile` took about 1 s (6 packages), and `tsc --noEmit` completed and
+was not killed (T2 measures it).
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+Round 1 (scoped sonnet): Spec worst = should-fix (rc-file and 255 gaps, shared fixed paths, no timeouts); Standards nit. One bounded
+retry (`69d33787`). Round 2: Spec none, Standards nit; the leftover nits are filed as TD-268 (review cap, not a third round).
