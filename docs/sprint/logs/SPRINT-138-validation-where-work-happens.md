@@ -211,3 +211,19 @@ T7:docs/research/logs/learning-loop-architecture.md". The coordinator's brief al
 sibling, but the Plan's T7 `Layers:` named only the doc and the index.
 Impact: T7 `Layers:` gain `docs/research/logs/learning-loop-architecture.md`. No member Done-when changes. A Layers correction,
 logged before the Plan edit (L-100 · L-229), and caught by the post-merge legs rather than at close.
+
+### 2026-10-24 | progress | T7 (TASK-488) done: the learning loop mapped end to end; five ranked candidates; Codex CLEAR at an owner-authorised round 3
+Research builder in a worktree (base `cf275631` verified) touched only its research files and the generated index. Merged as `c365670f`
+→ `17c8b8b7` → `7de0784f` (cherry-picked through `acb95272`), plus the round-3 nit `86ad67e8`. Doc 125/130 lines; measurement log 534
+lines. Headline findings: the loop breaks after placement (18 promoted rules recurred, a lower bound; Retros name 15 recurrences,
+the ledger holds 10). 98 promoted pointers are one pasted line from one bulk edit. First-run system verify was red in 7 of 10 sprints.
+16 of 114 known-home promotions target adopter-visible surfaces. workdoo runs lean-flow 2.0.0 against 2.13.2; its bump action was
+listed at S127/S128 and then dropped. Ranked candidates (owner ruling, recurrence × consequence): C1 recurrence-as-event (45) ·
+C3 delete prose a tool now carries (30) · C2 effect test (21) · C4 repair the 98 pointers (2, executes before C1) · C5 adopter
+route and pin (1). No ADR candidate. The coordinator cross-checked F1, F6, F7 and F9 by other routes. One query of the
+coordinator's own (log headings) fell into the substring trap (`red` inside `undeclared`); it was caught when the routes
+disagreed: L-108's nineteenth sighting. Post-merge legs found T7's undeclared measurement log; Layers corrected (scope-change above).
+consequence · T7 · behaviour:low · governance:high
+review · T7 · codex · behaviour:low · governance:high
+Codex round 1: FIX (7 items). Round 2: 8 of 9 applied, item 5 still blocking (no named reader of open assigned work). The owner
+authorised a narrow round 3, which came back CLEAR (VERDICT-T7); its one nit was applied at merge.
