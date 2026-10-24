@@ -507,6 +507,14 @@ with `git -C <path>` and absolute paths: a `cd` can make the harness adopt that 
 isolated dispatch then branches from its tip. Run nothing host-heavy (a gate, a typecheck, a test suite) while a task measures
 wall-clock on the same host. A measurement taken under load you added is discarded, not adjusted.
 
+**Dev dependencies in the worktree** (TASK-483): a harness-created worktree has no installed dependencies, so a type error the task
+introduces is otherwise invisible to its builder and reviewer until the final gate. When the host's gate has a leg that needs them
+(a typecheck is the usual one), the brief has each builder and reviewer, first thing in its worktree, install them by the host's own
+lockfile install (examples: `npm ci`, `pip install -r requirements.txt`; lean-flow's own: `bun install --frozen-lockfile`), then,
+before it reports, run that leg and quote its result in the host's own format. The coordinator checks the report quotes the install
+and the leg's result. A task that measures wall-clock defers the leg to the post-merge check and says so in its report; reviewers
+follow the same rule.
+
 **Declared-base rule** (ADR-013 · L-055): every worktree/agent branches from the current wave's
 declared base commit — stated up front, then verified against live HEAD at spawn, never assumed.
 Mismatch halts dispatch for the wave. Re-run the check at every wave boundary, not just once at the
