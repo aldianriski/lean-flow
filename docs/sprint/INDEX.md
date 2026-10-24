@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-22
+last_updated: 2026-10-24
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-137 — No Quiet Passes — closed 2026-10-24 · `728268d` · 4 of 4 members in `done/`, 16/16 DoD (unreleased; **no version bump** — no `skills/`, `spec/`, manifest or README path in the diff · spec unchanged at 0.18.1) · no epic (EPIC-005 parked under ADR-053) — fixes only: live epic index rows hold status and a pointer, every harness's ANSI pass-count parse has a retained must-FAIL, review-depth FAILs a consequence key that is not one task, epic-archive reads an unbalanced annotation, both suffix anchors and a frontmatter-only member list; system verify 302/0 (TD-267 widened · L-224 ×9 · L-218 ×3)
 - SPRINT-136 — Read What Is There — closed 2026-10-22 · `31682fa` · 4 of 4 members in `done/`, 14/14 DoD (released **2.13.2** PATCH; spec unchanged at 0.18.1) · no epic (EPIC-005 parked under ADR-053) — fixes only: epic checks read `[X]` and indented boxes and name an archived epic with no readable member, doc-caps reads the cap from the cell's start, verify-reaches reads a TypeScript checker as mechanical, one harness helper per name; system verify 301/0 (TD-266 · L-246)
 - SPRINT-135 — Checks That Mean It — closed 2026-10-21 · `93b13ef` · 4 of 4 members in `done/`, 14/14 DoD (released **2.13.1** PATCH; spec 0.18.1) · no epic (EPIC-005 parked under ADR-053) — fixes only: the close check keys on the reaper's tag, the review-depth check names an out-of-vocabulary class, the scope-change check excuses a corroborated prose fragment, §11 says only tracked `.md` files cite; system verify 299/0 after one owner-ruled rerun (L-244 · L-245)
 - SPRINT-134 — Three Families — closed 2026-10-20 · `af753b7` · 3 of 3 members in `done/`, 10/10 DoD (released **2.13.0** MINOR) · **EPIC-007** (last member; the epic closes 6/6) — the verification pack (scoped review + whole check) and the solution-analysis pack (decision research) make three families; the owner ruled the platform gate not satisfied by packs alone; system verify 298/0 after the owed T3 review (L-243)
