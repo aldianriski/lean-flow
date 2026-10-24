@@ -91,3 +91,13 @@ degenerate shapes (`consequence · T1 ·`, an empty slot) reads oddly; the verdi
 T4: Spec worst = should-fix: the `)`-only case did not discriminate (the old code already read it as unparsed). One bounded
 builder retry, `14b0b15c`: input `closed) 802`, which goes red with the guard removed; restored hash matches `ccc138a2`.
 Standards worst = nit (BOM or `--- ` reads as no frontmatter, consistent with `frontmatterValue`). Suite 60/0 after merge.
+
+### 2026-10-24 | progress | T2, T3, T4 (TASK-479, 480, 481) done: 13 boxes ticked against evidence re-run on main
+Every box was re-verified on main before its tick (`b4d21ed5`), not taken from the build reports. Harnesses: dod-delta 111/0,
+review-depth all green, epic-archive 60/0. Seeded reverts, each restored with `git hash-object` == `HEAD:<p>`: the ANSI strip
+removed from `run-authority-fixtures.sh` fails exactly that harness's case (110/1); each epic-archive suffix anchor removed fails
+only its own test (59/1 each). Real artifacts: SPRINT-087's archived log at a non-archived path PASSes the pre-fix checker and
+FAILs the fixed one on `pre-T1` ×5 (its 5 lines) and `pre-close` ×3; the live log PASSes; the epic-archive real run before
+`9d762603` and after is byte-identical (17 lines, exit 0). Population cross-check by a second route: 6 harnesses with a live
+`bun test` call = 6 with a live `n_pass` parse. Moves in their own commits: `1a009e69`, `f158099d`, `5267a0f4`.
+`check-sprint-by-reference --close`: 10 pass, 0 fail.
