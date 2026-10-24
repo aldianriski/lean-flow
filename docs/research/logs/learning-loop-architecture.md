@@ -368,9 +368,10 @@ judgement; this log re-uses it and does not re-judge it. Each of the 42 was file
 
 ### Round 2c — Retro-named recurrences vs the ledger (S128–S137)
 
-Selector: each Retro's "Retrieval check" paragraph, every named promoted rule that recurred (a "held" is not counted):
-S128 L-224, L-186 ×3 · S129 L-151 family, L-020 · S131 cross-check family ×3 · S133 L-130 family · S134 L-108 ·
-S135 L-108 · S136 L-108, L-136 · S137 L-224, L-218 = **15 named**. Present as a sighting on the entry: **10** (all but
+Selector: each Retro's "Retrieval check" paragraph, every named promoted rule that recurred (a hold is not counted).
+Enumeration, 16 events: S128 L-224, L-186 ×3 · S129 L-151 family, L-020 · S131 cross-check family ×3 · S133 L-130 family ·
+S134 L-108 · S135 L-108 · S136 L-108, L-136 · S137 L-224, L-218. **Excluded: S128 L-224, a hold** (caught by the immediate
+`--scope-change` re-run; it is on the entry as a sighting). That leaves **15 failures named**. Present as a sighting on the entry: **10** (all but
 S131 ×3, S133 ×1, S136 L-136: L-108 and L-130 carry no S131/S133 mention; L-136 still reads "Seen Sprint-074, count 1").
 The ledger undercounts what the Retros name by 5 of 15.
 

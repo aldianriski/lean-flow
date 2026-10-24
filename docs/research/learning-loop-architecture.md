@@ -56,8 +56,8 @@ promotion fires and added "every rule gets a matcher" (S10.MATCHER): that proves
 - **F2 Cohort** [C1 C2]. 18 of 213 promoted entries (a lower bound) logged a sighting after promotion. Counting units differ:
   L-224 ×9 = events, 7 after promotion = 6 failures + 1 hold; L-108 ×18 = numbered sightings, 15 after promotion in 11
   sprints; L-218 1 in 21 proxy sprints; L-229 3 runs in S118, none of its shape after automation; L-238 0 (control).
-  Reached observed only for L-108 (5 of 15) and L-229; acted on observed yes once (L-224 S128); effective unknown everywhere
-  (holds are not recorded). *R2.*
+  Reached observed only for L-108 (5 of 15) and L-229; acted on observed yes once (L-224 S128); overall effectiveness remains
+  unknown, despite one observed successful intervention (L-224, S128). *R2.*
 - **F3 No denominator** [C1 C3]. Opportunities are recorded nowhere; proxies exist for two rules only (R2).
 - **F4 What worked** [C1 C2]. L-242 (3 of 3 promotes cite it), L-238 (every plan's D1), L-217 (round cap declared): the rule
   sits at the step and the actor writes a trace into an artifact they already produce.
@@ -82,8 +82,8 @@ promotion fires and added "every rule gets a matcher" (S10.MATCHER): that proves
 2. **A recurrence is an event on the entry.** `/insights` appends a dated held/failed sighting to a matched promoted entry;
    the promote line lists promoted entries with a sighting since the latest disposition review; each is re-dispositioned.
 3. **Revise or retire through the ledger's own states.** The re-check assigns the change as an ordinary backlog task (as
-   TASK-411 and TASK-438 were), named on the pointer's `disposition re-check:` line; the next promote re-selects sightings
-   since that line, which checks the outcome. Kinds: `automate-into-check`, `replace`, `move-to-reference`, `retain` with reason;
+   TASK-411 and TASK-438 were), named on the pointer's `disposition re-check:` line; closure is read as in the paragraph
+   under the tables, not from new sightings. Kinds: `automate-into-check`, `replace`, `move-to-reference`, `retain` with reason;
    an obsolete rule goes `superseded`; a tool carrying a rule collapses it (§11) to the tool's one line; a costly checker ages as TD.
 4. **Measure against a baseline.** S128–S137 (R4) is the pre-change baseline; SPRINT-148 re-reads it.
 
@@ -102,11 +102,20 @@ Priority is the rank; execution order differs: C4 before C1 (honest counts), C3 
 
 | # | intervention · owner · scope | admission (ADR-053) · deps | success (proposal, not finding) | benefit · cost · reversal |
 |---|---|---|---|---|
-| 1 | A recurrence of a promoted rule is an event: `/insights` step 3 appends held/failed; promote line lists sightings since the latest disposition review. Maintainer. `insights` SKILL, one line in `lean-doc-generator` (140 of 140: replace text), one §10 clause; adopter-visible | repeated failure (L-224 ×9, L-108 ×18). After C4 | recorded/named ≥ 90% by S148 (10/15); 0 new ids later folded (42); each re-check closed at the next promote | revision gets a trigger. Reading burden per promote; sightings can accrete as in L-108. Ships to adopters; a wrong clause needs a release to undo | 
+| 1 | A recurrence of a promoted rule is an event: `/insights` step 3 appends held/failed; promote line lists sightings since the latest disposition review. Maintainer. `insights` SKILL, one line in `lean-doc-generator` (140 of 140: replace text), one §10 clause; adopter-visible. The one added step: promote reads each re-check line's task | repeated failure (L-224 ×9, L-108 ×18). After C4 | recorded/named ≥ 90% by S148 (10/15); 0 new ids later folded (42); every re-check line closed (task in `done/`, or `cancel/` with a reason) or still open and named at each promote | revision gets a trigger. Reading burden per promote; sightings can accrete as in L-108. Ships to adopters; a wrong clause needs a release to undo | 
 | 2 | Delete prose a tool now carries: after 5 merge-backs with no same-leg red, replace L-218/L-224/L-229 prose with the command line. Maintainer at promote. `dispatch.md`, CONTEXT § Sprint model | unfrozen (deletion); repeated failure. After C3 and S138 T3 | command logged at every observed merge-back, 0 same-leg reds over ≥ 10 sprints; if merge-backs are unlogged, untestable | shorter read path. One edit, Codex loop. A wrong deletion shows as a red close |
 | 3 | Effect test: from S139 the Cost line states members, QA_FULL runs, reds with cause, reviews, first-run verdict, and merge-backs run; S148 appends a log round. Coordinator | measured defect (24 runs, 10 red). After S138 | first-run red ≤ 3 of 10 (baseline 7), runs ≤ 1.5 (2.4), and reds on a leg the command passed on that revision = 0; exposure ≥ 10 sprints | "improves" becomes a number. A Cost-line sentence per Retro. A miss reopens S138 T3 |
 | 4 | Repair the 98 pasted pointers from `c52496fd^` / `825fac01^`: one script file, one reviewed diff, two-selector census; count-1 entries `active` or `retain` by owner ruling (J2). `docs/LEARNINGS.md` | measured defect (fix, unfrozen). None | each of the 98 verified restored to its own record or an owner-ruled home (shared homes allowed) | promoted census drops from 213 and the figure signed at S137 changes. One M task. Originals stay in git; external citations of 213 break |
 | 5 | Resolve the workdoo pin action (owner: bump or decline, recorded as a task). Intake wording: a task from an adopter names it in `## Why`; reports go to the README's GitHub issues, read at `/triage` bug-intake; a skill-procedure failure becomes a plugin change, a repo-specific one stays in the adopter's ledger. Maintainer | **unmet**: workdoo is the maintainer's repo, ADR-053 names an adopter who is not us. Defer the 71 repo-private L-id references (31 resolve to the unshipped ledger, 4 to nothing). After C1 | after workdoo's pin is on a release carrying C1, at its next two promotes ≥ 90% of Retro-named recurrences are on its entries (baseline 3 of 8), pin shown in the run record | the route exists and is exercised. Maintainer reads issues; one wording edit. Nothing arriving is itself the finding |
+
+**C1 closure reader (verified in the repo).** The assigned change is an ordinary `TASK-NNN` file. While in `backlog/` it is
+visible to `/triage` (backlog only, `skills/triage/SKILL.md:12-13`) and to promote, which pulls `state: ready` tasks into a
+sprint (`skills/lean-doc-generator/SKILL.md:106`); once a member, `/prime` counts its open `- [ ]` boxes (`skills/prime/SKILL.md:44-46`)
+and treats a task outside `done/`/`cancel/` as open (`:50-51`); a sprint cannot close until every member sits in `done/` or
+`cancel/` (`SKILL.md:108`). The `disposition re-check:` line (the form at `docs/LEARNINGS.md:206`) is closed only when its named
+task is in `done/`, or `cancel/` with a reason recorded on the line; while the task is open it stays open, with or without new
+sightings. **Not existing today:** promote's L-promotion review does not read that line (no "re-check" text in either skill file).
+Reading it, and listing each open one, is the one small step C1 adds.
 
 **ADR candidate: none.** C1 and C4 are the weakest to reverse (shipped text, a changed census), but neither is surprising.
 
