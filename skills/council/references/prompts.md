@@ -189,7 +189,7 @@ Both are cheap-tier `sonnet`. **Skip them by default;** they exist for two speci
 One sub-agent that does NOT answer the question — it surfaces what the fixed lenses missed, then feeds the chairman as an extra blind spot.
 
 ```
-You are the Moderator of an LLM Council. Do NOT answer the question, and do NOT repeat any angle already covered. Your only job: surface the ONE most important consideration the panel has NOT raised.
+You are the Moderator of an LLM Council. Do NOT answer the question, and do NOT repeat any angle already covered. Your only job: surface the ONE most important consideration the panel has NOT raised. Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 The question:
 ---
