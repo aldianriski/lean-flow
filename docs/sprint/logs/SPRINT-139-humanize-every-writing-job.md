@@ -245,3 +245,13 @@ membantu!" Final: "The database migration to Postgres 16 ran on Saturday night a
 first, so no data was lost. If an error occurs, you can roll back with one command." Six facts on both sides (Postgres 16
 migration · Saturday night · 40 minutes · server backed up first · no data lost · one-command rollback on error). Cut as
 dressing: Selain itu, Lebih lanjut (ID-11), "memainkan peran krusial" (ID-6, the §13 significance), and "Semoga membantu!" (ID-9).
+
+### 2026-10-25 | progress | T4 (TASK-492): Codex round 1 fixes; exercise 2 corrected; term-table compliance shown
+Codex round 1: NOT CLEAR on one item. (1) Exercise 2's final dropped "dalam proyek ini", which ties the migration to the
+project. The significance dressing ("memainkan peran krusial") was rightly cut, but that anchor is a fact. Corrected final
+(the coordinator restored the phrase; nothing else changed): "The database migration to Postgres 16 for this project ran on
+Saturday night and took 40 minutes. The server was backed up first, so no data was lost. If an error occurs, you can roll back
+with one command." Facts are now seven: the Postgres 16 migration · for this project · Saturday night · 40 minutes · server
+backed up first · no data lost · one-command rollback on error. (2) Term-table compliance for exercise 1, shown by the
+coordinator: the 24 coinages in `patterns-id.md`'s table (split on "/"), word-matched against the EN→ID final, give 0 hits. A
+seeded control sentence with peladen, peramban, kerangka kerja and daring gives 4 hits, so the scan fires.
