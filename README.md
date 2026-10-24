@@ -5,7 +5,7 @@
 
 # lean-flow
 
-**A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, and an opt-in decision council.
+**A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, an opt-in decision council, and a writing utility.
 <br />**15 skills · a repo scaffolder (`/lean-doc-generator init`) · no hooks and no agent definitions in the roster today.** Drop it into any repo and adapt.
 
 [![MIT License][license-shield]][license-url]

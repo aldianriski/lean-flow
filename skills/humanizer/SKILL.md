@@ -40,8 +40,9 @@ Not for: code, data, config or logs · writing something new from scratch · tex
    patching flagged phrases one at a time.
 6. **Check the draft.** Read it aloud and ask what still sounds AI-generated. Check that nothing
    was added or dropped: any fact, name, number, date, quote, citation, ranking, or claim that
-   things happen at once. An unsupported addition is an error; so is a lost claim, unless a
-   pattern calls for cutting it. Search again for the tells that most often survive: contrasts,
+   things happen at once. An unsupported addition is an error; so is any lost factual claim. Cut
+   only the dressing a pattern names (significance, sales language, a repeated closer, a chatbot
+   wrapper) and keep the fact underneath. Search again for the tells that most often survive: contrasts,
    closers, triads, dashes, bold labels.
 7. **Write the final version.** Vary sentence length. If a sentence stays awkward, rewrite the
    paragraph around its main point.
