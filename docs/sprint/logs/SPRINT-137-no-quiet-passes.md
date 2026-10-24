@@ -109,3 +109,12 @@ T3: its Acceptance was reworded to satisfy that checker. The same leg also tags 
 record key in its heading as a task (TD-267's defect, at a second site; TD-267 is widened, not fixed here).
 Impact: T3's `Cites:` gains one path; no `Layers:`, Acceptance or member Done-when changes. G2 stands.
 owner-ruling: popup, 2026-10-24 — "Cite it in T3", over an ADR-021 override or a checker change; TD-267 widened.
+
+### 2026-10-24 | gate | system verify PASS 302/0 (VPS, e98a7e34)
+`QA_FULL=1 sh scripts/qa-check.sh` on the VPS against `e98a7e34` (git bundle, clean detached checkout): `QA-CHECK: 302 pass,
+0 fail`, exit 0. Two earlier runs were red. On `8bbf0229`: 299/3. Two of those were the run's own environment (a
+`git clean -x` removed the clone's dev dependencies, so the typecheck leg and its population harness could not run; reinstalled),
+and the third was the scope-change leg (cleared by the entry above). On `f5a807ab`: 301/1, a real `tsc` error in T2's test
+(`e4eb536e`): two `noUncheckedIndexedAccess` violations at its parse-line destructures, fixed in `e98a7e34` with the file's own
+`[0]!` idiom (a missing line still fails loudly, so the control cannot pass vacuously). The coordinator's merge-back re-run
+exercised T2's harness but not the typecheck leg, which is why it surfaced only at system verify.
