@@ -5,7 +5,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { LEGS, mergeCheck, type Env, type Reply } from "../scripts/merge-check.ts";
+import { LEGS, gateFileSet, gateInvocation, mergeCheck, type Env, type Reply } from "../scripts/merge-check.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SPRINTS = ["docs/sprint/SPRINT-001-a.md", "docs/sprint/SPRINT-002-b.md"];
@@ -96,22 +96,68 @@ describe("merge-check", () => {
     expect(r.out).toContain("scope-change: skip (no active sprint in docs/sprint/SPRINT-*.md)");
     expect(lastLine(r.out)).toBe("merge-check: 4 green · 1 skipped · 0 failed (of 5)");
   });
+
+  test("a checker that exits 0 with only SKIP lines is a skip, not green; its SKIP line is relayed", () => {
+    const r = mergeCheck(env({ fail: { "check-layers-observed.ts": { status: 0, stdout: "SKIP  S1 uncommitted work\n" } } }).e);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain("SKIP  S1 uncommitted work");
+    expect(lastLine(r.out)).toBe("merge-check: 4 green · 1 skipped · 0 failed (of 5)");
+  });
+
+  test("PASS plus SKIP lines is green and relays the SKIP", () => {
+    const r = mergeCheck(env({ fail: { "check-layers-observed.ts": { status: 0, stdout: "PASS  S1\nSKIP  S2 wip\n" } } }).e);
+    expect(r.out).toContain("SKIP  S2 wip");
+    expect(lastLine(r.out)).toBe("merge-check: 5 green · 0 skipped · 0 failed (of 5)");
+  });
+
+  test("a checker that exits 0 but prints a FAIL line is a fail", () => {
+    const r = mergeCheck(env({ fail: { "check-prose-density.ts": { status: 0, stdout: "PASS  a\nFAIL  b denser\n" } } }).e);
+    expect(r.code).not.toBe(0);
+    expect(r.out).toContain("FAIL  prose-density: b denser");
+  });
+
+  test("calls: layers-observed gets both sprint files, tsc gets --noEmit", () => {
+    const { e, calls } = env();
+    mergeCheck(e);
+    expect(calls).toContain("bun scripts/lib/check-layers-observed.ts docs/sprint/SPRINT-001-a.md docs/sprint/SPRINT-002-b.md");
+    expect(calls).toContain("node_modules/.bin/tsc --noEmit");
+  });
 });
 
 describe("wiring against scripts/qa-check.sh", () => {
   const gate = readFileSync(`${ROOT}scripts/qa-check.sh`, "utf8");
+  /** A leg's own block: from its `<var>_script=` line (tsc: its `tsc` guard) to the first column-0 `fi`. */
+  function block(l: (typeof LEGS)[number]): string {
+    const start = gate.indexOf(l.gateVar !== null ? `${l.gateVar}_script="` : "if [ ! -x node_modules/.bin/tsc ]");
+    expect(start).toBeGreaterThan(-1);
+    const end = gate.indexOf("\nfi\n", start);
+    expect(end).toBeGreaterThan(start);
+    return gate.slice(start, end);
+  }
   test("five legs", () =>
     expect(LEGS.map((l) => l.name)).toEqual(["typecheck", "prose-density", "layers-completeness", "layers-observed", "scope-change"]));
-  test.each(LEGS.map((l) => [l.name, l] as const))("%s: checker path and argument expression are the gate's", (_n, l) => {
-    if (l.gateVar !== null) expect(gate).toContain(`${l.gateVar}_script="${l.script}"`);
-    for (const frag of l.gateFragments) expect(gate).toContain(frag);
+  test.each(LEGS.map((l) => [l.name, l] as const))("%s: checker path and argument expression are the gate's, in its own block", (_n, l) => {
+    const b = block(l);
+    if (l.gateVar !== null) expect(b).toContain(`${l.gateVar}_script="${l.script}"`);
+    expect(b).toContain(gateInvocation(l));
+    const fs = gateFileSet(l);
+    if (fs !== null) expect(b).toContain(fs);
   });
-  test("the fragments carry the arguments the task fixed", () => {
-    const all = LEGS.flatMap((l) => l.gateFragments).join("\n");
-    expect(all).toContain('"$ROOT"');
-    expect(all).toContain("--scope-change");
-    expect(all).toContain("ls docs/sprint/SPRINT-*.md");
-    expect(all).toContain("grep -lE '^status: *active' docs/sprint/SPRINT-*.md");
-    expect(all).toContain("node_modules/.bin/tsc --noEmit");
+  test("the table carries the arguments the task fixed", () => {
+    const inv = LEGS.map(gateInvocation);
+    expect(inv).toEqual([
+      "node_modules/.bin/tsc --noEmit",
+      'bun "$pd_script" "$ROOT"',
+      'bun "$lc_script" $lc_files',
+      'bun "$lo_script" $lo_files',
+      'bun "$sc_script" "$sc_f" --scope-change',
+    ]);
+    expect(LEGS.map(gateFileSet)).toEqual([
+      null,
+      null,
+      "lc_files=$(ls docs/sprint/SPRINT-*.md",
+      "lo_files=$(ls docs/sprint/SPRINT-*.md",
+      "sc_files=$(grep -lE '^status: *active' docs/sprint/SPRINT-*.md",
+    ]);
   });
 });

@@ -26,31 +26,41 @@ export interface Env {
   /** those with a `^status: *active` line (the gate's `grep -lE`). */
   activeSprintFiles(): string[];
 }
+/** Argument tokens: ROOT = the repo root, FILES = the sprint file set, FILE = one active sprint file. */
+export type Arg = "$ROOT" | "$FILES" | "$FILE" | `--${string}`;
 export interface Leg {
   name: string;
   /** the gate's `<var>_script` variable; null for tsc, which the gate calls by path */
   gateVar: string | null;
   script: string;
-  /** text qa-check.sh must contain: the gate's own invocation / file-set expression */
-  gateFragments: string[];
+  /** ONE table feeds the code (what judge passes) and the gate comparison (gateInvocation / gateFileSet) */
+  args: readonly Arg[];
+  /** which sprint files the gate's file-set expression selects; null = none (root or no files) */
+  files: "all" | "active" | null;
 }
 
 export const LEGS: readonly Leg[] = [
-  { name: "typecheck", gateVar: null, script: "node_modules/.bin/tsc", gateFragments: ["node_modules/.bin/tsc --noEmit"] },
-  { name: "prose-density", gateVar: "pd", script: "scripts/lib/check-prose-density.ts", gateFragments: ['bun "$pd_script" "$ROOT"'] },
-  {
-    name: "layers-completeness", gateVar: "lc", script: "scripts/lib/check-layers-completeness.ts",
-    gateFragments: ["lc_files=$(ls docs/sprint/SPRINT-*.md", 'bun "$lc_script" $lc_files'],
-  },
-  {
-    name: "layers-observed", gateVar: "lo", script: "scripts/lib/check-layers-observed.ts",
-    gateFragments: ["lo_files=$(ls docs/sprint/SPRINT-*.md", 'bun "$lo_script" $lo_files'],
-  },
-  {
-    name: "scope-change", gateVar: "sc", script: "scripts/lib/check-sprint-by-reference.ts",
-    gateFragments: ["grep -lE '^status: *active' docs/sprint/SPRINT-*.md", 'bun "$sc_script" "$sc_f" --scope-change'],
-  },
+  { name: "typecheck", gateVar: null, script: "node_modules/.bin/tsc", args: ["--noEmit"], files: null },
+  { name: "prose-density", gateVar: "pd", script: "scripts/lib/check-prose-density.ts", args: ["$ROOT"], files: null },
+  { name: "layers-completeness", gateVar: "lc", script: "scripts/lib/check-layers-completeness.ts", args: ["$FILES"], files: "all" },
+  { name: "layers-observed", gateVar: "lo", script: "scripts/lib/check-layers-observed.ts", args: ["$FILES"], files: "all" },
+  { name: "scope-change", gateVar: "sc", script: "scripts/lib/check-sprint-by-reference.ts", args: ["$FILE", "--scope-change"], files: "active" },
 ];
+
+/** The invocation as qa-check.sh spells it, derived from the table. */
+export function gateInvocation(l: Leg): string {
+  if (l.gateVar === null) return `${l.script} ${l.args.join(" ")}`;
+  const sh = (a: Arg) => (a === "$ROOT" ? '"$ROOT"' : a === "$FILES" ? `$${l.gateVar}_files` : a === "$FILE" ? '"$sc_f"' : a);
+  return `bun "$${l.gateVar}_script" ${l.args.map(sh).join(" ")}`;
+}
+/** The gate's file-set assignment prefix for this leg, or null. */
+export function gateFileSet(l: Leg): string | null {
+  if (l.files === null) return null;
+  const sel = l.files === "all" ? "ls docs/sprint/SPRINT-*.md" : "grep -lE '^status: *active' docs/sprint/SPRINT-*.md";
+  return `${l.gateVar}_files=$(${sel}`;
+}
+const fill = (l: Leg, env: Env, files: string[]): string[] =>
+  l.args.flatMap((a) => (a === "$ROOT" ? [env.root] : a === "$FILES" ? files : a === "$FILE" ? files.slice(0, 1) : [a]));
 
 type Verdict = { kind: "green" | "skip" | "fail"; text: string };
 const green = (name: string, why = ""): Verdict => ({ kind: "green", text: `PASS  ${name}${why}` });
@@ -67,7 +77,7 @@ const findings = (out: string, code: number) => {
 function typecheck(env: Env, leg: Leg): Verdict {
   const bin = ["tsc", "tsc.exe", "tsc.cmd"].map((b) => `node_modules/.bin/${b}`).find((p) => env.exists(p));
   if (bin === undefined) return notRunnable(leg.name, "no type checker at node_modules/.bin/tsc (run 'bun install')");
-  const r = env.run(bin, ["--noEmit"]);
+  const r = env.run(bin, fill(leg, env, []));
   if (r.status === -1) return notRunnable(leg.name, `could not spawn ${bin}`);
   if (r.status === 0) return green(leg.name, ": tsc --noEmit clean (0 errors)");
   const errs = lines(r.stdout, /error TS/);
@@ -78,30 +88,37 @@ function typecheck(env: Env, leg: Leg): Verdict {
   return fail(leg.name, `tsc --noEmit exited ${r.status} with ${errs.length} error(s) -- first: ${errs[0]}`);
 }
 
-/** Run one checker over `args`; `zeroIsSkip` mirrors the gate's "0 verified is a SKIP, never a PASS". */
-function runChecker(env: Env, leg: Leg, args: string[], zeroIsSkip: boolean): Verdict {
-  const r = env.run("bun", [leg.script, ...args]);
+/** Run one checker; the SKIP/PASS/FAIL tallies follow the gate (qa-check.sh counts `^SKIP` apart from `^PASS`). */
+function runChecker(env: Env, leg: Leg, files: string[]): Verdict {
+  const r = env.run("bun", [leg.script, ...fill(leg, env, files)]);
   if (r.status === -1) return notRunnable(leg.name, `could not spawn bun for ${leg.script}`);
-  if (r.status !== 0) return fail(leg.name, findings(r.stdout, r.status));
-  const n = lines(r.stdout, /^(PASS|SKIP)/).length;
-  if (zeroIsSkip && n === 0) return skip(leg.name, "0 checks verified -- nothing in scope");
-  return green(leg.name, ` (${lines(r.stdout, /^PASS/).length} check(s))`);
+  const fails = lines(r.stdout, /^FAIL/);
+  if (r.status !== 0 || fails.length > 0) return fail(leg.name, findings(r.stdout, r.status));
+  const pass = lines(r.stdout, /^PASS/).length;
+  const skips = lines(r.stdout, /^SKIP/);
+  const relay = skips.length > 0 ? "\n" + skips.join("\n") : "";
+  if (pass === 0 && skips.length > 0) return { kind: "skip", text: `SKIP  ${leg.name}: 0 checks verified, ${skips.length} skipped${relay}` };
+  if (pass === 0 && leg.files === "all") return skip(leg.name, "0 checks verified -- nothing in scope");
+  return { kind: "green", text: `PASS  ${leg.name} (${pass} check(s))${relay}` };
 }
 
 function judge(env: Env, leg: Leg): Verdict {
   if (leg.name === "typecheck") return typecheck(env, leg);
   if (!env.exists(leg.script)) return notRunnable(leg.name, `checker not found at ${leg.script}`);
-  if (leg.name === "prose-density") return runChecker(env, leg, [env.root], false);
-  if (leg.name === "scope-change") {
+  if (leg.files === "active") {
     const active = env.activeSprintFiles();
     if (active.length === 0) return skip(leg.name, "skip (no active sprint in docs/sprint/SPRINT-*.md)");
-    const vs = active.map((f) => runChecker(env, leg, [f, "--scope-change"], false));
+    const vs = active.map((f) => runChecker(env, leg, [f]));
     const bad = vs.filter((v) => v.kind === "fail");
-    return bad.length > 0 ? { kind: "fail", text: bad.map((v) => v.text).join("\n") } : green(leg.name, ` (${active.length} active sprint file(s))`);
+    if (bad.length > 0) return { kind: "fail", text: bad.map((v) => v.text).join("\n") };
+    return vs.every((v) => v.kind === "skip") ? { kind: "skip", text: vs.map((v) => v.text).join("\n") } : { kind: "green", text: vs.map((v) => v.text).join("\n") };
   }
-  const files = env.sprintFiles();
-  if (files.length === 0) return skip(leg.name, "skip (missing): docs/sprint/SPRINT-*.md");
-  return runChecker(env, leg, files, true);
+  if (leg.files === "all") {
+    const files = env.sprintFiles();
+    if (files.length === 0) return skip(leg.name, "skip (missing): docs/sprint/SPRINT-*.md");
+    return runChecker(env, leg, files);
+  }
+  return runChecker(env, leg, []);
 }
 
 export function mergeCheck(env: Env): { code: number; out: string } {

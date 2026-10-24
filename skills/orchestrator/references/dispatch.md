@@ -629,9 +629,12 @@ allowlist derivation in `night-run.md` Part 1; that list is built from this sect
 here is a step to add there.
 
 Review two-tier: **pre-merge** — full scoped review of each branch's diff, against that task's own
-branch (the primary pass). **Post-merge** — after each merge, run the host's documented **merge-back check** — its agreed, fixed set of cross-cutting legs (lean-flow's own: `bun scripts/merge-check.ts`, five legs) — on the merged tree, or the discovered gate (§ System verify) where it documents none
-never only the task's own harness, catching what per-branch
-review can't: cross-task interaction. System verify then runs on the **final** integrated tree, never on a trial merge taken before
+branch (the primary pass). **Post-merge** — after each merge, run the host's documented **merge-back check** —
+its fixed set of cross-cutting legs, agreed by the host maintainer and recorded in the check's documentation
+(lean-flow's own: `bun scripts/merge-check.ts`, five legs) — on the merged tree, or the discovered gate
+(§ System verify; choose the repo-wide gate over a unit-only script when both exist) if the host documents no
+such check — never only the task's own harness — to catch what per-branch review can't: cross-task interaction.
+System verify then runs on the **final** integrated tree, never on a trial merge taken before
 the last fix (L-218 ×2: a `typecheck` red sat on `main` through a sprint because each merge re-ran only its own harness).
 
 Conflicts: **expected** (overlap map named this file) → re-dispatch that agent to rebase onto the
