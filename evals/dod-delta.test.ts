@@ -1241,13 +1241,13 @@ describe("harness pass-count parse (TD-165)", () => {
 
   for (const f of s1) {
     test(`${f}: parse line yields the true pass count over the ANSI sample`, () => {
-      const [line] = parseLines(f);
+      const line = parseLines(f)[0]!;
       expect(line).toContain(STRIP);
       expect(evalLine(line)).toBe(TRUE_COUNT);
     });
 
     test(`${f}: control -- the same parse without the ANSI strip yields the wrong count`, () => {
-      const [line] = parseLines(f);
+      const line = parseLines(f)[0]!;
       const stripless = line.replace(STRIP, "");
       expect(evalLine(stripless)).not.toBe(TRUE_COUNT);
       expect(evalLine(stripless)).toBe("");
