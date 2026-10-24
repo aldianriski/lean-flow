@@ -170,3 +170,17 @@ The CHANGELOG line (box 3) is written with the sprint's other shipped changes. P
 consequence · T5 · behaviour:low · governance:high
 review · T5 · codex · behaviour:low · governance:high
 Codex round 1: CLEAR on all four items (answers R1 unambiguously; host-generic; Session Workflow is the right section; 150 kept).
+
+### 2026-10-24 | progress | T2 (TASK-483) built and merged; Codex CLEAR at round 2; exercise passed on branch (a)
+Builder in a worktree (base `06765938` verified) touched only `dispatch.md`. Cherry-picked as `b64dde5b`, Codex retry `77fe54b8`.
+Exercise: a real worktree probe briefed with the paragraph verbatim. It installed in 0.9 s (6 packages) and ran tsc clean. TypeScript 7
+is a native `tsc.exe`, which peaked at 122 MB in 0.3 s with 0.57 GB free, so A3 is answered: a worktree can typecheck on this host.
+It reported a seeded `error TS2322` before merge-back, removed it, and left `git status` empty. Consumer (workdoo, read-only): resolves
+to `bun install --frozen-lockfile` + `bun run typecheck`. TD-194 resolved. README/CHANGELOG (box 5) go with the sprint's other
+shipped changes. A tick check caught box 4's evidence naming workdoo's lockfile as a T2 file; the evidence was reworded (L-224's
+class, caught by `tick-box.ts` in seconds). Post-merge legs on `main` are green.
+consequence · T2 · behaviour:low · governance:high
+review · T2 · codex · behaviour:low · governance:high
+Codex round 1 (VERDICT-T2): FIX, four wording changes (install before dependent work under the timing rule; the host's
+dependency-install procedure; failure and blocker reporting; no install or leg overlapping any task's wall-clock run). One retry;
+round 2 CLEAR.
