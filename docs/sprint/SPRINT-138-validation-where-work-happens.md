@@ -3,7 +3,7 @@ sprint: 138
 slug: validation-where-work-happens
 owner: Maintainer
 last_updated: 2026-10-24
-status: active
+status: closed
 plan_commit: ade5c5c3
 gates_signed: G1,G2 @ d58c7538
 update_trigger: sprint execute/close events
@@ -160,5 +160,47 @@ Tier P research: builds nothing. Two Codex review rounds; the baseline is the co
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/gate-remote.ts` · `evals/gate-remote.test.ts` | T1 | one command runs the full gate off-host and passes only on the remote's own passing verdict | Med | 38/0 stubbed; accepted on a real run 310/0 |
+| `evals/run-workflow-command-fixtures.ts` · `scripts/qa-check.sh` | T1 · T3 | one registered harness gates both commands' tests (one token in `eval_harnesses_always`) | Low | floor = real count (38 + 24) |
+| `evals/run-emitter-column-fixtures.ts` | T1 · T3 | both new commands named in the gate-tooling out-of-scope rule | Low | 9/0 |
+| `.claude/CONTEXT.md` | T1 · T5 | the off-host route named in the QA_FULL bullet; a new task's birth folder named (150/150 kept) | Low | doc-caps; R1 probe hit |
+| `skills/orchestrator/references/dispatch.md` | T2 · T3 | worktree dev-dependency step; the host's merge-back check; tick at merge-back acceptance | Med | probe reported a seeded TS2322; Codex CLEAR ×2 |
+| `scripts/merge-check.ts` · `evals/merge-check.test.ts` | T3 | lean-flow's merge-back check: the gate's five cross-cutting legs in one command | Med | 24/0, mutation-checked; 5/5 on main |
+| `skills/orchestrator/references/review-scoping.md` | T4 | a review reports the tests that pin the change, found by path, file name and names | Med | exercised three ways; Codex CLEAR |
+| `skills/lean-doc-generator/templates/CLAUDE.md.template` | T5 | a scaffolded repo names where a new task is born | Low | R1 probe hit on a template-only scaffold |
+| `docs/research/learning-loop-architecture.md` (+ `logs/`) · `docs/knowledge-index.md` | T7 | the learning loop mapped end to end; five ranked candidates | Low | Codex CLEAR at round 3 |
+| `TECH-DEBT.md` · `README.md` · `CHANGELOG.md` · four manifests | coord | TD-194 · 212 · 222 resolved, TD-246 updated, TD-268–271 filed; README section; v2.14.0 | Low | lockstep; read back |
 
 ## Retro
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. Six promoted rules recurred, now each tagged as a failure or a
+hold (T7 found that holds go unrecorded, so this sprint records them). Holds: L-224 twice (a scope-change entry and a tick's
+evidence named undeclared paths, caught in seconds by the immediate re-run and `tick-box.ts`), and L-218 (T1's real run and the
+post-merge legs caught three cross-cutting FAILs before close). Failures: L-108 (the `red` inside `undeclared`), L-219 (a `cd` into a
+worktree), L-143 (a SHA typed from memory, and a placeholder SHA committed), L-215 (Git Bash path rewriting; PowerShell's PATH).
+
+**Cost** — coordinator inline plus about 33 dispatched agents. Intake: 1 Explore recon. G2: 7 builder checks and 2 R1 probes.
+Build: 7 worktree builders and 1 exercise probe. Review: 4 scoped-review rounds and 10 read-only Codex runs (next-work, intake,
+then T4 ×2, T2 + T5, T2, T7 ×3, T3 ×2). There were 4 bounded builder retries and 1 owner-authorised third Codex round (T7). 4 VPS
+gate runs: 2 failed at remote setup (an MSYS-rewritten path), 1 was T1's red on two real FAILs, and 1 was system verify, green on its
+first run. Seven members, 32 DoD.
+
+**Worked**
+- Validating at the write instead of at close. `tick-box.ts`, the immediate `--scope-change` re-run, the post-merge legs and then
+  `merge-check` caught five slips while they cost seconds, and system verify was green on its first run (311/0) for the first time
+  in 8 sprints. One observation, not a trend: T7's C2 effect test is the measure.
+- The real-run step (ADR-050) on T1 found three defects no review or stub test could reach: the MSYS path rewrite, the CONTEXT.md cap,
+  and the emitter-column scope.
+- Two builder routes for one figure kept disagreeing until reconciled (T7: 13 → 16 of 114; first-run red 7 of 10), and the
+  disagreement was the signal each time.
+- Exercising a shipped procedure on a real adopter (workdoo, read-only) produced a real finding (TD-271: System verify's rung 1 is
+  unranked) that dogfooding could not.
+
+**Friction**
+- The coordinator moved the session into a worktree with a `cd` (L-219) and, separately, measured checkers from a PowerShell PATH
+  that lacked Git's tools, which voided the first memory figures and found TD-270.
+- T7 hit the 2-round review cap with one blocking gap, and closing it needed an owner-authorised third round.
+- Two agents opened `.env` files under "read-only" briefs (new L-247, count 2: due at the next promote).
+- A builder's measurement could not reach grandchild processes (a scoop shim); the coordinator re-measured each leg directly.
+
+**Pattern candidate** — L-247 (count 2): a read-only brief names secret files as off-limits. It is due at SPRINT-139's promote.

@@ -251,3 +251,15 @@ the same last verdict line, rc file `0` and 0 FAIL lines. merge-check on the sam
 close in 8 sprints whose system verify was green on its first run (T7 baseline: 7 of the last 10 were red at first run). One
 observation, not a trend; T7's C2 effect test is the measure. Remaining before close: CHANGELOG with the owner's release decision
 (T2 box 5, T3 box 7, T4 box 3, T5 box 3), then the member moves.
+
+### 2026-10-24 | close | Validation Where Work Happens — 7 of 7 members in done/, 32 of 32 DoD, PLAN_EXHAUSTED
+All seven members are in the done folder, and `check-sprint-by-reference --close` passes 16/0. merge-check passes 5/5. System verify
+passed 311/0 on its first run (`ffce25bc`, via `scripts/gate-remote.ts`). Released as v2.14.0 MINOR (`d7252dd0`, owner ruling). No
+handoff entry exists, so nothing needs reconciling.
+Retro buckets, auto-filed:
+- Shipped → CHANGELOG v2.14.0 (SPRINT-138's consumer-facing procedure changes plus SPRINT-137's maintainer fixes).
+- Tech debt → TD-268 · 269 · 270 · 271 filed during the sprint; TD-194 · 212 · 222 resolved; TD-246 updated.
+- Learnings → L-247 new (count 2: agents opened `.env` under read-only briefs, due at the next promote). Sightings tagged failure or
+  hold: L-224 ×2 and L-218 (holds); L-108, L-219, L-143, L-215 (failures).
+- Follow-ups → TASK-489 (decide workdoo's lean-flow pin, from T7 C5). T7's five ranked candidates stay in the research doc for the
+  next `/task-decomposer` intake, since they need its grill and an ADR-053 admission.
