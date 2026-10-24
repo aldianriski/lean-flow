@@ -193,3 +193,14 @@ hold, and F2's "effective unknown everywhere" should acknowledge that one hold w
 leave no blocking finding, so it is unmet.
 owner-ruling (popup, 2026-10-24): "One narrow extra round". A third builder retry limited to item 5 and the two nits; Codex
 re-reviews only those. An owner-authorised exception to ADR-053 §5's default cap, not a new default.
+
+### 2026-10-24 | progress | T3 (TASK-484): local cost measured on this host before `dispatch.md` names the command on main
+Measured in T3's worktree (`9244c056`, not yet merged), three runs each, each process measured directly with PowerShell polling
+of PeakWorkingSet64 (native `tsc.exe`, real `bun.exe`, not the scoop shim). Whole `bun scripts/merge-check.ts`: 23.0 · 17.5 ·
+18.2 s, exit 0 each, `merge-check: 5 green · 0 skipped · 0 failed`. The wrapper holds about 60 MB while legs run one at a time
+under it. Typecheck is about 124 MB; prose-density 64–70, layers-completeness 64, layers-observed 74, scope-change 80–81 MB.
+Peak concurrent is about 185 MB, with 0.46–1.23 GB free.
+Surprise, recorded for debt: the first measurement ran from a PowerShell PATH without Git's `usr/bin` tools. There,
+prose-density reported 25 misleading baseline FAILs ("… not in the examined population") and layers-completeness crashed Bun.
+Neither said that a tool was missing. With Git's tools on PATH for that call only (edit-safety (d): diff the environments before
+the code), all five legs passed. Those first-run checker figures are void; the typecheck figure stands.
