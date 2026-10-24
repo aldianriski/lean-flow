@@ -14,6 +14,13 @@ status: current
 
 ---
 
+## [Unreleased]
+
+**Consumer-facing** (shipped procedure; every repo that installs lean-flow gets these):
+- **Every sub-agent brief now names secret files as off-limits.** The orchestrator's builder, worktree and reviewer briefs, the builder-check reader prompt, the task-decomposer `Explore` recon brief and the council's sub-agent prompts say: never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; report and ask, or read a non-secret record. Two SPRINT-138 agents briefed "read-only" had opened `.env` files (L-247).
+
+---
+
 ## v2.14.0 — validation runs where the work happens: worktree builders typecheck, merge-backs run a fixed check, reviews run the pinning tests (2026-10-24)
 
 **MINOR** — ships SPRINT-138 (Validation Where Work Happens), plus SPRINT-137's maintainer-side fixes, which closed unreleased.

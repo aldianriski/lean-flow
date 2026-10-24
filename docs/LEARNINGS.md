@@ -71,11 +71,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
-## L-247 [tags: edit-safety] [status: active]: **A read-only agent brief must name secret files as off-limits: "read-only" was read as "may read anything", and two agents opened `.env` files.** SPRINT-138's recon agent opened lean-flow's root `.env` to report its keys (it recorded no values), and T7's research builder opened workdoo's `.env` to read a version pin. Both briefs said read-only and neither forbade secret files; the pin was available from a host record by another route. Briefs from then on said "never its `.env` or any secret file", and no further opening occurred.
-- seen: 2026-10-24 (SPRINT-138 intake recon; SPRINT-138 T7 build)
-- count: 2
-- promoted: no
-- related: L-239 (a "static" reviewer run from inside the repo is not static) · TD-270
+## L-247 [tags: edit-safety] [status: promoted]: **A read-only agent brief must name secret files as off-limits: "read-only" was read as "may read anything", and two agents opened `.env` files.** SPRINT-138's recon agent opened lean-flow's root `.env` to report its keys (it recorded no values), and T7's research builder opened workdoo's `.env` to read a version pin. Both briefs said read-only and neither forbade secret files; the pin was available from a host record by another route. Briefs from then on said "never its `.env` or any secret file", and no further opening occurred.
+- **L-247 → promoted: the brief sites of `skills/orchestrator/references/dispatch.md` (builder brief · worktree protocol), `review-scoping.md` (reviewer brief) and `builder-check.md` (reader prompt), `skills/task-decomposer/SKILL.md` (the `Explore` recon clause), and `skills/council/references/prompts.md` (research · advisor · reviewer · chairman · fact-check)** · disposition: move-to-reference — each names secret files off-limits in host-generic words. Count 2: SPRINT-138 intake recon · SPRINT-138 T7 build (TASK-497, SPRINT-139). Related: L-239 · TD-270.
 
 ---
 ## L-246 [tags: tooling] [status: active]: **A RED that fails because the new function does not exist yet proves the test is new, not that the old code is wrong, so run the old code on the new input.** SPRINT-136 T2's builder reported RED for its doc-caps cases, but every case failed on importing `parseCapCell`, which the old module does not export. That says nothing about the defect TD-062 names. The coordinator then ran the unchanged checker over the new fixture: it read `see row 3; 120` as a cap of 3 and passed it, which is the behavioural RED the must-FAIL bar asks for. T1 and T3 showed their REDs through the old code's own entry points; only a test that imports a new export can produce the empty kind.

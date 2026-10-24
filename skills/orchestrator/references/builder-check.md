@@ -34,7 +34,7 @@ talk to the person who wrote it, and nobody will answer questions once you start
 
 Read the design file named below. It contains the design, the task's frozen **Done when** (the acceptance criteria the
 work is judged against — they cannot change without the owner's ruling), and the paths of the files or text it touches.
-You may read those touched files, read-only, to check the design against them. Open nothing else.
+You may read those touched files, read-only, to check the design against them. Open nothing else. Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 Report, ranked by importance:
 

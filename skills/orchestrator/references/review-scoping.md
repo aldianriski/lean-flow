@@ -6,7 +6,7 @@ isolated pass starts from zero context and re-scans unless you scope it.
 
 ## Scope every pass to the diff
 
-Hand each review pass a brief, not the repo:
+Hand each review pass a brief, not the repo. The brief states: Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 - the `git diff` (the actual change),
 - the changed files,
 - their **direct callers / dependents** (the blast radius — one hop, not the transitive closure),

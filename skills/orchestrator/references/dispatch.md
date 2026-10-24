@@ -28,6 +28,8 @@ context) with the relevant **procedure skill** invoked at runtime via the Skill 
 `/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor`. The skill is the maintained procedure; a
 paraphrased brief drifts from it (ADR-010 skill-dispatch amendment, mechanism C).
 
+**Every builder brief carries the secret-files rule:** Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record. ("read-only" is not a licence to open them — L-247.)
+
 ## Implement routing (which procedure the dispatched agent runs)
 
 Pick the routed skill from the **work type**, then hand that skill to the sub-agent (above):
@@ -469,6 +471,8 @@ Fires at **sprint-bulk** when the G2 overlap map marks a batch's tasks disjoint 
 no `depends-on`): dispatch one `Agent(isolation: "worktree")` call per disjoint task, all in a
 **single message**. Soft cap **3–5 concurrent** — no first-party concurrency limit is published
 (folklore only); revisit if one ships. Rationale/decisions: the lean-flow repo's `docs/research/fog-fleet-orchestration.md`.
+
+Each worktree agent's brief states the secret-files rule: Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 Each agent gets its own branch + working tree; it commits only its own files there and **never**
 runs a tree-wide git state op (`stash` / `checkout` / `restore` / `reset`) — a state op on a shared

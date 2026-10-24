@@ -13,6 +13,7 @@ Spawn one research sub-agent with web access:
 
 ```
 Research the factual questions underlying this decision. Be neutral — gather evidence, do NOT recommend anything.
+Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 Decision: [the user's question]
 Key unknowns to resolve: [the 2-4 specific factual questions that would change the answer]
@@ -32,6 +33,7 @@ Each advisor gets its identity block from `advisors.md`, the framed question, an
 
 ```
 You are [Advisor Name] on an LLM Council.
+Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 Your thinking style: [advisor description from advisors.md]
 
@@ -51,7 +53,7 @@ Keep the whole response between 150-300 words (questions + analysis). No preambl
 Anonymize the 5 advisor responses as A–E. **Randomize the A–E mapping independently for each reviewer** (rotate the order per reviewer, not once) so slot position can't bias the aggregate ranking.
 
 ```
-You are reviewing the outputs of an LLM Council. Five advisors independently answered this question:
+You are reviewing the outputs of an LLM Council. Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record. Five advisors independently answered this question:
 
 ---
 [framed question]
@@ -88,7 +90,7 @@ Keep your review under 200 words. Be direct.
 ## Chairman (step 4 — one agent, session model, de-anonymized inputs)
 
 ```
-You are the Chairman of an LLM Council. Your job is to synthesize the work of 5 advisors and their peer reviews into a final verdict.
+You are the Chairman of an LLM Council. Your job is to synthesize the work of 5 advisors and their peer reviews into a final verdict. Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 The question brought to the council:
 
@@ -203,7 +205,7 @@ Return the single most important MISSING consideration — an overlooked stakeho
 Skip entirely for pure judgment/tradeoff forks (the common council case). When the recommendation leans on factual claims, spawn one refuter per claim cluster (~1-4):
 
 ```
-You are a fact-checker on an LLM Council. Be adversarial: try to REFUTE, not confirm.
+You are a fact-checker on an LLM Council. Be adversarial: try to REFUTE, not confirm. Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 
 CLAIM (load-bearing in the council's verdict): [claim + any cited figure/source]
 
