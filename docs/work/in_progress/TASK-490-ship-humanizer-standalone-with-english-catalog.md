@@ -23,7 +23,7 @@ English catalog based on Wikipedia's "Signs of AI writing". The owner chose to v
 (TASK-491) rather than install it separately. ADR-001 still applies: nothing enters without a per-pattern review.
 
 ## Done when
-- [ ] Per-pattern review table (26 rows: keep / adapt + reason against "useful + important + used") approved at G2 **before**
+- [x] Per-pattern review table (26 rows: keep / adapt + reason against "useful + important + used") approved at G2 **before** ✓ § Pattern review, 26 rows, keep all; owner-approved by popup (fa689e3b) before any catalog commit
       the catalog is committed (ADR-001).
 - [ ] `skills/humanizer/SKILL.md` ≤140 lines; its first step reads `skills/humanizer/references/patterns-en.md` in full; modes: pasted text
       (default) and file. Embedded mode is TASK-493's.
