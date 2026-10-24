@@ -49,7 +49,7 @@ Layers: `skills/orchestrator/references/dispatch.md` · `skills/task-decomposer/
   · `docs/work/in_progress/TASK-497-agent-briefs-name-secret-files-off-limits.md`
   · `docs/work/done/TASK-497-agent-briefs-name-secret-files-off-limits.md`
 Depends-on: none
-Cites: `TASK-497` · L-247 · L-239
+Cites: `TASK-497` · L-247 · L-239 · `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/night-run-checks.md`
 
 Promotes L-247 (count 2) by the owner's ruling at this promote. The census of brief sites comes first; `Layers:` is amended
 by `scope-change` if it finds a site outside the list. Shipped skill: Codex loop.
