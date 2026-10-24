@@ -208,3 +208,11 @@ production · one-command rollback · dry run · a failed build shows the full l
 peran krusial dalam lanskap DevOps modern", "tidak hanya … tetapi juga", the stacked connectors, "Semoga membantu!".
 The coordinator caught the first final dropping the "sangkil" claim, a step-6 error, and had it redone. The log carries only
 the corrected run.
+
+### 2026-10-25 | progress | T3 (TASK-491): Codex round 1 fixes; the exercise's last sentence corrected
+Codex round 1: NOT CLEAR on two items. (1) Six example pairs (ID-1, 3, 4, 5, 6, 8) added facts their "before" never stated,
+and ID-5 dropped one; ID-10, 16 and 17 had no pair. The builder's bounded retry (`5883e965`) rewrote the six and added the
+three, with a 17-line facts-before = facts-after check. The coordinator then kept ID-16's "bermanfaat" conclusion as a claim
+in its "after" (`HEAD`). (2) The exercise narrowed "Jika terjadi galat saat build" (an error during build) to "build gagal"
+(the build fails). Corrected final sentence, verbatim: "Kalau terjadi error saat *build*, *log* lengkap ditampilkan."
+Fact 9 now reads: an error during build shows the full log. The other eight facts and sentences are as logged above.
