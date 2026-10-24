@@ -21,7 +21,7 @@ update_trigger: sprint execute/close events
 **In:** an off-host gate runner (T1) · worktree builders and reviewers that run the dependency-needing leg (T2) · a fixed
 merge-back check plus tick-at-acceptance (T3) · reviewers that run the tests pinning a change (T4) · the task birth-folder line,
 here and in a scaffolded repo (T5) · a one-time worktree cleanup (T6) · learning-loop research and a target architecture (T7).
-**Out (deferred):** changing `scripts/qa-check.sh` or its leg list · any new gate leg, ledger or ledger field · the TD cohort
+**Out (deferred):** changing `scripts/qa-check.sh` or its leg list, except registering T1/T3's one test harness (scope-change) · any new gate leg, ledger or ledger field · the TD cohort
 review of the 78 low/minor/trivial rows (a separate triage pass) · TASK-367 and TASK-402 (blocked) · writing anything in workdoo.
 
 ## Members
@@ -38,11 +38,12 @@ review of the 78 low/minor/trivial rows (a separate triage pass) · TASK-367 and
 
 ### T1 — Run the full gate off-host in one command `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/gate-remote.ts` · `evals/gate-remote.test.ts` · `.claude/CONTEXT.md`
+  · `evals/run-workflow-command-fixtures.ts` · `scripts/qa-check.sh`
   · `docs/work/todo/TASK-482-one-command-runs-the-full-gate-off-host.md`
   · `docs/work/in_progress/TASK-482-one-command-runs-the-full-gate-off-host.md`
   · `docs/work/done/TASK-482-one-command-runs-the-full-gate-off-host.md`
 Depends-on: none
-Cites: `TASK-482` · ADR-053 · `scripts/qa-check.sh`
+Cites: `TASK-482` · ADR-053 · `scripts/qa-verdict.ts` · `evals/run-typecheck-population-fixtures.ts`
 
 Other G. A wrapper around the existing gate: no new check, verdict format or run state. Review cap 2.
 
@@ -62,12 +63,12 @@ Tier P, shipped skill: the Codex review loop applies. T1 is its remote route if 
 
 ### T3 — A fixed merge-back check, and tick at acceptance `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/merge-check.ts` · `evals/merge-check.test.ts` · `skills/orchestrator/references/dispatch.md`
-  · `README.md` · `CHANGELOG.md`
+  · `README.md` · `CHANGELOG.md` · `evals/run-workflow-command-fixtures.ts` · `scripts/qa-check.sh`
   · `docs/work/todo/TASK-484-the-merge-back-check-runs-a-fixed-cross-cutting-set.md`
   · `docs/work/in_progress/TASK-484-the-merge-back-check-runs-a-fixed-cross-cutting-set.md`
   · `docs/work/done/TASK-484-the-merge-back-check-runs-a-fixed-cross-cutting-set.md`
 Depends-on: T2
-Cites: `TASK-484` · L-218 · L-224 · L-238 · ADR-053 · `scripts/qa-check.sh`
+Cites: `TASK-484` · L-218 · L-224 · L-238 · ADR-053
 
 Other G for lean-flow's command; the shipped `skills/orchestrator/references/dispatch.md` change takes the Codex loop.
 It follows T2's edit of the same file.
@@ -87,14 +88,14 @@ Tier P, shipped skill: the Codex review loop applies. Procedure only, no gate le
 **Acceptance:** a review reports the host's pinning tests and their results, or says none were found.
 
 ### T5 — Say where a new task is born `[size: S · risk: low · class: execution · HITL · J0]`
-Layers: `.claude/CONTEXT.md` · `skills/lean-doc-generator/templates/` · `TECH-DEBT.md` · `CHANGELOG.md`
+Layers: `.claude/CONTEXT.md` · `skills/lean-doc-generator/templates/CLAUDE.md.template` · `TECH-DEBT.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-486-an-always-loaded-line-says-where-a-new-task-is-born.md`
   · `docs/work/in_progress/TASK-486-an-always-loaded-line-says-where-a-new-task-is-born.md`
   · `docs/work/done/TASK-486-an-always-loaded-line-says-where-a-new-task-is-born.md`
 Depends-on: none
-Cites: `TASK-486` · TD-222 · `docs/research/logs/epic-017-effectiveness.md`
+Cites: `TASK-486` · TD-222 · `docs/research/logs/epic-017-effectiveness.md` · `.claude/CLAUDE.md`
 
-Tier P. Which scaffold template carries the line is ruled at G2; the `templates/` token narrows to that file then.
+Tier P. G2 ruled the scaffold template: CLAUDE.md, the one file `init` writes that Claude Code always loads.
 
 **Acceptance:** lean-flow and a fresh `init` scaffold each answer "where is a new task born" from an always-loaded file.
 

@@ -25,9 +25,10 @@ Consumer: any adopter whose gate needs installed dependencies (Node, Python, Bun
 
 ## Done when
 - [ ] `dispatch.md` § Worktree dispatch protocol says: when the host's gate has a leg that needs installed dev dependencies, the
-      coordinator installs them in each builder/reviewer worktree by the host's own install procedure, and the brief requires the
-      builder and reviewer to run that leg and report its result in the host's format before reporting. Host-generic, and
-      reconciled with the existing "run nothing host-heavy while a task measures wall-clock" line.
+      brief has each builder/reviewer install them first in its worktree by the host's own install procedure, then run that leg
+      and report its result in the host's format before reporting, and the coordinator checks that the report quotes the install
+      and the leg's result. Host-generic, and reconciled with the existing "run nothing host-heavy while a task measures
+      wall-clock" line.
 - [ ] Exercised, either branch: (a) the in-worktree typecheck runs on this host, and a seeded TypeScript error is reported by the
       builder before merge-back, then removed; or (b) a recorded local resource failure, followed by the same check, seeded error
       included, run remotely on the EXACT worktree commit through TASK-482's command. A local failure alone does not satisfy this box.
