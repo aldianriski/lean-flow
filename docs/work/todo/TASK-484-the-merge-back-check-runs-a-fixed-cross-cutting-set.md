@@ -1,6 +1,7 @@
 ---
 id: TASK-484
 title: "the host's merge-back check runs a fixed set of cross-cutting legs, and the coordinator ticks there"
+sprint: SPRINT-138
 priority: P2
 size: M
 risk: med

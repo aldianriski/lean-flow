@@ -1,6 +1,7 @@
 ---
 id: TASK-485
 title: "a reviewer runs the existing tests that pin what the change touches"
+sprint: SPRINT-138
 priority: P2
 size: S
 risk: med

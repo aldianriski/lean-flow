@@ -1,6 +1,7 @@
 ---
 id: TASK-488
 title: "map the learning loop end to end and propose an architecture where each iteration measurably improves the workflow"
+sprint: SPRINT-138
 priority: P2
 size: M
 risk: low

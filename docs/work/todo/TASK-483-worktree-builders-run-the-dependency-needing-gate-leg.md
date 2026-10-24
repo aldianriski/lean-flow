@@ -1,6 +1,7 @@
 ---
 id: TASK-483
 title: "worktree builders and reviewers run the host's dependency-needing gate leg before they report"
+sprint: SPRINT-138
 priority: P2
 size: S
 risk: med

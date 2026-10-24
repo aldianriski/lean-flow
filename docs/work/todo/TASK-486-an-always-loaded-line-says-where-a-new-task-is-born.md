@@ -1,6 +1,7 @@
 ---
 id: TASK-486
 title: "an always-loaded line says where a new task is born, in lean-flow and in a scaffolded repo"
+sprint: SPRINT-138
 priority: P3
 size: S
 risk: low

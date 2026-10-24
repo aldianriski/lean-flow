@@ -1,6 +1,7 @@
 ---
 id: TASK-482
 title: "one command runs the full gate on the off-host runner and prints its verdict"
+sprint: SPRINT-138
 priority: P2
 size: S
 risk: low

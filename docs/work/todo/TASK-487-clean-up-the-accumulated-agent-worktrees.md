@@ -1,6 +1,7 @@
 ---
 id: TASK-487
 title: "clean up the accumulated agent worktrees, owner-approved"
+sprint: SPRINT-138
 priority: P3
 size: S
 risk: low
