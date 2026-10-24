@@ -103,3 +103,7 @@ one commit not in main. The owner approved per class by popup: the 12 removed (`
 `9f1b2a4e`'s parent commit (`sprint(138): TECH-DEBT -- TD-246 …`). Ticks were re-checked with the gate's checkers
 (by-reference 8/0, layers-observed PASS, prose-density 28/0).
 consequence · T6 · behaviour:low · governance:low
+
+### 2026-10-24 | progress | correction to the T6 entry: the TD-246 commit is `5d2bca69`
+The T6 entry above cites "`9f1b2a4e`'s parent commit". That is a placeholder that was never substituted (the line wrapped, so
+the replacement missed it), and no such commit exists. TD-246's one-time-cleanup record landed in `5d2bca69`.
