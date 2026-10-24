@@ -13,6 +13,7 @@
 // Bun auto-loads the repo-root dotenv file unless launched with --no-env-file, so this refuses to run
 // without it, and it never opens that file itself.
 import { spawnSync } from "node:child_process";
+import { rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { judgeOutput } from "./qa-verdict.ts";
@@ -20,11 +21,15 @@ import { judgeOutput } from "./qa-verdict.ts";
 export interface Reply {
   status: number;
   stdout: string;
+  stderr?: string;
+  timedOut?: boolean;
 }
 export interface Transport {
   local(args: string[]): Reply;
-  ssh(cmd: string): Reply;
+  ssh(cmd: string, timeoutMs?: number): Reply;
+  /** `dest` is the bare remote path; the host prefix is the transport's concern. */
   scp(src: string, dest: string): Reply;
+  cleanup(path: string): void;
 }
 export interface Cfg {
   host: string;
@@ -32,41 +37,57 @@ export interface Cfg {
   dir: string;
 }
 
-const AUTH = ["-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes"];
-export const sshArgv = (c: Cfg, cmd: string) => ["-i", c.key, ...AUTH, c.host, cmd];
-export const scpArgv = (c: Cfg, src: string, dest: string) => ["-i", c.key, ...AUTH, src, `${c.host}:${dest}`];
+const AUTH = [
+  "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes",
+  "-o", "ConnectTimeout=20", "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
+];
+// `--` keeps a host (or path) that starts with `-` from being read as an option.
+export const sshArgv = (c: Cfg, cmd: string) => ["-i", c.key, ...AUTH, "--", c.host, cmd];
+export const scpArgv = (c: Cfg, src: string, dest: string) => ["-i", c.key, ...AUTH, "--", src, `${c.host}:${dest}`];
 
-const RBUNDLE = "/tmp/lf-gate.bundle";
-const RLOG = "/tmp/lf-gate.log";
-const RRC = "/tmp/lf-gate.rc";
+const RUN_TIMEOUT_MS = 900_000;
 
 const sh = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
 
-function spawnReply(cmd: string, args: string[]): Reply {
-  const r = spawnSync(cmd, args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-  return { status: r.status ?? 255, stdout: r.stdout ?? "" };
+function spawnReply(cmd: string, args: string[], timeoutMs?: number): Reply {
+  const r = spawnSync(cmd, args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: timeoutMs });
+  const timedOut = (r.error as NodeJS.ErrnoException | undefined)?.code === "ETIMEDOUT";
+  return { status: r.status ?? 255, stdout: r.stdout ?? "", stderr: r.stderr ?? r.error?.message ?? "", timedOut };
 }
 
 export function realTransport(c: Cfg): Transport {
   return {
     local: (args) => spawnReply("git", args),
-    ssh: (cmd) => spawnReply("ssh", sshArgv(c, cmd)),
-    scp: (src, dest) => spawnReply("scp", scpArgv(c, src, dest.replace(/^[^:]*:/, ""))),
+    ssh: (cmd, timeoutMs) => spawnReply("ssh", sshArgv(c, cmd), timeoutMs),
+    scp: (src, dest) => spawnReply("scp", scpArgv(c, src, dest)),
+    cleanup: (path) => rmSync(path, { force: true }),
   };
 }
 
-export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void): number {
+export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void, opts: { pid?: number } = {}): number {
   const dir = sh(c.dir);
-  const step = (name: string, why: string) => {
+  // The last few lines of a failed step's stderr: without them a failure leaves no cause behind.
+  const tail = (r?: Reply) => {
+    const lines = (r?.stderr ?? "").split("\n").map((l) => l.trim()).filter((l) => l !== "").slice(-5);
+    for (const l of lines) say(`  stderr: ${l}`);
+  };
+  const step = (name: string, why: string, r?: Reply) => {
     say(`gate-remote: transport failure at step '${name}' (${why}) -- not a gate result`);
+    tail(r);
     return 5;
   };
 
   const sha = t.local(["rev-parse", "HEAD"]).stdout.trim();
   if (!/^[0-9a-f]{40}$/.test(sha)) return step("local rev-parse", "no HEAD");
+  say(`gate-remote: ran ${sha}`);
+
+  const uniq = `${sha.slice(0, 8)}-${opts.pid ?? process.pid}`;
+  const RBUNDLE = `/tmp/lf-gate-${uniq}.bundle`;
+  const RLOG = `/tmp/lf-gate-${uniq}.log`;
+  const RRC = `/tmp/lf-gate-${uniq}.rc`;
 
   const rh = t.ssh(`git -C ${dir} rev-parse HEAD`);
-  if (rh.status === 255) return step("ssh remote head", "ssh exit 255");
+  if (rh.status === 255) return step("ssh remote head", "ssh exit 255", rh);
   const remote = rh.status === 0 ? rh.stdout.trim() : "";
   const incremental =
     /^[0-9a-f]{40}$/.test(remote) &&
@@ -75,36 +96,42 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void)
 
   const fetch = remote !== sha;
   if (fetch) {
-    const bundle = join(tmpdir(), "lf-gate.bundle");
+    const bundle = join(tmpdir(), `lf-gate-${uniq}.bundle`);
     const range = incremental ? `${remote}..HEAD` : "HEAD";
-    if (t.local(["bundle", "create", "-q", bundle, range]).status !== 0) return step("local bundle", range);
-    if (t.scp(bundle, RBUNDLE).status !== 0) return step("scp bundle", "scp failed");
+    const b = t.local(["bundle", "create", "-q", bundle, range]);
+    if (b.status !== 0) return step("local bundle", range, b);
+    const sc = t.scp(bundle, RBUNDLE);
+    t.cleanup(bundle);
+    if (sc.status !== 0) return step("scp bundle", "scp failed", sc);
   }
 
   const setup =
     `cd ${dir} && ` +
     (fetch ? `git fetch -q ${RBUNDLE} HEAD && ` : "") +
     `git checkout -q --detach ${sha} && git clean -fdq`;
-  if (t.ssh(setup).status !== 0) {
+  const su = t.ssh(setup);
+  if (su.status !== 0) {
     say("gate-remote: remote setup failed (fetch / checkout / clean) -- the gate was not run; not a gate result");
+    tail(su);
     return 5;
   }
 
-  const run = t.ssh(`rm -f ${RLOG} ${RRC}; cd ${dir} && QA_FULL=1 sh scripts/qa-check.sh > ${RLOG} 2>&1; echo $? > ${RRC}`);
-  if (run.status === 255) return step("ssh run", "ssh exit 255");
+  const run = t.ssh(`rm -f ${RLOG} ${RRC}; cd ${dir} && QA_FULL=1 sh scripts/qa-check.sh > ${RLOG} 2>&1; echo $? > ${RRC}`, RUN_TIMEOUT_MS);
+  if (run.timedOut) return step("ssh run", `timed out after ${RUN_TIMEOUT_MS / 1000}s`, run);
+  if (run.status === 255) return step("ssh run", "ssh exit 255", run);
 
   const rcR = t.ssh(`cat ${RRC}`);
-  if (rcR.status === 255) return step("ssh read rc", "ssh exit 255");
+  if (rcR.status === 255) return step("ssh read rc", "ssh exit 255", rcR);
   if (rcR.status !== 0 || !/^\d+$/.test(rcR.stdout.trim())) {
-    return step("read rc", "rc file missing or not a number");
+    return step("read rc", "rc file missing or not a number", rcR);
   }
   const rc = Number(rcR.stdout.trim());
 
   const logR = t.ssh(`cat ${RLOG}`);
-  if (logR.status === 255) return step("ssh read log", "ssh exit 255");
+  if (logR.status === 255) return step("ssh read log", "ssh exit 255", logR);
 
   say(`remote rc: ${rc}`);
-  const preserved = rc !== 0 ? rc : 1;
+  const preserved = rc === 0 ? 1 : Math.min(rc, 255); // an rc >= 256 must never wrap to 0
   if (logR.status !== 0) {
     say("gate-remote: no log -- the remote log file is missing or unreadable");
     return preserved;
@@ -119,6 +146,7 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void)
   }
   if (verdictLine !== undefined) say(verdictLine);
   if (rc === 0 && v.ok) return 0;
+  // a remote rc above 255 cannot be a real exit status; it falls through to the preserved branch
   if (rc !== 0 && v.ok) {
     say(`gate-remote: verdict contradicts exit code (rc ${rc}, passing verdict)`);
   } else if (rc === 0) {

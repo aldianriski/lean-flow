@@ -16,7 +16,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 // [test file, minimum live cases]. Losing cases is not fine; adding them is.
 const FILES: ReadonlyArray<readonly [string, number]> = [
-  ["evals/gate-remote.test.ts", 20],
+  ["evals/gate-remote.test.ts", 36],
 ];
 
 let pass = 0;

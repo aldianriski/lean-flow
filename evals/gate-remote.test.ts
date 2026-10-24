@@ -5,7 +5,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { runGateRemote, type Reply, type Transport } from "../scripts/gate-remote.ts";
+import { runGateRemote, scpArgv, sshArgv, type Reply, type Transport } from "../scripts/gate-remote.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SCRIPT = "scripts/gate-remote.ts";
@@ -30,6 +30,7 @@ const ok = (stdout = ""): Reply => ({ status: 0, stdout });
 
 function stub(s: Script) {
   const calls: string[] = [];
+  const timeouts: number[] = [];
   const t: Transport = {
     local(args) {
       const j = args.join(" ");
@@ -40,8 +41,12 @@ function stub(s: Script) {
       if (j.startsWith("bundle create")) return s.bundle ?? ok();
       throw new Error(`unexpected local ${j}`);
     },
-    ssh(cmd) {
+    cleanup(path) {
+      calls.push(`cleanup ${path}`);
+    },
+    ssh(cmd, timeoutMs) {
       calls.push(`ssh ${cmd}`);
+      if (timeoutMs !== undefined) timeouts.push(timeoutMs);
       if (cmd.includes("rev-parse HEAD")) return s.remoteHead ?? ok(`${REMOTE}\n`);
       if (cmd.includes("git fetch")) return s.setup ?? ok();
       if (cmd.includes("QA_FULL=1")) return s.run ?? ok();
@@ -54,14 +59,14 @@ function stub(s: Script) {
       return s.scp ?? ok();
     },
   };
-  return { t, calls };
+  return { t, calls, timeouts };
 }
 
-function go(s: Script) {
-  const { t, calls } = stub(s);
+function go(s: Script, pid = 4242) {
+  const { t, calls, timeouts } = stub(s);
   const lines: string[] = [];
-  const code = runGateRemote(CFG, t, (l) => lines.push(l));
-  return { code, calls, text: lines.join("\n") };
+  const code = runGateRemote(CFG, t, (l) => lines.push(l), { pid });
+  return { code, calls, timeouts, text: lines.join("\n") };
 }
 
 describe("exit cases through a stubbed transport", () => {
@@ -134,6 +139,8 @@ describe("exit cases through a stubbed transport", () => {
       "QA-CHECK: TRUNCATED at harness-x after 700s against a 600s budget -- 3 item(s) UNRUN\nQA-CHECK: 5 pass, 1 fail\n";
     const r = go({ log: ok(log) });
     expect(r.code).not.toBe(0);
+    expect(r.text).toContain("TRUNCATED at harness-x after 700s against a 600s budget");
+    expect(r.text).toContain("3 check(s) NEVER RAN");
   });
 
   test("missing log is non-zero and names 'no log'", () => {
@@ -145,19 +152,19 @@ describe("exit cases through a stubbed transport", () => {
   test("ssh 255 on the run step is transport: exit 5 naming the step, never a gate code", () => {
     const r = go({ run: { status: 255, stdout: "" } });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("transport");
-    expect(r.text).toContain("run");
+    expect(r.text).toContain("transport failure at step 'ssh run'");
   });
 
   test("ssh 255 asking for the remote head is exit 5", () => {
     const r = go({ remoteHead: { status: 255, stdout: "" } });
     expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'ssh remote head'");
   });
 
   test("scp failure is exit 5 naming scp", () => {
     const r = go({ scp: { status: 1, stdout: "" } });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("scp");
+    expect(r.text).toContain("step 'scp bundle'");
   });
 
   test("remote setup failure is exit 5 naming 'remote setup' and never reaches the gate", () => {
@@ -168,22 +175,111 @@ describe("exit cases through a stubbed transport", () => {
   });
 
   test("bundle creation failure is exit 5", () => {
-    expect(go({ bundle: { status: 1, stdout: "" } }).code).toBe(5);
+    const r = go({ bundle: { status: 1, stdout: "" } });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'local bundle'");
   });
 
-  test("unreadable rc file is exit 5", () => {
-    expect(go({ rc: ok("garbage") }).code).toBe(5);
+  test("garbage rc file is exit 5 naming step 'read rc'", () => {
+    const r = go({ rc: ok("garbage") });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'read rc'");
   });
 
-  test("ssh and scp always carry key auth options", () => {
-    // the real transport's argv, via its exported builder
-    const { sshArgv, scpArgv } = require("../scripts/gate-remote.ts");
+  test("empty rc file is exit 5 naming step 'read rc'", () => {
+    const r = go({ rc: ok("") });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'read rc'");
+  });
+
+  test("missing rc file (cat non-zero) is exit 5 naming step 'read rc'", () => {
+    const r = go({ rc: { status: 1, stdout: "" } });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'read rc'");
+  });
+
+  test("whitespace around the rc is tolerated", () => {
+    expect(go({ rc: ok(" 0 \n") }).code).toBe(0);
+  });
+
+  test("ssh 255 reading the rc is exit 5 naming step 'ssh read rc'", () => {
+    const r = go({ rc: { status: 255, stdout: "" } });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'ssh read rc'");
+  });
+
+  test("ssh 255 reading the log is exit 5 naming step 'ssh read log'", () => {
+    const r = go({ log: { status: 255, stdout: "" } });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'ssh read log'");
+  });
+
+  test("a remote rc >= 256 is clamped to 255, never 0", () => {
+    expect(go({ rc: ok("256\n"), log: ok(FAIL_LOG) }).code).toBe(255);
+    expect(go({ rc: ok("512\n"), log: ok(FAIL_LOG) }).code).toBe(255);
+  });
+
+  test("it prints the sha it ran", () => {
+    expect(go({}).text).toContain(`ran ${LOCAL}`);
+  });
+
+  test("stderr (last 5 lines, trimmed) of a failed step is printed", () => {
+    const err = ["l1", "l2", "l3", "l4", "l5", "l6", "fatal: bad object  "].join("\n") + "\n\n";
+    const cases: Script[] = [
+      { setup: { status: 1, stdout: "", stderr: err } },
+      { scp: { status: 1, stdout: "", stderr: err } },
+      { run: { status: 255, stdout: "", stderr: err } },
+    ];
+    for (const c of cases) {
+      const r = go(c);
+      expect(r.text).toContain("fatal: bad object");
+      expect(r.text).toContain("l3");
+      expect(r.text).not.toContain("l2");
+    }
+  });
+
+  test("per-run paths: two runs use distinct remote and local bundle paths; local bundle removed after scp", () => {
+    const a = go({}, 1);
+    const b = go({}, 2);
+    const paths = (c: string[]) => c.join("\n").match(/lf-gate[^ ';]*/g) ?? [];
+    const pa = new Set(paths(a.calls));
+    const pb = new Set(paths(b.calls));
+    expect(pa.size).toBeGreaterThan(0);
+    for (const p of pa) expect(pb.has(p)).toBe(false);
+    expect(a.calls.join("\n")).not.toContain("/tmp/lf-gate.bundle");
+    const iScp = a.calls.findIndex((c) => c.startsWith("scp "));
+    const iClean = a.calls.findIndex((c) => c.startsWith("cleanup "));
+    expect(iScp).toBeGreaterThan(-1);
+    expect(iClean).toBeGreaterThan(iScp);
+  });
+
+  test("scp gets the bare remote path (no host prefix)", () => {
+    const c = go({}).calls.find((x) => x.startsWith("scp "))!;
+    expect(c).toMatch(/ \/tmp\/lf-gate-[^ ]*\.bundle$/);
+  });
+
+  test("the gate-run ssh carries a 900 s timeout; a timeout is exit 5 naming step 'ssh run'", () => {
+    expect(go({}).timeouts).toContain(900_000);
+    const r = go({ run: { status: 255, stdout: "", timedOut: true } });
+    expect(r.code).toBe(5);
+    expect(r.text).toContain("step 'ssh run'");
+    expect(r.text).toContain("timed out");
+  });
+
+  test("ssh and scp always carry key auth, timeouts, and '--' before the host", () => {
     for (const a of [sshArgv(CFG, "x"), scpArgv(CFG, "s", "d")]) {
       const j = a.join(" ");
       expect(j).toContain("-i /k/id");
       expect(j).toContain("-o IdentitiesOnly=yes");
       expect(j).toContain("-o BatchMode=yes");
+      expect(j).toContain("-o ConnectTimeout=20");
+      expect(j).toContain("-o ServerAliveInterval=15");
+      expect(j).toContain("-o ServerAliveCountMax=4");
+      expect(a.indexOf("--")).toBeGreaterThan(-1);
     }
+    const ssh = sshArgv({ ...CFG, host: "-oProxyCommand=x" }, "cmd");
+    expect(ssh.indexOf("--")).toBeLessThan(ssh.indexOf("-oProxyCommand=x"));
+    expect(scpArgv(CFG, "s", "/d")).toContain("u@h:/d");
   });
 });
 
