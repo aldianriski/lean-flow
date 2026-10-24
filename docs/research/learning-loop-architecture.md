@@ -114,7 +114,7 @@ sprint (`skills/lean-doc-generator/SKILL.md:106`); once a member, `/prime` count
 and treats a task outside `done/`/`cancel/` as open (`:50-51`); a sprint cannot close until every member sits in `done/` or
 `cancel/` (`SKILL.md:108`). The `disposition re-check:` line (the form at `docs/LEARNINGS.md:206`) is closed only when its named
 task is in `done/`, or `cancel/` with a reason recorded on the line; while the task is open it stays open, with or without new
-sightings. **Not existing today:** promote's L-promotion review does not read that line (no "re-check" text in either skill file).
+sightings. **Not existing today:** promote's L-promotion review does not read that line (the existing close-time epic re-check does not read learning disposition lines).
 Reading it, and listing each open one, is the one small step C1 adds.
 
 **ADR candidate: none.** C1 and C4 are the weakest to reverse (shipped text, a changed census), but neither is surprising.
