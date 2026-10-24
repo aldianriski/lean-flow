@@ -391,6 +391,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-268** severity: trivial | status: open | created: Sprint-138 (T1 scoped review round 2, review-cap routed)
+  - Summary: **`scripts/gate-remote.ts` has three nits the capped review routed here, not to a third round.** (1) The verdict
+    is read from the FIRST `QA-CHECK:` line (`judgeOutput` and the FAIL listing both take the first match). A nested harness
+    printing a line-anchored `QA-CHECK:` earlier could mask the real one. Harmless at rc 0, but the last match is safer.
+    (2) A remote rc of 2 or 5 prints the same exit as the command's own refusal (2) and transport failure (5). The printed
+    message names the case, but the exit code alone cannot. (3) It gates HEAD, not the working tree, and does not warn on a
+    dirty tree (it prints `ran <sha>`).
+  - Fix direction: last verdict match; document or offset the local exit codes; a dirty-tree warning line. Other G.
+
 - **TD-267** severity: low | status: open | created: Sprint-137 (T1 tick, layers-completeness leg)
   - Summary: **`check-layers-completeness.ts` reads a task id inside a hyphenated token as a task reference.** Its Depends-on
     completeness scan matches `T<digits>` in a Plan block's DoD/Acceptance prose with no left boundary, so the record key
