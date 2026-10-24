@@ -130,3 +130,13 @@ consequence · T4 · behaviour:low · governance:high
 review · T4 · codex · behaviour:low · governance:high
 Codex round 1 (Spec): FIX, three wording changes (search by file name too; absence per file; excluded hits named). One bounded
 retry applied all three. Round 2: CLEAR, no new blocking finding. Within the 2-round cap.
+
+### 2026-10-24 | scope-change | T1, T3: `Layers:` gain the emitter-column harness, which the real run proved both must touch
+What broke: T1's real full-gate run through its own command (commit `cf48041e`, VPS) returned `QA-CHECK: 307 pass, 2 fail`.
+(1) `emitter-column(POPULATION-scope)`: every `.sh`/`.ts` under `scripts/` must be scanned or matched by a documented rule in
+`evals/run-emitter-column-fixtures.ts`'s out-of-scope list, and `scripts/gate-remote.ts` is neither. T3's `scripts/merge-check.ts`
+will hit the same rule. (2) `cap .claude/CONTEXT.md (151 > 150)`: T1's added continuation line crossed the cap. Neither leg is
+in a per-task check, so both were invisible until the real run (L-218's class, caught this time before merge).
+Impact: T1 and T3 `Layers:` gain `evals/run-emitter-column-fixtures.ts` (one rule entry each, on the precedent of
+`scripts/qa-verdict.ts` and `scripts/promote-check.ts`, which consume findings). The CONTEXT sentence is folded into the existing
+QA_FULL bullet without adding a line. No member Done-when changes. A Layers correction, logged before the Plan edit (L-100 · L-229).
