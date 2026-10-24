@@ -9,7 +9,7 @@ class: decision
 tier: G
 authority: J2
 origin: close-retro
-state: needs-info
+state: blocked
 ---
 
 # TASK-367 — Let the caller declare detachment, so the pre-flight gate can run complete
@@ -39,8 +39,7 @@ state note: the detachment signal's shape is the open question
 
 - that a complete pre-flight is worth its wall-clock at all. UNCONFIRMED — the alternative is that the launcher should keep refusing on a bounded gate and the completeness problem belongs to the gate's cost, not to the launcher. Rule that before building; `TD-090` and `TASK-357` (carried from SPRINT-104 T4) own the cost side.
 - **open:** the shape of the detachment signal (the open question — see Done when (a)).
-- **open:** re-measure the Windows default-profile gate total after Round 24 (engine −67%; VPS `QA_FULL=1` is 105–109 s, Round 22) — if it completes under the 520 s budget, the launcher already gets a complete verdict and this task may be moot.
-- **open:** take that measurement only with ≥ 3 GB free on this host — triage 2026-10-21 found 0.5 GB of 13.7 GB, and a timing under memory pressure is discarded, not adjusted (L-219). The VPS cannot stand in: the question is the Windows total (TD-223).
+- **blocked-by:** a valid Windows default-profile gate measurement after Round 24, taken with ≥ 3 GB free on this host (unblock condition). Under 520 s means the launcher already gets a complete verdict and this task may be moot. Triage found 0.5 GB free on 2026-10-21 and 0.3 GB on 2026-10-24. A timing under memory pressure is discarded, not adjusted (L-219), and the VPS cannot stand in, because the question is the Windows total (TD-223).
 
 ## Tracker
 
