@@ -116,6 +116,7 @@ J2: it deletes worktrees, and the disposition is the owner's. Run it when no wor
 
 ### T7 — Map the learning loop end to end `[size: M · risk: low · class: execution · HITL · J1]`
 Layers: `docs/research/learning-loop-architecture.md` · `docs/knowledge-index.md`
+  · `docs/research/logs/learning-loop-architecture.md`
   · `docs/work/todo/TASK-488-map-the-learning-loop-end-to-end-and-propose-an-architecture.md`
   · `docs/work/in_progress/TASK-488-map-the-learning-loop-end-to-end-and-propose-an-architecture.md`
   · `docs/work/done/TASK-488-map-the-learning-loop-end-to-end-and-propose-an-architecture.md`
