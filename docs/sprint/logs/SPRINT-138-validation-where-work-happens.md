@@ -116,3 +116,17 @@ owner-ruling (popup, 2026-10-24): accepted under D1, as at SPRINT-137. Builders 
 merge-back diff is checked against the builder's own declared files. 10 agent worktrees remain (1 locked and 9 dirty, kept at T6),
 against dispatch.md's leftover guardrail (harness #51596, stale-branch reuse on an agent-id collision). Each spawn is
 base-checked against the declared base, which catches a reused stale branch.
+
+### 2026-10-24 | progress | T4 (TASK-485) built and merged; Codex CLEAR at round 2; waits in review/ for exercise B
+Builder in a worktree (base `cf275631` verified at spawn) added one bullet to review-scoping.md § "Scope every pass to the diff";
+the diff touched only that file. Cherry-picked as `329f4ca5`, Codex retry `a0a03bb2`. Exercise A: on SPRINT-111 T3's break
+commit `d75d861` (S11.TODOCAP removed, 100 → 99 rules), the procedure names all three red test files the log lists. One of them,
+`packages/standard/src/spec-reader.test.ts`, builds its path with `new URL(...)` and is found only by a file-name search. That
+is why Codex required path + file name + names. The hit list ran about 20 files wide. Exercise C: on workdoo `180d5b7`
+(read-only), a names search found 10 test files, 4 of them pre-existing consumers outside the diff; they were named, not run.
+Exercise B (a real SPRINT-138 review reporting the section) is pending, so T4 waits in review/. Post-merge legs on `main`:
+typecheck clean, prose-density 28/0, layers-completeness 0 FAIL, layers-observed PASS, scope-change 9/0.
+consequence · T4 · behaviour:low · governance:high
+review · T4 · codex · behaviour:low · governance:high
+Codex round 1 (Spec): FIX, three wording changes (search by file name too; absence per file; excluded hits named). One bounded
+retry applied all three. Round 2: CLEAR, no new blocking finding. Within the 2-round cap.
