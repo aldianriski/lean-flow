@@ -67,7 +67,8 @@ Layers: `scripts/lib/check-review-depth.sh` · `evals/run-review-depth-fixtures.
   · `docs/work/in_progress/TASK-480-review-depth-fails-a-consequence-line-whose-key-is-not-one-task.md`
   · `docs/work/done/TASK-480-review-depth-fails-a-consequence-line-whose-key-is-not-one-task.md`
 Depends-on: none
-Cites: `TASK-480` · TD-099 · TD-244 · `skills/orchestrator/references/review-scoping.md` · `scripts/qa-check.sh`
+Cites: `TASK-480` · TD-099 · TD-244 · `skills/orchestrator/references/review-scoping.md` · `scripts/qa-check.sh` ·
+  `scripts/lib/check-layers-completeness.ts`
 
 Other G, as TASK-471 on this checker (owner ruling at intake, over Codex's consequential-G reading).
 
