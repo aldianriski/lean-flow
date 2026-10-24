@@ -22,7 +22,7 @@ technical terms into KBBI coinages people do not use or that shift the meaning (
 developer code-mixed Indonesian and wants English terms kept where the Indonesian word is uncommon.
 
 ## Done when
-- [ ] `skills/humanizer/references/patterns-id.md` has:
+- [x] `skills/humanizer/references/patterns-id.md` has: ✓ patterns-id.md: ID-1..17 mapped to EN § (+7 ID-only), 24-row term table + keep-list, italics rule with all four exclusions (13eee801, 5883e965, 97867184)
       (a) Indonesian slop patterns mapped to the upstream section they share ("Tidak hanya X, tetapi juga Y" → §1,
       "Mari kita selami" → §4, "Semoga membantu!" → §22, "memainkan peran penting" / "lanskap" / "krusial" → §12–13), plus
       Indonesian-only tells;
@@ -31,10 +31,10 @@ developer code-mixed Indonesian and wants English terms kept where the Indonesia
       pengguna, basis data, …);
       (c) the italics rule: foreign terms italicized in rendered Markdown only (docs, PR bodies), never in plain-text commit
       messages, code, identifiers, paths or URLs.
-- [ ] SKILL.md detects Indonesian text and reads `patterns-id.md` in full in addition to the English catalog.
-- [ ] The owner (native speaker) approves the term table and the slop list.
-- [ ] Exercised: one AI-drafted Indonesian text containing galat-class terms is cleaned; before/after in the sprint log.
-- [ ] CHANGELOG line; Codex gauntlet review clean.
+- [x] SKILL.md detects Indonesian text and reads `patterns-id.md` in full in addition to the English catalog. ✓ SKILL.md step 1 reads patterns-id.md in full for Indonesian or mixed text (71/140)
+- [x] The owner (native speaker) approves the term table and the slop list. ✓ owner reviewed by popup: 8 coinages to English, all rules kept, first-use italics (logged, d0b8a999)
+- [x] Exercised: one AI-drafted Indonesian text containing galat-class terms is cleaned; before/after in the sprint log. ✓ DeployKit text: galat/peladen/sangkil -> error/server/efficient, 9 facts kept; before/after in the log
+- [x] CHANGELOG line; Codex gauntlet review clean. ✓ CHANGELOG [Unreleased] bullet (13eee801); Codex CLEAR at round 2
 
 ## Touches
 `skills/humanizer/references/patterns-id.md` · `skills/humanizer/SKILL.md` · CHANGELOG

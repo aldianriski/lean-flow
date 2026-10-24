@@ -216,3 +216,9 @@ three, with a 17-line facts-before = facts-after check. The coordinator then kep
 in its "after" (`HEAD`). (2) The exercise narrowed "Jika terjadi galat saat build" (an error during build) to "build gagal"
 (the build fails). Corrected final sentence, verbatim: "Kalau terjadi error saat *build*, *log* lengkap ditampilkan."
 Fact 9 now reads: an error during build shows the full log. The other eight facts and sentences are as logged above.
+
+### 2026-10-25 | progress | T3 (TASK-491) done: 5 of 5 boxes; Codex CLEAR at round 2
+consequence · T3 · behaviour:material · governance:low
+review · T3 · codex · behaviour:material · governance:low
+The coordinator's ID-16 fix recorded above as `HEAD` is `97867184`. Round 2 cleared the example pairs, the exercise and
+regressions. The owner's linguistic rulings were held out of the review's scope.
