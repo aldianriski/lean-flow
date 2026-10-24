@@ -23,7 +23,7 @@ Unfrozen. It is a shipped skill, so the Codex review loop applies.
 Consumer: every adopter's reviewer gets the step, and it reads the host's own tests.
 
 ## Done when
-- [ ] `review-scoping.md`'s brief requires finding the host's existing tests and harnesses that reference each changed artifact (by
+- [x] `review-scoping.md`'s brief requires finding the host's existing tests and harnesses that reference each changed artifact (by ✓ `329f4ca5` + Codex retry `a0a03bb2`: brief bullet requires searching by path, file name and exported/defined names, running all hits (excluded hits named with a reason), a separate Pinning tests section in the host format, per-file "no pinning test found" with the searches run; lean-flow paths only as a marked example. Codex round 2 CLEAR
       path and by the names it exports or defines), running them, and reporting each result in the host's format, in a section
       separate from the Standards/Spec axes. Finding none is reported as "no pinning test found", never left silent. Host-generic.
 - [ ] Exercised three ways. Applied to one SPRINT-111 break's diff, the procedure names the test that caught it by hand. One real
