@@ -530,6 +530,12 @@ status: current
   - **Sighting (SPRINT-129 close, 2026-10-19):** 12 older agent worktrees present at dispatch (first written as 13, a miscount; 12 remain after cleanup, two routes agree) (the base guard reads each one:
     stale by 24–992 commits or divergent). The mitigation was applied by hand: this sprint's 4 builder worktrees and its integration
     worktree were proposed for removal at close and removed on owner approval; the 12 older ones were left for review.
+  - **One-time cleanup (SPRINT-138 T6, TASK-487, 2026-10-24, owner-approved per class):** 22 registered agent worktrees, two routes
+    agreeing (`git worktree list` 22 = 28 directories on disk − 6 empty orphans). Removed: the 12 that were clean, unlocked and fully
+    applied. "Merged" was read as `git cherry main <branch>` showing no `+`, because merge-backs are cherry-picked, so ancestry never
+    holds. Their branches were deleted with `-D` on that proof. Also removed: the 6 empty orphan directories. Kept: 1 locked and 9
+    dirty (two with one commit not in main). 10 remain registered; 2 stray files (`qa-t4.out`, `red.txt`) are left for the owner.
+    Still open: nothing removes worktrees as they accumulate, which is the debt itself.
 
 - **TD-245** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
   - Summary: **Epic ids now span two repositories and nothing derives the next one across both.** EPIC-016 to 020 live in workdoo
