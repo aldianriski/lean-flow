@@ -397,8 +397,11 @@ status: current
     `pre-T1` in SPRINT-137 T3's Acceptance read as "references T1, absent from Depends-on" and FAILed the gate leg. Worked
     around by rewording the Acceptance (scope-change, owner ruling 2026-10-23). Census at SPRINT-137: that one sighting; the
     other live Plan prose carries no `<word>-T<digits>` token.
-  - Fix direction: require a non-word, non-hyphen character (or line start) before `T<digits>`, with a must-FAIL fixture
-    holding `pre-T1` beside a real `T1` reference that still FAILs. Other G.
+  - **Widened (SPRINT-137 system verify, 2026-10-24):** a second site, `check-sprint-by-reference.ts`'s `--scope-change` leg,
+    selects an entry's tasks with `\bT<n>(?![0-9])` over its heading, so the 2026-10-23 T3 entry (heading quotes `pre-T1`)
+    was attributed `T1+T3`. Harmless there (the union only widened what it checked), but the same unbounded match.
+  - Fix direction: require a non-word, non-hyphen character (or line start) before `T<digits>` at both sites, with a must-FAIL
+    fixture holding `pre-T1` beside a real `T1` reference that still FAILs. Other G.
 
 - **TD-266** severity: low | status: open | created: Sprint-136 (T3 review, census-routed)
   - Summary: **verify-reaches' `.ts` support has two known looseness shapes.** (1) The `.ts` comment strip is line-start only,
