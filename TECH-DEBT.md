@@ -692,7 +692,7 @@ status: current
     adopter portability is unverified. A mismatch fails safe: the retired row becomes live again and is placed, never dropped.
   - Mitigation (hypothesis): run `run-s2-placement-fixtures.sh` under mawk and busybox in CI or a container once one exists.
 
-- **TD-212** severity: medium | status: open | created: Sprint-111 (close retro, L-221)
+- **TD-212** severity: medium | status: resolved → TASK-485 (SPRINT-138 T4, `329f4ca5` + `a0a03bb2`): the reviewer brief requires a Pinning tests section (search by path, file name and exported names; run all hits; per-file "no pinning test found"); exercised on SPRINT-111's break, a real SPRINT-138 review and an adopter diff | created: Sprint-111 (close retro, L-221)
   - Summary: **Neither the default gate nor any review brief runs the test surfaces that pin a spec or skill change.**
     `qa-check.sh` never invokes `bun test`, and opt-in harnesses run only under QA_FULL, which no builder or reviewer brief
     required. SPRINT-111 shipped four breaks through green default gates (T3's 9 TS assertions pinned to 100 rules · T5's
