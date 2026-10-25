@@ -14,7 +14,13 @@ status: current
 
 ---
 
-## [Unreleased]
+## v2.15.0 — `/humanizer`: AI-sounding prose rewritten to read human, in English and Indonesian, on every writing job (2026-10-25)
+
+**MINOR** — ships SPRINT-139 (Humanize Every Writing Job): one new skill, `/humanizer` (roster 14 → 15), wired into
+`/lean-doc-generator`, `/release-patch`, `/handoff` and every commit and PR message the skills compose. Installing the release
+is enough; no upgrade step. The standard is unchanged (spec 0.18.1). Restart the session after installing.
+
+### SPRINT-139 — Humanize Every Writing Job (2026-10-25)
 
 **Consumer-facing** (shipped procedure; every repo that installs lean-flow gets these):
 - **Every sub-agent brief now names secret files as off-limits.** The orchestrator's builder, worktree and reviewer briefs, the builder-check reader prompt, the task-decomposer `Explore` recon brief and the council's sub-agent prompts say: never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; report and ask, or read a non-secret record. Two SPRINT-138 agents briefed "read-only" had opened `.env` files (L-247).
