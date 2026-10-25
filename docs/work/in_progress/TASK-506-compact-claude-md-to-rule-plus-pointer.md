@@ -22,12 +22,12 @@ Many bullets carry their incident history inline, which anti-slop names "value i
 (ADR-048, `token-budget.txt` 16,087 for the pair) already catches long lines; this task spends the headroom.
 
 ## Done when
-- [ ] Every CLAUDE.md bullet is a rule plus its `L-NNN` / ADR pointer; no incident narrative remains.
-- [ ] Before any story is cut, its cited L-NNN entry is checked to hold it; a story with no home is moved into that entry
+- [x] Every CLAUDE.md bullet is a rule plus its `L-NNN` / ADR pointer; no incident narrative remains. ✓ `897047fb`: every section swept; each bullet is the rule plus its L-NNN / ADR / § pointer; scoped reviewer: no lost instruction, no lost signal
+- [x] Before any story is cut, its cited L-NNN entry is checked to hold it; a story with no home is moved into that entry ✓ `897047fb`: each cut story checked against its cited entry; six with no home moved verbatim to § Durable rules (each original line matches once, grep -cFx)
       first, so no signal is lost.
-- [ ] Before any block is removed, its readers are searched for (L-117); every count claim `check-count-claims.sh`
+- [x] Before any block is removed, its readers are searched for (L-117); every count claim `check-count-claims.sh` ✓ `897047fb`: readers searched (check-count-claims · prose-density · conformance-engine/qa-check header); count claims 3/3 PASS on CLAUDE.md
       verifies in CLAUDE.md still checks out.
-- [ ] ≤ 80 lines; the pair is re-measured with the calibrated method and `scripts/lib/token-budget.txt` is lowered to
+- [x] ≤ 80 lines; the pair is re-measured with the calibrated method and `scripts/lib/token-budget.txt` is lowered to ✓ `897047fb`: 79 lines; pair ~14,114 → ~12,691 tokens; token-budget.txt 16,087 → 12,691 (ratio 2.991, R2), check PASS at the new budget; calibration-log Round 2; CLAUDE.md 2,432 → 1,715 words, 15,700 → 11,445 bytes
       the new figure (ratchet); before → after words, bytes and tokens recorded.
 - [ ] qa-check PASS (system verify on the VPS); owner reads the result before close.
 

@@ -253,3 +253,16 @@ left out "or their own file"); both fixed. Run 2 printed the complete file: Dire
 colours and font filled from named repo files, template-vs-token conflicts raised as questions. check-count-claims: 36, 0 FAIL.
 Codex round 2: CLEAR, ruling that repo-derived Overview prose is a permitted fill because the never-invent rule governs the
 Direction fields. 5 of 5 boxes ticked.
+
+### 2026-10-25 | progress | T9 (TASK-506): CLAUDE.md compacted and the budget ratcheted; 4 of 5 boxes, the qa-check box waits for system verify
+consequence · T9 · behaviour:low · governance:high
+review · T9 · scoped · behaviour:low · governance:high
+Built on the session model (stated reason: CLAUDE.md is the contract every flow loads; each cut is a judgment on keeping a rule's
+force); committed by the coordinator as `897047fb`. CLAUDE.md 2,432 → 1,715 words, 15,700 → 11,445 bytes, 80 → 79 lines, 4 → 0 lines over
+400 chars. Every bullet swept to rule + pointer. Six stories with no home moved verbatim to LEARNINGS § Durable rules (roster ·
+flow-blocking-question · too-simple · manifest-lockstep · wiring-check · cross-check; R1); each cut story was checked against the
+L-NNN or ADR that holds it. Always-loaded pair ~14,114 → ~12,691 tokens; `token-budget.txt` 16,087 → 12,691 (ratio 2.991 kept, R2;
+zero headroom per ADR-048); calibration-log Round 2. Count claims 3/3; prose-density 28/0 (CLAUDE.md now has 0 dense lines, so its
+baseline row reads "spent, delete it": to the next promote, the file was outside T9's Layers); `evals/doc-caps.test.ts` 63/0.
+One scoped Sonnet reviewer, bullet by bullet: no lost instruction, no lost signal. The owner read and accepted the file by popup.
+Box 5 (qa-check PASS on the VPS) is ticked after system verify at close.
