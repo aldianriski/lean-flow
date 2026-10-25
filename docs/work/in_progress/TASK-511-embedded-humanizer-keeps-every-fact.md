@@ -29,7 +29,8 @@ job lean-flow composes. The two standalone runs kept every fact, so the loss sit
       sample can tell a fix from no fix).
 - [ ] After the fix: 6 separate headless embedded runs on the same sample, each judged from its own transcript; 0 of 6 add
       or drop a listed fact.
-- [ ] TD-274 is resolved with the before and after rates, and the CHANGELOG `[Unreleased]` block has a line.
+- [ ] TD-274 is narrowed with the before and after rates and a re-measure condition, and the CHANGELOG `[Unreleased]`
+      block has a line.
 
 ## Touches
 `skills/humanizer/references/embedded.md` · `evals/fixtures/humanizer/` · `TECH-DEBT.md` · `CHANGELOG.md`

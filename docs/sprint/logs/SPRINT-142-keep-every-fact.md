@@ -72,3 +72,33 @@ fixtures all green (L-251). Codex round 1: CLEAR on all four threat items (Done-
 promotion shape).
 consequence · T1 · behaviour:low · governance:high
 review · T1 · codex · behaviour:low · governance:high
+
+### 2026-10-25 | surprise | T2 baseline runs 1-3 discarded: each child read the live embedded.md while the coordinator edited it
+The three baseline runs used the brief assembled from `embedded.md` at `07f10d29`, but each child also reads `embedded.md`
+itself, from the plugin directory (the live checkout), because the humanizer SKILL.md routes embedded mode there. The
+coordinator wrote the fix into that file while the runs were in flight, so they cannot count as a pre-fix baseline.
+Discarded unjudged. The re-run pins the plugin directory to an export of `07f10d29` (`git archive` of `skills/` and
+`.claude-plugin/`; `embedded.md` matches the plan_commit blob except line endings, and carries no fact-list step). The
+after runs will pin to the fix commit the same way. The discarded runs also showed a judging gap: each final kept
+"faster", which the text implies ("not just faster") but `facts.md` listed only as dressing. `facts.md` now says that
+"faster" may be kept or cut and counts as neither; this landed before any run was judged. `git worktree add` failed on
+the scratch path ("Could not reset index file"), hence the export.
+
+### 2026-10-25 | scope-change | T2 strengthens the sample once under ruling R1 (pinned baseline 0 of 3)
+What broke: the re-run baseline (pinned to `07f10d29`) kept all eleven facts in 3 of 3 runs, by the coordinator's read of each
+final against the fixture's fact list; every final stayed close to the original sentences, so the sample cannot tell a fix from no
+fix. Impact: per owner ruling R1, `evals/fixtures/humanizer/fact-keep/` is strengthened once before any after-fix run.
+The same eleven facts now sit inside dressing the pass is tempted to cut (the range, audience and scope in bold-label list
+items, the hedged number inside an inflated contrast, the email fact in a closer), and the fixture's fact list lists the new dressing.
+The 3-run baseline then re-runs against the same pinned plugin dir. The fixture is frozen from the first after-fix run. No
+member's Done when changes. Re-confirm G2: not needed (R1 pre-approved this branch).
+
+### 2026-10-25 | scope-change | TASK-511 (T2) box 5 narrows TD-274 instead of resolving it (owner ruling R2)
+What broke: the defect did not reproduce. A fresh judge, given only the fact list and the finals, scored all six pre-fix
+runs (three on each sample version, pinned to `07f10d29`) at 11 of 11 kept and nothing added. The fact-list step cannot
+be shown to fix a loss that does not occur here. Owner ruling **R2**: ship the step as a guard, run the six after-fix runs
+as a regression check, and narrow TD-274 (not reproduced; guard added; re-measure on the first loss seen in a real writing
+job) rather than mark it resolved. Impact: TASK-511's fifth box changes from "TD-274 is resolved with the before and after
+rates" to "TD-274 is narrowed with the before and after rates and a re-measure condition"; the other four boxes stand, and
+the third is ticked with the 0-of-3 result it recorded. Edit: that box's text in TASK-511, then `TECH-DEBT.md` at the end
+of T2. Re-confirm G2: not needed.
