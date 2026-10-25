@@ -4,6 +4,7 @@ slug: roster-drift-and-the-adopter-pin
 owner: Maintainer
 last_updated: 2026-10-25
 status: active
+plan_commit: 9e693f41
 update_trigger: sprint execute/close events
 ---
 
