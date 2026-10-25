@@ -112,3 +112,14 @@ builder-check · T6 · 3 contradictions · 5 questions · design fixed (reviewer
 builder-check · T7 · 3 contradictions · 6 questions · design fixed (pass rule, negative control, page rule, snapshot)
 builder-check · T8 · 0 contradictions · 4 questions · settled; one intent question to the owner (R3)
 builder-check · T9 · 2 contradictions · 3 questions · one fixed (every bullet); one to the owner (R1); ratio to the owner (R2)
+
+### 2026-10-25 | progress | T1 (TASK-508) done: L-237, L-240 and L-241 promoted; Codex CLEAR at round 1
+consequence · T1 · behaviour:low · governance:high
+review · T1 · codex · behaviour:low · governance:high
+Built by one Sonnet builder from the signed design and the coordinator's fixes; committed by the coordinator as `df1c7b68`.
+`builder-check.md` gains § Two rules for the design itself (quote a frozen Done-when, never paraphrase it · log the `Layers:`
+pruning in the G2 entry), worded to bind the design's author whether or not a fresh reader runs. LEARNINGS § Durable rules ›
+consumer-side gains the headless no-plugin proof. The three entries are `[status: promoted]` with L-247-shaped pointer lines
+(`disposition: move-to-reference`); `promoted: no` 15 → 12. CHANGELOG opens `## [Unreleased]`. Checks: `check-doc-caps.ts`
+exit 0 with no FAIL; prose-density 28/0 (LEARNINGS is uncapped, so outside its population). Codex round 1, static from the
+diff with a five-item threat model: CLEAR on every item. 5 of 5 boxes ticked.
