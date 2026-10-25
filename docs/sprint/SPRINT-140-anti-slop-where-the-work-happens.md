@@ -4,6 +4,7 @@ slug: anti-slop-where-the-work-happens
 owner: Maintainer
 last_updated: 2026-10-25
 status: active
+gates_signed: G1,G2 @ 33bab223
 plan_commit: 3dbc2186
 update_trigger: sprint execute/close events
 ---
