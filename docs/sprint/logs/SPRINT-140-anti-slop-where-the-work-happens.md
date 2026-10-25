@@ -169,3 +169,18 @@ result only (L-248):
 The overlay was read in every embedded run. Three of six embedded runs added or dropped a fact, which is the SPRINT-139
 embedded pass itself, not the overlay: a TD at close (owner ruling), with an L candidate. Checks: SKILL.md 92/140;
 check-doc-caps 0 FAIL; prose-density 28/0. 5 of 5 boxes ticked.
+
+### 2026-10-25 | progress | T4 (TASK-501) done: humanizer Audit mode; Codex CLEAR at round 1
+consequence · T4 · behaviour:material · governance:low
+review · T4 · codex · behaviour:material · governance:low
+Built by one Sonnet builder; committed by the coordinator as `510d632c`. § Modes gains **Audit (explicit request only)**: numbered
+findings with §1–§5 (and ID-1..ID-5) first, each citing `§n`, `LF-n` or `ID-n` with its location and quoted sentence, weak-alone
+findings marked; the turn edits nothing. Apply is a second turn that rewrites only the picked sentences, running step 6's fact
+check on each. Embedded mode never audits. The description gains two audit triggers; its closing sentence was shortened to keep
+line 3 under prose-density's 400-character limit. The coordinator moved the CHANGELOG bullet into task order (D1).
+Exercise: a copy of lean-flow's SECURITY.md in a scratch folder of the trusted workdoo copy, two headless turns. Turn 1 (audit):
+13 findings in the stated order; sha256 prefix 6f5d2da8fefc7b89 before and after. Turn 2 (resumed session, simulated pick 1·6·9):
+the diff shows exactly lines 19, 33 and 55 changed, each inside its quoted sentence. The scratch folder was then removed.
+Side finding, outside this task: SECURITY.md still says "Of the 14" and its grant table has no `humanizer` row (the roster is
+15 since SPRINT-139); `check-count-claims.sh` does not read SECURITY.md. To the close Retro as a follow-up.
+Codex round 1: CLEAR on all five items. 5 of 5 boxes ticked.
