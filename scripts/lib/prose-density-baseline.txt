@@ -21,10 +21,8 @@
 # (L-186). Never hand-list this set again.
 #
 # format: <path> <count-at-adoption>
-.claude/CLAUDE.md 4
 .claude/CONTEXT.md 16
 docs/research/adhd-adaptation.md 2
-docs/research/adlc-epic-sequencing.md 1
 docs/research/allowed-tools-audit.md 1
 docs/research/architecture-baselines.md 1
 docs/research/conformance-coverage.md 5
