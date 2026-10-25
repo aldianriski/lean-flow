@@ -383,3 +383,28 @@ found the `/humanizer` rows written at T2 and not updated since. README's row na
 row lists the wiring but omits the Indonesian catalog and translate mode. README is in T8's `Layers:`; CONTEXT is not.
 Impact: `.claude/CONTEXT.md` added to T8's `Layers:`; both rows edited in place to name the Indonesian catalog,
 on-request EN↔ID translation and the embedded wiring (CONTEXT stays 149/150). The Done when is unchanged.
+
+### 2026-10-25 | progress | T8 (TASK-496): 2.15.0 bumped; consumer proof run in a real repo (owner's choice: the research copy of workdoo)
+Box 1 (`b8c4b9e6`): every manifest from `grep -l '"version"' .*-plugin/*.json` (4) is at 2.15.0, along with the README footer;
+`check-manifest-lockstep.sh` 4/4 PASS and the footer leg's rule agree. CHANGELOG `[Unreleased]` became the `v2.15.0` block;
+the spec is unchanged (0.18.1). Box 4: three routes agree on 15 skills (disk, CONTEXT rows, README capability table), and the
+stale `/humanizer` rows were fixed under the scope-change above (`696b225c`).
+Consumer proof. The owner asked to run it in a real repo, workdoo, "inside folder research, not project". That is
+`D:\Research\workdoo`, which has the lean-flow layout and is NOT a git repo (lean-flow's git-less mode). It was already trusted:
+a probe write worked, and the probe was removed. Before any run: `docs/`, `.claude/` and the top-level docs were copied to the
+scratchpad, and 1111 files were hashed (`.env*` excluded, never opened). The plugin was loaded as a zip of the release commit
+(`git archive` at `696b225c`, version 2.15.0) via `--plugin-dir`, with `--setting-sources project`, so the owner's installed
+lean-flow stayed out. Two headless sessions, transcript-verified:
+- Run 1. `/prime` → `Skills:   2.15.0 live checkout → fresh`. `/humanizer` standalone, pasted mode, on README's first
+  section: read `patterns-en.md` whole and returned draft, remaining tells and final. `/lean-doc-generator adr "Adopt
+  /humanizer for this repo's written docs"`: WROTE `docs/adr/ADR-004-adopt-humanizer-for-written-docs.md` and its
+  `DECISIONS.md` row. Its pass ran in one child sub-agent (Read `patterns-en.md` and `patterns-id.md` whole, no inline
+  notice); frontmatter, status lines and the Alternatives table stayed out of the pass. Leak scan of the ADR (lean-flow paths,
+  scripts, sprint and task ids): none.
+- Run 2. `/flow "Add a short note to CONTRIBUTING.md …"`: `/prime` → `/task-decomposer`, which parked at the intake grill and
+  did not approve itself (it also flagged that ADR-004 is only proposed) → `/handoff`. The handoff's pass ran in a child
+  sub-agent with both catalogs whole. That is humanizer firing through a wired writing stage, per the TASK-490 decision. In
+  the repo it wrote only `HANDOFF-LEDGER.md`.
+Snapshot diffs agree with each session's own file list (route 2): run 1 created 1 and modified 1; run 2 created 1. Owner
+ruling: revert all three. Done; all 1111 files are hash-identical to the pre-run snapshot, and copies are kept as scratchpad
+evidence. Nothing was pushed anywhere.
