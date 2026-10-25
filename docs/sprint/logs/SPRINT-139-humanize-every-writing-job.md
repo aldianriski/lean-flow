@@ -370,3 +370,9 @@ when unsure, it passes. dispatch and triage now point to `embedded.md` and state
 E4 restated: this sprint's status-move commits carry a parenthetical ("(T1 accepted; git mv, own commit)"), so under the
 corrected rule they would PASS, not skip; the earlier E4 line was wrong on that. A genuine fixed template here is
 `sprint(139): record plan_commit` (`873a765f`): every word is template or substitution, so it skips.
+
+### 2026-10-25 | progress | T7 (TASK-495): 4 of 5 boxes; Codex CLEAR at round 2; waits in review/ for E3 (the close commit)
+consequence · T7 · behaviour:material · governance:high
+review · T7 · codex · behaviour:material · governance:high
+Box 4 ("one real orchestrator commit, one lean-doc-generator close commit, and one PR body show the pass") has E1 and E2; its
+close-commit leg is ticked at SPRINT-139's close, when that commit goes through the pass.

@@ -21,14 +21,14 @@ Commit text is lean-flow's most frequent writing job (orchestrator dispatch, lea
 most cost-sensitive one, since night runs produce many commits.
 
 ## Done when
-- [ ] A census of every procedure that composes a commit message or PR body, derived by two different selectors that agree
+- [x] A census of every procedure that composes a commit message or PR body, derived by two different selectors that agree ✓ § Census: six sites, two selectors read in context; exclusions named (release-patch has no commit)
       (a wording grep, and a read of each skill's commit/PR step), is listed in this task.
-- [ ] Commit messages go through embedded mode as **plain text** (no italics, no Markdown; prefixes like `sprint(138):`
+- [x] Commit messages go through embedded mode as **plain text** (no italics, no Markdown; prefixes like `sprint(138):` ✓ all six sites -> embedded.md § Commit messages and PR bodies: plain commits, markdown PR bodies, prefixes/trailers verbatim, R6 whole-message skip (ee195b80, 81286c6f)
       preserved). PR bodies go through as **rendered Markdown** (the italics rule applies).
-- [ ] Every-invocation steps stay in each SKILL.md with read pointers; orchestrator detail goes in `skills/orchestrator/references/dispatch.md`
+- [x] Every-invocation steps stay in each SKILL.md with read pointers; orchestrator detail goes in `skills/orchestrator/references/dispatch.md` ✓ orchestrator SKILL.md 140/140 (appended clause) + references/dispatch.md § Commit messages; shared rules once in embedded.md
       (`skills/orchestrator/SKILL.md` is at the cap).
 - [ ] Fires end-to-end: one real orchestrator commit, one lean-doc-generator close commit, and one PR body show the pass.
-- [ ] CHANGELOG line; Codex gauntlet review clean.
+- [x] CHANGELOG line; Codex gauntlet review clean. ✓ CHANGELOG [Unreleased] bullet (ee195b80); Codex CLEAR at round 2 (box 4 pending E3)
 
 ## Census (commit and PR-message composers; two selectors, every hit read in context)
 
