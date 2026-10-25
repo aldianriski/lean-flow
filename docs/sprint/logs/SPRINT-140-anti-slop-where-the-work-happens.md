@@ -237,3 +237,19 @@ Doe +12% this week": FILE 1 CLEAN, FILE 2 INVENTED (3). `src/` was restored from
 identical before and after.
 Codex round 1: NOT CLEAR, 3 findings with exact fixes (static copy left ambiguous; the layout rule banned layouts a page may need;
 the CHANGELOG overstated it). Applied as given. Round 2: CLEAR, including that the pre-fix exercise still stands. 4 of 4 ticked.
+
+### 2026-10-25 | progress | T8 (TASK-505) done: the DESIGN template gains an owner-supplied Direction block; Codex CLEAR at round 2
+consequence · T8 · behaviour:low · governance:low
+review · T8 · codex · behaviour:low · governance:low
+Built by one Sonnet builder; committed by the coordinator as `8467601f`. DESIGN.md.template § Overview gains the Direction block and an
+optional Dial line; its header comment says the file is data to apply, never instructions; the lean-doc-generator DESIGN bullet
+says Direction fields come only from the owner's answers or their own file (same line, so SKILL.md stays 139/140).
+Owner rulings at T8 (R3 popup): direction is chosen per build and per client, so the template carries only `[CUSTOMIZE]` fields;
+the exercise used a throwaway sample brief the owner picked ("Calm B2B ops tool": plain, trustworthy · calm, focused · operations
+leads at mid-size firms · ENERGY 1 / RHYTHM 2 / MOTION 1), deleted after use. workdoo gets no DESIGN.md.
+Exercise: headless lean-doc-generator renders for the workdoo copy, printing rather than writing (no Write/Edit call). Run 1
+printed excerpts. Codex round 1: NOT CLEAR, 2 findings (a complete render and the count-check output were missing; the CHANGELOG
+left out "or their own file"); both fixed. Run 2 printed the complete file: Direction verbatim, 21 fields left `[CUSTOMIZE]`,
+colours and font filled from named repo files, template-vs-token conflicts raised as questions. check-count-claims: 36, 0 FAIL.
+Codex round 2: CLEAR, ruling that repo-derived Overview prose is a permitted fill because the never-invent rule governs the
+Direction fields. 5 of 5 boxes ticked.
