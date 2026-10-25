@@ -149,3 +149,23 @@ The file was restored from its snapshot: sha256 prefix 969901bc7fdef881 before a
 Codex round 1: NOT CLEAR, one finding: `/tdd`, README and CHANGELOG each repeated a shortened tell list, a second copy that can
 drift. Fixed by cutting the three glosses to pointers. Round 2: CLEAR on both items. Checks: check-doc-caps 0 FAIL; prose-density
 28/0 (tdd keeps its one baselined dense line). 6 of 6 boxes ticked.
+
+### 2026-10-25 | progress | T3 (TASK-500) done: the humanizer overlay ships; Codex CLEAR at round 2; embedded fact loss → TD
+consequence · T3 · behaviour:material · governance:low
+review · T3 · codex · behaviour:material · governance:low
+Built by one Sonnet builder; committed by the coordinator as `bc5cb4b5`. New `references/patterns-lf.md` (LF-1..LF-5), read in
+SKILL.md step 1, both Translate directions, the embedded child brief and the inline fallback; `patterns-en.md` byte-identical
+(`5bfea604`). The stale "both catalogs" wording is gone.
+Exercise, one 120-word sample with the five plants and ten listed facts, every run a separate headless `claude -p
+--setting-sources local --plugin-dir/--add-dir D:/Project/lean-flow` in the workdoo copy, judged from tool calls and the final
+result only (L-248):
+- Standalone a1: all five handled, one hedge added. a2 (final text): clean.
+- Embedded b1: LF-4 rewritten as a list, adding a claim. Fix 1 (coordinator inline, the one bounded retry): LF-4 says to cut an
+  end that names nothing. b2: two facts dropped. Owner ruling: strengthen and rerun. Fix 2: the overlay header says each fix
+  keeps the claim the dressing carried. b3: LF-3 missed. b4: clean.
+- Codex round 1: NOT CLEAR, 2 findings: b4 still kept "covers every invoice" as a scope the text never gave; the LF-3, LF-4 and
+  LF-5 examples could shift meaning. Fixed as given. b5: all five caught, one fact dropped. Owner ruling: one more run plus a TD.
+  b6: clean. Codex round 2: CLEAR on all three items.
+The overlay was read in every embedded run. Three of six embedded runs added or dropped a fact, which is the SPRINT-139
+embedded pass itself, not the overlay: a TD at close (owner ruling), with an L candidate. Checks: SKILL.md 92/140;
+check-doc-caps 0 FAIL; prose-density 28/0. 5 of 5 boxes ticked.
