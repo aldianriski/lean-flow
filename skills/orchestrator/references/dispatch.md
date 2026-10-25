@@ -779,6 +779,10 @@ whole tree and reports its contents as live violations. If the gate cannot be de
 some reason, exclude `.claude/worktrees/` from its scope explicitly rather than trusting the gate's own
 exclusions to reach a path they were never anchored against.
 
+## Commit messages
+
+Every commit the orchestrator composes (quick step 5, mvp step 7, the sprint-bulk loop's Commit) and every builder's commit in its worktree passes through `/humanizer` embedded mode, format `plain`. The brief for a worktree builder says so, and says to keep the prefix and trailers. The rules (prefix and trailers verbatim, fixed templates skip, failure keeps the original) live once in the humanizer skill's `references/embedded.md` § Commit messages and PR bodies. Status-move and record-sha commits are fixed templates and skip. The pass never delays a commit past a failure: the original message is committed with the one-line notice.
+
 ## Escalation
 
 Execution fails twice, or a fork is genuinely ADR-grade → escalate by hand to your strongest model

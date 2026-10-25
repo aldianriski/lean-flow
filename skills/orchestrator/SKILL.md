@@ -84,7 +84,7 @@ this changes *when* a run stops, never *who* records it. Full contract → `refe
 2. **G1** — run the checklist; BLOCK on any fail. On the owner's approval (plan-mode exit or popup) write the task file's `gates_signed: G1 @ <sha>` (`@ <YYYY-MM-DD>` with no git).
 3. **Implement** — execute per Implement routing (new behaviour → `/tdd` by default); flag scope creep the moment it appears.
 4. **Self-review** — run the review checklist (below) as the floor; heavier isolated `/code-review` / `/verify` passes apply to non-trivial diffs and mvp+sprint-bulk, not quick low-risk tasks.
-5. **Commit** — structured message: `type(scope): summary`.
+5. **Commit** — structured message: `type(scope): summary`; pass it through `/humanizer` embedded mode (format `plain`) unless a fixed template (also mvp step 7 and the sprint-bulk Commit) → `${CLAUDE_SKILL_DIR}/references/dispatch.md` § Commit messages.
 
 ### mvp
 1. **Parse** → 2. **G1** → 3. **Grill** (if requirements unclear) → 4. **G2 Design**

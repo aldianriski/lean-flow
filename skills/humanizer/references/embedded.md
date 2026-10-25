@@ -29,6 +29,15 @@ When the runtime cannot start a sub-agent, the caller runs the same pass itself 
 
 Frontmatter and YAML · the text and order of headings · table structure and data cells · code blocks · inline code · link targets · ids (task, learning and decision identifiers) · version strings.
 
+## Commit messages and PR bodies
+
+Callers that compose a commit message or PR body pass it through this contract too.
+
+- **Format:** a commit message is `plain` (no italics, no Markdown); a PR body is `markdown` (first-use italics apply to Indonesian).
+- **Verbatim:** the subject's conventional prefix (`type(scope):`, `sprint(N):`, `backlog:`, `triage:` and the like), every trailer (`Co-Authored-By:`, `Signed-off-by:`), ids, shas and paths.
+- **Fixed templates skip:** a message with no free prose (a status move such as `move <id> todo -> in_progress`, a record-sha commit) is not passed. Anything with free prose passes, including a descriptive subject.
+- **Failure:** commit the original message, print the failure line below, never block the commit.
+
 ## Failure rule
 
 On any failure (empty or broken output, an `UNAVAILABLE: <reason>` reply, a catalog that cannot be read, humanizer not installed), the caller writes the ORIGINAL text and prints one line:

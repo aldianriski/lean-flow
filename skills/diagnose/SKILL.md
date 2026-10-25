@@ -80,7 +80,7 @@ reddens nothing has tested nothing. Prove the restore the same way.
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or the absence of a seam is documented)
 - [ ] All `[DEBUG-…]` instrumentation removed (grep the prefix); throwaway harnesses deleted
-- [ ] The winning hypothesis is stated in the commit / PR message — so the next debugger learns
+- [ ] The winning hypothesis is stated in the commit / PR message (passed through `/humanizer` embedded mode: commit `plain`, PR body `markdown` → the humanizer skill's `references/embedded.md` § Commit messages and PR bodies) — so the next debugger learns
 
 **Then ask: what would have prevented this?** If the answer is architectural (no good seam, tangled
 callers, hidden coupling), file it as a `TD-NNN` tech-debt entry (groomed by `/triage`, aged at

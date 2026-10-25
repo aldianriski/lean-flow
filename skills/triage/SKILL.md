@@ -92,7 +92,7 @@ A `depends-on` cycle is a finding — report its ids; never break it silently.
   `origin:` · existing assumptions · the done-when are not triage's to rewrite).
 - **Cancel** — `git mv docs/work/backlog/<file> docs/work/cancel/` in its **own commit** (no git: a plain
   move); any content edit (the `## Amended` note) lands in a separate commit before it (with no git: it is made before the move). A status change
-  never shares a commit with a content edit.
+  never shares a commit with a content edit. Status-move commits are fixed templates and skip the `/humanizer` pass; any free-prose message passes (format `plain` → the humanizer skill's `references/embedded.md` § Commit messages and PR bodies).
 
 ## `.out-of-scope/` knowledge base
 
