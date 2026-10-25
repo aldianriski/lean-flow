@@ -119,6 +119,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-255 [tags: process] [status: active]: **A retained sample must first show the failure it is meant to catch, and facts in plain sentences do not.** SPRINT-142 T2's first sample stated its eleven facts in sentences the pass left almost untouched, and the pre-fix embedded pass kept all of them in 3 of 3 runs. Strengthened once (each fact inside dressing the pass is tempted to cut), it still lost nothing in 3 of 3. The 3-of-6 loss TD-274 recorded never reproduced, so the fix shipped as a guard and the TD was narrowed, not resolved. Run the baseline before writing the fix: a baseline that cannot fail measures nothing about the fix.
+- seen: 2026-10-25 (SPRINT-142 T2: pre-fix 0 of 3 on each sample version; owner rulings R1 and R2)
+- count: 1
+- promoted: no
+- related: L-252 (judge a model-driven pass over several runs) · L-246 (a RED that proves nothing about the old code)
+
+---
+
+## L-254 [tags: tooling] [status: active]: **A sub-agent reads its contract files from the plugin directory, so a measurement run pins that directory to an export of the commit under test.** SPRINT-142 T2's first three baseline runs were given a brief assembled from `embedded.md` at `plan_commit`, but each child also read `embedded.md` itself from the live checkout, which the coordinator was editing at that moment; the runs were discarded unjudged. The re-runs used `git archive <sha> skills .claude-plugin` as the plugin directory (`git worktree add` failed on the scratch path), and every transcript showed the child reading the pinned file. The prompt is not the only input a skill-driven child has.
+- seen: 2026-10-25 (SPRINT-142 T2, baseline runs 1 to 3 discarded)
+- count: 1
+- promoted: no
+- related: L-249 (headless exercises need a trusted folder) · L-248 (judge a run from its own transcript)
+
+---
+
 ## L-253 [tags: tooling] [status: active]: **In auto mode the coordinator cannot read the production host, so a box whose evidence lives there needs the owner to supply it.** SPRINT-141 T3's second box needed a workdoo run record on the VPS showing the bumped lean-flow version. The G2 design said "read through a non-secret route", and the coordinator tried a read-only ssh listing of the workdoo user's installed plugin version. The auto-mode classifier denied it as a production read, and it was not retried around. The VPS gate runner, a separate clone on the same host, ran twice without objection. Name who reads a host-side record at G2: an owner paste, or a permission rule the owner adds.
 - seen: 2026-10-25 (SPRINT-141 T3, after the owner ruled bump; T3 scoped out by owner ruling)
 - count: 1

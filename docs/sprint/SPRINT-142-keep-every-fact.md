@@ -3,7 +3,7 @@ sprint: 142
 slug: keep-every-fact
 owner: Maintainer
 last_updated: 2026-10-25
-status: active
+status: closed
 gates_signed: G1,G2 @ c123f2c0
 plan_commit: 07f10d29
 update_trigger: sprint execute/close events
@@ -94,8 +94,40 @@ every listed fact, after a 3-run baseline on the same sample has shown the old r
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/LEARNINGS.md` | T1 · close | L-234 promoted to edit-safety; L-254, L-255 filed | Low | Codex R1 CLEAR; prose-density 26/0 |
+| `skills/lean-doc-generator/templates/sprint-log.md.template` | T1 | scope-change heading and path line | Low | 3 sprint-log harnesses green |
+| `skills/humanizer/references/embedded.md` | T2 | fact list before rewriting, checked after, nothing returned but the final | Med | 6 + 6 after-fix runs, fresh judge; Codex R1-R3 |
+| `evals/fixtures/humanizer/fact-keep/` | T2 | retained sample, fact list, run notes | Low | baseline 0/3 on each version |
+| `TECH-DEBT.md` | T2 | TD-274 narrowed | Low | read-through |
+| `CHANGELOG.md` | T1 · T2 | `[Unreleased]` lines | Low | read-through |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 2 of 2 members delivered (TASK-512, TASK-511); 9 of 9 DoD boxes ticked. System verify on the VPS gate: 310/0 on
+`6500361e` at the first run (316 last sprint; 8 pruned task files and 2 new ones change the per-file origin lines).
+
+**Retrieval check** — yes. L-234's rule, promoted in T1, caught a scope-change entry naming an undeclared path on its first
+use in T2, before any commit. L-252 (judge over several runs) shaped T2's bar, and it found that TD-274's recorded loss
+did not reproduce.
+
+**Cost** — coordinator inline (Opus) plus: two Sonnet builder checks (~51k each), three Sonnet judge passes (~51k, ~51k,
+~53k), one Codex rescue agent reused across four rounds (~15k to ~19k each), and 21 headless Opus runs (3 discarded, 3 on
+the first sample, 3 strengthened baseline, 6 after-fix round 1, 6 round 2). One VPS gate run. Coordinator tokens were not
+measured. Most of the cost went to proving a negative: TD-274 did not reproduce.
+
+**Worked**
+- The baseline ran before any judged after-fix run, so "the sample cannot tell a fix from no fix" was found, not assumed.
+- Pinning the plugin directory to an export made every run's input checkable from its own transcript.
+- A fresh judge given only the fact list and the finals, rather than the coordinator's read alone.
+
+**Friction**
+- The first baseline was contaminated by editing the live `embedded.md` during the runs (L-254).
+- The new step caused a progress-remark leak in one after-fix run; the round-1 fix closed it.
+- Codex round 1 went NOT CLEAR because the review input left out `sample.md`.
+- One parallel run failed to load its skill and returned `UNAVAILABLE`; waves of three did not repeat it.
+
+**Buckets** — Shipped → CHANGELOG `[Unreleased]` (T1, T2). Tech debt → TD-274 narrowed (no new row). Follow-ups → none.
+Learnings → L-254 · L-255 new; L-234 promoted.

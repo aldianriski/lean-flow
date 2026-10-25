@@ -3,7 +3,7 @@ sprint: 142
 slug: keep-every-fact
 owner: Maintainer
 last_updated: 2026-10-25
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -132,3 +132,9 @@ and adds the CHANGELOG line. 5 of 5 boxes ticked. Cost: 18 headless runs (3 disc
 baseline, 6 + 6 after-fix), three judge passes, four Codex rounds.
 consequence · T2 · behaviour:material · governance:low
 review · T2 · codex · behaviour:material · governance:low
+
+### 2026-10-25 | close | 2 of 2 delivered, 9 of 9 DoD; system verify 310/0 on the first run; Retro and buckets
+System verify on the VPS gate: 310 pass, 0 fail on `6500361e`. Close gate (`check-sprint-by-reference --close
+--scope-change`): 7 pass, 0 fail. No handoff entry was ever written. Buckets: L-254 (pin the plugin dir for a measurement
+run) · L-255 (a retained sample must first show the failure) · L-234 promoted in T1 · TD-274 narrowed in T2 · CHANGELOG
+`[Unreleased]` carries both tasks. No follow-up task.
