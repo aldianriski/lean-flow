@@ -14,13 +14,27 @@ status: current
 
 ---
 
-## [Unreleased]
+## v2.16.2 — the embedded humanizer pass checks its own facts, and scope-change entries declare what they name (2026-10-25)
 
+**PATCH** — ships SPRINT-142 (Keep Every Fact), a fixes-only sprint. No new skill; the roster stays at 15. Installing the
+release is enough; no upgrade step. The standard is unchanged (spec 0.18.1). Restart the session after installing.
+
+### SPRINT-142 — Keep Every Fact (2026-10-25)
+
+**Consumer-facing:**
 - The sprint-log template's scope-change guidance says the entry's heading names every task it changes, and every path
   the entry names belongs to one of those tasks' `Layers:` or `Cites:` (L-234).
 - The humanizer pass that other skills run on their own prose now lists the text's facts before rewriting and checks
   its final against that list, returning only the final text. On a retained sample the pass kept every fact in 6 of 6
   runs both before and after the change, so the step ships as a guard (TD-274 narrowed, not resolved).
+
+**Maintainer-side:**
+- A retained fact-keep sample, its fact list and run notes live under `evals/fixtures/humanizer/fact-keep/`; a run pins the
+  plugin directory to an export of the commit under test (L-254).
+- LEARNINGS § Durable rules › edit-safety: after appending a scope-change entry, run the scope-change leg before committing.
+- TASK-490…497 pruned (§11); L-234 promoted; L-254 · L-255 filed; TD-274 narrowed.
+
+---
 
 ## v2.16.1 — SECURITY.md lists every skill's real tool grant, and its skill count is checked (2026-10-25)
 
