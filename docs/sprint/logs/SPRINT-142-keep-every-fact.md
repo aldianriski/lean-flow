@@ -61,3 +61,14 @@ Settled facts and design fixes (coordinator, from the builder checks):
   and TASK-512 were approved without one. Both still take the Codex loop on their diffs (D3).
 builder-check · T1 · 0 contradictions · 3 questions · settled from the repo (heading style, pointer clause left to the builder, sprint-log readers to run)
 builder-check · T2 · 3 contradictions · 4 questions · judging from the transcript, fallback wording, brief assembly fixed; baseline-0/3 by owner ruling R1
+
+### 2026-10-25 | progress | T1 done: L-234 promoted to edit-safety plus a sprint-log template line (TASK-512)
+Inline, not dispatched: four short prose edits whose wording the G2 design fixes. `9a69a6ec` adds a ❌ paragraph to LEARNINGS
+§ Durable rules › edit-safety, marks L-234 `[status: promoted]` with a move-to-reference pointer, adds one generic line to
+the shipped sprint-log template, and opens `## [Unreleased]` in CHANGELOG. The template is CRLF; the first edit attempt
+missed on line endings and was redone with CRLF. Checks: prose-density 26/0 · doc-caps budget ~12691/12691 · gen-index
+current · no `scripts/` path in the shipped diff · run-sprint-log-layout, run-sprint-family and run-conformance-engine
+fixtures all green (L-251). Codex round 1: CLEAR on all four threat items (Done-when fidelity · consumer-side · accuracy ·
+promotion shape).
+consequence · T1 · behaviour:low · governance:high
+review · T1 · codex · behaviour:low · governance:high
