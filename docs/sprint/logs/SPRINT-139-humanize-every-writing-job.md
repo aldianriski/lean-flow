@@ -336,3 +336,27 @@ and PR bodies), not in `skills/orchestrator/references/dispatch.md`. diagnose, p
 host-generic and cannot depend on the orchestrator's reference. The coordinator agrees: one contract, every caller pointing at
 it. Impact: one path added to T7's `Layers:`; the Done when is unchanged. This entry follows the edit (`ee195b80`) rather than
 preceding it, and that order is recorded here, not hidden.
+
+### 2026-10-25 | progress | T7 (TASK-495) built (`ee195b80`) and exercised: a real commit and a PR body through the pass; the close commit waits for this sprint's close
+The builder wired all six census sites. The shared rules sit once in `embedded.md` § Commit messages and PR bodies: plain for
+commits, markdown for PR bodies; prefixes, trailers, ids, shas and paths verbatim; fixed templates skip (R6); failure commits
+the original. Each site points at that section. orchestrator `SKILL.md` stayed at 140 (an appended clause); lean-doc-generator
+139; diagnose 98; prototype 54; triage 133; CONTEXT 149.
+Exercises, run by the coordinator through the edited contract (one sub-agent each, no model override, briefed per its six
+items, the installed 2.14.0 having no humanizer). Both sub-agent transcripts show Reads of SKILL.md, embedded.md,
+`patterns-en.md` and `patterns-id.md`, with no offset or limit.
+- E1, a real orchestrator commit: the scope-change commit `4c54c2ec` carries the pass's output byte for byte. Draft subject:
+  "… record the embedded.md scope-change — a crucial step that ensures every commit is clean, consistent, and human". Final
+  subject: "sprint(139) T7: record the embedded.md scope-change (Layers + skills/humanizer/references/embedded.md; Plan's
+  Layers line amended)". The body dropped "isn't just a log entry; it's the moment lean-flow's commits become human",
+  "Additionally" and "I hope this helps!", and kept every fact. Prefix and trailer verbatim.
+- E2, a PR body in diagnose's shape (the winning hypothesis stated), format markdown. Removed: "Great question! Let's break
+  this down", the "doesn't just fix a bug — it resolves a fundamental flaw" contrast, the "plays a crucial role … seamless and
+  robust" paragraph, and the "Let me know" closer. Kept: the root cause, fix and regression test, every code span, and the
+  heading.
+- E4, the fixed-template skip: this sprint's status-move commits (`move TASK-NNN … (git mv, own commit)`) are fixed templates
+  and are not passed (R6).
+- E3, the lean-doc-generator close commit: it exists only at a close. T7 therefore waits in `review/` and its box 4 is ticked
+  at SPRINT-139's own close, when that commit goes through the pass (as SPRINT-138 T4 waited for its exercise B).
+From E1 on, the coordinator's other commits in this sprint are not passed. The installed skills do not carry the wiring
+until 2.15.0 ships, and E1 is the demonstration.
