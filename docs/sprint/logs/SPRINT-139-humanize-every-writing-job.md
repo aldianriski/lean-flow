@@ -295,3 +295,20 @@ review · T5 · codex · behaviour:material · governance:high
 Codex round 1: NOT CLEAR on one ambiguity. The verbatim secret-files line says "report that and ask", but an embedded pass
 cannot ask, so two callers could diverge. Brief item 6 now says the pass never asks: an unavailable input returns
 `UNAVAILABLE: <reason>`, which the failure rule treats as a failure (`2eb4553c`). Round 2: CLEAR, no regressions.
+
+### 2026-10-25 | progress | T6 (TASK-494) built and exercised: a real handoff and a real release-patch dry run both show the pass
+The builder (`ce5f2946`) appended the pass to release-patch step 4 and to its changelog-only path (no renumbering; 100/140;
+the never-push rule intact). It added a "Before saving" paragraph to handoff (102/140), with the "What goes in" outline as the
+voice sample. The CONTEXT `/humanizer` row lists `/release-patch` and `/handoff`. Exercises: headless sessions in trusted
+in-repo worktrees at `ce5f2946` (an in-repo worktree inherits the repo's trust; a probe write succeeded, where the scratchpad
+and `D:\lf-exercise\` did not).
+- Handoff: one Agent dispatch ("Humanizer embedded pass on handoff"); the sub-agent Read both catalogs whole (no offset or
+  limit). The doc was WRITTEN to `C:\Users\HYPE AMD\AppData\Local\Temp\handoff-sprint139-t6.md`. The draft's "Great question!
+  Let's dive in", "crucial milestone" and "I hope this helps!" are gone; paths, ids, the commit hash and the headings are
+  unchanged.
+- release-patch: one Agent dispatch ("Humanizer embedded pass on entry"); the sub-agent Read both catalogs whole, plus
+  CHANGELOG as the voice sample. The humanized v2.14.1 entry kept its heading, PATCH lines, ids and bullet structure; only the
+  wording changed. No `git push` anywhere in the transcript. Nothing was written: the harness treats all four plugin manifests
+  (and the README footer) as sensitive files even in a trusted worktree, and release-patch correctly refused to write a
+  CHANGELOG block its unbumped manifests would contradict. The pass itself is shown on the dry run, which is what the box asks.
+  For T8: a headless session cannot bump manifests, so the coordinator does the MINOR bump in this session.
