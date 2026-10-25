@@ -3,7 +3,7 @@ sprint: 139
 slug: humanize-every-writing-job
 owner: Maintainer
 last_updated: 2026-10-24
-status: active
+status: closed
 gates_signed: G1,G2 @ 3e156e9a
 plan_commit: 31c0b32a
 update_trigger: sprint execute/close events
@@ -188,5 +188,41 @@ The owner pushes.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/dispatch.md` · `review-scoping.md` · `builder-check.md` · `skills/task-decomposer/SKILL.md` · `skills/council/references/prompts.md` | T1 | every sub-agent brief names secret files as off-limits (L-247) | Low | two real briefs; Codex CLEAR R4 |
+| `skills/humanizer/SKILL.md` · `references/patterns-en.md` | T2 | new skill; upstream catalog verbatim (MIT, `8c307f36`) | Med | blob `cmp`; pasted + file exercises |
+| `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` · `docs/architecture/overview.md` · `evals/run-layout-fixtures.ts` | T2, T8 | roster 14 → 15; humanizer rows | Low | count-claims; layout-fixtures 41/0 |
+| `skills/humanizer/references/patterns-id.md` | T3 | Indonesian slop, term policy, italics rule (owner-reviewed) | Med | DeployKit exercise |
+| `skills/humanizer/SKILL.md` (translate mode) | T4 | on-request EN↔ID | Low | README + ID-note exercises |
+| `skills/humanizer/references/embedded.md` · `skills/lean-doc-generator/SKILL.md` · `references/humanize-pass.md` | T5, T7 | embedded contract (child, inline, failure, commit rules) + doc wiring | High | child + inline headless runs |
+| `skills/release-patch/SKILL.md` · `skills/handoff/SKILL.md` | T6 | CHANGELOG entries and handoff docs pass | Med | real handoff; release-patch dry run |
+| `skills/orchestrator/SKILL.md` · `skills/diagnose/SKILL.md` · `skills/prototype/SKILL.md` · `skills/triage/SKILL.md` | T7 | commit messages and PR bodies pass; whole-message R6 skip | Med | E1 commit `4c54c2ec`, E2 PR body, E3 this close |
+| `.*-plugin/*.json` · `README.md` footer · `CHANGELOG.md` | T8 | 2.15.0 MINOR | Low | lockstep 4/4; consumer proof in research workdoo |
 
 ## Retro
+
+**Retrieval check** — yes, twice. L-237 (a design that paraphrases a frozen Done-when loosens it) was live and still
+recurred at T5, caught by the exercise rather than by the builder check. L-240 (prune a Layers token for an undecided
+choice) recurred at close and reddened system verify. Both are now at count 2.
+
+**Cost** — coordinator on the session model, plus Sonnet builders (one reused across T3–T7), eight Sonnet builder-check
+readers at G2, one Codex reviewer reused across 17 review rounds (T1 4, T2 3, T3 2, T4 2, T5 2, T6 1, T7 2, T8 1), and about
+twelve headless `claude -p` exercise sessions. Token counts were not captured per unit, so cost per task delivered is unavailable.
+
+**Worked**
+- Exercising through real headless sessions found defects no review did: the catalog-scope mismatch, a partial catalog
+  read, the write-trust limits, and a parser that counted the contract as output.
+- Codex as a standing second reader caught real gaps at every task: the moderator brief, examples that taught fabrication,
+  the "ask" ambiguity in the embedded contract, and the categorical R6 exemption.
+- The owner's real-repo request (research workdoo, git-less), with a hash snapshot first, gave a clean consumer proof and a
+  provable revert.
+
+**Friction**
+- Six owner popups were spent on Codex round caps before R5 made a narrow round 3 standing.
+- Headless write rules (trust, sensitive manifests, 8.3 paths) cost three exercise reruns (L-249).
+- System verify was red at first run on this sprint's own changes (dense lines, Layers tokens), the pattern SPRINT-138 T7
+  measured in 7 of the last 10.
+- The scope-change checker's exact-path rule needed a `Cites:` workaround (TD-272).
+
+**Pattern candidate**
+- L-237, L-240 and L-241 reach count 2, so they are due for promotion at the next promote.
+- New: L-248 (transcript searches count tool results), L-249 (headless write trust), L-250 (examples must obey the rule).

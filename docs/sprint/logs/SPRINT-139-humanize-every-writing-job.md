@@ -3,7 +3,7 @@ sprint: 139
 slug: humanize-every-writing-job
 owner: Maintainer
 last_updated: 2026-10-24
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -434,3 +434,17 @@ the `/humanizer` row in `.claude/CONTEXT.md` (the wiring list); `.claude/CONTEXT
 `gate-remote: ran 4a830318…`, `remote rc: 0`, `QA-CHECK: 319 pass, 0 fail`, exit 0, after the two dense-line splits and the
 T4/T6/T7 Layers correction. The first run was red (317/3), so this is a red-first-run close, the pattern T7 of SPRINT-138
 measured in 7 of the last 10.
+
+### 2026-10-25 | close | Humanize Every Writing Job — 8 of 8 members in done/, 43 of 43 DoD, PLAN_EXHAUSTED
+run · 43 of 43 DoD ticked
+outcome · DELIVERED
+Every member sits in `docs/work/done/`. `check-sprint-by-reference.ts --close` gives 18 pass, 0 fail (freeze held; every
+Done-when edit has its scope-change). System verify passed 319/0 on the second run (`4a830318`). The DoD count was derived
+two ways: per-member Done-when sections, and every box in the eight files; both give 43. Handoff reconciliation: this log has
+no `handoff` entry and there is no root `HANDOFF-LEDGER.md`, so nothing is live or consumed. The T6 exercise's handoff stub
+was written into a throwaway worktree, since removed. Retro written; buckets routed: shipped → CHANGELOG `v2.15.0` (T8) ·
+tech debt → TD-272 · follow-up → TASK-498 (`origin: close-retro`) · learnings → L-248, L-249, L-250, and sightings that bring
+L-237, L-240 and L-241 to count 2.
+The close commit's message went through `/humanizer` embedded mode (E3): one sub-agent, no model override, with Reads of
+SKILL.md, embedded.md and both catalogs whole. It is committed byte for byte, which ticks TASK-495's last box.
+Owner-side, outside this close: push 2.15.0, then install it; workdoo's pin is TASK-489.
