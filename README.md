@@ -245,7 +245,7 @@ dependencies by your own install procedure and runs the leg that needs them (a t
 reports, so a type error surfaces before merge-back. After each merge the coordinator runs your documented
 **merge-back check**, a fixed set of cross-cutting legs (or your discovered gate, the repo-wide one over a unit-only
 script), and ticks verified boxes in that same session. A review also runs the existing tests that pin what the
-change touches, searched by path, file name and exported names, and reports them in their own section.
+change touches, searched by path, file name and exported names, and reports them in their own section. The self-review checklist also carries a code-slop box.
 
 **Plan-mode approvals** — `quick`/`mvp` record the owner's G1/G2 approval on the task file (`gates_signed:` + `## Approved design`). You MAY set Claude Code's `plansDirectory` setting to a repo folder so plan mode's own plan file is kept; the task's record then cites that file. lean-flow never edits a settings file.
 

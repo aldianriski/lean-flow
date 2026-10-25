@@ -21,6 +21,8 @@ status: current
 - **The G2 builder check now carries two rules for whoever writes the design.** The design quotes a frozen Done-when
   verbatim instead of paraphrasing it, and when G2 rules between `Layers:` candidates declared in advance, the same G2 log
   entry records the scope-change that drops the losing tokens.
+- **Builders, reviewers and `/tdd` refactors now check for code slop.** The check uses the code-slop box in the self-review checklist.
+  A comment pass changes comments only and never touches code.
 
 **Maintainer-side**:
 

@@ -79,7 +79,7 @@ fail it (a specific expression or value, not a class of edits), and move to the 
 ### 4. Refactor
 Only once GREEN — **never refactor while RED**. Extract duplication, move complexity behind simple
 interfaces, apply patterns where natural (candidate list → `${CLAUDE_SKILL_DIR}/references/testability.md`). Run the
-tests after each refactor step.
+tests after each refactor step. Before moving on, check the new code against the code-slop box in the orchestrator's self-review checklist.
 
 ### Done = whole suite green
 The focused test drives each RED/GREEN cycle. A slice is done — or committed — only when the project's

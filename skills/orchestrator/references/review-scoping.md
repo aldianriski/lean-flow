@@ -9,6 +9,7 @@ isolated pass starts from zero context and re-scans unless you scope it.
 Hand each review pass a brief, not the repo. The brief states: Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 - the `git diff` (the actual change),
 - the changed files,
+- a pointer to the code-slop box in § Self-review checklist (below): the reviewer checks the diff against it,
 - their **direct callers / dependents** (the blast radius — one hop, not the transitive closure),
 - **the governing decision as logged** — when the change implements a ruling (an ADR, a G2 decision,
   an owner ruling in the Execution Log), the brief quotes it and it becomes the Spec comparand.
@@ -250,9 +251,14 @@ tests match the task's risk tier and ALL existing tests still pass (zero regress
 
 ## Self-review checklist (the trivial-diff floor)
 
-For doc-only / delete-only / trivial diffs this is enough — no agent pass:
+For doc-only / delete-only / trivial diffs this is enough — no agent pass. It is also the floor under every heavier pass:
 - [ ] Does the diff do exactly what the goal stated — nothing more?
 - [ ] Edge cases / error paths handled?
 - [ ] No secret, debug print, or commented-out block left behind?
 - [ ] Tests or a manual check confirm the behaviour?
 - [ ] Adjacent files left consistent (no half-renamed symbols)?
+- [ ] No code slop:
+  - Comment tells: decorative banners or ALL-CAPS separators · a comment that restates the next line or the signature · step-by-step workflow narration · empty labels and vague TODOs · decorative emoji and end-of-block markers · one comment running past two lines for a one-line fact.
+  - Keep: comments that carry the why, a constraint, a workaround, an edge case, a security or protocol note, or a licence.
+  - Guardrail: a comment pass changes comments only, never code.
+  - Code tells: a feature applied by a script that string-replaces source instead of editing it · fake-looking filler data in seeds or fixtures (`John Doe`, `johndoe@example.com`) instead of an honest placeholder · a stub or TODO control presented as finished.
