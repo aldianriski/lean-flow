@@ -123,12 +123,12 @@ Reuses T5's contract unchanged. Codex loop.
 
 ### T7 — Wire commit messages and PR bodies `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/lean-doc-generator/SKILL.md`
-  · `skills/release-patch/SKILL.md` · `CHANGELOG.md`
+  · `skills/diagnose/SKILL.md` · `skills/prototype/SKILL.md` · `skills/triage/SKILL.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
   · `docs/work/in_progress/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
   · `docs/work/done/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
 Depends-on: T6
-Cites: `TASK-495`
+Cites: `TASK-495` · `skills/lean-doc-generator/references/sprint-by-reference.md` (read) · `references/dispatch.md` (the T7 scope-change entry's short name for the Layers path above)
 
 The census of commit/PR composers comes first, by two selectors; `Layers:` is amended by `scope-change` if the census finds a
 site outside it. Commits are plain text, PR bodies rendered Markdown. Codex loop.

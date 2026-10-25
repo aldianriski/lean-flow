@@ -30,6 +30,22 @@ most cost-sensitive one, since night runs produce many commits.
 - [ ] Fires end-to-end: one real orchestrator commit, one lean-doc-generator close commit, and one PR body show the pass.
 - [ ] CHANGELOG line; Codex gauntlet review clean.
 
+## Census (commit and PR-message composers; two selectors, every hit read in context)
+
+| Site | Composes | Format |
+|---|---|---|
+| `skills/orchestrator/SKILL.md` | quick step 5, mvp step 7, sprint-bulk loop: `type(scope): summary` | plain |
+| `skills/orchestrator/references/dispatch.md` | builders' commits | plain |
+| `skills/lean-doc-generator/SKILL.md` | promote `plan locked`, close squash (`sprint-by-reference.md` repeats them) | plain |
+| `skills/diagnose/SKILL.md` | the winning hypothesis in the commit / PR message (the only PR-body site) | plain (commit) · markdown (PR body) |
+| `skills/prototype/SKILL.md` | the spent prototype's throwaway-branch commit | plain |
+| `skills/triage/SKILL.md` | status-move commits | plain (fixed templates skip, R6) |
+
+Selector A: a wording grep (commit message · git commit · squash-commit · type(scope) · PR body · pull request · gh pr).
+Selector B: step-shaped commit instructions. Read in context, they agree on these six. Not composers: release-patch (stops and
+hands back a ready-to-push message), init.md, fog-map.md, handoff-reconciliation.md, the CONTRIBUTING template, dispatch.md's
+merge-conflict guidance (reads messages). R6: a fixed-template message with no free prose skips the pass.
+
 ## Touches
 `skills/orchestrator/SKILL.md` + `references/dispatch.md` · lean-doc-generator close step + its references ·
 `skills/release-patch/SKILL.md` · CHANGELOG
