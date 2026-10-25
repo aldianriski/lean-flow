@@ -1,6 +1,6 @@
 ---
 name: humanizer
-description: Use when prose reads like AI wrote it and needs rewriting so it reads human, without changing what it says. Triggers - "humanize", "remove AI slop", "de-AI this", "make this sound less like AI", "rapikan tulisan". Works on pasted text or a named prose file. Do not use for code, data, config or generating new content - it edits existing prose only.
+description: Use when prose reads like AI wrote it and needs rewriting so it reads human, without changing what it says. Triggers - "humanize", "remove AI slop", "de-AI this", "make this sound less like AI", "rapikan tulisan", "audit for AI tells", "list the AI tells first". Works on pasted text or a named prose file. Not for code, data, config or new content; it edits existing prose only.
 argument-hint: "[pasted text | path to a prose file]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 user-invocable: true
@@ -60,6 +60,23 @@ the file. Change prose only. Keep code blocks, inline code, commands, paths, YAM
 and link targets unchanged. Then give the user a short summary of what changed. Do not print the
 draft or the remaining-patterns list.
 
+**Audit (explicit request only).** Runs only when the user asks for it ("audit this", "list the AI
+tells first", "list findings before changing anything"). Pasted-text and file modes never audit.
+Run steps 1 to 4, then return numbered findings and stop; this turn edits and writes nothing, even
+for a named file.
+
+- Order: findings for §1 to §5 (and ID-1 to ID-5, which map to them) first, then the rest in catalog
+  order (English §6 to §26, then LF-1 to LF-5, then any other ID pattern).
+- Each finding gives its number, its id (`§n`, `LF-n` or `ID-n`), the location (line number for a
+  file, paragraph number for pasted text) and the exact whole sentence holding the tell. That
+  sentence is the only text the finding may change.
+- A pattern the catalog marks weak alone is listed too and marked "weak alone"; add a note when the
+  passage gives it no company from other tells.
+- Apply is a second turn. When the owner names numbers, rewrite only the quoted sentences of those
+  findings, running step 6's fact check on each rewritten sentence (nothing added, nothing dropped),
+  then write the file back or return the text. Numbers not named stay byte-unchanged; a diff must
+  show no edit outside the quoted sentences.
+
 **Translate (explicit request only).** Runs only when the user names a target language ("translate
 to English", "terjemahkan ke bahasa Indonesia", "in English please", "to ID"). The default and file
 modes never translate, even for mixed-language text; without such a request, clean in place.
@@ -79,7 +96,7 @@ modes never translate, even for mixed-language text; without such a request, cle
 **Embedded.** When another skill runs this pass on prose it generated, follow
 `references/embedded.md`: the caller supplies the text, a voice sample and a format; the pass runs in
 a child sub-agent (inline fallback) and returns only the final text. The host doc is the voice
-sample, so its house style survives. A failed pass writes the original text and never blocks.
+sample, so its house style survives. A failed pass writes the original text and never blocks. Embedded mode never runs Audit, since it cannot ask.
 
 ## Rules
 

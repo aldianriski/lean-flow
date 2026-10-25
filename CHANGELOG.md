@@ -25,6 +25,8 @@ status: current
   A comment pass changes comments only and never touches code.
 - **`/humanizer` catches five more patterns.** They are human verbs on abstractions, filler phrases, synonym cycling, empty
   "from X to Y" ranges and clusters of scare quotes. They live in a lean-flow-owned file, so the vendored English catalog stays untouched.
+- **`/humanizer` can list its findings first, numbered and strongest first, and change only the ones you pick.** It runs
+  only when you ask for an audit. Everything you do not pick stays exactly as written.
 
 **Maintainer-side**:
 
