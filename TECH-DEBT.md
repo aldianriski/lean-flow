@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-24
+last_updated: 2026-10-25
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -693,13 +693,6 @@ status: current
   - done-when: a checked ceiling on tracked path length (or slug length), with headroom stated against MAX_PATH, plus a must-FAIL fixture;
     or a documented `core.longpaths` prerequisite in the README install section.
 
-- **TD-222** severity: low | status: resolved → TASK-486 (SPRINT-138 T5, `e90f1ec2`): CONTEXT § Task entry shape and CLAUDE.md.template § Session Workflow each name `docs/work/backlog/`; R1 re-run scored a literal hit in both (lean-flow files, and a template-only scaffold) | created: Sprint-114 (close retro, T5 effectiveness probe R1)
-  - Summary: **No always-loaded doc says where a NEW task lands.** The "after" measurement's probe R1 ("where does a new TASK get written
-    today?", key `docs/work/backlog/`) was a retrieval miss. `.claude/CONTEXT.md` § Task entry shape gives `docs/work/<status>/` and § roster
-    names `/triage`'s `docs/work/backlog/`, but nothing joins the two into "a new task is born in `backlog/`". The answer is reachable only by
-    inference (`docs/research/logs/epic-017-effectiveness.md`).
-  - done-when: one always-loaded line names `docs/work/backlog/` as the birth folder of a new task, and R1 scores a literal hit on a re-run.
-
 - **TD-221** severity: low | status: open | created: Sprint-114 (close retro, T6 acceptance)
   - Summary: **`scripts/lib/check-dod-delta.ts` leaks `fatal:` git stderr on a `git mv` store-transition commit.** The verdicts are still
     correct (`dod-delta … 0 unattributed ticks` at the release gate), but the noise lands in the gate log next to real output, where a reader
@@ -737,14 +730,6 @@ status: current
     (`—`) inside a single-quoted awk program. mawk (Debian's default awk) and busybox awk are absent on the dev host, so
     adopter portability is unverified. A mismatch fails safe: the retired row becomes live again and is placed, never dropped.
   - Mitigation (hypothesis): run `run-s2-placement-fixtures.sh` under mawk and busybox in CI or a container once one exists.
-
-- **TD-212** severity: medium | status: resolved → TASK-485 (SPRINT-138 T4, `329f4ca5` + `a0a03bb2`): the reviewer brief requires a Pinning tests section (search by path, file name and exported names; run all hits; per-file "no pinning test found"); exercised on SPRINT-111's break, a real SPRINT-138 review and an adopter diff | created: Sprint-111 (close retro, L-221)
-  - Summary: **Neither the default gate nor any review brief runs the test surfaces that pin a spec or skill change.**
-    `qa-check.sh` never invokes `bun test`, and opt-in harnesses run only under QA_FULL, which no builder or reviewer brief
-    required. SPRINT-111 shipped four breaks through green default gates (T3's 9 TS assertions pinned to 100 rules · T5's
-    work-store contract · T2's unexcluded frozen selftests · TD-211), each found only by running those surfaces by hand.
-  - Mitigation (hypothesis): a gate leg (or the dispatch brief) that greps `evals/` and `**/*.test.ts` for the changed artifact's
-    path or pinned values and runs every hit, opt-in included. Census first: how many past sprints changed a pinned artifact.
 
 - **TD-210** severity: low | status: open | created: Sprint-111 (T5 follow-up, Codex r2)
   - Summary: **The work-store harness's two membership selectors diverge on two shapes neither fixture varies.** (a) Member
@@ -797,15 +782,6 @@ status: current
     0 brace forms left in live `Layers:` lines (written out at SPRINT-109).
   - Mitigation (hypothesis): expand `{a,b}` before building the overlap map, or FAIL `layers-brace-shorthand` by name so the
     author knows to write the paths out. A fixture for each arm (L-186).
-
-- **TD-194** severity: medium | status: resolved → TASK-483 (SPRINT-138 T2, `b64dde5b` + `77fe54b8`): the worktree brief installs dev dependencies by the host's procedure and runs the dependent leg before reporting; a real probe reported a seeded TS2322 before merge-back (native tsc, 122 MB, 0.3 s) | created: Sprint-109 (close)
-  - **Narrowed (SPRINT-136 promote re-review, 2026-10-22, owner-signed):** the post-merge half is done (dispatch.md § Review two-tier runs the gate's cross-cutting legs, typecheck included, after each merge). What stays open is the worktree half: a builder or reviewer worktree still cannot resolve `tsc`.
-  - Summary: **A dispatched worktree cannot run the `typecheck` leg, and nothing says so.** The builder and reviewer worktrees
-    have no `node_modules/.bin/tsc`, so a TS error a task introduces is invisible to every check its builder and reviewer can run.
-    At SPRINT-109, T3's `Tree.commit` → optional left a call site on `!== null` (TS2345). Every per-task check and an outside
-    review were green, and it surfaced only at the close's full gate. Census: every Tier G task since the TS ports is exposed.
-  - Mitigation (hypothesis): the worktree run resolves `tsc` from the main checkout's `node_modules` (or the brief says the leg is
-    unrunnable, loudly), and the coordinator's post-merge check includes `typecheck` (L-218).
 
 - **TD-193** severity: low | status: open | created: Sprint-109 (T4 outside review)
   - Summary: **A `*Verify:*` clause that wraps onto a second line vanishes without a trace.** `extractClause` needs the
