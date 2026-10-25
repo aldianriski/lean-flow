@@ -201,7 +201,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |
 | **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
 | **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → a calibrated `verdict-<slug>.md` (pre-mortem · confidence+dissent · optional gated fact-verify) → feed an ADR (uses sub-agents) |
-| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) |
+| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) plus an Indonesian catalog (slop patterns, a term policy that keeps English where the KBBI coinage is uncommon); translates EN↔ID on explicit request; other skills call it in a child context for docs, CHANGELOG entries, handoffs, commits and PR bodies |
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
 promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates · modes →

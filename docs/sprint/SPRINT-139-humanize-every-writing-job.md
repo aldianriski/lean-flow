@@ -136,7 +136,7 @@ site outside it. Commits are plain text, PR bodies rendered Markdown. Codex loop
 **Acceptance:** a real orchestrator commit, a lean-doc-generator close commit and a PR body each show the pass.
 
 ### T8 — Release the set and prove it on the consumer path `[size: S · risk: med · class: execution · HITL · J2]`
-Layers: `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json`
+Layers: `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `.claude/CONTEXT.md`
   · `README.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-496-release-humanizer-set-and-verify-consumer-path.md`
   · `docs/work/in_progress/TASK-496-release-humanizer-set-and-verify-consumer-path.md`
