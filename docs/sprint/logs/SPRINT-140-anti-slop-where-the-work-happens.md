@@ -123,3 +123,9 @@ consumer-side gains the headless no-plugin proof. The three entries are `[status
 (`disposition: move-to-reference`); `promoted: no` 15 → 12. CHANGELOG opens `## [Unreleased]`. Checks: `check-doc-caps.ts`
 exit 0 with no FAIL; prose-density 28/0 (LEARNINGS is uncapped, so outside its population). Codex round 1, static from the
 diff with a five-item threat model: CLEAR on every item. 5 of 5 boxes ticked.
+
+### 2026-10-25 | progress | T1 tick tails corrected: each ` ✓` tail moved to its box's first line
+`check-sprint-by-reference.ts` reported `FREEZE-EDIT TASK-508` (9 pass, 1 fail) after `914daaff`: four of the five evidence
+tails sat on wrapped continuation lines, which the freeze compare reads as an edit (the tail is exempt only at the end of a
+box's first line). The ticks were rebuilt from the frozen text at `3dbc2186` with each tail on its first line; the check now
+reads 10 pass, 0 fail. No Done-when text changed, so no scope-change is owed. Ticks from T2 on go on the first line.
