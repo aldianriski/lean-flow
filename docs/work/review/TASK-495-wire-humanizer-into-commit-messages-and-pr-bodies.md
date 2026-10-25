@@ -27,7 +27,7 @@ most cost-sensitive one, since night runs produce many commits.
       preserved). PR bodies go through as **rendered Markdown** (the italics rule applies).
 - [x] Every-invocation steps stay in each SKILL.md with read pointers; orchestrator detail goes in `skills/orchestrator/references/dispatch.md` ✓ orchestrator SKILL.md 140/140 (appended clause) + references/dispatch.md § Commit messages; shared rules once in embedded.md
       (`skills/orchestrator/SKILL.md` is at the cap).
-- [ ] Fires end-to-end: one real orchestrator commit, one lean-doc-generator close commit, and one PR body show the pass.
+- [x] Fires end-to-end: one real orchestrator commit, one lean-doc-generator close commit, and one PR body show the pass. ✓ E1 commit 4c54c2ec + E2 PR body + E3 the SPRINT-139 close commit message, each through a sub-agent pass (both catalogs whole)
 - [x] CHANGELOG line; Codex gauntlet review clean. ✓ CHANGELOG [Unreleased] bullet (ee195b80); Codex CLEAR at round 2 (box 4 pending E3)
 
 ## Census (commit and PR-message composers; two selectors, every hit read in context)
