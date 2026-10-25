@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
+last_updated: 2026-10-25
 update_trigger: A skill's tool grant changes, the git boundary changes, or the reporting process changes
 status: current
 ---
