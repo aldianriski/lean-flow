@@ -113,3 +113,11 @@ added, no fact list in the final. Codex round 1: items 2 to 4 CLEAR; item 1 NOT 
 omitted `sample.md`. Fix (the one bounded builder retry): item 4 now says the list, the check and any remark about them
 are working material and none of it is returned, only the final text. All six runs re-run on the unchanged sample;
 Codex round 2 gets the sample.
+
+### 2026-10-25 | scope-change | T2 corrects fact 11 in the fixture's fact list after Codex round 2 (owner ruling R3)
+What broke: Codex round 2 found that fact 11 read "the next morning" while the sample says "by the next morning", a
+deadline rather than a time. The fixture was frozen from the first after-fix run (R1). Owner ruling **R3**: apply the
+correction, and run a third Codex round on it. Impact: the comparand gets stricter, not looser; the nine finals already
+scored (three pre-fix, six after-fix round 2) were judged under the corrected wording by a fresh judge, at 0 of 3 and 0 of
+6. `evals/fixtures/humanizer/fact-keep/sample.md` is unchanged. Edit: fact 11 in
+`evals/fixtures/humanizer/fact-keep/facts.md`. No member's Done when changes.

@@ -11,7 +11,7 @@ counts as part of the fact ("about 82%" kept as "82%" is a changed fact).
 8. It reads only PDF invoices.
 9. It covers only the Lisbon and Porto offices.
 10. Matching runs nightly at 02:00.
-11. Errors reach the AP lead (by email, in the inbox) the next morning.
+11. Errors reach the AP lead (by email, in the inbox) by the next morning: a deadline, not a time.
 
 Not facts (dressing the catalog names; cutting them is correct): "stands as a testament to what thoughtful automation can
 achieve", "not just a faster month-end, but a transformed one", "quietly", "a striking leap", "ensuring nothing slips
