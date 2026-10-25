@@ -280,7 +280,7 @@ For doc-only / delete-only / trivial diffs this is enough — no agent pass. It 
 - [ ] Tests or a manual check confirm the behaviour?
 - [ ] Adjacent files left consistent (no half-renamed symbols)?
 - [ ] No code slop:
-  - Comment tells: decorative banners or ALL-CAPS separators · a comment that restates the next line or the signature · step-by-step workflow narration · empty labels and vague TODOs · decorative emoji and end-of-block markers · one comment running past two lines for a one-line fact.
+  - Comment tells: decorative banners or ALL-CAPS separators · a comment that restates the next line or the signature · step-by-step workflow narration · empty labels and vague to-do notes · decorative emoji and end-of-block markers · one comment running past two lines for a one-line fact.
   - Keep: comments that carry the why, a constraint, a workaround, an edge case, a security or protocol note, or a licence.
   - Guardrail: a comment pass changes comments only, never code.
-  - Code tells: a feature applied by a script that string-replaces source instead of editing it · fake-looking filler data in seeds or fixtures (`John Doe`, `johndoe@example.com`) instead of an honest placeholder · a stub or TODO control presented as finished.
+  - Code tells: a feature applied by a script that string-replaces source instead of editing it · fake-looking filler data in seeds or fixtures (`John Doe`, `johndoe@example.com`) instead of an honest placeholder · a stub or to-do placeholder presented as finished.
