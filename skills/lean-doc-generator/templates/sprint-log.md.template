@@ -18,6 +18,7 @@ update_trigger: an Execution Log entry is appended
 >
 > The Plan is frozen at promote. A mid-sprint pivot that shifts scope is logged here as a
 > `scope-change` entry — what broke · impact · re-confirm G2 — **before** § Plan is edited.
+> Its heading names every `Tn` it changes, and every path the entry names sits in one of those tasks' `Layers:` or `Cites:`.
 
 <!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
      newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·

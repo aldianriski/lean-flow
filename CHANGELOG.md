@@ -14,6 +14,11 @@ status: current
 
 ---
 
+## [Unreleased]
+
+- The sprint-log template's scope-change guidance says the entry's heading names every task it changes, and every path
+  the entry names belongs to one of those tasks' `Layers:` or `Cites:` (L-234).
+
 ## v2.16.1 — SECURITY.md lists every skill's real tool grant, and its skill count is checked (2026-10-25)
 
 **PATCH** — ships SPRINT-141 (Roster Drift and the Adopter Pin), a fixes-only sprint. No skill changed. Installing the release
