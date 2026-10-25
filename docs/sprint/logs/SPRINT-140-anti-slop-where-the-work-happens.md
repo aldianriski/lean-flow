@@ -184,3 +184,8 @@ the diff shows exactly lines 19, 33 and 55 changed, each inside its quoted sente
 Side finding, outside this task: SECURITY.md still says "Of the 14" and its grant table has no `humanizer` row (the roster is
 15 since SPRINT-139); `check-count-claims.sh` does not read SECURITY.md. To the close Retro as a follow-up.
 Codex round 1: CLEAR on all five items. 5 of 5 boxes ticked.
+
+### 2026-10-25 | gate | owner ruling R4: a standing narrow Codex round 3 for the rest of this sprint
+D3 caps Codex at two rounds. T5's round 2 left one finding with an exact one-sentence fix (the zero-target wording contradicted
+§8). Owner ruling by popup: from T5 on, when round 2 leaves only an exact-fix item, the coordinator applies that exact text and
+runs one narrow round 3 on just that change. Anything broader still goes to the owner. Same shape as SPRINT-139's R5.
