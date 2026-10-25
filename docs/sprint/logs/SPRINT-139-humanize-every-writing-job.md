@@ -408,3 +408,9 @@ lean-flow stayed out. Two headless sessions, transcript-verified:
 Snapshot diffs agree with each session's own file list (route 2): run 1 created 1 and modified 1; run 2 created 1. Owner
 ruling: revert all three. Done; all 1111 files are hash-identical to the pre-run snapshot, and copies are kept as scratchpad
 evidence. Nothing was pushed anywhere.
+
+### 2026-10-25 | progress | T8 (TASK-496) done: 5 of 5 boxes; Codex CLEAR at round 1
+consequence · T8 · behaviour:material · governance:low
+review · T8 · codex · behaviour:material · governance:low
+Codex: the release zip is an acceptable fresh-install stand-in for this runtime check, but it does not prove marketplace
+delivery. That leg is the owner's push plus install.
