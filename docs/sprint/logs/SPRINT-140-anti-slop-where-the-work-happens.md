@@ -223,3 +223,17 @@ Codex round 1: NOT CLEAR, 2 findings (no fallback for a matched skill that fails
 whenever the plugin is installed). Both fixed as given. Round 2: CLEAR. One scoped Sonnet reviewer (TASK-503 box 5): CLEAR on
 Spec and Standards; of its three declined items, Block 1's coverage and the `after` spelling were checked against the
 anti-slop source, and `UNVERIFIED (cannot run)` has no second copy in orchestrator. 5 of 5 boxes ticked.
+
+### 2026-10-25 | progress | T7 (TASK-504) done: /prototype variants use honest placeholders; Codex CLEAR at round 2
+consequence · T7 · behaviour:material · governance:low
+review · T7 · codex · behaviour:material · governance:low
+Built by one Sonnet builder; committed by the coordinator as `cf3eda80`. ui.md § Anti-patterns gains "Invented content"; the stock
+dashboard and landing-page shells are named in the existing structural bullet; Process step 2 points at both. Line 25 (step 4,
+464 chars) was already over 400 at HEAD and is outside prose-density's population; left untouched.
+Exercise in the workdoo copy: a headless `/prototype` run (`--plugin-dir` the repo; it read the repo's prototype SKILL.md and
+ui.md) built three structurally different Agents-page variants on the existing route with the switcher, and traced every value
+to fixture-backed props. Blind scan by a fresh Sonnet reader over the generated file and a copy seeded with "Top performer: John
+Doe +12% this week": FILE 1 CLEAN, FILE 2 INVENTED (3). `src/` was restored from its snapshot; the 285-file sha256 manifest is
+identical before and after.
+Codex round 1: NOT CLEAR, 3 findings with exact fixes (static copy left ambiguous; the layout rule banned layouts a page may need;
+the CHANGELOG overstated it). Applied as given. Round 2: CLEAR, including that the pre-fix exercise still stands. 4 of 4 ticked.
