@@ -61,8 +61,7 @@ rules the pointer route, re-tier to P on the record.
 included, and the chosen route fails on a seeded wrong count and passes on the real file.
 
 ### T3 — Rule on workdoo's lean-flow pin `[size: S · risk: low · class: decision · HITL · J2]`
-Layers: `docs/research/learning-loop-architecture.md`
-  · `docs/work/todo/TASK-489-decide-workdoo-s-lean-flow-pin.md`
+Layers: `docs/work/todo/TASK-489-decide-workdoo-s-lean-flow-pin.md`
   · `docs/work/in_progress/TASK-489-decide-workdoo-s-lean-flow-pin.md`
   · `docs/work/done/TASK-489-decide-workdoo-s-lean-flow-pin.md`
 Depends-on: none

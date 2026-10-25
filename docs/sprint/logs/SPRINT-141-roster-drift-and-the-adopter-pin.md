@@ -41,3 +41,36 @@ Promote governance checklist, signed by the owner by popup:
 Intake: the owner asked what can be promoted next; the ready set was TASK-489, 509 and 510, and the owner took all three.
 Size check: 3 S, no `L`. All three are `origin: close-retro`. TASK-509 re-tiered P → G at promote (default-up, ADR-029):
 it may extend a maintainer-only check. No epic.
+
+### 2026-10-25 | scope-change | T1 also deletes the spent adlc-epic-sequencing.md baseline row
+What broke: nothing. The G2 recon run of `check-prose-density.ts` printed "baseline row is spent, delete it" for two rows,
+`.claude/CLAUDE.md 4` and `docs/research/adlc-epic-sequencing.md 1`; TASK-510 names only the first. Impact: T1 deletes both spent
+rows from `scripts/lib/prose-density-baseline.txt`, already in T1's `Layers:`. No member's Done when changes. Owner ruling at
+the G2 popup: include it.
+
+### 2026-10-25 | scope-change | T3 Layers drops docs/research/learning-loop-architecture.md (owner ruled bump)
+What broke: nothing. T3 declared the research doc for the decline branch only. The owner ruled bump to 2.16.0 at G2, so the
+token would match nothing at close (L-240). Impact: T3's `Layers:` loses that token; no member's Done when changes. Edit:
+T3's `Layers:` line.
+
+### 2026-10-25 | gate | G1 + G2 signed by the owner by popup; three builder checks settled; three owner rulings
+G1: all three members are `origin: close-retro`, so each took the full checklist (goal · size S · touches · out of scope ·
+assumptions), shown in the popup's table. G2: no file is shared, so the order is T1 → T2 → T3, sequential in the main tree.
+Owner rulings:
+- **R1 (T2 route):** extend `check-count-claims.sh` with `check_claim "skills" … SECURITY.md 'Of the ([0-9]+)'` and a
+  must-FAIL `security-drift` fixture. The choice and its reason go in a comment beside that line and in the CHANGELOG
+  line (box 2). Checking the table's rows and grant classes is out of scope. Tier stays G (other G).
+- **R2 (T1):** delete both spent rows (scope-change above).
+- **R3 (T3):** bump workdoo to lean-flow 2.16.0. The owner updates the plugin dir and `LEANFLOW_PLUGIN_VERSION_PIN` on
+  the VPS and notes it in workdoo's active sprint log (SPRINT-013). Box 2's evidence is a post-bump workdoo run record
+  showing `leanflowVersion` 2.16.0, read through a non-secret route or pasted by the owner; never `/etc/workdoo/*.env`.
+  T3 stays open until that record exists.
+Settled facts (coordinator):
+- SECURITY.md also misfiles `triage` (`Bash(git *)`) under "No shell at all". Box 1's "real `allowed-tools`" covers the
+  fix: 6 unscoped · 3 scoped · 6 no shell = 15.
+- No shipped skill or template names `check-count-claims`, so the new line cannot FAIL an adopter's repo. The existing
+  fixtures carry no SECURITY.md and skip it.
+- The T1 reader said the baseline holds one data row. It holds 28; line 27 is the second spent row.
+builder-check · T1 · 1 contradictions · 1 questions · settled by reading the baseline (28 rows; reader misread); design unchanged
+builder-check · T2 · 1 contradictions · 3 questions · box-2 record placed in a checker comment + CHANGELOG; consumer reach and regex settled from the repo
+builder-check · T3 · 2 contradictions · 4 questions · evidence moved to workdoo's run record, log = its SPRINT-013 log; version and timing by owner ruling R3
