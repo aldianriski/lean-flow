@@ -118,3 +118,10 @@ sprint open. Impact: TASK-489 leaves `## Members`, its `sprint:` stamp is cleare
 bump is done and a workdoo run record shows `leanflowVersion` 2.16.0. Nothing about T1 or T2 changes. Edit: T3's `Layers:`
 swaps the `done/` token, which would now match nothing (L-240), for the `backlog/` path the move writes. Re-confirm G2: not
 needed; nothing is built.
+
+### 2026-10-25 | scope-change | T1 and T3 Cites gain the paths their two earlier scope-change entries name (system verify 315/1)
+What broke: system verify FAILed one leg, `scope-change-outside-layers`. The T1 entry names the two baseline rows by their
+file paths, and the T3 scope-out names the backlog folder and the done-folder token, none of them declared on that task.
+The log is append-only, so the entries stay; the Plan declares what they name (L-234's fix). Impact: none on scope or on
+any member's Done when; every path added is only named, never touched. Edit: T1 `Cites:` gains `.claude/CLAUDE.md` and
+`docs/research/adlc-epic-sequencing.md`; T3 `Cites:` gains `docs/work/backlog/` and `done/`. Re-confirm G2: not needed.

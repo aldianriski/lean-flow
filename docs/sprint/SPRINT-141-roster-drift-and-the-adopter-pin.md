@@ -37,7 +37,7 @@ Layers: `scripts/lib/prose-density-baseline.txt`
   · `docs/work/in_progress/TASK-510-delete-spent-claude-md-prose-density-row.md`
   · `docs/work/done/TASK-510-delete-spent-claude-md-prose-density-row.md`
 Depends-on: none
-Cites: `TASK-510` · `check-prose-density.ts` · SPRINT-140 T9
+Cites: `TASK-510` · `check-prose-density.ts` · `.claude/CLAUDE.md` · `docs/research/adlc-epic-sequencing.md` · SPRINT-140 T9
 
 SPRINT-140 T9 took CLAUDE.md from 4 dense lines to 0, so the row is spent. A ratchet baseline exists to reach empty.
 
@@ -65,7 +65,7 @@ Layers: `docs/work/todo/TASK-489-decide-workdoo-s-lean-flow-pin.md`
   · `docs/work/in_progress/TASK-489-decide-workdoo-s-lean-flow-pin.md`
   · `docs/work/backlog/TASK-489-decide-workdoo-s-lean-flow-pin.md`
 Depends-on: none
-Cites: `TASK-489` · research candidate C5 · L-247
+Cites: `TASK-489` · research candidate C5 · L-247 · `docs/work/backlog/` · `done/`
 
 The owner action was listed in the SPRINT-127 and SPRINT-128 Retros and then dropped. The research doc is touched only on
 a decline; on a bump, G2 drops it by `scope-change` (L-240). The bump itself is the owner's act in workdoo.
