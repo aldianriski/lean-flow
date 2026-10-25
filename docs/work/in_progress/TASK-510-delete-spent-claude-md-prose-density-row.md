@@ -21,7 +21,7 @@ SPRINT-140 T9 took `.claude/CLAUDE.md` from 4 dense lines to 0. `check-prose-den
 delete it" for that row. The file was outside T9's `Layers:`, so the row stayed; a ratchet baseline exists to reach empty.
 
 ## Done when
-- [ ] The `.claude/CLAUDE.md 4` row is gone from `scripts/lib/prose-density-baseline.txt`, and `check-prose-density.ts` still
+- [x] The `.claude/CLAUDE.md 4` row is gone from `scripts/lib/prose-density-baseline.txt`, and `check-prose-density.ts` still ✓ 126844bc: `prose-density: 26 pass, 0 fail`, no CLAUDE.md line; fixtures 10/0
       passes with no "spent" note for CLAUDE.md.
 
 ## Assumes

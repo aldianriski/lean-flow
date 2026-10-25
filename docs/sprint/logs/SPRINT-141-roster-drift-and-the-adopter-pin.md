@@ -74,3 +74,10 @@ Settled facts (coordinator):
 builder-check · T1 · 1 contradictions · 1 questions · settled by reading the baseline (28 rows; reader misread); design unchanged
 builder-check · T2 · 1 contradictions · 3 questions · box-2 record placed in a checker comment + CHANGELOG; consumer reach and regex settled from the repo
 builder-check · T3 · 2 contradictions · 4 questions · evidence moved to workdoo's run record, log = its SPRINT-013 log; version and timing by owner ruling R3
+
+### 2026-10-25 | progress | T1 done: both spent prose-density baseline rows deleted (TASK-510)
+Inline, not dispatched: two line deletions in one file, where a brief would cost more than the work. `126844bc` deletes
+`.claude/CLAUDE.md 4` and `docs/research/adlc-epic-sequencing.md 1` (51 → 49 lines). `check-prose-density.ts .` prints
+`prose-density: 26 pass, 0 fail` (28 before; the two dropped rows were PASS lines) and no line for either file.
+`run-prose-density-fixtures.ts` (the only other reader of the baseline, per L-251): 10 pass, 0 fail. Self-review only.
+consequence · T1 · behaviour:low · governance:low
