@@ -102,3 +102,14 @@ job) rather than mark it resolved. Impact: TASK-511's fifth box changes from "TD
 rates" to "TD-274 is narrowed with the before and after rates and a re-measure condition"; the other four boxes stand, and
 the third is ticked with the 0-of-3 result it recorded. Edit: that box's text in TASK-511, then `TECH-DEBT.md` at the end
 of T2. Re-confirm G2: not needed.
+
+### 2026-10-25 | progress | T2 after-fix runs, round 1: a narration leak and an unloadable skill; Codex round 1 NOT CLEAR on missing input
+Six after-fix runs against an export of `cae91606`. a4 is invalid: its Skill call failed and read access was refused, so it
+returned `UNAVAILABLE` under the contract's failure rule (an environment failure, not a fact loss). a2 returned the line
+"Reading done; I'm drafting the rewrite and checking it against the fact list now." above its final, and a caller would
+paste that into its document; none of the six pre-fix runs did this, and the line names the new step, so it counts as a
+regression the fix introduced and fails the bar as an addition. a1, a3, a5 and a6 read as eleven of eleven kept, nothing
+added, no fact list in the final. Codex round 1: items 2 to 4 CLEAR; item 1 NOT CLEAR only because the review input
+omitted `sample.md`. Fix (the one bounded builder retry): item 4 now says the list, the check and any remark about them
+are working material and none of it is returned, only the final text. All six runs re-run on the unchanged sample;
+Codex round 2 gets the sample.
