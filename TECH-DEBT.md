@@ -400,6 +400,13 @@ status: current
     shell) and compares it with the table row naming that skill. Admit it under ADR-053 only if the table drifts again.
 
 - **TD-274** severity: medium | status: open | created: Sprint-140 (T3 exercise, owner ruling at the T3 retry popup)
+  - **Narrowed (SPRINT-142 T2, TASK-511, `cae91606` + `cc398202`; owner ruling R2):** not reproduced. On a retained sample
+    (`evals/fixtures/humanizer/fact-keep/`, eleven facts set inside dressing), a fresh judge scored the pre-fix embedded
+    pass 0 of 6 runs losing or adding a fact (3 on a first sample version, 3 on the strengthened one, plugin dir pinned
+    to `07f10d29`), and the pass with the new fact-list step 0 of 6 (pinned to `cc398202`). The step ships as a guard;
+    a first after-fix round had one run return a progress remark above its final, closed by keeping any remark about the
+    list out of the returned text. Re-measure when a real writing job is seen to lose or add a fact: run that text
+    through the fixture protocol before and after.
   - Summary: **The embedded humanizer pass adds or drops a fact in about half of runs.** On one fixed 120-word sample with ten
     listed facts, three of six embedded runs broke SKILL.md step 6: one turned an empty range into an added claim, two dropped a
     fact the text carried (the accountant's needs; the finance-team audience). The overlay was read in full in every run, and the

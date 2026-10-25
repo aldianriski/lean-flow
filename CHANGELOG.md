@@ -18,6 +18,9 @@ status: current
 
 - The sprint-log template's scope-change guidance says the entry's heading names every task it changes, and every path
   the entry names belongs to one of those tasks' `Layers:` or `Cites:` (L-234).
+- The humanizer pass that other skills run on their own prose now lists the text's facts before rewriting and checks
+  its final against that list, returning only the final text. On a retained sample the pass kept every fact in 6 of 6
+  runs both before and after the change, so the step ships as a guard (TD-274 narrowed, not resolved).
 
 ## v2.16.1 — SECURITY.md lists every skill's real tool grant, and its skill count is checked (2026-10-25)
 
