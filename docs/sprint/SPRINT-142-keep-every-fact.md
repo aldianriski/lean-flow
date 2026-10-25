@@ -4,6 +4,7 @@ slug: keep-every-fact
 owner: Maintainer
 last_updated: 2026-10-25
 status: active
+plan_commit: 07f10d29
 update_trigger: sprint execute/close events
 ---
 
