@@ -259,3 +259,32 @@ seeded control sentence with peladen, peramban, kerangka kerja and daring gives 
 ### 2026-10-25 | progress | T4 (TASK-492) done: 5 of 5 boxes; Codex CLEAR at round 2
 consequence · T4 · behaviour:material · governance:low
 review · T4 · codex · behaviour:material · governance:low
+
+### 2026-10-25 | progress | T5 (TASK-493) built and exercised on both paths; three defects found by the exercise and fixed
+The builder (`ff735b53`) wrote `skills/humanizer/references/embedded.md` (inputs, the child path with no model override, inline
+fallback with its notice, the never-touched list, and R2's failure line), an Embedded mode in SKILL.md, and
+`skills/lean-doc-generator/references/humanize-pass.md`. lean-doc-generator step 7 now runs the pass; to stay ≤140 it joined two
+lines in the handoff-reconciliation paragraph (139/140). The CONTEXT.md `/humanizer` row names the wiring.
+The coordinator ran the exercise as headless `claude -p` sessions on throwaway clones (`--setting-sources project`, so the
+owner's installed 2.14.0 stayed out; `--plugin-dir` the clone). The request: `/lean-flow:lean-doc-generator adr "Keep the
+vendored humanizer catalog verbatim"`, with a deliberately AI-styled context ("Great question! Let's dive in. … is not just a
+list of patterns — it's a living contract … plays a crucial role … future-proof … I hope this helps!"). Three runs per path.
+Defects the runs found, each fixed before the final run:
+- (1) `embedded.md` read the Indonesian catalog only for Indonesian text, but the frozen Done when says both catalogs; now
+  always both (`67253af9`).
+- (2) The inline caller read `patterns-en.md` from line 35, skipping the header; "in full" now means first line to last, no
+  offset or limit (`a4bb81bb`).
+- (3) A parser error of the coordinator's own: the first inline run was reported as printing the notice, but the only
+  occurrence was inside its Read of `embedded.md`. The parser now counts only the session's own text.
+Final runs, in `D:\lf-exercise\` at `a4bb81bb`, transcript-verified:
+- Child: one Agent dispatch ("Embedded humanizer pass on ADR"); the sub-agent Read `patterns-en.md` and `patterns-id.md` with
+  no offset or limit; no inline notice.
+- Inline: `--disallowedTools Agent`; no dispatch; the caller Read both catalogs with no offset or limit, and its final message
+  carries `humanizer: ran inline (no sub-agent available)`.
+- Both ADRs keep the template's section order (Context · Decision · Consequences · Alternatives considered; Strategy is
+  optional), em-dashes (4 and 3) and bold labels (9 and 10). The draft's tells are gone from the body; they appear only in each
+  run's summary of what it removed. Child Context, opening: "`/humanizer` ships an English pattern catalog vendored from
+  `blader/humanizer`, upstream version 3.1.0 at commit `8c307f36`, under the MIT license …"
+The file write did not happen. Headless sessions in an untrusted folder deny every write as a "sensitive file", in the scratchpad
+and in `D:\lf-exercise\` alike. Owner ruling by popup: box 4 is ticked on the generated text; the real install-and-write proof is
+T8's. T8's headless consumer run will hit the same trust block, so it is raised at T8's start.
