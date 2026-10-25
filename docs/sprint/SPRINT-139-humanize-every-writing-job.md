@@ -123,7 +123,7 @@ Reuses T5's contract unchanged. Codex loop.
 
 ### T7 — Wire commit messages and PR bodies `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/lean-doc-generator/SKILL.md`
-  · `skills/diagnose/SKILL.md` · `skills/prototype/SKILL.md` · `skills/triage/SKILL.md` · `CHANGELOG.md`
+  · `skills/diagnose/SKILL.md` · `skills/prototype/SKILL.md` · `skills/triage/SKILL.md` · `skills/humanizer/references/embedded.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
   · `docs/work/in_progress/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
   · `docs/work/done/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`

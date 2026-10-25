@@ -329,3 +329,10 @@ the CONTRIBUTING template, and dispatch.md:649 (reading messages). Impact: T7's 
 triage paths and drop `skills/release-patch/SKILL.md`; the Done when is unchanged. Owner-approved by popup.
 Owner ruling R6: a commit message that is a fixed template with no free prose (status moves such as "move TASK-NNN todo ->
 in_progress", record-sha commits) skips the pass; any message with free prose, including a descriptive subject, goes through it.
+
+### 2026-10-25 | scope-change | T7 (TASK-495): `Layers:` gain `skills/humanizer/references/embedded.md`, recorded after the builder's edit
+What broke: the builder put the shared commit and PR-body rules once in the humanizer contract (`embedded.md` § Commit messages
+and PR bodies), not in `skills/orchestrator/references/dispatch.md`. diagnose, prototype, triage and lean-doc-generator are
+host-generic and cannot depend on the orchestrator's reference. The coordinator agrees: one contract, every caller pointing at
+it. Impact: one path added to T7's `Layers:`; the Done when is unchanged. This entry follows the edit (`ee195b80`) rather than
+preceding it, and that order is recorded here, not hidden.
