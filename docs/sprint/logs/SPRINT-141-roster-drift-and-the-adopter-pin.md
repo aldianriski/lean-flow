@@ -81,3 +81,10 @@ Inline, not dispatched: two line deletions in one file, where a brief would cost
 `prose-density: 26 pass, 0 fail` (28 before; the two dropped rows were PASS lines) and no line for either file.
 `run-prose-density-fixtures.ts` (the only other reader of the baseline, per L-251): 10 pass, 0 fail. Self-review only.
 consequence · T1 · behaviour:low · governance:low
+
+### 2026-10-25 | progress | T3 ruling recorded; waiting on the owner's bump and a post-bump workdoo run (TASK-489)
+TASK-489 gains a `## Decision` section (outside `## Done when`) recording R3: bump to 2.16.0. Box 1 ticked against it. Box 3
+(decline) ticked `n/a` against the same section. Box 2 stays open until two things exist: a workdoo run record after the
+bump whose `leanflowVersion` reads 2.16.0, and the owner's note in workdoo's SPRINT-013 log. Owner action: bump the
+plugin dir and `LEANFLOW_PLUGIN_VERSION_PIN` on the VPS, then trigger or wait for one run.
+consequence · T3 · behaviour:low · governance:low

@@ -24,12 +24,18 @@ repo that could show whether they help, and T7's adopter success criterion (a re
 cannot be measured. The research ruled to resolve this through the existing task record rather than a new copy-forward rule.
 
 ## Done when
-- [ ] The owner's decision is recorded on this task: bump workdoo to a named lean-flow release (at least 2.14.0), or decline with
+- [x] The owner's decision is recorded on this task: bump workdoo to a named lean-flow release (at least 2.14.0), or decline with ✓ § Decision (owner, SPRINT-141 G2 popup, 2026-10-25): bump to 2.16.0
       a reason and a revisit-if condition.
 - [ ] If bumped: workdoo's run record shows the new pin in effect (read from that repo's own record, not from a secret file), and
       the bump is noted in workdoo's own log.
-- [ ] If declined: the reason and revisit-if condition are recorded here, and C5's success criterion is marked as waiting on it in
+- [x] If declined: the reason and revisit-if condition are recorded here, and C5's success criterion is marked as waiting on it in ✓ n/a: the owner ruled bump, not decline (§ Decision)
       the research doc's open questions.
+
+## Decision
+2026-10-25, the owner at SPRINT-141's G2 popup (ruling R3): **bump workdoo to lean-flow 2.16.0.** The owner updates the
+plugin dir and `LEANFLOW_PLUGIN_VERSION_PIN` on the VPS that runs workdoo, and notes the bump in workdoo's active sprint
+log (SPRINT-013). The evidence for the second box is a workdoo run record made after the bump whose `leanflowVersion`
+reads 2.16.0, read through a non-secret route or pasted by the owner. The third box does not apply.
 
 ## Touches
 workdoo's lean-flow pin (in workdoo; owner-run) · this task file · `docs/research/learning-loop-architecture.md` (only on decline)
