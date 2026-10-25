@@ -17,6 +17,7 @@ The caller dispatches ONE sub-agent, with no model override (it inherits the ses
 3. Passes the text, the voice sample and the format, and says to apply the voice sample.
 4. Says to return ONLY the final text, nothing else.
 5. Carries this line verbatim: "Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record."
+6. Says how "ask" resolves here: the embedded pass never asks an interactive question. If something it needs is unavailable (a catalog it cannot read, a value behind a secret file, a voice sample that is missing), it returns `UNAVAILABLE: <reason>` instead of a final text, and the caller applies the failure rule below with that reason.
 
 ## Inline fallback
 
@@ -30,7 +31,7 @@ Frontmatter and YAML · the text and order of headings · table structure and da
 
 ## Failure rule
 
-On any failure (empty or broken output, a catalog that cannot be read, humanizer not installed), the caller writes the ORIGINAL text and prints one line:
+On any failure (empty or broken output, an `UNAVAILABLE: <reason>` reply, a catalog that cannot be read, humanizer not installed), the caller writes the ORIGINAL text and prints one line:
 
 `humanizer: pass failed (<reason>); wrote the original text`
 
