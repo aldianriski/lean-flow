@@ -274,3 +274,7 @@ text contract "review-scoping.md mentions TODO only in the layout rule or a 'nev
 checks ran this harness, so only the full gate saw it. Owner ruling by popup (R5): reword to "to-do" (same meaning, so TASK-499's
 frozen boxes still read true); a wider text contract was declined (it would be new governance machinery). The harness reads
 42 pass, 0 fail after the reword. System verify is re-run before close.
+
+### 2026-10-25 | gate | system verify run 2 PASS: QA-CHECK 327 pass, 0 fail at d11be5e1; T9 box 5 ticked
+`gate-remote.ts` (VPS, QA_FULL) against `d11be5e1`, after the R5 reword: remote rc 0, `QA-CHECK: 327 pass, 0 fail`. TASK-506's last
+box (qa-check PASS; owner read) is ticked on this run. Every member is now ticked; TASK-506 moves to done.

@@ -29,7 +29,7 @@ Many bullets carry their incident history inline, which anti-slop names "value i
       verifies in CLAUDE.md still checks out.
 - [x] ≤ 80 lines; the pair is re-measured with the calibrated method and `scripts/lib/token-budget.txt` is lowered to ✓ `897047fb`: 79 lines; pair ~14,114 → ~12,691 tokens; token-budget.txt 16,087 → 12,691 (ratio 2.991, R2), check PASS at the new budget; calibration-log Round 2; CLAUDE.md 2,432 → 1,715 words, 15,700 → 11,445 bytes
       the new figure (ratchet); before → after words, bytes and tokens recorded.
-- [ ] qa-check PASS (system verify on the VPS); owner reads the result before close.
+- [x] qa-check PASS (system verify on the VPS); owner reads the result before close. ✓ system verify on the VPS: QA-CHECK 327 pass, 0 fail at `d11be5e1` (run 1, 326/1 at `821c6791`, was T2 wording, fixed under R5); owner read and accepted by popup
 
 ## Touches
 `.claude/CLAUDE.md` · `docs/LEARNINGS.md` · `scripts/lib/token-budget.txt` · `docs/research/logs/token-calibration.md`
