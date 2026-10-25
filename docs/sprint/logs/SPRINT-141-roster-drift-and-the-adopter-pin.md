@@ -100,3 +100,11 @@ real repo `PASS  skills: SECURITY.md claims 15 = disk 15`; a seeded temp copy `F
 15` (exit 1); `PASS  cap SECURITY.md (72 <= 80)`. Other G per D3: must-FAIL fixture plus one real-artifact run, so
 self-review only (a maintainer-only check; no shipped skill or template names it).
 consequence · T2 · behaviour:low · governance:low
+
+### 2026-10-25 | blocker | T3 box 2 waits on the owner's bump of workdoo to 2.16.0 (TASK-489)
+Run halted at the first blocker (attended sprint-bulk, step 5). T1 and T2 are in `done/`. T3 has 2 of its 3 boxes ticked;
+box 2 needs the owner's act on the VPS (plugin dir + `LEANFLOW_PLUGIN_VERSION_PIN`), one workdoo run after it whose record
+shows `leanflowVersion` 2.16.0, and the owner's note in workdoo's SPRINT-013 log. Unblock condition: the owner says the bump
+is done and a run has completed, then the coordinator reads that run record through a non-secret route (or the owner pastes
+it), ticks box 2 and moves TASK-489 to `done/`. Then system verify and `/lean-doc-generator close`.
+run · 6 of 7 DoD ticked · terminal: AUTHORITY_BOUNDARY (T3 box 2 is owner-reserved, J2)
