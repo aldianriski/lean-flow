@@ -65,6 +65,7 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ❌ Evaluating a change only against lean-flow's **own dogfooding**, never the **consumer who installs it** — every change checks its consumer-facing surface (skills self-contained **and** adaptable · README/CHANGELOG reflect user-visible changes · no repo-specific path — `scripts/…`, `docs/knowledge-index.md` — leaked into a generic skill/template). We repeatedly shipped maintainer-correct-but-consumer-leaky changes (SPRINT-014 → L-015). **Corollary (L-016):** when the repo *can't* dogfood a feature — its substrate is absent (a markdown repo has no testable code, so `/tdd` never fires) — verify on the **consumer path** (trace the consumer scenario / exercise the mechanism), never read "didn't fire in our repo" as either broken *or* fine.
 
 ❌ Proving "without the plugin" from a **sub-agent** — it inherits the host session's plugins and CLAUDE.md, so it can never be the agent with no lean-flow installed. Run the proof as a separate headless process (`claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, stdin redirected from `/dev/null`, in a trusted folder outside `~/.claude/`) and judge it from that run's own `system/init` event, not from the agent's report (L-241 ×2).
+  Pick that folder for trust first: an untrusted one (the scratchpad, a fresh clone) denies every write, while a worktree inside a trusted repo inherits the trust. Pass it as the long path; an 8.3 short path (`HYPEAM~1`) misses the match and fails the same way. A headless run never writes a plugin manifest or the README footer, so a bump stays in the attended session (L-249 ×2).
 
 ### wiring
 
@@ -140,10 +141,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-249 [tags: tooling] [status: active]: **A headless exercise writes only in a trusted folder, and never into a plugin manifest.** In SPRINT-139 every `claude -p` run in an untrusted folder (the scratchpad, a fresh `D:\lf-exercise\` clone) was denied every write as a "sensitive file", so a generated doc was printed and never saved. A git worktree inside an already-trusted repo inherits that trust (a probe write succeeded), and so did the owner's trusted research folder. Plugin manifests (`.*-plugin/*.json`) and the README footer were denied even in a trusted worktree, so a headless release-patch cannot bump. Separately, a working directory given as a Windows 8.3 short path (`HYPEAM~1`) did not match the long path of the write, which looked like the same denial. Pick the exercise folder for trust first, and do manifest edits in the attended session.
+## L-249 [tags: tooling] [status: promoted]: **A headless exercise writes only in a trusted folder, and never into a plugin manifest.** In SPRINT-139 every `claude -p` run in an untrusted folder (the scratchpad, a fresh `D:\lf-exercise\` clone) was denied every write as a "sensitive file", so a generated doc was printed and never saved. A git worktree inside an already-trusted repo inherits that trust (a probe write succeeded), and so did the owner's trusted research folder. Plugin manifests (`.*-plugin/*.json`) and the README footer were denied even in a trusted worktree, so a headless release-patch cannot bump. Separately, a working directory given as a Windows 8.3 short path (`HYPEAM~1`) did not match the long path of the write, which looked like the same denial. Pick the exercise folder for trust first, and do manifest edits in the attended session.
 - seen: 2026-10-25 (SPRINT-139 T5, T6, T8 exercises) · 2026-10-25 (SPRINT-140 T6: `--plugin-dir`/`--add-dir` given the anti-slop clone as the 8.3 short path `HYPEAM~1`; its skill files could not be read, so the review fell back to the floor; the long path loaded it)
 - count: 2
-- promoted: no
+- **L-249 → promoted: `docs/LEARNINGS.md` § Durable rules › consumer-side** · disposition: merge — joined to L-241's headless-proof rule: pick the folder for trust, pass the long path, keep manifest writes in the attended session.
 - related: L-241 (prove plugin behaviour from a separate headless process)
 
 ---
