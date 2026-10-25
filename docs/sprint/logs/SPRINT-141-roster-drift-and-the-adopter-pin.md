@@ -3,7 +3,7 @@ sprint: 141
 slug: roster-drift-and-the-adopter-pin
 owner: Maintainer
 last_updated: 2026-10-25
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -125,3 +125,11 @@ file paths, and the T3 scope-out names the backlog folder and the done-folder to
 The log is append-only, so the entries stay; the Plan declares what they name (L-234's fix). Impact: none on scope or on
 any member's Done when; every path added is only named, never touched. Edit: T1 `Cites:` gains `.claude/CLAUDE.md` and
 `docs/research/adlc-epic-sequencing.md`; T3 `Cites:` gains `docs/work/backlog/` and `done/`. Re-confirm G2: not needed.
+
+### 2026-10-25 | close | 2 of 3 delivered (T1, T2), T3 scoped out; system verify 316/0 on the second run; Retro and buckets
+System verify on the VPS gate: 315/1 on `36db932f` (`scope-change-outside-layers`, the coordinator's own entry wording;
+L-234), fixed by `Cites:` additions under a scope-change entry, then 316/0 on `a12f4d94`. Close gate
+(`check-sprint-by-reference --close`): 7 pass, 0 fail. No handoff entry was ever written, so there is nothing to
+reconcile. Buckets: TD-275 (SECURITY.md's grant rows unchecked) · L-234 to count 2 · L-253 (a host-side box needs
+owner-supplied evidence in auto mode) · follow-up TASK-489 (already in the backlog, blocked) · CHANGELOG `[Unreleased]`
+carries T2. SECURITY.md's ownership header was stale (2026-08-09) and was refreshed under T2 in `d54d3b08`.

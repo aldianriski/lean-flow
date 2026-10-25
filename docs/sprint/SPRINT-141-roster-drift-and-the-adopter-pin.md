@@ -3,7 +3,7 @@ sprint: 141
 slug: roster-drift-and-the-adopter-pin
 owner: Maintainer
 last_updated: 2026-10-25
-status: active
+status: closed
 gates_signed: G1,G2 @ 56739351
 plan_commit: 9e693f41
 update_trigger: sprint execute/close events
@@ -107,8 +107,40 @@ a revisit-if condition.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/prose-density-baseline.txt` | T1 | two spent rows deleted (CLAUDE.md, adlc-epic-sequencing.md) | Low | prose-density 26/0; fixtures 10/0 |
+| `SECURITY.md` | T2 | "Of the 15"; `humanizer` row; `triage` to scoped `Bash`; header refreshed | Low | count-claims PASS 15 = 15; cap 72/80 |
+| `scripts/lib/check-count-claims.sh` | T2 | SECURITY.md's skill count checked; route + reason in a comment | Low | seeded copy FAIL 14 != 15 |
+| `evals/run-count-claims-fixtures.sh` · `evals/fixtures/count-claims/security-drift/` | T2 | must-FAIL case 5 | Low | RED before the line, all green after |
+| `CHANGELOG.md` | T2 | `[Unreleased]` bullet | Low | read-through |
+| `docs/work/backlog/TASK-489-decide-workdoo-s-lean-flow-pin.md` | T3 | `## Decision` (bump to 2.16.0); scoped out as blocked | Low | close gate: scoped-out PASS |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 2 of 3 members delivered (TASK-510, TASK-509); TASK-489 scoped out by owner ruling to the backlog as blocked on
+the owner's bump of workdoo, its decision recorded. Members' DoD: 6 of 7 boxes ticked across all three, every box of the
+two delivered members. System verify on the VPS gate: 315/1 on `36db932f` (a bookkeeping finding, below), 316/0 on
+`a12f4d94`.
+
+**Retrieval check** — yes, once. L-234 says a scope-change entry is attributed by its heading and must declare every path
+its body names; two entries this sprint named paths no task declared, and system verify was the first thing to notice. L-234
+goes to count 2. No ADR was contradicted.
+
+**Cost** — coordinator inline (Opus) plus four Sonnet agents: three G2 builder checks (~50k, ~53k, ~56k tokens) and one T2
+builder (~71k). Coordinator tokens were not measured. Two full-gate runs on the VPS (~2 min each), one of them spent on the
+bookkeeping fix. Per delivered member: ~115k agent tokens, most of it the builder checks on two S tasks.
+
+**Worked**
+- The G2 recon found a second SECURITY.md drift (`triage` filed under "No shell") before the build, so T2's box 1 covered it.
+- Re-running every check the T2 builder reported, instead of trusting the report, agreed on all four lines.
+- The scope-out kept the owner's ruling on the file, and the close gate accepted it because a scope-change entry names it.
+
+**Friction**
+- T1's builder-check reader misread the baseline as one row; settling facts from the repo caught it.
+- A read-only probe of workdoo's host was denied in auto mode (L-253), so T3 could not finish inside the sprint.
+- System verify's first run reddened on my own scope-change wording (L-234, second time).
+
+**Buckets** — Shipped → CHANGELOG `[Unreleased]` (T2). Tech debt → TD-275 (the grant table's rows are unchecked). Follow-ups
+→ TASK-489, already in the backlog (`origin: close-retro`, blocked). Learnings → L-234 to count 2 · L-253 new.

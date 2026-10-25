@@ -117,6 +117,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-253 [tags: tooling] [status: active]: **In auto mode the coordinator cannot read the production host, so a box whose evidence lives there needs the owner to supply it.** SPRINT-141 T3's second box needed a workdoo run record on the VPS showing the bumped lean-flow version. The G2 design said "read through a non-secret route", and the coordinator tried a read-only ssh listing of the workdoo user's installed plugin version. The auto-mode classifier denied it as a production read, and it was not retried around. The VPS gate runner, a separate clone on the same host, ran twice without objection. Name who reads a host-side record at G2: an owner paste, or a permission rule the owner adds.
+- seen: 2026-10-25 (SPRINT-141 T3, after the owner ruled bump; T3 scoped out by owner ruling)
+- count: 1
+- promoted: no
+- related: L-247 (never open the adopter's secret files) · L-249 (headless write trust)
+
+---
+
 ## L-252 [tags: process] [status: active]: **One clean run of a model-driven pass proves it can work, not that it does: judge it over several runs of one fixed input.** SPRINT-140 T3 ran the embedded humanizer pass six times on one sample with ten listed facts. Run 4 was clean; runs 1, 2 and 5 added or dropped a fact, run 3 missed a pattern. Stopping at the first clean run would have shipped a box ticked on luck. The overlay under test was read in full every time, so the variance belonged to the pass itself, and it went to TD-274 rather than into the task being built.
 - seen: 2026-10-25 (SPRINT-140 T3, embedded runs b1–b6)
 - count: 1
@@ -248,8 +256,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **L-235 → promoted: merged into L-224** · disposition: merge — L-224's rule (check with the checker the gate actually runs, after every write) already covers a whole-tree leg a diff review cannot see; both sightings are counted on L-224, this entry's text stays as the record.
 
 ## L-234 [tags: sprint-model] [status: active]: **A scope-change entry is attributed by its HEADING, so the heading must name every `Tn` whose files the body lists.** SPRINT-125's Plan-meta entry named TASK-434 in its heading and then listed paths for T3, T7 and D1; the scope-change-layers check charged them all to T1 and system verify reddened. The log is append-only, so the fix cost a `Cites:` note on T1 rather than an edit. Write one entry per task, or a heading listing every `Tn`.
-- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7)
-- count: 1
+- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0)
+- count: 2
 - promoted: no
 - related: L-229 · L-151
 

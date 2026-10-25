@@ -391,6 +391,14 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-275** severity: low | status: open | created: Sprint-141 (close retro, T2 G2 ruling R1)
+  - Summary: **Nothing checks SECURITY.md's grant table against each skill's `allowed-tools:`.** SPRINT-141 T2 found two row
+    drifts besides the stale count: no `humanizer` row, and `triage` (`Bash(git *)`) filed under "No shell at all". The new
+    `check-count-claims.sh` line catches a count that falls behind the roster, but not a skill filed under the wrong grant,
+    and on a security page that misfiling understates what a skill can run. Owner ruling R1 kept the rows a read-through.
+  - Fix direction (not a ruling): a leg that classifies each `allowed-tools:` line (unscoped `Bash` · scoped `Bash(...)` · no
+    shell) and compares it with the table row naming that skill. Admit it under ADR-053 only if the table drifts again.
+
 - **TD-274** severity: medium | status: open | created: Sprint-140 (T3 exercise, owner ruling at the T3 retry popup)
   - Summary: **The embedded humanizer pass adds or drops a fact in about half of runs.** On one fixed 120-word sample with ten
     listed facts, three of six embedded runs broke SKILL.md step 6: one turned an empty range into an added claim, two dropped a
