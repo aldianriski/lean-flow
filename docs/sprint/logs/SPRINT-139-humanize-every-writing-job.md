@@ -360,3 +360,13 @@ items, the installed 2.14.0 having no humanizer). Both sub-agent transcripts sho
   at SPRINT-139's own close, when that commit goes through the pass (as SPRINT-138 T4 waited for its exercise B).
 From E1 on, the coordinator's other commits in this sprint are not passed. The installed skills do not carry the wiring
 until 2.15.0 ships, and E1 is the demonstration.
+
+### 2026-10-25 | progress | T7 (TASK-495): Codex round 1 fixes; E4 restated under the corrected rule
+Codex round 1: NOT CLEAR. `dispatch.md` exempted status-move and record-sha commits as a category, contradicting "anything
+with free prose passes"; triage was ambiguous the same way; and dispatch repeated rules the contract owns. Fix (`81286c6f`): R6
+now judges the ENTIRE message, trailers aside. It skips only when every word belongs to a fixed template whose substitutions
+are a prefix, ids, folder or state names, field names and shas. One added descriptive word makes it free prose, which passes;
+when unsure, it passes. dispatch and triage now point to `embedded.md` and state no rule of their own.
+E4 restated: this sprint's status-move commits carry a parenthetical ("(T1 accepted; git mv, own commit)"), so under the
+corrected rule they would PASS, not skip; the earlier E4 line was wrong on that. A genuine fixed template here is
+`sprint(139): record plan_commit` (`873a765f`): every word is template or substitution, so it skips.
