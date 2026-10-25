@@ -34,6 +34,8 @@ status: current
   available in the session and loads successfully, its Delivery Gate runs instead; otherwise the floor applies.
 - **`/prototype` UI variants now use real data or a visible `[REAL DATA]` placeholder instead of invented numbers and people.**
   Stock dashboard and landing-page shells alone do not establish structurally distinct variants.
+- **The optional DESIGN template gains a Direction block that the owner fills in.** It holds personality, mood, audience and an optional
+  energy, rhythm and motion dial. The agent fills it only from the owner's answers or their own file and otherwise leaves it as `[CUSTOMIZE]`.
 
 **Maintainer-side**:
 
