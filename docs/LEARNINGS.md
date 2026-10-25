@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-20
+last_updated: 2026-10-25
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -36,7 +36,8 @@ Reviewed at every **Sprint Promote** before planning.
 ## Durable rules moved out of CLAUDE.md (TASK-384 · SPRINT-112)
 
 Detail of the `.claude/CLAUDE.md` § Anti-Patterns rules whose one-liner now points here. Each entry is the rule's **original text, moved verbatim** —
-the always-loaded file keeps the rule's force in one line, this on-demand section keeps the proof. Each is recorded through the disposition route
+the always-loaded file keeps the rule's force in one line, this on-demand section keeps the proof. TASK-506 (SPRINT-140) extended it
+to the rules in § Project Overview, § Definition of Done and § Behavioral Guidelines. Each is recorded through the disposition route
 (`disposition: move-to-reference`); the `L-NNN` ids named are the learnings whose own bodies collapsed to a pointer, so this text is their record.
 
 ### spec-only
@@ -70,6 +71,48 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 - **wiring → moved: docs/LEARNINGS.md` § Durable rules › wiring** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: L-020
 
 ❌ Shipping a new capability **without wiring it into the jobs that trigger/chain it** — a behaviour written only in its own file is half-shipped. Wire every trigger point + downstream consumer (entry routing · dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT) and verify it *fires* end-to-end. Shipping ≠ wiring (SPRINT-022 audit: dispatch · review-split · fog-mode all shipped half-connected → L-020).
+
+### roster
+
+- **roster → moved: docs/LEARNINGS.md` § Durable rules › roster** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Project Overview · learnings: L-210 (no entry holds the TASK-366 withdrawal)
+
+- **Hooks and agents are admissible**, held to ADR-001's curation bar (ADR-044) — *admissible* is
+  not *present*: the first hook candidate was **withdrawn at outside review** (60% false positives
+  on real transcripts, and English-only patterns that missed the maintainer's own bilingual cases —
+  `TASK-366`). "No hooks / no scaffold / no agents" was a *proxy* for *curated* that began being
+  enforced in place of it, and "no scaffold" was flatly **false** for as long as `init` has shipped,
+  because a negative claim has no diff that ever makes it look wrong. **Describe the roster; never
+  advertise an absence — and never describe a roster you have not re-checked.**
+
+### flow-blocking-question
+
+- **flow-blocking-question → moved: docs/LEARNINGS.md` § Durable rules › flow-blocking-question** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: none (SPRINT-012 T1)
+
+❌ Parking a **flow-blocking open question** in a doc (a `TBD` / silent `assumes:`) instead of surfacing it — a question that blocks scope/design is asked (in its frontier round) or made an explicit `blocked`/owner-action with an unblock condition; never a passive placeholder that stalls dev (SPRINT-012 T1).
+
+### too-simple
+
+- **too-simple → moved: docs/LEARNINGS.md` § Durable rules › too-simple** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: none (brainstorming K1 · TASK-058)
+
+❌ Skipping design because a task **"looks too simple"** — the "too simple to need a design" rationalization is exactly where unexamined assumptions cause wasted work; a quick design (scaled to size) still applies, regardless of perceived simplicity (brainstorming K1, TASK-058).
+
+### manifest-lockstep
+
+- **manifest-lockstep → moved: docs/LEARNINGS.md` § Durable rules › manifest-lockstep** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Definition of Done · learnings: L-180 (the v1.61.0 recurrence)
+
+- [ ] **All FOUR versioned manifests** stay equal (lockstep) — `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` — **plus the README footer**, which no lockstep check covers. This line read "plugin.json + marketplace.json" for two releases and *both* under-bumped: a DoD that enumerates a subset is read as exhaustive, and the enumeration is the thing people follow (v1.60.0 missed both siblings and the footer; v1.61.0 missed the siblings again while quoting that very sentence). Derive the set with `grep -l '"version"' .*-plugin/*.json`, never from this list.
+
+### wiring-check
+
+- **wiring-check → moved: docs/LEARNINGS.md` § Durable rules › wiring-check** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Definition of Done · learnings: L-020 · L-172
+
+- [ ] **Wiring check** — a new capability *fires* end-to-end through every job that triggers or chains it (entry routing · dispatch/reviewer brief · `/flow` conductor · CONTEXT SSOT), not merely present in its own file (L-020). **Ask it of the repository, never of the author** — this line has been promoted and live through three sprints that shipped the class anyway (`attachLevel`, the two §4 registries, TD-103's pair), because each builder was correct within their declared `Layers:` and the seam sat outside all of them: a per-task DoD cannot enforce a property that lives *between* tasks, and the person who just wired what they were assigned is the one who cannot see it. The property is mechanically detectable — an exported or registry-registered symbol with **zero non-test callers** — so derive it, do not ask it (L-172 ×2 → TASK-318).
+
+### cross-check
+
+- **cross-check → moved: docs/LEARNINGS.md` § Durable rules › cross-check** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Behavioral Guidelines · learnings: L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198
+
+- **Cross-check a query before acting on it** — a search/count/grep whose result you will act on *immediately* gets a **second query that must agree**: an inverse whose sum is the known total, a count reconciled against a census, or a seeded gap the query must detect. Run it before the conclusion, not after it surprises you. **Why an action and not a caution:** the "match by shape, not substring" rule was promoted, correctly placed and *loaded in context* for all eleven sightings, and reached none — 8 of them ad-hoc queries inside a governance pass, where a wrong answer is acted on with no review between query and conclusion. Every one that was caught was caught by a *disagreeing second number*, never by recalling the rule. A negative control alone is not enough: it proves the query fires on rows it reaches, never that it reached them all (SPRINT-064 T1 — a nested `getline` silently examined 20 of 31 and returned "clean"). **A value entering a *frozen artifact* — an assumption, a DoD, an acceptance threshold — is a query result and gets the same treatment at the moment it is written, then again at execution.** Both grains count: a **figure** (SPRINT-071 wrote `~121` sites into A1; the real number was 39, so the DoD built on it was unsatisfiable the moment it froze) and a **structural claim about another document** (SPRINT-074 froze "the checker reads §14's tables" into three artifacts; §14 has no per-rule table). The guard does not fire on its own because *authoring* feels like planning, not querying — but the number is acted on later, by someone who cannot re-derive it, against a Plan nobody can amend cheaply. A **third grain: an identifier for a new row** — a `TD-NNN`, `TASK-NNN` or `L-NNN` — is a query result too, so **derive the maximum in use; never increment the one you remember**. Twice in one sprint the assumed id was wrong: a register cited `TASK-241`, which was that task's own twin, and a debt row filed as `TD-066` collided with an existing row whose subject was the very bug another task was fixing. Nothing rejects a duplicate id, and a second row with the same number reads as an edit to the first (L-143 ×2). **And derive it with the worktrees excluded** — `.claude/worktrees/` holds complete repo copies during isolated dispatch, so a bare `grep -r` over this repo counts them as content and returns a maximum that is not a row. It has now returned `L-999` (SPRINT-013's deliberate dangling-reference *negative-test token*) twice: once against a real max of `L-168`, once against `L-180` — the second time inside a close Retro, in a session that had already derived two `TD-NNN` correctly minutes earlier, because id-derivation feels like bookkeeping rather than querying. Treat a suspiciously high maximum as contamination before treating it as a row (L-170 ×2). **And the second query must vary the SELECTION rule, not the direction of the count.** An inverse whose two halves sum to the known total proves only that the rows were *partitioned* — both halves run the same selector, so they agree perfectly on the wrong population. SPRINT-098 got `37 open + 60 closed = 97` against a real figure of **5**; SPRINT-099 derived ten archive-exclusion call sites by grepping one predicate SHAPE and cross-checked by grepping the same shape, while an eleventh site written as `grep -v` sat outside what either query could reach — on a live gate leg, failing silently. Both were caught only by a number derived through a *different route*. The cheap tell: would both halves of your check break identically if the selector were wrong? (L-198 ×2). Full family → CONTEXT.md § Gates (L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198).
 
 ---
 

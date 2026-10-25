@@ -19,4 +19,10 @@
 # 16088 measured tokens = 2.991 (rounded to 3dp). Budget is the check's OWN estimate of today's
 # always-loaded set at that ratio (ceil(48115 / 2.991) = 16087) -- the adoption figure exactly, so
 # the gate is green today and any growth FAILs (owner G2 ruling: "ratchet at adoption").
-16087 2.991 2026-09-28+899be0c headless differential via claude-opus-5-5 (claude -p, no ANTHROPIC_API_KEY) -- see docs/research/logs/token-calibration.md
+#
+# RATCHETED 2026-10-25 (TASK-506, SPRINT-140). .claude/CLAUDE.md was compacted to rule plus pointer
+# (its incident narratives moved to docs/LEARNINGS.md § Durable rules moved out of CLAUDE.md). Owner ruling:
+# no recalibration -- the ratio stays the 2026-09-28 pooled 2.991; only the budget moves, to the check's OWN
+# estimate of the compacted set at that ratio (ceil(37957 / 2.991) = 12691), zero headroom (ADR-048: ratchet
+# at adoption). Round 2 of docs/research/logs/token-calibration.md records the before/after figures.
+12691 2.991 2026-10-25+bc0cac72 ratchet after TASK-506 compaction; ratio unchanged from the 2026-09-28 headless differential via claude-opus-5-5 (claude -p, no ANTHROPIC_API_KEY) -- see docs/research/logs/token-calibration.md

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-28
+last_updated: 2026-10-25
 update_trigger: a re-calibration round is appended (a new `--calibrate` adoption)
 status: active
 id: token-calibration-log
@@ -65,3 +65,29 @@ a FAIL (owner G2 ruling: "ratchet at adoption"). `adopted-at 2026-09-28+899be0c`
 sha of the adopting commit's parent). Confirmed live: `bun scripts/lib/check-doc-caps.ts` now prints
 `PASS  doc-caps: token-budget ~16087 tokens <= budget 16087 (ratio 2.991 bytes/token, claude-opus-5-5
 tokenizer; adopted 2026-09-28+899be0c)`.
+
+## Round 2 — budget ratchet after compaction, no recalibration (TASK-506, SPRINT-140, 2026-10-25)
+
+**What moved.** `.claude/CLAUDE.md` was compacted to rule plus pointer: each bullet keeps its rule and its
+`L-NNN` / ADR pointer, and its incident narrative was either cut (the cited `L-NNN` already holds it) or moved
+verbatim into `docs/LEARNINGS.md` § Durable rules moved out of CLAUDE.md. `.claude/CONTEXT.md` was not touched.
+
+**Method.** No headless or API call. Owner ruling 2026-10-25: the ratio stays the Round 1 pooled **2.991**
+bytes/token; only the budget moves, to the check's own estimate (`bun scripts/lib/check-doc-caps.ts`,
+`ceil(normalised bytes / 2.991)`) at **zero headroom** — ADR-048's "ratchet at adoption" rule.
+
+| | `.claude/CLAUDE.md` | `.claude/CONTEXT.md` | Pair |
+|---|---|---|---|
+| Before — lines / words / bytes | 80 / 2,432 / 15,700 | 149 / 3,998 / 26,512 | 229 / 6,430 / 42,212 |
+| After — lines / words / bytes | 79 / 1,715 / 11,445 | 149 / 3,998 / 26,512 | 228 / 5,713 / 37,957 |
+| Estimated tokens at 2.991, before → after | ~5,250 → ~3,827 | ~8,864 (unchanged) | **~14,114 → ~12,691** |
+
+The gate line before: `PASS  doc-caps: token-budget ~14114 tokens <= budget 16087 (ratio 2.991 bytes/token,
+claude-opus-5-5 tokenizer; adopted 2026-09-28+899be0c)`. The budget in `scripts/lib/token-budget.txt` drops
+**16,087 → 12,691**, `adopted-at 2026-10-25+bc0cac72` (date plus the short sha of the adopting commit's parent).
+
+**Caveat on the ratio.** It is unchanged by ruling, not re-measured. At Round 1 `.claude/CLAUDE.md` alone
+measured **2.841** bytes/token against `.claude/CONTEXT.md`'s 3.145, so the pooled 2.991 leans on the file mix of
+2026-09-28. CLAUDE.md is now a smaller share of the pair, and the narrative it lost may not tokenize like the
+rules it kept, so the pooled ratio may now be slightly off in either direction. A future `--calibrate` run can
+correct it; until then the estimate carries Round 1's error band (0.304 bytes/token per-file spread).
