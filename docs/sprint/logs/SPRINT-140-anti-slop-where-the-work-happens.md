@@ -278,3 +278,21 @@ frozen boxes still read true); a wider text contract was declined (it would be n
 ### 2026-10-25 | gate | system verify run 2 PASS: QA-CHECK 327 pass, 0 fail at d11be5e1; T9 box 5 ticked
 `gate-remote.ts` (VPS, QA_FULL) against `d11be5e1`, after the R5 reword: remote rc 0, `QA-CHECK: 327 pass, 0 fail`. TASK-506's last
 box (qa-check PASS; owner read) is ticked on this run. Every member is now ticked; TASK-506 moves to done.
+
+### 2026-10-25 | close | PLAN_EXHAUSTED, 9 of 9 members done, 45 of 45 DoD; system verify 327/0; v2.16.0 cut by hand
+run · 45 of 45 DoD ticked
+outcome · DELIVERED · terminal state PLAN_EXHAUSTED · parks 0 · repair-cycles 1 (system verify run 1 → R5 reword → run 2)
+`check-sprint-by-reference.ts --close` gives 20 pass, 0 fail. Every member is in `done/`, and there is no handoff entry to
+reconcile. System verify (VPS, QA_FULL) gave 326/1 on run 1 at `821c6791`, where the failure was the orchestrator-store text
+contract on T2's "TODO", and 327/0 on run 2 at `d11be5e1`.
+Retro buckets, filed automatically: tech debt → TD-273 (comment slop in scripts/, from T2's exercise) and TD-274 (fact loss in
+the embedded humanizer, 3 of 6 runs) · learnings → L-251 (run the harnesses that read a touched shipped file before ticking) and
+L-252 (judge a model-driven pass over several runs), plus L-249 bumped to count 2 (the 8.3 short path, seen again at T6; due at
+the next promote) · follow-ups → TASK-509 (SECURITY.md says 14 skills and has no humanizer row) and TASK-510 (delete the spent
+CLAUDE.md prose-density row), both `origin: close-retro`. The ids were derived with worktrees excluded: before filing, the
+maximums were L-250, TD-272 and TASK-508, and the `L-998/999` hits are the known test tokens (L-170).
+The owner approved these by popup. Cutting v2.16.0 by hand (D6): the four grep-derived manifests and the README footer were
+bumped, lockstep PASS, and `[Unreleased]` became the v2.16.0 block. §11: this sprint and its log were archived with an INDEX
+line, and v2.14.x was rotated verbatim to `docs/changelog/CHANGELOG-2.14.0.md` (31 non-blank lines identical). Doc freshness:
+README's humanizer row and references line, and CONTEXT.md's humanizer row, which is one byte shorter, so the always-loaded
+budget still passes at 12,691. The knowledge index was regenerated after the LEARNINGS change. Left for the owner: push.
