@@ -204,3 +204,22 @@ Codex round 2: one finding, "never a target of zero" contradicted §8; R4's narr
 Coordinator note: the SKILL.md fix and the R4 log entry were written with the file tools while the shell's permission check
 returned no verdict for several calls; the T4 builder's leftover background row was stopped (it had finished; nothing pending).
 5 of 5 boxes ticked.
+
+### 2026-10-25 | progress | T6 (TASK-503) done: the UI floor lands in review routing; Codex CLEAR at round 2; scoped reviewer CLEAR
+consequence · T6 · behaviour:low · governance:high
+review · T6 · codex · behaviour:low · governance:high
+Built by one Sonnet builder; committed by the coordinator as `90eeecc7`. review-scoping.md gains a skip-table row, a clause on the
+`/run` bullet and § UI floor (five recorded checks; cannot-run ends `UNVERIFIED`; deferral to an `antislop` / `anti-slop` skill's
+Delivery Gate, with a load-failure fallback to the floor). orchestrator SKILL.md untouched (140/140).
+Exercise in the workdoo copy: the coordinator added a "Copy email" button to `src/ui/AccountMenu.tsx` and restored it after
+(sha256 prefix c2b99c9cedd5ca59 before and after). Headless reviewers told only to follow lean-flow's review routing:
+- (a) lean-flow only: the floor row fired with "no skill named antislop or anti-slop is installed"; every command was blocked,
+  so every check was UNVERIFIED, none PASS; its scoped review found a real focus regression (the new button takes initial focus).
+- (b1) plus the anti-slop clone on an 8.3 short path: the deferral fired, the skill files could not be read (L-249), and the
+  reviewer fell back to the five checks and said so. (b2) on the long path: anti-slop's own mode notice printed and its Delivery
+  Gate report was attached (Block 1 FAIL on R-27, R-32, R-35, R-03; nothing written into workdoo); its contrast MCP tool was
+  denied in headless mode, so the contrast figure was a hand calculation on assumed colours, flagged as assumed.
+Codex round 1: NOT CLEAR, 2 findings (no fallback for a matched skill that fails to load; the CHANGELOG promised deferral
+whenever the plugin is installed). Both fixed as given. Round 2: CLEAR. One scoped Sonnet reviewer (TASK-503 box 5): CLEAR on
+Spec and Standards; of its three declined items, Block 1's coverage and the `after` spelling were checked against the
+anti-slop source, and `UNVERIFIED (cannot run)` has no second copy in orchestrator. 5 of 5 boxes ticked.
