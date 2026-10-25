@@ -414,3 +414,18 @@ consequence · T8 · behaviour:material · governance:low
 review · T8 · codex · behaviour:material · governance:low
 Codex: the release zip is an acceptable fresh-install stand-in for this runtime check, but it does not prove marketplace
 delivery. That leg is the owner's push plus install.
+
+### 2026-10-25 | gate | system verify RED on the first run: 317 pass, 3 fail (VPS, `149471cc`, via `scripts/gate-remote.ts`)
+`remote rc: 1`, `QA-CHECK: 317 pass, 3 fail`, with the verdict present and the run complete. All three are this sprint's:
+- (1) prose-density: T6's "Before saving" paragraph made `skills/handoff/SKILL.md` line 35 a dense line (411 chars).
+- (2) prose-density: T6's step-4 clause made `skills/release-patch/SKILL.md` line 45 693 chars.
+- (3) layers observed: T4 declares `skills/humanizer/references/translate.md`, which was conditional and never created
+  (L-240's case exactly). T6 and T7 changed `.claude/CONTEXT.md` without declaring it.
+Fixes: (1) and (2) are split at sentence boundaries, never squeezed; no word changes (handoff 103, release-patch 102 lines;
+prose-density 28/0 locally). (3) goes through the scope-change below. Then the gate is re-run.
+
+### 2026-10-25 | scope-change | T4, T6, T7: `Layers:` corrected to what the tasks touched
+What broke: system verify's layers-observed leg. T4's `Layers:` named `skills/humanizer/references/translate.md`, which T4
+left uncreated because SKILL.md stayed far under its cap; the token is pruned. T6 (TASK-494) and T7 (TASK-495) each edited
+the `/humanizer` row in `.claude/CONTEXT.md` (the wiring list); `.claude/CONTEXT.md` is added to both. Impact: Plan
+`Layers:` lines only; no Done when changes.
