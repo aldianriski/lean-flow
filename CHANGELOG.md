@@ -14,11 +14,25 @@ status: current
 
 ---
 
-## [Unreleased]
+## v2.16.1 — SECURITY.md lists every skill's real tool grant, and its skill count is checked (2026-10-25)
 
+**PATCH** — ships SPRINT-141 (Roster Drift and the Adopter Pin), a fixes-only sprint. No skill changed. Installing the release
+is enough; no upgrade step. The standard is unchanged (spec 0.18.1). Restart the session after installing.
+
+### SPRINT-141 — Roster Drift and the Adopter Pin (2026-10-25)
+
+**Consumer-facing:**
 - SECURITY.md's roster is corrected: 15 skills, a `humanizer` row added, and `triage` moved to scoped `Bash`. Its skill count is
   now checked by `check-count-claims.sh` (a count check rather than a roster pointer, because a count trips when a skill is added
   and sends the editor back to the grant table).
+
+**Maintainer-side:**
+- The prose-density baseline drops its two spent rows (`.claude/CLAUDE.md`, `docs/research/adlc-epic-sequencing.md`).
+- `check-count-claims.sh` gains a must-FAIL `security-drift` fixture; QA.md's skill-count row names SECURITY.md.
+- TD-222 · 212 · 194 deleted (§11); TD-275 filed; L-249 promoted (merge); L-234 at count 2; L-253 filed. TASK-489 (bump
+  workdoo's pin to 2.16.0) returns to the backlog, blocked on the owner's bump.
+
+---
 
 ## v2.16.0 — anti-slop where the work happens: a code-slop check, a UI review floor, honest prototypes and a sharper `/humanizer` (2026-10-25)
 
