@@ -121,3 +121,14 @@ correction, and run a third Codex round on it. Impact: the comparand gets strict
 scored (three pre-fix, six after-fix round 2) were judged under the corrected wording by a fresh judge, at 0 of 3 and 0 of
 6. `evals/fixtures/humanizer/fact-keep/sample.md` is unchanged. Edit: fact 11 in
 `evals/fixtures/humanizer/fact-keep/facts.md`. No member's Done when changes.
+
+### 2026-10-25 | progress | T2 done: the embedded fact-list step ships as a guard; TD-274 narrowed (TASK-511)
+After-fix round 2, six runs against an export of `cc398202`, two waves of three: every run read the pinned plugin dir,
+every final begins with the rewritten text, and none carries a fact list or a remark. A fresh judge, given only the fact
+list (with Codex's round-2 "by" correction) and the finals, scored the three strengthened-sample pre-fix runs 0 of 3 and
+the six after-fix runs 0 of 6. Codex: round 1 NOT CLEAR on missing input only; round 2 CLEAR on the fix, one fixture
+finding (fact 11's "by"); round 3 (owner-ruled) CLEAR. `83a4b016` narrows TD-274 with the rates and a re-measure condition,
+and adds the CHANGELOG line. 5 of 5 boxes ticked. Cost: 18 headless runs (3 discarded, 3 on the first sample, 3 strengthened
+baseline, 6 + 6 after-fix), three judge passes, four Codex rounds.
+consequence · T2 · behaviour:material · governance:low
+review · T2 · codex · behaviour:material · governance:low

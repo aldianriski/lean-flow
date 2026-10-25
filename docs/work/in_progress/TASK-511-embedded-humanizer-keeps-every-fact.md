@@ -21,15 +21,15 @@ TD-274: on one fixed sample, 3 of 6 embedded runs added or dropped a fact, which
 job lean-flow composes. The two standalone runs kept every fact, so the loss sits in the embedded child pass.
 
 ## Done when
-- [ ] `embedded.md`'s child brief has the child list the text's facts before it rewrites and check its final against that
+- [x] `embedded.md`'s child brief has the child list the text's facts before it rewrites and check its final against that ✓ cae91606 + cc398202: Child path item 4 + inline fallback clause; Codex R1-R3 CLEAR on the contract
       list, still returning only the final text; the inline fallback carries the same step.
-- [ ] A ~120-word sample with seeded tells, its list of about 10 facts, and a NOTES.md on how to run and judge it are
+- [x] A ~120-word sample with seeded tells, its list of about 10 facts, and a NOTES.md on how to run and judge it are ✓ cae91606 + d194f573: `evals/fixtures/humanizer/fact-keep/` (~140 words after R1, 11 facts, NOTES.md)
       retained under `evals/fixtures/humanizer/`.
-- [ ] Baseline: the pre-fix brief on that sample over 3 headless runs, with the loss rate recorded (it shows whether the
+- [x] Baseline: the pre-fix brief on that sample over 3 headless runs, with the loss rate recorded (it shows whether the ✓ 0 of 3 (pinned 07f10d29, fresh judge); the sample did not show the old loss, so R2 narrows TD-274
       sample can tell a fix from no fix).
-- [ ] After the fix: 6 separate headless embedded runs on the same sample, each judged from its own transcript; 0 of 6 add
+- [x] After the fix: 6 separate headless embedded runs on the same sample, each judged from its own transcript; 0 of 6 add ✓ 0 of 6 (pinned cc398202, round 2, fresh judge; no fact list or remark in any final)
       or drop a listed fact.
-- [ ] TD-274 is narrowed with the before and after rates and a re-measure condition, and the CHANGELOG `[Unreleased]`
+- [x] TD-274 is narrowed with the before and after rates and a re-measure condition, and the CHANGELOG `[Unreleased]` ✓ 83a4b016
       block has a line.
 
 ## Touches
