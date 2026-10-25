@@ -57,7 +57,7 @@ consumer-side durable rules. Shipped skill: Codex loop.
 
 ### T2 — Give builders and the self-review floor the code-slop tells `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/references/dispatch.md`
-  · `skills/tdd/SKILL.md` · `CHANGELOG.md`
+  · `skills/tdd/SKILL.md` · `CHANGELOG.md` · `README.md`
   · `docs/work/todo/TASK-499-code-slop-tells-for-builders.md`
   · `docs/work/in_progress/TASK-499-code-slop-tells-for-builders.md`
   · `docs/work/done/TASK-499-code-slop-tells-for-builders.md`
@@ -114,7 +114,7 @@ Layers: `skills/orchestrator/references/review-scoping.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-503-ui-floor-in-review-routing.md`
   · `docs/work/in_progress/TASK-503-ui-floor-in-review-routing.md`
   · `docs/work/done/TASK-503-ui-floor-in-review-routing.md`
-Depends-on: T2
+Depends-on: T5
 Cites: `TASK-503` · anti-slop `skills/antislop/SKILL.md` § Delivery Gate @ `4ca3b11c` · L-015
 
 A UI change routes to `/run` + `/verify` with nothing naming states, keyboard, narrow widths or contrast. The floor keys on

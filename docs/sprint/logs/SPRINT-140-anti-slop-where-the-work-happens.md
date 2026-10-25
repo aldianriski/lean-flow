@@ -42,3 +42,73 @@ budget already covers it); the CI matrix is parked `needs-info` P3 (TASK-507); t
 audit mode fires on an explicit request only. Decomposed into TASK-499..507 and filed with TASK-508 in `08d2fbc6`.
 Size check: 3 M, 6 S, no `L`. Eight members are `origin: decomposer`; TASK-508 is `origin: manual` (filed from governance,
 not grilled at intake). No epic.
+
+### 2026-10-25 | scope-change | T6 Depends-on T2 -> T5, so the chain is linear as D1 says
+What broke: the pre-dispatch preflight halted on nine `shared-file-unowned` findings. All nine are `CHANGELOG.md` between
+T3, T4 or T5 and T6, T7 or T8. D1 says the chain is linear, but T6's `Depends-on: T2` forked it after T2, so the humanizer
+branch (T3 to T5) and the UI branch (T6 to T8) had no order between them. Impact: none on scope or on any member's Done
+when; only the order changes, with T6 now after T5. Edit: T6's `Depends-on:` line, T2 -> T5. Re-confirm at the batch G2.
+
+### 2026-10-25 | scope-change | T2 Layers gains README.md
+What broke: T2's builder check found that TASK-499's last Done-when box reads "README/CHANGELOG line", but T2's `Layers:`
+named only `CHANGELOG.md`. A README edit would touch a file no task declares and fail `layers observed` at close. Impact: T2
+adds one README line (the `/tdd` row or the review section names the code-slop box); no member's Done when changes. Edit: T2's
+`Layers:` gains `README.md`. Re-confirm at the batch G2.
+
+### 2026-10-25 | gate | G1 + G2 signed by the owner by popup; nine builder checks settled; three owner rulings
+G1: eight members passed the fast-path (`origin: decomposer`, scope unchanged since `approve`). TASK-508 (`origin: manual`)
+took the full checklist: done when L-237, L-240 and L-241 are each `[status: promoted]` with a pointer and a disposition ·
+size S · touches `builder-check.md`, `docs/LEARNINGS.md`, `CHANGELOG.md` · out of scope: any checker or guard (ADR-053) and
+the orchestrator SKILL.md (140/140). Preflight CLEAR after the two scope-changes above: nine sequential waves (T1=0 … T9=8).
+Execution is sequential in the main tree.
+Owner rulings:
+- **R1 (T9 homes):** a story whose bullet cites no L-NNN moves verbatim to a new subsection of LEARNINGS § Durable rules
+  moved out of CLAUDE.md, `disposition: move-to-reference` (the TASK-384 pattern).
+- **R2 (T9 ratio):** the budget is re-estimated with the adopted ratio 2.991, at zero headroom (ADR-048); no headless
+  recalibration. The calibration log records that CLAUDE.md alone measured 2.841 at adoption.
+- **R3 (T8):** the owner supplies the workdoo direction answers by popup when T8 starts; nothing is drafted for them.
+Placement (T1, §10 test): both G2 rules go to `builder-check.md` because the G2 checklist loads it at every G2, and the new
+section binds the design's author whether or not a reader runs. L-241 goes under § Durable rules › consumer-side, which the
+CLAUDE.md consumer-side one-liner points at.
+Settled facts and design fixes (coordinator, from the builder checks):
+- T1: the promoted shape is L-247's: a `- **L-NNN → promoted: <home>** · disposition: move-to-reference — …` pointer line
+  replaces `- promoted: no`, body kept. Verify greps for `disposition:` too. CHANGELOG opens `## [Unreleased]` (SPRINT-139
+  precedent); close turns it into the v2.16.0 block.
+- T2: `/tdd` names the self-review box by title with a short gloss, no path. The pointer also goes into the worktree brief and
+  the reviewer brief, so heavier passes carry the box. Exercise (b) reviews a builder's real diff in the workdoo copy.
+  Exercise (a) rules every `scripts/` finding out to one TD at close (A4).
+- T3: the "BOTH catalogs" wording in `embedded.md` and the Translate-mode lines change too. The overlay is read every time and
+  applies to English spans. The embedded exercise uses `embedded.md`'s own child brief as the caller. The "26 patterns" count
+  stays; the overlay is counted separately. Every LF pattern gets a when-not-to-act note.
+- T4: strength order is §1–§5 (and the ID patterns that map to them) first, then catalog order; each finding cites `§n`,
+  `LF-n` or `ID-n`; weak-alone spans are listed and marked. Each finding quotes the exact sentence it may change, and the diff
+  check is against those quotes. Apply is a second turn and runs step 6's fact check on every rewritten span. The description
+  gains an "audit" trigger. The exercise states that its pick is simulated.
+- T5: counts are occurrences, with fenced and inline code subtracted. Step 6 counts the draft, step 7 re-counts the final;
+  "before" in file mode is the original file. Pasted text goes to a scratch file before Grep; failing that, the count is
+  manual and the report says so. Rate is per 100 words, per the catalog's § Voice. Only pasted-text and file modes report
+  counts.
+- T6: one scoped reviewer and a consequence line are added. A deliverable that cannot run ends `UNVERIFIED (cannot run):
+  <reason>`, never PASS. Match rule: a listed skill whose name after any `<plugin>:` prefix is `antislop` or `anti-slop`. The
+  Delivery Gate's Block 1 covers all five floor checks (R-03, R-25, R-27, R-32, R-35), so deferring does not lower the floor;
+  it runs as a PASS/FAIL report on the diff, mode `after` by session choice. If the "without" run cannot exclude an anti-slop
+  skill, the coordinator stops and asks the owner.
+- T7: pass rule: every number, name, delta and quote in the variants traces to a data source or shows the literal
+  `[REAL DATA]`; anything untraced is a FAIL. A seeded fake (`John Doe`, `+12%`) in a copy is the negative control. The
+  builder picks a page that reads real data. The transcript must show the repo's `ui.md` was read. The snapshot is `src/` only,
+  compared by hash after revert. The generic-layout bullet merges into the existing "differing only in colour" bullet.
+- T8: the Overview paragraph stays; the Dial line is marked optional and is deleted when unused; the new header sentence stays
+  inside the HTML comment; the render goes to a scratchpad path.
+- T9: every bullet is swept, not only the long ones. ADR-048 has zero headroom, so the new budget is the new estimate. Any
+  reduction counts. `prose-density-baseline.txt` is not touched: a row that shrinks or reaches 0 passes, and the next promote
+  review trims it. Other CLAUDE.md readers checked: `check-count-claims.sh` (three strings), `check-prose-density.ts`
+  (always-loaded), `conformance-engine.sh` (ownership header).
+builder-check · T1 · 3 contradictions · 2 questions · design fixed (pointer shape, author-binding wording, disposition grep)
+builder-check · T2 · 4 contradictions · 3 questions · design fixed; README via scope-change; wiring widened to worktree + reviewer briefs
+builder-check · T3 · 3 contradictions · 4 questions · design fixed (stale "both" wording, translate lines, when-not notes)
+builder-check · T4 · 3 contradictions · 6 questions · design fixed (ranking, extent, apply re-check, audit trigger)
+builder-check · T5 · 4 contradictions · 4 questions · design fixed (rate, final count in step 7, scratch file, occurrences)
+builder-check · T6 · 3 contradictions · 5 questions · design fixed (reviewer, UNVERIFIED branch, match rule, gate coverage)
+builder-check · T7 · 3 contradictions · 6 questions · design fixed (pass rule, negative control, page rule, snapshot)
+builder-check · T8 · 0 contradictions · 4 questions · settled; one intent question to the owner (R3)
+builder-check · T9 · 2 contradictions · 3 questions · one fixed (every bullet); one to the owner (R1); ratio to the owner (R2)
