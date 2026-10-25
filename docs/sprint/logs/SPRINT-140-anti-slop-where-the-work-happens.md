@@ -129,3 +129,23 @@ diff with a five-item threat model: CLEAR on every item. 5 of 5 boxes ticked.
 tails sat on wrapped continuation lines, which the freeze compare reads as an edit (the tail is exempt only at the end of a
 box's first line). The ticks were rebuilt from the frozen text at `3dbc2186` with each tail on its first line; the check now
 reads 10 pass, 0 fail. No Done-when text changed, so no scope-change is owed. Ticks from T2 on go on the first line.
+
+### 2026-10-25 | progress | T2 (TASK-499) done: the code-slop box lands in the self-review checklist; Codex CLEAR at round 2
+consequence · T2 · behaviour:low · governance:high
+review · T2 · codex · behaviour:low · governance:high
+Built by one Sonnet builder; committed by the coordinator as `bef5bb5c`. The self-review checklist gains `- [ ] No code slop:` (comment
+tells · keep list · comments-only guardrail · code tells), and its intro now says the checklist is also the floor under every
+heavier pass. Pointers: the dispatch builder brief, the worktree agent brief, the reviewer brief, `/tdd` step 4, README.
+Exercise (a): a read-only sub-agent applied the comment list to all 41 files in `scripts/` (a .ts/.sh listing of 38, reconciled
+by the 3 .txt files): T1 175 (about 14 strict `=====` banners, the rest titled dash rules) · T6 about 120 (8 confirmed by full
+read, the rest estimated from header and length) · T2 1 · T3–T5 0. The concrete item is 7 verbatim copies of a "Shared archive
+predicate" comment. Every finding is ruled fix-later, to one TD at the close Retro (A4).
+Exercise (b), consumer path in the `D:\Research\workdoo` copy: a headless `claude -p --setting-sources local --plugin-dir
+D:/Project/lean-flow` builder (init: lean-flow loaded from the repo, 15 skills). Run 1 was denied reads outside its working
+folder and refused to invent checklist marks. Run 2 added `--add-dir D:/Project/lean-flow`, found both sections, made a
+one-line real diff in `src/app/taskNavigation.ts` and reported every box, the code-slop box item by item; it reported removing
+a duplicate doc comment it had briefly added. It also found a real 'Runs'/'Execution' label mismatch in workdoo (not ours to fix).
+The file was restored from its snapshot: sha256 prefix 969901bc7fdef881 before and after.
+Codex round 1: NOT CLEAR, one finding: `/tdd`, README and CHANGELOG each repeated a shortened tell list, a second copy that can
+drift. Fixed by cutting the three glosses to pointers. Round 2: CLEAR on both items. Checks: check-doc-caps 0 FAIL; prose-density
+28/0 (tdd keeps its one baselined dense line). 6 of 6 boxes ticked.
