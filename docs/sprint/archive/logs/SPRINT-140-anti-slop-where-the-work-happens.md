@@ -3,7 +3,7 @@ sprint: 140
 slug: anti-slop-where-the-work-happens
 owner: Maintainer
 last_updated: 2026-10-25
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
