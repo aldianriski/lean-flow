@@ -189,3 +189,18 @@ Codex round 1: CLEAR on all five items. 5 of 5 boxes ticked.
 D3 caps Codex at two rounds. T5's round 2 left one finding with an exact one-sentence fix (the zero-target wording contradicted
 §8). Owner ruling by popup: from T5 on, when round 2 leaves only an exact-fix item, the coordinator applies that exact text and
 runs one narrow round 3 on just that change. Anything broader still goes to the owner. Same shape as SPRINT-139's R5.
+
+### 2026-10-25 | progress | T5 (TASK-502) done: humanizer counts the mechanical tells; Codex CLEAR at a narrow round 3 (R4)
+consequence · T5 · behaviour:material · governance:low
+review · T5 · codex · behaviour:material · governance:low
+Built by one Sonnet builder; committed by the coordinator as `74d53556`. Step 6 counts the em dash, a spaced ` -- `, bold-label list
+items and curly quotes in the draft (occurrences, code excluded); step 7 re-counts the final; pasted-text and file modes report
+before → after. A voice sample sets the rate per 100 words; otherwise the catalog's rules apply.
+Exercise: a 94-word sample with known counts (prose 3 / 2 / 3 / 4; one more of each in code). Run 1 wrote its scratch file to the
+system temp folder, was denied, counted by hand and said so: 3/2/3/4 → 0/0/0/0. Codex round 1: one finding, the unspecified
+scratch location; fixed as given (a uniquely named file in the working folder, removed after). Run 2 used that path: two scratch
+files, one Grep, both removed (no leftover files), 3/2/3/4 → 0/0/0/0. An independent python count agrees on both runs.
+Codex round 2: one finding, "never a target of zero" contradicted §8; R4's narrow round 3 on the exact fix: CLEAR.
+Coordinator note: the SKILL.md fix and the R4 log entry were written with the file tools while the shell's permission check
+returned no verdict for several calls; the T4 builder's leftover background row was stopped (it had finished; nothing pending).
+5 of 5 boxes ticked.
