@@ -55,6 +55,12 @@ run_case_anywhere "lockstep" 0 \
   "PASS  tmpl-total: README.md claims 4 = disk 4" -- \
   sh "$checker" "$fx/lockstep"
 
+# --- case 5: SECURITY.md's skill count drifts -> FAIL (TASK-509) ---------------------------------
+# SECURITY.md was never read by the checker, so its "Of the 14" outlived the 15th skill.
+run_case_anywhere "security-drift" 1 \
+  "FAIL  skills: SECURITY.md claims 99 != disk 2" -- \
+  sh "$checker" "$fx/security-drift"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "COUNT-CLAIMS FIXTURES: all green"; else echo "COUNT-CLAIMS FIXTURES: at least one FAIL"; fi
 exit $fail

@@ -20,13 +20,13 @@ threat surface, and it is what this file is about.
 
 ## What this plugin can do in your repo
 
-Skills declare their own tool grants. Of the 14:
+Skills declare their own tool grants. Of the 15:
 
 | Grant | Skills |
 |---|---|
 | **Unscoped `Bash`** | `diagnose` · `flow` · `handoff` · `orchestrator` · `prototype` · `tdd` |
-| Scoped `Bash(git *)` etc. | `lean-doc-generator` · `release-patch` |
-| No shell at all | `council` · `insights` · `prime` · `refactor-advisor` · `task-decomposer` · `triage` |
+| Scoped `Bash(git *)` etc. | `lean-doc-generator` · `release-patch` · `triage` |
+| No shell at all | `council` · `humanizer` · `insights` · `prime` · `refactor-advisor` · `task-decomposer` |
 
 Unscoped is deliberate where arbitrary commands are inherent to the job — a test runner or build tool
 cannot be enumerated in advance. It is not a licence: your Claude Code permission mode still gates

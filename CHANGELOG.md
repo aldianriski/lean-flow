@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-24
+last_updated: 2026-10-25
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -13,6 +13,12 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+
+## [Unreleased]
+
+- SECURITY.md's roster is corrected: 15 skills, a `humanizer` row added, and `triage` moved to scoped `Bash`. Its skill count is
+  now checked by `check-count-claims.sh` (a count check rather than a roster pointer, because a count trips when a skill is added
+  and sends the editor back to the grant table).
 
 ## v2.16.0 — anti-slop where the work happens: a code-slop check, a UI review floor, honest prototypes and a sharper `/humanizer` (2026-10-25)
 

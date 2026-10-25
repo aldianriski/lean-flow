@@ -49,6 +49,9 @@ check_claim() { # <label> <actual> <file-relative-to-root> <pattern>
 check_claim "skills"     "$skills_actual" .claude/CONTEXT.md             'Skill roster \(([0-9]+)'
 check_claim "skills"     "$skills_actual" docs/architecture/overview.md  '([0-9]+) skills'
 check_claim "skills"     "$skills_actual" .claude/CLAUDE.md              '([0-9]+) SKILL\.md'
+# SECURITY.md's count drifted 14 vs 15 with nothing re-deriving it (TASK-509). A count check, not a roster
+# pointer: a count trips when a skill is added and sends the editor back to the grant table, whose rows stay a read-through.
+check_claim "skills"     "$skills_actual" SECURITY.md                    'Of the ([0-9]+)'
 
 check_claim "tmpl-core"  "$tmpl_core"     .claude/CLAUDE.md              '([0-9]+) canonical doc templates'
 check_claim "tmpl-core"  "$tmpl_core"     docs/architecture/overview.md  '([0-9]+) canonical doc templates'
