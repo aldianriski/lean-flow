@@ -11,6 +11,7 @@ authority: J1
 origin: manual
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-508 — Promote L-237, L-240 and L-241 into durable rules where their flows read them

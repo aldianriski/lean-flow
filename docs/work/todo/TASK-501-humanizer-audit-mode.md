@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-501 — Add an explicit-request audit mode to humanizer: numbered findings, the owner picks which to apply

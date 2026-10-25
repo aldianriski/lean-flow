@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-505 — Give the DESIGN template a direction section the owner supplies, never the agent

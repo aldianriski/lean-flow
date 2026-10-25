@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-502 — Make humanizer's check step count the mechanical tells with Grep instead of reading for them

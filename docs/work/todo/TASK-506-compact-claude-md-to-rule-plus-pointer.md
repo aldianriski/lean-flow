@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-506 — Compact CLAUDE.md to rule plus pointer and ratchet the always-loaded token budget down

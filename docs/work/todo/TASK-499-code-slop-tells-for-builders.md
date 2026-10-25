@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-499 — Give builders and the self-review floor a list of AI-shaped code tells: comment slop plus three code tells

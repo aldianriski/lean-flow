@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-504 — Make /prototype UI variants use honest placeholders and reject generic AI layouts as variants

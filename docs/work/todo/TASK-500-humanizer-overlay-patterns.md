@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-140
 ---
 
 # TASK-500 — Add a lean-flow-owned humanizer overlay with five patterns the vendored catalog lacks
