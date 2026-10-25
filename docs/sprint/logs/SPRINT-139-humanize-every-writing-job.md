@@ -312,3 +312,7 @@ and `D:\lf-exercise\` did not).
   (and the README footer) as sensitive files even in a trusted worktree, and release-patch correctly refused to write a
   CHANGELOG block its unbumped manifests would contradict. The pass itself is shown on the dry run, which is what the box asks.
   For T8: a headless session cannot bump manifests, so the coordinator does the MINOR bump in this session.
+
+### 2026-10-25 | progress | T6 (TASK-494) done: 4 of 4 boxes; Codex CLEAR at round 1
+consequence · T6 · behaviour:material · governance:low
+review · T6 · codex · behaviour:material · governance:low
