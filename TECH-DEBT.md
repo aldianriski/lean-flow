@@ -391,6 +391,21 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-274** severity: medium | status: open | created: Sprint-140 (T3 exercise, owner ruling at the T3 retry popup)
+  - Summary: **The embedded humanizer pass adds or drops a fact in about half of runs.** On one fixed 120-word sample with ten
+    listed facts, three of six embedded runs broke SKILL.md step 6: one turned an empty range into an added claim, two dropped a
+    fact the text carried (the accountant's needs; the finance-team audience). The overlay was read in full in every run, and the
+    two standalone runs kept every fact, so the loss sits in the embedded child pass, not in TASK-500's overlay.
+  - Fix direction (not a ruling): have the embedded child brief list the text's facts before it rewrites and check the final
+    against that list (the second option at the T3 popup), then measure it over several runs of one sample, not one run.
+
+- **TD-273** severity: low | status: open | created: Sprint-140 (T2 exercise (a), ruled fix-later under sprint Assumption A4)
+  - Summary: **lean-flow's own `scripts/` comments trip the new code-slop box.** A read-only pass over all 41 files found about 14
+    strict `=====` banners (most in `conformance-engine.sh`), about 120 padded long comments (8 confirmed by a full read, the rest
+    estimated from header and length) and 7 verbatim copies of a "Shared archive predicate" comment that will drift.
+  - Fix direction: replace the 7 copies with one line pointing at `archive-path.sh`, then trim the confirmed padded headers to the
+    constraint they carry. Comments only, never code; the scripts are maintainer-side (Other G at most).
+
 - **TD-272** severity: low | status: open | created: Sprint-139 (T7 scope-change; worked around in T7 `Cites:`)
   - Summary: **`check-sprint-by-reference.ts --scope-change` misses a multi-segment path suffix.** `declares()` matches a bare
     file name by basename, but a token containing `/` must equal a declared path exactly. So a scope-change entry naming

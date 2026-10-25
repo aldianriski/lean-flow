@@ -116,6 +116,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-252 [tags: process] [status: active]: **One clean run of a model-driven pass proves it can work, not that it does: judge it over several runs of one fixed input.** SPRINT-140 T3 ran the embedded humanizer pass six times on one sample with ten listed facts. Run 4 was clean; runs 1, 2 and 5 added or dropped a fact, run 3 missed a pattern. Stopping at the first clean run would have shipped a box ticked on luck. The overlay under test was read in full every time, so the variance belonged to the pass itself, and it went to TD-274 rather than into the task being built.
+- seen: 2026-10-25 (SPRINT-140 T3, embedded runs b1–b6)
+- count: 1
+- promoted: no
+- related: TD-274 · L-248 (judge a transcript from its own events)
+
+---
+
+## L-251 [tags: process] [status: active]: **A static review cannot run the harnesses that read a shipped file, so search `evals/` for the touched path and run those before ticking.** SPRINT-140 T2 put "vague TODOs" into `review-scoping.md`'s new code-slop box. Two Codex rounds, a builder check and the per-task gates passed it. Only system verify at close ran `run-orchestrator-store-fixtures.ts`, whose text contract allows `TODO` in that file solely in the retired-layout rule: 326/1, one owner ruling and a second QA_FULL run. The reviewer-runs-the-pinning-tests rule covers a sub-agent reviewer; a static Codex pass reads text and runs nothing.
+- seen: 2026-10-25 (SPRINT-140 close, system verify 326/1 → 327/0)
+- count: 1
+- promoted: no
+- related: L-182 (verify against what was built, not the tooling's report) · L-117 (find what reads a block before changing it)
+
+---
+
 ## L-250 [tags: docs] [status: active]: **A catalog's examples must obey the rule the catalog teaches, or they teach the opposite.** SPRINT-139 T3's Indonesian catalog paired each slop pattern with a before → after example. Six "after" texts added facts their "before" never stated (query caching, Next.js cache layers, dashboard metrics), and one dropped a claim, while the skill's own step 6 forbids both. A model reading the catalog learns from the examples as much as from the rules. Codex caught it; the coordinator then found the same drop in ID-16 and in the exercise's first final ("sangkil" deleted rather than carried as *efficient*). Review the examples against the rule, one by one (facts before = facts after).
 - seen: 2026-10-25 (SPRINT-139 T3, Codex round 1 and the coordinator's re-read)
 - count: 1
@@ -125,8 +141,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-249 [tags: tooling] [status: active]: **A headless exercise writes only in a trusted folder, and never into a plugin manifest.** In SPRINT-139 every `claude -p` run in an untrusted folder (the scratchpad, a fresh `D:\lf-exercise\` clone) was denied every write as a "sensitive file", so a generated doc was printed and never saved. A git worktree inside an already-trusted repo inherits that trust (a probe write succeeded), and so did the owner's trusted research folder. Plugin manifests (`.*-plugin/*.json`) and the README footer were denied even in a trusted worktree, so a headless release-patch cannot bump. Separately, a working directory given as a Windows 8.3 short path (`HYPEAM~1`) did not match the long path of the write, which looked like the same denial. Pick the exercise folder for trust first, and do manifest edits in the attended session.
-- seen: 2026-10-25 (SPRINT-139 T5, T6, T8 exercises)
-- count: 1
+- seen: 2026-10-25 (SPRINT-139 T5, T6, T8 exercises) · 2026-10-25 (SPRINT-140 T6: `--plugin-dir`/`--add-dir` given the anti-slop clone as the 8.3 short path `HYPEAM~1`; its skill files could not be read, so the review fell back to the floor; the long path loaded it)
+- count: 2
 - promoted: no
 - related: L-241 (prove plugin behaviour from a separate headless process)
 
