@@ -63,6 +63,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ❌ Evaluating a change only against lean-flow's **own dogfooding**, never the **consumer who installs it** — every change checks its consumer-facing surface (skills self-contained **and** adaptable · README/CHANGELOG reflect user-visible changes · no repo-specific path — `scripts/…`, `docs/knowledge-index.md` — leaked into a generic skill/template). We repeatedly shipped maintainer-correct-but-consumer-leaky changes (SPRINT-014 → L-015). **Corollary (L-016):** when the repo *can't* dogfood a feature — its substrate is absent (a markdown repo has no testable code, so `/tdd` never fires) — verify on the **consumer path** (trace the consumer scenario / exercise the mechanism), never read "didn't fire in our repo" as either broken *or* fine.
 
+❌ Proving "without the plugin" from a **sub-agent** — it inherits the host session's plugins and CLAUDE.md, so it can never be the agent with no lean-flow installed. Run the proof as a separate headless process (`claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, stdin redirected from `/dev/null`, in a trusted folder outside `~/.claude/`) and judge it from that run's own `system/init` event, not from the agent's report (L-241 ×2).
+
 ### wiring
 
 - **wiring → moved: docs/LEARNINGS.md` § Durable rules › wiring** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: L-020
@@ -136,18 +138,18 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
-## L-241 [tags: process] [status: active]: **"Without the plugin" cannot be tested from a sub-agent. Use a separate headless process, and prove it from the run's own init event.** A sub-agent inherits the host session's plugins and the working repository's CLAUDE.md, so it can never be the "agent with no lean-flow installed" that EPIC-007's consumer-path condition asks for. SPRINT-132 T3 used `claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, which skips the user settings that enable plugins. Its `system/init` event listed only the three built-in plugins and `skills: []`: a mechanical proof, not the agent's own report. Two traps cost a run. A scratch repository under `~/.claude/` makes every edit fail as "a sensitive file", so put it in the system temp directory. And a run that is not given stdin waits 3 s and warns, so redirect `< /dev/null`.
+## L-241 [tags: process] [status: promoted]: **"Without the plugin" cannot be tested from a sub-agent. Use a separate headless process, and prove it from the run's own init event.** A sub-agent inherits the host session's plugins and the working repository's CLAUDE.md, so it can never be the "agent with no lean-flow installed" that EPIC-007's consumer-path condition asks for. SPRINT-132 T3 used `claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, which skips the user settings that enable plugins. Its `system/init` event listed only the three built-in plugins and `skills: []`: a mechanical proof, not the agent's own report. Two traps cost a run. A scratch repository under `~/.claude/` makes every edit fail as "a sensitive file", so put it in the system temp directory. And a run that is not given stdin waits 3 s and warns, so redirect `< /dev/null`.
 - seen: 2026-10-20 (SPRINT-132 T3, runs 1–3) · 2026-10-25 (SPRINT-139 T5–T8: every embedded, inline and consumer exercise ran as a separate headless process and was judged from its own transcript; held)
 - count: 2
-- promoted: no
+- **L-241 → promoted: `docs/LEARNINGS.md` § Durable rules › consumer-side** · disposition: move-to-reference — a "without the plugin" proof runs as a separate headless process and is judged from its own `system/init` event.
 - related: L-239 (the working directory decides what a reviewer can read) · L-016 (the consumer path)
 
 ---
 
-## L-240 [tags: process] [status: active]: **A Layers token declared for an undecided G2 choice must be pruned once G2 rules, or system verify fails at close.** SPRINT-132 T1 declared both candidate trees (`packs/` and `spec/packs/`) so that whichever placement G2 ruled would already be in its Layers. G2 ruled `packs/`; the unused token stayed in the frozen Plan, and the `layers observed` leg failed it at close (`layers-token-matches-nothing`), costing a ruling, a scope-change and a second QA_FULL run. When G2 rules between declared candidates, log the scope-change that drops the losers in the same G2 entry. This is the second close in a row that failed on the coordinator's own bookkeeping rather than on content (L-238).
+## L-240 [tags: process] [status: promoted]: **A Layers token declared for an undecided G2 choice must be pruned once G2 rules, or system verify fails at close.** SPRINT-132 T1 declared both candidate trees (`packs/` and `spec/packs/`) so that whichever placement G2 ruled would already be in its Layers. G2 ruled `packs/`; the unused token stayed in the frozen Plan, and the `layers observed` leg failed it at close (`layers-token-matches-nothing`), costing a ruling, a scope-change and a second QA_FULL run. When G2 rules between declared candidates, log the scope-change that drops the losers in the same G2 entry. This is the second close in a row that failed on the coordinator's own bookkeeping rather than on content (L-238).
 - seen: 2026-10-20 (SPRINT-132 close, system verify 303/1 → 304/0) · 2026-10-25 (SPRINT-139 close: T4's conditional `references/translate.md` token, never created, reddened system verify 317/3)
 - count: 2
-- promoted: no
+- **L-240 → promoted: `skills/orchestrator/references/builder-check.md` § Two rules for the design itself** · disposition: move-to-reference — the G2 entry that rules between declared `Layers:` candidates also logs the scope-change dropping the losers.
 - related: L-238 (commit-subject attribution)
 
 ---
@@ -165,10 +167,10 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
-## L-237 [tags: process] [status: active]: **A G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.** SPRINT-130 T1: the Done-when said the declared command must be the segment's TRAILING argument list; the coordinator's G2 text said "ending the segment or followed by a space", the owner signed it, and the builder implemented the looser reading — an interior run counted as invoking the gate. Only the review, briefed with the Done-when as its Spec comparand, caught it. The frozen text governs; a design paraphrase of a criterion is a second copy that can drift from it in the same hour.
+## L-237 [tags: process] [status: promoted]: **A G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.** SPRINT-130 T1: the Done-when said the declared command must be the segment's TRAILING argument list; the coordinator's G2 text said "ending the segment or followed by a space", the owner signed it, and the builder implemented the looser reading — an interior run counted as invoking the gate. Only the review, briefed with the Done-when as its Spec comparand, caught it. The frozen text governs; a design paraphrase of a criterion is a second copy that can drift from it in the same hour.
 - seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry) · 2026-10-25 (SPRINT-139 T5: the G2 design read the Indonesian catalog only for Indonesian text, the frozen Done when said both catalogs, the builder followed the design, and only the exercise caught it)
 - count: 2
-- promoted: no
+- **L-237 → promoted: `skills/orchestrator/references/builder-check.md` § Two rules for the design itself** · disposition: move-to-reference — a design quotes a frozen Done-when verbatim where it relies on it.
 - related: L-122 (the comparand-briefed reviewer catches what the builder carried) · L-088 (do not reinterpret a frozen DoD)
 
 ---

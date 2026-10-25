@@ -14,6 +14,21 @@ status: current
 
 ---
 
+## [Unreleased]
+
+**Consumer-facing** (shipped procedure; every repo that installs lean-flow gets these):
+
+- **The G2 builder check now carries two rules for whoever writes the design.** The design quotes a frozen Done-when
+  verbatim instead of paraphrasing it, and when G2 rules between `Layers:` candidates declared in advance, the same G2 log
+  entry records the scope-change that drops the losing tokens.
+
+**Maintainer-side**:
+
+- The consumer-side durable rules now say a "without the plugin" proof runs as a separate headless process and is judged
+  from its own `system/init` event, never from a sub-agent (L-241).
+
+---
+
 ## v2.15.0 — `/humanizer`: AI-sounding prose rewritten to read human, in English and Indonesian, on every writing job (2026-10-25)
 
 **MINOR** — ships SPRINT-139 (Humanize Every Writing Job): one new skill, `/humanizer` (roster 14 → 15), wired into

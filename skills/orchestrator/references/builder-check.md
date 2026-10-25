@@ -26,6 +26,16 @@ what they meant. A reader who cannot ask the author has only the text.
 
 "Nothing important left" is a result, not a skipped step: record it the same way.
 
+## Two rules for the design itself
+
+These bind whoever writes the G2 design, whether or not a fresh reader runs.
+
+- **Quote a frozen Done-when, never paraphrase it.** Where the design relies on a criterion, it copies the criterion
+  verbatim. A paraphrase is a second copy that can loosen the criterion, and the builder follows the design (L-237).
+- **Log the `Layers:` pruning in the G2 entry.** When G2 rules between `Layers:` candidates declared in advance, the same
+  G2 log entry carries the `scope-change` that drops the losing tokens. An unused token fails `layers observed` at close
+  (L-240).
+
 ## The reader prompt
 
 ```text
