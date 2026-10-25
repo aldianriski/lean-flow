@@ -22,11 +22,11 @@ and the tool-grant table has no `humanizer` row. `check-count-claims.sh` reads C
 SECURITY.md, so the claim drifted with nothing to catch it (the L-210 family: a claim nothing re-derives).
 
 ## Done when
-- [ ] SECURITY.md states the current skill count and its grant table has a row for every skill, `humanizer` included, with its
+- [x] SECURITY.md states the current skill count and its grant table has a row for every skill, `humanizer` included, with its ✓ f8b28689: "Of the 15"; 15 skills across 3 rows re-derived from each `allowed-tools:` (triage moved to scoped)
       real `allowed-tools`.
-- [ ] Either `check-count-claims.sh` reads SECURITY.md's count (with a retained must-FAIL fixture), or the count is removed in
+- [x] Either `check-count-claims.sh` reads SECURITY.md's count (with a retained must-FAIL fixture), or the count is removed in ✓ f8b28689: checker route; fixture `security-drift`; choice + reason in the checker comment and CHANGELOG [Unreleased]
       favour of a pointer to the roster; the choice and its reason are recorded.
-- [ ] Exercised: the chosen route fails on a seeded wrong count and passes on the real file.
+- [x] Exercised: the chosen route fails on a seeded wrong count and passes on the real file. ✓ seeded copy `FAIL  skills: SECURITY.md claims 14 != disk 15` (exit 1); real repo `PASS ... 15 = disk 15`; harness all green
 
 ## Assumes
 - Extending a checker is governance machinery (ADR-053); its reason here is a measured defect (the drift above).

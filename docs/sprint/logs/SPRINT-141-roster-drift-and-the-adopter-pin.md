@@ -88,3 +88,15 @@ TASK-489 gains a `## Decision` section (outside `## Done when`) recording R3: bu
 bump whose `leanflowVersion` reads 2.16.0, and the owner's note in workdoo's SPRINT-013 log. Owner action: bump the
 plugin dir and `LEANFLOW_PLUGIN_VERSION_PIN` on the VPS, then trigger or wait for one run.
 consequence · T3 · behaviour:low · governance:low
+
+### 2026-10-25 | progress | T2 done: SECURITY.md's roster made current and its count checked (TASK-509)
+Dispatched to a Sonnet builder with `/tdd`, fixture first. RED: the new `security-drift` case (SECURITY.md "Of the 99", two
+stub skills) failed against the unchanged checker, which exited 0 because every claim skipped. GREEN: one
+`check_claim "skills" … SECURITY.md 'Of the ([0-9]+)'` line, and the harness went all green over 5 cases. `f8b28689`
+also fixes the grant table, re-derived from all 15 `allowed-tools:` lines: `humanizer` joins the no-shell row and `triage`
+moves to scoped `Bash(git *)`. The route and its reason are in the checker comment and the CHANGELOG `[Unreleased]` bullet
+(box 2). The coordinator re-ran every check rather than trusting the report: harness `COUNT-CLAIMS FIXTURES: all green`;
+real repo `PASS  skills: SECURITY.md claims 15 = disk 15`; a seeded temp copy `FAIL  skills: SECURITY.md claims 14 != disk
+15` (exit 1); `PASS  cap SECURITY.md (72 <= 80)`. Other G per D3: must-FAIL fixture plus one real-artifact run, so
+self-review only (a maintainer-only check; no shipped skill or template names it).
+consequence · T2 · behaviour:low · governance:low
