@@ -20,7 +20,7 @@ density). An isolated route is a vacuum where every variant looks fine.
 ## Process
 
 1. **State the question and pick N** — default **3** variants; cap at 5 (more stops being radically different). One-line plan at the top: *"Three variants of /settings, switchable via `?variant=`, on the existing route."*
-2. **Generate radically different variants** — each held to the page's purpose + data and the project's component library. Export clear names (`VariantA`, …). They must be **structurally** different — different layout, hierarchy, primary affordance — not different colours. Two similar drafts → redo one with "do not reuse that layout".
+2. **Generate radically different variants** — each held to the page's purpose + data and the project's component library. Export clear names (`VariantA`…). They must be **structurally** different — different layout, hierarchy, primary affordance — not different colours. Two similar drafts → redo one with "do not reuse that layout". Variants use real data or honest placeholders (§ Anti-patterns).
 3. **Wire them** — one switcher on the route: `variant = searchParams.get('variant') ?? 'A'`, render the matching component + `<PrototypeSwitcher>`. Sub-shape A keeps existing data fetching above the switcher; only the subtree changes.
 4. **Floating switcher** — fixed bottom-centre bar: left arrow (prev, wraps) · variant label (`B — Sidebar layout`) · right arrow (next). Clicking updates the URL param via the framework router (shareable, reload-stable); `←`/`→` keys also cycle (not when an input/textarea/contenteditable is focused). Visually distinct from the page. **Hidden in production** (`NODE_ENV !== 'production'`) so a stray merge can't ship it. One shared component for both sub-shapes.
 5. **Hand it over** — surface the URL + the `?variant=` keys. The gold feedback is usually "I want the header from B with the sidebar from C" — that's the real design.
@@ -28,7 +28,8 @@ density). An isolated route is a vacuum where every variant looks fine.
 
 ## Anti-patterns
 
-- **Variants differing only in colour/copy** — that's a tweak; real variants disagree about structure.
+- **Variants differing only in colour/copy** — that's a tweak; real variants disagree about structure. Defaulting to the sidebar + stat-card row + chart + table dashboard shell or the hero + feature-card grid landing page does not establish a distinct variant; either layout is allowed when justified by the page's purpose and data, provided variants still differ structurally.
+- **Invented content** — no invented statistics, deltas, people, testimonials or activity feeds. A factual claim or data value with no real source shows the literal token `[REAL DATA]` or stays empty; static UI copy is allowed when it makes no unsupported factual claims; filler fields say what goes there (`Your Name`), never plausible fakes (`John Doe`, `jane@acme.com`).
 - **Sharing too much** — a shared `<Header>` is fine; a shared `<Layout>` defeats the point.
 - **Wiring variants to real mutations** — read-only, or point at a stub. The question is "what should this look like", not "does the backend work".
 - **Promoting the prototype to production as-is** — it was written under prototype constraints (no tests, minimal error handling). Rewrite it properly when folding in.

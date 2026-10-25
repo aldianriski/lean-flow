@@ -32,6 +32,8 @@ status: current
 - **A change to rendered UI now gets a review floor.** The reviewer clicks every changed control, checks the empty, loading and error states,
   keyboard reach, the narrowest supported width and computed contrast, and records each result. When an `antislop` or `anti-slop` skill is
   available in the session and loads successfully, its Delivery Gate runs instead; otherwise the floor applies.
+- **`/prototype` UI variants now use real data or a visible `[REAL DATA]` placeholder instead of invented numbers and people.**
+  Stock dashboard and landing-page shells alone do not establish structurally distinct variants.
 
 **Maintainer-side**:
 
