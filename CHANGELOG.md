@@ -29,6 +29,9 @@ status: current
   only when you ask for an audit. Everything you do not pick stays exactly as written.
 - **`/humanizer` now counts the dashes, bold labels and curly quotes before and after a rewrite and reports both numbers.**
   If your writing sample uses them, it keeps them at about your rate instead of driving them to zero.
+- **A change to rendered UI now gets a review floor.** The reviewer clicks every changed control, checks the empty, loading and error states,
+  keyboard reach, the narrowest supported width and computed contrast, and records each result. When an `antislop` or `anti-slop` skill is
+  available in the session and loads successfully, its Delivery Gate runs instead; otherwise the floor applies.
 
 **Maintainer-side**:
 

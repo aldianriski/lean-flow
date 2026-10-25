@@ -125,6 +125,7 @@ Don't fire every pass on every change. Decide per diff:
 | behaviour unchanged (rename / pure refactor / comment) | skip `/verify` |
 | files already read this session | skip `Explore` recon — context is already loaded |
 | small / medium diff | **one** scoped `sonnet` reviewer — not `/code-review`'s fan-out (§ Scale depth) |
+| rendered-UI behaviour change | `/run` + `/verify` with § UI floor |
 
 ### Two dimensions — why the first row is not `docs / config / trivial`
 
@@ -204,13 +205,34 @@ shrink the built-in command's internal fan-out — so the lever is reserving it 
 ## When a pass does fire
 
 - **Code review** — small/medium → one scoped `sonnet` reviewer · large/high-risk → **`/code-review`** (fan-out).
-- **Real behaviour change → `/run`** to drive the app + **`/verify`** it does what the goal stated.
+- **Real behaviour change → `/run`** to drive the app + **`/verify`** it does what the goal stated; a rendered-UI change adds § UI floor.
 - **Cleanup → `/simplify`** — reuse / simplification / efficiency (pairs with `/refactor-advisor`).
 - **Auth / input / secrets / data exposure → `/security-review`** as its own pass.
 - **Bug suspected →** `/diagnose`.
 
 Dispatch the mechanical passes on a cheap tier (`sonnet`) per the tier map (`.claude/CONTEXT.md`); the
 *judgment* on the findings stays on the session model.
+
+## UI floor
+
+Fires on a behaviour change to rendered UI: a subset of the material class in § Two dimensions, chosen by what the
+change does to what a person sees or operates, never by file extension or path. It adds five checks to `/run` + `/verify`,
+and each one is recorded as evidence:
+
+- Click-through: every changed control, written as control → what happened, with the console clean.
+- States: empty, loading and error each exist, and each says what to do next.
+- Keyboard: every control reachable with a visible focus indicator; Escape closes dialogs.
+- Width: no horizontal overflow at the narrowest supported width.
+- Contrast: computed with the WCAG 2.x relative-luminance formula against AA (4.5:1 normal text; 3:1 large text and UI boundaries), never judged by eye.
+
+A PASS with no record is not a PASS. A deliverable that cannot run ends as `UNVERIFIED (cannot run): <reason>`, never PASS,
+and is checked by code inspection as far as that goes.
+
+**Deferral.** When the session's skill listing holds a skill whose name, after any `<plugin>:` prefix, is `antislop` or
+`anti-slop`, run that skill's Delivery Gate on the diff as a PASS/FAIL report (choose "after", so nothing is written into the
+repo under review) and attach that report instead of the five checks. Its first block covers all five, so deferring never
+lowers the floor. If the matched skill cannot be loaded, record the reason and apply the five floor checks instead.
+Without such a skill the floor applies and nothing errors.
 
 ## Adversarial floor — 0 findings ⇒ re-run
 
