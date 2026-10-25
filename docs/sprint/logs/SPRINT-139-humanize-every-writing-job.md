@@ -429,3 +429,8 @@ What broke: system verify's layers-observed leg. T4's `Layers:` named `skills/hu
 left uncreated because SKILL.md stayed far under its cap; the token is pruned. T6 (TASK-494) and T7 (TASK-495) each edited
 the `/humanizer` row in `.claude/CONTEXT.md` (the wiring list); `.claude/CONTEXT.md` is added to both. Impact: Plan
 `Layers:` lines only; no Done when changes.
+
+### 2026-10-25 | gate | system verify PASS 319/0 on the second run (VPS, `4a830318`, via `scripts/gate-remote.ts`)
+`gate-remote: ran 4a830318…`, `remote rc: 0`, `QA-CHECK: 319 pass, 0 fail`, exit 0, after the two dense-line splits and the
+T4/T6/T7 Layers correction. The first run was red (317/3), so this is a red-first-run close, the pattern T7 of SPRINT-138
+measured in 7 of the last 10.

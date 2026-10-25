@@ -71,6 +71,30 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 
 ---
 
+## L-250 [tags: docs] [status: active]: **A catalog's examples must obey the rule the catalog teaches, or they teach the opposite.** SPRINT-139 T3's Indonesian catalog paired each slop pattern with a before → after example. Six "after" texts added facts their "before" never stated (query caching, Next.js cache layers, dashboard metrics), and one dropped a claim, while the skill's own step 6 forbids both. A model reading the catalog learns from the examples as much as from the rules. Codex caught it; the coordinator then found the same drop in ID-16 and in the exercise's first final ("sangkil" deleted rather than carried as *efficient*). Review the examples against the rule, one by one (facts before = facts after).
+- seen: 2026-10-25 (SPRINT-139 T3, Codex round 1 and the coordinator's re-read)
+- count: 1
+- promoted: no
+- related: L-237 (a design that paraphrases a frozen rule loosens it) · L-246
+
+---
+
+## L-249 [tags: tooling] [status: active]: **A headless exercise writes only in a trusted folder, and never into a plugin manifest.** In SPRINT-139 every `claude -p` run in an untrusted folder (the scratchpad, a fresh `D:\lf-exercise\` clone) was denied every write as a "sensitive file", so a generated doc was printed and never saved. A git worktree inside an already-trusted repo inherits that trust (a probe write succeeded), and so did the owner's trusted research folder. Plugin manifests (`.*-plugin/*.json`) and the README footer were denied even in a trusted worktree, so a headless release-patch cannot bump. Separately, a working directory given as a Windows 8.3 short path (`HYPEAM~1`) did not match the long path of the write, which looked like the same denial. Pick the exercise folder for trust first, and do manifest edits in the attended session.
+- seen: 2026-10-25 (SPRINT-139 T5, T6, T8 exercises)
+- count: 1
+- promoted: no
+- related: L-241 (prove plugin behaviour from a separate headless process)
+
+---
+
+## L-248 [tags: tooling] [status: active]: **A transcript search counts the tool results inside it, so a grep for the expected output also matches the instruction that prescribes it.** In SPRINT-139 T5 the coordinator grepped an inline run's transcript for `humanizer: ran inline (no sub-agent available)` and reported that the notice printed. The only match was inside the Read result of `embedded.md`, the contract that tells the caller to print it; that run never printed it. A fixed parser matched only the session's own text events and the final result, and it proved the opposite. Validate a transcript query on a run where the answer is known both ways before acting on it.
+- seen: 2026-10-25 (SPRINT-139 T5 inline exercise, run 1; corrected on the record)
+- count: 1
+- promoted: no
+- related: L-246 (a check that proves the wrong thing) · L-224
+
+---
+
 ## L-247 [tags: edit-safety] [status: promoted]: **A read-only agent brief must name secret files as off-limits: "read-only" was read as "may read anything", and two agents opened `.env` files.** SPRINT-138's recon agent opened lean-flow's root `.env` to report its keys (it recorded no values), and T7's research builder opened workdoo's `.env` to read a version pin. Both briefs said read-only and neither forbade secret files; the pin was available from a host record by another route. Briefs from then on said "never its `.env` or any secret file", and no further opening occurred.
 - **L-247 → promoted: the brief sites of `skills/orchestrator/references/dispatch.md` (builder brief · worktree protocol), `review-scoping.md` (reviewer brief) and `builder-check.md` (reader prompt), `skills/task-decomposer/SKILL.md` (the `Explore` recon clause), and `skills/council/references/prompts.md` (research · advisor · reviewer · chairman · fact-check)** · disposition: move-to-reference — each names secret files off-limits in host-generic words. Count 2: SPRINT-138 intake recon · SPRINT-138 T7 build (TASK-497, SPRINT-139). Related: L-239 · TD-270.
 
@@ -113,16 +137,16 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ---
 
 ## L-241 [tags: process] [status: active]: **"Without the plugin" cannot be tested from a sub-agent. Use a separate headless process, and prove it from the run's own init event.** A sub-agent inherits the host session's plugins and the working repository's CLAUDE.md, so it can never be the "agent with no lean-flow installed" that EPIC-007's consumer-path condition asks for. SPRINT-132 T3 used `claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, which skips the user settings that enable plugins. Its `system/init` event listed only the three built-in plugins and `skills: []`: a mechanical proof, not the agent's own report. Two traps cost a run. A scratch repository under `~/.claude/` makes every edit fail as "a sensitive file", so put it in the system temp directory. And a run that is not given stdin waits 3 s and warns, so redirect `< /dev/null`.
-- seen: 2026-10-20 (SPRINT-132 T3, runs 1–3)
-- count: 1
+- seen: 2026-10-20 (SPRINT-132 T3, runs 1–3) · 2026-10-25 (SPRINT-139 T5–T8: every embedded, inline and consumer exercise ran as a separate headless process and was judged from its own transcript; held)
+- count: 2
 - promoted: no
 - related: L-239 (the working directory decides what a reviewer can read) · L-016 (the consumer path)
 
 ---
 
 ## L-240 [tags: process] [status: active]: **A Layers token declared for an undecided G2 choice must be pruned once G2 rules, or system verify fails at close.** SPRINT-132 T1 declared both candidate trees (`packs/` and `spec/packs/`) so that whichever placement G2 ruled would already be in its Layers. G2 ruled `packs/`; the unused token stayed in the frozen Plan, and the `layers observed` leg failed it at close (`layers-token-matches-nothing`), costing a ruling, a scope-change and a second QA_FULL run. When G2 rules between declared candidates, log the scope-change that drops the losers in the same G2 entry. This is the second close in a row that failed on the coordinator's own bookkeeping rather than on content (L-238).
-- seen: 2026-10-20 (SPRINT-132 close, system verify 303/1 → 304/0)
-- count: 1
+- seen: 2026-10-20 (SPRINT-132 close, system verify 303/1 → 304/0) · 2026-10-25 (SPRINT-139 close: T4's conditional `references/translate.md` token, never created, reddened system verify 317/3)
+- count: 2
 - promoted: no
 - related: L-238 (commit-subject attribution)
 
@@ -142,8 +166,8 @@ the always-loaded file keeps the rule's force in one line, this on-demand sectio
 ---
 
 ## L-237 [tags: process] [status: active]: **A G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.** SPRINT-130 T1: the Done-when said the declared command must be the segment's TRAILING argument list; the coordinator's G2 text said "ending the segment or followed by a space", the owner signed it, and the builder implemented the looser reading — an interior run counted as invoking the gate. Only the review, briefed with the Done-when as its Spec comparand, caught it. The frozen text governs; a design paraphrase of a criterion is a second copy that can drift from it in the same hour.
-- seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry)
-- count: 1
+- seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry) · 2026-10-25 (SPRINT-139 T5: the G2 design read the Indonesian catalog only for Indonesian text, the frozen Done when said both catalogs, the builder followed the design, and only the exercise caught it)
+- count: 2
 - promoted: no
 - related: L-122 (the comparand-briefed reviewer catches what the builder carried) · L-088 (do not reinterpret a frozen DoD)
 

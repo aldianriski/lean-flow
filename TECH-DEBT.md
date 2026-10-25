@@ -391,6 +391,14 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-272** severity: low | status: open | created: Sprint-139 (T7 scope-change; worked around in T7 `Cites:`)
+  - Summary: **`check-sprint-by-reference.ts --scope-change` misses a multi-segment path suffix.** `declares()` matches a bare
+    file name by basename, but a token containing `/` must equal a declared path exactly. So a scope-change entry naming
+    `references/dispatch.md` was reported as `scope-change-outside-layers`, although T7's `Layers:` declared
+    `skills/orchestrator/references/dispatch.md`. SPRINT-139 added the short token to T7's `Cites:` to clear the leg.
+  - Fix direction: match a multi-segment token as a path suffix of a declared path, on a `/` boundary, with a fixture where the
+    suffix passes and a non-suffix still fails. Maintainer-only check (Other G).
+
 - **TD-271** severity: low | status: open | created: Sprint-138 (T3 consumer reading on workdoo)
   - Summary: **`dispatch.md` § System verify's rung 1 does not rank `test` · `check` · `verify`.** It says "a `test` / `check` /
     `verify` script … stop at the first hit", and an adopter with both `test` (`bun test`, unit only) and `verify` (its real
