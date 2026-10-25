@@ -9,8 +9,7 @@ class: decision
 tier: P
 authority: J2
 origin: close-retro
-state: ready
-sprint: SPRINT-141
+state: blocked
 depends-on: []
 ---
 
@@ -36,6 +35,9 @@ cannot be measured. The research ruled to resolve this through the existing task
 plugin dir and `LEANFLOW_PLUGIN_VERSION_PIN` on the VPS that runs workdoo, and notes the bump in workdoo's active sprint
 log (SPRINT-013). The evidence for the second box is a workdoo run record made after the bump whose `leanflowVersion`
 reads 2.16.0, read through a non-secret route or pasted by the owner. The third box does not apply.
+
+**Blocked** (SPRINT-141 scope-change, 2026-10-25): the bump had not happened when SPRINT-141 closed. Unblock when the
+bump is done and a workdoo run record shows `leanflowVersion` 2.16.0; then tick the second box and move this to `done/`.
 
 ## Touches
 workdoo's lean-flow pin (in workdoo; owner-run) · this task file · `docs/research/learning-loop-architecture.md` (only on decline)

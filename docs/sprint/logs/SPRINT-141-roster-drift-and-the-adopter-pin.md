@@ -108,3 +108,13 @@ shows `leanflowVersion` 2.16.0, and the owner's note in workdoo's SPRINT-013 log
 is done and a run has completed, then the coordinator reads that run record through a non-secret route (or the owner pastes
 it), ticks box 2 and moves TASK-489 to `done/`. Then system verify and `/lean-doc-generator close`.
 run · 6 of 7 DoD ticked · terminal: AUTHORITY_BOUNDARY (T3 box 2 is owner-reserved, J2)
+
+### 2026-10-25 | scope-change | TASK-489 (T3) scoped out to the backlog as blocked, so SPRINT-141 can close with T1 and T2
+What broke: T3's box 2 needs the owner's bump of workdoo to 2.16.0 and a post-bump workdoo run record, and the bump has not
+happened yet. A coordinator probe of the VPS (read-only, the workdoo user's installed plugin version) was denied by the
+auto-mode classifier as a production read and was not retried. Owner ruling by popup: scope T3 out rather than hold the
+sprint open. Impact: TASK-489 leaves `## Members`, its `sprint:` stamp is cleared, and it returns to `docs/work/backlog/` as
+`state: blocked`. Its `## Decision` (bump to 2.16.0) and its ticked boxes 1 and 3 stay on the file. Unblock condition: the
+bump is done and a workdoo run record shows `leanflowVersion` 2.16.0. Nothing about T1 or T2 changes. Edit: T3's `Layers:`
+swaps the `done/` token, which would now match nothing (L-240), for the `backlog/` path the move writes. Re-confirm G2: not
+needed; nothing is built.

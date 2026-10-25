@@ -28,7 +28,6 @@ owner's act in that repo).
 
 - docs/work/todo/TASK-510-delete-spent-claude-md-prose-density-row.md
 - docs/work/todo/TASK-509-fix-security-md-roster-drift.md
-- docs/work/todo/TASK-489-decide-workdoo-s-lean-flow-pin.md
 
 ## Plan
 
@@ -64,7 +63,7 @@ included, and the chosen route fails on a seeded wrong count and passes on the r
 ### T3 — Rule on workdoo's lean-flow pin `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `docs/work/todo/TASK-489-decide-workdoo-s-lean-flow-pin.md`
   · `docs/work/in_progress/TASK-489-decide-workdoo-s-lean-flow-pin.md`
-  · `docs/work/done/TASK-489-decide-workdoo-s-lean-flow-pin.md`
+  · `docs/work/backlog/TASK-489-decide-workdoo-s-lean-flow-pin.md`
 Depends-on: none
 Cites: `TASK-489` · research candidate C5 · L-247
 
