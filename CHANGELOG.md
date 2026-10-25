@@ -23,6 +23,8 @@ status: current
   entry records the scope-change that drops the losing tokens.
 - **Builders, reviewers and `/tdd` refactors now check for code slop.** The check uses the code-slop box in the self-review checklist.
   A comment pass changes comments only and never touches code.
+- **`/humanizer` catches five more patterns.** They are human verbs on abstractions, filler phrases, synonym cycling, empty
+  "from X to Y" ranges and clusters of scare quotes. They live in a lean-flow-owned file, so the vendored English catalog stays untouched.
 
 **Maintainer-side**:
 

@@ -10,7 +10,7 @@ version: "0.1.0"
 # humanizer
 
 Rewrite AI-sounding prose so it reads like a person wrote it. Keep what it says; make nothing up.
-The English pattern catalog (26 patterns, strongest first) lives in `references/patterns-en.md`.
+The English pattern catalog (26 patterns, strongest first) lives in `references/patterns-en.md`, plus a lean-flow overlay of five more in `references/patterns-lf.md`.
 Indonesian and mixed Indonesian-English text also uses `references/patterns-id.md` (slop patterns, term policy, italics rule).
 
 ## When to invoke
@@ -23,7 +23,7 @@ Not for: code, data, config or logs · writing something new from scratch · tex
 
 ## Procedure
 
-1. **Read the catalog in full.** Read `references/patterns-en.md` end to end (first line to last, no offset) before touching the
+1. **Read the catalog in full.** Read `references/patterns-en.md` end to end (first line to last, no offset), then `references/patterns-lf.md` the same way, before touching the
    text. If the text is Indonesian or mixed Indonesian-English (judge sentence by sentence), also
    read `references/patterns-id.md` end to end. No skimming and no working from memory; the pattern
    numbers, the "weak alone" marks and the "When not to act" list decide every edit.
@@ -65,10 +65,10 @@ to English", "terjemahkan ke bahasa Indonesia", "in English please", "to ID"). T
 modes never translate, even for mixed-language text; without such a request, clean in place.
 
 - Translate the meaning, then run the full clean pass (steps 2 to 7) in the **target** language with
-  its catalog. EN to ID: read both catalogs in full, use the English term from the term table (no
+  its catalog. EN to ID: read all three files (English catalog, overlay, Indonesian catalog) in full, use the English term from the term table (no
   KBBI coinage), italicize each foreign term at first use when the output is rendered Markdown, and
   check the result against the Indonesian slop list. ID to EN: check it against the English catalog
-  in full. Never add or drop a fact (step 6).
+  and the overlay in full. Never add or drop a fact (step 6).
 - Mixed text: translate only the spans not already in the target language. Text already fully in
   the target language gets a clean pass only; say no translation was needed.
 - Keep code blocks, inline code, commands, paths, YAML, data, link targets and proper names unchanged.
