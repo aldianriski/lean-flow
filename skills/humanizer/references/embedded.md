@@ -35,7 +35,7 @@ Callers that compose a commit message or PR body pass it through this contract t
 
 - **Format:** a commit message is `plain` (no italics, no Markdown); a PR body is `markdown` (first-use italics apply to Indonesian).
 - **Verbatim:** the subject's conventional prefix (`type(scope):`, `sprint(N):`, `backlog:`, `triage:` and the like), every trailer (`Co-Authored-By:`, `Signed-off-by:`), ids, shas and paths.
-- **Fixed templates skip:** a message with no free prose (a status move such as `move <id> todo -> in_progress`, a record-sha commit) is not passed. Anything with free prose passes, including a descriptive subject.
+- **Fixed templates skip:** judge the ENTIRE message, trailers aside. It skips only when every word belongs to a fixed template whose only substitutions are a prefix, ids, folder or state names, field names and shas, for example `<prefix> move <id> <from> -> <to>` or `<prefix> record <field> <sha>`. One added descriptive word (a parenthetical reason, a summary clause) makes it free prose, and it passes. When unsure, pass it.
 - **Failure:** commit the original message, print the failure line below, never block the commit.
 
 ## Failure rule
