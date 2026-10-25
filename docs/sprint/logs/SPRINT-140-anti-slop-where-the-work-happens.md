@@ -266,3 +266,11 @@ zero headroom per ADR-048); calibration-log Round 2. Count claims 3/3; prose-den
 baseline row reads "spent, delete it": to the next promote, the file was outside T9's Layers); `evals/doc-caps.test.ts` 63/0.
 One scoped Sonnet reviewer, bullet by bullet: no lost instruction, no lost signal. The owner read and accepted the file by popup.
 Box 5 (qa-check PASS on the VPS) is ticked after system verify at close.
+
+### 2026-10-25 | gate | system verify run 1 FAIL (326/1) at 821c6791; owner ruling R5: reword "TODO" to "to-do" in the code-slop box
+`gate-remote.ts` on the VPS (QA_FULL) against `821c6791`: `QA-CHECK: 326 pass, 1 fail`. The one FAIL: `run-orchestrator-store-fixtures.ts`,
+text contract "review-scoping.md mentions TODO only in the layout rule or a 'never' clause"; stray lines were T2's code-slop box
+("vague TODOs", "a stub or TODO control"). The contract exists because the v1 `TODO.md` layout is retired; none of T2's per-task
+checks ran this harness, so only the full gate saw it. Owner ruling by popup (R5): reword to "to-do" (same meaning, so TASK-499's
+frozen boxes still read true); a wider text contract was declined (it would be new governance machinery). The harness reads
+42 pass, 0 fail after the reword. System verify is re-run before close.
