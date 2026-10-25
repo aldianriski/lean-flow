@@ -376,3 +376,10 @@ consequence · T7 · behaviour:material · governance:high
 review · T7 · codex · behaviour:material · governance:high
 Box 4 ("one real orchestrator commit, one lean-doc-generator close commit, and one PR body show the pass") has E1 and E2; its
 close-commit leg is ticked at SPRINT-139's close, when that commit goes through the pass.
+
+### 2026-10-25 | scope-change | T8 (TASK-496): `Layers:` gain `.claude/CONTEXT.md`; the box-4 re-check found both humanizer rows stale
+What broke: box 4's re-check (three routes agree on 15 skills: disk, the CONTEXT roster rows, the README capability table)
+found the `/humanizer` rows written at T2 and not updated since. README's row names only the English catalog. CONTEXT's
+row lists the wiring but omits the Indonesian catalog and translate mode. README is in T8's `Layers:`; CONTEXT is not.
+Impact: `.claude/CONTEXT.md` added to T8's `Layers:`; both rows edited in place to name the Indonesian catalog,
+on-request EN↔ID translation and the embedded wiring (CONTEXT stays 149/150). The Done when is unchanged.
