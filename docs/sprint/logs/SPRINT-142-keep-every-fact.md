@@ -39,3 +39,25 @@ Intake: the owner asked what to tackle next to improve the plugin and picked TD-
 embedded child checks its own facts; the bar is 0 of 6 runs; one retained sample; L-234 goes to LEARNINGS edit-safety plus
 one template line. Filed as TASK-511 and TASK-512 in `76650898`. Size check: 1 M, 1 S, no `L`. Both are
 `origin: decomposer`. No epic.
+
+### 2026-10-25 | gate | G1 + G2 signed by the owner by popup; two builder checks settled; one owner ruling
+G1: both members are `origin: decomposer`; the owner confirmed scope unchanged since `approve` (fast-path). G2: `CHANGELOG.md`
+is the one shared file, owned T1 → T2 (D1); preflight CLEAR (T1=0, T2=1). Sequential in the main tree.
+Owner ruling:
+- **R1 (T2 baseline):** if the 3-run baseline on the new sample shows 0 of 3 losing a fact, the sample is strengthened once
+  (more of the fact kinds SPRINT-140 lost) under a scope-change and the baseline re-run, before any after-fix run. The
+  fixture is frozen from the first after-fix run on.
+Settled facts and design fixes (coordinator, from the builder checks):
+- T2 judging: each run is judged from its own `stream-json` transcript. A fresh judge compares the final with `facts.md`
+  (kept, dropped, added), and the coordinator confirms from the transcript that the final returns no fact list.
+- T2 wording: the new brief step reads "the pass (the child, or the caller in the inline fallback)", so the fallback
+  carries the same step.
+- T2 briefs: the before and after briefs are assembled from `embedded.md` at `plan_commit` and after the fix, identical
+  but for the new item; NOTES.md records both shas. `evals/fixtures/humanizer/` is new; NOTES.md follows the count-claims
+  fixtures.
+- T1: `## [Unreleased]` is the heading SPRINT-140 used (`c364ee22`). After T1, run the three sprint-log readers
+  (`run-sprint-log-layout-fixtures.sh` · `run-sprint-family-fixtures.sh` · `run-conformance-engine-fixtures.sh`, L-251).
+- Missed step, on the record: the owner's standing rule asks for a Codex review of intake drafts before `approve`; TASK-511
+  and TASK-512 were approved without one. Both still take the Codex loop on their diffs (D3).
+builder-check · T1 · 0 contradictions · 3 questions · settled from the repo (heading style, pointer clause left to the builder, sprint-log readers to run)
+builder-check · T2 · 3 contradictions · 4 questions · judging from the transcript, fallback wording, brief assembly fixed; baseline-0/3 by owner ruling R1
