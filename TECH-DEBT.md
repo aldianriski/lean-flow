@@ -939,39 +939,6 @@ status: current
     fixture that varies the **selection** and not only the verdict (L-186), since the bug class here
     is exactly a population/scope property.
 
-- **TD-163** severity: medium | status: resolved → TASK-478 (SPRINT-137 T1, `83882f79`): the epic index header now says a live row holds only status and a pointer, never member-sprint state; archived and moved-to-workdoo rows are frozen records; `update_trigger` unchanged (owner ruling) | created: Sprint-101
-  - Summary: **`docs/epic/INDEX.md`'s `update_trigger` cannot fire for the content its rows carry.**
-    The trigger reads *"An epic is opened, or closed and archived (STANDARD §11)"* — an epic-lifecycle
-    event. But each row's text carries **member-sprint** state, which changes far more often than the
-    epic does. The content has no trigger, so it drifts silently by construction. Filed at the
-    2026-09-16 post-close `/triage`.
-  - Evidence (both verified 2026-09-16, against the files as committed):
-
-    | Row claims | Actual |
-    |---|---|
-    | EPIC-015: **"`SPRINT-101` active** (promoted 2026-09-14)" | SPRINT-101 **closed** 2026-09-15 (`c8bc300`) and is archived |
-    | EPIC-015: **"4 of 8 § Closed-when ticked"** | **3 of 8** — `grep -c '^- \[x\]'` over the file |
-    | EPIC-014: "**SPRINT-083 promoted**" | five member sprints have closed since; the newest is SPRINT-092, 2026-08-31 |
-    | EPIC-016: "`SPRINT-002` **active**" | the epic file's own `member_sprints:` frontmatter says `SPRINT-002 (closed), SPRINT-003 (active)` |
-
-    The EPIC-016 row is the sharpest of the four: the index and the epic file disagree **inside this
-    repository**, so it needs no access to `workdoo` to be recognised as wrong — and neither figure is
-    reachable by any check, because nothing compares an index row against the file it indexes.
-
-  - **Why this is L-105's family, not a typo.** L-105 asks *when does a rule fire relative to the thing
-    it guards.* Here the answer is "never, for this content": the one event that would correct a member
-    -sprint figure — a member sprint closing — is **absent from the trigger**, so a correct close leaves
-    the index wrong and nothing anywhere notices. Three of the three sampled figures were stale, which
-    is the rate you expect when the refresh rate is zero rather than merely low.
-  - Impact: the index is the file a reader opens to decide **what to promote next**, so it is read at
-    exactly the moment its staleness is most expensive — and it reports epic progress *ahead* of
-    reality, which is the direction that under-states remaining work. This pass reached the right
-    answer only because the underlying epic files were re-counted rather than trusted.
-  - Fix direction (**not a ruling**): either add "a member sprint is promoted or closed" to the trigger
-    (cheap, but it is then a hand-maintained figure — LAW 3), or **derive** the per-epic tick count and
-    active-sprint pointer at `gen-index.sh` time from the epic files themselves, leaving the prose
-    rationale hand-written. The second is the shape the knowledge index already uses.
-
 - **TD-164** severity: medium | status: open | created: Sprint-101
   - Summary: **SPRINT-101's SIGNED `approval_envelope:` encodes a superseded reading of the rule it
     cites, and the record cannot be re-signed.** Its `design` dimension states *"the seeded Plan is
@@ -1431,37 +1398,6 @@ status: current
     costume, and every rule added to it will have its own counterexample.
   - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
     stops being load-bearing.
-
-
-- **TD-099** severity: medium | status: resolved → TASK-480 (SPRINT-137 T3, `7f56266e`): any `consequence ·` line whose key is not exactly one `T<digits>` FAILs `review-depth-consequence-vocab` naming the key, review or not; the 24 archived non-`Tn` records reconcile 24/24 | created: Sprint-087
-  - **Narrowed (SPRINT-136 promote re-review, 2026-10-22, owner-signed):** a `T<digits>` key with an out-of-vocabulary class now FAILs by name (`review-depth-consequence-vocab`, TASK-471). What stays open is a key that is not `T<digits>` (SPRINT-087's `pre-T1`), which is still skipped silently.
-  - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
-    it, so a `governance:high` declaration its parser cannot read passes GREEN.** The classification is
-    matched with an anchored full-line pattern — `^consequence · T[0-9]+ · behaviour:(low|material) ·
-    governance:(low|high)$`. Any task key that is not literally `T<digits>` fails to match and is
-    treated as though no classification were written at all.
-  - Evidence: SPRINT-087's Execution Log carries three gate entries. Two are keyed `pre-T1` — one of
-    them recording **`governance:high`** — and one is keyed `T4`. Only the `T4` line was seen: the gate
-    emitted `review-depth-governance-absent` for it. Verified empirically rather than read off the
-    regex: delete the `T4` line, leaving a file that still contains a `pre-T1 · governance:high` line,
-    and the checker reports **`PASS  review depth … (1 review record(s), 0 self-review examined)`**.
-  - Impact: **the failure direction is the bad one.** A well-formed key FAILs loudly and gets fixed; a
-    malformed key passes in silence and is never noticed. Which of the two a governance:high task gets
-    is decided by whether its key happens to match a regex — not by whether review was actually owed.
-    This is the guard's own subject matter: it exists so that "review was owed and silence is not a
-    clean record" cannot happen, and it has that exact hole one level in, in its own input.
-  - **This is L-148 verbatim, one layer up.** L-148 records a `Layers:` declaration promoted without
-    backticks that `check-layers-observed.sh` read as an *empty* set, passing green over every file the
-    sprint touched. Its stated prescription is that **a reader deriving an empty set from a non-empty
-    source must say so as a named finding rather than returning the empty set** — which is precisely
-    what this checker does not do. The lesson was recorded, promoted, and then reproduced in a
-    different guard.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): emit a named finding when a
-    line begins `consequence · ` but does not match the full pattern — *malformed*, distinct from
-    *absent* — rather than letting the anchored match fall through to silence. Consider the same
-    treatment for `^review · `. A retained fixture with a deliberately malformed key is the control.
-  - **Re-file fresh if** the consequence-line grammar changes — the finding is that malformed and
-    absent are indistinguishable to this reader, and any new grammar inherits that unless fixed.
 
 
 - **TD-094** severity: trivial | status: open | created: Sprint-085
