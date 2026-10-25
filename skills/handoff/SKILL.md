@@ -32,7 +32,8 @@ the repo or git status. Resolve temp per platform:
 
 Filename: `handoff-<short-slug>.md`. Emit the absolute path so the next session can read it.
 
-**Before saving**, pass the doc's prose through `/humanizer` embedded mode (the humanizer skill's `references/embedded.md`; format `markdown`; voice sample = the "What goes in" outline below, since no template file exists). Never changed: paths, commands, ids, the `handoff-path` line and the status fields. A failed pass saves the original text plus the contract's one-line notice; it never blocks the handoff.
+**Before saving**, pass the doc's prose through `/humanizer` embedded mode (the humanizer skill's `references/embedded.md`; format `markdown`; voice sample = the "What goes in" outline below, since no template file exists).
+Never changed: paths, commands, ids, the `handoff-path` line and the status fields. A failed pass saves the original text plus the contract's one-line notice; it never blocks the handoff.
 
 ## What goes in
 

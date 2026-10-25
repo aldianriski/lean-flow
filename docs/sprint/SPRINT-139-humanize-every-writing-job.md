@@ -83,12 +83,12 @@ The owner's native-speaker judgment is the deliverable: they approve the term ta
 **Acceptance:** an AI-drafted Indonesian text with galat-class terms comes back in dev code-mixed Indonesian.
 
 ### T4 — Add on-request EN↔ID translation `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `skills/humanizer/SKILL.md` · `skills/humanizer/references/translate.md` · `CHANGELOG.md`
+Layers: `skills/humanizer/SKILL.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-492-add-on-request-en-id-translate-mode.md`
   · `docs/work/in_progress/TASK-492-add-on-request-en-id-translate-mode.md`
   · `docs/work/done/TASK-492-add-on-request-en-id-translate-mode.md`
 Depends-on: T3
-Cites: `TASK-492`
+Cites: `TASK-492` · `skills/humanizer/references/translate.md` (conditional; not created, SKILL.md stayed under its cap)
 
 `skills/humanizer/references/translate.md` is written only if the cap needs it. Codex loop.
 
@@ -110,7 +110,7 @@ names are proposals; G2 may rename them.
 **Acceptance:** a real lean-doc-generator doc passes through humanizer by both paths and keeps template structure and house style.
 
 ### T6 — Wire release-patch CHANGELOG entries and handoff docs `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: `skills/release-patch/SKILL.md` · `skills/handoff/SKILL.md` · `CHANGELOG.md`
+Layers: `skills/release-patch/SKILL.md` · `skills/handoff/SKILL.md` · `.claude/CONTEXT.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-494-wire-humanizer-into-release-patch-and-handoff.md`
   · `docs/work/in_progress/TASK-494-wire-humanizer-into-release-patch-and-handoff.md`
   · `docs/work/done/TASK-494-wire-humanizer-into-release-patch-and-handoff.md`
@@ -123,7 +123,7 @@ Reuses T5's contract unchanged. Codex loop.
 
 ### T7 — Wire commit messages and PR bodies `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/lean-doc-generator/SKILL.md`
-  · `skills/diagnose/SKILL.md` · `skills/prototype/SKILL.md` · `skills/triage/SKILL.md` · `skills/humanizer/references/embedded.md` · `CHANGELOG.md`
+  · `skills/diagnose/SKILL.md` · `skills/prototype/SKILL.md` · `skills/triage/SKILL.md` · `skills/humanizer/references/embedded.md` · `.claude/CONTEXT.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
   · `docs/work/in_progress/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
   · `docs/work/done/TASK-495-wire-humanizer-into-commit-messages-and-pr-bodies.md`
