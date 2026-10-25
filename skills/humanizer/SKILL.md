@@ -46,18 +46,26 @@ Not for: code, data, config or logs · writing something new from scratch · tex
    only the dressing a pattern names (significance, sales language, a repeated closer, a chatbot
    wrapper) and keep the fact underneath. Search again for the tells that most often survive: contrasts,
    closers, triads, dashes, bold labels.
+   Then count four mechanical tells in the draft with Grep, as occurrences rather than lines: the em dash
+   `—`, a spaced double hyphen used as a dash (` -- `), bold-label list items (`- **Label:**`) and curly
+   quotes (“ ” ‘ ’). Subtract matches inside fenced code blocks and inline code. Write pasted text to a
+   uniquely named scratch file in the current working folder and remove it after counting. If Grep is
+   unavailable or the scratch write is denied, count by hand and say why Grep could not run.
+   A voice sample that uses one of these marks sets the target: about its rate per 100 words (the
+   catalog's § Voice). With no sample the catalog still drives the edits. Report the counts; apply a zero target only where the catalog requires it.
 7. **Write the final version.** Vary sentence length. If a sentence stays awkward, rewrite the
-   paragraph around its main point.
+   paragraph around its main point. Re-count the four tells in the final the same way; "before" is the
+   original text or file.
 8. **Return it** in the mode below.
 
 ## Modes
 
 **Pasted text (default).** Return three parts: the draft rewrite, a short list of the patterns
-that still remain in it, and the final rewrite.
+that still remain in it (with the before → after counts of the four tells beside it), and the final rewrite.
 
 **File.** When the user names a file, run the full process but write only the final text back to
 the file. Change prose only. Keep code blocks, inline code, commands, paths, YAML metadata, data
-and link targets unchanged. Then give the user a short summary of what changed. Do not print the
+and link targets unchanged. Then give the user a short summary of what changed, with the before → after counts of the four tells. Do not print the
 draft or the remaining-patterns list.
 
 **Audit (explicit request only).** Runs only when the user asks for it ("audit this", "list the AI

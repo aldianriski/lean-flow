@@ -27,6 +27,8 @@ status: current
   "from X to Y" ranges and clusters of scare quotes. They live in a lean-flow-owned file, so the vendored English catalog stays untouched.
 - **`/humanizer` can list its findings first, numbered and strongest first, and change only the ones you pick.** It runs
   only when you ask for an audit. Everything you do not pick stays exactly as written.
+- **`/humanizer` now counts the dashes, bold labels and curly quotes before and after a rewrite and reports both numbers.**
+  If your writing sample uses them, it keeps them at about your rate instead of driving them to zero.
 
 **Maintainer-side**:
 
