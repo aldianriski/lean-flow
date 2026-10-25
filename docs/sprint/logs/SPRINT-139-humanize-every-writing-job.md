@@ -288,3 +288,10 @@ Final runs, in `D:\lf-exercise\` at `a4bb81bb`, transcript-verified:
 The file write did not happen. Headless sessions in an untrusted folder deny every write as a "sensitive file", in the scratchpad
 and in `D:\lf-exercise\` alike. Owner ruling by popup: box 4 is ticked on the generated text; the real install-and-write proof is
 T8's. T8's headless consumer run will hit the same trust block, so it is raised at T8's start.
+
+### 2026-10-25 | progress | T5 (TASK-493) done: 6 of 6 boxes; Codex CLEAR at round 2
+consequence · T5 · behaviour:material · governance:high
+review · T5 · codex · behaviour:material · governance:high
+Codex round 1: NOT CLEAR on one ambiguity. The verbatim secret-files line says "report that and ask", but an embedded pass
+cannot ask, so two callers could diverge. Brief item 6 now says the pass never asks: an unavailable input returns
+`UNAVAILABLE: <reason>`, which the failure rule treats as a failure (`2eb4553c`). Round 2: CLEAR, no regressions.
