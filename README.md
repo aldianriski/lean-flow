@@ -201,7 +201,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |
 | **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
 | **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → a calibrated `verdict-<slug>.md` (pre-mortem · confidence+dissent · optional gated fact-verify) → feed an ADR (uses sub-agents) |
-| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) plus an Indonesian catalog (slop patterns, a term policy that keeps English where the KBBI coinage is uncommon); translates EN↔ID on explicit request; other skills call it in a child context for docs, CHANGELOG entries, handoffs, commits and PR bodies |
+| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) plus an Indonesian catalog (slop patterns, a term policy that keeps English where the KBBI coinage is uncommon) and a lean-flow overlay of five more patterns; on request it audits first (numbered findings, only the picked ones change) or translates EN↔ID; it reports before → after counts of dashes, bold labels and curly quotes; other skills call it in a child context for docs, CHANGELOG entries, handoffs, commits and PR bodies |
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
 promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates · modes →
@@ -482,7 +482,7 @@ skills/           15 skills — /flow conductor + 12 stages + /council + /humani
   refactor-advisor/references/ deepening.md
   prototype/references/       logic.md · ui.md
   council/                    opt-in agent decision aid
-  humanizer/references/       patterns-en.md (vendored from blader/humanizer, MIT)
+  humanizer/references/       patterns-en.md (vendored from blader/humanizer, MIT) · patterns-lf.md (lean-flow overlay) · patterns-id.md
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
 docs/             architecture/ · development/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
 
@@ -545,7 +545,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-10-25 · status: current · v2.15.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-10-25 · status: current · v2.16.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge
