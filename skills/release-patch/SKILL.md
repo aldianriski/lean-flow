@@ -42,7 +42,7 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 2. **Mode detect** — run the cascade; save the mode + manifest path(s). No manifest → **changelog-only mode** (below); do not exit.
 3. **PATCH bump** — increment the patch digit per mode. Plugin: derive the lockstep set, verify every file agrees, then bump all together. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
 3b. **Sibling references** — `git grep -nF '<old>'` (tracked text files); list the hits and bump every one that states the **current** version and that the project lints or displays (README footer/badge, a sibling manifest). Never CHANGELOG history, never another project's version. Report each in `[siblings]`.
-4. **CHANGELOG entry** — detect root `CHANGELOG.md` (canonical placement, STANDARD §2, ADR-012), else legacy `docs/CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` (default root `CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
+4. **CHANGELOG entry** — detect root `CHANGELOG.md` (canonical placement, STANDARD §2, ADR-012), else legacy `docs/CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` (default root `CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format. **Then pass the entry's prose through `/humanizer` embedded mode** (humanizer skill's `references/embedded.md`; format `markdown`; voice sample = the file's latest existing entry) — never changed: version strings and lines, headings, `[bump]` / version-label lines, the entry's structure. A failed pass writes the original entry plus the contract's one-line notice; it never blocks the release.
 5. **Stale-doc clear** — any doc with `last_updated:` frontmatter that appears in the diff → bump it to today (`yyyy-MM-dd`).
 6. **HARD STOP — push gate** — emit the message below and exit (if `docs/deployment/deployment-guide.md` exists — legacy `docs/DEPLOY.md` still matched — point to it for the push / deploy / verify / rollback steps). **This skill never invokes `git push`.**
 
@@ -75,7 +75,7 @@ When the cascade finds **no version manifest**, there is nothing to bump — but
 deserves a CHANGELOG line. So instead of skipping outright:
 
 1. The step-1 **docs-only abort still wins** — a docs-only diff exits there (nothing to log).
-2. For a code diff: prepend a dated entry to root `CHANGELOG.md` (legacy `docs/CHANGELOG.md`; Keep-a-Changelog format — a `[YYYY-MM-DD]` or `Unreleased` block), **no version line, no bump**.
+2. For a code diff: prepend a dated entry to root `CHANGELOG.md` (legacy `docs/CHANGELOG.md`; Keep-a-Changelog format — a `[YYYY-MM-DD]` or `Unreleased` block), **no version line, no bump**. Pass the entry's prose through `/humanizer` embedded mode exactly as in step 4 (this path skips the numbered steps).
 3. Emit the push gate with `Version: n/a (changelog-only)` and exit. Still never pushes.
 
 Gives manifestless repos (no `package.json` / `VERSION` / etc.) the changelog value without inventing a version scheme they don't use.
