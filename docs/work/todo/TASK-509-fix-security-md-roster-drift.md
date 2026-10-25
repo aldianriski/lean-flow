@@ -6,10 +6,11 @@ size: S
 risk: low
 autonomy: HITL
 class: execution
-tier: P
+tier: G
 authority: J1
 origin: close-retro
 state: ready
+sprint: SPRINT-141
 depends-on: []
 ---
 
