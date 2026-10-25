@@ -316,3 +316,16 @@ and `D:\lf-exercise\` did not).
 ### 2026-10-25 | progress | T6 (TASK-494) done: 4 of 4 boxes; Codex CLEAR at round 1
 consequence · T6 · behaviour:material · governance:low
 review · T6 · codex · behaviour:material · governance:low
+
+### 2026-10-25 | scope-change | T7 (TASK-495): `Layers:` gain diagnose, prototype and triage SKILL.md, and drop release-patch; owner ruling R6 on fixed-template commits
+What broke: the census (selector A, a wording grep for commit message / git commit / squash-commit / type(scope) / PR body /
+pull request / gh pr; selector B, step-shaped commit instructions; every hit read in context) finds six composer sites:
+orchestrator `SKILL.md` (quick step 5, mvp step 7, sprint-bulk loop), `references/dispatch.md` (builders commit),
+lean-doc-generator `SKILL.md` (promote `plan locked`, close squash; `sprint-by-reference.md` repeats those commits),
+`skills/diagnose/SKILL.md` (the hypothesis in the commit / PR message, the only PR-message site),
+`skills/prototype/SKILL.md` (the throwaway-branch commit), and `skills/triage/SKILL.md` (status-move commits). Not
+composers: release-patch (it stops and hands back a ready-to-push message), init.md, fog-map.md, handoff-reconciliation.md,
+the CONTRIBUTING template, and dispatch.md:649 (reading messages). Impact: T7's `Layers:` gain the three diagnose, prototype and
+triage paths and drop `skills/release-patch/SKILL.md`; the Done when is unchanged. Owner-approved by popup.
+Owner ruling R6: a commit message that is a fixed template with no free prose (status moves such as "move TASK-NNN todo ->
+in_progress", record-sha commits) skips the pass; any message with free prose, including a descriptive subject, goes through it.
