@@ -27,7 +27,7 @@ documents keep the child pass.
       three catalogs once per session (again after a compaction) and keeps the fact list and check; PR bodies and
       documents keep the child pass.
 - [x] The retained `evals/fixtures/humanizer/fact-keep` sample keeps every fact over 3 inline runs (L-252). ✓ 3 inline runs at 9ece808f kept 11/11 facts each; run 1 added an actor (TD-274, owner ruling); NOTES f3ead434, 7c3da633
-- [ ] The next sprint's commit messages spawn no humanizer child; the cost per commit is recorded against the ~73k
+- [x] The next sprint's commit messages spawn no humanizer child; the cost per commit is recorded against the ~73k ✓ 6e241add: 18 commits since d9c05e66 inline, no child (Log); ~3.1k/commit vs ~73k; TD-278 resolved
       baseline and TD-278 is resolved with that number.
 - [x] CHANGELOG `[Unreleased]` line. ✓ 9ece808f: CHANGELOG [Unreleased] SPRINT-144 bullet
 
