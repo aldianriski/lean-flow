@@ -54,6 +54,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ❌ A **scope-change entry that names a path no task declares** — the scope-change leg attributes an entry by its **heading**, so the heading names every `Tn` whose paths its body names, and every path the body names sits in one of those tasks' `Layers:` (touched) or `Cites:` (only named). The log is append-only, so a slip costs a `Cites:` fix and a second full gate. After appending one, run the leg (`bun scripts/lib/check-sprint-by-reference.ts <sprint> --scope-change`, or `bun scripts/merge-check.ts`) and read the verdict line it prints before committing (L-234 ×2).
 
+❌ **Ticking a box with only part of the checks that read the touched file** — before ticking a task that changed a shipped file, run every check that reads it: the `evals/` harnesses that name it **and** the gate legs that scan it (prose density, doc caps). Run each one as itself; an ad-hoc command that re-derives its rule is not that check, and a ratchet against a baseline is exactly what a re-derived threshold misses (L-251 ×2).
+
 ### plugin-cache
 
 - **plugin-cache → moved: docs/LEARNINGS.md` § Durable rules › plugin-cache** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: L-010 · L-021
@@ -159,10 +161,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-251 [tags: process] [status: active]: **A static review cannot run the harnesses that read a shipped file, so search `evals/` for the touched path and run those before ticking.** SPRINT-140 T2 put "vague TODOs" into `review-scoping.md`'s new code-slop box. Two Codex rounds, a builder check and the per-task gates passed it. Only system verify at close ran `run-orchestrator-store-fixtures.ts`, whose text contract allows `TODO` in that file solely in the retired-layout rule: 326/1, one owner ruling and a second QA_FULL run. The reviewer-runs-the-pinning-tests rule covers a sub-agent reviewer; a static Codex pass reads text and runs nothing.
+## L-251 [tags: process] [status: promoted]: **A static review cannot run the harnesses that read a shipped file, so search `evals/` for the touched path and run those before ticking.** SPRINT-140 T2 put "vague TODOs" into `review-scoping.md`'s new code-slop box. Two Codex rounds, a builder check and the per-task gates passed it. Only system verify at close ran `run-orchestrator-store-fixtures.ts`, whose text contract allows `TODO` in that file solely in the retired-layout rule: 326/1, one owner ruling and a second QA_FULL run. The reviewer-runs-the-pinning-tests rule covers a sub-agent reviewer; a static Codex pass reads text and runs nothing.
 - seen: 2026-10-25 (SPRINT-140 close, system verify 326/1 → 327/0) · 2026-10-26 (SPRINT-143 T1: a qa-check leg, prose-density, not under `evals/`; an ad-hoc awk stood in for it and two dense lines reached a commit)
 - count: 2
-- promoted: no
+- **L-251 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: move-to-reference — run every check that reads a touched shipped file, `evals/` harnesses and gate legs alike, each as itself before ticking
 - related: L-182 (verify against what was built, not the tooling's report) · L-117 (find what reads a block before changing it)
 
 ---
