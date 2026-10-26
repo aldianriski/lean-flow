@@ -27,3 +27,11 @@ at `86dbebd6`, three valid runs: 5 of 5 terms in English, no general word anglic
 added in 3 of 3. A fresh judge scored all six finals blind (labels shuffled): baseline 0 of 3 pass, after 3 of 3. One
 after-run was discarded unjudged and re-run: its Skill call failed, it searched for the catalogs and read the baseline
 export, which sat under the same `--add-dir`. Keep each export in a folder of its own.
+
+Recorded runs (SPRINT-145 T2, TASK-526): judged by a fresh judge on the open items (recast, none dropped or decided),
+the facts, the fragments, the hedging wording and the terms. At `5414fc86`, three runs: every open item recast as a
+request to the recipient with a formal close, all fifteen facts kept, fragments gone, terms English in 3 of 3; two runs
+swapped "di atas kertas" for "menurut perhitungan", so 1 of 3 passed. The one builder retry at `609cd9c9` named those
+paraphrases in ID-18; three fresh runs passed 2 of 3 by the judge, the third writing "Menurut hitungan kami kapasitas
+ini cukup". Owner ruling: "by our calculation" states the claim's basis, the real uncertainty the criterion keeps, not
+a hedge, so that run passes and the retry set is 3 of 3; the judge's stricter reading is kept here as the record.
