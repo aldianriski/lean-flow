@@ -26,17 +26,17 @@ rule plus the five rows as examples, in a subsection of its own. The fixture was
 but the pre-correction text is gone (the reporting session was cleared), so the owner ruled a synthetic sample instead.
 
 ## Done when
-- [ ] `patterns-id.md` § Term policy gains a "Domain terms of art" subsection: in domain or technical text, a spec
+- [x] `patterns-id.md` § Term policy gains a "Domain terms of art" subsection: in domain or technical text, a spec ✓ 86dbebd6: Domain terms of art subsection, frozen wording + five rows; Codex R1 CLEAR
       name, column header or capacity term that is an English term of art stays English even when a plain Indonesian
       phrase exists; the tell is a word-by-word translation of a spec name. The five rows (concurrent · acceptance test ·
       write penalty · free space · fault tolerance) are its examples, each with the Indonesian form it replaces.
-- [ ] "Keep Indonesian (common and natural)" states it covers general vocabulary, not domain terms of art.
-- [ ] A synthetic memo-shaped sample, built from the four reported corrections with no client text, is retained under
+- [x] "Keep Indonesian (common and natural)" states it covers general vocabulary, not domain terms of art. ✓ 86dbebd6: Keep Indonesian scoped to general vocabulary
+- [x] A synthetic memo-shaped sample, built from the four reported corrections with no client text, is retained under ✓ term-of-art fixture (synthetic, 15 facts incl. 3 open items); 2.17.0 baseline 0/3 pass, blind judge
       `evals/fixtures/humanizer/` with its expected terms and a fact list that already counts each open item of its
       to-do list as a fact; the 2.17.0 baseline shows the failure on it (L-255).
-- [ ] Three embedded runs on the fixture after the change keep every term of art in English, translate none of the
+- [x] Three embedded runs on the fixture after the change keep every term of art in English, translate none of the ✓ after @86dbebd6: 3/3 pass (5/5 terms, 15/15 facts, no additions), blind fresh judge; contaminated run re-run
       general vocabulary back, and keep every fact, judged by a reader that did not write the brief (L-252, L-259).
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] CHANGELOG `[Unreleased]` line. ✓ 86dbebd6: CHANGELOG [Unreleased] SPRINT-145 bullet
 
 ## Touches
 `skills/humanizer/references/patterns-id.md` · `evals/fixtures/humanizer/<new fixture>/` · CHANGELOG.md
