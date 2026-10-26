@@ -7,6 +7,7 @@
 - **Status:** Accepted (2026-05-24)
 - **Deciders:** Owner
 - **Context driver:** hosting/cost target (serverless / low-RAM)
+- **Revisit when:** the hosting target moves off serverless/low-RAM, or a feature needs relational loading that Drizzle cannot express without hand-written joins
 
 ## Context
 

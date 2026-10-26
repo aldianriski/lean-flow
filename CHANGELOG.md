@@ -26,6 +26,9 @@ status: current
   `requirements.md` § First milestone and puts the slice that proves it (or the ready slice that unblocks it) first;
   without a proof goal it says so and ranks ready slices by risk likelihood. The order is a proposal, and the
   requirements template now names the decomposer as the proof goal's reader (TASK-520).
+- The ADR template gains an optional **Revisit when:** header line beside Status and Deciders: the condition that
+  would reopen the decision, never a date. The worked example fills it. It is not a required §4 section, so the
+  conformance engine's ADR checks are unchanged (TASK-515).
 
 ---
 

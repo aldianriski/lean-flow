@@ -18,6 +18,7 @@ related: [ADR-NNN]
 - **Status:** proposed | accepted (YYYY-MM-DD) | deprecated | superseded by ADR-NNN
 - **Deciders:** [role — not a personal name]
 - **Context driver:** [the one constraint or goal forcing this — e.g. cost target, scale, deadline]
+- **Revisit when:** [optional — the condition that would reopen this decision (a measurement crossing a line, a constraint lifting, a dependency changing), never a date; delete the line if none]
 
 ## Context
 
