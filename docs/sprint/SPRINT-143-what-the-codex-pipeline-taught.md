@@ -158,6 +158,21 @@ into `DESIGN.md`, never written there without the owner.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/handoff/SKILL.md` | T1 | Uncertain writes item, inherited ones carried forward | Low | 8 harnesses; fresh-session exercise |
+| `skills/prime/SKILL.md` | T1 | `Handoff:` row names an uncertain write | Low | fresh-session exercise |
+| `skills/orchestrator/SKILL.md` | T1 · T4 | Guard reads back first; pin as a modifier (140 lines held) | Med | prose-density 26/0; Codex R2 CLEAR |
+| `skills/orchestrator/references/dispatch.md` | T1 · T4 | § Uncertain writes; pin row and builder-brief contract | Med | dispatch harnesses green |
+| `skills/orchestrator/references/review-scoping.md` | T2 | rejected / deferred outcomes | Med | review-depth harness green |
+| `skills/orchestrator/references/night-run.md` | T2 | Part 4 retry vocabulary | Low | read-through; Codex |
+| `scripts/night-run.sh` | T2 | reaper parks rejected/deferred, reads evidence, fails closed | Med | ceiling harness 26/26; old reaper passes every new must-FAIL |
+| `evals/fixtures/revise-loop-ceiling/` · `evals/run-revise-loop-ceiling-fixtures.sh` | T2 | 12 retained cases | Low | harness green |
+| `skills/lean-doc-generator/templates/product-requirements.md.template` | T3 | First milestone section | Low | init-scratch exercise |
+| `skills/lean-doc-generator/references/init.md` | T3 | milestone questions in the step 3 round | Low | init-scratch exercise; Codex R2 CLEAR |
+| `skills/prototype/SKILL.md` | T5 · T6 | demo branch routing; DESIGN.md capture line | Low | routing pin unchanged for logic/UI |
+| `skills/prototype/references/demo.md` | T5 | new customer-review demo branch | Med | Workdoo onboarding exercise |
+| `skills/prototype/references/ui.md` | T6 | direction brief, design-skill deferral, DESIGN.md offer | Low | Workdoo Inbox exercise |
+| `README.md` | T5 | /prototype one-liner and references tree | Low | read-through |
+| `CHANGELOG.md` | T1–T6 | six `[Unreleased]` lines | Low | read-through |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
