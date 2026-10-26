@@ -3,7 +3,7 @@ sprint: 144
 slug: wire-the-milestone-cut-the-cost
 owner: Maintainer
 last_updated: 2026-10-26
-status: active
+status: closed
 gates_signed: G1,G2 @ f93bcdef
 plan_commit: 79ff7e89
 update_trigger: sprint execute/close events
@@ -136,8 +136,56 @@ order only (D1).
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/humanizer/references/embedded.md` | T1 | § Inline path for commit messages; Route bullet; fallback scoped to docs and PR bodies | Med | 3 inline runs on the fact-keep sample; Codex R2 CLEAR |
+| `skills/humanizer/SKILL.md` | T1 | embedded summary names the commit-message exception | Low | read-through |
+| `evals/fixtures/humanizer/fact-keep/NOTES.md` | T1 | inline-path recipe and the three recorded runs | Low | Codex R2 CLEAR |
+| `TECH-DEBT.md` | T1 | TD-278 resolved with the measured cost; TD-274 sighting | Low | read-through |
+| `skills/task-decomposer/SKILL.md` | T2 | step 4 Build order: ready slices, proof goal first (133/140) | Low | workdoo P3 exercise; prose-density 3/3 |
+| `skills/lean-doc-generator/templates/product-requirements.md.template` | T2 | names the decomposer as the proof goal's reader | Low | workdoo P3 exercise |
+| `skills/lean-doc-generator/templates/ADR.md.template` | T3 | optional Revisit when header line | Low | S4 run with control; adr-family fixtures |
+| `skills/lean-doc-generator/references/ADR-example.md` | T3 | example fills Revisit when | Low | S4 run; Codex R2 CLEAR |
+| `skills/lean-doc-generator/templates/flows.md.template` | T4 | Steps table with record changed, owner, next owner (49/100) | Low | `wc -l`; Codex R1 CLEAR |
+| `skills/lean-doc-generator/templates/architecture-authentication.md.template` | T5 | Data scope column and enforcement line | Low | Codex R1 CLEAR |
+| `CHANGELOG.md` | T1–T5 | five `[Unreleased]` lines | Low | read-through |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 5 of 5 members delivered (TASK-524, 520, 515, 517, 518); 17 of 17 DoD boxes ticked. System verify on the
+VPS gate FAILed once on `e36eca1d` (`layers observed`: T1 and T4 ticked their member files in `review/`, a folder their
+`Layers:` did not name), was fixed by scope-change and passed 317/0 on `bbf74f98` (owner ruling: fixed-and-rerun). Every
+task was exercised on real input: three inline humanizer runs on the retained fact-keep sample (T1), a headless
+decomposition of workdoo's roadmap row P3 with the owner's proof goal (T2), and a conformance run of the edited example
+ADR beside an unedited control (T3). T4 and T5 are template-only, judged by read-through and Codex.
+
+**Retrieval check** — two misses. L-229/L-234 (the scope-change leg reads the paths an entry names) were loaded, yet two
+entries reddened the leg before commit: one with shortened paths, one with backticked folder words (L-257, count 2). L-238
+says a coordinator write in a folder a task does not declare commits as bare `sprint(N):`; a tick in `review/` is that
+write, and it reached system verify (L-258). L-252 and L-254 shaped the T1 runs (three runs, plugin dir pinned to an
+export); L-240 kept `Layers:` free of unused tokens; L-251 drove the per-task check runs.
+
+**Cost** — coordinator inline (Opus) for all five builds, no builder dispatch. Sub-agents: five Sonnet builder checks
+(~53k each); one Codex rescue agent reused for six rounds (T1 ×2, T2 ×1, T3 ×2, T4+T5 ×1 joint; 15k–20k agent tokens
+each). Headless: three inline humanizer runs ($0.27–$0.29, ~77k tokens each) and one decomposer exercise ($0.89, ~500k
+tokens, mostly cache reads). Humanizer on commit messages: 18 inline passes, no child; the catalogs were read once
+(~22k). Gate: one local default-profile run (549 s, truncated at the 520 s budget, TD-117) and three VPS runs, one of which
+lost ssh mid-run and was read back rather than retried. Coordinator tokens were not measured.
+
+**Worked**
+- The inline route did what TD-278 asked: about 3.1k tokens per commit message against ~73k, with no child started.
+- Codex caught what the coordinator's own read missed: run 1's added rollout actor (L-259).
+- The uncertain-writes rule paid off at once: the dropped ssh run was read back, found still running, and finished green.
+- Five builder checks settled every contradiction before G2 (the `[Unreleased]` block, step 3 vs step 4, the T3 line
+  placement) without a builder retry.
+
+**Friction**
+- Two scope-change entries and one joint `T4 T5` tick commit had to be rewritten before commit to satisfy the
+  attribution checkers; all three were caught before they landed.
+- T3's first Codex round lacked the example's body and returned NOT CLEAR on missing input (also seen in SPRINT-142).
+- The local gate still overruns its 520 s budget on this host; the VPS route is the working default.
+
+**Buckets** — Shipped → CHANGELOG `[Unreleased]` (five lines, T1–T5). Tech debt → none new; TD-278 resolved; TD-274 gains
+a sighting; the gate overrun is TD-117's. Follow-ups → none. Learnings → L-257 (scope-change paths, count 2, promotable at
+the next promote), L-258 (a tick in `review/`), L-259 (a self-judged run).

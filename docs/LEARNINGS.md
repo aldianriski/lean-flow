@@ -121,6 +121,30 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-259 [tags: process] [status: active]: **The coordinator who wrote a pass's brief is the wrong judge of its runs: it reads the final as what it expected.** SPRINT-144 T1 judged three inline humanizer runs against the fact list and scored all three clean. Codex, given the same finals and the same list, found that run 1 had added a rollout actor ("Finance Ops rolled out"; the sample names none). SPRINT-142 had used a fresh judge for the same fixture and caught nothing because nothing was there. The fixture NOTES say how to judge (from the transcript, L-248) but not who. Judge a model-pass run with a reader that did not write the brief.
+- seen: 2026-10-26 (SPRINT-144 T1, Codex R1 item 3; owner ruling at the box 2 popup)
+- count: 1
+- promoted: no
+- related: L-252 (judge over several runs) · L-248 (judge from the transcript) · TD-274
+
+---
+
+## L-258 [tags: sprint-model] [status: active]: **A member file ticked in `review/` is a write in a folder its task's `Layers:` does not name, so the tick commits as bare `sprint(N):` or the path is declared first.** SPRINT-144's promote declared each member's `todo/`, `in_progress/` and `done/` paths. T1 and T4 waited in `review/` and were ticked there under `Tn:` subjects, so system verify FAILed `layers observed` on both. L-238 already says a coordinator write outside a task's declared files goes under `sprint(N):`, but it names a status move, not a tick, and the per-tick checkers (`tick-box.ts`: sprint-by-reference and layers-completeness) passed every time because neither reads commit attribution.
+- seen: 2026-10-26 (SPRINT-144 close, system verify on `e36eca1d`; fixed by scope-change, rerun 317/0)
+- count: 1
+- promoted: no
+- related: L-238 (coordinator writes go under `sprint(N):`) · L-240 (Layers tokens observed at close)
+
+---
+
+## L-257 [tags: sprint-model] [status: active]: **A scope-change entry names its paths in full: the leg reads every backticked span as a path, so a shortened path or a backticked folder word reads as undeclared.** SPRINT-144 wrote `humanizer/SKILL.md` and `fact-keep/NOTES.md` in a T1 entry whose `Layers:` held the full paths, and later backticked `todo/`, `in_progress/` and `done/` as prose in a T1+T4 entry; the scope-change leg reddened on both before commit. L-229 and L-234 say what the leg compares; neither says that every backticked token in the body is a candidate path. Write full repo paths in backticks, and plain words for folders mentioned as prose.
+- seen: 2026-10-26 (SPRINT-144 G2, T1 scope-change) · 2026-10-26 (SPRINT-144 close, T1+T4 scope-change)
+- count: 2
+- promoted: no
+- related: L-229 · L-234 · TD-263 (fragment corroboration)
+
+---
+
 ## L-256 [tags: process] [status: active]: **A model's critique is never consumer, customer or expert evidence, so it cannot carry ADR-053's "consumer evidence" reason or a validated-by-users claim.** The owner's Codex `run-project-pipeline` skill states it outright ("never claim customer, expert, or field validation from a model critique alone") and keeps a prepared walkthrough separate from observed customer validation. lean-flow's admission rule lists consumer evidence as one of five reasons but says nothing about what source qualifies, so a `/council` verdict or a Codex review round could be cited as if it were consumer evidence. Name the source of consumer evidence: an adopter report, a real-repo run, or an observed session. A model review is a review.
 - seen: 2026-10-25 (research: docs/research/codex-run-project-pipeline.md)
 - count: 1

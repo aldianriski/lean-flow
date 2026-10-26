@@ -3,7 +3,7 @@ sprint: 144
 slug: wire-the-milestone-cut-the-cost
 owner: Maintainer
 last_updated: 2026-10-26
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -151,3 +151,13 @@ task's `Layers:`; no Done-when changes; the gate re-runs before close.
 system-verify · FAIL(layers-observed: T1 and T4 review/ member paths undeclared) · e36eca1d · 316 pass, 1 fail
 owner-ruling: system-verify — fixed-and-rerun: the T1 and T4 review/ member paths were declared by scope-change (bbf74f98); the rerun printed 317 pass, 0 fail
 system-verify · PASS · bbf74f98 · 317 pass, 0 fail (gate-remote QA_FULL; the first attempt lost ssh mid-run, the remote run was read back and finished rc 0, not retried)
+
+### 2026-10-26 | close | 5 of 5 delivered, 17 of 17 DoD; system verify 317/0 on the VPS after one fixed FAIL; Retro and buckets filed
+Every member sits in `docs/work/done/` (close check 12/0, freeze held on all five). System verify: `gate-remote` FAILed
+`layers observed` on `e36eca1d`, fixed by scope-change, PASS on `bbf74f98` with `QA-CHECK: 317 pass, 0 fail`, remote rc 0
+(owner ruling: fixed-and-rerun). No handoff entry was ever logged, so nothing needs reconciling. No epic.
+Buckets auto-filed: L-257 (count 2), L-258, L-259; no new TD (TD-278 resolved, TD-274 sighting, the gate overrun is
+TD-117's); no follow-ups; CHANGELOG `[Unreleased]` already carries T1–T5. Owner-approved by popup: the §11 archival pass,
+the doc-freshness fix to the humanizer rows in `.claude/CONTEXT.md` and `README.md` (commit messages now inline; the
+token budget holds at ~12688 of 12691), the v2.16.x CHANGELOG rotation, and a MINOR release to 2.18.0 by hand (feature
+sprint), no push.
