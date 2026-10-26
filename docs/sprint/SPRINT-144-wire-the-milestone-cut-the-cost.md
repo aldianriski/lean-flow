@@ -38,6 +38,7 @@ Layers: `skills/humanizer/references/embedded.md` · `CHANGELOG.md` · `TECH-DEB
   · `skills/humanizer/SKILL.md` · `evals/fixtures/humanizer/fact-keep/NOTES.md`
   · `docs/work/todo/TASK-524-humanize-commit-messages-inline-once-per-session.md`
   · `docs/work/in_progress/TASK-524-humanize-commit-messages-inline-once-per-session.md`
+  · `docs/work/review/TASK-524-humanize-commit-messages-inline-once-per-session.md`
   · `docs/work/done/TASK-524-humanize-commit-messages-inline-once-per-session.md`
 Depends-on: none
 Cites: `TASK-524` · TD-278 · L-252 · `evals/fixtures/humanizer/fact-keep/`
@@ -80,6 +81,7 @@ engine. Depends on T2 for `CHANGELOG.md` order only (D1).
 Layers: `skills/lean-doc-generator/templates/flows.md.template` · `CHANGELOG.md`
   · `docs/work/todo/TASK-517-record-the-owner-and-next-owner-of-each-step-in-the-flows-template.md`
   · `docs/work/in_progress/TASK-517-record-the-owner-and-next-owner-of-each-step-in-the-flows-template.md`
+  · `docs/work/review/TASK-517-record-the-owner-and-next-owner-of-each-step-in-the-flows-template.md`
   · `docs/work/done/TASK-517-record-the-owner-and-next-owner-of-each-step-in-the-flows-template.md`
 Depends-on: T3
 Cites: `TASK-517` · `docs/research/codex-run-project-pipeline.md` (6)

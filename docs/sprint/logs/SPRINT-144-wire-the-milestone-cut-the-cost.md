@@ -141,3 +141,11 @@ session plus 1,454 to 1,857 output tokens per pass, about 3.1k per commit over 1
 pass changed 0 of 18 drafts, all written with the catalogs loaded. TD-278 resolved in `6e241add`. The close commits
 also take the inline pass. A joint T4/T5 tick commit was split per task before anything else landed, so each commit's
 files sit inside one task's `Layers:`.
+
+### 2026-10-26 | scope-change | T1 and T4 add their review/ member paths to Layers (system-verify finding)
+What broke: system verify on `e36eca1d` (gate-remote, QA_FULL) FAILed `layers observed`: T1's box 3 tick commit edited
+`docs/work/review/TASK-524-humanize-commit-messages-inline-once-per-session.md` and T4's tick commit edited
+`docs/work/review/TASK-517-record-the-owner-and-next-owner-of-each-step-in-the-flows-template.md`, and neither task's
+`Layers:` named a review path; both declared only the todo, in_progress and done paths. Impact: each path joins its
+task's `Layers:`; no Done-when changes; the gate re-runs before close.
+system-verify · FAIL(layers-observed: T1 and T4 review/ member paths undeclared) · e36eca1d · 316 pass, 1 fail
