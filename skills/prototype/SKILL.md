@@ -45,6 +45,7 @@ or absorb the prototype:
 - A genuine design decision → an **ADR**, where it clears STANDARD §4's bar for one.
 - A decision-rich snippet (state machine, schema, type shape) → feed it into `/task-decomposer`'s PRD (its Implementation Decisions already cite "a prototype produced a snippet").
 - Otherwise → a `NOTES.md` next to the prototype with the verdict, filled before deletion.
+- A UI variant's winning direction → offered for the repo's `DESIGN.md` (never created unasked; fields only from the owner).
 - A demo's recorded customer session → its observations into `docs/product/requirements.md` (through `/lean-doc-generator prd`) or an ADR. Call it validated only from recorded observations of real target users.
 
 ## Red flags

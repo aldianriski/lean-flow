@@ -20,11 +20,22 @@ density). An isolated route is a vacuum where every variant looks fine.
 ## Process
 
 1. **State the question and pick N** — default **3** variants; cap at 5 (more stops being radically different). One-line plan at the top: *"Three variants of /settings, switchable via `?variant=`, on the existing route."*
-2. **Generate radically different variants** — each held to the page's purpose + data and the project's component library. Export clear names (`VariantA`…). They must be **structurally** different — different layout, hierarchy, primary affordance — not different colours. Two similar drafts → redo one with "do not reuse that layout". Variants use real data or honest placeholders (§ Anti-patterns).
-3. **Wire them** — one switcher on the route: `variant = searchParams.get('variant') ?? 'A'`, render the matching component + `<PrototypeSwitcher>`. Sub-shape A keeps existing data fetching above the switcher; only the subtree changes.
-4. **Floating switcher** — fixed bottom-centre bar: left arrow (prev, wraps) · variant label (`B — Sidebar layout`) · right arrow (next). Clicking updates the URL param via the framework router (shareable, reload-stable); `←`/`→` keys also cycle (not when an input/textarea/contenteditable is focused). Visually distinct from the page. **Hidden in production** (`NODE_ENV !== 'production'`) so a stray merge can't ship it. One shared component for both sub-shapes.
-5. **Hand it over** — surface the URL + the `?variant=` keys. The gold feedback is usually "I want the header from B with the sidebar from C" — that's the real design.
-6. **Capture + clean up** — record the winner + why (ADR / PRD snippet / `NOTES.md`). Sub-shape A → delete losing variants + switcher, fold the winner into the page. Sub-shape B → promote the winner to a real route, delete the throwaway route + switcher.
+2. **Direction brief** — before any variant, five lines in the prototype's `NOTES.md`: subject idea · palette roles ·
+   type roles · density · operational or promotional. Operational screens keep useful density, repeated rows and
+   semantic colour; promotional pages lead with narrative. Each variant then says how it sits within, or departs from,
+   the brief. When the session's skill listing holds a skill whose name, after any `<plugin>:` prefix, is
+   `frontend-design`, `anti-slop` or `antislop`, load it for the brief and the variant critique; if it cannot be loaded,
+   record why in `NOTES.md` and use the brief and § Anti-patterns as the floor. Without one, that floor applies and
+   nothing errors.
+3. **Generate radically different variants** — each held to the page's purpose + data and the project's component library. Export clear names (`VariantA`…). They must be **structurally** different — different layout, hierarchy, primary affordance — not different colours. Two similar drafts → redo one with "do not reuse that layout". Variants use real data or honest placeholders (§ Anti-patterns).
+4. **Wire them** — one switcher on the route: `variant = searchParams.get('variant') ?? 'A'`, render the matching component + `<PrototypeSwitcher>`. Sub-shape A keeps existing data fetching above the switcher; only the subtree changes.
+5. **Floating switcher** — fixed bottom-centre bar: left arrow (prev, wraps) · variant label (`B — Sidebar layout`) · right arrow (next). Clicking updates the URL param via the framework router (shareable, reload-stable); `←`/`→` keys also cycle (not when an input/textarea/contenteditable is focused). Visually distinct from the page. **Hidden in production** (`NODE_ENV !== 'production'`) so a stray merge can't ship it. One shared component for both sub-shapes.
+6. **Hand it over** — surface the URL + the `?variant=` keys. The gold feedback is usually "I want the header from B with the sidebar from C" — that's the real design.
+7. **Capture + clean up** — record the winner + why (ADR / PRD snippet / `NOTES.md`). Sub-shape A → delete losing variants + switcher, fold the winner into the page. Sub-shape B → promote the winner to a real route, delete the throwaway route + switcher.
+   Offer the winner's direction for the repo's `DESIGN.md` by popup. Never create it unasked, and take its fields only
+   from the owner's answers or their own file; declined, the direction stays in `NOTES.md` beside the verdict. The
+   template's example values (sizes, radii, spacing) are not approvals: every field the owner did not give stays a
+   placeholder.
 
 ## Anti-patterns
 

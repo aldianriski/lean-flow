@@ -37,6 +37,10 @@ status: current
   It writes a contract (audience, proof goal, depth, reset, integration boundary), labels every simulated action and
   sample record, and prepares a task script with non-leading questions. A demo counts as validated only after a recorded
   session with real target users; it is retired after that session (TASK-521).
+- `/prototype`'s UI branch writes a short design-direction brief before any variant (subject idea, palette and type
+  roles, density, operational or promotional), hands the brief and the critique to `frontend-design` or `anti-slop`
+  when one is installed, and offers the winning direction for your `DESIGN.md` without ever creating it unasked
+  (TASK-522).
 
 ---
 
