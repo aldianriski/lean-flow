@@ -10,7 +10,7 @@ How another skill (or any caller) runs the humanizer pass on prose it generated,
 
 ## Child path (default)
 
-The caller dispatches ONE sub-agent, with no model override (it inherits the session model). The brief:
+Documents and PR bodies take this path; a commit message takes § Inline path. The caller dispatches ONE sub-agent, with no model override (it inherits the session model). The brief:
 
 1. Names the humanizer skill: invoke it with the Skill tool when available, else read its `SKILL.md` (the sibling skill directory `../humanizer/`, relative to the caller's own skill directory).
 2. Says to read all three pattern files in full, `references/patterns-en.md`, `references/patterns-lf.md` and `references/patterns-id.md`, whatever the language of the text, each from its first line to its last (no offset, no limit): an embedded pass cannot ask, so it never skips one or part of one.
@@ -20,9 +20,13 @@ The caller dispatches ONE sub-agent, with no model override (it inherits the ses
 6. Carries this line verbatim: "Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record."
 7. Says how "ask" resolves here: the embedded pass never asks an interactive question. If something it needs is unavailable (a catalog it cannot read, a value behind a secret file, a voice sample that is missing), it returns `UNAVAILABLE: <reason>` instead of a final text, and the caller applies the failure rule below with that reason.
 
+## Inline path (commit messages)
+
+A commit message is short and usually written in the repo's own voice, so the caller runs the pass itself instead of dispatching a child. The first time it humanizes a commit message in a session, it reads `references/patterns-en.md`, `references/patterns-lf.md` and `references/patterns-id.md` in full (first line to last, no offset or limit). Later commit messages in that session reuse that read. After a compaction or context summary the catalogs are no longer in context, so it reads them again. A worktree builder is a session of its own and reads them once there. Each pass keeps Child path item 4 (the fact list before, the check after, the repair, none of it in the output), the format, the voice sample and § Never touched. It prints no status line; the fallback's line is for a runtime that could not start a child.
+
 ## Inline fallback
 
-When the runtime cannot start a sub-agent, the caller runs the same pass itself after reading `references/patterns-en.md`, `references/patterns-lf.md` and `references/patterns-id.md` in full (first line to last, no offset or limit), including the fact list and check of Child path item 4, and prints exactly:
+When the runtime cannot start a sub-agent for a document or PR body, the caller runs the same pass itself after reading `references/patterns-en.md`, `references/patterns-lf.md` and `references/patterns-id.md` in full (first line to last, no offset or limit), including the fact list and check of Child path item 4, and prints exactly:
 
 `humanizer: ran inline (no sub-agent available)`
 
@@ -34,6 +38,7 @@ Frontmatter and YAML · the text and order of headings · table structure and da
 
 Callers that compose a commit message or PR body pass it through this contract too.
 
+- **Route:** a commit message takes § Inline path; a PR body takes § Child path, as every document does.
 - **Format:** a commit message is `plain` (no italics, no Markdown); a PR body is `markdown` (first-use italics apply to Indonesian).
 - **Verbatim:** the subject's conventional prefix (`type(scope):`, `sprint(N):`, `backlog:`, `triage:` and the like), every trailer (`Co-Authored-By:`, `Signed-off-by:`), ids, shas and paths.
 - **Fixed templates skip:** judge the ENTIRE message, trailers aside. It skips only when every word belongs to a fixed template whose only substitutions are a prefix, ids, folder or state names, field names and shas, for example `<prefix> move <id> <from> -> <to>` or `<prefix> record <field> <sha>`. One added descriptive word (a parenthetical reason, a summary clause) makes it free prose, and it passes. When unsure, pass it.

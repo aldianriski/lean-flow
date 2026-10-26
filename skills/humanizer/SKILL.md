@@ -103,7 +103,8 @@ modes never translate, even for mixed-language text; without such a request, cle
 
 **Embedded.** When another skill runs this pass on prose it generated, follow
 `references/embedded.md`: the caller supplies the text, a voice sample and a format; the pass runs in
-a child sub-agent (inline fallback) and returns only the final text. The host doc is the voice
+a child sub-agent (inline fallback) and returns only the final text. A commit message is the exception:
+the caller humanizes it inline, with the catalogs read once per session. The host doc is the voice
 sample, so its house style survives. A failed pass writes the original text and never blocks. Embedded mode never runs Audit, since it cannot ask.
 
 ## Rules

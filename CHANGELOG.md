@@ -14,6 +14,17 @@ status: current
 
 ---
 
+## [Unreleased]
+
+### SPRINT-144 — Wire the Milestone, Cut the Cost
+
+**Consumer-facing:**
+- Commit messages are humanized inline. The caller reads the three pattern catalogs once per session (again after a
+  compaction) and runs the fact list and check itself, instead of starting a sub-agent per message that re-read about
+  49 KB of catalogs each time. PR bodies and documents keep the sub-agent pass (TASK-524).
+
+---
+
 ## v2.17.0 — a customer-review demo in `/prototype`, review findings that can close without a fix, and uncertain writes read back before retry (2026-10-26)
 
 **MINOR** — ships SPRINT-143 (What the Codex Pipeline Taught), a feature sprint drawn from the owner's Codex
