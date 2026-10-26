@@ -99,3 +99,26 @@ The same session found a real defect the coordinator missed: T1 made two lines d
 the gate's own leg. Fixed in `adbc80b6` by splitting both lines, words unchanged (word-diff empty), orchestrator held at 140
 by joining two mvp lines that already render as one paragraph; prose-density 26/0. No Codex round on the reflow: no word
 changed, and the word-diff proves it.
+
+### 2026-10-26 | progress | T2 done: a review finding can close as rejected (with evidence) or deferred (with impact) (TASK-514)
+Built inline by the coordinator (same reason as T1: small edits to an existing guard and its harness, context already
+held). Commit `fcb7f289`. Pin captured before any edit: the ceiling harness's 11 cases; after the change the same 11 lines
+are identical, and the harness has 26 cases, all green. Every new must-FAIL case passes the pre-change reaper (rc 0), so
+each reddens only because of the new check. Real artifacts: the three archived logs carrying `Tn · retry ·` lines
+(SPRINT-066, 067, 123) all PASS, so the fail-closed rule raises no false positive. Other harnesses reading the touched
+files, all green: dispatch-preflight, night-run-gate-exception, night-run-outcome, night-run-rollup, reap-terminal,
+review-depth, run-mode, by-reference, emitter-column, orchestrator-store, qa-store-legs.
+consequence · T2 · behaviour:material · governance:high
+review · T2 · scoped-reviewer · behaviour:NOT CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR (evidence read from the finding text or past the closing parenthesis; no unparked-rejection case) →
+fixed. R2 NOT CLEAR (an arrow inside the rejection's own parenthesis read as the outcome) → fixed with a depth-aware parse.
+R3, by owner ruling over the 2-round cap (D4), NOT CLEAR (an unmatched `(` in the finding text failed open; nested
+parentheses cut the evidence short) → fixed: the parser fails closed with `revise-loop-outcome-unparseable`, and evidence is
+read to the matching `)`. Codex sub-agent tokens per round: ~23k, ~28k, ~36k.
+Owner rulings: **R4 (T2)** — one Codex round over the cap (round 3). **R5 (T2)** — box 4's `revise-loop` LLM recipe is a
+judgment tick (its input and expected outcomes are unchanged and it reads none of the new outcome words). **R6 (T2)** — close
+after round 3 with no round 4: the parser now fails closed, so a remaining gap can only produce a false FAIL; a crafted
+shape found later becomes a TD row. The review line above records the last round's verdict as NOT CLEAR on purpose; the
+close rests on R6, not on a CLEAR.
+Uncertain write from T1's exercise, reconciled: the background gate run finished `QA-CHECK: 304 pass, 2 fail`, the two
+prose-density FAILs the fresh session predicted, already fixed in `adbc80b6`.

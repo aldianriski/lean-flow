@@ -22,13 +22,13 @@ The revise loop's outcomes are `fixed | still-open`, so a reviewer's false posit
 fix · reject with evidence · defer with impact and scope reason. Source: `docs/research/codex-run-project-pipeline.md` (2).
 
 ## Done when
-- [ ] The revise loop accepts `rejected` (cites evidence in the rollup vocabulary: test · check · fixture · owner-ruling)
+- [x] The revise loop accepts `rejected` (cites evidence in the rollup vocabulary: test · check · fixture · owner-ruling) ✓ review: review-scoping.md § The revise loop + night-run.md Part 4 (fcb7f289); evidence read only inside the outcome's own parenthesis; Codex R1-R3 findings fixed, R4 waived by owner ruling
       and `deferred` (states impact and where it was routed: TASK/TD).
-- [ ] Attended: the builder may reject with evidence and the rejection is shown in the report. Unattended: a rejection is
+- [x] Attended: the builder may reject with evidence and the rejection is shown in the report. Unattended: a rejection is ✓ fixture: rejection-unparked + deferred-escalation-missing FAIL `revise-loop-escalation-missing`; ADR-022 carve-out text untouched
       a judgement and parks; ADR-022's mechanical carve-out is unchanged.
-- [ ] A retained must-FAIL fixture: a `rejected` with no evidence fails with its named finding; a sibling with evidence stays green.
-- [ ] The existing `revise-loop` and `revise-loop-ceiling` fixtures still pass.
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] A retained must-FAIL fixture: a `rejected` with no evidence fails with its named finding; a sibling with evidence stays green. ✓ fixture: rejection-unevidenced FAILs `revise-loop-rejection-unevidenced`, rejection-evidenced-sibling PASS; the old reaper passes every new must-FAIL case
+- [x] The existing `revise-loop` and `revise-loop-ceiling` fixtures still pass. ✓ check: ceiling harness 26/26, the 11 pre-existing lines identical to the pin; revise-loop LLM recipe: owner-ruling, judgment tick (input and expected outcomes unchanged, it reads none of the new words)
+- [x] CHANGELOG `[Unreleased]` line. ✓ check: CHANGELOG `## [Unreleased]` › SPRINT-143 second line (fcb7f289)
 
 ## Touches
 `skills/orchestrator/references/review-scoping.md` (§ The revise loop) · `skills/orchestrator/references/night-run.md`
