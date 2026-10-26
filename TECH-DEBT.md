@@ -391,7 +391,14 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-278** severity: medium | status: open | created: Sprint-143 (close retro, measured cost)
+- **TD-278** severity: medium | status: resolved → TASK-524 (Sprint-144) | created: Sprint-143 (close retro, measured cost)
+  - **Resolved (SPRINT-144 T1, `9ece808f`):** commit messages take the inline path, catalogs read once per session. From
+    the G2 entry to this resolution, 18 free-prose commit messages took the inline pass and none started a child (11
+    fixed-template moves skipped it). Measured in three headless runs: the catalog read adds 20,028 to 22,342 tokens of
+    context once per session, and one pass spends 1,454 to 1,857 output tokens on a 140-word sample, an upper bound for a
+    commit message. Amortized over the 18: about 3.1k tokens per commit against the ~73k child baseline. The catalogs
+    then stay in the caller's context, re-read from cache on each later turn. Change rate: the pass changed 0 of 18
+    drafts, which were written with the catalogs already loaded.
   - Summary: **The embedded humanizer pass costs ~73k sub-agent tokens per commit message and changed none in SPRINT-143.**
     Thirteen child passes (eleven commit messages, one batch of two sprint docs and two messages) each read the three
     pattern catalogs in full and returned "unchanged". About 950k tokens bought no edit, on short messages written in the
