@@ -183,3 +183,22 @@ T4 box 3 (the pin, TASK-519): before any edit, `/prototype`'s description and §
 after the change they were recorded again and diffed. The logic and UI bullets are unchanged and the fallback keeps both
 rules, with the demo rule appended. One difference the Done-when did not name was reported to the owner rather than
 absorbed: the description's "terminal logic prototype" became "logic TUI" to stay under the density limit.
+
+### 2026-10-26 | progress | T6 done: /prototype's UI branch writes a design-direction brief before any variant (TASK-522)
+Built inline by the coordinator. Commit `6435949c`. Steps in ui.md renumbered 1–7 with the brief at step 2; no stale step
+number anywhere (Codex checked). prose-density 26/0; prototype/SKILL.md 57 lines.
+consequence · T6 · behaviour:material · governance:low
+review · T6 · scoped-reviewer · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR, 2 findings fixed: the exercise offered DESIGN.md on the brief with no winner picked (the owner then
+picked one); the exercise's DESIGN.md carried the template's example sizes, radii and spacing as if approved (ui.md step 7
+now says template examples are not approvals, and the exercise file's unapproved values became placeholders). R2 CLEAR.
+Owner ruling **R7 (T6)**: the exercise covers the new steps only — the brief, three variants described against it but not
+built, and the DESIGN.md offer — not a full branch run.
+Box 4 exercise (real UI question): Workdoo's Inbox, where each department receives its own accountable onboarding work.
+The installed `frontend-design` skill was loaded for the brief, per the new deferral. Brief: a handover desk, not a feed;
+colour only for state (blocked, waiting, verified); Inter kept as the product face; operational density. Variants: A owner
+lanes, B blocking-first list (a deliberate departure from the brief), C case sheet; critiqued against frontend-design's
+calibration list. Capture: the owner picked C by popup and chose to record it, so `D:\Research\workdoo\docs\DESIGN.md` was
+written from the template with only the owner's fields (name, description, Inter, the direction line, the winner's layout
+sentence); every other value stayed a placeholder. Both exercise files are removed after this entry (workdoo copy
+snapshot and revert); copies are kept in the session scratchpad.

@@ -24,11 +24,11 @@ already has `frontend-design` and `anti-slop`, so lean-flow defers to them rathe
 Source: `docs/research/codex-run-project-pipeline.md` (11).
 
 ## Done when
-- [ ] Before variants: a short direction brief (subject idea · palette roles · type roles · density · operational vs promotional).
-- [ ] When the session's skill listing holds `frontend-design` or `anti-slop`, the branch defers to it (same shape as
+- [x] Before variants: a short direction brief (subject idea · palette roles · type roles · density · operational vs promotional). ✓ review: ui.md § Process step 2 (6435949c); Codex R2 CLEAR
+- [x] When the session's skill listing holds `frontend-design` or `anti-slop`, the branch defers to it (same shape as ✓ review: ui.md step 2 deferral (prefix-normalized names incl. `antislop`, load failure recorded, floor otherwise); Codex R2 CLEAR
       review's `antislop` deferral); without one, the brief and the existing anti-patterns are the floor and nothing errors.
-- [ ] Capture: the winner's direction is offered into `DESIGN.md` (never auto-created; fields only from the owner).
-- [ ] Exercised once on a real UI question; CHANGELOG `[Unreleased]` line.
+- [x] Capture: the winner's direction is offered into `DESIGN.md` (never auto-created; fields only from the owner). ✓ test: ui.md step 7 + SKILL.md capture; exercise: owner picked winner C by popup and chose to record it; DESIGN.md holds only owner fields, template examples left as placeholders
+- [x] Exercised once on a real UI question; CHANGELOG `[Unreleased]` line. ✓ test: Workdoo Inbox (D:\Research copy, new steps only by owner ruling; frontend-design loaded); CHANGELOG `## [Unreleased]` › SPRINT-143 sixth line (6435949c)
 
 ## Touches
 `skills/prototype/references/ui.md` · `skills/prototype/SKILL.md` (capture line) · CHANGELOG.md
