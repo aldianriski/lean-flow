@@ -22,10 +22,10 @@ independent slice to build first. The Codex pipeline ranks the first proof by va
 effort, so the slice whose outcome is least certain goes first. Source: `docs/research/codex-run-project-pipeline.md` (9).
 
 ## Done when
-- [ ] Among slices with no unmet dependency, the decomposer lists first the one that removes the most uncertainty,
+- [x] Among slices with no unmet dependency, the decomposer lists first the one that removes the most uncertainty, ✓ 84c901c9: step 4 Build order (ready slices; proof goal or its unblocker first; absent -> say so, rank by likelihood); Codex R1 CLEAR
       reading the requirements' First-milestone proof goal when present (TASK-516) and saying so when absent.
-- [ ] Exercised on one real decomposition.
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] Exercised on one real decomposition. ✓ headless workdoo --roadmap P3, plugin @84c901c9: TASK-088 listed first, proof goal cited; copy reverted, 3781 hashes match
+- [x] CHANGELOG `[Unreleased]` line. ✓ 84c901c9: CHANGELOG [Unreleased] SPRINT-144 bullet
 
 ## Touches
 `skills/task-decomposer/SKILL.md` (step 3) · CHANGELOG.md
