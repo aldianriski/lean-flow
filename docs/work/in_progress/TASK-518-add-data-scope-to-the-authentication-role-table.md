@@ -22,9 +22,9 @@ workspace), which is where permission bugs live. The Codex pipeline uses role ×
 navigation is not enforcement. Source: `docs/research/codex-run-project-pipeline.md` (7).
 
 ## Done when
-- [ ] `architecture-authentication.md.template`'s role table gains a data-scope column.
-- [ ] One line states that permissions are enforced at the application boundary; hiding a control is not enforcement.
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] `architecture-authentication.md.template`'s role table gains a data-scope column. ✓ 507bd917: Data scope column, header + separator + both rows widened; Codex R1 CLEAR
+- [x] One line states that permissions are enforced at the application boundary; hiding a control is not enforcement. ✓ 507bd917: enforcement line under the table, concept level
+- [x] CHANGELOG `[Unreleased]` line. ✓ 507bd917: CHANGELOG [Unreleased] SPRINT-144 bullet
 
 ## Touches
 `skills/lean-doc-generator/templates/architecture-authentication.md.template` · CHANGELOG.md
