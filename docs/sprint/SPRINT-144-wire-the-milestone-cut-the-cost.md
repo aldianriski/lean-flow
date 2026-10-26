@@ -4,6 +4,7 @@ slug: wire-the-milestone-cut-the-cost
 owner: Maintainer
 last_updated: 2026-10-26
 status: active
+gates_signed: G1,G2 @ f93bcdef
 plan_commit: 79ff7e89
 update_trigger: sprint execute/close events
 ---
@@ -34,6 +35,7 @@ owners in the flows template (T4) · data scope in the authentication role table
 
 ### T1 — Humanize commit messages inline, catalogs once per session `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `skills/humanizer/references/embedded.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+  · `skills/humanizer/SKILL.md` · `evals/fixtures/humanizer/fact-keep/NOTES.md`
   · `docs/work/todo/TASK-524-humanize-commit-messages-inline-once-per-session.md`
   · `docs/work/in_progress/TASK-524-humanize-commit-messages-inline-once-per-session.md`
   · `docs/work/done/TASK-524-humanize-commit-messages-inline-once-per-session.md`

@@ -30,3 +30,49 @@ Promote governance checklist, signed by the owner by popup:
 Intake: after SPRINT-143's close, `/triage` readied TASK-520 (TASK-516 done) at P2 and TD-278 became TASK-524 (owner
 rulings: inline path for commit messages; PR bodies unchanged). The owner chose all five ready tasks. Size check: five S,
 no `L`. All are `origin: decomposer`. No epic.
+
+### 2026-10-26 | gate | G1 + G2 signed by the owner by popup; five builder checks settled; three owner rulings
+G1: all five members are `origin: decomposer`; the owner confirmed scope unchanged since `approve` (fast-path). G2:
+`CHANGELOG.md` is shared by all five, owned in T order (D1). Dispatch preflight CLEAR (T1=0 … T5=4, base-ref = HEAD
+`f93bcdef`); sequential in the main tree. Each task changes a shipped file, so each takes the Codex loop, cap 2 rounds (D2,
+the owner chose full D2 over a T1+T2-only option).
+Owner rulings:
+- **R1 (A1, T1):** "the next sprint's commit messages" means the commits after T1 lands, T2 to T5 and close included.
+  TASK-524 waits in `review/` until then; box 3 ticks and TD-278 resolves inside this sprint.
+- **R2 (T2 target):** the exercise runs in `D:\Research\workdoo` on `--roadmap P3`. Its `requirements.md` has no First
+  milestone, so one is added to the research copy (snapshot, then revert) with the proof goal the owner accepted: "an
+  internal project and a company-wide work row can be created with an owner and a dependency, and a dependency cycle is
+  refused". Stopping condition and boundary keep their placeholders.
+- **R3:** A2 and A3 confirmed. A3 by reading: S4.SECTIONS matches only the Status and Deciders bullets plus four `## `
+  headings, so a new header bullet cannot change its verdict.
+Settled facts and design fixes (coordinator, from the builder checks):
+- T1: a new § Inline path in `embedded.md` (catalogs read once per session, again after a compaction; fact list and check
+  kept; no status line); § Commit messages and PR bodies gains a Route bullet; the fallback stays for documents and PR
+  bodies on a runtime with no sub-agent; a worktree builder is its own session. Box 2: three headless runs on the retained
+  sample, format `markdown` as in the fixture's recorded runs, judged from each transcript. Box 3 is measured, not
+  estimated: catalog tokens once plus the pass's output tokens, amortized over this sprint's inline commits, with the
+  change rate TD-278's fix direction asks for. "No child spawned" is a judgment tick resting on this Log, since git
+  cannot show a dispatch. `fact-keep/NOTES.md` gains the inline recipe and runs; `humanizer/SKILL.md`'s summary names the
+  inline route (scope-change below).
+- T2: the rule sits in step 4, where the risk scores exist, and orders ready slices only; when the proof slice is not
+  ready, the ready slice that unblocks it goes first. `--roadmap` input skips the grill, so a headless run reaches the
+  breakdown.
+- T3: the line goes after `Context driver`. The S4 run places the example at `docs/adr/` in a scratch repo, with an
+  unedited-example control.
+- T4: the comment above the table is one line; the cap check is `wc -l` against §2's 100, since `check-doc-caps` does not
+  scan templates. T5: the enforcement sentence copies the Done-when and drops "on every request".
+- T4 and T5 readers found no `[Unreleased]` block: T1 creates it, shaped as SPRINT-143's `25a0a55b`. No checker parses
+  any touched section (grep over `scripts/`, `evals/`, `test/`, `conformance.sh`: zero hits).
+Deviation: commit messages from this entry on take the inline pass now (catalogs read once), per the owner's intake ruling
+that T1 codifies; the current text would send each to a child.
+builder-check · T1 · 3 contradictions · 5 questions · box 3 measured not estimated; worktree builder = own session; NOTES + SKILL.md by scope-change; A1 by ruling R1
+builder-check · T2 · 2 contradictions · 3 questions · rule in step 4, ready slices only; `--roadmap` skips the grill; target by ruling R2
+builder-check · T3 · 0 contradictions · 2 questions · placement after Context driver; qa-check covers other readers
+builder-check · T4 · 1 contradictions · 4 questions · Unreleased created by T1; one-line comment; no parser of the section
+builder-check · T5 · 1 contradictions · 4 questions · Unreleased created by T1; sentence copies the Done-when
+
+### 2026-10-26 | scope-change | T1 adds skills/humanizer/SKILL.md and evals/fixtures/humanizer/fact-keep/NOTES.md to its Layers
+What broke: `skills/humanizer/SKILL.md` § Embedded says the pass "runs in a child sub-agent (inline fallback)", which
+T1 makes untrue for commit messages; and `evals/fixtures/humanizer/fact-keep/NOTES.md` defines the run recipe as the
+child brief, so box 2's inline runs would leave it stale. Neither file was in T1's `Layers:`. Impact: both join T1's
+`Layers:`; no Done-when changes. G2 confirmed by the owner in the same popup.
