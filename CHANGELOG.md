@@ -29,6 +29,8 @@ status: current
 - The ADR template gains an optional **Revisit when:** header line beside Status and Deciders: the condition that
   would reopen the decision, never a date. The worked example fills it. It is not a required §4 section, so the
   conformance engine's ADR checks are unchanged (TASK-515).
+- The flows template's Steps that matter is now a table: each step records the record it changes, its owner and the
+  next owner (roles, never names), because business flows tend to break at the handover between steps (TASK-517).
 
 ---
 

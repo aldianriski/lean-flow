@@ -31,8 +31,12 @@ flowchart TD
 ```
 
 ## Steps that matter [CUSTOMIZE]
-1. [step — WHY it happens, not the implementation]
-2. [step]
+<!-- One row per step, in order. Owner and next owner are roles, never personal names. -->
+
+| # | Step (WHY it happens) | Record changed | Owner | Next owner |
+|:--|:----------------------|:---------------|:------|:-----------|
+| 1 | [step — WHY it happens, not the implementation] | [the authoritative record it creates or changes, or `none`] | [role] | [role that acts next, or `end`] |
+| 2 | [step] | [record] | [role] | [role] |
 
 ## Failure / edge branches [CUSTOMIZE]
 
