@@ -4,6 +4,7 @@ slug: what-the-codex-pipeline-taught
 owner: Maintainer
 last_updated: 2026-10-26
 status: active
+plan_commit: dce1cd3b
 update_trigger: sprint execute/close events
 ---
 
