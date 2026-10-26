@@ -149,3 +149,5 @@ What broke: system verify on `e36eca1d` (gate-remote, QA_FULL) FAILed `layers ob
 `Layers:` named a review path; both declared only the todo, in_progress and done paths. Impact: each path joins its
 task's `Layers:`; no Done-when changes; the gate re-runs before close.
 system-verify · FAIL(layers-observed: T1 and T4 review/ member paths undeclared) · e36eca1d · 316 pass, 1 fail
+owner-ruling: system-verify — fixed-and-rerun: the T1 and T4 review/ member paths were declared by scope-change (bbf74f98); the rerun printed 317 pass, 0 fail
+system-verify · PASS · bbf74f98 · 317 pass, 0 fail (gate-remote QA_FULL; the first attempt lost ssh mid-run, the remote run was read back and finished rc 0, not retried)
