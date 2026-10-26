@@ -41,7 +41,8 @@ Never changed: paths, commands, ids, the `handoff-path` line and the status fiel
 2. **State** — what's done, what's in progress, what's left. Be concrete (files touched, decisions made).
 3. **Next steps** — the ordered list the next agent should start with.
 4. **Blockers / open questions** — anything unresolved, with what's needed to unblock.
-5. **Uncertain writes** — every write you started but did not see finish (a worktree agent that timed out, a remote gate run whose connection dropped, a merge-back that stopped part-way, a push with no reply), plus any you inherited from an earlier handoff and have not yet reconciled: the operation, its target, and how to read it back. A timeout does not prove it failed. Write `none` when there is none; never omit the item.
+5. **Uncertain writes** — every write you started but did not see finish (a worktree agent that timed out, a remote gate run whose connection dropped, a merge-back that stopped part-way, a push with no reply), plus any you inherited from an earlier handoff and have not yet reconciled:
+   the operation, its target, and how to read it back. A timeout does not prove it failed. Write `none` when there is none; never omit the item.
 6. **Suggested skills** — which skills the next agent should invoke (e.g. `/prime` first, then `/orchestrator` to resume, `/diagnose` for the failing test).
 7. **References — do not duplicate** — point to durable artifacts by path or URL (PRDs, ADRs, the sprint file, commits, diffs, issues). Summarize only what is NOT already captured elsewhere.
 
