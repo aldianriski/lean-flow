@@ -132,3 +132,12 @@ review · T4 · codex · behaviour:CLEAR · governance:CLEAR
 consequence · T5 · behaviour:material · governance:low
 review · T5 · codex · behaviour:CLEAR · governance:CLEAR
 Codex R1 CLEAR on all six items (three per task).
+
+### 2026-10-26 | progress | T1 done: box 3 ticked and TD-278 resolved with the measured cost (TASK-524)
+Under ruling R1, box 3 counts the commits after T1. From `d9c05e66` to `6e241add`, 18 free-prose commit messages took
+the inline pass and none started a humanizer child (this Log is the record; git cannot show a dispatch); 11
+fixed-template moves skipped it. Cost per commit, measured in the box 2 runs: catalogs 20,028 to 22,342 tokens once per
+session plus 1,454 to 1,857 output tokens per pass, about 3.1k per commit over 18 against the ~73k child baseline. The
+pass changed 0 of 18 drafts, all written with the catalogs loaded. TD-278 resolved in `6e241add`. The close commits
+also take the inline pass. A joint T4/T5 tick commit was split per task before anything else landed, so each commit's
+files sit inside one task's `Layers:`.
