@@ -20,6 +20,18 @@ Two named findings, so a fixture asserts on the checker's own finding rather tha
 | `ceiling-ok-sibling/` | same task, one `retry` line, `fixed` | control (L-142) — PASS |
 | `escalation-missing/` | one `retry` line ending `still-open`, no `parked-hitl` line | must-FAIL — `revise-loop-escalation-missing` |
 | `escalation-ok-sibling/` | same `still-open` retry, followed by `parked-hitl` | control (L-142) — PASS |
+| `rejection-unevidenced/` | a `rejected (…)` retry, parked, its parenthesis naming no evidence token | must-FAIL — `revise-loop-rejection-unevidenced` (SPRINT-143 T2) |
+| `rejection-evidenced-sibling/` | the same rejection with `fixture` inside the parenthesis | control (L-142) — PASS |
+| `rejection-token-outside/` | an evidence token in the finding text, none inside the parenthesis | must-vary-**selection** (L-186) — FAIL `revise-loop-rejection-unevidenced`; a checker matching the token anywhere on the line would pass it |
+| `rejection-unparked/` | an evidenced `rejected (…)` retry with no `parked-hitl` line | must-FAIL — `revise-loop-escalation-missing` (a rejection parks too) |
+| `rejection-prior-outcome-quoted/` | the finding quotes an earlier `→ rejected (test: …)`; the actual outcome's parenthesis has none | must-vary-**selection** — FAIL `revise-loop-rejection-unevidenced` |
+| `rejection-paren-crossing/` | an evidence token just past the rejection's closing `)` | must-vary-**selection** — FAIL `revise-loop-rejection-unevidenced` |
+| `rejection-inner-arrow-parked/` | `→ rejected (reviewer quoted → fixed)`, parked: the inner arrow is payload | must-FAIL — `revise-loop-rejection-unevidenced` |
+| `rejection-inner-arrow-unparked/` | `→ rejected (check: observed -> fixed)` with no park | must-FAIL — `revise-loop-escalation-missing` |
+| `outcome-unbalanced-paren/` | an unmatched `(` in the finding text before a `→ rejected (…)` outcome | must-FAIL — `revise-loop-outcome-unparseable` (fail closed, never open) |
+| `rejection-nested-evidence-sibling/` | evidence after a nested parenthesis inside `rejected (…)` | control — PASS (read to the matching `)`) |
+| `quoted-rejection-then-fixed/` | the finding quotes an old `-> rejected (…)`; the actual outcome is `fixed` | control — PASS (no park, no evidence needed) |
+| `deferred-escalation-missing/` | a `deferred (…)` retry with no `parked-hitl` line | must-FAIL — `revise-loop-escalation-missing` (unattended, a deferral parks) |
 | `selection-window/` | two textually-identical `T6 · retry ·` lines, one either side of a `<!-- fixture: this-run-window-starts-here -->` marker | must-vary-**selection** (L-186) — fed with `base=0` the two lines collapse into one task's count and FAIL; fed with the marker-derived base only this run's single retry is in scope and PASS. Same verdict math either time — what differs is which line is in the window |
 
 `ceiling-exceeded/` and `escalation-missing/` are each built to carry only their own trigger (no

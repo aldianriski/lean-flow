@@ -759,9 +759,11 @@ designed and needs a decision; a denial is an under-scoped allowlist and needs a
 distinguish both from `unattempted`: those two were *reached*, this one never was.
 
 **A revise-loop retry (ADR-022) adds one line per firing** beneath its task's state line —
-`Tn · retry · <axis>: <finding> → fixed | still-open` — emitted whether or not the retry succeeded.
-A `still-open` outcome parks the task (`parked-hitl`, the finding named); the states above are
-unchanged — the retry line is supplementary, never a new task state.
+`Tn · retry · <axis>: <finding> → fixed | still-open | rejected (<evidence>) | deferred (<impact> → TASK/TD)`
+— emitted whether or not the retry succeeded. A `still-open`, `rejected` or `deferred` outcome parks the
+task (`parked-hitl`, the finding named): unattended, closing a finding without a fix is a judgement, and a
+`rejected` names its evidence inside the parenthesis (`test` · `check` · `fixture` · `owner-ruling`). The states
+above are unchanged — the retry line is supplementary, never a new task state.
 
 **The ceiling is enforced mechanically over whatever retry lines the run wrote — and what it does
 NOT do is verify that every retry was logged.** Unlike `unattempted`, a retry has no absence-based
@@ -773,9 +775,10 @@ because an earlier draft of this passage claimed the opposite and an independent
 false (SPRINT-098 T2 · `TD-152`). The reaper (§ The reaper, above) reads
 these same lines back at exit — `check_revise_ceiling()` in lean-flow's launcher (`scripts/night-run.sh`), called from
 `reap()` before `terminal ·` is derived — and FAILs the run named if a task carries more than one
-`retry` line in this run's window (`revise-loop-ceiling-exceeded`) or a `still-open` outcome has no
-matching `Tn · parked-hitl ·` line (`revise-loop-escalation-missing`): a second firing, or a
-still-open that never escalates, becomes `HARD_FAILURE`, never a silent `PLAN_EXHAUSTED`. The ceiling
+`retry` line in this run's window (`revise-loop-ceiling-exceeded`), a `still-open`, `rejected` or
+`deferred` outcome has no matching `Tn · parked-hitl ·` line (`revise-loop-escalation-missing`), or a
+`rejected` cites no evidence (`revise-loop-rejection-unevidenced`), or a retry line's outcome cannot be read
+(`revise-loop-outcome-unparseable` — fail closed): each becomes `HARD_FAILURE`, never a silent `PLAN_EXHAUSTED`. The ceiling
 itself is ADR-022 § Decision item 2, read from there and never re-chosen.
 
 **A system-verify pass (dispatch.md § System verify) adds one line, once, after the final wave's

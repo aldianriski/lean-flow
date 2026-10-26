@@ -82,10 +82,17 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
 
 - **Ceiling: one retry per review pass, total.** Both findings travel together; there is never a second
   retry. Whatever the re-review still flags goes to the owner as `still-open` — the loop cannot spiral.
+  Two more outcomes close a finding without a fix: **`rejected (<evidence>)`** — the finding is wrong, and the
+  parenthesis cites what shows it (`test` · `check` · `fixture` · `owner-ruling`; citing the review itself proves
+  nothing) — and **`deferred (<impact> → TASK-NNN | TD-NNN)`** — real but out of this task's scope, routed with its
+  impact stated. Attended, the builder may reject with evidence, and the rejection is shown in the review report
+  before anything commits. Unattended, both are judgements, so both park (`parked-hitl`), exactly like `still-open`.
   **Unattended, this is not only stated here** — lean-flow's own launcher (`scripts/night-run.sh`) reaper (`check_revise_ceiling`,
   called from `reap()`) reads the run's own `Tn · retry ·` lines off the Execution Log at exit and FAILs
-  the run's `terminal ·` state named (`revise-loop-ceiling-exceeded` / `revise-loop-escalation-missing`)
-  if a task fired more than one retry, or a `still-open` outcome never escalated to `parked-hitl` — the
+  the run's `terminal ·` state named (`revise-loop-ceiling-exceeded` / `revise-loop-escalation-missing` /
+  `revise-loop-rejection-unevidenced` / `revise-loop-outcome-unparseable`) if a task fired more than one retry,
+  a `still-open`, `rejected` or `deferred` outcome never escalated to `parked-hitl`, a `rejected` cites no
+  evidence, or a retry line's outcome cannot be read — the
   ceiling is ADR-022 § Decision item 2, read from there and never re-chosen (A4).
 - **Fires automatically in attended modes** (`quick` · `mvp` · `sprint-bulk` with a human present). The
   review report surfaces `finding → retry → outcome` per axis before anything commits — the human gates
@@ -99,10 +106,10 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   ≠ consent), writing one rollup line per firing (`night-run.md` Part 0 + Part 4 · ADR-022).
 - **Log the outcome.** The report always shows it; in sprint modes the coordinator also appends one
   Execution Log **`progress`** entry (the log taxonomy defines no `revise` kind, and inventing event
-  kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open` per
-  axis — each outcome names its evidence in the rollup's own vocabulary (`test | check | fixture |
+  kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open | rejected (…) |
+  deferred (…)` per axis — each outcome names its evidence in the rollup's own vocabulary (`test | check | fixture |
   review | owner-ruling` — night-run.md Part 4): `fixed` names what proved it, `still-open` names
-  what's still missing.
+  what's still missing, `rejected` names what shows the finding wrong (never `review`), `deferred` names where it went.
 - **Close the loop with its review line.** When a review loop closes — CLEAR, `fixed`, or `still-open`,
   whichever reviewer ran — append `review · Tn · <depth> · behaviour:… · governance:…` to the Execution Log
   (night-run.md Part 4). An external reviewer (e.g. a Codex review loop, or any reviewer outside Claude's

@@ -120,7 +120,9 @@ find_sprint() {
 # fixed|still-open` line (night-run.md Part 4) and a task's own `Tn · <state> ·` line. Two named
 # findings, so a fixture asserts on which rule fired, never on a bare non-zero exit:
 #   revise-loop-ceiling-exceeded   -- a task fired more than one retry in this run's window
-#   revise-loop-escalation-missing -- a still-open retry with no matching parked-hitl line
+#   revise-loop-escalation-missing -- a still-open, rejected or deferred retry with no matching parked-hitl line
+#   revise-loop-rejection-unevidenced -- a rejected retry whose parenthesis names no evidence token
+#   revise-loop-outcome-unparseable -- a retry line whose outcome cannot be read (fails closed)
 #
 # `base` is the SAME 0-indexed "lines already in the file before this run" cutoff `reap()`'s
 # rp_base uses (default 0, i.e. the whole file) -- an EARLIER run's retry line for the same task
@@ -172,6 +174,61 @@ check_revise_ceiling() {
         printf 'FAIL  revise-loop-escalation-missing: %s retry ended still-open with no %s · parked-hitl · line -- ADR-022 requires a second failure to escalate, never loop\n' "$crc_t" "$crc_t"
         crc_fail=1
       }
+    fi
+
+    # `rejected` and `deferred` close a finding without a fix. Unattended that is a judgement, so they
+    # park exactly like still-open (review-scoping.md § The revise loop, SPRINT-143 T2). A finding's own
+    # text can quote an earlier outcome, so the line's ACTUAL outcome is isolated first: the LAST
+    # `→ <outcome word>` (or `->`) at parenthesis depth 0, kept with whatever follows. An arrow inside any
+    # parenthesis -- a deferral's `→ TD-NNN`, a rejection quoting `→ fixed` -- is payload, never the
+    # outcome (L-108; Codex R1 and R2, SPRINT-143 T2). `length("→")` keeps it right in byte and char awks.
+    crc_outs=$(printf '%s\n' "$crc_window" | grep -E "^${crc_t} · retry · " | awk '
+      BEGIN { ua = "→"; ul = length(ua) }
+      {
+        s = $0; n = length(s); d = 0; last = 0
+        for (i = 1; i <= n; i++) {
+          c = substr(s, i, 1)
+          if (c == "(") { d++; continue }
+          if (c == ")") { if (d > 0) d--; continue }
+          if (d) continue
+          al = 0
+          if (substr(s, i, ul) == ua) al = ul
+          else if (substr(s, i, 2) == "->") al = 2
+          if (al) {
+            j = i + al; while (substr(s, j, 1) == " ") j++
+            if (substr(s, j) ~ /^(fixed|still-open|rejected|deferred)([^a-z-]|$)/) last = j
+          }
+        }
+        # Fail CLOSED (Codex R3): no outcome at depth 0, or a parenthesis left open, means the line cannot be
+        # read with confidence -- say so by name rather than dropping it and passing.
+        if (!last || d > 0) print "UNPARSEABLE"; else print substr(s, last)
+      }')
+    if printf '%s\n' "$crc_outs" | grep -qx 'UNPARSEABLE'; then
+      printf 'FAIL  revise-loop-outcome-unparseable: %s has a retry line whose outcome cannot be read (no outcome word outside parentheses, or an unbalanced parenthesis) -- refusing to pass it unchecked\n' "$crc_t"
+      crc_fail=1
+    fi
+    for crc_o in rejected deferred; do
+      if printf '%s\n' "$crc_outs" | grep -qE "^${crc_o}([^a-z-]|$)"; then
+        printf '%s\n' "$crc_window" | grep -qE "^${crc_t} · parked-hitl · " || {
+          printf 'FAIL  revise-loop-escalation-missing: %s retry ended %s with no %s · parked-hitl · line -- unattended, closing a finding without a fix is a judgement and parks\n' "$crc_t" "$crc_o" "$crc_t"
+          crc_fail=1
+        }
+      fi
+    done
+
+    # A rejection names its evidence INSIDE its own parenthesis: one of test · check · fixture ·
+    # owner-ruling, as an exact word. Only that parenthesis is read -- never the finding text, never past
+    # its closing `)`; a rejection with no parenthesis has no evidence.
+    crc_bad=$(printf '%s\n' "$crc_outs" | grep -E '^rejected([^a-z-]|$)' | while IFS= read -r crc_r; do
+      printf '%s\n' "$crc_r" | awk '{ i = index($0, "("); if (!i || substr($0, 1, i - 1) !~ /^rejected *$/) exit
+        d = 0; for (k = i; k <= length($0); k++) { c = substr($0, k, 1)
+          if (c == "(") d++; else if (c == ")" && --d == 0) { print substr($0, i + 1, k - i - 1); exit } } }' |
+        tr -cs 'A-Za-z-' '\n' |
+        grep -qxE 'test|check|fixture|owner-ruling' || echo unevidenced
+    done)
+    if [ -n "$crc_bad" ]; then
+      printf 'FAIL  revise-loop-rejection-unevidenced: %s rejected a finding without evidence (test · check · fixture · owner-ruling) inside its rejected (...) -- a rejection must show the finding wrong\n' "$crc_t"
+      crc_fail=1
     fi
   done
 

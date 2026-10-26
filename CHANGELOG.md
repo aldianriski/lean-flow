@@ -22,6 +22,10 @@ status: current
 - A write whose outcome is unknown is read back before it is retried. `/handoff` lists every write it started but did not
   see finish, `/prime` names it on the `Handoff:` row and the `Next:` line, and `/orchestrator` reads its target back before
   any retry, because a timeout does not prove a write failed (TASK-513).
+- A review finding can close without a fix. The revise loop's outcomes are now `fixed`, `still-open`,
+  `rejected (<evidence>)` and `deferred (<impact> → TASK/TD)`. When a human is present, the builder may reject a
+  finding by citing a test, check, fixture or owner ruling, and the rejection shows in the review report. In an
+  unattended run, rejecting or deferring is a judgement, so the task parks (TASK-514).
 
 ---
 
