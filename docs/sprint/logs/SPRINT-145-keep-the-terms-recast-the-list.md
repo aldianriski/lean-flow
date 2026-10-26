@@ -54,3 +54,17 @@ builder-check · T2 · 1 contradictions · 5 questions · ID-18 example facts eq
 What broke: T2's box 4 runs on the T1 fixture, and its run record belongs in
 `evals/fixtures/humanizer/term-of-art/NOTES.md`, a file T2's `Layers:` did not name. Impact: the path joins T2's
 `Layers:`; no Done-when changes. G2 confirmed by the owner in the same popup.
+
+### 2026-10-26 | progress | T1 done: Indonesian domain text keeps English terms of art (TASK-525)
+Built inline by the coordinator (a subsection and a sentence in one catalog, plus a fixture it designed at G2). Commits
+`86dbebd6` (rule, fixture, CHANGELOG) and the run record in the fixture NOTES. Order per L-255: fixture, then the
+baseline, then the fix. Baseline: three child-path runs pinned to an export of `81a8ef87` (2.17.0); all three kept "ruang
+kosong" and "serah terima" and wrote the fault tolerance in Indonesian. After: three runs pinned to `86dbebd6`. One was
+discarded unjudged: its Skill call failed, it searched for the catalogs and read the baseline export, which sat under
+the same `--add-dir` (an L-254-class contamination of the coordinator's setup, not a result); re-run in a folder holding
+only the T1 export. A fresh Sonnet judge scored all six valid finals blind (labels shuffled; key kept in the scratchpad):
+baseline 0 of 3 pass (free space, fault tolerance, acceptance test stay Indonesian in each), after 3 of 3 (5 of 5 terms,
+no general word anglicized, all fifteen facts kept, nothing added). Headless cost $0.29 to $0.38 per run.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · codex · behaviour:CLEAR · governance:CLEAR
+Codex R1 CLEAR on all five items.
