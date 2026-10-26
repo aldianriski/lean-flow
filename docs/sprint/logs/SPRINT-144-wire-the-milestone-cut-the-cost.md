@@ -76,3 +76,21 @@ What broke: `skills/humanizer/SKILL.md` § Embedded says the pass "runs in a chi
 T1 makes untrue for commit messages; and `evals/fixtures/humanizer/fact-keep/NOTES.md` defines the run recipe as the
 child brief, so box 2's inline runs would leave it stale. Neither file was in T1's `Layers:`. Impact: both join T1's
 `Layers:`; no Done-when changes. G2 confirmed by the owner in the same popup.
+
+### 2026-10-26 | progress | T1 built: commit messages humanized inline; boxes 1, 2 and 4 ticked, box 3 waits on the later commits (TASK-524)
+Built inline by the coordinator, not dispatched: small prose edits in two files it had already read, where a dispatch
+would re-pay ~50k of substrate for a few lines. Commits `9ece808f` (the change), `f3ead434` (fixture NOTES), `7c3da633`
+(round-1 fix). Checks that read the touched files: prose-density (no FAIL), layout harness, doc caps; the full gate on
+`d9c05e66` ran remotely, 316 pass, 0 fail.
+Box 2: three headless inline runs against an export of `9ece808f`, prompt assembled verbatim from `embedded.md`. All three
+kept 11 of 11 facts and returned no fact list. Run 1 added a rollout actor ("Finance Ops rolled out"); the coordinator's
+first read missed it and Codex caught it. Owner ruling at the T1 box 2 popup: box 2 ticks on its words ("keeps every
+fact"); the addition is the pass's own variance (same item-4 instructions as the child) and is recorded under TD-274.
+Measured cost: each run read the catalogs once at 20,028 to 22,342 tokens of new context and spent 1,454 to 1,857 output
+tokens on the pass; the whole fresh-session run came to about 77k tokens, roughly the child's ~73k, so the saving comes
+from paying the catalogs once per session, not from a cheaper single pass.
+Humanizer route so far: `d9c05e66`, `9ece808f`, `f3ead434` and `7c3da633` took the inline pass with no child (catalogs
+read once at the gate entry); the pass changed 0 of 4 drafts. Fixed-template moves skip.
+consequence · T1 · behaviour:material · governance:high
+review · T1 · codex · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR on item 3 only (run 1's added actor), items 1, 2 and 4 CLEAR; fix `7c3da633`; R2 CLEAR.
