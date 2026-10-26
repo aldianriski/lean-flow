@@ -26,7 +26,7 @@ inspects the existing artifact first and compares before and after. Source:
 - [x] The implement routing has a row for "change existing behaviour", whose first G2 micro-task pins that behaviour ✓ review: dispatch.md § Implement routing, modifier row; SKILL.md G2 bullet + Phases line (5bc89300); Codex R2 CLEAR
       (characterization test, or a before/after record where no test harness exists).
 - [x] The pin is re-run after the change; a difference not named in the task's Done-when is reported, not absorbed. ✓ review: the same row + the builder-brief pin contract in dispatch.md (5bc89300); Codex R2 CLEAR
-- [ ] Exercised once on a real change to existing behaviour.
+- [x] Exercised once on a real change to existing behaviour. ✓ test: T5's change to /prototype's branch routing, pinned before any edit (ab25f243) and re-run after (5fb1ac2c): logic and UI routes unchanged; one unnamed difference reported to the owner ("terminal logic prototype" → "logic TUI" in the description, forced by the density limit)
 - [x] SKILL.md stays within ~140 lines; CHANGELOG `[Unreleased]` line. ✓ check: `wc -l` 140; CHANGELOG `## [Unreleased]` › SPRINT-143 fourth line (5bc89300)
 
 ## Touches

@@ -23,12 +23,12 @@ persistence/reset · integration boundary · demo identity ≠ auth), labelled s
 "ready for walkthrough" kept apart from "validated". Source: `docs/research/codex-run-project-pipeline.md` (10).
 
 ## Done when
-- [ ] `/prototype` routes a "will a customer understand and want this?" question to a third branch, in its own reference file.
-- [ ] The branch records the contract, labels every simulated action, and never presents fixtures as real customers or data.
-- [ ] It prepares a task script (starting state · tasks · expected outcomes · non-leading questions) and claims
+- [x] `/prototype` routes a "will a customer understand and want this?" question to a third branch, in its own reference file. ✓ review: SKILL.md § Pick a branch + fallback → references/demo.md (5fb1ac2c); Codex R2 CLEAR
+- [x] The branch records the contract, labels every simulated action, and never presents fixtures as real customers or data. ✓ review: demo.md § Write the contract first (undecided field blocks the build) + § Honest claims; Codex R2 CLEAR
+- [x] It prepares a task script (starting state · tasks · expected outcomes · non-leading questions) and claims ✓ review: demo.md § The task script + § Claims ladder (validated = real target users, owner-ruling R2); Codex R2 CLEAR
       "validated" only after a recorded session.
-- [ ] Lifecycle: retired after the recorded session; observations captured to requirements or an ADR, as the other branches do.
-- [ ] Exercised once on a real brief; SKILL.md stays within ~140 lines; CHANGELOG + README if the skill's one-liner changes.
+- [x] Lifecycle: retired after the recorded session; observations captured to requirements or an ADR, as the other branches do. ✓ review: demo.md § Lifecycle + SKILL.md § Capture the answer; Codex R2 CLEAR
+- [x] Exercised once on a real brief; SKILL.md stays within ~140 lines; CHANGELOG + README if the skill's one-liner changes. ✓ test: Workdoo onboarding brief → contract + task script, no validated claim (signed G2 scope); `wc -l` 56; CHANGELOG + README lines 196 and 483 (5fb1ac2c)
 
 ## Touches
 `skills/prototype/SKILL.md` · `skills/prototype/references/demo.md` (new) · CHANGELOG.md · README.md (if wording changes)

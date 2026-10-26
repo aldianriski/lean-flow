@@ -163,3 +163,23 @@ applies, and dispatch.md's intro says the last row is not a work type); the pin'
 builder (the builder-brief paragraph now carries the contract in full). R2 CLEAR.
 Boxes 1, 2 and 4 ticked. Box 3 (a real change to existing behaviour) is exercised at T5: T5's first G2 micro-task captures
 /prototype's current branch routing before any edit and re-runs it after. TASK-519 stays in `in_progress/` until then.
+
+### 2026-10-26 | progress | T5 done: /prototype gains a customer-review demo branch (TASK-521); T4's box 3 exercised on it
+Built inline by the coordinator. Commit `5fb1ac2c`. Harnesses reading prototype/SKILL.md, all green: sprint-family, layout,
+orchestrator-store, prose-density, qa-store-legs, store-readers, store-writers, work-store; prose-density 26/0 after the
+description was shortened (a first draft pushed line 3 to 407 characters, a new dense line).
+consequence · T5 · behaviour:material · governance:low
+review · T5 · scoped-reviewer · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR, 2 Standards findings fixed: an undecided contract field had no blocking rule (demo.md now blocks the
+build on one); the exercise's notes claimed "ready for walkthrough" with no screens built (corrected to "not yet ready").
+R1's box-5 finding was withdrawn at R2 against the signed G2 scope (contract and task script, no app code). R2 CLEAR.
+Box 5 exercise (real brief, owner's choice: a Workdoo flow): Workdoo's onboarding flow
+(`D:\Research\workdoo\docs\flows\onboarding.md`) routed to the branch. Output `D:\Research\demo-scratch\NOTES.md`: a
+contract (HR lead audience; proof goal "name what blocks readiness and who owns it"; deterministic simulation; seeded,
+resettable state; simulated boundary with no allowed side effects; demo roles labelled as not sign-in), honest-claims notes
+using the source flow's own sample people, a four-task script with expected outcomes and non-leading questions, and the
+claim "not yet ready for walkthrough". No app code; the scratch folder is deleted after this entry.
+T4 box 3 (the pin, TASK-519): before any edit, `/prototype`'s description and § Pick a branch were recorded at `ab25f243`;
+after the change they were recorded again and diffed. The logic and UI bullets are unchanged and the fallback keeps both
+rules, with the demo rule appended. One difference the Done-when did not name was reported to the owner rather than
+absorbed: the description's "terminal logic prototype" became "logic TUI" to stay under the density limit.
