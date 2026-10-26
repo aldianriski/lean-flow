@@ -120,3 +120,15 @@ all green; prose-density no FAIL.
 consequence · T3 · behaviour:material · governance:low
 review · T3 · codex · behaviour:CLEAR · governance:CLEAR
 Codex R1 NOT CLEAR on item 2 only because the review input omitted the example's body; R2 with the full example CLEAR.
+
+### 2026-10-26 | progress | T4 and T5 done: flow steps name their owners; the role table records data scope (TASK-517, TASK-518)
+Both built inline by the coordinator (a few template lines each). T4 `457e07a2`: § Steps that matter becomes a table of
+step, record changed, owner and next owner, with a one-line comment (roles, never names); the file was re-read after the
+edit and both tables stand apart; 49 lines against §2's 100 for `flows/<slug>.md` (`wc -l`; `check-doc-caps` does not scan
+templates). T5 `507bd917`: a Data scope column (header, separator and both rows widened) and the enforcement line copied
+from the Done-when. prose-density no FAIL for either. Reviewed together in one Codex call with a verdict per task.
+consequence · T4 · behaviour:material · governance:low
+review · T4 · codex · behaviour:CLEAR · governance:CLEAR
+consequence · T5 · behaviour:material · governance:low
+review · T5 · codex · behaviour:CLEAR · governance:CLEAR
+Codex R1 CLEAR on all six items (three per task).
