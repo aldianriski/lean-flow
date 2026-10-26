@@ -19,6 +19,12 @@ bounded by the safe-scaffold allowlist (ADR-012).
    names it and the condition that skipped it), so an absent doc reads as a decision rather than a miss.
 3. **Offer higher tiers via an AskUserQuestion popup** — default the selection from the substrate
    detection in step 1, let the user confirm/override:
+   - **First milestone** (same popup round — independent of the tier choice) — three questions for
+     `requirements.md` § First milestone: proof goal · stopping condition · integration boundary
+     (`none` · `simulated` · `live`, with its allowed side effects). Each offers *not decided yet*, which
+     leaves that field `[CUSTOMIZE]`; boundary `none` writes side effects `none`. Never invent an answer.
+     The section is written only from this round's answers; headless, it parks with the rest (below) and
+     nothing is written.
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
      `architecture/authentication.md` (auth exists). Templates → table below.

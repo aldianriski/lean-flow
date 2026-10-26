@@ -28,6 +28,14 @@ status: current
 **Out of scope:**
 - [what it deliberately does not cover, and why]
 
+## First milestone [CUSTOMIZE]
+<!-- What the first slice must prove, and where it stops. Filled from the owner's answers, never
+     invented; an unanswered field keeps its placeholder. -->
+
+- **Proof goal:** [the uncertainty this first slice removes]
+- **Stopping condition:** [what "done" means for this milestone; further ideas go to the backlog, not into it]
+- **Integration boundary:** [none | simulated | live] · **allowed side effects:** [named, or `none`; a simulated action is labelled as simulated]
+
 ## Functional requirements [CUSTOMIZE]
 <!-- Each requirement: one line, testable, numbered — acceptance-criteria.md keys off these
      R-numbers, so numbering is stable once assigned; never renumber, only append or deprecate. -->

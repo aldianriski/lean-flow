@@ -26,6 +26,9 @@ status: current
   `rejected (<evidence>)` and `deferred (<impact> → TASK/TD)`. When a human is present, the builder may reject a
   finding by citing a test, check, fixture or owner ruling, and the rejection shows in the review report. In an
   unattended run, rejecting or deferring is a judgement, so the task parks (TASK-514).
+- A new repo's `requirements.md` records its first milestone: what the first slice must prove, when to stop, and
+  the integration boundary (none, simulated or live, with its allowed side effects). `/lean-doc-generator init`
+  asks for all three in its popup and leaves `[CUSTOMIZE]` for any answer you have not decided yet (TASK-516).
 
 ---
 
