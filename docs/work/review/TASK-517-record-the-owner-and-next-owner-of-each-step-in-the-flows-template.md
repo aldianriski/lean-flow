@@ -22,9 +22,9 @@ is where business flows break (handover gaps). The Codex pipeline maps each jour
 owner and next owner. Source: `docs/research/codex-run-project-pipeline.md` (6).
 
 ## Done when
-- [ ] `flows.md.template` § Steps that matter carries, per step: record changed · owner · next owner (WHY/WHERE, no HOW).
-- [ ] The template stays within its line cap.
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] `flows.md.template` § Steps that matter carries, per step: record changed · owner · next owner (WHY/WHERE, no HOW). ✓ 457e07a2: Steps table # / Step / Record changed / Owner / Next owner, roles not names; Codex R1 CLEAR
+- [x] The template stays within its line cap. ✓ wc -l 49 vs STANDARD §2 flows cap 100 (check-doc-caps does not scan templates)
+- [x] CHANGELOG `[Unreleased]` line. ✓ 457e07a2: CHANGELOG [Unreleased] SPRINT-144 bullet
 
 ## Touches
 `skills/lean-doc-generator/templates/flows.md.template` · CHANGELOG.md
