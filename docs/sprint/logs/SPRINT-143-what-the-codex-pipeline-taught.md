@@ -144,3 +144,22 @@ re-adds it as part of its own wiring.
 Out of scope, for the close Retro's tech-debt bucket (pre-existing, raised by Codex): init.md's step 2 scaffolds base-tier
 files before step 3's popup decides a headless park; `product-requirements.md.template`'s header comment names lean-flow's
 `ADR-012`, which leaks into adopter output.
+
+### 2026-10-26 | scope-change | T4 drops .claude/CONTEXT.md from its Layers (sprint assumption A1)
+What broke: the always-loaded token budget sits exactly at its cap (~12691 of 12691), so T4's one-phrase addition to the
+CONTEXT.md routing line pushed it to ~12704 and `check-doc-caps` FAILed. Impact: per A1's stated fallback, the routing
+modifier lives in `skills/orchestrator/references/dispatch.md` and `skills/orchestrator/SKILL.md` only; CONTEXT.md's
+routing line, which already points at `/orchestrator`'s routing, is unchanged. T4's `Layers:` loses `.claude/CONTEXT.md`,
+which moves to its `Cites:` (left unchanged). No Done-when changes.
+
+### 2026-10-26 | progress | T4 built: a change to working behaviour starts by pinning it (TASK-519); box 3 waits for T5
+Built inline by the coordinator (in-place edits in a 140/140 SKILL.md plus one table row). Commit `5bc89300`.
+Harnesses green: orchestrator-store 42/0, sprint-family, dispatch-preflight, system-verify, worktree-base; prose-density
+26/0; doc-caps 0 FAIL after the A1 revert.
+consequence · T4 · behaviour:material · governance:high
+review · T4 · scoped-reviewer · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR, 2 findings fixed: SKILL.md listed the pin like a fifth route (now stated as a modifier on whatever route
+applies, and dispatch.md's intro says the last row is not a work type); the pin's definition did not reach a dispatched
+builder (the builder-brief paragraph now carries the contract in full). R2 CLEAR.
+Boxes 1, 2 and 4 ticked. Box 3 (a real change to existing behaviour) is exercised at T5: T5's first G2 micro-task captures
+/prototype's current branch routing before any edit and re-runs it after. TASK-519 stays in `in_progress/` until then.

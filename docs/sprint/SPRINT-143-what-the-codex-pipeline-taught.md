@@ -81,12 +81,12 @@ Depends on T2 for `CHANGELOG.md` order only (D1).
 `[CUSTOMIZE]` where none was given.
 
 ### T4 — Pin working behaviour before changing it `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/` · `.claude/CONTEXT.md` · `CHANGELOG.md`
+Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/` · `CHANGELOG.md`
   · `docs/work/todo/TASK-519-pin-existing-behaviour-before-changing-it.md`
   · `docs/work/in_progress/TASK-519-pin-existing-behaviour-before-changing-it.md`
   · `docs/work/done/TASK-519-pin-existing-behaviour-before-changing-it.md`
 Depends-on: T1, T3
-Cites: `TASK-519` · `docs/research/codex-run-project-pipeline.md` (8)
+Cites: `TASK-519` · `docs/research/codex-run-project-pipeline.md` (8) · `.claude/CONTEXT.md` (left unchanged, A1)
 
 Owner ruling at intake: it lives in `/orchestrator`'s routing and G2, not `/tdd`, because the owner's loop does not use
 `/tdd`. Depends on T3 for `CHANGELOG.md` order and on T1 for `skills/orchestrator/SKILL.md` (D1, D2).
