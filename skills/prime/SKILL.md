@@ -50,7 +50,7 @@ sprint → fall back to the backlog.
 **Coverage (read-only count):** an open `- [ ]` § Closed-when item of a `status: active` epic, and a roadmap row with `Status: active`,
 is **covered** when its mark names `next slice:`, an open task (outside `done/` · `cancel/`), or (rows) an active `EPIC-NNN`; else
 **uncovered**. Count both; `proposed` epics and `planned`/`done` rows exempt. Procedure → `lean-doc-generator/references/epic-coverage.md`.
-**Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
+**Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed. When its **Uncertain writes** item names one, the `Handoff:` row adds `· uncertain write: <target> → reconcile first` (the row is emitted for this even when no repo-side `handoff` entry exists) and `Next:` leads with reading that target back before any retry (a timeout is not a failure); `none` adds nothing.
 
 **Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root
 `HANDOFF-LEDGER.md` when none is active, may carry a `handoff` entry (see

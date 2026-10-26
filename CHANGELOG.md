@@ -14,6 +14,17 @@ status: current
 
 ---
 
+## [Unreleased]
+
+### SPRINT-143 — What the Codex Pipeline Taught
+
+**Consumer-facing:**
+- A write whose outcome is unknown is read back before it is retried. `/handoff` lists every write it started but did not
+  see finish, `/prime` names it on the `Handoff:` row and the `Next:` line, and `/orchestrator` reads its target back before
+  any retry, because a timeout does not prove a write failed (TASK-513).
+
+---
+
 ## v2.16.2 — the embedded humanizer pass checks its own facts, and scope-change entries declare what they name (2026-10-25)
 
 **PATCH** — ships SPRINT-142 (Keep Every Fact), a fixes-only sprint. No new skill; the roster stays at 15. Installing the

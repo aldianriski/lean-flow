@@ -779,6 +779,17 @@ whole tree and reports its contents as live violations. If the gate cannot be de
 some reason, exclude `.claude/worktrees/` from its scope explicitly rather than trusting the gate's own
 exclusions to reach a path they were never anchored against.
 
+## Uncertain writes — read back before retry
+
+A timeout, a dropped connection or an interrupted session does not prove a write failed. A worktree agent can commit
+after its call timed out, a remote gate run can finish after ssh drops, and a merge-back can stop part-way. Before
+re-dispatching that agent, re-running that gate or redoing that merge, read the target back and act on what is there:
+the agent's branch or worktree for commits, the remote run's output and verdict line, `git status` and any in-progress
+merge. A `/handoff` doc's **Uncertain writes** item is reconciled the same way, first, before any other work resumes.
+If the operation may still be running, or the readback cannot tell whether the write landed, the uncertainty stands:
+wait for it or ask, and carry it forward in the next handoff. An inconclusive readback never authorizes a retry.
+Retrying without the readback can apply the write twice or discard a result that already landed.
+
 ## Commit messages
 
 Every commit the orchestrator composes (quick step 5, mvp step 7, the sprint-bulk loop's Commit) and every builder's commit in its worktree passes through `/humanizer` embedded mode, format `plain`. The brief for a worktree builder says so, and says to keep the prefix and trailers. Which messages skip (only an entire message that is a fixed template) and what a failure does both follow the humanizer skill's `references/embedded.md` § Commit messages and PR bodies; this section adds no rule of its own.
