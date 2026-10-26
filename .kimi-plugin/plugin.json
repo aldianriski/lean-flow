@@ -1,6 +1,6 @@
 {
   "name": "lean-flow",
-  "version": "2.17.0",
+  "version": "2.18.0",
   "description": "Lean agentic development workflow with planning, gated execution, testing, debugging, documentation, and release skills.",
   "author": {
     "name": "Aldian Rizki",
