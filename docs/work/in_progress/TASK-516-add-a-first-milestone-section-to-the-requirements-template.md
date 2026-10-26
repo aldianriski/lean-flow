@@ -23,11 +23,11 @@ things first: the proof goal, the stopping condition, and the integration bounda
 allowed side effects named). Source: `docs/research/codex-run-project-pipeline.md` (5).
 
 ## Done when
-- [ ] `product-requirements.md.template` has a **First milestone** section: proof goal (the uncertainty it removes) ·
+- [x] `product-requirements.md.template` has a **First milestone** section: proof goal (the uncertainty it removes) · ✓ review: template § First milestone (00f3245b); Codex R2 CLEAR
       stopping condition · integration boundary + allowed side effects.
-- [ ] `/lean-doc-generator init` asks for it in its popup and leaves `[CUSTOMIZE]` when unanswered (never invents it).
-- [ ] Exercised on a real greenfield input (consumer path, e.g. a scratch repo): the section is filled from the answers.
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] `/lean-doc-generator init` asks for it in its popup and leaves `[CUSTOMIZE]` when unanswered (never invents it). ✓ review: init.md step 3, same popup round, "not decided yet" keeps `[CUSTOMIZE]`, headless writes nothing (00f3245b); Codex R2 CLEAR
+- [x] Exercised on a real greenfield input (consumer path, e.g. a scratch repo): the section is filled from the answers. ✓ test: D:\Research\init-scratch (owner ruling R3), the owner's three popup answers written into docs/product/requirements.md § First milestone (log entry)
+- [x] CHANGELOG `[Unreleased]` line. ✓ check: CHANGELOG `## [Unreleased]` › SPRINT-143 third line (00f3245b)
 
 ## Touches
 `skills/lean-doc-generator/templates/product-requirements.md.template` · `skills/lean-doc-generator/references/init.md` · CHANGELOG.md

@@ -122,3 +122,25 @@ shape found later becomes a TD row. The review line above records the last round
 close rests on R6, not on a CLEAR.
 Uncertain write from T1's exercise, reconciled: the background gate run finished `QA-CHECK: 304 pass, 2 fail`, the two
 prose-density FAILs the fresh session predicted, already fixed in `adbc80b6`.
+
+### 2026-10-26 | progress | T3 done: a new repo's requirements.md records its first milestone (TASK-516)
+Built inline by the coordinator (a template section and one init bullet). Commit `00f3245b`. No harness reads either file;
+prose-density 26/0.
+consequence · T3 · behaviour:material · governance:low
+review · T3 · scoped-reviewer · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR, 1 Standards finding (the added sentence said the section is completed "after step 2 scaffolded the
+file", reinforcing init's step 2-before-popup order against its own headless park) → reworded: written only from this
+round's answers, headless writes nothing. R2 CLEAR.
+Box 3 exercise (owner ruling R3): `D:\Research\init-scratch`, a folder with only a minimal `package.json` (substrate: has
+code; no DB, auth or API, so no conditional tier fired). The three milestone questions were asked as the edited init.md
+specifies, and the owner answered: proof goal "a first-time user can complete the one main job end to end without help";
+stopping condition "one complete journey works on fixtures and the owner has reviewed it"; boundary "simulated", side
+effects "none (every simulated action is labelled)". `docs/product/requirements.md` was written from the edited template
+with exactly those values; the exercise covered the milestone path only, not the full base-tier scaffold. The folder is
+deleted after this entry, per R3.
+Caught in the exercise: the new template comment claimed task decomposition reads the proof goal, which is TASK-520 and not
+yet shipped; the sentence was removed before commit so the adopter template makes no claim ahead of the code. TASK-520
+re-adds it as part of its own wiring.
+Out of scope, for the close Retro's tech-debt bucket (pre-existing, raised by Codex): init.md's step 2 scaffolds base-tier
+files before step 3's popup decides a headless park; `product-requirements.md.template`'s header comment names lean-flow's
+`ADR-012`, which leaks into adopter output.
