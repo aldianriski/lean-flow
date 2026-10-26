@@ -4,6 +4,7 @@ slug: keep-the-terms-recast-the-list
 owner: Maintainer
 last_updated: 2026-10-26
 status: active
+plan_commit: 756aba28
 update_trigger: sprint execute/close events
 ---
 
