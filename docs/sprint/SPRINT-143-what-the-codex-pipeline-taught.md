@@ -50,13 +50,13 @@ of it. Prose only, no state file (the out-of-scope guardrail).
 
 ### T2 — Let a review finding be rejected with evidence or deferred with impact `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/references/night-run.md`
-  · `evals/fixtures/revise-loop/` · `evals/fixtures/revise-loop-ceiling/` · `evals/run-revise-loop-ceiling-fixtures.sh`
+  · `scripts/night-run.sh` · `evals/fixtures/revise-loop-ceiling/` · `evals/run-revise-loop-ceiling-fixtures.sh`
   · `CHANGELOG.md`
   · `docs/work/todo/TASK-514-let-a-review-finding-be-rejected-with-evidence-or-deferred-with-impact.md`
   · `docs/work/in_progress/TASK-514-let-a-review-finding-be-rejected-with-evidence-or-deferred-with-impact.md`
   · `docs/work/done/TASK-514-let-a-review-finding-be-rejected-with-evidence-or-deferred-with-impact.md`
 Depends-on: T1
-Cites: `TASK-514` · ADR-022 · L-251 · `docs/research/codex-run-project-pipeline.md` (2)
+Cites: `TASK-514` · ADR-022 · L-251 · `docs/research/codex-run-project-pipeline.md` (2) · `evals/fixtures/revise-loop/` (read by box 4)
 
 A false positive today reaches the owner as `still-open`. Owner ruling at intake: the builder may reject with evidence
 when attended; an unattended run parks it. Depends on T1 for `CHANGELOG.md` order only (D1).
