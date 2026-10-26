@@ -4,6 +4,7 @@ slug: keep-the-terms-recast-the-list
 owner: Maintainer
 last_updated: 2026-10-26
 status: active
+gates_signed: G1,G2 @ 941242f1
 plan_commit: 756aba28
 update_trigger: sprint execute/close events
 ---
@@ -48,7 +49,7 @@ did not.
 
 ### T2 — Recast an internal to-do list in an outward request `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `skills/humanizer/references/patterns-lf.md` · `skills/humanizer/references/patterns-id.md`
-  · `skills/humanizer/SKILL.md` · `README.md` · `CHANGELOG.md`
+  · `skills/humanizer/SKILL.md` · `README.md` · `CHANGELOG.md` · `evals/fixtures/humanizer/term-of-art/NOTES.md`
   · `docs/work/todo/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
   · `docs/work/in_progress/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
   · `docs/work/review/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
