@@ -22,10 +22,10 @@ decision is found by accident. The Codex pipeline records "reopen when" on every
 through `init`. Source: `docs/research/codex-run-project-pipeline.md` (3).
 
 ## Done when
-- [ ] `ADR.md.template` carries an optional **Revisit when:** header line (a condition, not a date) beside Status / Deciders.
-- [ ] The worked example ADR fills it.
-- [ ] The conformance engine's S4 checks still pass against the example (the line is not a required §4 section).
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] `ADR.md.template` carries an optional **Revisit when:** header line (a condition, not a date) beside Status / Deciders. ✓ 12fad813: optional Revisit when bullet after Context driver
+- [x] The worked example ADR fills it. ✓ 12fad813: ADR-example fills it from its own driver and negative; Codex R2 CLEAR
+- [x] The conformance engine's S4 checks still pass against the example (the line is not a required §4 section). ✓ conformance.sh on scratch docs/adr/: S4 ONEFILE/INDEX/SECTIONS/NEGATIVE PASS, same as unedited control; adr-family fixtures green
+- [x] CHANGELOG `[Unreleased]` line. ✓ 12fad813: CHANGELOG [Unreleased] SPRINT-144 bullet
 
 ## Touches
 `skills/lean-doc-generator/templates/ADR.md.template` · `skills/lean-doc-generator/references/ADR-example.md` · CHANGELOG.md
