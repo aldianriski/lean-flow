@@ -94,3 +94,19 @@ read once at the gate entry); the pass changed 0 of 4 drafts. Fixed-template mov
 consequence · T1 · behaviour:material · governance:high
 review · T1 · codex · behaviour:CLEAR · governance:CLEAR
 Codex R1 NOT CLEAR on item 3 only (run 1's added actor), items 1, 2 and 4 CLEAR; fix `7c3da633`; R2 CLEAR.
+
+### 2026-10-26 | progress | T2 done: the decomposer lists the riskiest ready slice first, reading the proof goal (TASK-520)
+Built inline by the coordinator (three prose lines in one skill and one template comment it had already read). Commit
+`84c901c9`; `skills/task-decomposer/SKILL.md` 133/140. A first draft packed the rule into one line and reddened the
+prose-density ratchet (4 dense lines, baseline 3); split into three lines before commit, then 3/3.
+Box 2 exercise (owner ruling R2): `D:\Research\workdoo` snapshotted (3,781 file hashes, `node_modules`, `dist` and
+`.env*` excluded), the owner's proof goal added to its `requirements.md` § First milestone, then a headless
+`/lean-flow:task-decomposer --roadmap P3` in plan mode with the plugin pinned to an export of `84c901c9`. It found most
+of P3 already delivered (TASK-051/052) and proposed three ready slices, all `depends-on: none`; it listed TASK-088 (the
+two-browser proof of project, work, owner, dependency and refused cycle) first "because it proves the proof goal
+directly", citing the goal and noting it came from an uncommitted edit. Nothing was written to `docs/work/`. Afterwards
+`requirements.md` was restored and all 3,781 hashes match; the plan file the run left in `~/.claude/plans` was removed.
+The absent-goal branch was not exercised (the Done-when asks for one decomposition).
+consequence · T2 · behaviour:material · governance:low
+review · T2 · codex · behaviour:CLEAR · governance:CLEAR
+Codex R1 CLEAR on all four items (rule vs Done-when, exercise, template claim, CHANGELOG).
