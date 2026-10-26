@@ -23,4 +23,7 @@ run, each expected term of art in English, any listed general word anglicized, e
 Recorded runs (SPRINT-145 T1): baseline at `81a8ef87` (the 2.17.0 release; the three pattern catalogs are byte-identical
 to SPRINT-145's `plan_commit`), three runs; all three kept "ruang kosong" and "serah terima" and wrote the fault
 tolerance as Indonesian, so 3 of 5 terms of art were not English in 3 of 3 runs (the failure shows, L-255). After-change
-runs: recorded below once judged.
+at `86dbebd6`, three valid runs: 5 of 5 terms in English, no general word anglicized, all fifteen facts kept and nothing
+added in 3 of 3. A fresh judge scored all six finals blind (labels shuffled): baseline 0 of 3 pass, after 3 of 3. One
+after-run was discarded unjudged and re-run: its Skill call failed, it searched for the catalogs and read the baseline
+export, which sat under the same `--add-dir`. Keep each export in a folder of its own.
