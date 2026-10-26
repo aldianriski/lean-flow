@@ -193,7 +193,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | | `/task-decomposer` | intent / ticket / PRD → `TASK-NNN` backlog entries (tracer-bullet slices; or a **fog-map** for foggy work too big to plan) |
 | | `/triage` | re-prioritise + state the backlog; route rejects to `.out-of-scope/` |
 | **build** | `/orchestrator` | gate-driven execution — `quick` · `mvp` · `sprint-bulk` · `overnight` |
-| | `/prototype` | throwaway code to answer one design question (logic TUI / web UI variants) |
+| | `/prototype` | throwaway code to answer one design question (logic TUI / web UI variants / customer-review demo) |
 | | `/tdd` | build NEW behaviour test-first — vertical-slice red-green-refactor |
 | **maintain** | `/diagnose` | 6-phase systematic debugging with a regression test |
 | | `/refactor-advisor` | find shallow→deep refactors (seams · deletion test) and design them |
@@ -480,7 +480,7 @@ skills/           15 skills — /flow conductor + 12 stages + /council + /humani
   diagnose/references/        feedback-loops.md
   task-decomposer/references/ prd-and-slices.md · fog-map.md
   refactor-advisor/references/ deepening.md
-  prototype/references/       logic.md · ui.md
+  prototype/references/       logic.md · ui.md · demo.md
   council/                    opt-in agent decision aid
   humanizer/references/       patterns-en.md (vendored from blader/humanizer, MIT) · patterns-lf.md (lean-flow overlay) · patterns-id.md
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)

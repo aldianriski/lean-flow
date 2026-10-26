@@ -33,6 +33,10 @@ status: current
   behaviour does today, with a characterization test or a before/after record, and re-runs it after the change. Any
   difference the task did not ask for is reported to you rather than absorbed. A bug fix through `/diagnose` already
   writes its regression test first (TASK-519).
+- `/prototype` has a third branch, a customer-review demo, for the question "will a customer understand and want this?"
+  It writes a contract (audience, proof goal, depth, reset, integration boundary), labels every simulated action and
+  sample record, and prepares a task script with non-leading questions. A demo counts as validated only after a recorded
+  session with real target users; it is retired after that session (TASK-521).
 
 ---
 

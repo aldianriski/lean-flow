@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Use when a design question needs to be felt before committing — sanity-check a state machine / data model / API shape, or mock up a few UI options. Builds throwaway code that answers ONE question, then captures the answer and is deleted. Routes to a terminal logic prototype or web UI variants. Do not use to build the real thing (use /tdd) or to debug (use /diagnose).
+description: Use when a design question needs to be felt before committing — sanity-check a state machine / data model / API shape, or mock up a few UI options. Builds throwaway code that answers ONE question, then captures the answer and is deleted. Routes to a logic TUI, web UI variants, or a customer-review demo. Do not use to build the real thing (use /tdd) or to debug (use /diagnose).
 argument-hint: "[the design question to answer]"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 user-invocable: true
@@ -19,10 +19,11 @@ Identify the question — from the prompt, the surrounding code, or by asking:
 
 - **"Does this logic / state model / API feel right?"** → terminal logic prototype. A tiny interactive TUI that drives a state machine by hand through cases that are hard to reason about on paper. Full process → `${CLAUDE_SKILL_DIR}/references/logic.md`.
 - **"What should this look like?"** → web UI prototype *(web projects only)*. Several radically different UI variations on one route, switchable from a floating bar. Full process → `${CLAUDE_SKILL_DIR}/references/ui.md`.
+- **"Will a customer understand and want this?"** → customer-review demo *(any project with something to show)*. A bounded, labelled simulation plus a task script for real target users, kept until the recorded session. Full process → `${CLAUDE_SKILL_DIR}/references/demo.md`.
 
-Wrong branch = wasted prototype. If genuinely ambiguous and the user is unreachable, match the surrounding code (backend module → logic; page/component → UI) and state the assumption at the top.
+Wrong branch = wasted prototype. If genuinely ambiguous and the user is unreachable, match the surrounding code (backend module → logic; page/component → UI; a question about what a customer will understand or want → demo) and state the assumption at the top.
 
-## Rules (both branches)
+## Rules (all branches — the demo's exceptions to rules 3, 4 and 5 are in `references/demo.md`)
 
 1. **Throwaway from day one, clearly marked.** Locate it next to where it'll be used so context is obvious; name it so a casual reader sees it's a prototype, not production.
 2. **One command to run** — via the project's existing task runner. No path to remember.
@@ -44,6 +45,7 @@ or absorb the prototype:
 - A genuine design decision → an **ADR**, where it clears STANDARD §4's bar for one.
 - A decision-rich snippet (state machine, schema, type shape) → feed it into `/task-decomposer`'s PRD (its Implementation Decisions already cite "a prototype produced a snippet").
 - Otherwise → a `NOTES.md` next to the prototype with the verdict, filled before deletion.
+- A demo's recorded customer session → its observations into `docs/product/requirements.md` (through `/lean-doc-generator prd`) or an ADR. Call it validated only from recorded observations of real target users.
 
 ## Red flags
 
