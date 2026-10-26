@@ -45,6 +45,7 @@ workdoo's lean-flow pin (in workdoo; owner-run) · this task file · `docs/resea
 ## Assumes
 - The pin lives in workdoo's own configuration; reading or changing it is the owner's act in that repo. lean-flow's coordinator
   never opens workdoo's secret files (L-247).
+- **blocked-by:** the owner pastes workdoo's run record showing lean-flow ≥ 2.16.0 in effect (unblock condition; an owner-supplied read, L-253).
 
 ## Tracker
 - SPRINT-138 close Retro (follow-up), from T7 candidate C5

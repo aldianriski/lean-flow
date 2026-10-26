@@ -30,6 +30,7 @@ someone notices a new upstream release.
 
 ## Assumes
 - **blocked-by:** a blader/humanizer release after 3.1.0 (check the upstream repository's tags or CHANGELOG).
+- **open:** pin the re-synced source by upstream commit (sha), not only the release version (`docs/research/codex-run-project-pipeline.md`, source-register row).
 
 ## Tracker
 SPRINT-139 Retro (follow-up).

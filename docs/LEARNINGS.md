@@ -119,6 +119,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-256 [tags: process] [status: active]: **A model's critique is never consumer, customer or expert evidence, so it cannot carry ADR-053's "consumer evidence" reason or a validated-by-users claim.** The owner's Codex `run-project-pipeline` skill states it outright ("never claim customer, expert, or field validation from a model critique alone") and keeps a prepared walkthrough separate from observed customer validation. lean-flow's admission rule lists consumer evidence as one of five reasons but says nothing about what source qualifies, so a `/council` verdict or a Codex review round could be cited as if it were consumer evidence. Name the source of consumer evidence: an adopter report, a real-repo run, or an observed session. A model review is a review.
+- seen: 2026-10-25 (research: docs/research/codex-run-project-pipeline.md)
+- count: 1
+- promoted: no
+- related: L-014 (fact-verify catches what reasoning-review misses) · L-015 (consumer side)
+
+---
+
 ## L-255 [tags: process] [status: active]: **A retained sample must first show the failure it is meant to catch, and facts in plain sentences do not.** SPRINT-142 T2's first sample stated its eleven facts in sentences the pass left almost untouched, and the pre-fix embedded pass kept all of them in 3 of 3 runs. Strengthened once (each fact inside dressing the pass is tempted to cut), it still lost nothing in 3 of 3. The 3-of-6 loss TD-274 recorded never reproduced, so the fix shipped as a guard and the TD was narrowed, not resolved. Run the baseline before writing the fix: a baseline that cannot fail measures nothing about the fix.
 - seen: 2026-10-25 (SPRINT-142 T2: pre-fix 0 of 3 on each sample version; owner rulings R1 and R2)
 - count: 1
