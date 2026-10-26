@@ -28,11 +28,12 @@ context) with the relevant **procedure skill** invoked at runtime via the Skill 
 `/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor`. The skill is the maintained procedure; a
 paraphrased brief drifts from it (ADR-010 skill-dispatch amendment, mechanism C).
 
-**Every builder brief carries the secret-files rule:** Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record. ("read-only" is not a licence to open them — L-247.) It also points the builder at the code-slop box in `review-scoping.md` § Self-review checklist, so the tells are avoided while writing, not only caught at review.
+**Every builder brief carries the secret-files rule:** Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record. ("read-only" is not a licence to open them — L-247.) It also points the builder at the code-slop box in `review-scoping.md` § Self-review checklist, so the tells are avoided while writing, not only caught at review. When the task changes behaviour that already works, the brief also carries the pin contract in full: capture what it does today before any edit, re-run that capture after, and report any difference the Done-when does not name instead of absorbing it (§ Implement routing, last row).
 
 ## Implement routing (which procedure the dispatched agent runs)
 
-Pick the routed skill from the **work type**, then hand that skill to the sub-agent (above):
+Pick the routed skill from the **work type**, then hand that skill to the sub-agent (above). The last row is not a work
+type: it adds a pin to whichever route applies.
 
 | Work type | Routes to |
 |---|---|
@@ -40,6 +41,7 @@ Pick the routed skill from the **work type**, then hand that skill to the sub-ag
 | a bug / failing test | `/diagnose` — it already writes the regression test first |
 | code that's hard to change (shallow modules, leaky seams) | `/refactor-advisor` |
 | docs · config · spikes | implement directly, no routed skill |
+| changing behaviour that already works — a modifier, combined with the row above that fits | **pin it first**: the first G2 micro-task captures what it does today (a characterization test where a harness exists, else a before/after record of the observable output) and re-runs it after the change; a difference the Done-when does not name is reported to the owner, never absorbed. A bug via `/diagnose` already writes its regression test first and needs no second pin |
 
 **Declining `/tdd` needs a stated reason** — the owner opts out, or the repo has no harness. Either way,
 note a manual verification step in its place; a silent skip is how spec-only debt enters (L-007).

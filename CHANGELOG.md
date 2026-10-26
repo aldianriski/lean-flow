@@ -29,6 +29,10 @@ status: current
 - A new repo's `requirements.md` records its first milestone: what the first slice must prove, when to stop, and
   the integration boundary (none, simulated or live, with its allowed side effects). `/lean-doc-generator init`
   asks for all three in its popup and leaves `[CUSTOMIZE]` for any answer you have not decided yet (TASK-516).
+- A change to behaviour that already works starts by pinning it. `/orchestrator`'s first G2 micro-task captures what the
+  behaviour does today, with a characterization test or a before/after record, and re-runs it after the change. Any
+  difference the task did not ask for is reported to you rather than absorbed. A bug fix through `/diagnose` already
+  writes its regression test first (TASK-519).
 
 ---
 
