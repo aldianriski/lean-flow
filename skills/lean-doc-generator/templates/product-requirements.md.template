@@ -30,7 +30,8 @@ status: current
 
 ## First milestone [CUSTOMIZE]
 <!-- What the first slice must prove, and where it stops. Filled from the owner's answers, never
-     invented; an unanswered field keeps its placeholder. -->
+     invented; an unanswered field keeps its placeholder. `/task-decomposer` reads the Proof goal
+     to decide which ready slice is built first. -->
 
 - **Proof goal:** [the uncertainty this first slice removes]
 - **Stopping condition:** [what "done" means for this milestone; further ideas go to the backlog, not into it]

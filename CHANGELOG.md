@@ -22,6 +22,10 @@ status: current
 - Commit messages are humanized inline. The caller reads the three pattern catalogs once per session (again after a
   compaction) and runs the fact list and check itself, instead of starting a sub-agent per message that re-read about
   49 KB of catalogs each time. PR bodies and documents keep the sub-agent pass (TASK-524).
+- `/task-decomposer` lists first the ready slice that removes the most uncertainty. It reads the Proof goal in
+  `requirements.md` § First milestone and puts the slice that proves it (or the ready slice that unblocks it) first;
+  without a proof goal it says so and ranks ready slices by risk likelihood. The order is a proposal, and the
+  requirements template now names the decomposer as the proof goal's reader (TASK-520).
 
 ---
 
