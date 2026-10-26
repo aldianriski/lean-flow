@@ -17,6 +17,8 @@ Each pattern names the English section it shares. The English problem statements
 **ID-2 (§2) Penutup satu kalimat.** Watch for: "Itulah kuncinya.", "Itulah yang membuatnya istimewa.", "Dan itu penting.", "Hasilnya? Luar biasa.", a row of fragments ("Tanpa ribet. Tanpa drama.").
 > Sebelum: Retry menutupi gangguan singkat. Itulah kuncinya.
 > Sesudah: Retry menutupi gangguan singkat.
+> Sebelum (fragmen di awal butir): Storage cukup. Kapasitas 40 TB. / RAM ditambah. Menjadi 256 GB.
+> Sesudah: Kapasitas storage 40 TB sudah cukup. / RAM ditambah menjadi 256 GB.
 
 **ID-3 (§3) Ungkapan yang terdengar dalam.** Watch for: "Pada intinya", "Pada hakikatnya", "Hakikatnya", "Sejatinya", "Esensinya", "Yang terpenting", "Inti dari permasalahannya".
 > Sebelum: Pada intinya, rilis tertunda karena tim belum siap.
@@ -49,6 +51,10 @@ Each pattern names the English section it shares. The English problem statements
 **ID-10 (§23) Batas pengetahuan dan tebakan.** Watch for: "Berdasarkan informasi yang tersedia", "Sejauh pengetahuan saya", "Per tanggal ...", "diyakini bahwa", "kemungkinan besar". State what the source does not show, or cut.
 > Sebelum: Sejauh pengetahuan saya, library ini dirilis pada 2019.
 > Sesudah: Library ini dirilis pada 2019. (If the source does not confirm the year, say that instead of guessing.)
+
+**ID-18 (§9) Hedge bertumpuk.** Watch for: "di atas kertas", "tetap harus dibuktikan dengan uji" wrapped around a claim. The hedging words go; a real uncertainty or a testing obligation stays, stated plainly. When not to act: a real approximation ("kurang lebih 40 TB") is a fact, so it stays.
+> Sebelum: Di atas kertas kapasitas ini cukup, tetapi tetap harus dibuktikan dengan uji fio saat acceptance test.
+> Sesudah: Kapasitas ini cukup; angka ini wajib dibuktikan dengan uji fio saat acceptance test.
 
 ### Indonesian-only tells
 

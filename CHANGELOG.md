@@ -23,6 +23,10 @@ status: current
   or test name stays English even when a plain Indonesian phrase exists (concurrent user, acceptance test, write
   penalty, free space, fault tolerance), and the Keep Indonesian list now says it covers general vocabulary only.
   Measured on a new retained fixture of a synthetic Indonesian request memo (TASK-525).
+- A sixth overlay pattern, LF-6: an internal list of open decisions inside text addressed to someone else is recast as
+  numbered requests or questions to the recipient, every item kept and none decided for them. The Indonesian catalog
+  gains ID-18 (hedges such as "di atas kertas" go while a testing obligation stays) and a label-first fragment example
+  under ID-2 (TASK-526).
 
 ---
 

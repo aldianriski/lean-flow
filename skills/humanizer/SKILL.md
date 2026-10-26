@@ -10,7 +10,7 @@ version: "0.1.0"
 # humanizer
 
 Rewrite AI-sounding prose so it reads like a person wrote it. Keep what it says; make nothing up.
-The English pattern catalog (26 patterns, strongest first) lives in `references/patterns-en.md`, plus a lean-flow overlay of five more in `references/patterns-lf.md`.
+The English pattern catalog (26 patterns, strongest first) lives in `references/patterns-en.md`, plus a lean-flow overlay of six more in `references/patterns-lf.md`.
 Indonesian and mixed Indonesian-English text also uses `references/patterns-id.md` (slop patterns, term policy, italics rule).
 
 ## When to invoke
@@ -74,7 +74,7 @@ Run steps 1 to 4, then return numbered findings and stop; this turn edits and wr
 for a named file.
 
 - Order: findings for §1 to §5 (and ID-1 to ID-5, which map to them) first, then the rest in catalog
-  order (English §6 to §26, then LF-1 to LF-5, then any other ID pattern).
+  order (English §6 to §26, then LF-1 to LF-6, then any other ID pattern).
 - Each finding gives its number, its id (`§n`, `LF-n` or `ID-n`), the location (line number for a
   file, paragraph number for pasted text) and the exact whole sentence holding the tell. That
   sentence is the only text the finding may change.

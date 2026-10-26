@@ -1,6 +1,6 @@
 # Humanizer: lean-flow overlay patterns
 
-Five patterns that `patterns-en.md` lacks. This file belongs to lean-flow: it is not vendored, so a re-sync of the upstream catalog never overwrites it. Read it after `patterns-en.md`, in full, on the same terms: a pattern marked *weak alone* needs company from other tells in the same passage before you act. The numbers carry an `LF-` prefix so a renumbering upstream never collides with them. Each Before and After pair keeps its facts equal, and so must every fix you make: an LF pattern names dressing, so cut the dressing and keep the claim it was dressing (who picks the columns, who the change is for). Dropping that claim is an error under SKILL.md step 6, the same as adding one.
+Six patterns that `patterns-en.md` lacks. This file belongs to lean-flow: it is not vendored, so a re-sync of the upstream catalog never overwrites it. Read it after `patterns-en.md`, in full, on the same terms: a pattern marked *weak alone* needs company from other tells in the same passage before you act. The numbers carry an `LF-` prefix so a renumbering upstream never collides with them. Each Before and After pair keeps its facts equal, and so must every fix you make: an LF pattern names dressing, so cut the dressing and keep the claim it was dressing (who picks the columns, who the change is for). Dropping that claim is an error under SKILL.md step 6, the same as adding one.
 
 ### LF-1. An abstraction given a human verb
 
@@ -51,3 +51,28 @@ Five patterns that `patterns-en.md` lacks. This file belongs to lean-flow: it is
 **After:**
 > The importer reads large files in 10 minutes and supports Windows.
 **When not to act:** dialogue, real quotations, titles, and a term mentioned as a term (the word "cache" in a glossary) keep their quotes. A single scare quote the writer means is theirs to keep. Preserve deliberate doubt or irony whatever the quote count; when you cannot tell emphasis from doubt, ask or leave the quotes.
+
+### LF-6. A working list handed to the reader
+
+**Watch for:** a list of open decisions, checkboxes or to-dos ("Decisions needed", "Open questions", "Yang perlu diputuskan") inside text addressed to someone else: a request, a letter, a proposal. Act on one sighting.
+**Problem:** The list is the writer's working notes, and it hands the recipient a to-do list instead of saying what is asked of them. Recast each item as a numbered request or a question put to the recipient, under a heading that says what is asked; in a formal register, close formally.
+Keep every item: never turn an open question into a decided term (that adds a claim), and never drop one (that drops a fact).
+**Before:**
+> Decisions needed:
+> - [ ] Third node this year or next?
+> - [ ] Who runs the load test?
+**After:**
+> Please confirm two points:
+> 1. Is the third node bought this year or next year?
+> 2. Who runs the load test?
+**Before** (Indonesian, formal request):
+> Yang perlu diputuskan:
+> - [ ] Node ketiga dibeli tahun ini atau tahun depan?
+> - [ ] Siapa penanggung jawab uji fio?
+**After:**
+> Ketentuan permintaan:
+> 1. Mohon konfirmasi apakah node ketiga dibeli tahun ini atau tahun depan.
+> 2. Mohon tetapkan penanggung jawab uji fio.
+>
+> Demikian permohonan ini kami sampaikan. Atas perhatian Bapak, kami ucapkan terima kasih.
+**When not to act:** an internal doc, meeting notes or an agenda, where the list is the content; a checklist the recipient asked for; a list that is already phrased as requests.
