@@ -110,3 +110,13 @@ The absent-goal branch was not exercised (the Done-when asks for one decompositi
 consequence · T2 · behaviour:material · governance:low
 review · T2 · codex · behaviour:CLEAR · governance:CLEAR
 Codex R1 CLEAR on all four items (rule vs Done-when, exercise, template claim, CHANGELOG).
+
+### 2026-10-26 | progress | T3 done: the ADR template carries an optional Revisit when line (TASK-515)
+Built inline by the coordinator (one template line and one example line). Commit `12fad813`. Box 3: the edited example
+and an unedited control, each placed at `docs/adr/ADR-001-migrate-orm-to-drizzle.md` in a scratch repo with a
+`docs/DECISIONS.md` row, run through `sh conformance.sh`: S4.ONEFILE, S4.INDEX, S4.SECTIONS and S4.NEGATIVE PASS on both;
+S4.APPEND reports history unavailable (no git) on both; BAR and NOINVENT are judgment-only. The ADR-family fixtures are
+all green; prose-density no FAIL.
+consequence · T3 · behaviour:material · governance:low
+review · T3 · codex · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR on item 2 only because the review input omitted the example's body; R2 with the full example CLEAR.
