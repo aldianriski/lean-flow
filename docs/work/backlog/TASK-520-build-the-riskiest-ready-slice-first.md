@@ -1,7 +1,7 @@
 ---
 id: TASK-520
 title: "Have task-decomposer order ready slices so the one carrying the most uncertainty is built first"
-priority: P3
+priority: P2
 size: S
 risk: low
 autonomy: HITL
@@ -9,7 +9,7 @@ class: execution
 tier: P
 authority: J1
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-516]
 ---
 
@@ -30,7 +30,6 @@ effort, so the slice whose outcome is least certain goes first. Source: `docs/re
 `skills/task-decomposer/SKILL.md` (step 3) · CHANGELOG.md
 
 ## Assumes
-- **blocked-by:** TASK-516 (the proof goal it reads).
 - Ordering is a proposal in the breakdown; `/triage` and promote still own final priority.
 
 ## Tracker
