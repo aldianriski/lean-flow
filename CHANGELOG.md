@@ -31,6 +31,9 @@ status: current
   conformance engine's ADR checks are unchanged (TASK-515).
 - The flows template's Steps that matter is now a table: each step records the record it changes, its owner and the
   next owner (roles, never names), because business flows tend to break at the handover between steps (TASK-517).
+- The authentication template's role table gains a Data scope column (own records, one tenant or site, all), and a line
+  stating that permissions are enforced at the application boundary; hiding a control in the UI is not enforcement
+  (TASK-518).
 
 ---
 

@@ -22,10 +22,12 @@ status: current
 
 ## Authorization model [CUSTOMIZE]
 
-| Role | Can do | Cannot do |
-|:-----|:-------|:-----------|
-| `[role_one]` | [permission summary] | [explicit boundary] |
-| `[role_two]` | [permission summary] | [explicit boundary] |
+| Role | Can do | Cannot do | Data scope |
+|:-----|:-------|:-----------|:-----------|
+| `[role_one]` | [permission summary] | [explicit boundary] | [which data it reaches — own records · one tenant/site/workspace · all] |
+| `[role_two]` | [permission summary] | [explicit boundary] | [data scope] |
+
+Permissions are enforced at the application boundary; hiding a control in the UI is not enforcement.
 
 ## Token / session lifecycle [CUSTOMIZE — optional]
 
