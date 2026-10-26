@@ -76,3 +76,26 @@ Separately, `evals/fixtures/revise-loop/` is read by T2's box 4 but never edited
 close (L-240). Impact: T2's `Layers:` gains `scripts/night-run.sh` and loses `evals/fixtures/revise-loop/`; T2 re-tiers
 X → Other G (must-FAIL fixture plus one run on a real artifact). No Done-when changes. G2 re-confirmed by the owner in the
 same popup.
+
+### 2026-10-26 | progress | T1 done: an uncertain write is read back before it is retried (TASK-513)
+Built inline by the coordinator, not dispatched: small in-place prose edits in two skills at their line caps
+(orchestrator 140/140, prime 138/140) whose context the coordinator already held. Commits `25a0a55b` (the change) and
+`adbc80b6` (density fix). Harnesses that read the touched files, all green: sprint-family, layout, orchestrator-store,
+prose-density, qa-store-legs, store-readers, store-writers, work-store, dispatch-preflight, system-verify, worktree-base,
+dod-delta.
+consequence · T1 · behaviour:material · governance:high
+review · T1 · scoped-reviewer · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR, 4 findings fixed: inherited writes carried forward (box 1); an inconclusive readback never authorizes a
+retry; prime emits the `Handoff:` row for a doc-named write with no repo-side entry; the Guard reference rooted at
+`${CLAUDE_SKILL_DIR}`. R2 CLEAR.
+Box 3 exercise (real input): a full `qa-check.sh` run started in the background at 10:11 and left unread; a handoff doc
+listed it under Uncertain writes; a fresh headless session (plan mode, plugin dir pinned to a `git archive` export of
+`25a0a55b`, L-254) read the handoff first, read the log back, checked the process list, found no verdict yet, and ruled
+"read the gate log back once the run finishes (don't re-run it)". Its `Handoff:` row read `no ledger entry · uncertain
+write: gate-run.log → reconcile first`. Deviation from the G2 note: a local gate run stood in for `gate-remote` (the remote
+variables are not set in this shell); the Done-when is unchanged.
+The same session found a real defect the coordinator missed: T1 made two lines dense (handoff 427 chars, orchestrator Guard
+576), which the prose-density ratchet FAILs. The coordinator had measured line length with an ad-hoc awk instead of running
+the gate's own leg. Fixed in `adbc80b6` by splitting both lines, words unchanged (word-diff empty), orchestrator held at 140
+by joining two mvp lines that already render as one paragraph; prose-density 26/0. No Codex round on the reflow: no word
+changed, and the word-diff proves it.
