@@ -23,13 +23,13 @@ Owner ruling at intake: commit messages move to the existing inline path, catalo
 documents keep the child pass.
 
 ## Done when
-- [ ] `embedded.md` § Commit messages and PR bodies routes commit messages through the inline path: the caller reads the
+- [x] `embedded.md` § Commit messages and PR bodies routes commit messages through the inline path: the caller reads the ✓ 9ece808f: embedded.md § Inline path + Route bullet; callers defer (grep); Codex R1 item 1-2 CLEAR
       three catalogs once per session (again after a compaction) and keeps the fact list and check; PR bodies and
       documents keep the child pass.
-- [ ] The retained `evals/fixtures/humanizer/fact-keep` sample keeps every fact over 3 inline runs (L-252).
+- [x] The retained `evals/fixtures/humanizer/fact-keep` sample keeps every fact over 3 inline runs (L-252). ✓ 3 inline runs at 9ece808f kept 11/11 facts each; run 1 added an actor (TD-274, owner ruling); NOTES f3ead434, 7c3da633
 - [ ] The next sprint's commit messages spawn no humanizer child; the cost per commit is recorded against the ~73k
       baseline and TD-278 is resolved with that number.
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] CHANGELOG `[Unreleased]` line. ✓ 9ece808f: CHANGELOG [Unreleased] SPRINT-144 bullet
 
 ## Touches
 `skills/humanizer/references/embedded.md` · `CHANGELOG.md` · `TECH-DEBT.md` (TD-278 resolution)
