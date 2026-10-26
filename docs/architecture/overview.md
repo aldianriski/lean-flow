@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-25
+last_updated: 2026-10-26
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -34,7 +34,7 @@ skills/           15 skills (auto-discovered at root)
     diagnose/references/feedback-loops.md         10 ways to build a loop · determinism · perf
     task-decomposer/references/prd-and-slices.md  PRD template · tracer-bullet slices · breakdown quiz
     refactor-advisor/references/deepening.md      seam/depth vocab · dependency categories · design-it-twice
-    prototype/references/{logic,ui}.md            throwaway TUI over a portable module · web UI variants
+    prototype/references/{logic,ui,demo}.md       throwaway TUI over a portable module · web UI variants · customer-review demo
   lean-doc-generator/templates/   34 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 36 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · development/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md

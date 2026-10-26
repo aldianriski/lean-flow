@@ -3,7 +3,7 @@ sprint: 143
 slug: what-the-codex-pipeline-taught
 owner: Maintainer
 last_updated: 2026-10-26
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -202,3 +202,11 @@ calibration list. Capture: the owner picked C by popup and chose to record it, s
 written from the template with only the owner's fields (name, description, Inter, the direction line, the winner's layout
 sentence); every other value stayed a placeholder. Both exercise files are removed after this entry (workdoo copy
 snapshot and revert); copies are kept in the session scratchpad.
+
+### 2026-10-26 | close | 6 of 6 delivered, 26 of 26 DoD; system verify 318/0 on the VPS; Retro and buckets filed
+Every member sits in `docs/work/done/` (close check 14/0). System verify: the local `QA_FULL=1` run was stopped by the host's
+low-memory reaper before a verdict; per the owner's choice it ran on the VPS gate runner instead — `gate-remote` on
+`1194c0b6`, `QA-CHECK: 318 pass, 0 fail`, remote rc 0. No handoff entry was ever logged, so nothing needs reconciling.
+Buckets auto-filed: TD-276, TD-277, TD-278; L-251 to count 2; CHANGELOG `[Unreleased]` already carries T1–T6. Owner-approved
+by popup: the §11 archival pass, the doc-freshness fix to `docs/architecture/overview.md` (the `/prototype` references line
+now names `demo.md`), and a MINOR release to 2.17.0 by hand (feature sprint), no push.

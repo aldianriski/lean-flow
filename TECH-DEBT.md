@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-25
+last_updated: 2026-10-26
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -390,6 +390,26 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-278** severity: medium | status: open | created: Sprint-143 (close retro, measured cost)
+  - Summary: **The embedded humanizer pass costs ~73k sub-agent tokens per commit message and changed none in SPRINT-143.**
+    Thirteen child passes (eleven commit messages, one batch of two sprint docs and two messages) each read the three
+    pattern catalogs in full and returned "unchanged". About 950k tokens bought no edit, on short messages written in the
+    repo's own voice.
+  - Fix direction (not a ruling): measure the change rate over a sprint's worth of commit messages; if it stays near zero,
+    run commit messages inline or above a length threshold only, keeping the child for documents. ADR-053's measured-cost
+    reason applies.
+
+- **TD-277** severity: low | status: open | created: Sprint-143 (T3 Codex R1, out of scope)
+  - Summary: **`product-requirements.md.template`'s header comment names lean-flow's `ADR-012`.** The comment is copied into
+    every adopter's `docs/product/requirements.md`, where `ADR-012` points at nothing.
+  - Fix direction: reword the comment without the lean-flow id, and check the other templates for the same leak.
+
+- **TD-276** severity: low | status: open | created: Sprint-143 (T3 Codex R1, out of scope)
+  - Summary: **`init.md` step 2 scaffolds base-tier files before step 3's popup decides a headless park.** The headless rule
+    says base-tier scaffolding waits with the tier choice, but the numbered order writes first. T3 kept its own new
+    section out of the conflict (written only from step 3's answers); the older order is unchanged.
+  - Fix direction: prepare the scaffold in step 2 and write it after step 3's popup or headless decision.
 
 - **TD-275** severity: low | status: open | created: Sprint-141 (close retro, T2 G2 ruling R1)
   - Summary: **Nothing checks SECURITY.md's grant table against each skill's `allowed-tools:`.** SPRINT-141 T2 found two row

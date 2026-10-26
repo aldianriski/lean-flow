@@ -3,7 +3,7 @@ sprint: 143
 slug: what-the-codex-pipeline-taught
 owner: Maintainer
 last_updated: 2026-10-26
-status: active
+status: closed
 gates_signed: G1,G2 @ 8424fa09
 plan_commit: dce1cd3b
 update_trigger: sprint execute/close events
@@ -178,3 +178,37 @@ into `DESIGN.md`, never written there without the owner.
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 6 of 6 members delivered (TASK-513, 514, 516, 519, 521, 522); 26 of 26 DoD boxes ticked. System verify on
+the VPS gate: 318/0 on `1194c0b6`, the first run (the local run was stopped by the host's low-memory reaper, not by a
+FAIL). Every task was exercised on real input: a fresh headless session resuming a real unread gate run (T1), the
+pre-change reaper (T2), a scratch greenfield repo with the owner's answers (T3), a before/after pin of `/prototype`'s routing
+(T4), the Workdoo onboarding brief (T5) and the Workdoo Inbox (T6).
+
+**Retrieval check** — yes, one miss. T1 measured line length with an ad-hoc awk instead of running the gate's
+prose-density leg, so two new dense lines reached a commit; L-251 (run the checks that read a touched file) was loaded but
+its selection names only `evals/`. The fresh session in T1's exercise caught it. L-234 (run the scope-change leg before
+committing) was applied to all three scope-change entries; L-240 drove two `Layers:` prunings; L-254 pinned the exercise's
+plugin directory.
+
+**Cost** — coordinator inline (Opus) for all six builds, no builder dispatch. Sub-agents: six Sonnet builder checks
+(~53k each); Codex review rounds T1 ×2, T2 ×3, T3 ×2, T4 ×2, T5 ×2, T6 ×2 (~21k–36k each, ~330k total); thirteen embedded
+humanizer passes on commit messages and sprint docs (~73k each, ~950k total, every one returning "unchanged"); one headless
+Opus resume session. Gate runs: four local full runs (one stopped by memory) and one VPS run. Coordinator tokens were not
+measured. The humanizer passes were the largest single cost and changed nothing (TD-278).
+
+**Worked**
+- Exercising on real input found two defects no review had: the density regression (T1) and a template comment claiming a
+  capability not yet shipped (T3).
+- Pre-ruled fallbacks: A1 resolved the CONTEXT.md token-budget breach without a popup.
+- Codex probing found the T2 parser's holes; the fail-closed rule ended the arms race at round 3.
+
+**Friction**
+- T2's parser took three Codex rounds over freeform finding text; the stop rule (owner ruling R6) was needed to end it.
+- One coordinator commit (`0fcb5639`) carried free prose without the humanizer pass.
+- The local default-profile gate overran its 520 s budget (530 s), and the host's memory reaper stopped the full local run.
+
+**Buckets** — Shipped → CHANGELOG `[Unreleased]` (six lines, T1–T6). Tech debt → TD-276 (init writes base-tier files before
+its headless park), TD-277 (an `ADR-012` reference leaks into adopters' requirements.md), TD-278 (embedded humanizer cost on
+commit messages). Follow-ups → none new; TASK-520 re-adds the proof-goal sentence to the template when it lands.
+Learnings → L-251 bumped to count 2 (promotable at the next promote).

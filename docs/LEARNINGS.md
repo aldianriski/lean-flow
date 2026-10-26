@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-25
+last_updated: 2026-10-26
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -160,8 +160,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-251 [tags: process] [status: active]: **A static review cannot run the harnesses that read a shipped file, so search `evals/` for the touched path and run those before ticking.** SPRINT-140 T2 put "vague TODOs" into `review-scoping.md`'s new code-slop box. Two Codex rounds, a builder check and the per-task gates passed it. Only system verify at close ran `run-orchestrator-store-fixtures.ts`, whose text contract allows `TODO` in that file solely in the retired-layout rule: 326/1, one owner ruling and a second QA_FULL run. The reviewer-runs-the-pinning-tests rule covers a sub-agent reviewer; a static Codex pass reads text and runs nothing.
-- seen: 2026-10-25 (SPRINT-140 close, system verify 326/1 → 327/0)
-- count: 1
+- seen: 2026-10-25 (SPRINT-140 close, system verify 326/1 → 327/0) · 2026-10-26 (SPRINT-143 T1: a qa-check leg, prose-density, not under `evals/`; an ad-hoc awk stood in for it and two dense lines reached a commit)
+- count: 2
 - promoted: no
 - related: L-182 (verify against what was built, not the tooling's report) · L-117 (find what reads a block before changing it)
 
