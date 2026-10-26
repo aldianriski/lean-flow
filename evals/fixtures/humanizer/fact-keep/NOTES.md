@@ -23,8 +23,8 @@ Inline path (commit messages, TASK-524): the same run setup, with the prompt ass
 § Inputs, § Inline path, Child path items 4, 6 and 7, and § Never touched, plus the same three inputs; the run reads the
 catalogs itself. It is judged the same way.
 
-Recorded runs (SPRINT-144 T1): the inline path at `9ece808f`, three runs, 3 of 3 with all eleven facts kept and nothing
-added. Each run read the three catalogs (about 20k to 22k tokens of context) and spent 1,454 to 1,857 output tokens on
+Recorded runs (SPRINT-144 T1): the inline path at `9ece808f`, three runs, 3 of 3 with all eleven facts kept and 2 of 3
+clean: run 1 added a rollout actor ("Finance Ops rolled out"), found by Codex review (TD-274 sighting). Each run read the three catalogs (about 20k to 22k tokens of context) and spent 1,454 to 1,857 output tokens on
 the pass.
 
 Recorded runs (SPRINT-142 T2): the baseline brief is `embedded.md` at `07f10d29` (before the fact list step); the

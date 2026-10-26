@@ -427,6 +427,10 @@ status: current
     a first after-fix round had one run return a progress remark above its final, closed by keeping any remark about the
     list out of the returned text. Re-measure when a real writing job is seen to lose or add a fact: run that text
     through the fixture protocol before and after.
+  - **Sighting (SPRINT-144 T1, TASK-524, `9ece808f`):** three inline-path runs on the same sample kept all eleven facts;
+    run 1 added a rollout actor ("Finance Ops rolled out"; the sample names none), caught by Codex, not by the
+    coordinator's first read. 2 of 3 clean. The item-4 instructions are the child path's, so this counts as the pass's
+    own variance, not the inline route's (owner ruling at the T1 box 2 popup).
   - Summary: **The embedded humanizer pass adds or drops a fact in about half of runs.** On one fixed 120-word sample with ten
     listed facts, three of six embedded runs broke SKILL.md step 6: one turned an empty range into an added claim, two dropped a
     fact the text carried (the accountant's needs; the finance-team audience). The overlay was read in full in every run, and the
