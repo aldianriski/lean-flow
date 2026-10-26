@@ -111,7 +111,22 @@ Each pattern names the English section it shares. The English problem statements
 | peretas | hacker | news wording; hacker in dev text |
 | narahubung | contact person | rare outside formal letters |
 
+### Domain terms of art (keep English)
+
+In domain or technical text (sizing, infrastructure, specs, test plans), a term of art stays English even when a plain Indonesian phrase exists: a spec name, a column header, a capacity term or the name of a test.
+These are ordinary Indonesian words, not KBBI coinages, so the table above does not catch them. The tell is a word-by-word translation of a spec name; when you see one, write the English term.
+
+| Indonesian form | Keep | Reason |
+|---|---|---|
+| simultan / bersamaan (pengguna simultan, pengguna aktif bersamaan, VM berjalan bersamaan) | concurrent (concurrent user, concurrent VM) | sizing and capacity docs say concurrent user; the Indonesian reads as a translation |
+| serah terima (for a test) | acceptance test | serah terima is a handover of goods, not the test |
+| penalti tulis | write penalty | RAID term of art |
+| ruang kosong (minimal 25%) | free space | capacity-planning term |
+| toleransi drive rusak / drive boleh rusak | fault tolerance (drive) | RAID term of art |
+
 ### Keep Indonesian (common and natural)
+
+This list is general vocabulary. A domain term of art follows the subsection above, even where a word here would translate it.
 
 unduh · unggah · kata sandi · pengguna · basis data · perangkat lunak · berkas · tautan · pindai · cadangan · akun · aplikasi · jaringan · layar · tangkapan layar · peringatan · pembaruan · pemrograman · antarmuka · pengembang · kode sumber · mesin pencari · tenggat
 

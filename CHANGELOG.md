@@ -14,6 +14,18 @@ status: current
 
 ---
 
+## [Unreleased]
+
+### SPRINT-145 — Keep the Terms, Recast the List
+
+**Consumer-facing:**
+- The Indonesian humanizer catalog keeps English terms of art in domain text: a spec name, column header, capacity term
+  or test name stays English even when a plain Indonesian phrase exists (concurrent user, acceptance test, write
+  penalty, free space, fault tolerance), and the Keep Indonesian list now says it covers general vocabulary only.
+  Measured on a new retained fixture of a synthetic Indonesian request memo (TASK-525).
+
+---
+
 ## v2.18.0 — commit messages humanized inline, the riskiest ready slice built first, and three template deltas (2026-10-26)
 
 **MINOR** — ships SPRINT-144 (Wire the Milestone, Cut the Cost), a feature sprint. No new skill; the roster stays at 15.
