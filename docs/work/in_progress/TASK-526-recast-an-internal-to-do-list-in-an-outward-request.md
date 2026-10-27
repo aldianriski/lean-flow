@@ -25,20 +25,20 @@ ruling at intake: the pattern recasts the list as requests or questions to the r
 invents a firm answer. Depends on TASK-525 for the fixture and for the shared `patterns-id.md` and CHANGELOG.
 
 ## Done when
-- [ ] `patterns-lf.md` gains LF-6: an internal working list (open decisions, a checkbox to-do) inside text addressed to
+- [x] `patterns-lf.md` gains LF-6: an internal working list (open decisions, a checkbox to-do) inside text addressed to ✓ LF-6 at 5414fc86, Before names the purchase 8441293d; EN + ID pairs, every item kept, none decided; Codex R2 CLEAR
       someone else is recast as numbered requests or questions to the recipient, with a formal close where the
       register is formal; every item is kept, and no open item is turned into a decided term. It carries a When-not-to-act
       (an internal doc, a meeting agenda) and an Indonesian example ("Yang perlu diputuskan" → "Ketentuan permintaan").
-- [ ] `patterns-id.md` gains an ID line for §9 with the hedges "di atas kertas" and "tetap harus dibuktikan dengan
+- [x] `patterns-id.md` gains an ID line for §9 with the hedges "di atas kertas" and "tetap harus dibuktikan dengan ✓ ID-18 + ID-2 fragment example; ID-18 keeps basis + test obligation (owner ruling) at 8441293d; Codex R2 CLEAR
       uji": the hedging wording goes, while any real uncertainty and any testing obligation stay stated (the memo's fix
       kept the test: "dibuktikan dengan uji … saat acceptance test"). ID-2 gains the label-first bullet fragment example
       ("Storage cukup." "RAM ditambah.") → one full sentence with the number.
-- [ ] The overlay count reads six in `patterns-lf.md`, `skills/humanizer/SKILL.md` and `README.md`, and SKILL.md's
+- [x] The overlay count reads six in `patterns-lf.md`, `skills/humanizer/SKILL.md` and `README.md`, and SKILL.md's ✓ 5414fc86: six in patterns-lf.md, SKILL.md, README.md; audit order LF-1 to LF-6; grep finds no five
       audit order reads "LF-1 to LF-6".
-- [ ] Three embedded runs on the TASK-525 fixture keep every open item (recast, not dropped or decided), every fact
+- [x] Three embedded runs on the TASK-525 fixture keep every open item (recast, not dropped or decided), every fact ✓ final text 8441293d: 3/3 pass by fresh judge on every field; earlier sets 1/3 and 2/3 recorded in NOTES
       (each stated uncertainty and testing obligation included), and remove the fragments and the hedging wording,
       judged by a reader that did not write the brief (L-252, L-259).
-- [ ] CHANGELOG `[Unreleased]` line.
+- [x] CHANGELOG `[Unreleased]` line. ✓ 5414fc86: CHANGELOG [Unreleased] SPRINT-145 bullet
 
 ## Touches
 `skills/humanizer/references/patterns-lf.md` · `skills/humanizer/references/patterns-id.md` ·
