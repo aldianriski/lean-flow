@@ -35,3 +35,6 @@ swapped "di atas kertas" for "menurut perhitungan", so 1 of 3 passed. The one bu
 paraphrases in ID-18; three fresh runs passed 2 of 3 by the judge, the first writing "Menurut hitungan kami kapasitas
 ini cukup". Owner ruling: "by our calculation" states the claim's basis, the real uncertainty the criterion keeps, not
 a hedge, so that run passes and the retry set is 3 of 3; the judge's stricter reading is kept here as the record.
+After Codex round 1, ID-18 was rewritten to the ruling ("menurut perhitungan" names the basis and stays) and re-measured
+at `8441293d`: three runs, 3 of 3 pass by the same judge on every field (open items recast, fifteen facts, fragments,
+hedging wording, terms). This last set is the evidence for the shipped text.
