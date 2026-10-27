@@ -3,7 +3,7 @@ sprint: 145
 slug: keep-the-terms-recast-the-list
 owner: Maintainer
 last_updated: 2026-10-26
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -91,3 +91,14 @@ in_progress straight to done once review was accepted, so neither path ever exis
 (the SPRINT-144 fix, L-258) only holds when the member actually waits in review; otherwise it is an unused token (L-240).
 Impact: both tokens leave their task's `Layers:`; no Done-when changes; the gate re-runs before close.
 system-verify · FAIL(layers-observed: T1 and T2 review/ tokens match nothing) · 86b8afad · 314 pass, 1 fail
+owner-ruling: system-verify — fixed-and-rerun: the unused T1 and T2 review/ member tokens were pruned by scope-change (72b30d12); the rerun printed 315 pass, 0 fail
+system-verify · PASS · 72b30d12 · 315 pass, 0 fail (gate-remote QA_FULL)
+
+### 2026-10-27 | close | 2 of 2 delivered, 10 of 10 DoD; system verify 315/0 on the VPS after one fixed FAIL; Retro and buckets filed
+Every member sits in `docs/work/done/` (close check 6/0, freeze held on both). System verify: `gate-remote` FAILed
+`layers observed` on `86b8afad`, fixed by scope-change, PASS on `72b30d12` with `QA-CHECK: 315 pass, 0 fail`, remote rc 0
+(owner ruling: fixed-and-rerun). No handoff entry was ever logged, so nothing needs reconciling. No epic.
+Buckets auto-filed: L-258 to count 2 with a refinement; no new TD; no follow-ups; CHANGELOG `[Unreleased]` already
+carries T1 and T2. Doc-freshness: the only §2-triggered surface T2 touched (the README humanizer row) changed with T2
+itself; nothing else to refresh. Owner-approved by popup: the §11 archival pass, the v2.17.x CHANGELOG rotation and a
+MINOR release to 2.19.0 by hand (feature sprint), no push.
