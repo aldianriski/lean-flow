@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-26
+last_updated: 2026-10-28
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -129,10 +129,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-258 [tags: sprint-model] [status: active]: **A member file ticked in `review/` is a write in a folder its task's `Layers:` does not name, so the tick commits as bare `sprint(N):` or the path is declared first.** SPRINT-144's promote declared each member's `todo/`, `in_progress/` and `done/` paths. T1 and T4 waited in `review/` and were ticked there under `Tn:` subjects, so system verify FAILed `layers observed` on both. L-238 already says a coordinator write outside a task's declared files goes under `sprint(N):`, but it names a status move, not a tick, and the per-tick checkers (`tick-box.ts`: sprint-by-reference and layers-completeness) passed every time because neither reads commit attribution.
+## L-258 [tags: sprint-model] [status: promoted]: **A member file ticked in `review/` is a write in a folder its task's `Layers:` does not name, so the tick commits as bare `sprint(N):` or the path is declared first.** SPRINT-144's promote declared each member's `todo/`, `in_progress/` and `done/` paths. T1 and T4 waited in `review/` and were ticked there under `Tn:` subjects, so system verify FAILed `layers observed` on both. L-238 already says a coordinator write outside a task's declared files goes under `sprint(N):`, but it names a status move, not a tick, and the per-tick checkers (`tick-box.ts`: sprint-by-reference and layers-completeness) passed every time because neither reads commit attribution.
 - seen: 2026-10-26 (SPRINT-144 close, system verify on `e36eca1d`; fixed by scope-change, rerun 317/0) · 2026-10-27 (SPRINT-145 close, system verify on `86b8afad`: the opposite failure. Promote declared both members' `review/` paths up front to avoid the first sighting, both went from in_progress straight to done, and the two tokens matched nothing, L-240's finding; pruned by scope-change, rerun 315/0)
 - count: 2
-- promoted: no
+- **L-258 → promoted: `.claude/CONTEXT.md` § Sprint model** · disposition: merge — appended to L-238's coordinator-write line: a tick on a member in a folder its task's `Layers:` does not name commits as bare `sprint(NNN):` (SPRINT-146 promote, owner-signed).
 - refinement from the second sighting: declaring `review/` at promote is a guess about the route, and it fails whichever way the guess goes. The route-free rule is the attribution one: tick a member that sits outside its task's declared folders as a bare `sprint(N):` commit.
 - related: L-238 (coordinator writes go under `sprint(N):`) · L-240 (Layers tokens observed at close)
 
