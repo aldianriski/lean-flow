@@ -68,3 +68,17 @@ no general word anglicized, all fifteen facts kept, nothing added). Headless cos
 consequence · T1 · behaviour:material · governance:low
 review · T1 · codex · behaviour:CLEAR · governance:CLEAR
 Codex R1 CLEAR on all five items.
+
+### 2026-10-27 | progress | T2 done: an outward request's to-do list is recast as requests (TASK-526)
+Built inline by the coordinator (one overlay pattern, two catalog entries, three count edits). Commits `5414fc86` (the
+change), `609cd9c9` (the one builder retry), `8441293d` (Codex round 1 fixes) and the fixture NOTES records. Runs, each
+three child-path passes pinned to an export of the commit in a folder of its own, judged by a fresh Sonnet judge: at
+`5414fc86` 1 of 3 (two swapped "di atas kertas" for "menurut perhitungan"); the retry at `609cd9c9` named the paraphrases,
+2 of 3 (one wrote "Menurut hitungan kami"). Owner ruling at the T2 box 4 popup: "by our calculation" states the claim's
+basis, the real uncertainty the criterion keeps, not a hedge. Codex round 1 then found that ID-18 still called that phrase a
+hedge and its example dropped the basis, and that LF-6's English After added "bought"; both fixed, and by owner ruling the
+final text was re-measured at `8441293d`: 3 of 3 pass on every field. Every field but the hedge passed in all nine T2 runs.
+consequence · T2 · behaviour:material · governance:low
+review · T2 · codex · behaviour:CLEAR · governance:CLEAR
+Codex R1 NOT CLEAR on items 1, 2 and 5 (fixed in `8441293d`); R2: the three defects resolved, items 3 and 4 unchanged
+since their R1 CLEAR (the fix diff touches neither; the R2 input omitted their criteria).
