@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-26
+last_updated: 2026-10-28
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -947,7 +947,8 @@ status: current
     `WINDOW` lever trades directly against flakiness under load (a coverage decision, D6).
   - **Narrowed (SPRINT-116 T1, ADR-051):** two of the three wrappers it names (`run-s4-ts-evaluators.sh` · `run-s4-differential-parity.sh`) are deleted; the debt stands for the surviving `run-dod-delta-fixtures.sh`, whose pass-count parser still has no retained must-FAIL fixture.
 
-- **TD-166** severity: medium | status: open | created: Sprint-102
+- **TD-166** severity: medium | status: resolved → TASK-354 (Sprint-115) | created: Sprint-102
+  - **Resolved (2026-10-28, owner ruling at the /prime overview):** the row's fix direction landed in SPRINT-115 T4 (TASK-354) and the row was never closed. `.dod-delta-exempt` at the repo root holds reasoned `<sha> -- <ruling> -- <reason>` rows in ADR-031's shape, and `scripts/lib/check-dod-delta.ts` reads it (a declared tick → `PASS dod-delta: EXEMPT`, a malformed row → FAIL). A ruled historical mis-attribution is now declarable, so the close deadlock has a tool-read escape.
   - Summary: **The `dod-delta` leg can hold a sprint permanently un-closable on a finding that only
     closing can clear.** SPRINT-102's close-time system-verify printed `226 pass, 2 fail`. The
     surviving FAIL is accurate: commit `b89d6f0`, subject `sprint(102) T4: 2 DoD ticked; fix two
@@ -1372,7 +1373,8 @@ status: current
   - **Re-file fresh if** T3's detector is extended past the TS module graph, or a compat harness leg is
     added — the fix belongs with either.
 
-- **TD-128** severity: medium | status: open | created: Sprint-092
+- **TD-128** severity: medium | status: resolved → SPRINT-099 T2 + ADR-042 | created: Sprint-092
+  - **Resolved (2026-10-28, owner ruling at the /prime overview):** the missing reader this row names exists. `scripts/lib/qa-budget-check.sh` (sourced by `qa-check.sh`) asserts the ACTUAL runtime against the 600 s command ceiling (SPRINT-099 T2), printed as an uncounted `INFO qa-runtime-over-ceiling` by ADR-042's ruling. The remaining cost is the Windows host's gate runtime, which TD-090 and TD-117 already carry (routed to TASK-367).
   - Summary: **`qa-budget-default` asserts the CONFIGURED budget against the command ceiling, never the
     ACTUAL runtime** — it prints `PASS qa-budget-default: 520s < 600s command ceiling` while real runs
     on this host exceed 600 s. A guard that stays green precisely when the thing it guards is failing.
