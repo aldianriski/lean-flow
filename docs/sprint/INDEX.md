@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-26
+last_updated: 2026-10-27
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-145 — Keep the Terms, Recast the List — closed 2026-10-27 · `8d7005c` · 2 of 2 members in `done/`, 10/10 DoD (released **2.19.0** MINOR; spec unchanged at 0.18.1) · no epic · English terms of art kept in Indonesian domain text and LF-6 for an outward to-do list, both measured on a synthetic memo that fails on 2.17.0 first; system verify 315/0 on the VPS after one fixed layers-observed FAIL
 - SPRINT-144 — Wire the Milestone, Cut the Cost — closed 2026-10-26 · `121d8ce` · 5 of 5 members in `done/`, 17/17 DoD (released **2.18.0** MINOR; spec unchanged at 0.18.1) · no epic · commit messages humanized inline (TD-278 resolved, ~3.1k tokens per commit against ~73k); system verify 317/0 on the VPS after one fixed layers-observed FAIL
 - SPRINT-143 — What the Codex Pipeline Taught — closed 2026-10-26 · `52858f8` · 6 of 6 members in `done/`, 26/26 DoD (released **2.17.0** MINOR; spec unchanged at 0.18.1) · no epic · taken from the owner's Codex `run-project-pipeline` skill; system verify 318/0 on the VPS after the local run was stopped by low memory
 - SPRINT-142 — Keep Every Fact — closed 2026-10-25 · `b3ff9a0` · 2 of 2 members in `done/`, 9/9 DoD (released **2.16.2** PATCH; spec unchanged at 0.18.1) · no epic · TD-274 narrowed, not resolved: the loss did not reproduce (pre-fix 0/6, after-fix 0/6)
