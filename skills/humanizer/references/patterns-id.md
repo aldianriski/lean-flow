@@ -52,10 +52,10 @@ Each pattern names the English section it shares. The English problem statements
 > Sebelum: Sejauh pengetahuan saya, library ini dirilis pada 2019.
 > Sesudah: Library ini dirilis pada 2019. (If the source does not confirm the year, say that instead of guessing.)
 
-**ID-18 (§9) Hedge bertumpuk.** Watch for: "di atas kertas", "tetap harus dibuktikan dengan uji" wrapped around a claim. The hedging words go; a real uncertainty or a testing obligation stays, stated plainly.
-Swapping in a paraphrase ("menurut perhitungan", "secara teori", "tetap wajib") keeps the hedge: state the claim, then the obligation. When not to act: a real approximation ("kurang lebih 40 TB") is a fact, so it stays.
+**ID-18 (§9) Hedge bertumpuk.** Watch for: "di atas kertas", "tetap harus dibuktikan dengan uji" wrapped around a claim. The hedging words go; the claim's basis (a calculation, an estimate) and any testing obligation stay, stated plainly.
+"Menurut perhitungan" names that basis and is the plain form, not a hedge; "secara teori" or "tetap wajib" stacked on it keeps the hedge. When not to act: a real approximation ("kurang lebih 40 TB") is a fact, so it stays.
 > Sebelum: Di atas kertas kapasitas ini cukup, tetapi tetap harus dibuktikan dengan uji fio saat acceptance test.
-> Sesudah: Kapasitas ini cukup; angka ini wajib dibuktikan dengan uji fio saat acceptance test.
+> Sesudah: Menurut perhitungan, kapasitas ini cukup; angka ini wajib dibuktikan dengan uji fio saat acceptance test.
 
 ### Indonesian-only tells
 

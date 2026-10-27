@@ -59,7 +59,7 @@ Six patterns that `patterns-en.md` lacks. This file belongs to lean-flow: it is 
 Keep every item: never turn an open question into a decided term (that adds a claim), and never drop one (that drops a fact).
 **Before:**
 > Decisions needed:
-> - [ ] Third node this year or next?
+> - [ ] Buy the third node this year or next?
 > - [ ] Who runs the load test?
 **After:**
 > Please confirm two points:
