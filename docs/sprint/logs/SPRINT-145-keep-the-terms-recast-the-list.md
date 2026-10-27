@@ -82,3 +82,12 @@ consequence · T2 · behaviour:material · governance:low
 review · T2 · codex · behaviour:CLEAR · governance:CLEAR
 Codex R1 NOT CLEAR on items 1, 2 and 5 (fixed in `8441293d`); R2: the three defects resolved, items 3 and 4 unchanged
 since their R1 CLEAR (the fix diff touches neither; the R2 input omitted their criteria).
+
+### 2026-10-27 | scope-change | T1 and T2 drop their unused review/ member paths from Layers (system-verify finding)
+What broke: system verify on `86b8afad` (gate-remote, QA_FULL) FAILed `layers observed` with layers-token-matches-nothing:
+T1 declared `docs/work/review/TASK-525-keep-english-terms-of-art-in-indonesian-domain-text.md` and T2 declared
+`docs/work/review/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`, per D1, but both members went from
+in_progress straight to done once review was accepted, so neither path ever existed. Declaring the review path up front
+(the SPRINT-144 fix, L-258) only holds when the member actually waits in review; otherwise it is an unused token (L-240).
+Impact: both tokens leave their task's `Layers:`; no Done-when changes; the gate re-runs before close.
+system-verify · FAIL(layers-observed: T1 and T2 review/ tokens match nothing) · 86b8afad · 314 pass, 1 fail

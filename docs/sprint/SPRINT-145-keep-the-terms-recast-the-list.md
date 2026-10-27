@@ -35,7 +35,6 @@ not scheduled).
 Layers: `skills/humanizer/references/patterns-id.md` · `evals/fixtures/humanizer/term-of-art/` · `CHANGELOG.md`
   · `docs/work/todo/TASK-525-keep-english-terms-of-art-in-indonesian-domain-text.md`
   · `docs/work/in_progress/TASK-525-keep-english-terms-of-art-in-indonesian-domain-text.md`
-  · `docs/work/review/TASK-525-keep-english-terms-of-art-in-indonesian-domain-text.md`
   · `docs/work/done/TASK-525-keep-english-terms-of-art-in-indonesian-domain-text.md`
 Depends-on: none
 Cites: `TASK-525` · L-255 · L-252 · L-259 · `evals/fixtures/humanizer/fact-keep/`
@@ -52,7 +51,6 @@ Layers: `skills/humanizer/references/patterns-lf.md` · `skills/humanizer/refere
   · `skills/humanizer/SKILL.md` · `README.md` · `CHANGELOG.md` · `evals/fixtures/humanizer/term-of-art/NOTES.md`
   · `docs/work/todo/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
   · `docs/work/in_progress/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
-  · `docs/work/review/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
   · `docs/work/done/TASK-526-recast-an-internal-to-do-list-in-an-outward-request.md`
 Depends-on: T1
 Cites: `TASK-526` · `evals/fixtures/humanizer/term-of-art/` · L-252 · L-259
