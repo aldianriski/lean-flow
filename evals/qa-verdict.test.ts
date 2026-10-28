@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { judgeOutput, runAndJudge } from "../scripts/qa-verdict.ts";
+import { chainSkipNotice, judgeOutput, runAndJudge } from "../scripts/qa-verdict.ts";
 
 const QA_VERDICT_TS = fileURLToPath(new URL("../scripts/qa-verdict.ts", import.meta.url));
 
@@ -252,5 +252,70 @@ describe("judgeOutput -- a truncation whose unrun set could not be derived (revi
     const outcome = judgeOutput(wellFormed);
     expect(outcome.truncated?.unrun).toBe(27);
     expect(outcome.reason).toMatch(/27 check\(s\) NEVER RAN/);
+  });
+});
+
+// TD-155: under package.json's `test`, a non-ok verdict exits 1 and the `&& bun test` after it never
+// runs, silently. Bun sets npm_lifecycle_script to the running script's text, so the wrapper can see
+// the chain; the notice is printed only when a stage is chained after it and the run exits non-zero.
+const TEST_SCRIPT = "bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test";
+const GATE_SCRIPT = "bun scripts/qa-verdict.ts sh scripts/qa-check.sh";
+
+function runCliWithScript(script: string | undefined, sample: string) {
+  const env: Record<string, string | undefined> = { ...process.env, npm_lifecycle_script: script };
+  if (script === undefined) delete env.npm_lifecycle_script;
+  try {
+    const stdout = execFileSync("bun", [QA_VERDICT_TS, "sh", "-c", `printf '${sample}'; exit 0`], {
+      encoding: "utf8",
+      env: env as NodeJS.ProcessEnv,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    return { code: 0, stdout, stderr: "" };
+  } catch (e) {
+    const err = e as { status?: number; stdout?: string; stderr?: string };
+    return { code: err.status ?? 1, stdout: err.stdout ?? "", stderr: err.stderr ?? "" };
+  }
+}
+
+describe("chainSkipNotice -- names the stage a non-zero exit skips (TD-155)", () => {
+  test("a script chaining `&& bun test` after the wrapper yields a notice naming `bun test`", () => {
+    const n = chainSkipNotice(TEST_SCRIPT);
+    expect(n).not.toBeNull();
+    expect(n).toContain("`bun test`");
+    expect(n).toMatch(/NOT run|did not run|will not run/i);
+  });
+  test("the gate script (no &&) yields null", () => {
+    expect(chainSkipNotice(GATE_SCRIPT)).toBeNull();
+  });
+  test("an undefined script (direct run) yields null", () => {
+    expect(chainSkipNotice(undefined)).toBeNull();
+  });
+});
+
+describe("CLI process -- chain-skip notice wiring (TD-155)", () => {
+  const FAIL = "QA-CHECK: 3 pass, 1 fail\n";
+  const TRUNC =
+    "QA-CHECK: 3 pass, 1 fail\nQA-CHECK: TRUNCATED at leg 2 after 9s against a 5s budget -- 2 item(s) UNRUN\n";
+  const PASS = "QA-CHECK: 3 pass, 0 fail\n";
+
+  test("failing sample under `test` prints the notice and exits 1", () => {
+    const r = runCliWithScript(TEST_SCRIPT, FAIL);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain("`bun test`");
+  });
+  test("truncated sample under `test` prints the notice and exits 1", () => {
+    const r = runCliWithScript(TEST_SCRIPT, TRUNC);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain("`bun test`");
+  });
+  test("passing sample under `test` prints no notice and exits 0", () => {
+    const r = runCliWithScript(TEST_SCRIPT, PASS);
+    expect(r.code).toBe(0);
+    expect(r.stderr).not.toContain("`bun test`");
+  });
+  test("failing sample under `gate` prints no notice and exits 1", () => {
+    const r = runCliWithScript(GATE_SCRIPT, FAIL);
+    expect(r.code).toBe(1);
+    expect(r.stderr).not.toContain("`bun test`");
   });
 });

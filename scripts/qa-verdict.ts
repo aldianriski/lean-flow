@@ -160,6 +160,21 @@ export function runAndJudge(cmd: string, args: readonly string[]): Promise<RunOu
   });
 }
 
+/**
+ * TD-155: a non-zero exit here short-circuits any `&&` stage chained after this wrapper in a
+ * package.json script, silently. Bun exposes the running script's text as npm_lifecycle_script, so the
+ * chained remainder can be named verbatim. Null when there is no chain (gate, direct run).
+ */
+export function chainSkipNotice(lifecycleScript: string | undefined): string | null {
+  if (!lifecycleScript) return null;
+  const at = lifecycleScript.indexOf("qa-verdict");
+  const amp = lifecycleScript.indexOf("&&", at < 0 ? 0 : at);
+  if (amp < 0) return null;
+  const rest = lifecycleScript.slice(amp + 2).trim();
+  if (!rest) return null;
+  return `qa-verdict: exiting non-zero -- the stage chained after it with && (\`${rest}\`) will NOT run; run it separately to see its result (TD-155)`;
+}
+
 if (import.meta.main) {
   const [cmd, ...args] = process.argv.slice(2);
   if (!cmd) {
@@ -169,6 +184,8 @@ if (import.meta.main) {
   const result = await runAndJudge(cmd, args);
   if (!result.ok) {
     console.error(result.reason);
+    const notice = chainSkipNotice(process.env.npm_lifecycle_script);
+    if (notice) console.error(notice);
   }
   process.exit(result.ok ? 0 : 1);
 }
