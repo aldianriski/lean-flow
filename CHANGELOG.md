@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-27
+last_updated: 2026-10-28
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -14,11 +14,24 @@ status: current
 
 ---
 
-## [Unreleased]
+## v2.19.1 — three guards report only what they saw (2026-10-28)
 
+**PATCH** — ships SPRINT-146 (Say What They Saw), a fixes-only sprint. No new skill; the roster stays at 15. Installing the
+release is enough; no upgrade step. The standard is unchanged (spec 0.18.1). Restart the session after installing.
+
+### SPRINT-146 — Say What They Saw (2026-10-28)
+
+**Consumer-facing:**
+- `orchestrator/references/night-run.md` names a new rollup line, `TASK-NNN · uncovered · …`, for a member's open
+  `## Done when` box that no Plan `Tn` cites. It also adds that case to the `HARD_FAILURE` row: such a run can no longer
+  end `PLAN_EXHAUSTED`.
+
+**Maintainer-side:**
 - **Fixed** — the night-run reaper no longer ends `PLAN_EXHAUSTED` over a member's open `## Done when` box that no Plan `Tn` cites (TD-201): it writes a `TASK-NNN · uncovered · …` rollup line and the terminal becomes `HARD_FAILURE`, replacing only the clean ending. `sprint-members-cli.ts` gains an `uncovered` mode; `counts` output is unchanged.
 - **Fixed** — the revise-loop ceiling verdict no longer overclaims (TD-152): its `PASS` line keeps its prefix and now states how many `Tn · retry ·` lines it read, that they are model-reported, and that an unlogged retry is undetectable. FAIL paths are unchanged.
 - **Fixed** — `qa-verdict.ts` now says so when its non-zero exit skips a stage chained after it with `&&` (TD-155): under `bun run test` it prints that `bun test` will not run; nothing new prints on a pass, under `gate`, or on a direct run. Exit codes are unchanged.
+- TD-128 and TD-166 closed (fixed in code earlier, rows never closed); TASK-527 cancelled under ADR-053; TASK-513…522
+  (six files) pruned (§11); L-258 promoted to LEARNINGS § Durable rules › edit-safety; L-260 and TD-279 filed.
 
 ## v2.19.0 — English terms of art kept in Indonesian domain text, and a working list recast as requests (2026-10-27)
 
