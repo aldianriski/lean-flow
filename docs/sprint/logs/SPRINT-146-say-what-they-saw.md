@@ -85,3 +85,15 @@ cases went red before the change and green after. Coordinator re-ran the harness
 and the four real-artifact counts, matching the builder's: SPRINT-066 1, SPRINT-067 2, SPRINT-123 1, SPRINT-070 0.
 Review: coordinator self-review (Other G, no shipped file); the diff is the counted line plus the scoped tail, with FAIL
 paths untouched. Six boxes ticked through the tick tool; both per-tick checkers passed after each.
+
+### 2026-10-28 | surprise | system verify red on the VPS: two coordinator misses, both fixed
+`gate-remote` on `7a4cfb2d` (QA_FULL, VPS): `QA-CHECK: 312 pass, 2 fail`. An earlier background launch had been stopped
+by low memory on the Windows host before printing a verdict; the rerun was in the foreground (owner ruling). Both FAILs
+were the coordinator's, not the builds':
+- `token-budget-exceeded` (~12752 > 12691): the L-258 clause merged into CONTEXT at promote cost ~61 tokens against 3 of
+  headroom; the promote ran the cap check before that edit and never after. Owner ruling: CONTEXT restored byte-identical
+  to `1635712b`, and L-258 moved to LEARNINGS § Durable rules › edit-safety as its own line. Local re-run: token budget
+  ~12688 <= 12691, PASS.
+- `review-depth-material-absent`: T1's consequence line is `behaviour:material`, and its Codex review was logged only as
+  prose. The structured line it owed:
+review · T1 · scoped-reviewer · behaviour:material · governance:low
