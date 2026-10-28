@@ -391,6 +391,17 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-279** severity: medium | status: open | created: Sprint-146 (close retro, measured)
+  - Summary: **The off-host system verify never runs `bun test`, the second stage of the declared gate.** `scripts/gate-remote.ts`
+    runs `QA_FULL=1 sh scripts/qa-check.sh` and judges that alone; `qa-check.sh` has no `bun test` leg, while `package.json`'s
+    `test` (ADR-033 rung 1) chains `&& bun test`. A close verified off-host therefore says nothing about the TypeScript suite.
+  - Evidence: SPRINT-146's system verify on `c01a64f5` printed `QA-CHECK: 314 pass, 0 fail` with no `bun test` stage. The
+    563-test suite ran only through a manual `bun run test` over ssh at `834e237d`, which T3's real-artifact box asked for.
+  - Impact: TD-155's class one level up: a coverage gap that prints nothing. Any close that trusts the gate-remote verdict
+    alone skips every TypeScript test.
+  - Mitigation (hypothesis, re-derive first): have `gate-remote.ts` run the declared gate command (or `bun test` after
+    `qa-check.sh` in the same checkout) and judge both. A change to an existing tool, so a defect fix under ADR-053.
+
 - **TD-278** severity: medium | status: resolved → TASK-524 (Sprint-144) | created: Sprint-143 (close retro, measured cost)
   - **Resolved (SPRINT-144 T1, `9ece808f`):** commit messages take the inline path, catalogs read once per session. From
     the G2 entry to this resolution, 18 free-prose commit messages took the inline pass and none started a child (11

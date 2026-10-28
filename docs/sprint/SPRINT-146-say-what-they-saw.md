@@ -3,7 +3,7 @@ sprint: 146
 slug: say-what-they-saw
 owner: Maintainer
 last_updated: 2026-10-28
-status: active
+status: closed
 gates_signed: G1,G2 @ bc4da31a
 plan_commit: 623017fb
 update_trigger: sprint execute/close events
@@ -113,8 +113,49 @@ The chain and its exit semantics stay as they are (no ADR-033 amendment); only t
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/night-run.sh` | T1 · T2 | reap() names an uncovered open member box and ends HARD_FAILURE instead of PLAN_EXHAUSTED; the revise-ceiling PASS states its count is model-reported | Med | reap-terminal and revise-loop harnesses, red then green |
+| `scripts/lib/sprint-members-cli.ts` | T1 | new `uncovered` mode; `counts` output byte-identical (the conformance engine parses it) | Low | reap-terminal harness; Codex R1 item 3 |
+| `skills/orchestrator/references/night-run.md` | T1 | the uncovered line in Part 4 and its cause in Part 0b's HARD_FAILURE row | Low | Codex R1 CLEAR |
+| `evals/run-reap-terminal-fixtures.sh` | T1 | three must-FAIL cases and two controls | Low | red on the old code |
+| `evals/run-revise-loop-ceiling-fixtures.sh` · `evals/fixtures/revise-loop-ceiling/` | T2 | four scoped-PASS cases, two fixture logs, README index | Low | red before the change |
+| `scripts/qa-verdict.ts` | T3 | chain-aware notice naming the `&&` stage a non-zero exit skips | Low | qa-verdict tests 26/0; seeded removal |
+| `evals/qa-verdict.test.ts` | T3 | nine notice tests; CLI spawns scrub the inherited lifecycle variable | Low | 0 stray notices with and without the variable |
+| `TECH-DEBT.md` · `CHANGELOG.md` | T1 · T2 · T3 | TD-201 and TD-155 resolved, TD-152 accepted; three `[Unreleased]` bullets | Low | read-through |
+| `.claude/CONTEXT.md` · `docs/LEARNINGS.md` | coordinator | L-258 placed in CONTEXT at promote, moved to LEARNINGS edit-safety at system verify (token budget) | Low | doc-caps token budget ~12688 of 12691 |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 3 of 3 members delivered (TASK-528, 529, 530); 18 of 18 DoD boxes ticked. System verify on the VPS gate
+FAILed once on `7a4cfb2d` (token budget; T1's missing review line), both coordinator misses, fixed and passed 314/0 on
+`834e237d` and again on the final tree `c01a64f5`. Each guard now reports what it saw: the reaper cannot call a run
+exhausted over an open box, the retry ceiling says its count is model-reported, and a failed gate names the `bun test`
+it skips. One intake task (TASK-527) was cancelled as new machinery under ADR-053.
+
+**Retrieval check** — four misses, all of rules already on record. The intake Codex review ran after `approve`, against
+the standing owner rule that it runs before. TASK-529's frozen box copied "the only two logs with retry lines" from a TD
+row without a query; SPRINT-123 has them too (L-130). T3's ruling R3 read the running script from an environment variable
+without asking who inherits it, and the tests' child processes did (edit-safety (d), L-067). The promote ran the cap check
+before its own governance edit to an always-loaded file, the new L-260. L-251, L-257 and L-258's route-free rule were
+applied and held.
+
+**Cost** — coordinator inline (Opus). Sub-agents: Codex intake R1 and R2 (~17k, ~19k), three Sonnet builder checks
+(~52k–55k each), three Sonnet builders (T1 ~114k, T2 ~98k, T3 ~71k), Codex T1 R1 (~23k). Gate: four VPS launches, one
+stopped by low host memory before a verdict, one red, two green. Coordinator tokens were not measured.
+
+**Worked**
+- Recon before decomposition found two of the five chosen TD rows already fixed, and the Codex intake review then caught a
+  freeze breach and three missing real-artifact runs before the Plan froze.
+- The builder checks turned up a false notice under `bun run gate` and an unreachable population (SPRINT-088 is v1), both
+  settled at G2 rather than after the build.
+- The VPS `bun run test` run for T3's real artifact surfaced T3's own environment leak.
+
+**Friction**
+- System verify was red on two coordinator writes, not on any build.
+- The off-host system verify never runs `bun test`; the TypeScript suite ran only because T3's box asked for it (TD-279).
+
+**Buckets** — Shipped → CHANGELOG `[Unreleased]` (three lines). Tech debt → TD-279 (system verify off-host skips the
+declared gate's `bun test` stage). Follow-ups → none. Learnings → L-260 (a promote-time edit lands after the scan that
+measured its file).

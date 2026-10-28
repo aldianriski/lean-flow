@@ -123,6 +123,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-260 [tags: process] [status: active]: **A governance edit made at promote lands after the doc-aging scan that measured its file, so the signed scan no longer describes the tree being locked.** SPRINT-146's promote ran `check-doc-caps.ts` (no FAIL; the always-loaded token budget at ~12688 of 12691), then merged L-258 into `.claude/CONTEXT.md` under the signed checklist. The clause cost ~61 tokens, and the next system verify FAILed `token-budget-exceeded`. L-251 runs every check that reads a touched file before a tick, but promote's own governance edits belong to no task, so no tick ever fires it. After the governance edits and before `plan locked`, re-run the cap check, token budget included, over the edited tree.
+- seen: 2026-10-28 (SPRINT-146 system verify on `7a4cfb2d`; L-258 moved to LEARNINGS by owner ruling, rerun 314/0)
+- count: 1
+- promoted: no
+- related: L-251 (run every check that reads a touched file) · L-106 (doc-aging reads §2 caps) · L-258
+
+---
+
 ## L-259 [tags: process] [status: active]: **The coordinator who wrote a pass's brief is the wrong judge of its runs: it reads the final as what it expected.** SPRINT-144 T1 judged three inline humanizer runs against the fact list and scored all three clean. Codex, given the same finals and the same list, found that run 1 had added a rollout actor ("Finance Ops rolled out"; the sample names none). SPRINT-142 had used a fresh judge for the same fixture and caught nothing because nothing was there. The fixture NOTES say how to judge (from the transcript, L-248) but not who. Judge a model-pass run with a reader that did not write the brief.
 - seen: 2026-10-26 (SPRINT-144 T1, Codex R1 item 3; owner ruling at the box 2 popup)
 - count: 1

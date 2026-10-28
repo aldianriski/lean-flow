@@ -3,7 +3,7 @@ sprint: 146
 slug: say-what-they-saw
 owner: Maintainer
 last_updated: 2026-10-28
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -110,3 +110,10 @@ That run surfaced a defect of T3's own: three older CLI spawns in the qa-verdict
 fixed it inline as a trivial test-only change (`26500b71`); the tests show zero stray notices with and without the
 inherited variable, 26 pass, 0 fail. Review: coordinator self-review (Other G, no shipped file). Six boxes ticked through
 the tick tool.
+
+### 2026-10-28 | close | Say What They Saw closed: 3 of 3 delivered, 18 of 18 DoD, system verify 314/0
+Every member sits in done (close gate 8 pass, 0 fail); the freeze holds. System verify on the final tree `c01a64f5`:
+`QA-CHECK: 314 pass, 0 fail` on the VPS. No handoff entry was taken this sprint, so none needs reconciling. Retro written
+in the Plan file. Buckets: Shipped → three CHANGELOG `[Unreleased]` bullets; Tech debt → TD-279 (the off-host system
+verify never runs `bun test`); Follow-ups → none; Learnings → L-260 (a promote-time governance edit lands after the scan
+that measured its file).
