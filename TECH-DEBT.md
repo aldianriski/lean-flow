@@ -799,7 +799,8 @@ status: current
     do read their exit status and fail closed. Census 2026-09-30: 0 (both sites pass only real sprint files).
   - Mitigation (hypothesis): capture `kind`'s exit status and fail with a named finding on anything but 0 (L-120).
 
-- **TD-201** severity: medium | status: open | created: Sprint-110 (T4 outside review)
+- **TD-201** severity: medium | status: resolved → TASK-528 (Sprint-146) | created: Sprint-110 (T4 outside review)
+  - **Resolved (SPRINT-146 T1, `55c899e5`):** `reap()` now asks `sprint-members-cli.ts uncovered` and writes one `TASK-NNN · uncovered · …` rollup line per member with an open `## Done when` box that no counted unit's `Cites:` leading run names; where the terminal would have been `PLAN_EXHAUSTED` it is now `HARD_FAILURE` (no other rank moves, `counts` output unchanged). Evidence: three must-FAIL reap-terminal fixtures went red on the old code (uncited member, TD-199 tail-cite variant, parked-run line) and green after; the sibling controls (every box covered, covered-but-open) still end `PLAN_EXHAUSTED` / `BUDGET_STOP` with no uncovered line. Both rollup checker forms pass over a log carrying the line, differential parity 140 of 140 identical. Real artifact: the patched reaper over SPRINT-119 (`5bb2dd3`) and SPRINT-123 (`d69331f`) at their close commits reproduced the recorded `PLAN_EXHAUSTED` and `AUTHORITY_BOUNDARY`, census 0 uncovered.
   - Summary: **A Tn whose `Cites:` names no current member drops out of the unit counts, and so can the open box of an uncited member.**
     `counts` gives `units 0 0` beside `dod 1 1`. `reap()` builds its unattempted list from open counted units only, so the run can
     end `PLAN_EXHAUSTED` while its own DoD line shows open boxes. Census 2026-09-30: 0 (every live Tn cites a member).
