@@ -68,3 +68,12 @@ Impact: T1's Layers add `scripts/lib/sprint-members-cli.ts` and `skills/orchestr
 latter is shipped, so T1 takes the Codex loop (D2, cap 2). TASK-528's box is reworded (owner ruling R2) to run the
 patched reaper over SPRINT-119 and SPRINT-123 at their close commits and to exclude SPRINT-088 by name.
 Re-confirm G2: in the sign-off below.
+
+### 2026-10-28 | progress | T1 done: an uncovered open member box no longer reads as PLAN_EXHAUSTED
+T1 (TASK-528), built by a Sonnet builder on /tdd in the main tree: `55c899e5` (code, fixtures, docs, CHANGELOG) and
+`00a84d65` (TD-201 resolved). Three must-FAIL reap-terminal cases went red on the old code and green after; both
+controls stayed green throughout. Coordinator re-ran each check as itself: REAP-TERMINAL FIXTURES all green,
+NIGHT-RUN-ROLLUP FIXTURES all green, DIFFERENTIAL PARITY all identical, tsc rc 0, and the new uncovered mode prints
+nothing on this sprint. Real artifact: SPRINT-119 and SPRINT-123 at their close commits reproduced their recorded
+terminal states. Codex R1 (shipped night-run.md, D2): CLEAR on all seven items, so no second round. Six boxes ticked
+through the tick tool; both per-tick checkers passed after each.
