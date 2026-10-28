@@ -97,3 +97,16 @@ were the coordinator's, not the builds':
 - `review-depth-material-absent`: T1's consequence line is `behaviour:material`, and its Codex review was logged only as
   prose. The structured line it owed:
 review · T1 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-28 | progress | T3 done: a non-zero gate names the chained bun test it skips
+T3 (TASK-530), built by a Sonnet builder on /tdd in the main tree: `41347cf2` (chain-aware notice, nine tests) and
+`4b52c83e` (TD-155 resolved, CHANGELOG). Three of the new tests were red on a null stub and green after. A seeded removal
+of the print reddened only the two notice-printing tests, and the file was restored byte-identical. Local real artifact:
+`QA_BUDGET_SECONDS=5 bun run test` truncated with 17 checks unrun, printed the notice naming `bun test`, and exited 1
+with no test output after it. System verify at `834e237d` on the VPS: `QA-CHECK: 314 pass, 0 fail`. On the same checkout
+`bun run test` passed its outer verdict (304 pass, 0 fail) with no outer notice, then `bun test` ran 563 pass, 0 fail.
+That run surfaced a defect of T3's own: three older CLI spawns in the qa-verdict tests inherited the outer
+`npm_lifecycle_script` and printed two false notices into the test output (CLAUDE.md edit-safety (d)). The coordinator
+fixed it inline as a trivial test-only change (`26500b71`); the tests show zero stray notices with and without the
+inherited variable, 26 pass, 0 fail. Review: coordinator self-review (Other G, no shipped file). Six boxes ticked through
+the tick tool.
