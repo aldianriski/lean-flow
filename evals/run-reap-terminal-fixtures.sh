@@ -150,6 +150,65 @@ case_fx "v1-is-named-unsupported-beside-store" "v1-with-unrelated-store" "T1 · 
 T2 · done · b" \
   "run · 0 of 0 DoD ticked  [mechanical]" "v1 sprint unsupported since 2.0 (ADR-046)"
 
+# --- an open member DoD box that NO counted unit covers (SPRINT-146 T1 · TASK-528 · TD-201 b) ---------------------
+# counts() drops a Tn that cites no current member and never reports a member no counted unit cites, so the
+# member's open box reached `dod` but never the unattempted list and the run ended a clean PLAN_EXHAUSTED.
+# Tree: members TASK-9601 (ticked) and TASK-9602 (box per <b2>); T1 cites 9601 only, <t2> says how 9602 is cited.
+#   uncited -> no unit names 9602 | control -> T2 cites 9602 | tail -> 9602 named in T1's Cites: but OUTSIDE its leading run (TD-199)
+mk_unc() { # <dir> <b2-box> <uncited|control|tail>
+  mu_d=$1; mu_b2=$2; mu_v=$3
+  mkdir -p "$mu_d/docs/sprint/logs" "$mu_d/docs/work/in_progress"
+  {
+    printf -- '---\nsprint: 960\nstatus: active\n---\n\n## Members\n\n- docs/work/in_progress/TASK-9601-a.md\n- docs/work/in_progress/TASK-9602-b.md\n'
+    printf -- '\n## Plan\n\n### T1 \342\200\224 x `[size: S]`\nLayers: `a.md`\n'
+    if [ "$mu_v" = tail ]; then printf -- 'Cites: `TASK-9601` (see also `TASK-9602`)\n'; else printf -- 'Cites: `TASK-9601`\n'; fi
+    [ "$mu_v" = control ] && printf -- '\n### T2 \342\200\224 y `[size: S]`\nLayers: `b.md`\nCites: `TASK-9602`\n'
+  } > "$mu_d/docs/sprint/SPRINT-960-fx.md"
+  printf -- '---\nid: TASK-9601\nsprint: SPRINT-960\nstate: ready\n---\n\n# TASK-9601\n\n## Done when\n\n- [x] a thing\n' > "$mu_d/docs/work/in_progress/TASK-9601-a.md"
+  printf -- '---\nid: TASK-9602\nsprint: SPRINT-960\nstate: ready\n---\n\n# TASK-9602\n\n## Done when\n\n- [%s] b thing\n' "$mu_b2" > "$mu_d/docs/work/in_progress/TASK-9602-b.md"
+}
+# case_unc <label> <b2-box> <variant> <log-body> <pattern>...  (patterns fixed strings; one starting `!` must be ABSENT)
+case_unc() {
+  label=$1; ub=$2; uv=$3; body=$4; shift 4
+  d="$work/$label"
+  mk_unc "$d" "$ub" "$uv"
+  printf '# log\n%s\n' "$body" > "$d/docs/sprint/logs/SPRINT-960-fx.md"
+  : > "$d/run.log"
+  err=$(sh "$launcher" --reap "$d/run.log" "$d" "" 0 2>&1 >/dev/null)
+  rolled=$(cat "$d/docs/sprint/logs/SPRINT-960-fx.md")
+  miss=""
+  for pat in "$@"; do
+    case "$pat" in
+      '!'*) ! printf '%s\n' "$rolled" | grep -qF -- "${pat#!}" || miss="$miss [present: ${pat#!}]" ;;
+      *)    printf '%s\n' "$rolled" | grep -qF -- "$pat" || miss="$miss [$pat]" ;;
+    esac
+  done
+  if [ -z "$miss" ] && [ -z "$err" ]; then
+    echo "PASS fixture($label): $# assertion(s) on the rollup"
+  else
+    echo "FAIL fixture($label): missing${miss:- none}${err:+ -- stderr: $err}"
+    printf '%s\n' "$rolled" | sed 's/^/    | /'
+    fail=1
+  fi
+}
+# must-FAIL: T1 done, TASK-9602 open and cited by no Plan Tn -> named line + HARD_FAILURE, never PLAN_EXHAUSTED
+case_unc "uncovered-box-is-hard-failure" " " uncited "T1 · done · a" \
+  "TASK-9602 · uncovered · 1 open box(es) cited by no Plan Tn" "terminal · HARD_FAILURE · 1 member(s) with open DoD cited by no Plan Tn" \
+  "!terminal · PLAN_EXHAUSTED" "outcome · FAILED"
+# selection variant (TD-199): named in Cites: but outside the leading run is still uncovered
+case_unc "uncovered-box-named-outside-lead-run" " " tail "T1 · done · a" \
+  "TASK-9602 · uncovered · 1 open box(es)" "terminal · HARD_FAILURE" "!terminal · PLAN_EXHAUSTED"
+# R1: the branch replaces ONLY the final PLAN_EXHAUSTED -- a parked task keeps AUTHORITY_BOUNDARY, and the line still prints
+case_unc "uncovered-box-keeps-higher-terminal" " " uncited "T1 · parked-hitl · waiting on the owner" \
+  "terminal · AUTHORITY_BOUNDARY" "TASK-9602 · uncovered · 1 open box(es)"
+# sibling control: the same tree with 9602 cited by T2 and ticked -> the clean ending, and no uncovered line
+case_unc "covered-box-stays-plan-exhausted" "x" control "T1 · done · a
+T2 · done · b" \
+  "terminal · PLAN_EXHAUSTED" "!uncovered"
+# control: 9602 open but cited by T2 (T2 unattempted) -> BUDGET_STOP and NO uncovered line (covered != done)
+case_unc "cited-open-box-is-not-uncovered" " " control "T1 · done · a" \
+  "terminal · BUDGET_STOP" "T2 · unattempted ·" "!uncovered"
+
 # --- USER_STOP: a signal caught by the detached wrapper (SPRINT-122 T1 · TASK-423) ----------------
 # The wrapper is `night-run.sh --wrap` (the process the launcher prints as `fired detached: pid=`).
 # Only a signal IT catches is a human stop; a bare child exit, or a TERM sent straight to the child

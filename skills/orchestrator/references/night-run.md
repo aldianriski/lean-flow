@@ -164,7 +164,7 @@ declared — the failure that reads as success, because a turn that simply ends 
 |---|---|---|
 | `PLAN_EXHAUSTED` | every task reached a resolved state — the only *clean* ending | close, or re-fire for what parked |
 | `AUTHORITY_BOUNDARY` | work remains, but all of it is J2 or blocked behind a park | take the named human step; the rest already completed around it |
-| `HARD_FAILURE` | a step failed in a way the run cannot proceed past (a red gate, a broken tree) | read the named finding; fix before re-firing |
+| `HARD_FAILURE` | a step failed in a way the run cannot proceed past (a red gate, a broken tree), or a member's open DoD box that no Plan `Tn` cites — the Plan cannot reach it (replaces only a would-be `PLAN_EXHAUSTED`) | read the named finding; fix before re-firing |
 | `BUDGET_STOP` | a declared budget ceiling was reached with Plan remaining | raise the ceiling or re-fire; the Plan is unchanged |
 | `USER_STOP` | a human signalled the launcher's wrapper (the `fired detached: pid=` process) | resume at will |
 
@@ -684,6 +684,8 @@ verification · <system-verify's own token, or "none logged">
 warnings · <comma/semicolon-joined list, or "none">
 Tn · state (done | blocked | parked-hitl | denied-tool | stalled | unattempted) · unblock condition / next action
 ```
+
+A member's open `## Done when` box that **no counted Plan `Tn` cites** gets its own line in the same block, whatever the terminal state: `TASK-NNN · uncovered · <n> open box(es) cited by no Plan Tn — amend the Plan by scope-change`. The launcher writes it (mechanical), and it keeps a would-be `PLAN_EXHAUSTED` from reading clean.
 
 **What the counts read (by reference, ADR-047).** `N of M` counts the `## Done when` boxes across the
 sprint's **member files** — the `## Members` paths ∪ every `docs/work/*/TASK-*.md` stamped

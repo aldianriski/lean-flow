@@ -17,6 +17,9 @@
 //                       unit <Tn> <delivered|open>             one per counted unit, Plan order
 //                     A unit is delivered when EVERY current member its `Cites:` leading run names has no open box.
 //                     A Tn citing no current member is scoped out and leaves both unit counts.
+//   uncovered <sprint> `uncovered <TASK-id> <open>` per current member with open > 0 whose id no COUNTED unit's `Cites:`
+//                     leading run names (the `counts` population, so `dod` open boxes counts() cannot attribute to any
+//                     unit -- TD-201). No output when every open box is covered. `counts` output is unchanged.
 //   active            sprint numbers (one per line, ascending) of top-level `<root>/docs/sprint/SPRINT-*.md`
 //                     files whose frontmatter says `status: active` (archive/ and logs/ are not candidates).
 //
@@ -136,6 +139,16 @@ function counts(root: string, sprintFile: string): string {
   ].join("\n") + "\n";
 }
 
+function uncovered(root: string, sprintFile: string): string {
+  const { members, text } = requireMembers(root, sprintFile);
+  const open = new Map<string, number>();
+  for (const m of members) open.set(m.id, doneWhenBoxes(readFileSync(join(root, m.path), "utf8")).open);
+  const cited = new Set<string>();
+  for (const u of planUnits(text)) for (const id of u.cites) if (open.has(id)) cited.add(id);
+  return [...open].filter(([id, n]) => n > 0 && !cited.has(id)).map(([id, n]) => `uncovered ${id} ${n}
+`).join("");
+}
+
 function active(root: string): string {
   const dir = join(root, "docs/sprint");
   const nums: number[] = [];
@@ -160,11 +173,12 @@ function main(argv: string[]): string {
   }
   const [mode, sprint] = args;
   if (mode === "active" && args.length === 1) return active(root);
-  if (!sprint || args.length !== 2 || !["kind", "members", "counts"].includes(mode ?? "")) {
-    throw new CliError(64, "USAGE", "usage: sprint-members-cli.ts kind|members|counts <sprint-file> [--root <dir>] | active [--root <dir>]");
+  if (!sprint || args.length !== 2 || !["kind", "members", "counts", "uncovered"].includes(mode ?? "")) {
+    throw new CliError(64, "USAGE", "usage: sprint-members-cli.ts kind|members|counts|uncovered <sprint-file> [--root <dir>] | active [--root <dir>]");
   }
   if (mode === "kind") return isV2(root, sprint) ? "v2\n" : "v1\n";
   if (mode === "members") return requireMembers(root, sprint).members.map((m) => m.path + "\n").join("");
+  if (mode === "uncovered") return uncovered(root, sprint);
   return counts(root, sprint);
 }
 

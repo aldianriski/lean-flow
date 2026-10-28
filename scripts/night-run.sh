@@ -292,7 +292,7 @@ reap() {
   # member its `Cites:` names has no open box; a Tn citing no current member leaves both counts.
   # rp_unit_list is the OPEN units, one Tn per line, from whichever shape applies.
   rp_cli="$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd)/lib/sprint-members-cli.ts"
-  rp_v2=0; rp_cnt_err=""
+  rp_v2=0; rp_cnt_err=""; rp_unc=""
   if command -v bun >/dev/null 2>&1 && [ -f "$rp_cli" ]; then
     rp_kind=$(bun "$rp_cli" kind "$rp_sprint" --root "$rp_root" 2>/dev/null)
     [ "$rp_kind" = "v2" ] && rp_v2=1
@@ -309,6 +309,11 @@ reap() {
       rp_units=$(printf '%s\n' "$rp_cnt" | awk '$1=="units"{print $2}')
       rp_units_done=$(printf '%s\n' "$rp_cnt" | awk '$1=="units"{print $3}')
       rp_unit_list=$(printf '%s\n' "$rp_cnt" | awk '$1=="unit" && $3=="open"{print $2}')
+      # An open member box no counted unit cites is in `dod` but in no unit (TD-201): named below, never a clean ending.
+      rp_unc=$(bun "$rp_cli" uncovered "$rp_sprint" --root "$rp_root" 2>&1); rp_unc_rc=$?
+      if [ "$rp_unc_rc" -ne 0 ]; then
+        rp_cnt_err="member DoD unreadable: $(printf '%s' "$rp_unc" | head -n1)"; rp_unc=""
+      fi
     else
       rp_cnt_err="member DoD unreadable: $(printf '%s' "$rp_cnt" | head -n1)"
       rp_done=0; rp_open=0; rp_units=0; rp_units_done=0; rp_unit_list=""
@@ -444,6 +449,9 @@ reap() {
     rp_term="BUDGET_STOP"; rp_term_why="$rp_unatt task(s) never reached — turn/budget ceiling with Plan remaining"
   elif [ "$rp_parked" -gt 0 ]; then
     rp_term="AUTHORITY_BOUNDARY"; rp_term_why="$rp_parked task(s) parked or blocked for a human; the rest completed around them"
+  elif [ -n "$rp_unc" ]; then
+    # Replaces ONLY the clean ending: an open DoD box the Plan cannot reach is not "every task resolved".
+    rp_term="HARD_FAILURE"; rp_term_why="$(printf '%s\n' "$rp_unc" | grep -c .) member(s) with open DoD cited by no Plan Tn — the Plan cannot reach them"
   else
     rp_term="PLAN_EXHAUSTED"; rp_term_why="every task reached a resolved state"
   fi
@@ -532,6 +540,10 @@ reap() {
       [ -n "$tn" ] || continue
       printf '%s\n' "$rp_win_run" | grep -q "^$tn · " && continue
       printf '%s · unattempted · run ended before this task was started — re-fire; the Plan is unchanged\n' "$tn"
+    done
+    printf '%s\n' "$rp_unc" | while read -r _ uid un; do
+      [ -n "$uid" ] || continue
+      printf '%s · uncovered · %s open box(es) cited by no Plan Tn — amend the Plan by scope-change\n' "$uid" "$un"
     done
     printf '```\n\nCalibration row (Part 4), transcribed from the harness result event:\n\n'
     printf '```\nrun · %s · %s turns · %s · %s of %s units · inline\n```\n' \

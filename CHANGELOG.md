@@ -14,6 +14,10 @@ status: current
 
 ---
 
+## [Unreleased]
+
+- **Fixed** — the night-run reaper no longer ends `PLAN_EXHAUSTED` over a member's open `## Done when` box that no Plan `Tn` cites (TD-201): it writes a `TASK-NNN · uncovered · …` rollup line and the terminal becomes `HARD_FAILURE`, replacing only the clean ending. `sprint-members-cli.ts` gains an `uncovered` mode; `counts` output is unchanged.
+
 ## v2.19.0 — English terms of art kept in Indonesian domain text, and a working list recast as requests (2026-10-27)
 
 **MINOR** — ships SPRINT-145 (Keep the Terms, Recast the List), a feature sprint drawn from an owner's corrections to a
