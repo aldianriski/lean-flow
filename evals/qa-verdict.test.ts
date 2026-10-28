@@ -5,10 +5,15 @@ import { chainSkipNotice, judgeOutput, runAndJudge } from "../scripts/qa-verdict
 
 const QA_VERDICT_TS = fileURLToPath(new URL("../scripts/qa-verdict.ts", import.meta.url));
 
+// Under `bun run test` every child inherits npm_lifecycle_script and would print the TD-155 chain notice for a
+// chain that is not its own; the chain-aware cases set it explicitly through runCliWithScript.
+const CLEAN_ENV: NodeJS.ProcessEnv = { ...process.env };
+delete CLEAN_ENV.npm_lifecycle_script;
+
 /** Runs the real CLI as its own process (not the imported functions) and reports exit code + stderr. */
 function runCli(args: readonly string[]): { readonly code: number; readonly stdout: string; readonly stderr: string } {
   try {
-    const stdout = execFileSync("bun", [QA_VERDICT_TS, ...args], { encoding: "utf8" });
+    const stdout = execFileSync("bun", [QA_VERDICT_TS, ...args], { encoding: "utf8", env: CLEAN_ENV });
     return { code: 0, stdout, stderr: "" };
   } catch (e) {
     const err = e as { status?: number; stdout?: string; stderr?: string };
@@ -110,7 +115,7 @@ describe("CLI process -- the invocation surface package.json's gate/test scripts
     const shellChain = `bun "${QA_VERDICT_TS}" sh -c "printf 'PASS x\\n'; exit 0" && echo SHOULD_NOT_RUN`;
     let chain: { code: number; out: string };
     try {
-      chain = { code: 0, out: execFileSync("sh", ["-c", shellChain], { encoding: "utf8" }) };
+      chain = { code: 0, out: execFileSync("sh", ["-c", shellChain], { encoding: "utf8", env: CLEAN_ENV }) };
     } catch (e) {
       const err = e as { status?: number; stdout?: string };
       chain = { code: err.status ?? 1, out: err.stdout ?? "" };
@@ -122,7 +127,7 @@ describe("CLI process -- the invocation surface package.json's gate/test scripts
   // Sibling control for the chain shape: a clean verdict DOES let the chain proceed to its next stage.
   test("wired into the same chain shape, a clean verdict lets the chain proceed", () => {
     const shellChain = `bun "${QA_VERDICT_TS}" sh -c "printf 'QA-CHECK: 1 pass, 0 fail\\n'; exit 0" && echo CHAIN_CONTINUED`;
-    const out = execFileSync("sh", ["-c", shellChain], { encoding: "utf8" });
+    const out = execFileSync("sh", ["-c", shellChain], { encoding: "utf8", env: CLEAN_ENV });
     expect(out).toMatch(/CHAIN_CONTINUED/);
   });
 });
