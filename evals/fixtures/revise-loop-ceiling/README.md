@@ -33,6 +33,8 @@ Two named findings, so a fixture asserts on the checker's own finding rather tha
 | `quoted-rejection-then-fixed/` | the finding quotes an old `-> rejected (…)`; the actual outcome is `fixed` | control — PASS (no park, no evidence needed) |
 | `deferred-escalation-missing/` | a `deferred (…)` retry with no `parked-hitl` line | must-FAIL — `revise-loop-escalation-missing` (unattended, a deferral parks) |
 | `selection-window/` | two textually-identical `T6 · retry ·` lines, one either side of a `<!-- fixture: this-run-window-starts-here -->` marker | must-vary-**selection** (L-186) — fed with `base=0` the two lines collapse into one task's count and FAIL; fed with the marker-derived base only this run's single retry is in scope and PASS. Same verdict math either time — what differs is which line is in the window |
+| `no-retry-lines/` | a log with no `retry` line at all | control — PASS, the scoped line reads `0 retry line(s)` (SPRINT-146 T2, TD-152) |
+| `ceiling-ok-two-tasks/` | two tasks, one `fixed` retry each | control — PASS, the scoped line reads `2 retry line(s)`; `fenced-doc-example/` (0) and `selection-window/` at the derived base (1) pin the count's selection |
 
 `ceiling-exceeded/` and `escalation-missing/` are each built to carry only their own trigger (no
 `still-open` at all in the ceiling fixture; only one `retry` line in the escalation fixture), so

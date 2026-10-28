@@ -232,7 +232,10 @@ check_revise_ceiling() {
     fi
   done
 
-  [ "$crc_fail" -eq 0 ] && printf 'PASS  revise-loop-ceiling: within ADR-022 § Decision item 2 (one retry per review pass, total)\n'
+  # The count is of `Tn · retry ·` lines the MODEL wrote; nothing mechanical forces a retry through a
+  # door, so an unlogged retry reads as none. The PASS names that instead of claiming more (TD-152).
+  crc_lines=$(printf '%s\n' "$crc_window" | grep -cE '^T[0-9]+ · retry · ')
+  [ "$crc_fail" -eq 0 ] && printf 'PASS  revise-loop-ceiling: within ADR-022 § Decision item 2 (one retry per review pass, total) -- %s retry line(s) read, all model-reported; an unlogged retry is undetectable (TD-152)\n' "$crc_lines"
   return $crc_fail
 }
 

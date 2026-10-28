@@ -222,6 +222,22 @@ else
   fail=1
 fi
 
+# --- case 12 family (SPRINT-146 T2, TASK-529): the PASS line states what it actually read ---------
+# The `Tn · retry ·` lines are written by the model; nothing mechanical forces a retry through a door,
+# so an unlogged retry and no retry both PASS (TD-152). The verdict therefore names its N and the limit.
+# 12a: zero retry lines -> the scoped line with "0 retry line(s)", never the bare PASS.
+run_case_anywhere "pass-scoped-zero-retry-lines" 0 "-- 0 retry line(s) read, all model-reported; an unlogged retry is undetectable (TD-152)" -- \
+  sh "$night_run" --check-revise-loop "$fx/no-retry-lines/log.md" 0
+# 12b: two tasks, one retry each, within ceiling -> the scoped line with its count.
+run_case_anywhere "pass-scoped-counts-retry-lines" 0 "-- 2 retry line(s) read, all model-reported; an unlogged retry is undetectable (TD-152)" -- \
+  sh "$night_run" --check-revise-loop "$fx/ceiling-ok-two-tasks/log.md" 0
+# 12c (must-vary-SELECTION): fenced `Tn · retry ·` lines are quoted documentation, not counted.
+run_case_anywhere "pass-scoped-fenced-not-counted" 0 "-- 0 retry line(s) read, all model-reported" -- \
+  sh "$night_run" --check-revise-loop "$fenced" 0
+# 12d (window): the selection-window fixture with the derived base counts only THIS run's line.
+run_case_anywhere "pass-scoped-window-counts-this-run" 0 "-- 1 retry line(s) read, all model-reported" -- \
+  sh "$night_run" --check-revise-loop "$sel_fixture" "$sel_base"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVISE-LOOP-CEILING FIXTURES: all green"; else echo "REVISE-LOOP-CEILING FIXTURES: at least one FAIL"; fi
 exit $fail
