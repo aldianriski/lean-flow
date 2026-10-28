@@ -1127,7 +1127,7 @@ status: current
   - Re-file fresh if: a sidecar or marker lands and the checker is not re-pointed at it — the guard
     would then keep reading composable text while real evidence sat beside it.
 
-- **TD-152** severity: medium | status: open | created: Sprint-098
+- **TD-152** severity: medium | status: resolved → accepted (no task) | created: Sprint-098
   - Tracker: none — found by the coordinator's population check at SPRINT-098 T2, then independently
     confirmed and ruled by that task's worktree-isolated outside review.
   - Summary: **The revise-loop ceiling guard reads a line that nothing mechanically emits, so an
@@ -1161,6 +1161,11 @@ status: current
     overclaims is worse than one whose limits are written down.
   - Re-file fresh if: a retry-firing choke point lands but the ceiling check is not re-pointed at
     it — the guard would then read the old advisory line while a real record existed beside it.
+  - **Resolved (SPRINT-146 T2, 6855ebd2), accepted:** the overclaim is gone (TASK-529) -- the PASS line keeps its
+    prefix and now reads `-- N retry line(s) read, all model-reported; an unlogged retry is undetectable (TD-152)`.
+    The detection limit stays: an unlogged retry is still indistinguishable from none, because a retry fires inside
+    one model turn and no external door exists to force it through (owner ruling, SPRINT-146 promote). Cost weighed
+    and knowingly kept. **Re-file fresh if** a retry-firing choke point becomes feasible.
 - **TD-148** severity: medium | status: open | created: Sprint-097
   - **Narrowed again (SPRINT-137 T4, TASK-481, `9d762603`):** items 2, 4 and 5 are done in the TypeScript checker: an unbalanced annotation is `unparsed` and earns no foreign exemption, both suffix anchors have a test each (seeded removal reddens only its own), and `member_sprints:` is read from frontmatter only. Items 3, 6 and 7 stay open.
   - **Narrowed (SPRINT-136 T1, TASK-474, `6a51a673`):** item 1 is done: an archived epic with no member entry the parser can read (an empty list, a missing key, a block sequence) now FAILs by name instead of earning "every member sprint closed". Items 2-6 stay open.
