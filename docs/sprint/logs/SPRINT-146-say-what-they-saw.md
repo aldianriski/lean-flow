@@ -77,3 +77,11 @@ NIGHT-RUN-ROLLUP FIXTURES all green, DIFFERENTIAL PARITY all identical, tsc rc 0
 nothing on this sprint. Real artifact: SPRINT-119 and SPRINT-123 at their close commits reproduced their recorded
 terminal states. Codex R1 (shipped night-run.md, D2): CLEAR on all seven items, so no second round. Six boxes ticked
 through the tick tool; both per-tick checkers passed after each.
+
+### 2026-10-28 | progress | T2 done: the revise-ceiling PASS states its count is model-reported
+T2 (TASK-529), built by a Sonnet builder on /tdd in the main tree: `6855ebd2` (`check_revise_ceiling()` only, four new
+retained cases, two fixture dirs, README index) and `b10ad362` (TD-152 resolved as accepted, CHANGELOG). The four new
+cases went red before the change and green after. Coordinator re-ran the harness (REVISE-LOOP-CEILING FIXTURES all green)
+and the four real-artifact counts, matching the builder's: SPRINT-066 1, SPRINT-067 2, SPRINT-123 1, SPRINT-070 0.
+Review: coordinator self-review (Other G, no shipped file); the diff is the counted line plus the scoped tail, with FAIL
+paths untouched. Six boxes ticked through the tick tool; both per-tick checkers passed after each.
