@@ -35,3 +35,8 @@ is invisible to the run. Catching it before the Plan freezes places the guard in
 
 ## Tracker
 TECH-DEBT TD-201 · owner choice at /prime overview 2026-10-27 (false-green guard cluster).
+
+## Cancelled
+2026-10-28, owner ruling at the SPRINT-146 promote, on the Codex intake review (R1, NOT CLEAR): a promote-time refusal is
+new governance machinery under ADR-053, and its only candidate admission (measured defect) was measured in `reap()`, not at
+promote; the live census of the shape is 0. TASK-528 fixes the false-green where it lies.

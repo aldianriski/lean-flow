@@ -25,6 +25,7 @@ amendment, owner choice at intake); only the skip becomes visible. G2 review-rou
 - [ ] On a passing run that line is absent.
 - [ ] Exit codes are unchanged on every existing qa-verdict path (existing tests stay green).
 - [ ] A retained Bun test covers both paths (truncated/failed sample → line + non-zero; passing sample → no line); a seeded removal of the print reddens only that test.
+- [ ] Run on the real artifact: a real gate run truncated on purpose (a small `QA_BUDGET_SECONDS`) through `package.json`'s `test` prints the line and exits non-zero; a real passing gate run (VPS) prints no line.
 - [ ] TD-155 resolved → TASK-530.
 
 ## Touches
