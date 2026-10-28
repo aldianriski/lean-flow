@@ -34,3 +34,37 @@ ran after `approve` rather than before it, a coordinator miss: R1 NOT CLEAR (527
 and 530 lacked the Other-G real-artifact run; 529 claimed more than it removes), R2 CLEAR after the fixes (`f41b4d73`).
 Owner rulings: TASK-527 cancelled (`c07b3006`); TD-152's detection limit resolves as accepted. Size check: three S, no
 `L`. All three are `origin: decomposer`. No epic.
+
+### 2026-10-28 | progress | batch G2 designs drafted; three builder checks run and settled; three owner rulings
+Batch G1: fast path, all three `origin: decomposer`, scope unchanged since `approve`. G2 designs, one per Tn, each
+quoting its member's Done-when verbatim. Routing: all three to /tdd (fixture first), each opening with its existing pins.
+Shared-file order T1 → T2 → T3 in the main tree (D1).
+- T1: a new `uncovered` mode in the members CLI (its `counts` output stays byte-identical, because the consumer-facing
+  conformance engine parses it), read by `reap()`; each uncovered member writes a `TASK-NNN · uncovered ·` rollup line.
+  Owner ruling R1: it maps to HARD_FAILURE and replaces only PLAN_EXHAUSTED (ranked last, just above the clean ending), so
+  every other terminal keeps its meaning. HARD_FAILURE is unasserted by the rollup checker; both of its forms and the
+  parity harness are run over the fixture log anyway (DoD 4).
+- T2: the PASS line keeps its prefix `revise-loop-ceiling: within ADR-022` (all eight pins match it by substring through
+  `run_case_anywhere`) and gains the scoped tail with N = retry lines in the fence-stripped window. Real-artifact runs use
+  base 0, as the existing SPRINT-067 case does. Factual correction to TASK-529's real-artifact box: SPRINT-123's log also
+  carries retry lines, so 066 and 067 are not "the only two"; the criterion stays checkable as written and T2 runs all
+  three.
+- T3: owner ruling R3: the notice is chain-aware. `qa-verdict.ts` prints it on a non-zero exit only when the running
+  package.json script (`npm_lifecycle_script`, set by Bun; measured on 1.3.14) continues with `&&`, naming that stage.
+  Silent under `gate` and on a direct run, where no chained stage exists. TASK-530's first box is read as conditional on
+  a chain existing; `package.json` is untouched.
+builder-check · T1 · 4 contradictions · 4 questions · rollup-accept step added; TD row and CHANGELOG step added; census scope and rank settled by owner rulings R1 and R2
+builder-check · T2 · 2 contradictions · 6 questions · all factual, settled from the repo (base 0, substring pins, no doc quotes, fenced count assertion added, TD row format copied)
+builder-check · T3 · 3 contradictions · 4 questions · TD row step added; false notice under `gate` settled by owner ruling R3; spawn convention and budget variable read from the repo
+consequence · T1 · behaviour:material · governance:low
+consequence · T2 · behaviour:low · governance:low
+consequence · T3 · behaviour:low · governance:low
+
+### 2026-10-28 | scope-change | T1: Layers gain the members CLI and night-run.md; TASK-528's real-artifact box names its population
+What broke: the T1 design needs two files the Plan did not declare, and TASK-528's real-artifact box asks that "every
+archived real night-run log" keep its recorded terminal state, but one of the three, SPRINT-088, is a v1 sprint that no
+reaper can count since ADR-046, so that box could not be met by any build.
+Impact: T1's Layers add `scripts/lib/sprint-members-cli.ts` and `skills/orchestrator/references/night-run.md`; the
+latter is shipped, so T1 takes the Codex loop (D2, cap 2). TASK-528's box is reworded (owner ruling R2) to run the
+patched reaper over SPRINT-119 and SPRINT-123 at their close commits and to exclude SPRINT-088 by name.
+Re-confirm G2: in the sign-off below.

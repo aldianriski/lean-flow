@@ -27,7 +27,7 @@ G2 review-round cap: 2.
 - [ ] That line maps to one of Part 0b's five existing terminal states (no sixth state); the mapping is the G2 decision below.
 - [ ] Retained must-FAIL fixture in the reap-terminal harness reddens on the uncovered box; a sibling control with every box covered still ends `PLAN_EXHAUSTED`.
 - [ ] `check-night-run-rollup` accepts a correct log carrying the new line (no rollup FAIL), in both its `.ts` and `.sh` forms (the differential-parity pair stays green).
-- [ ] Run on the real artifact: the patched `reap()` over every archived real night-run log leaves each recorded terminal state unchanged (census: 0 uncovered boxes).
+- [ ] Run on the real artifact: the patched `reap()` over the archived real night-run logs of SPRINT-119 and SPRINT-123, at their close commits, leaves each recorded terminal state unchanged (census: 0 uncovered boxes); SPRINT-088 is excluded as a v1 sprint no reap can count since ADR-046 (scope-change 2026-10-28).
 - [ ] TD-201 resolved → TASK-528.
 
 ## Touches

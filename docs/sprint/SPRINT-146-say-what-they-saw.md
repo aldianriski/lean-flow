@@ -4,6 +4,7 @@ slug: say-what-they-saw
 owner: Maintainer
 last_updated: 2026-10-28
 status: active
+gates_signed: G1,G2 @ bc4da31a
 plan_commit: 623017fb
 update_trigger: sprint execute/close events
 ---
@@ -34,11 +35,12 @@ TD-081 · TASK-367, 402, 489, 498 (blocked) and TASK-507, 523 (`needs-info`).
 
 ### T1 — Make reap() name an uncovered open DoD box `[size: S · risk: med · class: execution · HITL · J2]`
 Layers: `scripts/night-run.sh` · `evals/run-reap-terminal-fixtures.sh` · `CHANGELOG.md` · `TECH-DEBT.md`
+  · `scripts/lib/sprint-members-cli.ts` · `skills/orchestrator/references/night-run.md`
   · `docs/work/todo/TASK-528-reap-names-an-uncovered-open-dod-box.md`
   · `docs/work/in_progress/TASK-528-reap-names-an-uncovered-open-dod-box.md`
   · `docs/work/done/TASK-528-reap-names-an-uncovered-open-dod-box.md`
 Depends-on: none
-Cites: `TASK-528` · TD-201 · TD-199 · ADR-016 · `skills/orchestrator/references/night-run.md`
+Cites: `TASK-528` · TD-201 · TD-199 · ADR-016
 
 The reaper builds its unattempted list from counted units only, so an open box on a member no `Tn` cites is invisible
 and the run can end `PLAN_EXHAUSTED` (reproduced by SPRINT-110's outside review). Which of Part 0b's five terminal states the new
