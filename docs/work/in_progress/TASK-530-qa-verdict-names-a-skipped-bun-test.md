@@ -22,12 +22,12 @@ verdict skips the whole TypeScript suite and nothing says so. The chain and exit
 amendment, owner choice at intake); only the skip becomes visible. G2 review-round cap: 2.
 
 ## Done when
-- [ ] On a non-zero exit, `qa-verdict.ts` prints a line stating the chained `bun test` stage does not run.
-- [ ] On a passing run that line is absent.
-- [ ] Exit codes are unchanged on every existing qa-verdict path (existing tests stay green).
-- [ ] A retained Bun test covers both paths (truncated/failed sample → line + non-zero; passing sample → no line); a seeded removal of the print reddens only that test.
+- [x] On a non-zero exit, `qa-verdict.ts` prints a line stating the chained `bun test` stage does not run. ✓ 41347cf2: chainSkipNotice names the && stage on a non-zero exit when the package.json script chains one (owner ruling R3); real run printed it naming bun test
+- [x] On a passing run that line is absent. ✓ passing sample under the test script text: no notice, exit 0 (qa-verdict.test.ts, coordinator re-run 26 pass 0 fail)
+- [x] Exit codes are unchanged on every existing qa-verdict path (existing tests stay green). ✓ judgeOutput/runAndJudge and their reasons unchanged; every pre-existing qa-verdict test green (26 pass, 0 fail)
+- [x] A retained Bun test covers both paths (truncated/failed sample → line + non-zero; passing sample → no line); a seeded removal of the print reddens only that test. ✓ spawned tests: fail and truncated samples give notice + exit 1, passing gives none + exit 0, gate text gives none; seeded removal of the print reddened only the 2 notice tests (24/2), restored byte-identical
 - [ ] Run on the real artifact: a real gate run truncated on purpose (a small `QA_BUDGET_SECONDS`) through `package.json`'s `test` prints the line and exits non-zero; a real passing gate run (VPS) prints no line.
-- [ ] TD-155 resolved → TASK-530.
+- [x] TD-155 resolved → TASK-530. ✓ TD-155 status: resolved -> TASK-530 (Sprint-146), 4b52c83e
 
 ## Touches
 `scripts/qa-verdict.ts` · its test.
