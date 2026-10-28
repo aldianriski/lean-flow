@@ -1074,7 +1074,8 @@ status: current
     subject its own shape, rather than teaching every consumer to guess.
   - Dormant today: these sites fire only when `STANDARD.md`'s own §2/§11/§12 tables are malformed.
 
-- **TD-155** severity: medium | status: open | created: Sprint-099
+- **TD-155** severity: medium | status: resolved → TASK-530 (Sprint-146) | created: Sprint-099
+  - **Resolved (SPRINT-146 T3, `41347cf2`):** `qa-verdict.ts` now prints a notice on a non-zero exit when `npm_lifecycle_script` shows a stage chained after it with `&&`, naming that stage verbatim (under `test`: `bun test`); silent on exit 0, under `gate`, and on a direct run. Exit codes, `judgeOutput` and `runAndJudge` are unchanged; `package.json` untouched (owner ruling R3: chain semantics kept, only the skip made visible). Evidence: the spawned notice tests went red on the stub and green after; seeding out the print reddened only the two notice-printing tests. Real artifact: `QA_BUDGET_SECONDS=5 bun run test` printed the notice, exited 1, and no `bun test` output followed.
   - Summary: **The declared gate command's second stage is unreachable whenever its first stage
     truncates.** `package.json`'s `test` is
     `bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test`. A truncated `qa-check.sh` makes

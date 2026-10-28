@@ -18,6 +18,7 @@ status: current
 
 - **Fixed** — the night-run reaper no longer ends `PLAN_EXHAUSTED` over a member's open `## Done when` box that no Plan `Tn` cites (TD-201): it writes a `TASK-NNN · uncovered · …` rollup line and the terminal becomes `HARD_FAILURE`, replacing only the clean ending. `sprint-members-cli.ts` gains an `uncovered` mode; `counts` output is unchanged.
 - **Fixed** — the revise-loop ceiling verdict no longer overclaims (TD-152): its `PASS` line keeps its prefix and now states how many `Tn · retry ·` lines it read, that they are model-reported, and that an unlogged retry is undetectable. FAIL paths are unchanged.
+- **Fixed** — `qa-verdict.ts` now says so when its non-zero exit skips a stage chained after it with `&&` (TD-155): under `bun run test` it prints that `bun test` will not run; nothing new prints on a pass, under `gate`, or on a direct run. Exit codes are unchanged.
 
 ## v2.19.0 — English terms of art kept in Indonesian domain text, and a working list recast as requests (2026-10-27)
 
