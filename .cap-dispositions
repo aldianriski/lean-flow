@@ -15,3 +15,4 @@
 
 docs/research/epic-017-effectiveness.md -- retain -- the "before" baseline that TASK-386 re-runs unchanged and diffs against, so trimming it alters the comparand; archive via §11 once TASK-386 has consumed it and nothing live cites it
 docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md -- retain -- the 3,050-line authoritative handoff, still cited by ADR-036 (§9), EPIC-017 and TECH-DEBT, so it cannot be archived (§11 needs nothing live citing it) and splitting it breaks those pointers; a diet cannot earn the cap. Revisit when a ruling supersedes it
+docs/research/lean-flow-3-foundation.md -- retain -- the live design source of active EPIC-023 (hypotheses, staged A/B, owner rulings D1-D12, R-a..R-c) that every S0-S4 task cites; splitting it breaks those pointers. Ends when EPIC-023 closes and the doc is superseded and archived (§11)
