@@ -141,3 +141,7 @@ VPS system verify on `b41932a7`: QA-CHECK 325 pass, 3 fail. None is a defect in 
 Each is a structured field a guard reads, so the correction goes in place, not as a new entry (L-176). Local re-runs:
 review-depth no FAIL · promote-check 7/0 · scope-change layers PASS. The two token-shaped misses are L-108's
 substring-versus-shape family on the author's side, a retro candidate.
+
+### 2026-10-29 | progress | system verify green on the integrated tree
+VPS gate runner (`gate-remote.ts`, `QA_FULL=1`) on `95cd0746`: QA-CHECK 327 pass, 0 fail, remote rc 0, after the first run on
+`b41932a7` was red on the three coordinator misses above. Every member is in `done/`; the run ends `PLAN_EXHAUSTED`, 11 of 11 DoD ticked.
