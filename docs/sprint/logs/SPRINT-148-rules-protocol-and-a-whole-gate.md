@@ -79,3 +79,12 @@ over `scripts/` `evals/`): the three named callers only. Coordinator re-run: `ts
 `bun test` 587 pass, 0 fail. VPS at `5759a853`: on a clean tree, no warning and exit 0; with one untracked probe file, the warning line printed and exit 0.
 The logged scope addition landed: `judgeBun` reads the last summary, with a two-order test.
 - consequence · T4 · behaviour:low (exit codes, verdict selection) · governance:low (Other G, D2) → coordinator self-review of the diff: no finding
+
+### 2026-10-29 | execute | T1 done -- the clinic repo enforces five invariants, its spec is complete, realism signed (TASK-535)
+App `D:\Research\clinic-ab` `4eabb74..ac4ede3` (12 commits, test-first per rule), spec `D:\Research\clinic-ab-spec\spec.md`. Builder: sonnet, `/tdd`.
+A1 confirmed: green at `4eabb74` before any change. Fresh clone: `go test -count=1 ./...`, `go vet`, web `npm ci`/`typecheck`/`lint`/`test`/`build` all exit 0
+(builder-run). Coordinator check: commit order, a clean tree, the cluster stopped, the six headings, 5 `[not in code]` facts. The A3 bug is gone: working hours are
+Asia/Jakarta wall-clock. Owner realism review: signed by popup.
+Builder notes kept as facts: three tests passed on first run (already covered by earlier code: unknown patient via the FK backstop, cap-is-per-doctor,
+cap-must-be-positive), each with a named edit that would fail it; the working-hours red commit carried one wrong case, fixed in its implementation commit.
+- consequence · T1 · behaviour:med (external A/B repo, not shipped) · governance:low (tier X) → read-through + owner realism review

@@ -21,9 +21,9 @@ depends-on: [TASK-534]
 Completes the clinic domain so the business-rule and lost-detail measures have enough to show on. Not frozen under ADR-053: maintainer-only measurement (`evals/ab/`, paid, run by hand), never a gate or `qa-check.sh` leg. G2 review-round cap: 2. Design source: `docs/research/lean-flow-3-foundation.md` §7 and the S0 intake rulings I-1..I-3, R-a..R-c (2026-10-29).
 
 ## Done when
-- [ ] Cancellation window · daily appointment cap per doctor · patient record required before booking — each enforced UI → API → DB with tests; at least 5 invariants in total with TASK-534.
-- [ ] The external spec is complete: goal · core flows · invariants · quality attributes · non-goals · business facts not visible in code (each marked).
-- [ ] Owner realism review of domain, rules and conventions signed.
+- [x] Cancellation window · daily appointment cap per doctor · patient record required before booking — each enforced UI → API → DB with tests; at least 5 invariants in total with TASK-534. ✓ clinic-ab `9dbf90c..ac4ede3`, each rule as a failing-test commit then its implementation (patient 0330109→6203ee4 · cap e2e1b7d→c937f19 · cancel e3c849d→9c38dd5, web 831cf62→3214afb; Go HTTP + DB tests and Vitest page/gateway tests); 5 invariants; fresh clone: go test/vet and npm ci/typecheck/lint/test/build all exit 0 (builder run; coordinator checked commit order + clean tree)
+- [x] The external spec is complete: goal · core flows · invariants · quality attributes · non-goals · business facts not visible in code (each marked). ✓ clinic-ab-spec/spec.md: the six named headings present, 5 facts marked `[not in code]` (zone Asia/Jakarta · 24 h window · cap 8 per doctor · record = DOB + phone · cancel deletes and frees the slot)
+- [x] Owner realism review of domain, rules and conventions signed. ✓ owner popup 2026-10-29: "Signed: realistic"
 
 ## Touches
 `D:\Research\clinic-ab\` · `D:\Research\clinic-ab-spec\`
