@@ -4,7 +4,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 export type Grader = { name: string; cmd: string; artifact?: string };
-export type Task = { id: string; prompt: string; graders: Grader[] };
+/** layers / outOfScope are required only by a protocol trial (D9): repo-relative paths or `dir/` prefixes, and the task's Out-of-scope behaviours */
+export type Task = { id: string; prompt: string; graders: Grader[]; layers?: string[]; outOfScope?: string[] };
 export type Verdict = { name: string; passed: boolean; detail: string };
 export type Grade = { passed: boolean; graders: Verdict[] };
 
