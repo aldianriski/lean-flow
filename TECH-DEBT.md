@@ -397,7 +397,7 @@ status: current
   - Impact: low. The check fails loud and a workaround exists, but the message sends the reader to a fix that does not work.
   - Mitigation (hypothesis, re-derive first): apply the same single-basename rule to `Cites:` tokens, keeping the ambiguity case. A defect fix of an existing checker, unfrozen under ADR-053.
 
-- **TD-279** severity: medium | status: open | created: Sprint-146 (close retro, measured)
+- **TD-279** severity: medium | status: resolved → TASK-531 (filed Sprint-146, resolved SPRINT-148) | created: Sprint-146 (close retro, measured)
   - Summary: **The off-host system verify never runs `bun test`, the second stage of the declared gate.** `scripts/gate-remote.ts`
     runs `QA_FULL=1 sh scripts/qa-check.sh` and judges that alone; `qa-check.sh` has no `bun test` leg, while `package.json`'s
     `test` (ADR-033 rung 1) chains `&& bun test`. A close verified off-host therefore says nothing about the TypeScript suite.

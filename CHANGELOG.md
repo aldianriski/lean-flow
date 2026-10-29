@@ -18,6 +18,7 @@ status: current
 
 - **Added (maintainer-only)** — `evals/ab/`: an A/B measurement harness tracer for EPIC-023 (lean-flow 3.0). It runs one pinned (model ids, verified plugin hash), isolated (temp home, isolated config, outside reads denied) and measured trial on a fixture repo and appends a graded, costed row to `docs/research/logs/ab-measurements.md`. It is run by hand (`bun evals/ab/selftest.ts [--paid]`) and is never part of the gate. Nothing ships to consumers (SPRINT-147, TASK-533).
 - **Changed (maintainer-only)** — `evals/run-emitter-column-fixtures.ts` treats `evals/ab/` as out of scope for its population census (SPRINT-147 scope-change).
+- **Fixed (maintainer-only)** — `scripts/gate-remote.ts` runs and judges the declared gate's second stage: `bun test` now runs after `QA_FULL=1 sh scripts/qa-check.sh` in the same remote call, each stage to its own log and rc file, and the run exits 0 only when both pass (TD-279, TASK-531).
 
 ## v2.19.1 — three guards report only what they saw (2026-10-28)
 
