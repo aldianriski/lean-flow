@@ -88,3 +88,21 @@ Asia/Jakarta wall-clock. Owner realism review: signed by popup.
 Builder notes kept as facts: three tests passed on first run (already covered by earlier code: unknown patient via the FK backstop, cap-is-per-doctor,
 cap-must-be-positive), each with a named edit that would fail it; the working-hours red commit carried one wrong case, fixed in its implementation commit.
 - consequence · T1 · behaviour:med (external A/B repo, not shipped) · governance:low (tier X) → read-through + owner realism review
+
+### 2026-10-29 | execute | T2 done -- the D9 two-phase trial protocol on the fixture repo (TASK-542)
+Worktree commits `e40d2509` (protocol + S7-S13) · `afe2d0dc` (smoke-a1 arm) · `7b56705d` (P6 + P4 rows) · `650adb4d` (synced-plugin clear, S14, `--only`)
+· `49ac10e9` (P6 re-run row) · `412ce889` (review round, S15); merged `5b541121`; `c6503711` type-only fix after the merge. Builder: sonnet, `/tdd`.
+Free checks 16 of 16 (coordinator re-run, worktree and main). P5: the real judge refused the out-of-scope rename and signed the control.
+P6, first run: G2 signed, build passed 3/3 graders, row **invalid**: the CLI synced an account plugin (`codex`) into the isolated config between
+phases, caught by the existing init check. Owner ruling (popup): fix in T2, re-run once. The harness now clears `plugins/synced` before every spawn
+(no supported switch: `--bare` drops OAuth); S14 pins it.
+P6 re-run: valid, G2 signed, then **parked** on a Bash permission denial in phase 2 (the model ran the graders itself under `acceptEdits`). This
+is the protocol working, and a finding for TASK-544: under `acceptEdits` headless, a lean-flow arm parks on any Bash call, so the arm's permission
+mode is a pre-registration decision. Pin: the smoke arm pins a clean clone at `%TEMP%\abp` (owner: keep, smoke-only).
+- consequence · T2 · behaviour:high (risk high, measurement harness) · governance:low (Other G, maintainer-only) → one scoped sonnet review
+- review · T2 · round 1: 6 findings (2 CONFIRMED fail-open on the signing inputs: multi-path `Files:` entries passed `startsWith`; a two-object judge reply
+  signed). Spec worst + Standards worst + a one-line `--protocol` guard went to one builder retry (`412ce889`). Re-review: all four CLOSED, no new fail-open.
+  Routed to close as TD: the `docs/work/` + `.ab/` breach exemption is wider than the two harness files; a post-build manifest throw leaves no row.
+- merge · T2 · the post-merge `merge-check` typecheck leg went red (9 `exactOptionalPropertyTypes` errors in `evals/ab/lib/`); the worktree builder had never run
+  `tsc`. Coordinator applied a type-only fix inline (stated reason: mechanical, no behaviour change); tsc clean, 16/16, merge-check 4 green + 1 WIP skip, then clean.
+  Second sighting this sprint of a builder skipping `tsc` (T3's VPS run caught the first) → Retro learning candidate.
