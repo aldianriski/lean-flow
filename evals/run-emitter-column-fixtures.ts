@@ -255,6 +255,9 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
   // Both classes were outside the census and nothing said so until SPRINT-113 T1 cut them (ADR-050).
   { test: (f) => f.endsWith("-differential.ts"), why: "differential harness (cut SPRINT-113 T1), emitted no FAIL findings" },
   { test: (f) => f.includes("/fixtures/"), why: "fixture data, never run as a checker" },
+  // SPRINT-147 T1 (TASK-533): the A/B measurement harness runs by hand and is never a gate leg; its
+  // selftest PASS/FAIL lines are read by its own exit code, and no column-keyed consumer reads them.
+  { test: (f) => f.startsWith("evals/ab/"), why: "maintainer-only A/B measurement harness, run by hand, never a gate checker" },
   {
     test: (f) =>
       f === "scripts/qa-check.sh" || f === "scripts/gen-index.sh" ||
