@@ -15,8 +15,10 @@ export const spawnRunner: Runner = async (cmd, { cwd, env, timeoutMs }) => {
   return { stdout, stderr, exitCode, wallMs: Date.now() - t0 };
 };
 
-export function buildCommand(arm: Arm, prompt: string): string[] {
+/** `extra` carries per-call flags: --session-id / --resume for the two protocol phases, --tools "" for the judge. */
+export function buildCommand(arm: Arm, prompt: string, extra: string[] = []): string[] {
   const cmd = ["claude", "-p", prompt, "--model", arm.sessionModel, "--effort", arm.effort, "--permission-mode", arm.permissionMode, "--output-format", "stream-json", "--verbose"];
   if (arm.plugin) cmd.push("--plugin-dir", arm.plugin.path); // the very path pin.ts hashed
+  cmd.push(...extra);
   return cmd;
 }

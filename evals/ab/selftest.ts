@@ -179,6 +179,168 @@ check("S6 usage: CLI reports no usage -> usage-missing row, invalid, no tokens i
   assert(none.res.row.tokens === null && none.log.includes("usage-missing") && none.log.includes("| none | none | none | none |"), "the row must record the gap, not zeros");
 });
 
+// ---- D9 protocol (TASK-542): two-phase trial, G2 signed by the harness under the eval-only exception ----
+const protoTask = async () => ({ ...(await task("add-fn")), layers: ["src/add.ts"], outOfScope: ["changing or renaming any existing function", "adding new files"] });
+const designOf = (files: string[]) => `Files:\n${files.map((f) => `- ${f}`).join("\n")}\n\nBehaviour: add an exported mul(a, b) returning the product.\n`;
+const SOLVED_ADD = path.join(AB, "fixtures", "smoke-solutions", "add-fn", "src", "add.ts");
+
+/** A two-call runner: call 1 (phase 1) writes `design` into the trial copy, call 2 (phase 2) runs `build`; both replay the recorded stream. */
+function protoReplay(o: { design?: string; build?: (cwd: string) => void; mutate?: (events: Ev[], call: number) => void }) {
+  const calls = { n: 0, cmds: [] as string[][] };
+  const runner: import("./lib/run.ts").Runner = async (cmd, { cwd }) => {
+    calls.n++;
+    calls.cmds.push(cmd);
+    if (calls.n === 1 && o.design !== undefined) {
+      fs.mkdirSync(path.join(cwd, ".ab"), { recursive: true });
+      fs.writeFileSync(path.join(cwd, ".ab", "g2-design.md"), o.design);
+    }
+    if (calls.n === 2) o.build?.(cwd);
+    const events: Ev[] = fs.readFileSync(path.join(AB, "fixtures", "recorded", "smoke-run.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    events.find((e) => e.type === "system" && e.subtype === "init")!.cwd = cwd;
+    o.mutate?.(events, calls.n);
+    return { stdout: events.map((e) => JSON.stringify(e)).join("\n"), stderr: "", exitCode: 0, wallMs: 1000 };
+  };
+  return { runner, calls };
+}
+const judgeSays = (reply: string) => {
+  const j = { n: 0, prompts: [] as string[], fn: async (p: string) => (j.n++, j.prompts.push(p), reply) };
+  return j;
+};
+const SIGN = '{"verdict":"sign","reason":"inside task scope"}';
+const REFUSE = '{"verdict":"refuse","reason":"renames an existing function"}';
+const buildOk = (cwd: string) => fs.copyFileSync(SOLVED_ADD, path.join(cwd, "src", "add.ts"));
+async function protoTrial(r: { runner: import("./lib/run.ts").Runner }, judge: { fn: (p: string) => Promise<string> }, src = SMOKE_REPO) {
+  const { loadArm } = await import("./lib/arm.ts");
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const dir = tmpdir("proto");
+  const log = path.join(dir, "log.md");
+  const res = await runProtocolTrial({ arm: loadArm(ARM_FILE), srcRepo: src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: log, tag: "smoke -- not a measurement", runner: r.runner, judge: judge.fn });
+  return { res, row: res.row, log: fs.readFileSync(log, "utf8") };
+}
+
+// S7 -- the mechanical scope check: files declared in the design must sit inside the task's Layers.
+check("S7 scope: file outside Layers / no Files list / traversal -> not signed naming the finding; in-Layers control -> passes", async () => {
+  const { scopeCheck } = await import("./lib/protocol.ts");
+  const layers = ["src/add.ts"];
+  const out = scopeCheck(designOf(["src/index.ts"]), layers);
+  assert(!out.ok && out.reason === "outside Layers: src/index.ts", `outside file must fail naming it: ${JSON.stringify(out)}`);
+  const mixed = scopeCheck(designOf(["src/add.ts", "src/index.ts"]), layers);
+  assert(!mixed.ok && mixed.reason === "outside Layers: src/index.ts", `one outside file among in-scope ones must still fail: ${JSON.stringify(mixed)}`);
+  assert(scopeCheck("Behaviour: nothing listed\n", layers).reason === "no files declared", "a design with no Files: list must be not signed");
+  assert(scopeCheck(designOf(["src/../src/index.ts"]), layers).ok === false, "a traversal path must not pass");
+  assert(scopeCheck(undefined, layers).reason === "no design", "a missing design must be not signed");
+  assert(scopeCheck(designOf(["src/add.ts"]), layers).ok, "control: an in-Layers design must pass");
+  assert(scopeCheck(designOf(["src/new.ts"]), ["src/"]).ok && !scopeCheck(designOf(["lib/new.ts"]), ["src/"]).ok, "a dir/ layer covers files under it and nothing else");
+});
+
+// S8 -- the isolated policy judge's plumbing, with recorded replies (the real judge is P5).
+check("S8 policy: refuse reply / unparsable reply -> not signed; sign reply -> signed and the D9 deviation is in the row", async () => {
+  const { policyCheck } = await import("./lib/protocol.ts");
+  const design = designOf(["src/add.ts"]);
+  const oos = ["changing or renaming any existing function"];
+  const refuse = judgeSays(REFUSE);
+  const r = await policyCheck(design, oos, refuse.fn);
+  assert(!r.sign && r.reason.includes("renames"), `refuse reply must not sign with its reason: ${JSON.stringify(r)}`);
+  assert(refuse.prompts[0]!.includes("approve as written unless the design leaves task scope") && refuse.prompts[0]!.includes(oos[0]!) && refuse.prompts[0]!.includes("Behaviour: add an exported mul"), "judge prompt must carry the policy, the Out-of-scope list and the design");
+  assert(!(await policyCheck(design, oos, async () => "I think this is fine!")).sign, "an unparsable reply must fail closed");
+  assert(!(await policyCheck(design, oos, async () => '{"verdict":"maybe"}')).sign, "an unknown verdict must fail closed");
+  assert(!(await policyCheck(design, oos, async () => { throw new Error("judge down"); })).sign, "a judge error must fail closed");
+  assert((await policyCheck(design, oos, async () => `Sure.\n${SIGN}\n`)).sign, "control: a sign reply (with chatter around) must sign");
+
+  const run = protoReplay({ design, build: buildOk });
+  const j = judgeSays(SIGN);
+  const t = await protoTrial(run, j);
+  assert(run.calls.n === 2 && t.res.exit === "ok" && t.row.passed, `signed trial must run both phases and pass: calls ${run.calls.n}, ${t.res.exit}`);
+  assert(String(t.row.deviation).startsWith("D9 eval-only G2 exception") && String(t.row.deviation).includes("never applies to product runs"), `deviation must be logged: ${t.row.deviation}`);
+  assert(t.row.g2?.scope === "pass" && t.row.g2?.judge === "sign" && /^[0-9a-f]{64}$/.test(t.row.g2?.designSha256 ?? ""), `g2 record incomplete: ${JSON.stringify(t.row.g2)}`);
+  assert(t.log.includes("D9 eval-only G2 exception"), "the log row must carry the deviation");
+  assert(run.calls.cmds[0]!.includes("--session-id") && run.calls.cmds[1]!.includes("--resume") && run.calls.cmds[0]![run.calls.cmds[0]!.indexOf("--session-id") + 1] === run.calls.cmds[1]![run.calls.cmds[1]!.indexOf("--resume") + 1], "phase 2 must resume the session id phase 1 was given");
+});
+
+// S9 -- a refused G2 ends the trial: scored not-passed, no phase 2, graders not run, deviation still logged.
+check("S9 refused: out-of-Layers design / policy refusal / missing design -> not-passed, no phase 2; signed control -> builds and passes", async () => {
+  const scope = protoReplay({ design: designOf(["src/index.ts"]), build: buildOk });
+  const js = judgeSays(SIGN);
+  const a = await protoTrial(scope, js);
+  assert(scope.calls.n === 1 && js.n === 0, `scope refusal must spawn once and not consult the judge: spawns ${scope.calls.n}, judge ${js.n}`);
+  assert(!a.row.passed && a.res.exit === "g2-refused: scope: outside Layers: src/index.ts" && a.row.graders === "not-run:g2-refused" && a.res.valid, `scope refusal row wrong: ${a.res.exit} / ${a.row.graders} / valid ${a.res.valid}`);
+  assert(String(a.row.deviation).includes("D9") && a.log.includes("g2-refused"), "a refused trial still logs the deviation");
+
+  const policy = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const b = await protoTrial(policy, judgeSays(REFUSE));
+  assert(policy.calls.n === 1 && !b.row.passed && b.res.exit === "g2-refused: policy: renames an existing function", `policy refusal wrong: spawns ${policy.calls.n}, ${b.res.exit}`);
+
+  const none = protoReplay({ build: buildOk });
+  const c = await protoTrial(none, judgeSays(SIGN));
+  assert(none.calls.n === 1 && !c.row.passed && c.res.exit === "g2-refused: scope: no design", `missing design must be refused: ${c.res.exit}`);
+
+  const ok = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const d = await protoTrial(ok, judgeSays(SIGN));
+  assert(ok.calls.n === 2 && d.row.passed && d.res.exit === "ok" && /typecheck:pass,acceptance:pass,build:pass/.test(d.row.graders), `control must build and pass: ${d.res.exit} / ${d.row.graders}`);
+});
+
+// S10 -- any popup other than the G2 file parks the trial.
+check("S10 popup: AskUserQuestion / ExitPlanMode / permission denial -> parked, park recorded, not-passed; clean control -> not parked", async () => {
+  const ask = (tool: string, input: Ev) => (events: Ev[], call: number) => {
+    if (call === 1) events.splice(1, 0, { type: "assistant", message: { content: [{ type: "tool_use", name: tool, input }] } });
+  };
+  const ro = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: ask("AskUserQuestion", { questions: [{ question: "Which approach should G2 take?" }] }) });
+  const j = judgeSays(SIGN);
+  const a = await protoTrial(ro, j);
+  assert(ro.calls.n === 1 && j.n === 0, "a parked trial must not reach the judge or phase 2");
+  assert(a.row.exit === "parked: popup AskUserQuestion: Which approach should G2 take?" && !a.row.passed && a.row.graders === "not-run:parked" && a.res.valid, `park row wrong: ${a.row.exit} / ${a.row.graders}`);
+  assert(JSON.stringify(a.row.park).includes("Which approach should G2 take?") && a.log.includes("Which approach"), "the park must be recorded in the row");
+
+  const plan = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: ask("ExitPlanMode", { plan: "step one" }) }), judgeSays(SIGN));
+  assert(plan.row.exit === "parked: popup ExitPlanMode: step one" && !plan.row.passed, `ExitPlanMode must park: ${plan.row.exit}`);
+
+  const denial = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: (events, call) => { if (call === 1) events.find((e) => e.type === "result")!.permission_denials = [{ tool_name: "Bash", tool_input: { command: "rm -rf x" } }]; } }), judgeSays(SIGN));
+  assert(denial.row.exit.startsWith("parked: popup Bash") && !denial.row.passed, `a permission denial must park: ${denial.row.exit}`);
+
+  const late = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: (events, call) => { if (call === 2) ask("AskUserQuestion", { questions: [{ question: "Proceed?" }] })(events, 1); } }), judgeSays(SIGN));
+  assert(late.row.exit.startsWith("parked: popup AskUserQuestion") && late.row.graders === "not-run:parked" && !late.row.passed, `a phase 2 popup must park too: ${late.row.exit}`);
+
+  const clean = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk }), judgeSays(SIGN));
+  assert(clean.row.exit === "ok" && clean.row.park === undefined && clean.row.passed, `control must not park: ${clean.row.exit}`);
+});
+
+// S11 -- protocol trials run on the fixture repo only (R-c freeze, enforced in code).
+check("S11 fixture-only: repo outside evals/ab/fixtures -> refused before any spawn; the smoke repo -> proceeds", async () => {
+  const outside = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  let err: unknown;
+  await protoTrial(outside, judgeSays(SIGN), await fixtureCopy(false)).catch((e) => (err = e));
+  const { FixtureOnly } = await import("./lib/protocol.ts");
+  assert(err instanceof FixtureOnly && outside.calls.n === 0, `outside repo must throw FixtureOnly with no spawn: ${err}, spawns ${outside.calls.n}`);
+  const inside = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const t = await protoTrial(inside, judgeSays(SIGN));
+  assert(inside.calls.n === 2 && t.row.repo === "smoke-repo", "the smoke repo must proceed");
+});
+
+// S12 -- files touched are checked a second time, against what the build really changed.
+check("S12 breach: build touching a file outside Layers -> scope-breach, not-passed, graders still run; in-Layers build -> ok", async () => {
+  const breach = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: (cwd) => { buildOk(cwd); fs.appendFileSync(path.join(cwd, "src", "index.ts"), "// sneaked\n"); } }), judgeSays(SIGN));
+  assert(breach.row.exit === "scope-breach: src/index.ts" && !breach.row.passed && /typecheck:/.test(breach.row.graders) && breach.res.valid, `breach row wrong: ${breach.row.exit} / ${breach.row.graders}`);
+  const added = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: (cwd) => { buildOk(cwd); fs.writeFileSync(path.join(cwd, "src", "extra.ts"), "export {};\n"); } }), judgeSays(SIGN));
+  assert(added.row.exit === "scope-breach: src/extra.ts", `an added file outside Layers is a breach: ${added.row.exit}`);
+  const control = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk }), judgeSays(SIGN));
+  assert(control.row.exit === "ok" && control.row.passed, `harness files and in-Layers edits are not a breach: ${control.row.exit}`);
+});
+
+// S13 -- a log written before the protocol columns existed (CRLF, as the real one is) gets its header widened; its rows stay byte-identical.
+check("S13 record: old 17-column CRLF log -> header widened to the new columns, earlier row untouched, new row appended", async () => {
+  const { appendRow } = await import("./lib/record.ts");
+  const base = ["ts", "tag", "arm", "repo", "task", "trial", "attempt", "graders", "in", "out", "cache-read", "cache-write", "cost-usd", "wall-s", "exit", "pins", "raw"];
+  const oldRow = "| 2026-10-29T00:00:00.000Z | smoke | a0 | r | t | 1 | 1 | g | 1 | 1 | 0 | 0 | 0.1 | 1.0 | ok | {} | {} |";
+  const log = path.join(tmpdir("rec"), "log.md");
+  fs.writeFileSync(log, ["# log", "", `| ${base.join(" | ")} |`, `|${base.map(() => "---").join("|")}|`, oldRow, ""].join("\r\n"));
+  appendRow(log, { tag: "smoke", arm: "a1", repo: "r", task: "t", trial: 1, attempt: 1, graders: "g", tokens: null, costUsd: null, wallS: 1, exit: "ok", pins: {}, raw: {}, passed: true });
+  const text = fs.readFileSync(log, "utf8");
+  assert(text.includes("| raw | passed | deviation | g2 | park |") && text.includes(`|${[...base, "p", "d", "g", "k"].map(() => "---").join("|")}|`), "header and separator must carry the new columns");
+  assert(text.includes(oldRow) && text.split("\n").filter((l) => l.startsWith("| 20")).length === 2, "the earlier row must stay and the new one be appended");
+  appendRow(log, { tag: "smoke", arm: "a1", repo: "r", task: "t", trial: 2, attempt: 1, graders: "g", tokens: null, costUsd: null, wallS: 1, exit: "ok", pins: {}, raw: {}, passed: true });
+  assert((fs.readFileSync(log, "utf8").match(/\| raw \| passed/g) ?? []).length === 1, "the header is widened once, not repeated");
+});
+
 // ---- paid checks: headless haiku runs under the same isolation real trials use ----
 const ARM_FILE = path.join(AB, "arms", "smoke-a0.json");
 const WORK_ROOT = () => tmpdir("work");
@@ -275,6 +437,40 @@ check("P4 tracer: run-trial.ts on the smoke repo -> exit 0, one complete row app
   assert(exit === "ok" && /smoke/.test(tag ?? ""), `exit/tag: ${exit} / ${tag}`);
   for (const key of ["sessionModel", "dispatch", "effort", "permissionMode", "plugin", "configDir"]) assert((pins ?? "").includes(`"${key}"`), `pins cell lacks ${key}`);
   console.log(`     P4 row: ${last.slice(0, 400)}`);
+}, true);
+
+// P5 -- the real policy judge discriminates: an in-Layers design doing an Out-of-scope behaviour is refused, the in-scope control signed.
+check("P5 judge: in-Layers design renaming an existing function -> refuse; in-scope control -> sign", async () => {
+  const { policyCheck, realJudge } = await import("./lib/protocol.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const t = await protoTask();
+  const judge = realJudge(WORK_ROOT(), loadArm(ARM_FILE));
+  const bad = await policyCheck("Files:\n- src/add.ts\n\nBehaviour: rename the existing function add to sum, and add mul(a, b) returning the product.\n", t.outOfScope, judge);
+  console.log(`     P5 must-FAIL verdict: ${bad.sign ? "sign" : "refuse"} -- ${bad.reason}`);
+  assert(!bad.sign, `a design renaming add must be refused: ${bad.reason}`);
+  const good = await policyCheck(designOf(["src/add.ts"]), t.outOfScope, judge);
+  console.log(`     P5 control verdict: ${good.sign ? "sign" : "refuse"} -- ${good.reason}`);
+  assert(good.sign, `the in-scope design must be signed: ${good.reason}`);
+}, true);
+
+// P6 -- one real protocol trial on the smoke repo; whatever it ends in (graded, refused, parked) is the evidence.
+check("P6 protocol: run-trial.ts --protocol d9 on the smoke repo -> a row with the D9 deviation and a recorded outcome", async () => {
+  const { DEFAULT_LOG } = await import("./lib/record.ts");
+  const arm = path.join(AB, "arms", "smoke-a1.json");
+  const rowsBefore = fs.existsSync(DEFAULT_LOG) ? fs.readFileSync(DEFAULT_LOG, "utf8").split("\n").filter((l) => l.startsWith("| 20")).length : 0;
+  const p = Bun.spawn(["bun", path.join(AB, "run-trial.ts"), "--protocol", "d9", "--arm", arm, "--task", path.join(AB, "fixtures", "smoke-tasks", "add-fn.json"), "--repo", SMOKE_REPO], { stdin: "ignore", stdout: "pipe", stderr: "pipe" });
+  const out = (await new Response(p.stdout).text()) + (await new Response(p.stderr).text());
+  const code = await p.exited;
+  console.log(`     P6 output: ${out.trim().split("\n").join(" | ")}`);
+  assert(code === 0, `run-trial.ts --protocol d9 exited ${code}: ${out}`);
+  const rows = fs.readFileSync(DEFAULT_LOG, "utf8").split("\n").filter((l) => l.startsWith("| 20"));
+  assert(rows.length === rowsBefore + 1, `expected exactly one appended row, rows ${rowsBefore} -> ${rows.length}`);
+  const cells = rows[rows.length - 1]!.split(/(?<!\\) \| /);
+  const [, , armId, repo, , , , graders, , , , , , , exit, , , passed, deviation, g2, park] = cells;
+  assert(armId === "smoke-a1" && repo === "smoke-repo", `identity cells wrong: ${armId} / ${repo}`);
+  assert((deviation ?? "").includes("D9 eval-only G2 exception"), `deviation cell: ${deviation}`);
+  assert(/^(ok|g2-refused|parked|scope-breach)/.test(exit ?? ""), `unexpected outcome: ${exit}`);
+  console.log(`     P6 row fields: exit=${exit} passed=${passed} graders=${graders} g2=${g2} park=${park}`);
 }, true);
 
 const paid = process.argv.includes("--paid");
