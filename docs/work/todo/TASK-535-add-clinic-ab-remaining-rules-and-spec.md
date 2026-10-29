@@ -2,6 +2,7 @@
 id: TASK-535
 title: "Add the clinic A/B repo's remaining business rules and complete its business spec"
 epic: EPIC-023
+sprint: SPRINT-148
 priority: P2
 size: M
 risk: med

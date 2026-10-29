@@ -2,6 +2,7 @@
 id: TASK-542
 title: "Implement the unattended A/B trial protocol with the D9 G2 exception (fixture repo only)"
 epic: EPIC-023
+sprint: SPRINT-148
 priority: P2
 size: M
 risk: high
