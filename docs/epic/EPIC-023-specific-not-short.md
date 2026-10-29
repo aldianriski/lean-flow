@@ -64,8 +64,10 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 
 ## Closed when
 
-- [ ] S0: pre-registration frozen before any run; arms A0 (no docs) and A1 (2.x) measured on both repos;
-  each of the three symptoms recorded as *measured defect* or *not reproduced* → next slice: S0 Baseline
+- [ ] S0: design frozen at S0 promote; pre-registration hash frozen before any trial on an A/B repo or a
+  task-set task (harness smoke runs use a separate fixture repo only; owner ruling R-c, 2026-10-29); arms
+  A0 (no lean-flow docs) and A1 (2.x) measured on both repos; each of the three symptoms recorded as
+  *measured defect* or *not reproduced* → TASK-544, TASK-545
 - [ ] S1: `init`/`migrate` produce a repo profile on both A/B repos and on an unprofiled stack through the
   installed plugin; a real 2.x `migrate` keeps every existing decision; arm A2 measured vs A1
   → next slice: S1 Discovery

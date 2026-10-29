@@ -123,7 +123,14 @@ the baseline for every arm); S1 → S2 → S3 because each arm stacks on the pre
 last, once the hypotheses are tested. The STANDARD rewrite moved from first to last: writing R1–R4 into
 the standard before H1 is measured would be a new Standard requirement without one of the five.
 
-## 7. A/B design (frozen at S0 promote)
+## 7. A/B design (design frozen at S0 promote; pre-registration hash at TASK-544)
+
+**Freeze timing (owner ruling R-c, 2026-10-29):** the design below freezes at S0 promote; the
+pre-registration hash freezes before any trial on an A/B repo or a task-set task. Harness smoke runs use
+a separate fixture repo only. **Evidence parity (R-a):** every arm, A0 included, carries the same raw
+answers file as `BUSINESS-NOTES.md`, so A0 means raw facts without lean-flow. **Baseline defect rule
+(R-b):** a symptom is a *measured defect* when A1 fails its measure ≥ 20% and the 90% bootstrap lower
+bound of that failure rate is > 10%; Unknown counts as failure. S0 tasks: TASK-533..545.
 
 **Arms (staged, cumulative):** A0 no lean-flow docs · A1 2.x (pinned 2.19.x) · A2 = A1 + S1 discovery ·
 A3 = A2 + S2 carry-through · A4 = A3 + S3 candidates · A4−x ablations (S4) · Final = admitted set.

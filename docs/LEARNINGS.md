@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-28
+last_updated: 2026-10-29
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -465,10 +465,11 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-193: SPRINT-097)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-188: SPRINT-094)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-190: SPRINT-095)
-- count: 4
+- seen: 2026-10-29 (EPIC-023 proposal and S0 intake Codex gauntlets: 4 and 5 rounds. A new class, proposal/intake reviews outside ADR-053 § Decision 5's G2 round cap. Every High after R1 sat in text the coordinator's previous fix had added. Owner-adopted rhythm: self-check · forks asked before R1 · altitude brief · max 2 rounds · the rest → G2 notes. Re-placement candidate at next promote)
+- count: 5
 - promoted: yes
 - **L-217 → promoted: yes → ADR-053 § Decision 5** (bounded review: a G2-declared round cap, cumulative spend, census-zero → TD, threat-model briefs) + its `.claude/CLAUDE.md` Anti-Patterns line · disposition: move-to-reference — every flow here reads CLAUDE.md, and the ADR holds the rule; this entry stays as the record (SPRINT-124 T3, re-disposed as the SPRINT-122 promote required).
-- related: L-165 (every Tier G change gets an outside reviewer — this bounds how many) · L-186 (vary the selection) · L-088 (re-agree a criterion execution invalidated)
+- related: L-188 (a fresh defect each round in the same region) · L-165 (every Tier G change gets an outside reviewer — this bounds how many) · L-186 (vary the selection) · L-088 (re-agree a criterion execution invalidated)
 
 ---
 
