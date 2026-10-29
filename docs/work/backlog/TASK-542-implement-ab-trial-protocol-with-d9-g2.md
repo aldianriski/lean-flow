@@ -10,7 +10,7 @@ class: execution
 tier: G
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-533]
 ---
 
@@ -29,7 +29,6 @@ A1+ trials run the lean-flow loop unattended; G2's subject is produced inside th
 `evals/ab/`
 
 ## Assumes
-- **blocked-by:** TASK-533 (harness).
 
 ## Tracker
 EPIC-023 D4 · research D9
