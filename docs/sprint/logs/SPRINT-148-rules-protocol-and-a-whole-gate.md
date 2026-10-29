@@ -59,3 +59,16 @@ dispatch T1 ∥ T2 (worktree) ∥ T3→T4 (main tree), sonnet builders. A1 is co
 - builder-check · T3 · 0 contradictions · 4 questions · settled in the design: the pin compares exact segments; both-fail output; `cd` failure → exit 5;
   TD-224/225 resolved at SPRINT-115 (fact)
 - builder-check · T4 · 0 contradictions · 3 questions · nothing important left (porcelain counts untracked paths, as intended)
+
+### 2026-10-29 | execute | T3 done -- gate-remote runs and judges both declared stages (TASK-531, TD-279 resolved)
+Commits `54eed65d` (code + tests) · `cfbb748c` (strict-index typecheck fix) · `31b85143` (TD-279 + CHANGELOG). Builder: sonnet, `/tdd`.
+Checks re-run by the coordinator: `bunx tsc --noEmit` clean; `bun test evals/gate-remote.test.ts` 54 pass, 0 fail. Builder's full `bun test`
+579 pass, 0 fail. VPS at `cfbb748c`: `bun test: 579 pass, 0 fail (rc 0)` · `QA-CHECK: 329 pass, 0 fail` · exit 0.
+Deviation: two VPS runs, not one. The first, at `54eed65d`, was red on `typecheck` (7 strict-index errors in the new code) with bun test green; it was fixed
+and re-run once. The gate caught a real defect, which is the tool doing its job.
+- consequence · T3 · behaviour:med (maintainer tool's exit verdict) · governance:low (Other G, D2) → coordinator self-review of the diff
+- review · T3 · 1 finding, routed: `judgeBun` reads the FIRST bun summary match, so a nested summary printed earlier could mask the real one
+  (the same class as TD-268). It goes to T4 as a scope note, because T4 owns the same file next and the fix is the same last-match rule.
+- scope-change · T4 · `judgeBun` also reads the LAST summary lines, with a two-order test. What broke: the review finding above. Impact: one function and
+  one test, inside T4's `Layers:` (`scripts/gate-remote.ts` · `evals/gate-remote.test.ts`); no box changes. G2 re-confirm: coordinator, in scope as the
+  same last-match rule TD-268 names.
