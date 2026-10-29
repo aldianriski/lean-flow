@@ -3,12 +3,13 @@
 //     bun --no-env-file scripts/gate-remote.ts
 //
 // Thin wrapper: ship HEAD as a git bundle (incremental from the remote's HEAD when it is an ancestor),
-// check it out detached, run `QA_FULL=1 sh scripts/qa-check.sh` in ONE blocking ssh call, read the
-// remote rc and log back, and judge with scripts/qa-verdict.ts (the one definition of a valid verdict).
+// check it out detached, run both stages of the declared gate (`QA_FULL=1 sh scripts/qa-check.sh`, then
+// `bun test`) in ONE blocking ssh call, each to its own log + rc file, read them back, and judge qa-check
+// with scripts/qa-verdict.ts and bun test by its own summary. Both stages always run.
 //
 // Exit codes: 0 = rc 0 AND a valid passing verdict. 2 = refused before any spawn (flag / variable).
-// 5 = transport or remote-setup failure (never a gate result). Otherwise the remote rc, or 1 when the
-// rc is 0 but the verdict is missing / failing / contradicts it.
+// 5 = transport or remote-setup failure (never a gate result). Otherwise the qa-check rc, or 1 when the
+// rc is 0 but the verdict is missing / failing / contradicts it, or when only the bun test stage fails.
 //
 // Bun auto-loads the repo-root dotenv file unless launched with --no-env-file, so this refuses to run
 // without it, and it never opens that file itself.
@@ -58,6 +59,34 @@ export function dirProblem(dir: string): string | null {
 
 const RUN_TIMEOUT_MS = 900_000;
 
+/** The remote stages, in order. `declared` is the segment text each carries in package.json's `test` script. */
+export const STAGES = [
+  { name: "qa-check", cmd: "QA_FULL=1 sh scripts/qa-check.sh", declared: "bun scripts/qa-verdict.ts sh scripts/qa-check.sh" },
+  { name: "bun test", cmd: "bun test", declared: "bun test" },
+] as const;
+const SLUGS = ["qa", "bun"] as const;
+
+/** True when the script's `&&`-chained segments equal the stages' declared text, in order. Pure: the caller reads package.json. */
+export function stagesMatchScript(script: string, stages: readonly { declared: string }[]): boolean {
+  const segs = script.split("&&").map((x) => x.trim());
+  return segs.length === stages.length && segs.every((x, i) => x === stages[i].declared);
+}
+
+/** Judge a `bun test` log by its summary: present, `0 fail`, and at least one test run. */
+export function judgeBun(log: string): { ok: boolean; pass: number; fail: number; ran: number; reason: string } {
+  const num = (re: RegExp) => {
+    const m = re.exec(log);
+    return m === null ? null : Number(m[1]);
+  };
+  const pass = num(/^\s*(\d+) pass$/m);
+  const fail = num(/^\s*(\d+) fail$/m);
+  const ran = num(/^Ran (\d+) tests? across/m);
+  if (pass === null || fail === null || ran === null) return { ok: false, pass: 0, fail: 0, ran: 0, reason: "no bun test summary" };
+  if (fail > 0) return { ok: false, pass, fail, ran, reason: `${fail} fail` };
+  if (ran < 1) return { ok: false, pass, fail, ran, reason: "no tests ran" };
+  return { ok: true, pass, fail, ran, reason: "" };
+}
+
 const sh = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
 
 function spawnReply(cmd: string, args: string[], timeoutMs?: number): Reply {
@@ -94,8 +123,7 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
 
   const uniq = `${sha.slice(0, 8)}-${opts.pid ?? process.pid}`;
   const RBUNDLE = `/tmp/lf-gate-${uniq}.bundle`;
-  const RLOG = `/tmp/lf-gate-${uniq}.log`;
-  const RRC = `/tmp/lf-gate-${uniq}.rc`;
+  const R = (slug: string, ext: string) => `/tmp/lf-gate-${uniq}.${slug}.${ext}`;
 
   const rh = t.ssh(`git -C ${dir} rev-parse HEAD`);
   if (rh.status === 255) return step("ssh remote head", "ssh exit 255", rh);
@@ -127,20 +155,48 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
     return 5;
   }
 
-  const run = t.ssh(`rm -f ${RLOG} ${RRC}; cd ${dir} && QA_FULL=1 sh scripts/qa-check.sh > ${RLOG} 2>&1; echo $? > ${RRC}`, RUN_TIMEOUT_MS);
+  // Both stages in ONE ssh call, joined by `;` so bun test runs whatever qa-check returned. If `cd` fails
+  // no rc file is written, and the run ends at `read qa rc` (exit 5), never as a gate result.
+  const [qa, bun] = STAGES;
+  const files = STAGES.flatMap((st, i) => [R(SLUGS[i], "log"), R(SLUGS[i], "rc")]);
+  const stageCmd = (cmd: string, slug: string) => `${cmd} > ${R(slug, "log")} 2>&1; echo $? > ${R(slug, "rc")}`;
+  const run = t.ssh(
+    `rm -f ${files.join(" ")}; cd ${dir} && { ${stageCmd(qa.cmd, "qa")}; ${stageCmd(bun.cmd, "bun")}; }`,
+    RUN_TIMEOUT_MS,
+  );
   if (run.timedOut) return step("ssh run", `timed out after ${RUN_TIMEOUT_MS / 1000}s`, run);
   if (run.status === 255) return step("ssh run", "ssh exit 255", run);
 
-  const rcR = t.ssh(`cat ${RRC}`);
-  if (rcR.status === 255) return step("ssh read rc", "ssh exit 255", rcR);
-  if (rcR.status !== 0 || !/^\d+$/.test(rcR.stdout.trim())) {
-    return step("read rc", "rc file missing or not a number", rcR);
+  const rcs: number[] = [];
+  for (const slug of SLUGS) {
+    const r = t.ssh(`cat ${R(slug, "rc")}`);
+    if (r.status === 255) return step(`ssh read ${slug} rc`, "ssh exit 255", r);
+    if (r.status !== 0 || !/^\d+$/.test(r.stdout.trim())) {
+      return step(`read ${slug} rc`, "rc file missing or not a number", r);
+    }
+    rcs.push(Number(r.stdout.trim()));
   }
-  const rc = Number(rcR.stdout.trim());
+  const logs: Reply[] = [];
+  for (const slug of SLUGS) {
+    const r = t.ssh(`cat ${R(slug, "log")}`);
+    if (r.status === 255) return step(`ssh read ${slug} log`, "ssh exit 255", r);
+    logs.push(r);
+  }
 
-  const logR = t.ssh(`cat ${RLOG}`);
-  if (logR.status === 255) return step("ssh read log", "ssh exit 255", logR);
+  // bun test: judged from its own log; printed whenever its log was read.
+  const bunRc = rcs[1];
+  const b = logs[1].status === 0 ? judgeBun(logs[1].stdout) : { ok: false, pass: 0, fail: 0, ran: 0, reason: "no bun test log" };
+  const bunOk = bunRc === 0 && b.ok;
+  if (logs[1].status === 0 && b.reason !== "no bun test summary") say(`bun test: ${b.pass} pass, ${b.fail} fail (rc ${bunRc})`);
+  if (!bunOk) say(`gate-remote: bun test stage failed (${bunRc !== 0 ? `rc ${bunRc}` : b.reason})`);
 
+  // qa-check: judged from the qa log alone, never the bun log.
+  const qaCode = judgeQa(rcs[0], logs[0], say);
+  if (qaCode !== 0) return qaCode;
+  return bunOk ? 0 : 1;
+}
+
+function judgeQa(rc: number, logR: Reply, say: (line: string) => void): number {
   say(`remote rc: ${rc}`);
   const preserved = rc === 0 ? 1 : Math.min(rc, 255); // an rc >= 256 must never wrap to 0
   if (logR.status !== 0) {
@@ -155,7 +211,10 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
     say("gate-remote: no verdict line in the remote log");
     return preserved;
   }
-  if (verdictLine !== undefined) say(verdictLine);
+  if (verdictLine !== undefined) {
+    say(verdictLine);
+    say(`qa-check: ${verdictLine} (rc ${rc})`);
+  }
   if (rc === 0 && v.ok) return 0;
   // a remote rc above 255 cannot be a real exit status; it falls through to the preserved branch
   if (rc !== 0 && v.ok) {

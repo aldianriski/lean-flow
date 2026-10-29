@@ -5,7 +5,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { dirProblem, runGateRemote, scpArgv, sshArgv, type Reply, type Transport } from "../scripts/gate-remote.ts";
+import { dirProblem, judgeBun, runGateRemote, scpArgv, sshArgv, STAGES, stagesMatchScript, type Reply, type Transport } from "../scripts/gate-remote.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SCRIPT = "scripts/gate-remote.ts";
@@ -14,6 +14,9 @@ const LOCAL = "a".repeat(40);
 const REMOTE = "b".repeat(40);
 const PASS_LOG = "  PASS  x\nQA-CHECK: 12 pass, 0 fail\n";
 const FAIL_LOG = "  FAIL  guard-x: broken\nQA-CHECK: 11 pass, 1 fail\n";
+// a real bun summary as captured from `bun test` (SPRINT-148 T3 builder check)
+const BUN_PASS = " 38 pass\n 0 fail\n 117 expect() calls\nRan 38 tests across 1 file. [3.84s]\n";
+const BUN_FAIL = " 35 pass\n 3 fail\n 117 expect() calls\nRan 38 tests across 1 file. [3.84s]\n";
 
 interface Script {
   remoteHead?: Reply; // reply to `git rev-parse HEAD` on the remote
@@ -23,8 +26,10 @@ interface Script {
   scp?: Reply;
   setup?: Reply;
   run?: Reply;
-  rc?: Reply;
-  log?: Reply;
+  rc?: Reply; // qa-check stage rc file
+  log?: Reply; // qa-check stage log
+  bunRc?: Reply;
+  bunLog?: Reply;
 }
 const ok = (stdout = ""): Reply => ({ status: 0, stdout });
 
@@ -50,8 +55,10 @@ function stub(s: Script) {
       if (cmd.includes("rev-parse HEAD")) return s.remoteHead ?? ok(`${REMOTE}\n`);
       if (cmd.includes("git fetch")) return s.setup ?? ok();
       if (cmd.includes("QA_FULL=1")) return s.run ?? ok();
-      if (cmd.startsWith("cat ") && cmd.endsWith(".rc")) return s.rc ?? ok("0\n");
-      if (cmd.startsWith("cat ")) return s.log ?? ok(PASS_LOG);
+      if (cmd.startsWith("cat ") && cmd.endsWith(".qa.rc")) return s.rc ?? ok("0\n");
+      if (cmd.startsWith("cat ") && cmd.endsWith(".bun.rc")) return s.bunRc ?? ok("0\n");
+      if (cmd.startsWith("cat ") && cmd.endsWith(".qa.log")) return s.log ?? ok(PASS_LOG);
+      if (cmd.startsWith("cat ") && cmd.endsWith(".bun.log")) return s.bunLog ?? ok(BUN_PASS);
       throw new Error(`unexpected ssh ${cmd}`);
     },
     scp(src, dest) {
@@ -180,38 +187,38 @@ describe("exit cases through a stubbed transport", () => {
     expect(r.text).toContain("step 'local bundle'");
   });
 
-  test("garbage rc file is exit 5 naming step 'read rc'", () => {
+  test("garbage rc file is exit 5 naming step 'read qa rc'", () => {
     const r = go({ rc: ok("garbage") });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("step 'read rc'");
+    expect(r.text).toContain("step 'read qa rc'");
   });
 
-  test("empty rc file is exit 5 naming step 'read rc'", () => {
+  test("empty rc file is exit 5 naming step 'read qa rc'", () => {
     const r = go({ rc: ok("") });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("step 'read rc'");
+    expect(r.text).toContain("step 'read qa rc'");
   });
 
-  test("missing rc file (cat non-zero) is exit 5 naming step 'read rc'", () => {
+  test("missing rc file (cat non-zero) is exit 5 naming step 'read qa rc'", () => {
     const r = go({ rc: { status: 1, stdout: "" } });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("step 'read rc'");
+    expect(r.text).toContain("step 'read qa rc'");
   });
 
   test("whitespace around the rc is tolerated", () => {
     expect(go({ rc: ok(" 0 \n") }).code).toBe(0);
   });
 
-  test("ssh 255 reading the rc is exit 5 naming step 'ssh read rc'", () => {
+  test("ssh 255 reading the rc is exit 5 naming step 'ssh read qa rc'", () => {
     const r = go({ rc: { status: 255, stdout: "" } });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("step 'ssh read rc'");
+    expect(r.text).toContain("step 'ssh read qa rc'");
   });
 
-  test("ssh 255 reading the log is exit 5 naming step 'ssh read log'", () => {
+  test("ssh 255 reading the log is exit 5 naming step 'ssh read qa log'", () => {
     const r = go({ log: { status: 255, stdout: "" } });
     expect(r.code).toBe(5);
-    expect(r.text).toContain("step 'ssh read log'");
+    expect(r.text).toContain("step 'ssh read qa log'");
   });
 
   test("a remote rc >= 256 is clamped to 255, never 0", () => {
@@ -280,6 +287,100 @@ describe("exit cases through a stubbed transport", () => {
     const ssh = sshArgv({ ...CFG, host: "-oProxyCommand=x" }, "cmd");
     expect(ssh.indexOf("--")).toBeLessThan(ssh.indexOf("-oProxyCommand=x"));
     expect(scpArgv(CFG, "s", "/d")).toContain("u@h:/d");
+  });
+});
+
+describe("the bun test stage (TASK-531)", () => {
+  test("green control: both stages pass -> 0, both verdict lines printed", () => {
+    const r = go({});
+    expect(r.code).toBe(0);
+    expect(r.text).toContain("qa-check: QA-CHECK: 12 pass, 0 fail (rc 0)");
+    expect(r.text).toContain("bun test: 38 pass, 0 fail (rc 0)");
+  });
+
+  test("bun rc 1 with a '0 fail' summary under a passing qa-check is non-zero and names the bun test stage", () => {
+    const r = go({ bunRc: ok("1\n") });
+    expect(r.code).not.toBe(0);
+    expect(r.text).toContain("bun test stage failed");
+  });
+
+  test("bun rc 0 with '3 fail' in the summary under a passing qa-check is non-zero and names the bun test stage", () => {
+    const r = go({ bunLog: ok(BUN_FAIL) });
+    expect(r.code).not.toBe(0);
+    expect(r.text).toContain("bun test stage failed");
+    expect(r.text).toContain("bun test: 35 pass, 3 fail (rc 0)");
+  });
+
+  test("a bun log with no summary is non-zero", () => {
+    const r = go({ bunLog: ok("whatever\n") });
+    expect(r.code).not.toBe(0);
+    expect(r.text).toContain("no bun test summary");
+  });
+
+  test("a missing bun log is non-zero", () => {
+    const r = go({ bunLog: { status: 1, stdout: "" } });
+    expect(r.code).not.toBe(0);
+    expect(r.text).toContain("bun test stage failed");
+  });
+
+  test("control: only qa-check fails, bun passes -> non-zero, qa-check exit preserved", () => {
+    const r = go({ rc: ok("1\n"), log: ok(FAIL_LOG) });
+    expect(r.code).toBe(1);
+    expect(r.text).toContain("bun test: 38 pass, 0 fail (rc 0)");
+    expect(r.text).not.toContain("bun test stage failed");
+  });
+
+  test("both stages fail: both stage lines and the bun failure print", () => {
+    const r = go({ rc: ok("1\n"), log: ok(FAIL_LOG), bunRc: ok("1\n"), bunLog: ok(BUN_FAIL) });
+    expect(r.code).toBe(1);
+    expect(r.text).toContain("qa-check: QA-CHECK: 11 pass, 1 fail (rc 1)");
+    expect(r.text).toContain("bun test stage failed");
+  });
+
+  test("the qa verdict comes from the qa log alone: a nested passing line in the bun log cannot rescue a failing qa log", () => {
+    const r = go({ rc: ok("1\n"), log: ok(FAIL_LOG), bunLog: ok("QA-CHECK: 1 pass, 0 fail\n" + BUN_PASS) });
+    expect(r.code).not.toBe(0);
+    expect(r.text).toContain("qa-check: QA-CHECK: 11 pass, 1 fail (rc 1)");
+  });
+
+  test("a nested failing line in a passing bun log does not fail the qa verdict", () => {
+    expect(go({ bunLog: ok("QA-CHECK: 1 pass, 1 fail\n" + BUN_PASS) }).code).toBe(0);
+  });
+
+  test("the run command runs both stages joined by ';' and each writes its own rc file", () => {
+    const run = go({}).calls.find((c) => c.includes("QA_FULL=1"))!;
+    expect(run).toMatch(
+      /QA_FULL=1 sh scripts\/qa-check\.sh > \/tmp\/lf-gate-[^ ]*\.qa\.log 2>&1; echo \$\? > \/tmp\/lf-gate-[^ ]*\.qa\.rc; bun test > \/tmp\/lf-gate-[^ ]*\.bun\.log 2>&1; echo \$\? > \/tmp\/lf-gate-[^ ]*\.bun\.rc/,
+    );
+  });
+
+  test("ssh 255 / garbage reading the bun rc is exit 5 naming the step", () => {
+    const a = go({ bunRc: { status: 255, stdout: "" } });
+    expect(a.code).toBe(5);
+    expect(a.text).toContain("step 'ssh read bun rc'");
+    const b = go({ bunRc: ok("x") });
+    expect(b.code).toBe(5);
+    expect(b.text).toContain("step 'read bun rc'");
+  });
+
+  test("judgeBun reads the real summary shape", () => {
+    expect(judgeBun(BUN_PASS)).toMatchObject({ ok: true, pass: 38, fail: 0 });
+    expect(judgeBun(BUN_FAIL).ok).toBe(false);
+    expect(judgeBun(" 0 pass\n 0 fail\nRan 0 tests across 0 files.\n").ok).toBe(false);
+  });
+
+  const script = (JSON.parse(readFileSync(`${ROOT}package.json`, "utf8")) as { scripts: { test: string } }).scripts.test;
+  test("STAGES is pinned to package.json's test script", () => {
+    expect(stagesMatchScript(script, STAGES)).toBe(true);
+  });
+  test("pin: a chained stage added to the script reddens it", () => {
+    expect(stagesMatchScript(`${script} && bun run lint`, STAGES)).toBe(false);
+  });
+  test("pin: a stage removed from the script reddens it", () => {
+    expect(stagesMatchScript(script.replace(" && bun test", ""), STAGES)).toBe(false);
+  });
+  test("pin: dropping the qa-verdict wrapper reddens it", () => {
+    expect(stagesMatchScript(script.replace("bun scripts/qa-verdict.ts ", ""), STAGES)).toBe(false);
   });
 });
 
