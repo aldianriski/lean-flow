@@ -25,6 +25,7 @@ if (pinDir) {
 }
 
 const need = (name: string) => flag(name) ?? (console.error(`missing --${name}`), process.exit(2));
+if (flag("protocol") !== undefined && flag("protocol") !== "d9") (console.error(`unknown --protocol ${flag("protocol")} (only d9)`), process.exit(2));
 const repo = path.resolve(need("repo"));
 const workRoot = path.join(os.tmpdir(), "ab-work");
 fs.mkdirSync(workRoot, { recursive: true });
