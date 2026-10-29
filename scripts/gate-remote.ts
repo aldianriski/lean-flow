@@ -69,7 +69,7 @@ const SLUGS = ["qa", "bun"] as const;
 /** True when the script's `&&`-chained segments equal the stages' declared text, in order. Pure: the caller reads package.json. */
 export function stagesMatchScript(script: string, stages: readonly { declared: string }[]): boolean {
   const segs = script.split("&&").map((x) => x.trim());
-  return segs.length === stages.length && segs.every((x, i) => x === stages[i].declared);
+  return segs.length === stages.length && segs.every((x, i) => x === stages[i]?.declared);
 }
 
 /** Judge a `bun test` log by its summary: present, `0 fail`, and at least one test run. */
@@ -158,7 +158,7 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
   // Both stages in ONE ssh call, joined by `;` so bun test runs whatever qa-check returned. If `cd` fails
   // no rc file is written, and the run ends at `read qa rc` (exit 5), never as a gate result.
   const [qa, bun] = STAGES;
-  const files = STAGES.flatMap((st, i) => [R(SLUGS[i], "log"), R(SLUGS[i], "rc")]);
+  const files = STAGES.flatMap((st, i) => [R(SLUGS[i]!, "log"), R(SLUGS[i]!, "rc")]);
   const stageCmd = (cmd: string, slug: string) => `${cmd} > ${R(slug, "log")} 2>&1; echo $? > ${R(slug, "rc")}`;
   const run = t.ssh(
     `rm -f ${files.join(" ")}; cd ${dir} && { ${stageCmd(qa.cmd, "qa")}; ${stageCmd(bun.cmd, "bun")}; }`,
@@ -184,14 +184,15 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
   }
 
   // bun test: judged from its own log; printed whenever its log was read.
-  const bunRc = rcs[1];
-  const b = logs[1].status === 0 ? judgeBun(logs[1].stdout) : { ok: false, pass: 0, fail: 0, ran: 0, reason: "no bun test log" };
+  const bunRc = rcs[1]!;
+  const bunLogR = logs[1]!;
+  const b = bunLogR.status === 0 ? judgeBun(bunLogR.stdout) : { ok: false, pass: 0, fail: 0, ran: 0, reason: "no bun test log" };
   const bunOk = bunRc === 0 && b.ok;
-  if (logs[1].status === 0 && b.reason !== "no bun test summary") say(`bun test: ${b.pass} pass, ${b.fail} fail (rc ${bunRc})`);
+  if (bunLogR.status === 0 && b.reason !== "no bun test summary") say(`bun test: ${b.pass} pass, ${b.fail} fail (rc ${bunRc})`);
   if (!bunOk) say(`gate-remote: bun test stage failed (${bunRc !== 0 ? `rc ${bunRc}` : b.reason})`);
 
   // qa-check: judged from the qa log alone, never the bun log.
-  const qaCode = judgeQa(rcs[0], logs[0], say);
+  const qaCode = judgeQa(rcs[0]!, logs[0]!, say);
   if (qaCode !== 0) return qaCode;
   return bunOk ? 0 : 1;
 }
