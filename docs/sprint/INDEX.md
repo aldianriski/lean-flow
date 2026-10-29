@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-28
+last_updated: 2026-10-29
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-147 — First Trial, First Slice — closed 2026-10-29 · `751df00` · 2 of 2 members in `done/`, 11/11 DoD (no release: maintainer-only tooling, held under [Unreleased]) · EPIC-023 (S0) · the A/B harness tracer runs one pinned, isolated, graded and costed trial, and the clinic A/B repo books end-to-end with both invariants red-before-green
 - SPRINT-146 — Say What They Saw — closed 2026-10-28 · `cc02166` · 3 of 3 members in `done/`, 18/18 DoD (released **2.19.1** PATCH; spec unchanged at 0.18.1) · no epic · the reaper names an uncovered open box instead of a clean PLAN_EXHAUSTED, the retry-ceiling PASS says its count is model-reported, and a failed gate names the chained `bun test` it skips; system verify 314/0 on the VPS after one red run on two coordinator misses
 - SPRINT-145 — Keep the Terms, Recast the List — closed 2026-10-27 · `8d7005c` · 2 of 2 members in `done/`, 10/10 DoD (released **2.19.0** MINOR; spec unchanged at 0.18.1) · no epic · English terms of art kept in Indonesian domain text and LF-6 for an outward to-do list, both measured on a synthetic memo that fails on 2.17.0 first; system verify 315/0 on the VPS after one fixed layers-observed FAIL
 - SPRINT-144 — Wire the Milestone, Cut the Cost — closed 2026-10-26 · `121d8ce` · 5 of 5 members in `done/`, 17/17 DoD (released **2.18.0** MINOR; spec unchanged at 0.18.1) · no epic · commit messages humanized inline (TD-278 resolved, ~3.1k tokens per commit against ~73k); system verify 317/0 on the VPS after one fixed layers-observed FAIL

@@ -3,7 +3,7 @@ sprint: 147
 slug: first-trial-first-slice
 owner: Maintainer
 last_updated: 2026-10-29
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
