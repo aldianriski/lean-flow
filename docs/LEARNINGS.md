@@ -123,6 +123,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-261 [tags: edit-safety] [status: active]: **Prose that a guard parses is a structured field: a path-shaped token written into it is a claim the guard will check.** At SPRINT-147's system verify, two of three FAILs were the coordinator's own words. Tick evidence on TASK-533 named the bare `run-trial.ts` and a dotted `result.…` token, which the member-layers check reads as undeclared files. A scope-change entry backticked two directory names, which the scope-change check reads as paths the entry claims, though T1's `Layers:` did not hold them. Both guards were right; the author wrote file-shaped tokens where plain words were meant. L-108 is the guard's side of this (match by shape, not substring); this is the writer's side. Inside a governed artifact (tick evidence, a log entry's paths, Plan lines), write a token in backticks with a path shape only when it names a file the task touches or cites; otherwise use words.
+- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0)
+- count: 1
+- promoted: no
+- related: L-108 (the guard's side) · L-176 (structured fields in a narrative file) · L-251 (run every check that reads a touched file)
+
+---
+
 ## L-260 [tags: process] [status: active]: **A governance edit made at promote lands after the doc-aging scan that measured its file, so the signed scan no longer describes the tree being locked.** SPRINT-146's promote ran `check-doc-caps.ts` (no FAIL; the always-loaded token budget at ~12688 of 12691), then merged L-258 into `.claude/CONTEXT.md` under the signed checklist. The clause cost ~61 tokens, and the next system verify FAILed `token-budget-exceeded`. L-251 runs every check that reads a touched file before a tick, but promote's own governance edits belong to no task, so no tick ever fires it. After the governance edits and before `plan locked`, re-run the cap check, token budget included, over the edited tree.
 - seen: 2026-10-28 (SPRINT-146 system verify on `7a4cfb2d`; L-258 moved to LEARNINGS by owner ruling, rerun 314/0)
 - count: 1

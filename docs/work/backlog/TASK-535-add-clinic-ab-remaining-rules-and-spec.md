@@ -29,6 +29,7 @@ Completes the clinic domain so the business-rule and lost-detail measures have e
 
 ## Assumes
 - **blocked-by:** TASK-534 (the booking slice).
+- **note from SPRINT-147 close:** the booking page converts browser-local time to UTC while working hours are stored and read as UTC, so on a UTC+7 host a 10:00 local booking is refused `OUTSIDE_WORKING_HOURS`. Which time zone the clinic's hours live in is a business fact the spec must record (not visible in code); the owner rules it in the realism review.
 
 ## Tracker
 EPIC-023 D3 · research D7

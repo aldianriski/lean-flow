@@ -4,7 +4,7 @@ slug: first-trial-first-slice
 epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-10-29
-status: active
+status: closed
 gates_signed: G1,G2 @ 309860a7
 plan_commit: 7691cdc3
 update_trigger: sprint execute/close events
@@ -102,3 +102,36 @@ booking and per-doctor working hours, and the external spec names at least three
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 2 of 2 members delivered (TASK-533, 534); 11 of 11 DoD boxes ticked, each re-verified by the coordinator
+rather than taken from a builder's report. EPIC-023's S0 now has its two foundations: a harness that runs one pinned,
+isolated, graded and costed trial (self-tests 7/7 free, 11/11 paid, about $0.004 a smoke trial on haiku), and a second
+real repo on another stack (Vue 3 + Go chi + PostgreSQL) whose booking path works end-to-end with both invariants
+red-before-green. System verify: the VPS gate was red once on three coordinator misses, then 327/0 on `95cd0746`; `bun test`
+563/0 locally, because the VPS route does not run it (TD-279).
+
+**Retrieval check** — three misses, all of rules on record. A `consequence` line carried trailing prose, though the
+vocabulary is fixed (`check-review-depth.sh`). Tick evidence and a scope-change entry used file- and directory-shaped tokens
+that the layers checkers parse: L-108's family, on the author's side (L-261). Closing on the VPS verdict alone would have
+skipped `bun test`; TD-279 was read in time, at close.
+
+**Cost** — coordinator plus 4 sub-agents in the sprint: T1 builder about 156k tokens, T2 builder about 94k, two builder
+checks about 53k and 54k (about 357k sub-agent tokens in all). Paid smoke trials about $0.03 on haiku under the subscription
+login. Pre-sprint intake (Codex rounds, research) is outside this figure. The coordinator session is unmetered.
+
+**Worked**
+- G2 probes before the design was signed. Three cheap headless calls showed that the owner's own config runs in `auto` and
+  lets outside reads through, that an isolated config loads nothing of the user's, and that `result` carries usage. Each fact
+  changed the design before any code. The product's launcher already refuses any mode but `dontAsk`.
+- Builder checks caught 11 contradictions across the two designs (a pin that hashed only tracked files, an unpaired leak
+  probe, a page leg with no automated test) while they were still sentences.
+- Not trusting the reports. The T2 re-run reproduced every claim and added the manual page booking, which surfaced the time
+  zone gap.
+
+**Friction**
+- System verify red on three of my own text tokens (L-261), and a promote-check FAIL on a bare-name `Cites:` (TD-280).
+- The local full gate cannot finish inside 1200 s on this host, so every complete verdict needs the VPS, and the VPS
+  verdict needs a separate `bun test` (TD-279, TASK-531 in the backlog).
+
+**Pattern candidate**
+- L-261: prose that a guard parses is a structured field, so a path-shaped token in it is a claim the guard will check.
+

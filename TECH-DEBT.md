@@ -391,6 +391,12 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-280** severity: low | status: open | created: Sprint-147 (close retro, measured)
+  - Summary: **The member-layers check matches a bare filename against `Layers:` by basename but against `Cites:` only as the exact token, so the fix its own FAIL message recommends fails.** A Done-when naming the bare `lean-flow-3-foundation.md`, with `Cites:` carrying `docs/research/lean-flow-3-foundation.md`, stays a `member-layers-incomplete` FAIL whose text says "declare it on that block's Cites: line".
+  - Evidence: the SPRINT-147 promote-check FAILed until T2's `Cites:` carried the bare token; `evaluateMemberLayers` in `scripts/lib/check-layers-completeness.ts` applies its basename branch to `Layers:` paths only.
+  - Impact: low. The check fails loud and a workaround exists, but the message sends the reader to a fix that does not work.
+  - Mitigation (hypothesis, re-derive first): apply the same single-basename rule to `Cites:` tokens, keeping the ambiguity case. A defect fix of an existing checker, unfrozen under ADR-053.
+
 - **TD-279** severity: medium | status: open | created: Sprint-146 (close retro, measured)
   - Summary: **The off-host system verify never runs `bun test`, the second stage of the declared gate.** `scripts/gate-remote.ts`
     runs `QA_FULL=1 sh scripts/qa-check.sh` and judges that alone; `qa-check.sh` has no `bun test` leg, while `package.json`'s
