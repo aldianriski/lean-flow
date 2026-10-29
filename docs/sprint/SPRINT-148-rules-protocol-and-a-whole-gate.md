@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-10-29
 status: active
 plan_commit: a241c29e
+gates_signed: G1,G2 @ 0c33d7ce
 update_trigger: sprint execute/close events
 ---
 
@@ -50,7 +51,7 @@ hours live in time (the SPRINT-147 note on the task).
 goal, flows, invariants, quality attributes, non-goals and the facts not visible in code, signed off as realistic by the owner.
 
 ### T2 — Implement the unattended trial protocol with the D9 G2 exception `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `evals/ab/`
+Layers: `evals/ab/` · `docs/research/logs/ab-measurements.md`
   · `docs/work/todo/TASK-542-implement-ab-trial-protocol-with-d9-g2.md`
   · `docs/work/in_progress/TASK-542-implement-ab-trial-protocol-with-d9-g2.md`
   · `docs/work/done/TASK-542-implement-ab-trial-protocol-with-d9-g2.md`

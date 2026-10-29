@@ -36,3 +36,26 @@ Intake: `/triage` (`0b8dec25`, owner `y`) set TASK-535 and 542 ready, since thei
 Size check: two M, two S, no `L`. All four are `origin: decomposer`. Epic: EPIC-023 (T1, T2); T3 and T4 carry no epic.
 `promote-check`: 13 pass, 0 fail. Pre-dispatch preflight: CLEAR (waves T1 = T2 = T3 = 0, T4 = 1; the four shared files
 owned T3 -> T4).
+
+### 2026-10-29 | scope-change | T2 -- `docs/research/logs/ab-measurements.md` joins T2's `Layers:`
+What broke: T2's paid real run (P6) appends its smoke row to the harness's default run log, which sits outside `evals/ab/`.
+Impact: one Layers token added to T2's Plan line; no other task touches the file, so the overlap map is unchanged. Re-confirm
+G2: signed with the G2 entry below (owner popup).
+
+### 2026-10-29 | G2 | G1 fast-path + batch G2 signed for T1-T4 (owner popup), `gates_signed: G1,G2 @ 0c33d7ce`
+G1: all four `origin: decomposer`, scope unchanged since intake. G2 designs: T1 adds three clinic rules test-first (page + API + DB
+test each) and the spec under six named headings. T2 is a two-phase D9 trial: the design goes to a file, a Layers scope check and an
+isolated judge sign it, the session resumes, and the post-build diff is re-checked; any popup or permission denial is parked; the fixture
+repo only. T3 runs both stages in one ssh call, judges each from its own log, and pins the stage list to `package.json`. T4 makes
+the verdict the last `QA-CHECK:` line, closes the exit set at 0/1/2/5 and warns on a dirty tree.
+Owner rulings: A3, the clinic's hours live in **Asia/Jakarta** (fixed, one zone); rule values as proposed (24 h cancellation window
+with a hard delete that frees the slot · daily cap default 8 per doctor · a patient record is complete with date of birth + phone);
+dispatch T1 ∥ T2 (worktree) ∥ T3→T4 (main tree), sonnet builders. A1 is confirmed at T1's first build step.
+- builder-check · T1 · 4 contradictions · 7 questions · settled in the design: each rule gets a page + API + DB test, the six spec headings are named,
+  box 3 covers domain/rules/conventions, one migration, seeds backfilled, rule order fixed; intent → popup (zone, values)
+- builder-check · T2 · 5 contradictions · 6 questions · settled in the design: the popup set is stated whole (incl. any permission denial), the post-build diff is
+  checked against Layers (S12), a deviation is recorded on every protocol row, harness files are excluded from judge and diff; Layers → scope-change above;
+  the two-phase stability fact is left to P6, and a park there is surfaced to the owner, never retried
+- builder-check · T3 · 0 contradictions · 4 questions · settled in the design: the pin compares exact segments; both-fail output; `cd` failure → exit 5;
+  TD-224/225 resolved at SPRINT-115 (fact)
+- builder-check · T4 · 0 contradictions · 3 questions · nothing important left (porcelain counts untracked paths, as intended)
