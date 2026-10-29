@@ -2,6 +2,7 @@
 id: TASK-534
 title: "Build the clinic A/B repo's booking slice (Vue 3 + Vite + Go chi + PostgreSQL)"
 epic: EPIC-023
+sprint: SPRINT-147
 priority: P2
 size: M
 risk: med

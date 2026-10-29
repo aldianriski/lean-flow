@@ -4,7 +4,7 @@ slug: specific-not-short
 owner: Maintainer
 last_updated: 2026-10-29
 status: active
-member_sprints: []
+member_sprints: [SPRINT-147]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -41,6 +41,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
+| [SPRINT-147](../sprint/SPRINT-147-first-trial-first-slice.md) | First Trial, First Slice (S0: harness tracer + clinic booking slice) | active | — |
 
 ## Decisions
 

@@ -2,6 +2,7 @@
 id: TASK-533
 title: "Run one pinned, isolated, measured A/B trial end-to-end on a fixture repo"
 epic: EPIC-023
+sprint: SPRINT-147
 priority: P2
 size: M
 risk: med
