@@ -28,6 +28,7 @@ The decision procedure must be written, owner-signed and frozen before the first
 
 ## Assumes
 - **blocked-by:** TASK-537..543.
+- **note from SPRINT-148 close:** under `permissionMode: acceptEdits` in a headless run, a lean-flow arm's Bash call is denied, and the D9 protocol parks it as a popup. The P6 smoke re-run signed G2, then parked in phase 2 when the model tried to run the graders itself. The arms' permission mode (and an allow-list, if one is used) is a treatment control that the pre-registration must fix before any A1 trial; otherwise every lean-flow trial can park.
 
 ## Tracker
 research §7 · intake R-b, R-c

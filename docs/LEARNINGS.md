@@ -123,9 +123,15 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-262 [tags: process] [status: active]: **A builder brief that names the task's tests but not `tsc --noEmit` gets a commit that passes its tests and fails the typecheck leg.** SPRINT-148 had two sightings. The T3 builder committed gate-remote's new code with its file tests and the full `bun test` green, and the VPS gate went red on seven strict-index errors in that code. The T2 builder, in a worktree, never ran `tsc` at all, and nine `exactOptionalPropertyTypes` errors surfaced only when the coordinator's post-merge `merge-check` ran (L-218 working as written). Bun runs TypeScript without type-checking it, so a green test run says nothing about types. L-218 is the coordinator's side, catching it after the merge; this is the brief's side. Every dispatch brief that touches `.ts` names `bunx tsc --noEmit` among the checks to run before commit.
+- seen: 2026-10-29 (SPRINT-148 T3: red VPS typecheck at `54eed65d`, fixed in `cfbb748c` · T2: post-merge `merge-check` red, fixed in `c6503711`)
+- count: 2
+- promoted: no
+- related: L-218 (coordinator-side legs after each merge) · L-251 (run every check that reads a touched file)
+
 ## L-261 [tags: edit-safety] [status: active]: **Prose that a guard parses is a structured field: a path-shaped token written into it is a claim the guard will check.** At SPRINT-147's system verify, two of three FAILs were the coordinator's own words. Tick evidence on TASK-533 named the bare `run-trial.ts` and a dotted `result.…` token, which the member-layers check reads as undeclared files. A scope-change entry backticked two directory names, which the scope-change check reads as paths the entry claims, though T1's `Layers:` did not hold them. Both guards were right; the author wrote file-shaped tokens where plain words were meant. L-108 is the guard's side of this (match by shape, not substring); this is the writer's side. Inside a governed artifact (tick evidence, a log entry's paths, Plan lines), write a token in backticks with a path shape only when it names a file the task touches or cites; otherwise use words.
-- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0)
-- count: 1
+- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run)
+- count: 2
 - promoted: no
 - related: L-108 (the guard's side) · L-176 (structured fields in a narrative file) · L-251 (run every check that reads a touched file)
 

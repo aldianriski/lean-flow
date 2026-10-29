@@ -391,6 +391,27 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-282** severity: trivial | status: open | created: Sprint-148 (close-time scoped review of T3/T4, PLAUSIBLE, owner kept the rule)
+  - Summary: **Reading the LAST `QA-CHECK:` line (TD-268's fix) can trust a nested line when the run's own verdict never prints.**
+    A qa-check run that exits rc 0 after nested fixture output printed `QA-CHECK: 5 pass, 0 fail`, but dies before its own verdict
+    line, is read as passing by `judgeOutput()` and `gate-remote.ts`. Before the fix, the first line had the mirror-image hole.
+  - Evidence: the reviewer traced it by reading; no such run is on record (census zero). It needs rc 0 and a missing final verdict together.
+  - Impact: trivial today, since a run that dies mid-flight usually exits non-zero.
+  - Mitigation (hypothesis, re-derive first): have qa-check print an end-of-run marker and require the verdict to be the last
+    `QA-CHECK:` line before it. A defect fix of an existing tool, unfrozen under ADR-053.
+
+- **TD-281** severity: low | status: open | created: Sprint-148 (T2 scoped review round 1 + re-review, review-cap routed)
+  - Summary: **The D9 trial protocol in `evals/ab/lib/protocol.ts` has three gaps that the capped review routed here.** (1) The post-build
+    scope-breach diff exempts all of `docs/work/` and `.ab/`, not only the two files the harness writes. A build can edit the G1
+    task file, or add files there, without a `scope-breach`. (2) The post-build manifest can throw (a directory symlink, an unreadable
+    entry), and the exception escapes before the row is appended, so a paid trial can leave no row. (3) The judge run's init
+    plugins are never validated. Only its model set is pinned, and a plain-string (test-only) judge skips even that.
+  - Evidence: T2's scoped review round 1 (findings 4 and 6) and the re-review's residual notes, 2026-10-29. P6 hit none of them.
+  - Impact: low. The harness is maintainer-only and run by hand, but each gap weakens a trial's validity before TASK-544's real trials.
+  - Mitigation (hypothesis, re-derive first): exempt only the exact task file and `.ab/g2-design.md` (or hash them before and after);
+    wrap the post-build manifest and grade steps so a throw records `exit: manifest-error` as not-passed; run `checkInitPlugins` on
+    the judge's init event.
+
 - **TD-280** severity: low | status: open | created: Sprint-147 (close retro, measured)
   - Summary: **The member-layers check matches a bare filename against `Layers:` by basename but against `Cites:` only as the exact token, so the fix its own FAIL message recommends fails.** A Done-when naming the bare `lean-flow-3-foundation.md`, with `Cites:` carrying `docs/research/lean-flow-3-foundation.md`, stays a `member-layers-incomplete` FAIL whose text says "declare it on that block's Cites: line".
   - Evidence: the SPRINT-147 promote-check FAILed until T2's `Cites:` carried the bare token; `evaluateMemberLayers` in `scripts/lib/check-layers-completeness.ts` applies its basename branch to `Layers:` paths only.

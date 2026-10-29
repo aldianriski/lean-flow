@@ -66,8 +66,9 @@ Checks re-run by the coordinator: `bunx tsc --noEmit` clean; `bun test evals/gat
 579 pass, 0 fail. VPS at `cfbb748c`: `bun test: 579 pass, 0 fail (rc 0)` · `QA-CHECK: 329 pass, 0 fail` · exit 0.
 Deviation: two VPS runs, not one. The first, at `54eed65d`, was red on `typecheck` (7 strict-index errors in the new code) with bun test green; it was fixed
 and re-run once. The gate caught a real defect, which is the tool doing its job.
-- consequence · T3 · behaviour:med (maintainer tool's exit verdict) · governance:low (Other G, D2) → coordinator self-review of the diff
-- review · T3 · 1 finding, routed: `judgeBun` reads the FIRST bun summary match, so a nested summary printed earlier could mask the real one
+- skip-table · T3: the maintainer tool's exit verdict changes; Other G (D2) → coordinator self-review at execute, the scoped review it owed ran at close (record corrected in place at close per L-176: the bulleted form was unreadable to `check-review-depth` and its `med`/`high` tokens are outside the vocabulary; every task is `behaviour:material` by the dispatch classifier, since each changes behaviour)
+consequence · T3 · behaviour:material · governance:low
+- review finding · T3 · 1 finding, routed: `judgeBun` reads the FIRST bun summary match, so a nested summary printed earlier could mask the real one
   (the same class as TD-268). It goes to T4 as a scope note, because T4 owns the same file next and the fix is the same last-match rule.
 - scope-change · T4 · `judgeBun` also reads the LAST summary lines, with a two-order test. What broke: the review finding above. Impact: one function and
   one test, inside T4's `Layers:` (`scripts/gate-remote.ts` · `evals/gate-remote.test.ts`); no box changes. G2 re-confirm: coordinator, in scope as the
@@ -78,7 +79,8 @@ Commits `5759a853` (code + tests) · `0065c26f` (TD-268 + CHANGELOG). Builder: s
 over `scripts/` `evals/`): the three named callers only. Coordinator re-run: `tsc --noEmit` clean; the two test files 88 pass, 0 fail. Builder: full
 `bun test` 587 pass, 0 fail. VPS at `5759a853`: on a clean tree, no warning and exit 0; with one untracked probe file, the warning line printed and exit 0.
 The logged scope addition landed: `judgeBun` reads the last summary, with a two-order test.
-- consequence · T4 · behaviour:low (exit codes, verdict selection) · governance:low (Other G, D2) → coordinator self-review of the diff: no finding
+- skip-table · T4: exit codes and verdict selection change; Other G (D2) → coordinator self-review at execute (no finding), the scoped review it owed ran at close (record corrected in place at close per L-176: the bulleted form was unreadable to `check-review-depth` and its `med`/`high` tokens are outside the vocabulary; every task is `behaviour:material` by the dispatch classifier, since each changes behaviour)
+consequence · T4 · behaviour:material · governance:low
 
 ### 2026-10-29 | execute | T1 done -- the clinic repo enforces five invariants, its spec is complete, realism signed (TASK-535)
 App `D:\Research\clinic-ab` `4eabb74..ac4ede3` (12 commits, test-first per rule), spec `D:\Research\clinic-ab-spec\spec.md`. Builder: sonnet, `/tdd`.
@@ -87,7 +89,8 @@ A1 confirmed: green at `4eabb74` before any change. Fresh clone: `go test -count
 Asia/Jakarta wall-clock. Owner realism review: signed by popup.
 Builder notes kept as facts: three tests passed on first run (already covered by earlier code: unknown patient via the FK backstop, cap-is-per-doctor,
 cap-must-be-positive), each with a named edit that would fail it; the working-hours red commit carried one wrong case, fixed in its implementation commit.
-- consequence · T1 · behaviour:med (external A/B repo, not shipped) · governance:low (tier X) → read-through + owner realism review
+- skip-table · T1: business rules in the external A/B repo, not shipped; tier X → read-through + owner realism review at execute, the scoped review it owed ran at close (record corrected in place at close per L-176: the bulleted form was unreadable to `check-review-depth` and its `med`/`high` tokens are outside the vocabulary; every task is `behaviour:material` by the dispatch classifier, since each changes behaviour)
+consequence · T1 · behaviour:material · governance:low
 
 ### 2026-10-29 | execute | T2 done -- the D9 two-phase trial protocol on the fixture repo (TASK-542)
 Worktree commits `e40d2509` (protocol + S7-S13) · `afe2d0dc` (smoke-a1 arm) · `7b56705d` (P6 + P4 rows) · `650adb4d` (synced-plugin clear, S14, `--only`)
@@ -99,8 +102,10 @@ phases, caught by the existing init check. Owner ruling (popup): fix in T2, re-r
 P6 re-run: valid, G2 signed, then **parked** on a Bash permission denial in phase 2 (the model ran the graders itself under `acceptEdits`). This
 is the protocol working, and a finding for TASK-544: under `acceptEdits` headless, a lean-flow arm parks on any Bash call, so the arm's permission
 mode is a pre-registration decision. Pin: the smoke arm pins a clean clone at `%TEMP%\abp` (owner: keep, smoke-only).
-- consequence · T2 · behaviour:high (risk high, measurement harness) · governance:low (Other G, maintainer-only) → one scoped sonnet review
-- review · T2 · round 1: 6 findings (2 CONFIRMED fail-open on the signing inputs: multi-path `Files:` entries passed `startsWith`; a two-object judge reply
+- skip-table · T2: risk high, new measurement-harness behaviour; Other G, maintainer-only → one scoped sonnet review (record corrected in place at close per L-176: the bulleted form was unreadable to `check-review-depth` and its `med`/`high` tokens are outside the vocabulary; every task is `behaviour:material` by the dispatch classifier, since each changes behaviour)
+consequence · T2 · behaviour:material · governance:low
+review · T2 · scoped-reviewer · behaviour:material · governance:low
+- review finding · T2 · round 1: 6 findings (2 CONFIRMED fail-open on the signing inputs: multi-path `Files:` entries passed `startsWith`; a two-object judge reply
   signed). Spec worst + Standards worst + a one-line `--protocol` guard went to one builder retry (`412ce889`). Re-review: all four CLOSED, no new fail-open.
   Routed to close as TD: the `docs/work/` + `.ab/` breach exemption is wider than the two harness files; a post-build manifest throw leaves no row.
 - merge · T2 · the post-merge `merge-check` typecheck leg went red (9 `exactOptionalPropertyTypes` errors in `evals/ab/lib/`); the worktree builder had never run
@@ -112,3 +117,26 @@ Members closed (plain-git check; this repo has no `check-sprint-by-reference.ts`
 `gate-remote.ts` (now running both stages, T3/T4): `bun test: 587 pass, 0 fail (rc 0)` · `qa-check: QA-CHECK: 329 pass, 0 fail (rc 0)` · exit 0.
 D4 met: the close verify ran `bun test` through the tool itself, not by hand, the first close to do so (TD-279 is closed in practice).
 run · 19 of 19 DoD ticked · terminal state PLAN_EXHAUSTED.
+
+### 2026-10-29 | review | close-time scoped reviews owed by T1, T3 and T4, and the fix rounds the owner ruled
+Found at close while reading `check-review-depth` before writing the Retro: the five consequence records above were bulleted prose
+with `med`/`high` tokens, so the checker saw none of them, and by the dispatch classifier every task is `behaviour:material`. T1, T3 and
+T4 had had only a self-review, which that check FAILs for material work. D2's default does not override the classifier. Records corrected in
+place (L-176); the owed reviews ran rather than downgrading the class.
+review · T3 · scoped-reviewer · behaviour:material · governance:low
+review · T4 · scoped-reviewer · behaviour:material · governance:low
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+- T3+T4 (one reviewer over the gate-remote diff since `a241c29e`): no fail-open path traced. CONFIRMED: the pin test checked each stage's declared text, never
+  its command, so dropping `QA_FULL=1` stayed green; a bun-only failure printed the qa rc as `remote rc: 0`; a dead clause in the verdict guard.
+  PLAUSIBLE: the last-verdict rule can trust a nested line when the real verdict never prints at rc 0 (owner kept it → TD-282).
+  Owner ruling (popup): fix now. Commit `90c2be61` (T4's builder): the stage command is pinned to its declared text, the rc is labelled per stage
+  (`qa-check rc:` / `bun test rc:`; T4's tick evidence quotes the earlier label, true when ticked), the dead clause is dropped. Coordinator re-run:
+  tsc clean, 90 pass and 0 fail across the two files; builder's full `bun test` 589 pass, 0 fail.
+- T1 (one reviewer over the clinic diff): zone, day and 24 h boundaries sound; conventions held. CONFIRMED: the daily cap can be exceeded by two
+  concurrent bookings for different slots. PLAUSIBLE: chi's default 404/405 bodies skip the fault envelope the spec promises. Owner ruling (popup):
+  fix both, test-first. Clinic repo `7ef8859` (red: a concurrent-booking test, cap 3 with 16 bookings, failing 5 of 5 before the fix; router
+  envelope test) → `28aa247` (checks and insert in one transaction under a doctor row lock) → `aab2fa6` (404/405 through the envelope, two codes
+  declared once). Spec updated. Fresh clone all exit 0 (builder-run); the coordinator checked the commit order, a clean tree and the cluster stopped.
+- Close filings: TD-281 (T2 harness gaps routed by its capped review) · TD-282 (above) · L-262 new (builder briefs omit the typecheck, count 2) ·
+  L-261 bumped to count 2 (the consequence records are its second sighting) · CHANGELOG [Unreleased] line for T2 · TASK-544 note on the arms'
+  permission mode.
