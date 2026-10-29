@@ -1,0 +1,13 @@
+{
+  "id": "smoke-a1",
+  "sessionModel": "claude-haiku-5-5",
+  "dispatch": { "subagent": "claude-haiku-5-5" },
+  "effort": "low",
+  "permissionMode": "acceptEdits",
+  "auth": "subscription",
+  "plugin": {
+    "path": "C:\\Users\\HYPE AMD\\AppData\\Local\\Temp\\abp",
+    "sha": "e40d2509469f0a7fd24fc581b73d6da142684050",
+    "hash": "ca5b5cfc9d93a8866cab053276cd43035ac6cd9af51afed9f032dfaa3e6f61fc"
+  }
+}
