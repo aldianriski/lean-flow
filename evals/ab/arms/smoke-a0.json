@@ -1,0 +1,8 @@
+{
+  "id": "smoke-a0",
+  "sessionModel": "claude-haiku-5-5",
+  "dispatch": { "subagent": "claude-haiku-5-5" },
+  "effort": "low",
+  "permissionMode": "acceptEdits",
+  "auth": "subscription"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "add-fn",
+  "prompt": "In src/add.ts add an exported function mul(a: number, b: number): number that returns the product. Change nothing else.",
+  "graders": [
+    { "name": "typecheck", "cmd": "{TSC} -p ." },
+    { "name": "acceptance", "cmd": "bun acceptance/mul.mjs" },
+    { "name": "build", "cmd": "bun build src/index.ts --outfile dist/index.js", "artifact": "dist/index.js" }
+  ]
+}
