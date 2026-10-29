@@ -102,7 +102,7 @@ Deviation, recorded: for its fresh-clone check the builder cloned into the sessi
 folders; it wrote nothing else there.
 
 ### 2026-10-29 | scope-change | T1 -- the emitter-column population leg needs an out-of-scope rule for evals/ab/
-What broke: `evals/run-emitter-column-fixtures.ts`'s POPULATION-scope leg FAILs on any `.ts` under `scripts/` or `evals/` that
+What broke: `evals/run-emitter-column-fixtures.ts`'s POPULATION-scope leg FAILs on any `.ts` in the two trees it scans that
 is neither scanned nor covered by a documented out-of-scope rule. The 11 new harness files (`evals/ab/lib/*.ts`,
 `evals/ab/selftest.ts`) match neither, so the declared gate goes red with T1 merged (`93230f13`). The builder found this and,
 rightly, did not edit outside its `Layers:`. Impact: T1 needs one rule in that file's `OUT_OF_SCOPE` list, `evals/ab/`, with
@@ -127,4 +127,17 @@ The gate impact (F1) went through the scope-change above. With the `evals/ab/` r
 emitter-column harness passes 9/0, and a probe file outside `evals/ab/` still turns it red.
 Open for TASK-543: sub-agent usage inside `modelUsage` is unproven; the `api-key` arm is coded but untested. The worktree's
 other gate reds (missing `node_modules`) are environmental. The full gate runs at system verify.
-consequence · T1 · behaviour:low · governance:low (re-confirmed after the scope-change: an out-of-scope rule for a maintainer-only harness)
+Consequence re-checked after the scope-change: behaviour low, governance low (an out-of-scope rule for a maintainer-only harness).
+
+### 2026-10-29 | surprise | system verify red on three coordinator misses, all in text written today; fixed in place per L-176
+VPS system verify on `b41932a7`: QA-CHECK 325 pass, 3 fail. None is a defect in T1 or T2.
+- **review-depth-consequence-vocab:** my T1 re-check line after the scope-change carried trailing prose after
+  `governance:low`, so it was out of vocabulary. It is now plain prose, and the exact line from the G2 entry stands.
+- **member-layers-incomplete:** TASK-533's tick evidence named the bare `run-trial.ts` and a dotted `result.…` token. The
+  checker reads both as files, so the evidence now names `evals/ab/run-trial.ts` and the result event's per-model usage.
+  The tick text is outside the freeze; the freeze check still passes.
+- **scope-change-outside-layers:** my scope-change entry named the two scanned trees as backticked directory tokens, which
+  T1's `Layers:` does not hold. The entry now says "the two trees it scans".
+Each is a structured field a guard reads, so the correction goes in place, not as a new entry (L-176). Local re-runs:
+review-depth no FAIL · promote-check 7/0 · scope-change layers PASS. The two token-shaped misses are L-108's
+substring-versus-shape family on the author's side, a retro candidate.
