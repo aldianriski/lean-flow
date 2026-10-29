@@ -3,7 +3,7 @@ sprint: 148
 slug: rules-protocol-and-a-whole-gate
 owner: Maintainer
 last_updated: 2026-10-29
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
