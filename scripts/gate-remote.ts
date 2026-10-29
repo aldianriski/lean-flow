@@ -7,9 +7,8 @@
 // `bun test`) in ONE blocking ssh call, each to its own log + rc file, read them back, and judge qa-check
 // with scripts/qa-verdict.ts and bun test by its own summary. Both stages always run.
 //
-// Exit codes: 0 = rc 0 AND a valid passing verdict. 2 = refused before any spawn (flag / variable).
-// 5 = transport or remote-setup failure (never a gate result). Otherwise the qa-check rc, or 1 when the
-// rc is 0 but the verdict is missing / failing / contradicts it, or when only the bun test stage fails.
+// Exit codes (a closed set): 0 pass · 1 the gate did not pass · 2 refused before any spawn ·
+// 5 transport or setup. Pass means both stages pass. Any gate failure exits 1 and prints `remote rc: N`.
 //
 // Bun auto-loads the repo-root dotenv file unless launched with --no-env-file, so this refuses to run
 // without it, and it never opens that file itself.
@@ -74,13 +73,14 @@ export function stagesMatchScript(script: string, stages: readonly { declared: s
 
 /** Judge a `bun test` log by its summary: present, `0 fail`, and at least one test run. */
 export function judgeBun(log: string): { ok: boolean; pass: number; fail: number; ran: number; reason: string } {
+  // The LAST summary is the run's own; an earlier one can only be nested output.
   const num = (re: RegExp) => {
-    const m = re.exec(log);
-    return m === null ? null : Number(m[1]);
+    const m = [...log.matchAll(re)].at(-1);
+    return m === undefined ? null : Number(m[1]);
   };
-  const pass = num(/^\s*(\d+) pass$/m);
-  const fail = num(/^\s*(\d+) fail$/m);
-  const ran = num(/^Ran (\d+) tests? across/m);
+  const pass = num(/^\s*(\d+) pass$/gm);
+  const fail = num(/^\s*(\d+) fail$/gm);
+  const ran = num(/^Ran (\d+) tests? across/gm);
   if (pass === null || fail === null || ran === null) return { ok: false, pass: 0, fail: 0, ran: 0, reason: "no bun test summary" };
   if (fail > 0) return { ok: false, pass, fail, ran, reason: `${fail} fail` };
   if (ran < 1) return { ok: false, pass, fail, ran, reason: "no tests ran" };
@@ -120,6 +120,14 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
   const sha = t.local(["rev-parse", "HEAD"]).stdout.trim();
   if (!/^[0-9a-f]{40}$/.test(sha)) return step("local rev-parse", "no HEAD");
   say(`gate-remote: ran ${sha}`);
+  // Information, never a refusal: the gate runs HEAD's bundle, so uncommitted work is not what is tested.
+  const st = t.local(["status", "--porcelain"]);
+  if (st.status !== 0) {
+    say(`gate-remote: warning -- could not read the working-tree status; HEAD ${sha} is gated`);
+  } else {
+    const n = st.stdout.split("\n").filter((l) => l.trim() !== "").length;
+    if (n > 0) say(`gate-remote: warning -- ${n} uncommitted path(s); HEAD ${sha} is gated, not the working tree`);
+  }
 
   const uniq = `${sha.slice(0, 8)}-${opts.pid ?? process.pid}`;
   const RBUNDLE = `/tmp/lf-gate-${uniq}.bundle`;
@@ -199,25 +207,20 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
 
 function judgeQa(rc: number, logR: Reply, say: (line: string) => void): number {
   say(`remote rc: ${rc}`);
-  const preserved = rc === 0 ? 1 : Math.min(rc, 255); // an rc >= 256 must never wrap to 0
   if (logR.status !== 0) {
     say("gate-remote: no log -- the remote log file is missing or unreadable");
-    return preserved;
+    return 1;
   }
   const log = logR.stdout;
   for (const l of log.split("\n")) if (/^\s*FAIL/.test(l)) say(l);
-  const verdictLine = log.split("\n").find((l) => /^QA-CHECK: \d+ pass, \d+ fail$/.test(l));
+  const verdictLine = log.split("\n").filter((l) => /^QA-CHECK: \d+ pass, \d+ fail$/.test(l)).at(-1);
   const v = judgeOutput(log);
   if (verdictLine === undefined && !v.truncated) {
     say("gate-remote: no verdict line in the remote log");
-    return preserved;
+    return 1;
   }
-  if (verdictLine !== undefined) {
-    say(verdictLine);
-    say(`qa-check: ${verdictLine} (rc ${rc})`);
-  }
+  if (verdictLine !== undefined) say(`qa-check: ${verdictLine} (rc ${rc})`);
   if (rc === 0 && v.ok) return 0;
-  // a remote rc above 255 cannot be a real exit status; it falls through to the preserved branch
   if (rc !== 0 && v.ok) {
     say(`gate-remote: verdict contradicts exit code (rc ${rc}, passing verdict)`);
   } else if (rc === 0) {
@@ -225,7 +228,7 @@ function judgeQa(rc: number, logR: Reply, say: (line: string) => void): number {
   } else {
     say(`gate-remote: ${v.reason}`);
   }
-  return preserved;
+  return 1;
 }
 
 if (import.meta.main) {

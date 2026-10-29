@@ -44,7 +44,8 @@ export interface VerdictOutcome {
 
 /** Reads the SAME line a human reads. Never trusts the caller's raw exit code (L-120). */
 export function judgeOutput(output: string): VerdictOutcome {
-  const m = VERDICT_RE.exec(output);
+  // The LAST verdict line is the run's own; an earlier one can only be nested output (TD-268).
+  const m = [...output.matchAll(new RegExp(VERDICT_RE.source, "gm"))].at(-1) ?? null;
   if (!m) {
     return {
       ok: false,

@@ -324,3 +324,17 @@ describe("CLI process -- chain-skip notice wiring (TD-155)", () => {
     expect(r.stderr).not.toContain("`bun test`");
   });
 });
+
+describe("judgeOutput -- the verdict is the LAST QA-CHECK line (TD-268)", () => {
+  test("an earlier nested passing line before the real failing one reads the real one", () => {
+    const o = judgeOutput("QA-CHECK: 1 pass, 0 fail\nQA-CHECK: 10 pass, 2 fail\n");
+    expect(o.ok).toBe(false);
+    expect(o.fail).toBe(2);
+    expect(o.pass).toBe(10);
+  });
+  test("an earlier nested failing line before the real passing one reads the real one", () => {
+    const o = judgeOutput("QA-CHECK: 1 pass, 1 fail\nQA-CHECK: 10 pass, 0 fail\n");
+    expect(o.ok).toBe(true);
+    expect(o.pass).toBe(10);
+  });
+});

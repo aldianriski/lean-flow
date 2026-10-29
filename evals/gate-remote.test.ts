@@ -30,6 +30,7 @@ interface Script {
   log?: Reply; // qa-check stage log
   bunRc?: Reply;
   bunLog?: Reply;
+  status?: Reply; // local `git status --porcelain`
 }
 const ok = (stdout = ""): Reply => ({ status: 0, stdout });
 
@@ -43,6 +44,7 @@ function stub(s: Script) {
       if (j === "rev-parse HEAD") return ok(`${LOCAL}\n`);
       if (j.startsWith("cat-file")) return { status: s.haveCommit ?? 0, stdout: "" };
       if (j.startsWith("merge-base")) return { status: s.ancestor ?? 0, stdout: "" };
+      if (j === "status --porcelain") return s.status ?? ok();
       if (j.startsWith("bundle create")) return s.bundle ?? ok();
       throw new Error(`unexpected local ${j}`);
     },
@@ -119,8 +121,12 @@ describe("exit cases through a stubbed transport", () => {
     expect(r.text).toContain("remote rc: 1");
   });
 
-  test("a distinctive non-zero rc (7) is preserved exactly", () => {
-    expect(go({ rc: ok("7\n"), log: ok(FAIL_LOG) }).code).toBe(7);
+  test("remote rc 2, 5 and 7 each exit 1 (the closed set) and print that rc", () => {
+    for (const n of [2, 5, 7]) {
+      const r = go({ rc: ok(`${n}\n`), log: ok(FAIL_LOG) });
+      expect(r.code).toBe(1);
+      expect(r.text).toContain(`remote rc: ${n}`);
+    }
   });
 
   test("missing verdict line is non-zero and names 'no verdict line'", () => {
@@ -137,7 +143,8 @@ describe("exit cases through a stubbed transport", () => {
 
   test("rc != 0 with a passing verdict: 'verdict contradicts exit code', rc kept", () => {
     const r = go({ rc: ok("3\n") });
-    expect(r.code).toBe(3);
+    expect(r.code).toBe(1);
+    expect(r.text).toContain("remote rc: 3");
     expect(r.text).toContain("verdict contradicts exit code");
   });
 
@@ -221,9 +228,12 @@ describe("exit cases through a stubbed transport", () => {
     expect(r.text).toContain("step 'ssh read qa log'");
   });
 
-  test("a remote rc >= 256 is clamped to 255, never 0", () => {
-    expect(go({ rc: ok("256\n"), log: ok(FAIL_LOG) }).code).toBe(255);
-    expect(go({ rc: ok("512\n"), log: ok(FAIL_LOG) }).code).toBe(255);
+  test("a remote rc >= 256 exits 1, never 0, and prints the rc", () => {
+    for (const n of [256, 512]) {
+      const r = go({ rc: ok(`${n}\n`), log: ok(FAIL_LOG) });
+      expect(r.code).toBe(1);
+      expect(r.text).toContain(`remote rc: ${n}`);
+    }
   });
 
   test("it prints the sha it ran", () => {
@@ -381,6 +391,43 @@ describe("the bun test stage (TASK-531)", () => {
   });
   test("pin: dropping the qa-verdict wrapper reddens it", () => {
     expect(stagesMatchScript(script.replace("bun scripts/qa-verdict.ts ", ""), STAGES)).toBe(false);
+  });
+});
+
+describe("the last verdict line and the working-tree warning (TASK-532)", () => {
+  test("a nested passing line before the real failing one: the real (last) line is printed and the exit is 1", () => {
+    const r = go({ rc: ok("1\n"), log: ok("QA-CHECK: 1 pass, 0 fail\n" + FAIL_LOG) });
+    expect(r.code).toBe(1);
+    expect(r.text).toContain("qa-check: QA-CHECK: 11 pass, 1 fail (rc 1)");
+    expect(r.text).not.toContain("QA-CHECK: 1 pass, 0 fail");
+  });
+  test("a nested failing line before the real passing one: the real (last) line is printed and the exit is 0", () => {
+    const r = go({ log: ok("QA-CHECK: 1 pass, 1 fail\n" + PASS_LOG) });
+    expect(r.code).toBe(0);
+    expect(r.text).toContain("qa-check: QA-CHECK: 12 pass, 0 fail (rc 0)");
+    expect(r.text).not.toContain("QA-CHECK: 1 pass, 1 fail");
+  });
+  test("judgeBun reads the LAST summary: nested pass then real fail is not ok; the reverse is ok", () => {
+    expect(judgeBun(BUN_PASS + BUN_FAIL).ok).toBe(false);
+    expect(judgeBun(BUN_FAIL + BUN_PASS).ok).toBe(true);
+    expect(judgeBun(BUN_FAIL + BUN_PASS)).toMatchObject({ pass: 38, fail: 0, ran: 38 });
+  });
+  test("a dirty tree prints exactly one warning with the count and HEAD, and the run still reaches the gate", () => {
+    const r = go({ status: ok(" M a\n?? b\n M c\n") });
+    const w = r.text.split("\n").filter((l) => l.includes("warning"));
+    expect(w).toHaveLength(1);
+    expect(w[0]).toContain("3 uncommitted path(s)");
+    expect(w[0]).toContain(`HEAD ${LOCAL}`);
+    expect(r.code).toBe(0);
+    expect(r.calls.some((c) => c.includes("QA_FULL=1"))).toBe(true);
+  });
+  test("a clean tree prints no warning", () => {
+    expect(go({}).text).not.toContain("warning");
+  });
+  test("an unreadable status prints the could-not-read warning and the run continues", () => {
+    const r = go({ status: { status: 128, stdout: "" } });
+    expect(r.text).toContain("could not read the working-tree status");
+    expect(r.code).toBe(0);
   });
 });
 
