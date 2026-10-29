@@ -185,11 +185,12 @@ const designOf = (files: string[]) => `Files:\n${files.map((f) => `- ${f}`).join
 const SOLVED_ADD = path.join(AB, "fixtures", "smoke-solutions", "add-fn", "src", "add.ts");
 
 /** A two-call runner: call 1 (phase 1) writes `design` into the trial copy, call 2 (phase 2) runs `build`; both replay the recorded stream. */
-function protoReplay(o: { design?: string; build?: (cwd: string) => void; mutate?: (events: Ev[], call: number) => void }) {
+function protoReplay(o: { onCall?: (n: number, env: Record<string, string>) => void; design?: string; build?: (cwd: string) => void; mutate?: (events: Ev[], call: number) => void }) {
   const calls = { n: 0, cmds: [] as string[][] };
-  const runner: import("./lib/run.ts").Runner = async (cmd, { cwd }) => {
+  const runner: import("./lib/run.ts").Runner = async (cmd, { cwd, env }) => {
     calls.n++;
     calls.cmds.push(cmd);
+    o.onCall?.(calls.n, env);
     if (calls.n === 1 && o.design !== undefined) {
       fs.mkdirSync(path.join(cwd, ".ab"), { recursive: true });
       fs.writeFileSync(path.join(cwd, ".ab", "g2-design.md"), o.design);
@@ -324,6 +325,29 @@ check("S12 breach: build touching a file outside Layers -> scope-breach, not-pas
   assert(added.row.exit === "scope-breach: src/extra.ts", `an added file outside Layers is a breach: ${added.row.exit}`);
   const control = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk }), judgeSays(SIGN));
   assert(control.row.exit === "ok" && control.row.passed, `harness files and in-Layers edits are not a breach: ${control.row.exit}`);
+});
+
+// S14 -- account-synced plugins must not reach phase 2; the strict init check still catches any that do.
+check("S14 synced: plugin dir planted in cfg before phase 2 is gone at spawn; unpinned plugin in init -> invalid; clean control -> ok", async () => {
+  const synced = (env: Record<string, string>) => path.join(env.CLAUDE_CONFIG_DIR!, "plugins", "synced");
+  const seen: boolean[] = [];
+  const planted = protoReplay({
+    design: designOf(["src/add.ts"]),
+    build: buildOk,
+    onCall: (n, env) => {
+      if (n === 2) seen.push(fs.existsSync(synced(env)) || fs.existsSync(path.join(env.CLAUDE_CONFIG_DIR!, "plugins", "data", "codex-synced")));
+      if (n === 1) {
+        fs.mkdirSync(path.join(synced(env), "codex"), { recursive: true });
+        fs.mkdirSync(path.join(env.CLAUDE_CONFIG_DIR!, "plugins", "data", "codex-synced"), { recursive: true });
+      }
+    },
+  });
+  const a = await protoTrial(planted, judgeSays(SIGN));
+  assert(seen.length === 1 && seen[0] === false, `the synced plugin must be gone when phase 2 spawns, present=${seen}`);
+  assert(a.row.exit === "ok", `a clean control must not be flagged: ${a.row.exit}`);
+
+  const leaked = await protoTrial(protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: (events, call) => { if (call === 2) events.find((e) => e.type === "system" && e.subtype === "init")!.plugins.push({ name: "codex", path: "C:\\x\\cfg\\plugins\\synced\\codex", source: "codex@synced" }); } }), judgeSays(SIGN));
+  assert(leaked.row.exit.startsWith("invalid:") && leaked.row.exit.includes("init names codex") && !leaked.row.passed, `an unpinned plugin in phase 2 init must stay invalid: ${leaked.row.exit}`);
 });
 
 // S13 -- a log written before the protocol columns existed (CRLF, as the real one is) gets its header widened; its rows stay byte-identical.
@@ -474,9 +498,11 @@ check("P6 protocol: run-trial.ts --protocol d9 on the smoke repo -> a row with t
 }, true);
 
 const paid = process.argv.includes("--paid");
+const onlyIdx = process.argv.indexOf("--only");
+const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;
 for (const c of checks) {
-  if (c.paid && !paid) continue;
+  if (only ? !c.name.startsWith(`${only} `) : c.paid && !paid) continue;
   try {
     await c.fn();
     console.log(`PASS ${c.name}`);

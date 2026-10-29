@@ -80,6 +80,13 @@ export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunn
   };
 }
 
+/** The CLI syncs account plugins into the config dir between calls (seen as `codex` in phase 2's init). No supported switch exists (--bare drops OAuth), so they are removed before each spawn; the init check stays strict. */
+export function clearSynced(cfg: string): void {
+  fs.rmSync(path.join(cfg, "plugins", "synced"), { recursive: true, force: true });
+  const data = path.join(cfg, "plugins", "data");
+  if (fs.existsSync(data)) for (const d of fs.readdirSync(data)) if (d.endsWith("-synced")) fs.rmSync(path.join(data, d), { recursive: true, force: true });
+}
+
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
 /** G1 pre-signed from the frozen task: the task as a lean-flow task file whose gates_signed carries the hash of the task JSON. */
@@ -120,6 +127,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const call = { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? 300_000 };
   const sid = randomUUID();
 
+  clearSynced(iso.cfg);
   const raw1 = await run(buildCommand(o.arm, phase1Prompt(o.task), ["--session-id", sid]), call);
   fs.writeFileSync(path.join(iso.root, "stream-phase1.jsonl"), raw1.stdout);
   const s1 = parseStream(raw1.stdout);
@@ -147,6 +155,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   let graded: Grade | undefined;
   let breach: string[] = [];
   if (!park && !refused) {
+    clearSynced(iso.cfg);
     const raw2 = await run(buildCommand(o.arm, PHASE2_PROMPT, ["--resume", sid]), call);
     fs.writeFileSync(path.join(iso.root, "stream-phase2.jsonl"), raw2.stdout);
     const s2 = parseStream(raw2.stdout);
