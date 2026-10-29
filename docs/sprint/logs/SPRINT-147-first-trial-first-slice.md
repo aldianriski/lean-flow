@@ -47,3 +47,41 @@ R-a evidence parity · R-b baseline defect rule · R-c freeze wording. Size chec
 T2's `Cites:` carried the full path. A bare name matches `Layers:` by basename but `Cites:` only as the exact token, so
 the FAIL message's own advice ("declare it on Cites:") failed until the bare token was written. Retro candidate: a
 checker gap (TD).
+
+### 2026-10-29 | progress | batch G1 and G2 signed by the owner by popup; two builder checks run and settled; G2 probes settled isolation and access
+G1: both members are `origin: decomposer` with scope unchanged since `approve`, so the fast-path confirm applied. G2 designs
+are summarised below; the full design text was handed to each builder.
+- **T1 (TASK-533):** TypeScript on Bun under `evals/ab/`: `run-trial.ts` plus `lib/` modules (arm · snapshot · pin · isolate ·
+  run · parse · grade · record), a fixture repo, and smoke arms on haiku. Self-tests run by hand through `bun
+  evals/ab/selftest.ts [--paid]`, and no harness file is named `*.test.ts`, because `bun test` sits in the declared gate (intake A8).
+  Free checks: S1 pin refusal · S2 loaded plugin = pinned · S3 grader must-FAILs · S4 source never mutates · S5 model pins
+  checked against `modelUsage`. Paid checks: P1 access (Read and Bash, long paths, in the trials' own permission mode) · P2
+  five canaries visible when selected · P3 none visible from the ambient home, valid only when P2 detected all five in the same
+  run · P4 the smoke trial end-to-end. Plugin hash covers every file and a dirty tree is refused. Every grader always
+  runs. A missing `usage` produces an invalid row and a non-zero exit.
+- **T2 (TASK-534):** a dispatched builder works test-first from a sanitised brief (no lean-flow or EPIC names), retained at
+  `docs/research/logs/ab-clinic-builder-brief.md`. Go 1.26 + chi v5 + pgx v5, with migrations by a Go `cmd/migrate`, and Vue 3 +
+  Vite + TS with vue-tsc, ESLint and Vitest (a page→gateway component test, plus gateway→API integration on the test database).
+  Postgres is a local `initdb` cluster (no Docker daemon); tests fail rather than skip without `DATABASE_URL`. Red-before-green
+  is proven by the clinic repo's commit history.
+G2 probes (headless haiku, 2026-10-29). The user's real config runs in mode `auto`, where an outside Read and an outside Bash
+`cat` both succeeded. `--permission-mode default` denied both and listed them in `permission_denials`, while inside reads
+worked. `CLAUDE_CONFIG_DIR` plus a redirected `HOME`/`USERPROFILE` loads only built-in plugins and no user hooks, and fails
+"Not logged in", so the credentials-only entry is required. `result` carries `usage`, `modelUsage`, `total_cost_usd` and
+`subagent_stats`, which settles A1 (token usage is reported).
+builder-check · T1 · 7 contradictions · 7 questions · all settled: pin hashes every file + dirty refusal; plugin canary
+registered in the canary config's own registry; structural canary probes, P3 paired to P2; access in the trials' mode on long
+paths, Read + Bash; grader aggregate; no-usage branch; model pins against `modelUsage`; log frontmatter follows the research
+logs. B and D answered by probe, A (auth) answered by the owner.
+builder-check · T2 · 4 contradictions · 5 questions · all settled: automated page→gateway→API tests; clean checkout = clone +
+the README's DB precondition; sanitised brief with a named grep list; spec locations grep-verified after the build; `initdb`
+first, with a named blocker if it fails; red-before-green from commit history. Q1 (conventions) answered by the owner.
+Owner rulings: trials use the **subscription login**, with the credentials file copied unread into each isolated config.
+They run as separate `claude -p` processes, not as sub-agents of this session, so no inherited context, config or plugin
+reaches a trial, and each trial's tokens are its own. Clinic conventions **C1 · C2′ · C3 · C4′**: C2′, rules return a
+`Verdict{OK, Fault}` and never an `error`, and handlers map verdicts through one table; C4′, `use<Aggregate>Gateway` returns
+`{data, fault}` and never throws.
+consequence · T1 · behaviour:low · governance:low
+consequence · T2 · behaviour:low · governance:low
+Pre-dispatch preflight on `309860a7`: CLEAR (base-ref matches HEAD; waves T1=0, T2=0). Dispatch: T1 worktree-isolated, T2
+building outside this repo, in parallel.
