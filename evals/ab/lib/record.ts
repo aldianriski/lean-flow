@@ -26,7 +26,7 @@ export type Row = {
   /** protocol trials: the D9 exception, logged on every use */
   deviation?: string;
   /** protocol trials: scope result, judge verdict + reason, design sha256 */
-  g2?: { scope: string; judge: string; reason: string; designSha256: string; judgeUsage?: { input: number; output: number; cacheRead: number; cacheWrite: number; costUsd: number } };
+  g2?: { scope: string; judge: string; reason: string; designSha256: string; judgeUsage?: { input: number; output: number; cacheRead: number; cacheWrite: number; costUsd: number } | undefined } | undefined;
   /** protocol trials: the popup that parked the trial, verbatim */
   park?: unknown;
 };

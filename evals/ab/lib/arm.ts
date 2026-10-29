@@ -13,7 +13,7 @@ export type Arm = {
   permissionMode: string;
   auth: "subscription" | "api-key";
   /** absent for A0 (no plugin) */
-  plugin?: PluginPin;
+  plugin?: PluginPin | undefined;
 };
 
 const EFFORTS = ["low", "medium", "high", "xhigh", "max"];

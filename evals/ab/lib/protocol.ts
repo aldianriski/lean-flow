@@ -55,7 +55,7 @@ const inLayers = (f: string, layers: string[]) => !path.posix.isAbsolute(f) && !
 export type JudgeReply = { text: string; totals: Totals | null };
 /** a plain string is a recorded reply (free checks); a JudgeReply carries the judge run's own usage */
 export type Judge = (prompt: string) => Promise<string | JudgeReply>;
-export type Policy = { sign: boolean; reason: string; usage?: Omit<Totals, "models"> };
+export type Policy = { sign: boolean; reason: string; usage?: Omit<Totals, "models"> | undefined };
 /** Isolated policy check: the judge sees only the written policy, the design text and the Out-of-scope list. Anything but one clean JSON verdict from the pinned model refuses. */
 export async function policyCheck(design: string, outOfScope: string[], judge: Judge): Promise<Policy> {
   if (/<\/design\s*>/i.test(design)) return { sign: false, reason: "design contains </design>, which could close its own tag" };
@@ -176,7 +176,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     park = detectPopups(s2)[0];
     if (!park) {
       const touched = diffManifest(base, manifest(iso.trialDir)).map((d) => d.replace(/^\w+ /, ""));
-      breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, o.task.layers));
+      breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, o.task.layers!));
       graded = await grade(o.task, iso.trialDir);
     }
   }
