@@ -93,6 +93,7 @@ booking and per-doctor working hours, and the external spec names at least three
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/logs/ab-clinic-builder-brief.md` | T2 | the clinic builder brief, retained verbatim as evidence that the build saw no 3.0 material | Low | 0 hits on the excluded tokens; committed before dispatch (`1320bb88`) |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):

@@ -85,3 +85,18 @@ consequence · T1 · behaviour:low · governance:low
 consequence · T2 · behaviour:low · governance:low
 Pre-dispatch preflight on `309860a7`: CLEAR (base-ref matches HEAD; waves T1=0, T2=0). Dispatch: T1 worktree-isolated, T2
 building outside this repo, in parallel.
+
+### 2026-10-29 | progress | T2 done: the clinic repo's booking slice runs end-to-end, with both invariants red-before-green
+TASK-534 4 of 4. The builder (sonnet, from the retained brief `1320bb88`) built `D:\Research\clinic-ab\` in 10 commits, with
+`initdb` working (PostgreSQL 18.3). The coordinator re-verified rather than trusting the report (L-227):
+- **Fresh clone, README steps only:** every step rc=0 (cluster, migrate ×2, `go test`, `go vet`, `npm ci`, typecheck, lint,
+  test 4/4, build).
+- **Red before green:** red at the test commits `10b9d19`, `868f08b`, `a412186`, each an assertion failure and none a compile
+  error; green at `b0fd585`, `8db6604`, `ee781f1`. Without `DATABASE_URL` the suite fails (rc=1, 0 skips).
+- **By hand:** a booking through the page in the browser stored row 1 at 09:00Z, and resubmitting gave `SLOT_TAKEN`.
+- **Conventions:** grep-verified (C1 · C2′ · C3 · C4′); the spec is marked partial.
+Note for TASK-535: the page converts the browser's local time to UTC, while working hours are stored and read as UTC, so on
+this UTC+7 host a 10:00 local booking is refused as `OUTSIDE_WORKING_HOURS`. Which time zone the clinic's hours live in is a
+business fact the spec does not state yet; it belongs in TASK-535's "facts not visible in code" (owner realism review).
+Deviation, recorded: for its fresh-clone check the builder cloned into the session scratchpad, outside its two allowed
+folders; it wrote nothing else there.
