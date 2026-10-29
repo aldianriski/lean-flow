@@ -484,7 +484,7 @@ status: current
     `toBeGreaterThan` guards do not catch it.
   - Fix direction: assert the invocation as a whole trimmed line (allowing the trailing `2>&1`); fail when a block has no closing `fi`.
 
-- **TD-268** severity: trivial | status: open | created: Sprint-138 (T1 scoped review round 2, review-cap routed)
+- **TD-268** severity: trivial | status: resolved → TASK-532 (filed Sprint-138, resolved SPRINT-148) | created: Sprint-138 (T1 scoped review round 2, review-cap routed)
   - Summary: **`scripts/gate-remote.ts` has three nits the capped review routed here, not to a third round.** (1) The verdict
     is read from the FIRST `QA-CHECK:` line (`judgeOutput` and the FAIL listing both take the first match). A nested harness
     printing a line-anchored `QA-CHECK:` earlier could mask the real one. Harmless at rc 0, but the last match is safer.
