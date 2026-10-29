@@ -4,7 +4,7 @@ slug: rules-protocol-and-a-whole-gate
 epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-10-29
-status: active
+status: closed
 plan_commit: a241c29e
 gates_signed: G1,G2 @ 0c33d7ce
 update_trigger: sprint execute/close events
@@ -124,8 +124,51 @@ prints one warning while a clean tree prints none.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/gate-remote.ts` | T3 · T4 | runs and judges both declared stages, each from its own log; the last verdict line counts; exits 0/1/2/5 only; warns on a dirty tree; each stage's command pinned to its declared text | Med | 90/0 across the two test files, full `bun test` 589/0; VPS 330/0 + 589/0 at `9c31e4e7` |
+| `evals/gate-remote.test.ts` | T3 · T4 | stubbed-transport cases for every stage verdict, the stage-list pin and its mutations, the closed exit set, the dirty-tree warning | Low | runs in `bun test` |
+| `scripts/qa-verdict.ts` · `evals/qa-verdict.test.ts` | T4 | `judgeOutput()` reads the LAST verdict line (TD-268), with two-order tests | Low | the caller grep found the three named callers only |
+| `TECH-DEBT.md` | T3 · T4 · close | TD-279 and TD-268 resolved; TD-281 and TD-282 filed | Low | — |
+| `CHANGELOG.md` | T3 · T4 · close | three [Unreleased] lines, maintainer-only | Low | — |
+| `evals/ab/` (lib/protocol.ts · lib/ · run-trial.ts · selftest.ts · arms/smoke-a1.json · fixtures/) | T2 | the D9 two-phase trial protocol: G1 pre-signed, G2 by scope check + isolated judge, post-build breach diff, popup park, synced-plugin clear | Med | selftest 16/16 free (coordinator re-run); P5 judge refuse/sign; P6 re-run valid, parked |
+| `docs/research/logs/ab-measurements.md` | T2 | smoke rows from P4 and the two P6 runs, tagged not a measurement (scope-change) | Low | appended by the harness |
+| `docs/work/backlog/TASK-544-freeze-ab-pre-registration.md` | close | note: under `acceptEdits` a lean-flow arm parks on Bash, so the pre-registration fixes the permission mode | Low | — |
+| `docs/LEARNINGS.md` · `docs/knowledge-index.md` | close | L-262 filed, L-261 to count 2; index regenerated | Low | merge-check 5/5 |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 4 of 4 members delivered (TASK-535, 542, 531, 532); 19 of 19 DoD boxes ticked, each re-verified by the coordinator
+rather than taken from a builder's report. The clinic A/B repo enforces five invariants test-first, with a complete spec the owner
+signed as realistic. The D9 trial protocol runs end to end on the fixture repo. The off-host gate now runs and judges both stages
+of the declared gate, so this was the first close whose system verify ran `bun test` through the tool (TD-279, TD-268 resolved).
+System verify: VPS 330/0 + 589/0 at `9c31e4e7`, exit 0.
+
+**Retrieval check** — four misses of rules on record. (1) The consequence records were bulleted prose with out-of-vocabulary
+tokens, so `check-review-depth` saw none of them. That repeats SPRINT-147's miss (L-261 → count 2). (2) Pre-locked D2 said
+"coordinator self-review", but the dispatch classifier makes every task here `behaviour:material`. Writing the records
+correctly exposed three owed reviews, which ran at close and found four real defects: the cap race, the router envelope, the
+unpinned stage command, a mislabelled rc. (3) Builder briefs named the tests but not `tsc`, twice (L-262). (4) The VPS memory
+still listed TD-224/225 as open host FAILs; they were resolved at SPRINT-115, and the memory was corrected.
+
+**Cost** — coordinator plus sub-agents: four builder checks about 219k tokens; T1 builder about 140k, T2 about 172k, T3/T4 about
+123k (each including its fix round); T2 review with re-review about 87k; close reviews about 66k (T3/T4) and 75k (T1). About 881k
+sub-agent tokens in all. Paid smoke trials on haiku plus two sonnet judge calls cost cents under the subscription login. Five VPS gate
+runs: one red on a builder's typecheck slip. The coordinator session is unmetered.
+
+**Worked**
+- Builder checks caught 9 contradictions in the T1 and T2 designs while they were still sentences; T4's came back with nothing important.
+- The real P6 run found what no free check could: the CLI syncs account plugins into an isolated config between phases. The existing init
+  check caught it, and the owner ruled a fix before any trial counts.
+- Every scoped review found something, and each ran in a context that had not written the code: T2's signing inputs failed open
+  twice, and the close reviews found the four defects above.
+
+**Friction**
+- Records written for the checker were read only by the author until close (L-261). Reading the checker before writing the Retro
+  is what found them.
+- Two builders committed type errors that their tests could not see (L-262). The VPS gate caught one, post-merge `merge-check` the other.
+- A lean-flow arm under `acceptEdits` parks on any Bash call (TASK-544 note). The protocol worked; the arm's permission mode is undecided.
+
+**Pattern candidate**
+- L-262: a builder brief that touches `.ts` names `bunx tsc --noEmit` before commit.
+- L-261 (count 2, due at the next promote): a line a checker greps at column 1 is a structured field, so write it in the checker's vocabulary or as plain words.
