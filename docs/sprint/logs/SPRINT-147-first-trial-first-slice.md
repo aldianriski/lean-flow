@@ -100,3 +100,13 @@ this UTC+7 host a 10:00 local booking is refused as `OUTSIDE_WORKING_HOURS`. Whi
 business fact the spec does not state yet; it belongs in TASK-535's "facts not visible in code" (owner realism review).
 Deviation, recorded: for its fresh-clone check the builder cloned into the session scratchpad, outside its two allowed
 folders; it wrote nothing else there.
+
+### 2026-10-29 | scope-change | T1 -- the emitter-column population leg needs an out-of-scope rule for evals/ab/
+What broke: `evals/run-emitter-column-fixtures.ts`'s POPULATION-scope leg FAILs on any `.ts` under `scripts/` or `evals/` that
+is neither scanned nor covered by a documented out-of-scope rule. The 11 new harness files (`evals/ab/lib/*.ts`,
+`evals/ab/selftest.ts`) match neither, so the declared gate goes red with T1 merged (`93230f13`). The builder found this and,
+rightly, did not edit outside its `Layers:`. Impact: T1 needs one rule in that file's `OUT_OF_SCOPE` list, `evals/ab/`, with
+its reason: a maintainer-only A/B measurement harness, run by hand, whose PASS/FAIL lines no column-keyed consumer reads.
+No renaming to dodge the rule. G2 re-confirmed by the owner by popup. `evals/run-emitter-column-fixtures.ts` joins T1's
+`Layers:` as an exact path (L-229). Proof: the harness runs green with the rule, and a probe file placed outside `evals/ab/`
+still turns its population leg red.

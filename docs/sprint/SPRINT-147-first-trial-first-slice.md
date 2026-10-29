@@ -34,7 +34,7 @@ separate task) · TASK-531, 532 (gate-remote, ready, not chosen) · TASK-367, 40
 ## Plan
 
 ### T1 — Run one pinned, isolated, measured A/B trial on a fixture repo `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `evals/ab/` · `docs/research/logs/ab-measurements.md`
+Layers: `evals/ab/` · `docs/research/logs/ab-measurements.md` · `evals/run-emitter-column-fixtures.ts`
   · `docs/work/todo/TASK-533-run-one-pinned-isolated-measured-ab-trial.md`
   · `docs/work/in_progress/TASK-533-run-one-pinned-isolated-measured-ab-trial.md`
   · `docs/work/done/TASK-533-run-one-pinned-isolated-measured-ab-trial.md`
