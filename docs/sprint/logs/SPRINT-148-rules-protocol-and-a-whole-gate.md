@@ -106,3 +106,9 @@ mode is a pre-registration decision. Pin: the smoke arm pins a clean clone at `%
 - merge · T2 · the post-merge `merge-check` typecheck leg went red (9 `exactOptionalPropertyTypes` errors in `evals/ab/lib/`); the worktree builder had never run
   `tsc`. Coordinator applied a type-only fix inline (stated reason: mechanical, no behaviour change); tsc clean, 16/16, merge-check 4 green + 1 WIP skip, then clean.
   Second sighting this sprint of a builder skipping `tsc` (T3's VPS run caught the first) → Retro learning candidate.
+
+### 2026-10-29 | system-verify | the integrated tree passes both declared stages off-host, at `054beacd`
+Members closed (plain-git check; this repo has no `check-sprint-by-reference.ts`): TASK-535, 542, 531, 532 all in `docs/work/done/`.
+`gate-remote.ts` (now running both stages, T3/T4): `bun test: 587 pass, 0 fail (rc 0)` · `qa-check: QA-CHECK: 329 pass, 0 fail (rc 0)` · exit 0.
+D4 met: the close verify ran `bun test` through the tool itself, not by hand, the first close to do so (TD-279 is closed in practice).
+run · 19 of 19 DoD ticked · terminal state PLAN_EXHAUSTED.
