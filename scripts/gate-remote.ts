@@ -8,7 +8,7 @@
 // with scripts/qa-verdict.ts and bun test by its own summary. Both stages always run.
 //
 // Exit codes (a closed set): 0 pass · 1 the gate did not pass · 2 refused before any spawn ·
-// 5 transport or setup. Pass means both stages pass. Any gate failure exits 1 and prints `remote rc: N`.
+// 5 transport or setup. Pass means both stages pass. Any gate failure exits 1 and prints each stage's rc (`qa-check rc: N`, `bun test rc: N`).
 //
 // Bun auto-loads the repo-root dotenv file unless launched with --no-env-file, so this refuses to run
 // without it, and it never opens that file itself.
@@ -65,11 +65,20 @@ export const STAGES = [
 ] as const;
 const SLUGS = ["qa", "bun"] as const;
 
-/** True when the script's `&&`-chained segments equal the stages' declared text, in order. Pure: the caller reads package.json. */
-export function stagesMatchScript(script: string, stages: readonly { declared: string }[]): boolean {
+/** True when the script's `&&`-chained segments equal the stages' declared text, in order, and each stage's `cmd` is what that text implies. Pure: the caller reads package.json. */
+export function stagesMatchScript(script: string, stages: readonly { declared: string; cmd: string }[]): boolean {
   const segs = script.split("&&").map((x) => x.trim());
-  return segs.length === stages.length && segs.every((x, i) => x === stages[i]?.declared);
+  return (
+    segs.length === stages.length &&
+    segs.every((x, i) => x === stages[i]?.declared && stages[i]?.cmd === remoteCmd(x))
+  );
 }
+
+/** What a declared segment must run remotely: the qa-verdict wrapper is dropped, and qa-check runs in full mode. */
+const remoteCmd = (declared: string): string => {
+  const bare = declared.replace(/^bun scripts\/qa-verdict\.ts /, "");
+  return bare.startsWith("sh scripts/qa-check.sh") ? `QA_FULL=1 ${bare}` : bare;
+};
 
 /** Judge a `bun test` log by its summary: present, `0 fail`, and at least one test run. */
 export function judgeBun(log: string): { ok: boolean; pass: number; fail: number; ran: number; reason: string } {
@@ -196,6 +205,7 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
   const bunLogR = logs[1]!;
   const b = bunLogR.status === 0 ? judgeBun(bunLogR.stdout) : { ok: false, pass: 0, fail: 0, ran: 0, reason: "no bun test log" };
   const bunOk = bunRc === 0 && b.ok;
+  say(`bun test rc: ${bunRc}`);
   if (bunLogR.status === 0 && b.reason !== "no bun test summary") say(`bun test: ${b.pass} pass, ${b.fail} fail (rc ${bunRc})`);
   if (!bunOk) say(`gate-remote: bun test stage failed (${bunRc !== 0 ? `rc ${bunRc}` : b.reason})`);
 
@@ -206,7 +216,7 @@ export function runGateRemote(c: Cfg, t: Transport, say: (line: string) => void,
 }
 
 function judgeQa(rc: number, logR: Reply, say: (line: string) => void): number {
-  say(`remote rc: ${rc}`);
+  say(`qa-check rc: ${rc}`);
   if (logR.status !== 0) {
     say("gate-remote: no log -- the remote log file is missing or unreadable");
     return 1;
@@ -215,7 +225,7 @@ function judgeQa(rc: number, logR: Reply, say: (line: string) => void): number {
   for (const l of log.split("\n")) if (/^\s*FAIL/.test(l)) say(l);
   const verdictLine = log.split("\n").filter((l) => /^QA-CHECK: \d+ pass, \d+ fail$/.test(l)).at(-1);
   const v = judgeOutput(log);
-  if (verdictLine === undefined && !v.truncated) {
+  if (verdictLine === undefined) {
     say("gate-remote: no verdict line in the remote log");
     return 1;
   }

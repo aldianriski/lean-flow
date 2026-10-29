@@ -83,7 +83,7 @@ describe("exit cases through a stubbed transport", () => {
     const r = go({});
     expect(r.code).toBe(0);
     expect(r.text).toContain("QA-CHECK: 12 pass, 0 fail");
-    expect(r.text).toContain("remote rc: 0");
+    expect(r.text).toContain("qa-check rc: 0");
   });
 
   test("incremental bundle from a remote commit that is an ancestor; checkout detached, clean without -x", () => {
@@ -118,14 +118,14 @@ describe("exit cases through a stubbed transport", () => {
     const r = go({ rc: ok("1\n"), log: ok(FAIL_LOG) });
     expect(r.code).toBe(1);
     expect(r.text).toContain("FAIL  guard-x: broken");
-    expect(r.text).toContain("remote rc: 1");
+    expect(r.text).toContain("qa-check rc: 1");
   });
 
   test("remote rc 2, 5 and 7 each exit 1 (the closed set) and print that rc", () => {
     for (const n of [2, 5, 7]) {
       const r = go({ rc: ok(`${n}\n`), log: ok(FAIL_LOG) });
       expect(r.code).toBe(1);
-      expect(r.text).toContain(`remote rc: ${n}`);
+      expect(r.text).toContain(`qa-check rc: ${n}`);
     }
   });
 
@@ -144,7 +144,7 @@ describe("exit cases through a stubbed transport", () => {
   test("rc != 0 with a passing verdict: 'verdict contradicts exit code', rc kept", () => {
     const r = go({ rc: ok("3\n") });
     expect(r.code).toBe(1);
-    expect(r.text).toContain("remote rc: 3");
+    expect(r.text).toContain("qa-check rc: 3");
     expect(r.text).toContain("verdict contradicts exit code");
   });
 
@@ -232,7 +232,7 @@ describe("exit cases through a stubbed transport", () => {
     for (const n of [256, 512]) {
       const r = go({ rc: ok(`${n}\n`), log: ok(FAIL_LOG) });
       expect(r.code).toBe(1);
-      expect(r.text).toContain(`remote rc: ${n}`);
+      expect(r.text).toContain(`qa-check rc: ${n}`);
     }
   });
 
@@ -388,6 +388,17 @@ describe("the bun test stage (TASK-531)", () => {
   });
   test("pin: a stage removed from the script reddens it", () => {
     expect(stagesMatchScript(script.replace(" && bun test", ""), STAGES)).toBe(false);
+  });
+  test("pin: a stage whose cmd drops QA_FULL=1 reddens it; the real STAGES stays green", () => {
+    const weak = [{ ...STAGES[0], cmd: "sh scripts/qa-check.sh" }, STAGES[1]];
+    expect(stagesMatchScript(script, weak)).toBe(false);
+    expect(stagesMatchScript(script, [STAGES[0], { ...STAGES[1], cmd: "bun test --bail" }])).toBe(false);
+    expect(stagesMatchScript(script, STAGES)).toBe(true);
+  });
+  test("a bun-only failure prints the bun rc, named, beside the passing qa-check rc", () => {
+    const r = go({ bunRc: ok("1\n") });
+    expect(r.text).toContain("bun test rc: 1");
+    expect(r.text).toContain("qa-check rc: 0");
   });
   test("pin: dropping the qa-verdict wrapper reddens it", () => {
     expect(stagesMatchScript(script.replace("bun scripts/qa-verdict.ts ", ""), STAGES)).toBe(false);
