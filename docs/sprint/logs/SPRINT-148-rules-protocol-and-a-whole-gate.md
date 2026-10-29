@@ -72,3 +72,10 @@ and re-run once. The gate caught a real defect, which is the tool doing its job.
 - scope-change · T4 · `judgeBun` also reads the LAST summary lines, with a two-order test. What broke: the review finding above. Impact: one function and
   one test, inside T4's `Layers:` (`scripts/gate-remote.ts` · `evals/gate-remote.test.ts`); no box changes. G2 re-confirm: coordinator, in scope as the
   same last-match rule TD-268 names.
+
+### 2026-10-29 | execute | T4 done -- the verdict is the last line, the exit set is 0/1/2/5, a dirty tree warns (TASK-532, TD-268 resolved)
+Commits `5759a853` (code + tests) · `0065c26f` (TD-268 + CHANGELOG). Builder: sonnet, `/tdd`, continuing from T3. Caller grep (`judgeOutput|VERDICT_RE`
+over `scripts/` `evals/`): the three named callers only. Coordinator re-run: `tsc --noEmit` clean; the two test files 88 pass, 0 fail. Builder: full
+`bun test` 587 pass, 0 fail. VPS at `5759a853`: on a clean tree, no warning and exit 0; with one untracked probe file, the warning line printed and exit 0.
+The logged scope addition landed: `judgeBun` reads the last summary, with a two-order test.
+- consequence · T4 · behaviour:low (exit codes, verdict selection) · governance:low (Other G, D2) → coordinator self-review of the diff: no finding
