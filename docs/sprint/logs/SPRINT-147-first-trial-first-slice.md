@@ -110,3 +110,21 @@ its reason: a maintainer-only A/B measurement harness, run by hand, whose PASS/F
 No renaming to dodge the rule. G2 re-confirmed by the owner by popup. `evals/run-emitter-column-fixtures.ts` joins T1's
 `Layers:` as an exact path (L-229). Proof: the harness runs green with the rule, and a probe file placed outside `evals/ab/`
 still turns its population leg red.
+
+### 2026-10-29 | progress | T1 done: one pinned, isolated, measured A/B trial runs end-to-end on a fixture repo
+TASK-533 7 of 7. The builder (sonnet, worktree, `/tdd`) wrote `a83bd4ba`: `evals/ab/` (run-trial · selftest · lib: arm, snapshot,
+pin, isolate, run, parse, grade, record, trial, canary · smoke arm · fixtures), plus the measurement log. No `*.test.ts`, no
+`.sh`; the credentials file is byte-copied only. Coordinator re-run: `bun evals/ab/selftest.ts` 7/7, `--paid` 11/11; its
+P4 row was committed (`f433ac33`), then merged (`93230f13`). Build-time facts:
+- `acceptEdits` alone denies outside Read and Bash headless.
+- A plugin canary loads only through the marketplace, installed and enabled registry files together.
+- The full model id is `claude-haiku-5-5`.
+- A smoke trial costs about $0.004.
+The builder broke the harness 8 ways in code, and each named check went red. One paid mutation, P1 in `bypassPermissions`,
+was denied by the auto-mode safety classifier and not retried; P1's discrimination rests on the G2 probe, where `auto` let
+outside reads through.
+The gate impact (F1) went through the scope-change above. With the `evals/ab/` rule (`sprint(147) T1` commit) the
+emitter-column harness passes 9/0, and a probe file outside `evals/ab/` still turns it red.
+Open for TASK-543: sub-agent usage inside `modelUsage` is unproven; the `api-key` arm is coded but untested. The worktree's
+other gate reds (missing `node_modules`) are environmental. The full gate runs at system verify.
+consequence · T1 · behaviour:low · governance:low (re-confirmed after the scope-change: an out-of-scope rule for a maintainer-only harness)

@@ -93,6 +93,9 @@ booking and per-doctor working hours, and the external spec names at least three
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/` (run-trial.ts · selftest.ts · lib/ · arms/ · fixtures/) | T1 | the A/B harness tracer: pinned, isolated, graded, costed trials; self-tests run by hand, never in the gate | Med | selftest 7/7 free, 11/11 paid, re-run by the coordinator; 8 harness mutations each reddened their check |
+| `docs/research/logs/ab-measurements.md` | T1 | the A/B measurement log; smoke rows only, tagged not a measurement | Low | rows from P4 runs |
+| `evals/run-emitter-column-fixtures.ts` | T1 | one out-of-scope rule for `evals/ab/` (scope-change) | Low | 9/0; a probe file outside `evals/ab/` still reddens the population leg |
 | `docs/research/logs/ab-clinic-builder-brief.md` | T2 | the clinic builder brief, retained verbatim as evidence that the build saw no 3.0 material | Low | 0 hits on the excluded tokens; committed before dispatch (`1320bb88`) |
 
 ## Retro
