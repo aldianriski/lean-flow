@@ -13,8 +13,8 @@ status: current
 
 # [Project Name] — Requirements [CUSTOMIZE]
 
-## Problem [CUSTOMIZE]
-[The problem this product/feature solves, in 2-4 sentences. WHY it exists, not HOW it's built.]
+## Business goal [CUSTOMIZE]
+[The problem this product/feature solves and the outcome the business wants, in 2-4 sentences. WHY it exists, not HOW it's built. Not a feature list.]
 
 ## Users [CUSTOMIZE]
 - **[Primary user role]** — [what they need from this]
@@ -25,8 +25,23 @@ status: current
 **In scope:**
 - [what this solution covers]
 
-**Out of scope:**
+## Non-goals [CUSTOMIZE]
+<!-- Belongs: what the product deliberately does not do, and why. Does not belong: work that is
+     merely not scheduled yet (that is backlog) or anything already listed under In scope. -->
+
 - [what it deliberately does not cover, and why]
+
+## Main flows [CUSTOMIZE]
+<!-- Belongs: one line per flow a user or system runs end to end, pointing at `docs/flows/<slug>.md`
+     when one exists. Does not belong: the steps themselves (the flow doc holds them). -->
+
+- [Flow name] — [what it achieves] → `docs/flows/[slug].md`
+
+## Invariants [CUSTOMIZE]
+<!-- Belongs: rules that must always hold, each stated so a test can break it. Does not belong:
+     behaviour that happens once (a requirement below) or a rule the code cannot violate. -->
+
+- [A rule that must always hold, stated so it can be tested]
 
 ## First milestone [CUSTOMIZE]
 <!-- What the first slice must prove, and where it stops. Filled from the owner's answers, never
@@ -44,7 +59,9 @@ status: current
 - **R1**: [the system does X, observable and testable]
 - **R2**: [the system does Y, observable and testable]
 
-## Non-functional requirements [CUSTOMIZE]
+## Quality attributes [CUSTOMIZE]
+<!-- Belongs: measurable targets the product must meet (speed, uptime, security, scale). Does not
+     belong: a feature, or a target nobody will measure. -->
 
 | Category | Requirement |
 |:---------|:------------|

@@ -12,6 +12,18 @@ status: current
 
 # [Project Name] — Coding Standards [CUSTOMIZE]
 
+## Conventions in use [CUSTOMIZE]
+<!-- Belongs: conventions the code actually follows, grouped by layer, each with the file it was
+     seen in. A convention the scan could not settle goes under Not confirmed as an open question,
+     never invented. Does not belong: anything a linter or formatter config enforces, or a
+     convention seen nowhere in the code. -->
+
+**[Layer — e.g. data access]**
+- [Convention the code follows] — seen in `[path/to/file]`
+
+**Not confirmed:**
+- [A convention the scan could not settle — asked, not assumed]
+
 ## Naming conventions [CUSTOMIZE]
 - Files: [kebab-case / snake_case / PascalCase — per file type if it varies]
 - [Variables / functions / classes — convention + one filled example]

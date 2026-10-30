@@ -6,9 +6,14 @@ bounded by the safe-scaffold allowlist (ADR-012).
 
 ## Procedure
 
-1. **Detect substrate** — read `package.json` / `pyproject.toml` / `go.mod` / etc. and the existing
-   file tree to infer stack, and whether a database or auth substrate is present. If inaccessible,
-   ask the user to paste the manifest + file tree.
+1. **Detect substrate and read the stack** — read `package.json` / `pyproject.toml` / `go.mod` / etc.
+   and the existing file tree to infer stack, and whether a database or auth substrate is present. If
+   inaccessible, ask the user to paste the manifest + file tree. Then read a small sample of real files
+   per layer (entry or routing, a data-access file, a UI component, a test, config) — never secret
+   files — and hold what they show for step 2, which writes `## Stack` (architecture overview) and
+   `## Conventions in use` (coding standards, written only on a repo with code, as that row is) with
+   one cited file per line. Anything the sample cannot confirm goes under `Not confirmed`, never
+   invented. An unknown stack gets this scan alone (curated question sets for known stacks come later).
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
@@ -68,7 +73,7 @@ bounded by the safe-scaffold allowlist (ADR-012).
    per the generator's § Bundled + cited assets);
    enforce the line cap and the ownership header (§3) on every file touched.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
-   file's ownership header + placement match STANDARD §2/§3; report the full file list, including
+   file's ownership header + placement match STANDARD §2/§3; every Stack and Conventions-in-use line cites a repo file; report the full file list, including
    safe-scaffold writes and any skips.
 
 ## Base-tier mandatory minimum
@@ -133,4 +138,5 @@ non-doc file stay **banned** from init — no exceptions.
 - Every file carries its STANDARD §3 ownership header (or the README/AGENTS footer-line
   exception) with `owner` a role, never a person.
 - Placement matches STANDARD §2 exactly — root vs `.claude/` vs the `docs/` tree.
+- Every Stack and Conventions-in-use line cites a repo file it was seen in.
 - Report: files written · files skipped (pre-existing) · any WARN (missing template).

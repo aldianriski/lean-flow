@@ -14,6 +14,15 @@ status: current
 > [One-line statement of the architectural style — e.g. "Layered service", "Clean Architecture +
 > DDD", "Hexagonal", "Modular monolith".] [CUSTOMIZE]
 
+## Stack [CUSTOMIZE]
+<!-- Belongs: the stack choices a reader needs and cannot read off the manifest — framework and
+     rendering mode, data layer and how it is reached, how the internal pieces connect — each line
+     citing the repo file it was seen in. Does not belong: dependency lists and versions (the
+     manifest has them) and external systems (Key Integration Points keeps those). -->
+
+- [Stack choice — e.g. framework + rendering mode] — seen in `[path/to/file]`
+- [Stack choice — e.g. data layer and how it is reached] — seen in `[path/to/file]`
+
 ## Dependency Rule [CUSTOMIZE]
 
 [State which direction dependencies are allowed to point, in one line. Example:]
