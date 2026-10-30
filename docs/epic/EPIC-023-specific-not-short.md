@@ -2,7 +2,7 @@
 epic: 023
 slug: specific-not-short
 owner: Maintainer
-last_updated: 2026-10-29
+last_updated: 2026-10-30
 status: active
 member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -43,7 +43,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 |---|---|---|---|
 | [SPRINT-147](../sprint/archive/SPRINT-147-first-trial-first-slice.md) | First Trial, First Slice (S0: harness tracer + clinic booking slice) | closed · `751df00d` | S0's two foundations. The harness runs one pinned, isolated, graded and costed trial (TASK-533), and the second A/B repo, Vue 3 + Go chi + PostgreSQL, books end-to-end with both invariants red-before-green (TASK-534). Closed-when 1 stays open on TASK-544/545 |
 | [SPRINT-148](../sprint/archive/SPRINT-148-rules-protocol-and-a-whole-gate.md) | Rules, Protocol and a Whole Gate (S0: clinic rules + spec, trial protocol) | closed · `c8ebeea1` | The clinic repo enforces five invariants test-first (cap serialised per doctor) and its spec carries the facts not in code, signed realistic (TASK-535). The D9 two-phase protocol runs on the fixture repo with G1 pre-signed, G2 by scope check + isolated judge, popup parks recorded (TASK-542). The off-host gate is whole (TASK-531, 532, outside the epic). Closed-when 1 stays open on TASK-544/545 |
-| [SPRINT-150](../sprint/SPRINT-150-scan-tracer-and-answers-scope.md) | Scan Tracer and Answers Scope (S1 tracer + S0 answers-file widening) | active | — |
+| [SPRINT-150](../sprint/archive/SPRINT-150-scan-tracer-and-answers-scope.md) | Scan Tracer and Answers Scope (S1 tracer + S0 answers-file widening) | closed · `1b917eb6` | S1's tracer holds: on an unprofiled SvelteKit repo, through the installed plugin, `init` wrote Stack and Conventions in use with every line citing a real file, read by the owner as specific (TASK-547). TASK-536's answers file now covers the seven profile topics and is ready (TASK-556). Closed-when lines 1 and 2 stay open (S0 on TASK-544/545, S1 on TASK-548..555) |
 
 ## Decisions
 
@@ -60,10 +60,13 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   touched ⊆ task `Layers:`), recorded as a deviation. It never applies to product runs.
 - **D5** — Shipped expert agents each clear ADR-001 on their own ablation delta. Expertise ships only
   if the final set beats the carry-through arm by the minimum gain.
+- **D6** — Release (owner, 2026-10-30): S1 and S2 each ship as a 2.x MINOR only once their own arm passes (A2, A3); until
+  then their changes stay under [Unreleased], unversioned. Fresh installs from the marketplace's `main` already carry what is
+  merged there; a release, not a push, is what counts as shipping.
 
 ## Open questions
 
-- Ship S1/S2 as 2.x MINORs as each proves out, or hold everything for 3.0.0? → owner ruling at S1 promote
+- Closed 2026-10-30 → D6 (asked at SPRINT-150's close; the S1 promote scan did not raise it).
 
 ## Closed when
 
