@@ -107,3 +107,11 @@ What broke: the first copied batch put the clinic app's acceptance tests under t
 compiled them as lean-flow code (they import the app's test runner), so merge-check FAILed with 7 errors. Impact:
 `tsconfig.json` gains an exclude for the task corpus; the batches are fixtures of other repos, never compiled here. Re-confirm
 G2: not needed, no design change.
+
+### 2026-10-30 | progress | T5 -- clinic batch A verified, signed and committed; all seven boxes ticked
+consequence · T5 · behaviour:low · governance:low
+The author's four tasks were re-run by the coordinator in fresh baseline copies, each with its own Postgres cluster; all four
+went red before the reference and green after, every grader passing (`verify.json`). A first verify run went red on all
+sixteen for a harness reason, not a task reason: GNU tar read the drive letter as a remote host. That was fixed and re-run.
+Owner realism review signed, with the clinic lost-detail limit accepted (scope-change above). Committed at `5b3f731f`; the batch
+folder is marked `-text` so a reference patch keeps its line endings. Self-review: maintainer-only fixtures, no code.
