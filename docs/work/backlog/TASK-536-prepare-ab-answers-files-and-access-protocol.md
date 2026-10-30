@@ -11,7 +11,7 @@ tier: X
 authority: J2
 origin: decomposer
 state: blocked
-depends-on: [TASK-535]
+depends-on: [TASK-535, TASK-556]
 ---
 
 # TASK-536 — Prepare the A/B answers files and the evidence-access protocol for both repos
