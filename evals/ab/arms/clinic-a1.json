@@ -1,6 +1,7 @@
 {
   "id": "clinic-a1",
   "snapshot": "D:\\Research\\ab-arm-clinic-a1",
+  "manifest": "evals/ab/arms/clinic-a1.manifest.json",
   "plugin": {
     "path": "C:\\Users\\HYPE AMD\\AppData\\Local\\Temp\\abp-2191",
     "sha": "4714da509a454e839ce855e415b96569ca359812",

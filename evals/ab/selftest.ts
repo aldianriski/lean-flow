@@ -1156,6 +1156,28 @@ check("S34 primary: infra-lost first-pass trial counts not-passed in the primary
   assert(/primary endpoint \(first pass, infra-lost = not-passed\)/.test(text) && /secondary: after replacement/.test(text), "the report labels the primary and the secondary");
 });
 
+// S35 -- the committed clinic arms: both snapshots match their manifests; A0 equals the pre-init copy; A1 differs from A0 by exactly the declared set.
+check("S35 clinic: both snapshots match their manifests; A0 == pre-init manifest; A1 vs A0 == the declared lean-flow doc set exactly (added + the modified README)", async () => {
+  const { loadArm } = await import("./lib/arm.ts");
+  const { checkArmSnapshot } = await import("./lib/freeze.ts");
+  const { diffManifest } = await import("./lib/snapshot.ts");
+  const dir = path.join(AB, "arms");
+  for (const n of ["a0", "a1"]) {
+    const arm = loadArm(path.join(dir, `clinic-${n}.json`));
+    if (!fs.existsSync(arm.snapshot!)) {
+      console.log(`     skipped ${n}: snapshot ${arm.snapshot} absent on this host`);
+      continue;
+    }
+    const r = checkArmSnapshot(arm);
+    assert(r.length === 0, `clinic-${n} snapshot differs from its manifest: ${r.slice(0, 5)}`);
+  }
+  const rd = (f: string) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")) as Record<string, string>;
+  const set = fs.readFileSync(path.join(dir, "clinic-lf-docs.txt"), "utf8").split("\n").filter(Boolean);
+  assert(diffManifest(rd("clinic-a1.pre-init.manifest.json"), rd("clinic-a0.manifest.json")).length === 0, "A0 must equal the pre-init copy");
+  const diff = diffManifest(rd("clinic-a0.manifest.json"), rd("clinic-a1.manifest.json")).map((d) => d.replace(/^\S+ /, "")).sort();
+  assert(JSON.stringify(diff) === JSON.stringify([...set].sort()), `A1 vs A0 must be exactly the set (diff ${diff.length}, set ${set.length})`);
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
