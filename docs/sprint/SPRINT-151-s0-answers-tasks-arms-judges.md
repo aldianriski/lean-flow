@@ -128,7 +128,7 @@ Layers: `evals/ab/` · `docs/research/logs/ab-measurements.md`
   · `docs/work/todo/TASK-543-build-ab-judges-and-measured-run-pipeline.md`
   · `docs/work/in_progress/TASK-543-build-ab-judges-and-measured-run-pipeline.md`
   · `docs/work/done/TASK-543-build-ab-judges-and-measured-run-pipeline.md`
-Depends-on: T3, T4, T5, T6, T7
+Depends-on: T3, T4, T5, T6
 Cites: `TASK-543`
 
 Wave 2. Tier G (maintainer-only). Calibrated on reference and deliberately wrong solutions, never on trials.

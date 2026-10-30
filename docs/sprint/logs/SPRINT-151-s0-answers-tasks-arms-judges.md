@@ -137,3 +137,9 @@ Both authors needed Node 24.16+ (the host has 22); the coordinator kept a copy o
 eight tasks in fresh baselines on it, every one red before and green after with its graders (verify.json per batch). The
 batch notes record the Node 24 requirement for every later workdoo trial. Owner realism review signed for both.
 Self-review: maintainer-only fixtures, no code.
+
+### 2026-10-30 | scope-change | T8 -- T8 starts beside T7: its dependency on T7 is dropped, and T7 keeps the arms folder
+What broke: T8 depended on T7 only because T8's harness folder contains T7's arms folder (path ownership), and T7 now waits
+on the owner-operated clinic init. Impact: T8's Plan line depends on T3..T6 only (all done); T8 never writes T7's arms
+folder, while T7's remaining writes are the clinic arm manifests and configs there. The harness library files T7 changed
+are committed, so T8 takes them over from here. Re-confirm G2: owner ruling by popup (start T8 now).
