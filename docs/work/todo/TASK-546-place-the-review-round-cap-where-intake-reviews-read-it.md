@@ -1,6 +1,7 @@
 ---
 id: TASK-546
 title: "Place the review-round cap where intake and proposal reviews read it"
+sprint: SPRINT-149
 priority: P2
 size: S
 risk: low
