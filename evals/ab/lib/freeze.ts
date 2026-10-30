@@ -4,13 +4,16 @@ import path from "node:path";
 import type { Arm } from "./arm.ts";
 import { blobId, diffManifest } from "./snapshot.ts";
 
-/** Directory or file names left out at any depth: VCS state, installs, secrets, database files, build output. */
+/** Directory or file names left out at any depth: VCS state, installs, database files, build output. */
 const EXCLUDE_NAMES = new Set([".git", "node_modules", ".pgdata", "dist", ".workdoo", "tsconfig.tsbuildinfo"]);
+/** `.env` and `.env.*` hold secrets and are left out; the committed templates (names only) are part of the real repo. */
+const ENV_TEMPLATES = new Set([".env.example", ".env.sample", ".env.template"]);
+const isSecretEnv = (name: string) => (name === ".env" || name.startsWith(".env.")) && !ENV_TEMPLATES.has(name);
 /** Repo-relative paths left out (a worktree of the repo itself would double-count every file). */
 const EXCLUDE_PATHS = new Set([".claude/worktrees"]);
 
 export function isExcluded(rel: string, name: string): boolean {
-  return EXCLUDE_NAMES.has(name) || name.startsWith(".env") || EXCLUDE_PATHS.has(rel);
+  return EXCLUDE_NAMES.has(name) || isSecretEnv(name) || EXCLUDE_PATHS.has(rel);
 }
 
 /** relative path -> git blob id for every non-excluded file under `dir` (sorted, forward slashes). Same ids as `git hash-object`. */

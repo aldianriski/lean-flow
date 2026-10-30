@@ -1,6 +1,7 @@
 {
   ".claude/CLAUDE.md": "46fac5965a31526b867d5aacc06063f9c0180406",
   ".claude/CONTEXT.md": "a59d0cf9a8c35ed042e4eb8757823aa766a82d20",
+  ".env.example": "b9c25332b8e139d2196e229726c18ffdd9c4c1be",
   ".gitattributes": "dc5df1487266c2883227d46fd1281aa81da0be85",
   ".github/workflows/backup.yml": "db950c4ce19ac472bbd627e980e6134cf499c550",
   ".github/workflows/browser.yml": "c9f6cf76fd9ee7f2be6a2dd53dee7a109afb4506",
