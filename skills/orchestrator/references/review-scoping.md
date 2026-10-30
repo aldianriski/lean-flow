@@ -120,6 +120,25 @@ Guarded by a retained must-FAIL fixture (`evals/fixtures/revise-loop/`, L-058 ·
 violation must surface as the named worst finding on its axis, and an inadequate fix must end at the
 ceiling as `still-open → owner` — never a second retry.
 
+## Draft reviews — intake and proposal
+
+A draft someone reviews before the owner approves it, such as an intake breakdown (`/task-decomposer`, before `approve`)
+or an epic or other proposal (`/lean-doc-generator`, before activation), is not a diff, so the revise loop above does not
+bound it. Left unbounded, each round's fix adds text, the next round finds a new high-severity issue in that text, and the
+late rounds chase detail that belongs to a later gate. Whoever reviews it (another model, a sub-agent, a person), run the
+review in this rhythm:
+
+1. **Self-check first.** Run the reviewer's threat model over the draft yourself before round 1.
+2. **Ask the owner's forks before round 1**, in one popup, so the reviewer reviews one draft, not its branches.
+3. **State the altitude in the brief.** Detail that the work's own later gate decides (a task's G2) is not a finding.
+4. **At most two rounds.** Round 2 blocks only on a high-severity finding that would change the outcome. Every other
+   finding becomes a note for the gate that owns it: a line in the affected task's `## Assumes`, which its G2 reads, or in
+   the epic's `## Open questions`.
+5. **A fix states what must be true.** A fix that needs a new mechanism goes to that later gate, not into the draft.
+
+Record the round count with the approval: in the commit that writes the approved tasks, or the one that activates the
+proposal.
+
 ## Skip table — which passes actually fire
 
 Don't fire every pass on every change. Decide per diff:

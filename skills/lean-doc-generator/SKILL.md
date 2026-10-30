@@ -92,7 +92,7 @@ route to `/task-decomposer --fog`. *Yes, and it fits one sprint?* → it is a sp
 nameable outcome that genuinely spans sprints earns a file. Created here; **consumed** by
 `/task-decomposer --epic`, which never creates one. Member sprints are appended at promote and
 completed at close (Sprint lifecycle below); the epic closes only when every § Closed-when condition
-is `[x]`, not when its last sprint closes. Retention → STANDARD §11. **Activation (`status: active`) lists the epic's uncovered open conditions** — rule + procedure → `${CLAUDE_SKILL_DIR}/references/epic-coverage.md`.
+is `[x]`, not when its last sprint closes. Retention → STANDARD §11. **Activation (`status: active`) lists the epic's uncovered open conditions** — rule + procedure → `${CLAUDE_SKILL_DIR}/references/epic-coverage.md`. A proposal someone reviews before activation runs that review under `orchestrator/references/review-scoping.md` § Draft reviews (at most two rounds).
 
 ## Sprint lifecycle
 
