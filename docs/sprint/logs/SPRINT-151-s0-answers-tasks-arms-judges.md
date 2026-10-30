@@ -129,3 +129,11 @@ What broke: TASK-537 and TASK-538 box 5 ask for a lost-detail task whose accepta
 statement (date-times shown in UTC, en-GB style) whose wording is notes-only while the behaviour is partly visible in code.
 Impact: box 5 is read for workdoo the way it is for clinic; the Done-when text is not reworded. Re-confirm G2: owner
 ruling by popup (both batches signed, the shared fact accepted, recorded in each batch's notes).
+
+### 2026-10-30 | progress | T3 T4 -- workdoo batches A and B verified, signed and committed; all seven boxes ticked on each
+consequence · T3 · behaviour:low · governance:low
+consequence · T4 · behaviour:low · governance:low
+Both authors needed Node 24.16+ (the host has 22); the coordinator kept a copy outside the author snapshots and re-ran all
+eight tasks in fresh baselines on it, every one red before and green after with its graders (verify.json per batch). The
+batch notes record the Node 24 requirement for every later workdoo trial. Owner realism review signed for both.
+Self-review: maintainer-only fixtures, no code.
