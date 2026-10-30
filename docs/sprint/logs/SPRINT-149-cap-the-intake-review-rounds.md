@@ -66,3 +66,16 @@ pushing a line past 400 characters; split onto its own line, then merge-check 4 
 review-depth fixtures green, SKILL caps 133/139/140. Codex R1 under the placed rhythm (self-check done, no open fork, altitude in
 the brief, cap 2): CLEAR on all five threat items, so the review closed in 1 round. Box 3 waits on the S1 intake (D3).
 review · T1 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-10-30 | progress | T1 -- DoD 3 met: the S1 intake's draft review ended in 2 rounds; box 3 ticked
+The EPIC-023 S1 Discovery intake ran under § Draft reviews. It started with a self-check, in which a fact check swapped the
+business-discovery repo to compass. All owner forks were asked before round 1 (I-1..I-6, three popups), and the altitude was
+stated in the brief. Codex R1 came back NOT CLEAR with one outcome-changing High: no task proved the finished `init` on an
+unprofiled stack. Its fix states what must be true (a third box on TASK-554), and the Medium note became a dependency
+(TASK-553 on TASK-549). Codex R2 came back CLEAR. Owner `approve`, then TASK-547..555 were written at `31f3873f`, round count
+in the commit. Follow-up for /triage: widen TASK-536 to the seven profile topics (I-6) and set it ready (TASK-535 is done).
+
+### 2026-10-30 | scope-change | T1 -- the knowledge-index token leaves T1's `Layers:`
+What broke: T1 declared the generated index at promote, but no T1 commit changed it (the L-217 pointer edit left the index
+unchanged), and an unused token fails the layers-observed check at close (L-240). Impact: one token removed from T1's Plan
+line; nothing else changes. Re-confirm G2: not needed, the design is unchanged.

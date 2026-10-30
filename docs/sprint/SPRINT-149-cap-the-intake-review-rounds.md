@@ -33,7 +33,7 @@ gate leg or field: the rule ships as prose.
 
 ### T1 — Place the review-round cap where intake and proposal reviews read it `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `skills/task-decomposer/` · `skills/orchestrator/references/review-scoping.md` · `skills/lean-doc-generator/SKILL.md`
-  · `docs/work/backlog/` · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `CHANGELOG.md`
+  · `docs/work/backlog/` · `docs/LEARNINGS.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-546-place-the-review-round-cap-where-intake-reviews-read-it.md`
   · `docs/work/in_progress/TASK-546-place-the-review-round-cap-where-intake-reviews-read-it.md`
   · `docs/work/done/TASK-546-place-the-review-round-cap-where-intake-reviews-read-it.md`

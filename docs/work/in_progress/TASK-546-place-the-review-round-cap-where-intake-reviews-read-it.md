@@ -29,7 +29,7 @@ count 5, which admits it under ADR-053 if it adds machinery; as prose in an exis
   where every flow that runs an intake or proposal review reads it, chosen by §10's placement test and named in the
   L-217 pointer line with its disposition.
 - [x] The placement is consumer-safe: no maintainer-only path or Codex-specific wording leaks into a shipped skill. ✓ consumer grep over the shipped section: 0 hits for maintainer paths, repo ids or Codex wording, control hits 1; Codex R1 T3 CLEAR
-- [ ] One real intake review run under the placed rule ends in at most 2 rounds, recorded in its log or commit.
+- [x] One real intake review run under the placed rule ends in at most 2 rounds, recorded in its log or commit. ✓ EPIC-023 S1 Discovery intake reviewed under the placed rule: 2 Codex rounds (R1 NOT CLEAR on one High, fixed; R2 CLEAR), recorded in commit 31f3873f
 
 ## Touches
 the shipped skill or reference §10's placement test selects (likely `/task-decomposer`'s review guidance) · `docs/LEARNINGS.md` (L-217 pointer line)
