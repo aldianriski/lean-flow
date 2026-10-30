@@ -2,6 +2,7 @@
 id: TASK-540
 title: "Author clinic A/B task batch B (4 tasks)"
 epic: EPIC-023
+sprint: SPRINT-151
 priority: P2
 size: M
 risk: high

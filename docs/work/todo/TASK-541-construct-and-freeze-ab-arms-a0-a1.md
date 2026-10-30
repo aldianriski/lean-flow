@@ -2,6 +2,7 @@
 id: TASK-541
 title: "Construct and freeze A/B arms A0 and A1 for both repos (no trials)"
 epic: EPIC-023
+sprint: SPRINT-151
 priority: P2
 size: M
 risk: med

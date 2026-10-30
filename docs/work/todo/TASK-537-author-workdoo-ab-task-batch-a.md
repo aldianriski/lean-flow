@@ -2,6 +2,7 @@
 id: TASK-537
 title: "Author workdoo A/B task batch A (4 tasks)"
 epic: EPIC-023
+sprint: SPRINT-151
 priority: P2
 size: M
 risk: high

@@ -1,6 +1,7 @@
 ---
 id: TASK-558
 title: "Let promote pull a dependent task together with its blockers, ordered in waves"
+sprint: SPRINT-151
 priority: P2
 size: S
 risk: med

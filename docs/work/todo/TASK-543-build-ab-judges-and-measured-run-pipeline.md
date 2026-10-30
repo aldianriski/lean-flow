@@ -2,6 +2,7 @@
 id: TASK-543
 title: "Build the blinded A/B judges and the full measured-run pipeline"
 epic: EPIC-023
+sprint: SPRINT-151
 priority: P2
 size: M
 risk: high

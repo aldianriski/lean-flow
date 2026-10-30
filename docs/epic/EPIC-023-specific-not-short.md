@@ -4,7 +4,7 @@ slug: specific-not-short
 owner: Maintainer
 last_updated: 2026-10-30
 status: active
-member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150]
+member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -44,6 +44,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-147](../sprint/archive/SPRINT-147-first-trial-first-slice.md) | First Trial, First Slice (S0: harness tracer + clinic booking slice) | closed · `751df00d` | S0's two foundations. The harness runs one pinned, isolated, graded and costed trial (TASK-533), and the second A/B repo, Vue 3 + Go chi + PostgreSQL, books end-to-end with both invariants red-before-green (TASK-534). Closed-when 1 stays open on TASK-544/545 |
 | [SPRINT-148](../sprint/archive/SPRINT-148-rules-protocol-and-a-whole-gate.md) | Rules, Protocol and a Whole Gate (S0: clinic rules + spec, trial protocol) | closed · `c8ebeea1` | The clinic repo enforces five invariants test-first (cap serialised per doctor) and its spec carries the facts not in code, signed realistic (TASK-535). The D9 two-phase protocol runs on the fixture repo with G1 pre-signed, G2 by scope check + isolated judge, popup parks recorded (TASK-542). The off-host gate is whole (TASK-531, 532, outside the epic). Closed-when 1 stays open on TASK-544/545 |
 | [SPRINT-150](../sprint/archive/SPRINT-150-scan-tracer-and-answers-scope.md) | Scan Tracer and Answers Scope (S1 tracer + S0 answers-file widening) | closed · `1b917eb6` | S1's tracer holds: on an unprofiled SvelteKit repo, through the installed plugin, `init` wrote Stack and Conventions in use with every line citing a real file, read by the owner as specific (TASK-547). TASK-536's answers file now covers the seven profile topics and is ready (TASK-556). Closed-when lines 1 and 2 stay open (S0 on TASK-544/545, S1 on TASK-548..555) |
+| [SPRINT-151](../sprint/SPRINT-151-s0-answers-tasks-arms-judges.md) | S0: Answers, Tasks, Arms and Judges (S0 waves 0-2) | active | — |
 
 ## Decisions
 
