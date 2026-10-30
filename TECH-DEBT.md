@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-29
+last_updated: 2026-10-30
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -821,14 +821,6 @@ status: current
     do read their exit status and fail closed. Census 2026-09-30: 0 (both sites pass only real sprint files).
   - Mitigation (hypothesis): capture `kind`'s exit status and fail with a named finding on anything but 0 (L-120).
 
-- **TD-201** severity: medium | status: resolved → TASK-528 (Sprint-146) | created: Sprint-110 (T4 outside review)
-  - **Resolved (SPRINT-146 T1, `55c899e5`):** `reap()` now asks `sprint-members-cli.ts uncovered` and writes one `TASK-NNN · uncovered · …` rollup line per member with an open `## Done when` box that no counted unit's `Cites:` leading run names; where the terminal would have been `PLAN_EXHAUSTED` it is now `HARD_FAILURE` (no other rank moves, `counts` output unchanged). Evidence: three must-FAIL reap-terminal fixtures went red on the old code (uncited member, TD-199 tail-cite variant, parked-run line) and green after; the sibling controls (every box covered, covered-but-open) still end `PLAN_EXHAUSTED` / `BUDGET_STOP` with no uncovered line. Both rollup checker forms pass over a log carrying the line, differential parity 140 of 140 identical. Real artifact: the patched reaper over SPRINT-119 (`5bb2dd3`) and SPRINT-123 (`d69331f`) at their close commits reproduced the recorded `PLAN_EXHAUSTED` and `AUTHORITY_BOUNDARY`, census 0 uncovered.
-  - Summary: **A Tn whose `Cites:` names no current member drops out of the unit counts, and so can the open box of an uncited member.**
-    `counts` gives `units 0 0` beside `dod 1 1`. `reap()` builds its unattempted list from open counted units only, so the run can
-    end `PLAN_EXHAUSTED` while its own DoD line shows open boxes. Census 2026-09-30: 0 (every live Tn cites a member).
-    TD-199's mention rule is the sibling.
-  - Mitigation (hypothesis): an open box on a member no counted unit covers is itself unattempted work (or a named finding); never a clean exhaustion.
-
 - **TD-200** severity: low | status: open | created: Sprint-110 (T4 outside review)
   - Summary: **A member whose `## Done when` has no boxes counts as delivered.** `counts` gives `dod 0 0`, `units 1 1`. Census 2026-09-30:
     0 of 29 task files. CRLF files parse correctly.
@@ -970,36 +962,6 @@ status: current
     `WINDOW` lever trades directly against flakiness under load (a coverage decision, D6).
   - **Narrowed (SPRINT-116 T1, ADR-051):** two of the three wrappers it names (`run-s4-ts-evaluators.sh` · `run-s4-differential-parity.sh`) are deleted; the debt stands for the surviving `run-dod-delta-fixtures.sh`, whose pass-count parser still has no retained must-FAIL fixture.
 
-- **TD-166** severity: medium | status: resolved → TASK-354 (Sprint-115) | created: Sprint-102
-  - **Resolved (2026-10-28, owner ruling at the /prime overview):** the row's fix direction landed in SPRINT-115 T4 (TASK-354) and the row was never closed. `.dod-delta-exempt` at the repo root holds reasoned `<sha> -- <ruling> -- <reason>` rows in ADR-031's shape, and `scripts/lib/check-dod-delta.ts` reads it (a declared tick → `PASS dod-delta: EXEMPT`, a malformed row → FAIL). A ruled historical mis-attribution is now declarable, so the close deadlock has a tool-read escape.
-  - Summary: **The `dod-delta` leg can hold a sprint permanently un-closable on a finding that only
-    closing can clear.** SPRINT-102's close-time system-verify printed `226 pass, 2 fail`. The
-    surviving FAIL is accurate: commit `b89d6f0`, subject `sprint(102) T4: 2 DoD ticked; fix two
-    self-inflicted layers findings`, ticked **three** DoD — two of T4's and one of **T2's** ("The
-    population is re-derived, not inherited…"). The leg named it exactly and was right to.
-  - **Why it cannot be fixed forward.** A tick lives in a commit's diff, so no later commit can
-    un-tick it; the leg's exemptions are structural (coord-scoped or ambiguous subjects), with no
-    declaration file and no per-commit allow-list. The only clean remedies are rewriting published
-    history — five commits, against a repo carrying ~90 live `worktree-agent-*` branches whose bases
-    would move — or closing the sprint.
-  - **The trap, which is the durable part.** The leg's population is `plan_commit..HEAD` over
-    `lo_files=$(ls docs/sprint/SPRINT-*.md)` — **non-recursive** (`scripts/qa-check.sh:1373`). `close`
-    moves the Plan to `docs/sprint/archive/`, out of that glob, so the finding leaves scope the moment
-    the sprint closes. Meanwhile ADR-021 makes a FAIL block the close. **A guard that blocks the only
-    action able to clear it is not a gate, it is a deadlock** — and the escape is always the same
-    move, an owner ruling, which trains the ruling rather than the fix. This is L-105's family seen
-    from a new side: that rule asks *when* a guard fires relative to what it guards; this one asks
-    whether the guard's own clearing condition is **reachable** from inside the state it creates.
-  - Ruled at the SPRINT-102 close: the finding is accurate and unfixable-forward; the sprint closes on
-    it by owner ruling (SPRINT-101's precedent — closed by ruling, not exhaustion), and the defect is
-    carried here rather than waived silently.
-  - Fix direction (**not a ruling**): give the leg a way to record a *ruled* historical
-    mis-attribution — a declaration the checker reads, in the shape ADR-031 already established for
-    `.conformance-exempt` (a reasoned exemption the tool parses, not a prose note two files away,
-    L-151). Weigh against ADR-029: this leg is Tier **G**, so the full bar applies — including a
-    fixture that varies the **selection** and not only the verdict (L-186), since the bug class here
-    is exactly a population/scope property.
-
 - **TD-164** severity: medium | status: open | created: Sprint-101
   - Summary: **SPRINT-101's SIGNED `approval_envelope:` encodes a superseded reading of the rule it
     cites, and the record cannot be re-signed.** Its `design` dimension states *"the seeded Plan is
@@ -1096,27 +1058,6 @@ status: current
     subject its own shape, rather than teaching every consumer to guess.
   - Dormant today: these sites fire only when `STANDARD.md`'s own §2/§11/§12 tables are malformed.
 
-- **TD-155** severity: medium | status: resolved → TASK-530 (Sprint-146) | created: Sprint-099
-  - **Resolved (SPRINT-146 T3, `41347cf2`):** `qa-verdict.ts` now prints a notice on a non-zero exit when `npm_lifecycle_script` shows a stage chained after it with `&&`, naming that stage verbatim (under `test`: `bun test`); silent on exit 0, under `gate`, and on a direct run. Exit codes, `judgeOutput` and `runAndJudge` are unchanged; `package.json` untouched (owner ruling R3: chain semantics kept, only the skip made visible). Evidence: the spawned notice tests went red on the stub and green after; seeding out the print reddened only the two notice-printing tests. Real artifact: `QA_BUDGET_SECONDS=5 bun run test` printed the notice, exited 1, and no `bun test` output followed.
-  - Summary: **The declared gate command's second stage is unreachable whenever its first stage
-    truncates.** `package.json`'s `test` is
-    `bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test`. A truncated `qa-check.sh` makes
-    `qa-verdict.ts` exit non-zero — correctly, a truncated run is not a pass — so `&& bun test`
-    never runs and the **entire 533-test TypeScript suite is skipped in silence.**
-  - Evidence (2026-09-13, SPRINT-099): every one of the first five gate runs this session truncated,
-    so `bun test` did not execute once under the declared command. Run separately afterwards it
-    reported **531 pass, 2 fail** in 266 s — two failures that the declared gate command could not
-    have surfaced on a truncating host. The final, untruncated run (`218 pass, 0 fail`) does reach it.
-  - Impact: the gate's coverage is **conditional on its own speed**, which is the same class as
-    TD-117 one level up — a skipped harness is an unrun guard, and here the skipped thing is every
-    TS test at once. It is invisible rather than reported: nothing prints "bun test did not run".
-  - **Deliberately not fixed in SPRINT-099** (owner ruling at close). `package.json`'s `test` script
-    is the discovered gate at **ADR-033 rung 1**, so changing the chain re-points what System verify
-    means and what a green gate attests to — an ADR-grade decision, not a patch, and outside T2's
-    declared `Layers:`.
-  - **Re-file fresh if** the chain is changed, or the gate stops truncating on ordinary hosts.
-
-
 - **TD-153** severity: medium | status: open | created: Sprint-098
   - Tracker: none — found by the coordinator's population probe at SPRINT-098 T3, then independently
     reproduced and ruled inherent by that task's worktree-isolated outside review.
@@ -1150,45 +1091,6 @@ status: current
   - Re-file fresh if: a sidecar or marker lands and the checker is not re-pointed at it — the guard
     would then keep reading composable text while real evidence sat beside it.
 
-- **TD-152** severity: medium | status: resolved → accepted (no task) | created: Sprint-098
-  - Tracker: none — found by the coordinator's population check at SPRINT-098 T2, then independently
-    confirmed and ruled by that task's worktree-isolated outside review.
-  - Summary: **The revise-loop ceiling guard reads a line that nothing mechanically emits, so an
-    unlogged retry is indistinguishable from no retry and both PASS.** `check_revise_ceiling()`
-    counts `Tn · retry · <axis>: <finding> → fixed|still-open` lines. `reap()` mechanically writes
-    `run ·`, `terminal ·` and `Tn · unattempted ·`; **nothing in `scripts/`, `skills/` or `evals/`
-    writes a `retry` line.** It exists only as a prose instruction in `night-run.md` Part 4 telling
-    the model to write one. A run that fired three retries and logged none returns
-    `PASS revise-loop-ceiling: within ADR-022 § Decision item 2`.
-  - Location: `scripts/night-run.sh` `check_revise_ceiling()` (the reader) · `skills/orchestrator/references/night-run.md` Part 4 (the only "emitter", which is prose).
-  - Evidence (2026-09-11): `grep -rn '· retry ·' scripts/ skills/ evals/` returns readers and
-    specifications, no writer. **2 of 51** archived sprint logs carry a retry line at all
-    (`SPRINT-066`, `SPRINT-067`), both attended, both model-authored.
-  - **Why this is a limit and not a T2 defect** (outside-review ruling (b), recorded because the
-    reasoning is the valuable part): every *other* Part 4 state line — `done` · `blocked` ·
-    `parked-hitl` · `denied-tool` · `stalled` — is also model-written and trusted identically.
-    `unattempted` is the sole exception, and only because it has real absence-based ground truth: an
-    open DoD with **no line at all** for that task proves it was never reached. A retry has no such
-    ground truth — retried-and-fixed is textually identical to never-needed-a-retry. ADR-016 already
-    moved the *outer* rollup into the launcher's wrapper for exactly this reason; that move is not
-    available here, because a retry fires **inside one continuous model turn** with no external
-    process boundary for a wrapper to observe.
-  - Fix direction (**hypothesis, re-derive first** — §10): make the retry *action* flow through a
-    choke point that records it — e.g. a second attempt permitted only via a dedicated
-    `night-run.sh --record-retry` call that the allowlist makes the sole path. That is a change to
-    the retry-firing **mechanism**, not to the checker, and it was out of T2's declared `Layers:`.
-    Do not "fix" this by tightening `check_revise_ceiling()`; the checker is not where the gap is.
-  - **Already done, so it is not re-litigated:** the false claim was removed from the doc. Part 4
-    previously read *"The ceiling is not left to the writer's own bookkeeping"* directly above the
-    passage establishing that it is; it now states the limit plainly. A guard whose documentation
-    overclaims is worse than one whose limits are written down.
-  - Re-file fresh if: a retry-firing choke point lands but the ceiling check is not re-pointed at
-    it — the guard would then read the old advisory line while a real record existed beside it.
-  - **Resolved (SPRINT-146 T2, 6855ebd2), accepted:** the overclaim is gone (TASK-529) -- the PASS line keeps its
-    prefix and now reads `-- N retry line(s) read, all model-reported; an unlogged retry is undetectable (TD-152)`.
-    The detection limit stays: an unlogged retry is still indistinguishable from none, because a retry fires inside
-    one model turn and no external door exists to force it through (owner ruling, SPRINT-146 promote). Cost weighed
-    and knowingly kept. **Re-file fresh if** a retry-firing choke point becomes feasible.
 - **TD-148** severity: medium | status: open | created: Sprint-097
   - **Narrowed again (SPRINT-137 T4, TASK-481, `9d762603`):** items 2, 4 and 5 are done in the TypeScript checker: an unbalanced annotation is `unparsed` and earns no foreign exemption, both suffix anchors have a test each (seeded removal reddens only its own), and `member_sprints:` is read from frontmatter only. Items 3, 6 and 7 stay open.
   - **Narrowed (SPRINT-136 T1, TASK-474, `6a51a673`):** item 1 is done: an archived epic with no member entry the parser can read (an empty list, a missing key, a block sequence) now FAILs by name instead of earning "every member sprint closed". Items 2-6 stay open.
@@ -1401,40 +1303,6 @@ status: current
     did not — and the reason it could not is this row.
   - **Re-file fresh if** T3's detector is extended past the TS module graph, or a compat harness leg is
     added — the fix belongs with either.
-
-- **TD-128** severity: medium | status: resolved → SPRINT-099 T2 + ADR-042 | created: Sprint-092
-  - **Resolved (2026-10-28, owner ruling at the /prime overview):** the missing reader this row names exists. `scripts/lib/qa-budget-check.sh` (sourced by `qa-check.sh`) asserts the ACTUAL runtime against the 600 s command ceiling (SPRINT-099 T2), printed as an uncounted `INFO qa-runtime-over-ceiling` by ADR-042's ruling. The remaining cost is the Windows host's gate runtime, which TD-090 and TD-117 already carry (routed to TASK-367).
-  - Summary: **`qa-budget-default` asserts the CONFIGURED budget against the command ceiling, never the
-    ACTUAL runtime** — it prints `PASS qa-budget-default: 520s < 600s command ceiling` while real runs
-    on this host exceed 600 s. A guard that stays green precisely when the thing it guards is failing.
-  - Evidence: the default profile hit the 600 s tool ceiling twice in SPRINT-092 with its verdict line
-    unprinted; the opt-in profile measured **1450 s**. Meanwhile the check passed on every run.
-  - Impact: the same silent-false-negative shape this sprint spent itself on, in the leg that is supposed
-    to *catch* overruns. It also blocks `TD-117`: the loaned 520 s budget cannot be reduced on evidence
-    while no clean whole-gate sample can be taken.
-  - **Cause is NOT known, and one hypothesis is already disproved.** 18 leftover agent worktrees (178 MB)
-    were pruned on the theory that the gate was scanning them (TD-095's shape); the opt-in profile
-    measured **1413 s before and 1450 s after** — no improvement. Recorded so the next investigation does
-    not re-run that experiment.
-  - **Measured again at SPRINT-095's close (2026-09-07), and the sample is STILL not clean.** The
-    opt-in profile was launched for the close and was killed by a **590 s** external cap having
-    printed no verdict the launcher could read. That is consistent with the 1450 s figure above and
-    is one more instance of the row's own claim: this gate cannot be sampled whole on this host, so
-    a close that is supposed to run it cannot verify itself. SPRINT-095 closed saying so rather than
-    implying a green gate.
-  - **Method caveat, recorded because it changes what the run proves:** the launch piped the gate
-    into `tail -40`, which buffers to EOF, so nothing was flushed when the cap fired. The run
-    therefore shows *the cap was hit*, and does **not** establish that the gate printed nothing —
-    CLAUDE.md's edit-safety trap (c) / L-057, committed while verifying a sprint about guards that
-    misreport. A future measurement must run the gate bare and tee it, never through a formatter.
-  - **Re-file fresh if** the runtime overrun turns out to be host-local rather than a property of the
-    gate, which would make this an environment note rather than a guard defect.
-  - **Escalated to `TODO.md` Backlog P2 as `TASK-329`** at the 2026-09-07 `/triage`, by the ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible to every promote that reads the Backlog (L-151) — and **decomposed the same day**, absorbing TD-117 (`TASK-330`, retired) as one mechanism. **Scope note the fix must respect:** `check-qa-budget-default.sh` is CORRECT within its declared scope (configured default < ceiling, which is all its header claims). This row is a **missing reader**, not a broken checker, and widening that script is the wrong fix.
-  - **Re-reviewed at the SPRINT-106 promote (2026-09-23, owner-signed):** `TASK-329` is no longer in the Backlog, so this high row has **no live owner**. Its named gap looks closed: SPRINT-099 T2 added the ACTUAL-runtime reader (`CHANGELOG.md`, "the ACTUAL runtime is asserted against the 600 s command ceiling"), and SPRINT-102 (`ADR-042`) then re-ruled that assertion as an uncounted `INFO`. **Proposed: resolve** against those two commits once someone confirms the reader still fires. Not resolved here, because a re-review is not a verification.
-  - **Re-routed at the SPRINT-109 promote (2026-09-28, owner-signed) → `TASK-357`** (P1): the previous
-    owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
-  - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
-    Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
 
 - **TD-116** severity: minor | status: open | created: Sprint-091
   - Summary: **Every F12 finding sub-line prints its own name twice** -- `- secret-committed:
