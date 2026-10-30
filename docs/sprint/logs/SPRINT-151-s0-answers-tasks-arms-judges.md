@@ -38,3 +38,32 @@ owner asked for that ruling to become the standard, filed as TASK-558 and added 
 and two cited-only files moved to `Cites:`.
 Pre-dispatch preflight by inspection (no script): no cycle; wave 1 paths disjoint (four batch subfolders, the arms folder);
 one overlap found and resolved before the lock: T8 (`evals/ab/`) contains T7 (`evals/ab/arms/`), so T8 now depends on T7 as well.
+
+### 2026-10-30 | scope-change | T1 -- TASK-536 box 3 reworded: task authors read the repo and its answers file, not the spec
+What broke: TASK-536 box 3 said task authors read "repo + spec", while TASK-537..540 say each author's brief holds only the
+repo, its answers file and the category list. Both were frozen, and they contradict for clinic (workdoo has no spec). Impact:
+box 3's author clause now matches 537..540 (for clinic the answers file distils the spec; the spec itself is not given), and
+`BUSINESS-NOTES.md` is named as the answers file's raw-facts part. No Layers change. Re-confirm G2: owner ruling in the G2
+popup below.
+
+### 2026-10-30 | G2 | batch G1 (seven fast-path, TASK-558 full) + G2 signed for T1-T8 (owner popup), `gates_signed: G1,G2 @ d12a4cf6`
+G1: seven `origin: decomposer` members, scope unchanged since intake; TASK-558 (manual) took the full checklist: done when the
+promote procedure lets a dependent join with its open in-sprint blockers; size S; two files plus CHANGELOG; out of scope:
+triage's in-flight rule and any check. Owner rulings: authors get the repo and its answers file only, as sub-agents in
+snapshots outside this repo; a slot still infra-lost after two replacement rounds fails the run and the owner decides; T2 is
+scoped out at close with boxes 1 and 2 and closes at the next promote that pulls a dependent; the owner operates the A1 clinic
+init against the pinned 2.19.1 checkout; graders run without remote services, clinic may use its repo-local Postgres cluster.
+Design settlements (from five builder checks): each answers file splits into raw facts (`BUSINESS-NOTES.md` in every arm)
+and a provenance file (citations, coverage table) that no trial sees; lost-detail facts are absent from the repo's code, docs
+and tests (grep-checked); T2 defines a wave and says "every open blocker", and no gate reads a member's state; batch folders
+fixed as batch-a and batch-b; A0 differs from A1 by the declared doc set and the absent plugin pin, all else asserted equal;
+the arm check is wired into runTrial; T8's analysis choices (token weighting, bootstrap, calibration bar, the k=2 cell limit)
+are parameters with proposed defaults, frozen at TASK-544.
+- builder-check · T1 · 2 contradictions · 4 questions · settled: raw-facts/provenance split; authors' input ruled by owner (scope-change above)
+- builder-check · T2 · 2 contradictions · 5 questions · settled: frontmatter depends-on, wave defined, "open" blockers, no state gate; box 3 carry ruled by owner
+- builder-check · T3 · 2 contradictions · 5 questions · settled (one shared design for T3..T6): folders, brief, repo graders, lost-detail grep; isolation ruled by owner
+- builder-check · T4 · covered by the T3 check (shared design; one fresh reader read all four Done-when lists)
+- builder-check · T5 · covered by the T3 check (shared design)
+- builder-check · T6 · covered by the T3 check (shared design)
+- builder-check · T7 · 2 contradictions · 6 questions · settled: A0 has no plugin by declaration, Arm extended, check wired into runTrial, manifest excludes build files
+- builder-check · T8 · 3 contradictions · 6 questions · settled: R5 wording owner-ruled, validity measured on the first pass, dropped items restored, analysis choices parameterised to TASK-544
