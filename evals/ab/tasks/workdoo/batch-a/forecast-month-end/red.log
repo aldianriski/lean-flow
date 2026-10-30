@@ -1,0 +1,32 @@
+## acceptance (untouched baseline + acceptance files only): node scripts/verify-forecast-month-end.mjs
+  expected: [
+    [ 'LEASE-0', '2026-10-31' ],
+    [ 'LEASE-1', '2026-11-30' ],
+    [ 'LEASE-2', '2026-12-31' ]
+  ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.2
+node:internal/errors:986
+  const err = new Error(message);
+              ^
+
+Error: Command failed: C:\Users\HYPEAM~1\AppData\Local\Temp\claude\D--Project-lean-flow\87928164-5436-4927-ba8e-4effa4c8333b\scratchpad\n24\node_modules\node\bin\node.exe C:\Users\HYPEAM~1\AppData\Local\Temp\workdoo-forecast-month-end-DgUMJl\checks.cjs
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at checkExecSyncError (node:child_process:943:11)
+    at execFileSync (node:child_process:979:15)
+    at file:///D:/Research/ab-author-workdoo-a/scripts/verify-forecast-month-end.mjs:48:3
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 41544,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v24.22.2
+exit=1

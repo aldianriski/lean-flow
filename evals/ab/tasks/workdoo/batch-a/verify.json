@@ -1,0 +1,146 @@
+[
+  {
+    "id": "access-activity-type-filter",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:access:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:openapi",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "forecast-month-end",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:foundation",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "self-onboarding-guard",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:planning:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:access:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "shared-timestamp-format",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:navigation",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:company-workspace",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  }
+]

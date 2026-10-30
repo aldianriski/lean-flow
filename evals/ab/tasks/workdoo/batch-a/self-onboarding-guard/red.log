@@ -1,0 +1,29 @@
+## acceptance (untouched baseline + acceptance files only): node scripts/verify-onboarding-self-intake.mjs
+installed: ?? scripts/verify-onboarding-self-intake.mjs 
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: A joiner cannot be onboarded by their own account (avery@self.example)
++ actual - expected
+
+  [
++   201,
++   undefined
+-   422,
+-   'SELF_ONBOARDING'
+  ]
+
+    at equal (file:///D:/Research/ab-author-workdoo-a/scripts/verify-onboarding-self-intake.mjs:7:53)
+    at file:///D:/Research/ab-author-workdoo-a/scripts/verify-onboarding-self-intake.mjs:36:5
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [ 201, undefined ],
+  expected: [ 422, 'SELF_ONBOARDING' ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.2
+exit=1

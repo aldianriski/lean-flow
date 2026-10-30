@@ -1,0 +1,49 @@
+{
+  "id": "self-onboarding-guard",
+  "category": "business-rule change",
+  "symptoms": [
+    "business-rule"
+  ],
+  "prompt": "Compliance asked for a separation-of-duties rule on onboarding intakes: nobody may be onboarded by themselves. When an intake is created, reject it if the new joiner's email (compare case-insensitively) is the sign-in email of the onboarding owner chosen for the case, or of whoever currently holds the HR, equipment or access responsibility. Reject with HTTP 422 and the error code `SELF_ONBOARDING`, and create nothing. An intake with no email is not affected, and neither is anyone who holds no duty on the case. Retrying an intake that was already accepted must keep working.",
+  "layers": [
+    "server/store.ts"
+  ],
+  "outOfScope": [
+    "Intake validation for joiners who hold no duty",
+    "Replay of an already-accepted intake",
+    "Responsibility configuration and who may change it",
+    "Existing error codes and statuses"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/verify-onboarding-self-intake.mjs"
+    ],
+    "cmd": "node scripts/verify-onboarding-self-intake.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:workspace:api",
+      "cmd": "npm run verify:workspace:api"
+    },
+    {
+      "name": "verify:workspace:planning:api",
+      "cmd": "npm run verify:workspace:planning:api"
+    },
+    {
+      "name": "verify:workspace:access:api",
+      "cmd": "npm run verify:workspace:access:api"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ]
+}

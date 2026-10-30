@@ -1,0 +1,59 @@
+{
+  "id": "shared-timestamp-format",
+  "category": "under-documented area",
+  "symptoms": [
+    "lost-detail",
+    "convention"
+  ],
+  "prompt": "Admins in Jakarta and Singapore read different times for the same event. Four places in the private workspace format event times with the browser's own zone and locale: the Access activity feed, the Factory configuration history, the publication details and the \"Copied at\" line of a copied factory. Add `formatTimestamp(value: string): string` in `src/workspace/formatTimestamp.ts` that returns the product's standard display for a stored timestamp (text that cannot be parsed is shown as received), and use it in those four places so everyone sees the same text. Leave other screens as they are.",
+  "layers": [
+    "src/workspace/formatTimestamp.ts",
+    "src/workspace/PeopleAccess.tsx",
+    "src/workspace/FactoryHistoryView.tsx",
+    "src/workspace/FactoryPublicationActions.tsx",
+    "src/workspace/FactoryWorkspace.tsx"
+  ],
+  "outOfScope": [
+    "Other screens that format dates (delivery pages, pager 'Updated' time, demo company pages)",
+    "Stored timestamp values and API responses",
+    "Any change to server code"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/verify-shared-timestamp-format.mjs"
+    ],
+    "cmd": "node scripts/verify-shared-timestamp-format.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:workspace:navigation",
+      "cmd": "npm run verify:workspace:navigation"
+    },
+    {
+      "name": "verify:company-workspace",
+      "cmd": "npm run verify:company-workspace"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ],
+  "lostDetail": {
+    "fact": "Users see dates and times in UTC, en-GB style (BUSINESS-NOTES.md, Business rules 14), not in the viewer's zone or locale.",
+    "grepTerms": [
+      "en-GB style",
+      "dates and times in UTC",
+      "times in UTC",
+      "users see dates"
+    ],
+    "hitsOutsideNotes": 0
+  }
+}

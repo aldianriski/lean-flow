@@ -1,0 +1,47 @@
+diff --git a/docs/api/openapi.yaml b/docs/api/openapi.yaml
+index bda6750..97ce837 100644
+--- a/docs/api/openapi.yaml
++++ b/docs/api/openapi.yaml
+@@ -2198,6 +2198,14 @@
+               "type": "string",
+               "format": "uuid"
+             }
++          },
++          {
++            "name": "type",
++            "in": "query",
++            "description": "Return only events of this type; an unsupported type is rejected with INVALID_QUERY",
++            "schema": {
++              "type": "string"
++            }
+           }
+         ],
+         "responses": {
+diff --git a/server/access.ts b/server/access.ts
+index bdbda3e..d1c7a33 100644
+--- a/server/access.ts
++++ b/server/access.ts
+@@ -141,17 +141,21 @@ export function listReassignments(db: DatabaseSync, organizationId: string, user
+     total, page: paging.page, pageSize: paging.pageSize, asOf: new Date().toISOString() };
+ }
+ 
++const activityTypes = ['member.updated', 'member.transferred', 'assignment.changed', 'invitation.created', 'invitation.accepted', 'invitation.revoked',
++  'division.created', 'division.updated', 'team.created', 'team.updated', 'division.member_added', 'division.member_removed', 'team.member_added', 'team.member_removed'];
+ export function accessActivity(db: DatabaseSync, organizationId: string, userId: string, query: URLSearchParams): ActivityPage {
+   requireCompanyOwner(companyActor(db, organizationId, userId));
+   const paging = companyPage(query);
+   const membershipId = query.get('membershipId') ?? '';
+   if (membershipId) accessMember(db, organizationId, userId, membershipId);
++  const type = query.get('type') ?? '';
++  if (type && !activityTypes.includes(type)) throw new ApiError(422, 'INVALID_QUERY', 'Select a supported activity type.');
+   const source = `WITH events AS (
+     SELECT id,event_type,created_at,actor_membership_id,actor_name,actor_role,target_membership_id,target_name,summary,case_id FROM organization_access_events WHERE organization_id=?
+     UNION ALL SELECT id,event_type,created_at,actor_membership_id,actor_name,actor_role,target_membership_id,target_name,summary,NULL AS case_id FROM organization_group_events WHERE organization_id=?
+   )`;
+-  const where = 'WHERE (?=\'\' OR target_membership_id=? OR actor_membership_id=?) AND instr(lower(summary),lower(?))>0';
+-  const values = [organizationId, organizationId, membershipId, membershipId, membershipId, paging.search];
++  const where = 'WHERE (?=\'\' OR target_membership_id=? OR actor_membership_id=?) AND (?=\'\' OR event_type=?) AND instr(lower(summary),lower(?))>0';
++  const values = [organizationId, organizationId, membershipId, membershipId, membershipId, type, type, paging.search];
+   const total = (db.prepare(`${source} SELECT count(*) AS total FROM events ${where}`).get(...values) as {total:number}).total;
+   interface EventRow { id:string;event_type:string;created_at:string;actor_membership_id:string;actor_name:string;actor_role:'owner'|'operator';target_membership_id:string|null;target_name:string|null;summary:string;case_id:string|null }
+   const rows = db.prepare(`${source} SELECT * FROM events ${where} ORDER BY created_at DESC,id LIMIT ? OFFSET ?`).all(...values, paging.pageSize, paging.offset) as unknown as EventRow[];

@@ -1,0 +1,41 @@
+{
+  "id": "forecast-month-end",
+  "category": "bug",
+  "symptoms": [
+    "business-rule"
+  ],
+  "prompt": "Finance forecast: recurring monthly items dated on the 31st land in the wrong month. Our office lease is set to renew on 31 Oct; the forecast shows its November payment on 1 Dec instead of 30 Nov. A monthly subscription renewing on the 31st does the same, and when its November bill has already been recorded (due 30 Nov) the forecast still lists the renewal next to that bill. A monthly item should keep its day of the month and, in a shorter month, fall on that month's last day. Only the forecast timing should change.",
+  "layers": [
+    "src/company/model.ts"
+  ],
+  "outOfScope": [
+    "Dates before the 29th",
+    "Annual renewals",
+    "The delayed scenario's 14-day shifts for invoices and milestones",
+    "Forecast week layout and arithmetic"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/verify-forecast-month-end.mjs"
+    ],
+    "cmd": "node scripts/verify-forecast-month-end.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:foundation",
+      "cmd": "npm run verify:foundation"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ]
+}

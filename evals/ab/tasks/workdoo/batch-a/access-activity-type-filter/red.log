@@ -1,0 +1,28 @@
+## acceptance (untouched baseline + acceptance files only): node scripts/verify-access-activity-type.mjs
+installed: ?? scripts/verify-access-activity-type.mjs 
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: An access event type narrows the feed and its total
++ actual - expected
+
+  [
+    200,
++   8
+-   2
+  ]
+
+    at equal (file:///D:/Research/ab-author-workdoo-a/scripts/verify-access-activity-type.mjs:8:53)
+    at file:///D:/Research/ab-author-workdoo-a/scripts/verify-access-activity-type.mjs:46:3
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [ 200, 8 ],
+  expected: [ 200, 2 ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.2
+exit=1

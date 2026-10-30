@@ -1,0 +1,44 @@
+## node scripts/verify-onboarding-self-intake.mjs
+Self-onboarding guard: 16 checks passed.
+exit=0
+## npm run typecheck
+
+> workdoo-factory-design@0.4.4 typecheck
+> tsc --noEmit && tsc -p server/tsconfig.json
+
+exit=0
+## npm run build
+[2mdist/[22m[36massets/DeliveryWorkspace-C-94WQ8i.js          [39m[1m[2m138.57 kB[22m[1m[22m[2m │ gzip:  37.28 kB[22m
+[2mdist/[22m[36massets/react-runtime-wFuQnrTg.js              [39m[1m[2m148.45 kB[22m[1m[22m[2m │ gzip:  48.14 kB[22m
+[2mdist/[22m[36massets/WorkspaceApp-DcHLxntZ.js               [39m[1m[2m236.68 kB[22m[1m[22m[2m │ gzip:  62.84 kB[22m
+[2mdist/[22m[36massets/ViewContext-DkgdjEai.js                [39m[1m[2m261.44 kB[22m[1m[22m[2m │ gzip:  73.88 kB[22m
+[2mdist/[22m[36massets/App-Bs_9AZZM.js                        [39m[1m[33m835.58 kB[39m[22m[2m │ gzip: 216.93 kB[22m
+[2mdist/[22m[36massets/three-DRxSk_Up.js                      [39m[1m[33m862.82 kB[39m[22m[2m │ gzip: 231.95 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 11.35s[39m
+exit=0
+## npm run verify:workspace:api
+
+> workdoo-factory-design@0.4.4 verify:workspace:api
+> node scripts/verify-workspace-api.mjs
+
+Workspace API: 241 checks passed.
+exit=0
+## npm run verify:workspace:planning:api
+
+> workdoo-factory-design@0.4.4 verify:workspace:planning:api
+> node scripts/verify-workspace-planning-api.mjs
+
+Workspace planning API: 258 checks passed.
+exit=0
+## npm run verify:workspace:access:api
+
+> workdoo-factory-design@0.4.4 verify:workspace:access:api
+> node scripts/verify-workspace-access-api.mjs
+
+Private company access API: 136 checks passed.
+exit=0

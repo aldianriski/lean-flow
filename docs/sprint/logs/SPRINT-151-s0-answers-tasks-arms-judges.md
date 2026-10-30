@@ -122,3 +122,10 @@ Two of the author's tasks overlapped batch A and were replaced on the coordinato
 a 2-hour booking lead time, and a clinic-local confirmation time became an appointment lookup. Every final task was re-run by
 the coordinator in a fresh baseline (verify.json, 4 of 4). Owner realism review signed, including the replacement. Committed
 at `ca5769c5`, folder marked `-text`. Self-review: maintainer-only fixtures, no code.
+
+### 2026-10-30 | scope-change | T3 T4 -- workdoo lost-detail facts are partly readable from code; owner accepts it as the workdoo limit
+What broke: TASK-537 and TASK-538 box 5 ask for a lost-detail task whose acceptance depends on a fact found only in
+`BUSINESS-NOTES.md`. Workdoo's docs are thorough, so the authors found no fully absent fact: both chosen tasks rest on one
+statement (date-times shown in UTC, en-GB style) whose wording is notes-only while the behaviour is partly visible in code.
+Impact: box 5 is read for workdoo the way it is for clinic; the Done-when text is not reworded. Re-confirm G2: owner
+ruling by popup (both batches signed, the shared fact accepted, recorded in each batch's notes).

@@ -1,0 +1,46 @@
+{
+  "id": "access-activity-type-filter",
+  "category": "convention-bearing feature",
+  "symptoms": [
+    "convention"
+  ],
+  "prompt": "Owners reading the Access activity history on a busy company can't find anything: membership changes, invitation events and team/division changes are all mixed in one feed. Add a `type` query parameter to `GET /api/workspaces/:workspaceId/access/activity` so the feed can be narrowed to a single event type, for example `?type=invitation.revoked`. The total and paging must describe the narrowed feed, and it must work together with the existing search and member filters. The accepted values are the event types the feed can show; anything else should be rejected the way the API rejects other bad query values. Keep the API reference in step with the change.",
+  "layers": [
+    "server/access.ts",
+    "docs/api/openapi.yaml"
+  ],
+  "outOfScope": [
+    "Behaviour of the feed when no type is given",
+    "Owner-only access and company scoping of the feed",
+    "Response shape and event content",
+    "The browser UI for the feed"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/verify-access-activity-type.mjs"
+    ],
+    "cmd": "node scripts/verify-access-activity-type.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:workspace:access:api",
+      "cmd": "npm run verify:workspace:access:api"
+    },
+    {
+      "name": "verify:openapi",
+      "cmd": "npm run verify:openapi"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ]
+}

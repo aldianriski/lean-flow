@@ -1,0 +1,37 @@
+## node scripts/verify-forecast-month-end.mjs
+Forecast month-end: 6 checks passed.
+exit=0
+## npm run typecheck
+
+> workdoo-factory-design@0.4.4 typecheck
+> tsc --noEmit && tsc -p server/tsconfig.json
+
+exit=0
+## npm run build
+[2mdist/[22m[36massets/DeliveryWorkspace-B-0qrA3r.js          [39m[1m[2m138.57 kB[22m[1m[22m[2m │ gzip:  37.28 kB[22m
+[2mdist/[22m[36massets/react-runtime-wFuQnrTg.js              [39m[1m[2m148.45 kB[22m[1m[22m[2m │ gzip:  48.14 kB[22m
+[2mdist/[22m[36massets/WorkspaceApp-fb2BOYPx.js               [39m[1m[2m236.68 kB[22m[1m[22m[2m │ gzip:  62.84 kB[22m
+[2mdist/[22m[36massets/ViewContext-BlQ08Mp1.js                [39m[1m[2m261.57 kB[22m[1m[22m[2m │ gzip:  73.93 kB[22m
+[2mdist/[22m[36massets/App-OwI9mgqs.js                        [39m[1m[33m835.58 kB[39m[22m[2m │ gzip: 216.92 kB[22m
+[2mdist/[22m[36massets/three-DRxSk_Up.js                      [39m[1m[33m862.82 kB[39m[22m[2m │ gzip: 231.95 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 21.02s[39m
+exit=0
+## npm run verify:foundation
+17 integrated SSR checks: /overview, 1440px environment only. No layout or browser inspection.
+12 integrated SSR checks: /finance, 1280px environment only. No layout or browser inspection.
+13 integrated SSR checks: /finance?area=invoices&record=invoice:INV-041, 390px environment only. No layout or browser inspection.
+13 integrated SSR checks: /resources?area=equipment&record=asset:AST-018, 390px environment only. No layout or browser inspection.
+12 integrated SSR checks: /sales?area=pipeline, 1440px environment only. No layout or browser inspection.
+12 integrated SSR checks: /sales?record=opportunity:OP-041, 1280px environment only. No layout or browser inspection.
+12 integrated SSR checks: /inbox, 1440px environment only. No layout or browser inspection.
+13 integrated SSR checks: /inbox?inboxTab=approvals, 1280px environment only. No layout or browser inspection.
+12 integrated SSR checks: /agents?agentsTab=automations, 1440px environment only. No layout or browser inspection.
+13 integrated SSR checks: /settings?section=company, 390px environment only. No layout or browser inspection.
+13 integrated SSR checks: /projects?projectDetail=portal, 1440px environment only. No layout or browser inspection.
+12 integrated SSR checks: /work?record=account:all, 1440px environment only. No layout or browser inspection.
+exit=0

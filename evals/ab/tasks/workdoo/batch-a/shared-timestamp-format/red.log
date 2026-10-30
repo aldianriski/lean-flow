@@ -1,0 +1,24 @@
+## acceptance (untouched baseline + acceptance files only): node scripts/verify-shared-timestamp-format.mjs
+installed: ?? scripts/verify-shared-timestamp-format.mjs 
+D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:1467
+  let error = new Error(text);
+              ^
+
+Error: Build failed with 1 error:
+format-timestamp.ts:2:30: ERROR: Could not resolve "./src/workspace/formatTimestamp"
+    at failureErrorWithLog (D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:1467:15)
+    at D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:926:25
+    at D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:878:52
+    at buildResponseToResult (D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:924:7)
+    at D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:951:16
+    at responseCallbacks.<computed> (D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:603:9)
+    at handleIncomingPacket (D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:658:12)
+    at Socket.readFromStdout (D:\Research\ab-author-workdoo-a\node_modules\esbuild\lib\main.js:581:7)
+    at Socket.emit (node:events:514:28)
+    at addChunk (node:internal/streams/readable:569:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+
+Node.js v24.22.2
+exit=1

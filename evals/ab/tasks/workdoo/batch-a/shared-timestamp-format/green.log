@@ -1,0 +1,42 @@
+## node scripts/verify-shared-timestamp-format.mjs
+Shared timestamp format: 10 checks passed.
+exit=0
+## npm run typecheck
+
+> workdoo-factory-design@0.4.4 typecheck
+> tsc --noEmit && tsc -p server/tsconfig.json
+
+exit=0
+## npm run build
+[2mdist/[22m[36massets/DeliveryWorkspace-DVvnSmDA.js          [39m[1m[2m138.57 kB[22m[1m[22m[2m │ gzip:  37.28 kB[22m
+[2mdist/[22m[36massets/react-runtime-wFuQnrTg.js              [39m[1m[2m148.45 kB[22m[1m[22m[2m │ gzip:  48.14 kB[22m
+[2mdist/[22m[36massets/WorkspaceApp-BhCmF7Pj.js               [39m[1m[2m236.68 kB[22m[1m[22m[2m │ gzip:  62.88 kB[22m
+[2mdist/[22m[36massets/ViewContext-3edEis7h.js                [39m[1m[2m261.44 kB[22m[1m[22m[2m │ gzip:  73.88 kB[22m
+[2mdist/[22m[36massets/App-pDqlYxwY.js                        [39m[1m[33m835.58 kB[39m[22m[2m │ gzip: 216.92 kB[22m
+[2mdist/[22m[36massets/three-DRxSk_Up.js                      [39m[1m[33m862.82 kB[39m[22m[2m │ gzip: 231.95 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 11.39s[39m
+exit=0
+## npm run verify:workspace:navigation
+
+> workdoo-factory-design@0.4.4 verify:workspace:navigation
+> node scripts/verify-private-workspace-routes.mjs
+
+Private workspace routes: 73 checks passed.
+exit=0
+## npm run verify:company-workspace
+
+> workdoo-factory-design@0.4.4 verify:company-workspace
+> node scripts/verify-workspace-chrome.mjs && node scripts/verify-organization.mjs && node scripts/verify-organization-ui.mjs && node scripts/verify-factory-workspace.mjs && node scripts/verify-custom-factory-monitor.mjs && node scripts/verify-recap-workflows.mjs
+
+26 workspace chrome checks passed (notification projection; not browser verification).
+Organization scope, delegation, invitation, team and deactivation checks pass
+36 organization policy bridge and UI checks pass
+50 factory-workspace checks passed.
+12 custom-factory monitor checks passed.
+Recap workflows: 73 behavior checks passed.
+exit=0
