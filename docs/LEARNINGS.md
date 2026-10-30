@@ -123,6 +123,30 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-268 [tags: process] [status: active]: **A review record written before the review depth is decided becomes a permanent finding in an append-only log.** SPRINT-151 logged `review · T8 · self-review` against a behaviour:material change, meaning to run one review per wave. Two independent Codex rounds followed, each recorded as `scoped-reviewer`, but the review-depth check examines every self-review line on its own and the log cannot drop one. System verify FAILed at close on a review that had in fact happened, and the owner had to rule it. Write the `review · Tn` line only after the depth is decided; until then the `consequence` line is the record.
+- seen: 2026-10-30 (SPRINT-151 close, system verify at `a27eeaed`; owner override, checker fix filed as TASK-559)
+- count: 1
+- promoted: no
+- related: L-261 (prose a guard parses is a structured field) · TASK-559
+
+---
+
+## L-267 [tags: tooling] [status: active]: **A corpus of another repo's files stored as fixtures is picked up by every repo-wide tool of the host: exclude it from each one when it lands.** SPRINT-151 stored 16 A/B tasks, each with its app's acceptance tests, under the eval tree. First the repo typecheck compiled the clinic tests as lean-flow code (7 errors; fixed by an exclude at T5). Then, at close, `bun test` ran three of them as lean-flow tests (3 failures; fixed by a test ignore pattern). Both tools glob the whole tree, and neither was checked when the corpus landed. When a fixture corpus of foreign code lands, list every repo-wide tool that globs (typecheck, test runner, linters, prose and cap checks) and exclude the corpus from each in the same change.
+- seen: 2026-10-30 (SPRINT-151 T5 merge-check typecheck FAIL) · 2026-10-30 (SPRINT-151 close, system verify bun test 3 FAIL)
+- count: 2
+- promoted: no
+- related: L-264 (count across the whole set, not the touched files)
+
+---
+
+## L-266 [tags: edit-safety] [status: active]: **A regex written through an escaping layer can lose its backslash and still look right in review: `\b` became a literal backspace byte.** SPRINT-151 T8's retry classifier had U+0008 bytes where word boundaries were meant, so a terminal `HTTP 503` never matched and would have been scored a task failure. Selftest passed, because no fixture used an HTTP status at a word boundary. Codex found it only by reading the bytes. A later fix written with the edit tool, plus a check that the file holds no control byte, closed it. Write regex and escape-heavy source with the edit tool, not a shell heredoc or an inline interpreter, and give a classifier a fixture for each pattern it claims to match.
+- seen: 2026-10-30 (SPRINT-151 wave review R2, `evals/ab/lib/retry.ts`; fixed in `a0b61b70`, S36)
+- count: 1
+- promoted: no
+- related: memory "seed edits ship as a script file" · L-189
+
+---
+
 ## L-265 [tags: process] [status: active]: **A skill's `argument-hint` is a second copy of its mode table, and it drifts silently: nothing compares the two.** `/lean-doc-generator` documented eight modes and its hint offered four (`init`, `migrate`, `epic` and `prd` missing) for as long as those modes had shipped. A consumer cannot find a mode the prompt does not suggest. The owner found it by typing the command during SPRINT-150, not through any check. A 15-skill audit found one more (humanizer's audit mode). When a change adds or renames a mode, update the hint in the same change; a matcher would compare each hint with its skill's Modes table.
 - seen: 2026-10-30 (SPRINT-150, owner observation during T2's init run; fixed as TASK-557)
 - count: 1

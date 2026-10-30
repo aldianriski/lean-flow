@@ -25,6 +25,7 @@ status: current
 - **Added** — `init` reads code samples per layer and writes two cited sections, Stack (architecture overview) and Conventions in use (coding standards); the requirements template gains Main flows and Invariants and renames Problem → Business goal, Out of scope → Non-goals and Non-functional requirements → Quality attributes (new scaffolds only; existing docs are untouched) (SPRINT-150, TASK-547).
 - **Fixed** — `/lean-doc-generator` now suggests all eight of its modes when typed (it showed four: `init`, `migrate`, `epic` and `prd` were missing), and `/humanizer` names its audit mode (SPRINT-150, TASK-557).
 - **Changed** — `promote` can pull a still-blocked task together with its blockers: when every open blocker joins the same sprint, the dependent joins in a later wave with no state change, and leaves by scope-change if a blocker fails (SPRINT-151, TASK-558).
+- **Added (maintainer-only)** — `evals/ab/`: EPIC-023's S0 corpus and machinery. Answers files for both A/B repos (business facts, operator answers, provenance); 16 tasks authored in isolation, each re-verified red then green, owner-signed realistic; arms A0/A1 frozen per repo by per-file manifests that the measured-run preflight enforces; blind per-dimension judges with file context, retry and validity rules, and the analysis (primary, symptoms, bootstrap, R-b, A0 floor), calibrated live at 85.5% on judged rows. Run by hand, never part of the gate; nothing ships to consumers (SPRINT-151, TASK-536..541, 543).
 
 ## v2.19.1 — three guards report only what they saw (2026-10-28)
 

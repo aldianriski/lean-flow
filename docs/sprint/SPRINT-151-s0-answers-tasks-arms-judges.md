@@ -164,8 +164,54 @@ Wave 2. Tier G (maintainer-only). Calibrated on reference and deliberately wrong
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/answers/` | T1 | facts, operator and provenance files per repo, and the access protocol; owner interview and setup decisions | Low | facts files grep-clean of tool and stack terms |
+| `skills/lean-doc-generator/references/sprint-by-reference.md` · `skills/lean-doc-generator/SKILL.md` · `CHANGELOG.md` | T2 | promote may pull a dependent with its in-sprint blockers, wave-ordered | Med | Codex R1 CLEAR; scoped out with boxes 1-2 |
+| `evals/ab/tasks/` (clinic and workdoo, batch-a and batch-b) | T3..T6 · T8 | 16 tasks with acceptance tests, reference and deliberately wrong solutions, briefs, notes, verify records | Low | coordinator re-verified 16 of 16 red then green; all 16 wrong patches apply |
+| `evals/ab/arms/` | T7 | shared inventory, four frozen arms, declared lean-flow sets, setup launcher config | Med | selftest S16-S19, S35; owner-operated A1 init |
+| `evals/ab/lib/` · `evals/ab/run-trial.ts` · `evals/ab/selftest.ts` · `evals/ab/setup-a1.ts` · `evals/ab/analyze.ts` · `evals/ab/judges/` | T7 · T8 | freeze preflight, judges with file context, retry and validity rules, analysis, calibration (three live runs kept) | High | selftest 40 of 40; two Codex rounds; calibration 85.5% on judged rows |
+| `tsconfig.json` · `bunfig.toml` | T5 · close | the task corpus is excluded from the repo typecheck and from `bun test` | Low | tsc clean; bun test 589 of 589 |
+| `docs/work/backlog/` (TASK-536, 544, 552, 559) | coordinator | TASK-536 widened and set ready; open lines on TASK-552 and TASK-544; TASK-559 filed | Low | merge-check 5 of 5 |
+| `docs/LEARNINGS.md` · `docs/knowledge-index.md` | close | L-266..L-268 filed; index regenerated | Low | — |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 7 of 8 members delivered (TASK-536, 537, 538, 539, 540, 541, 543); TASK-558 scoped out with 2 of 3 boxes, its
+third met at the next promote. EPIC-023's S0 now has everything its pre-registration needs except the freeze itself:
+answers files, 16 independently verified tasks owner-signed realistic, four frozen arms, and blind judges calibrated at
+85.5% on judged rows. Promote can pull a dependent with its in-sprint blockers. System verify on the VPS: qa-check 340/1
+(review-depth, owner override recorded) and bun test 589/3 at `a27eeaed`, the three test failures fixed in `bb7c91fd`
+(local bun test 589/0).
+
+**Retrieval check** — three misses of rules on record. (1) Corpus fixtures were picked up by the repo-wide typecheck and
+then by `bun test`; nobody listed the host's globbing tools when the corpus landed (L-267, count 2). (2) A self-review
+record was written before the review depth was decided, and it became a permanent FAIL (L-268). (3) A builder's ``
+reached the file as a backspace byte, the escaping trap the memory already names (L-266).
+
+**Cost** — coordinator plus sub-agents: five G2 builder checks about 290k tokens; two answers drafters and a restructurer
+about 330k; four task authors about 760k; the arms builder about 360k; the judges builder about 300k; the wrong-solution
+author about 95k; four Codex passes about 65k. About 2.2M sub-agent tokens. Three live calibration runs (about 290 judge
+calls) and one setup session on Opus, all on the subscription. One owner-operated init, two owner pushes, one disk cleanup.
+
+**Worked**
+- Waves let one sprint hold eight tasks instead of one: four authors and the arms builder ran in parallel, each in its own
+  folder, and T8 started early by scope-change once its only overlap was settled.
+- Re-running every author's red/green in a fresh baseline caught nothing wrong in the tasks, and it did catch a bug in the
+  verifier itself (the drive letter read as a remote host) before it could pass as a clean run.
+- The independent wave review found six measurement defects the fixtures could not; R2 found two more, fixed by owner ruling.
+
+**Friction**
+- C: filled mid-sprint and stopped three agents and a review at once; tool caches now go to D: per command.
+- A builder waited on a "commit landed" signal that never reached it, so it sat idle until the owner asked what was
+  running. A wait needs an explicit wake-up.
+- The init operator answered several popups by choice rather than from the sheet; those answers were adopted as decisions,
+  which kept A1 and A2 fair but cost a round.
+
+**Pattern candidate**
+- L-267 (count 2, due at the next promote): a fixture corpus of foreign code is excluded from every repo-wide tool when it lands.
+- L-266, L-268 (count 1).
+
+**Buckets routed** — Shipped: the CHANGELOG [Unreleased] lines for T2 and the S0 machinery (maintainer-only). Tech debt:
+none new. Follow-ups: TASK-559 (review-depth: a later independent review supersedes an earlier self-review, `origin:
+close-retro`). Learnings: L-266, L-267, L-268.
