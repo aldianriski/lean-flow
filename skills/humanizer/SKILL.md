@@ -1,7 +1,7 @@
 ---
 name: humanizer
 description: Use when prose reads like AI wrote it and needs rewriting so it reads human, without changing what it says. Triggers - "humanize", "remove AI slop", "de-AI this", "make this sound less like AI", "rapikan tulisan", "audit for AI tells", "list the AI tells first". Works on pasted text or a named prose file. Not for code, data, config or new content; it edits existing prose only.
-argument-hint: "[pasted text | path to a prose file]"
+argument-hint: "[pasted text | path to a prose file | audit <text or path>]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 user-invocable: true
 version: "0.1.0"

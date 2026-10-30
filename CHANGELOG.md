@@ -23,6 +23,7 @@ status: current
 - **Fixed (maintainer-only)** — `scripts/gate-remote.ts` and `judgeOutput()` read the LAST `QA-CHECK` verdict line, `gate-remote` exits through a closed set (0 pass, 1 gate failed, 2 refused, 5 transport) with the remote rc printed, and a dirty working tree prints a one-line warning that HEAD is what is gated (TD-268, TASK-532).
 - **Added** — a review of a draft before the owner approves it (a `/task-decomposer` breakdown before `approve`, an epic or other proposal before activation) now runs in a fixed rhythm: self-check first, the owner's forks asked before round 1, the altitude stated in the brief, at most two rounds with round 2 blocking only on an outcome-changing high, and every other finding carried to the later gate as a note. It lives in the orchestrator's `review-scoping.md` § Draft reviews; both skills point there (SPRINT-149, TASK-546).
 - **Added** — `init` reads code samples per layer and writes two cited sections, Stack (architecture overview) and Conventions in use (coding standards); the requirements template gains Main flows and Invariants and renames Problem → Business goal, Out of scope → Non-goals and Non-functional requirements → Quality attributes (new scaffolds only; existing docs are untouched) (SPRINT-150, TASK-547).
+- **Fixed** — `/lean-doc-generator` now suggests all eight of its modes when typed (it showed four: `init`, `migrate`, `epic` and `prd` were missing), and `/humanizer` names its audit mode (SPRINT-150, TASK-557).
 
 ## v2.19.1 — three guards report only what they saw (2026-10-28)
 

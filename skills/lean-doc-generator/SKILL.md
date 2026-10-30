@@ -1,7 +1,7 @@
 ---
 name: lean-doc-generator
 description: Use when creating, updating, or reviewing technical documentation, ADRs, sprint files, or AI-context files; running the sprint lifecycle (promote / execute / close); or **migrating existing docs** (dev-flow / adlc-flow / any layout) into the lean-flow standard. Follows the LEAN DOCUMENTATION STANDARD — WHY and WHERE only, never HOW. Bundles its own templates and cites the versioned standard at `spec/STANDARD.md`, so generated docs match a canonical format. Do not use to document HOW something works; redirect to code comments instead.
-argument-hint: "[ | type subject | promote | close]"
+argument-hint: "[ | <type> <subject> | promote | close | epic \"<outcome>\" | prd | migrate | init]"
 allowed-tools: Read, Write, Edit, Bash(git *), Glob, Grep
 user-invocable: true
 version: "0.4.0"
