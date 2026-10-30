@@ -418,17 +418,6 @@ status: current
   - Impact: low. The check fails loud and a workaround exists, but the message sends the reader to a fix that does not work.
   - Mitigation (hypothesis, re-derive first): apply the same single-basename rule to `Cites:` tokens, keeping the ambiguity case. A defect fix of an existing checker, unfrozen under ADR-053.
 
-- **TD-279** severity: medium | status: resolved → TASK-531 (filed Sprint-146, resolved SPRINT-148) | created: Sprint-146 (close retro, measured)
-  - Summary: **The off-host system verify never runs `bun test`, the second stage of the declared gate.** `scripts/gate-remote.ts`
-    runs `QA_FULL=1 sh scripts/qa-check.sh` and judges that alone; `qa-check.sh` has no `bun test` leg, while `package.json`'s
-    `test` (ADR-033 rung 1) chains `&& bun test`. A close verified off-host therefore says nothing about the TypeScript suite.
-  - Evidence: SPRINT-146's system verify on `c01a64f5` printed `QA-CHECK: 314 pass, 0 fail` with no `bun test` stage. The
-    563-test suite ran only through a manual `bun run test` over ssh at `834e237d`, which T3's real-artifact box asked for.
-  - Impact: TD-155's class one level up: a coverage gap that prints nothing. Any close that trusts the gate-remote verdict
-    alone skips every TypeScript test.
-  - Mitigation (hypothesis, re-derive first): have `gate-remote.ts` run the declared gate command (or `bun test` after
-    `qa-check.sh` in the same checkout) and judge both. A change to an existing tool, so a defect fix under ADR-053.
-
 - **TD-277** severity: low | status: open | created: Sprint-143 (T3 Codex R1, out of scope)
   - Summary: **`product-requirements.md.template`'s header comment names lean-flow's `ADR-012`.** The comment is copied into
     every adopter's `docs/product/requirements.md`, where `ADR-012` points at nothing.
@@ -504,15 +493,6 @@ status: current
     --strict`) goes unnoticed. (2) If a gate block loses its column-0 `fi`, the block reader runs past the real block; the
     `toBeGreaterThan` guards do not catch it.
   - Fix direction: assert the invocation as a whole trimmed line (allowing the trailing `2>&1`); fail when a block has no closing `fi`.
-
-- **TD-268** severity: trivial | status: resolved → TASK-532 (filed Sprint-138, resolved SPRINT-148) | created: Sprint-138 (T1 scoped review round 2, review-cap routed)
-  - Summary: **`scripts/gate-remote.ts` has three nits the capped review routed here, not to a third round.** (1) The verdict
-    is read from the FIRST `QA-CHECK:` line (`judgeOutput` and the FAIL listing both take the first match). A nested harness
-    printing a line-anchored `QA-CHECK:` earlier could mask the real one. Harmless at rc 0, but the last match is safer.
-    (2) A remote rc of 2 or 5 prints the same exit as the command's own refusal (2) and transport failure (5). The printed
-    message names the case, but the exit code alone cannot. (3) It gates HEAD, not the working tree, and does not warn on a
-    dirty tree (it prints `ran <sha>`).
-  - Fix direction: last verdict match; document or offset the local exit codes; a dirty-tree warning line. Other G.
 
 - **TD-267** severity: low | status: open | created: Sprint-137 (T1 tick, layers-completeness leg)
   - Summary: **`check-layers-completeness.ts` reads a task id inside a hyphenated token as a task reference.** Its Depends-on
