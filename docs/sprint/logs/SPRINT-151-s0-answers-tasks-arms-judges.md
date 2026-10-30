@@ -86,3 +86,11 @@ operator-only, so the convention-adherence gap S1 targets stays measurable), and
 agent restructured each repo into facts, operator and provenance files plus the protocol; the coordinator re-checked the facts
 files for tool, process and stack terms and trimmed one stack word. Committed at `f81e0214`. Self-review: maintainer-only
 data, no code. Wave 1 is released.
+
+### 2026-10-30 | scope-change | T7 -- the harness files the signed design named join T7's `Layers:`
+What broke: T7's G2 design wires the arm check into the trial runner and adds fixtures and a launcher, but promote declared
+only `evals/ab/arms/`; merge-check's layers-observed FAILed on T7's commits. Impact: T7's Plan line gains
+`evals/ab/lib/arm.ts`, `evals/ab/lib/freeze.ts`, `evals/ab/lib/setup.ts`, `evals/ab/lib/snapshot.ts`, `evals/ab/lib/trial.ts`,
+`evals/ab/run-trial.ts`, `evals/ab/selftest.ts`, `evals/ab/setup-a1.ts` and `evals/ab/fixtures/arm-freeze/`. T8 also declares
+the whole harness folder but depends on T7, so T7 owns these first; no wave-1 author writes this repo. Re-confirm G2: not needed, the files
+are the ones the signed design named.

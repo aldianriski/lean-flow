@@ -111,7 +111,8 @@ Wave 1.
 **Acceptance:** four more clinic tasks, same bar, realism review signed.
 
 ### T7 — Construct and freeze A/B arms A0 and A1 for both repos `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `evals/ab/arms/`
+Layers: `evals/ab/arms/` · `evals/ab/lib/arm.ts` · `evals/ab/lib/freeze.ts` · `evals/ab/lib/setup.ts` · `evals/ab/lib/snapshot.ts`
+  · `evals/ab/lib/trial.ts` · `evals/ab/run-trial.ts` · `evals/ab/selftest.ts` · `evals/ab/setup-a1.ts` · `evals/ab/fixtures/arm-freeze/`
   · `docs/work/todo/TASK-541-construct-and-freeze-ab-arms-a0-a1.md`
   · `docs/work/in_progress/TASK-541-construct-and-freeze-ab-arms-a0-a1.md`
   · `docs/work/done/TASK-541-construct-and-freeze-ab-arms-a0-a1.md`
