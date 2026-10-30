@@ -163,3 +163,11 @@ snapshot passes. Short arm ids slip the blindness filter. A missing-usage phase 
 prose cause a retry. The expected slots come from the data itself. The primary endpoint used the post-replacement results.
 One bounded retry was sent to the T8 builder: all six fixes, each with its own must-FAIL fixture. T6 follows the signed
 brief, so the primary endpoint counts the first pass. R2 is the last round and blocks only on an outcome-changing High.
+
+### 2026-10-30 | progress | T8 -- first live calibration: 48 of 64 expected verdicts (75%), below the 80% bar; judges get file context
+The coordinator wrote one deliberately wrong solution per task (16, each a single-dimension break). All 16 apply to a fresh
+baseline. The owner ruled that their read is the construction: references pass every dimension, and a wrong solution fails
+its named dimension. The live run (96 judge calls) matched 48 of 64 expected verdicts. Fifteen of the sixteen misses were
+UNKNOWN, and the judges' own reasons name the cause: a diff alone cannot show whether a change follows the repo's
+conventions. Owner ruling: judges also see the post-change content of the touched files, capped, with lean-flow docs
+excluded for blindness; the prompts are re-hashed and calibration re-runs live. Run 1 is kept as calibration-run1.md.
