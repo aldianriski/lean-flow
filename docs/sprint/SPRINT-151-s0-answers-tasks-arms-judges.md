@@ -28,7 +28,6 @@ TASK-367, 402, 498 (blocked) · TASK-507, 523 (`needs-info`) · TASK-557's guard
 ## Members
 
 - docs/work/todo/TASK-536-prepare-ab-answers-files-and-access-protocol.md
-- docs/work/todo/TASK-558-let-promote-pull-a-dependent-with-its-in-sprint-blockers.md
 - docs/work/todo/TASK-537-author-workdoo-ab-task-batch-a.md
 - docs/work/todo/TASK-538-author-workdoo-ab-task-batch-b.md
 - docs/work/todo/TASK-539-author-clinic-ab-task-batch-a.md

@@ -207,3 +207,9 @@ three workdoo tasks failed with an API error during a transient authentication d
 arms builder; the login worked again right after. Owner ruling: accept 85.5% and close box 2. The judged disagreements
 (three where the construction may be wrong, three cut off by the 400-line cap, one missed lost-detail fact) and the three
 unjudged tasks go to TASK-544 as open lines, since it freezes the prompts and the bar.
+
+### 2026-10-30 | scope-change | T2 -- TASK-558 leaves the sprint with boxes 1-2 ticked; box 3 is met at the next promote
+What broke: TASK-558 box 3 (the next real promote that pulls a dependent uses the rule) can only be met at a later promote.
+Impact: per the owner's G2 ruling, TASK-558 is scoped out at this close with boxes 1 and 2 ticked; its `sprint:` stamp and its
+Members line are removed, and it returns to the backlog to join the next sprint, whose promote meets box 3. Re-confirm
+G2: owner ruling at G2 (carry to the next promote).
