@@ -35,6 +35,8 @@ the core templates in lean-doc-generator
 - A removed section's content in an adopter's existing docs is left alone: `migrate` never deletes (TASK-553).
 - **open:** the CONTEXT.md template keeps its own Stack list (manifest-style) and a Patterns in Use section, which now overlap
   the profile's Stack and Conventions in use (SPRINT-150 T2, Codex R1 T4): rule which one holds each fact and point the other at it.
+- **open:** 15 templates carry an HTML comment citing lean-flow's own ADR-012 ("Lives at … (STANDARD §2, ADR-012)"), and
+  `init` copies it into every consumer doc, where the id resolves to nothing (SPRINT-150 T2 box-3 run): strip or generalise it.
 
 ## Tracker
 EPIC-023 Closed-when S1 · research §4 R1, R4, §9 · S1 intake (2026-10-30)
