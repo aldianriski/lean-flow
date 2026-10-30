@@ -4,6 +4,7 @@ import path from "node:path";
 import { modelInventory, type Arm } from "./arm.ts";
 import { grade, type Grade, type Task } from "./grade.ts";
 import { isolationEnv, makeIsolation, type Isolation } from "./isolate.ts";
+import { checkArmSnapshot } from "./freeze.ts";
 import { checkInitPlugins, verifyPin } from "./pin.ts";
 import { parseStream, totalsOf, type Stream, type Totals } from "./parse.ts";
 import { appendRow, type Row } from "./record.ts";
@@ -14,6 +15,12 @@ import fs from "node:fs";
 export class PinRefused extends Error {
   constructor(public reasons: string[]) {
     super(`plugin pin refused before spawn: ${reasons.join("; ")}`);
+  }
+}
+
+export class ArmRefused extends Error {
+  constructor(public reasons: string[]) {
+    super(`arm refused before spawn: ${reasons.join("; ")}`);
   }
 }
 
@@ -63,6 +70,9 @@ export function pinsOf(arm: Arm, iso: Isolation, totals: Totals | null, streams:
 }
 
 export async function runTrial(o: TrialOpts): Promise<TrialResult> {
+  const drift = checkArmSnapshot(o.arm);
+  if (o.arm.snapshot && path.resolve(o.srcRepo).toLowerCase() !== path.resolve(o.arm.snapshot).toLowerCase()) drift.push(`srcRepo ${o.srcRepo} is not the arm's snapshot ${o.arm.snapshot}`);
+  if (drift.length > 0) throw new ArmRefused(drift);
   if (o.arm.plugin) {
     const reasons = verifyPin(o.arm.plugin);
     if (reasons.length > 0) throw new PinRefused(reasons);

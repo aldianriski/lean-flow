@@ -542,6 +542,111 @@ check("P6 protocol: run-trial.ts --protocol d9 on the smoke repo -> a row with t
   console.log(`     P6 row fields: exit=${exit} passed=${passed} graders=${graders} g2=${g2} park=${park}`);
 }, true);
 
+// S16 -- arm freeze (TASK-541): a snapshot differing from its manifest is refused, naming the path; the unchanged control runs.
+const FREEZE = path.join(AB, "fixtures", "arm-freeze");
+const frozenArm = async (snapshot: string) => ({ ...(await import("./lib/arm.ts")).loadArm(ARM_FILE), id: "freeze-fx", snapshot, manifest: "evals/ab/fixtures/arm-freeze/manifest.json" });
+async function snapCopy(): Promise<string> {
+  const dir = path.join(tmpdir("frz"), "snap");
+  (await import("./lib/snapshot.ts")).copyTree(path.join(FREEZE, "snap"), dir);
+  return dir;
+}
+check("S16 freeze: edited byte / missing file / extra file -> refused naming the path; unchanged and excluded-only control -> passes", async () => {
+  const { checkArmSnapshot } = await import("./lib/freeze.ts");
+  const refusal = async (mutate: (d: string) => void) => {
+    const d = await snapCopy();
+    mutate(d);
+    return checkArmSnapshot(await frozenArm(d));
+  };
+  const control = await snapCopy();
+  assert(checkArmSnapshot(await frozenArm(control)).length === 0, "unchanged snapshot must pass");
+  fs.mkdirSync(path.join(control, "node_modules", "x"), { recursive: true }); // excluded names must not count as extra
+  fs.writeFileSync(path.join(control, "node_modules", "x", "i.js"), "x");
+  fs.writeFileSync(path.join(control, ".env.local"), "SECRET=1");
+  fs.mkdirSync(path.join(control, "dist"));
+  fs.writeFileSync(path.join(control, "dist", "o.js"), "x");
+  assert(checkArmSnapshot(await frozenArm(control)).length === 0, "excluded node_modules / .env* / dist must not change the verdict");
+
+  const edited = await refusal((d) => fs.appendFileSync(path.join(d, "src", "a.ts"), " "));
+  assert(edited.join() === "edited src/a.ts", `edited byte must be refused as 'edited src/a.ts', got ${edited}`);
+  const missing = await refusal((d) => fs.rmSync(path.join(d, "docs", "notes.md")));
+  assert(missing.join() === "missing docs/notes.md", `missing file must be refused as 'missing docs/notes.md', got ${missing}`);
+  const extra = await refusal((d) => fs.writeFileSync(path.join(d, "docs", "extra.md"), "x"));
+  assert(extra.join() === "extra docs/extra.md", `extra file must be refused as 'extra docs/extra.md', got ${extra}`);
+  const unfrozen = checkArmSnapshot({ id: "u", snapshot: control });
+  assert(unfrozen.length === 1 && unfrozen[0]!.includes("not frozen"), `a snapshot arm with no manifest must be refused, got ${unfrozen}`);
+  assert(checkArmSnapshot({ id: "smoke" }).length === 0, "an arm with no snapshot is unaffected");
+});
+
+check("S16b trial: runTrial refuses a drifted snapshot arm BEFORE any spawn; the unchanged one runs; smoke arms (no snapshot) unaffected", async () => {
+  const { ArmRefused } = await import("./lib/trial.ts");
+  const drifted = await snapCopy();
+  fs.appendFileSync(path.join(drifted, "README.md"), "drift");
+  const refused = replay();
+  let err: unknown;
+  await trialWith(refused, { arm: await frozenArm(drifted), src: drifted }).catch((e) => (err = e));
+  assert(err instanceof ArmRefused && refused.calls.n === 0 && /edited README/.test(String(err)), `drifted arm must throw ArmRefused naming the file with no spawn (spawns ${refused.calls.n}, err ${err})`);
+  const clean = await snapCopy();
+  const control = replay();
+  await trialWith(control, { arm: await frozenArm(clean), src: clean });
+  assert(control.calls.n === 1, `unchanged snapshot must run (spawns ${control.calls.n})`);
+  const wrongSrc = replay();
+  let err2: unknown;
+  await trialWith(wrongSrc, { arm: await frozenArm(clean) }).catch((e) => (err2 = e));
+  assert(err2 instanceof ArmRefused && wrongSrc.calls.n === 0, `srcRepo other than the arm snapshot must be refused (${err2})`);
+  assert((await trialWith(replay())).res.exit === "ok", "a smoke arm with no snapshot must still run");
+});
+
+check("S17 arms: A0 and A1 configs differ only in id / snapshot / manifest / plugin and share the one inventory; configs validate", async () => {
+  const { loadArm } = await import("./lib/arm.ts");
+  const dir = path.join(AB, "arms");
+  const inv = Object.keys(JSON.parse(fs.readFileSync(path.join(dir, "inventory.json"), "utf8")));
+  for (const repo of ["workdoo", "clinic"]) {
+    const raw = (n: string) => JSON.parse(fs.readFileSync(path.join(dir, `${repo}-${n}.json`), "utf8")) as Record<string, unknown>;
+    for (const n of ["a0", "a1"]) assert(inv.every((k) => !(k in raw(n))), `${repo}-${n}.json must not restate the shared inventory`);
+    const a0 = loadArm(path.join(dir, `${repo}-a0.json`)) as Record<string, unknown>;
+    const a1 = loadArm(path.join(dir, `${repo}-a1.json`)) as Record<string, unknown>;
+    const differing = [...new Set([...Object.keys(a0), ...Object.keys(a1)])].filter((k) => JSON.stringify(a0[k]) !== JSON.stringify(a1[k])).sort();
+    assert(differing.every((k) => ["id", "snapshot", "manifest", "plugin"].includes(k)), `${repo}: A0/A1 differ in ${differing}`);
+    assert(a0.plugin === undefined && a1.plugin !== undefined, `${repo}: A0 carries no plugin, A1 does`);
+  }
+  const bad = (cfg: object) => {
+    const f = path.join(tmpdir("arm"), "x.json");
+    fs.writeFileSync(f, JSON.stringify(cfg));
+    try {
+      loadArm(f);
+      return "";
+    } catch (e) {
+      return String(e);
+    }
+  };
+  const ok = { id: "x", sessionModel: "claude-haiku-5-5", dispatch: {}, effort: "low", permissionMode: "acceptEdits", auth: "subscription" };
+  assert(/absolute/.test(bad({ ...ok, snapshot: "rel/dir" })), "relative snapshot must be refused");
+  assert(/needs a snapshot/.test(bad({ ...ok, manifest: "m.json" })), "manifest without snapshot must be refused");
+  assert(bad({ ...ok, snapshot: path.resolve("/x"), manifest: "evals/m.json" }) === "", "valid snapshot + manifest must load");
+});
+
+// S18 -- the committed workdoo arms: A1 and A0 snapshots match their frozen manifests, and A0 = A1 minus exactly the declared set.
+check("S18 workdoo: both snapshots match their manifests; A1 minus A0 == the declared lean-flow doc set exactly", async () => {
+  const { loadArm } = await import("./lib/arm.ts");
+  const { checkArmSnapshot } = await import("./lib/freeze.ts");
+  const { diffManifest } = await import("./lib/snapshot.ts");
+  const dir = path.join(AB, "arms");
+  for (const n of ["a0", "a1"]) {
+    const arm = loadArm(path.join(dir, `workdoo-${n}.json`));
+    if (!fs.existsSync(arm.snapshot!)) {
+      console.log(`     skipped ${n}: snapshot ${arm.snapshot} absent on this host`);
+      continue;
+    }
+    const r = checkArmSnapshot(arm);
+    assert(r.length === 0, `workdoo-${n} snapshot differs from its manifest: ${r.slice(0, 5)}`);
+  }
+  const m = (n: string) => JSON.parse(fs.readFileSync(path.join(dir, `workdoo-${n}.manifest.json`), "utf8")) as Record<string, string>;
+  const set = fs.readFileSync(path.join(dir, "workdoo-lf-docs.txt"), "utf8").split("\n").filter(Boolean);
+  const diff = diffManifest(m("a1"), m("a0")).sort();
+  assert(JSON.stringify(diff) === JSON.stringify(set.map((f) => `removed ${f}`).sort()), `A0 must be A1 minus exactly the set (diff ${diff.length}, set ${set.length})`);
+  assert(m("a1")["BUSINESS-NOTES.md"] === m("a0")["BUSINESS-NOTES.md"] && m("a0")["BUSINESS-NOTES.md"] !== undefined, "both arms carry the same BUSINESS-NOTES.md");
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it

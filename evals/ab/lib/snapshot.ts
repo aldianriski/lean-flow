@@ -9,7 +9,7 @@ export function copyTree(src: string, dest: string): void {
 }
 
 /** Git blob id of a file's bytes -- the same value `git hash-object <file>` prints. */
-function blobId(file: string): string {
+export function blobId(file: string): string {
   const body = fs.readFileSync(file);
   return createHash("sha1").update(`blob ${body.length}\0`).update(body).digest("hex");
 }

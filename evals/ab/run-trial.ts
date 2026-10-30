@@ -10,7 +10,7 @@ import { loadTask } from "./lib/grade.ts";
 import { computePin } from "./lib/pin.ts";
 import { DEFAULT_LOG } from "./lib/record.ts";
 import { runProtocolTrial } from "./lib/protocol.ts";
-import { PinRefused, runTrial } from "./lib/trial.ts";
+import { ArmRefused, PinRefused, runTrial } from "./lib/trial.ts";
 
 const argv = process.argv.slice(2);
 const flag = (name: string): string | undefined => {
@@ -46,6 +46,6 @@ try {
   if (r.exit === "usage-missing") console.error("STOP: the CLI reported no usage. A usage-missing row was logged; this needs an owner ruling.");
   process.exit(r.valid ? 0 : 1);
 } catch (e) {
-  console.error(e instanceof PinRefused ? `REFUSED: ${e.message}` : `ERROR: ${(e as Error).message}`);
-  process.exit(e instanceof PinRefused ? 2 : 1);
+  console.error(e instanceof PinRefused || e instanceof ArmRefused ? `REFUSED: ${e.message}` : `ERROR: ${(e as Error).message}`);
+  process.exit(e instanceof PinRefused || e instanceof ArmRefused ? 2 : 1);
 }
