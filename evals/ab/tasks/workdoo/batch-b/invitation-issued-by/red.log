@@ -1,0 +1,18 @@
+=== node scripts/accept-invitation-issued-by.mjs
+
+    at equal (file:///D:/Research/ab-author-workdoo-b/scripts/accept-invitation-issued-by.mjs:14:53)
+    at file:///D:/Research/ab-author-workdoo-b/scripts/accept-invitation-issued-by.mjs:25:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 'Olivia Owner',
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.2
+RESULT FAIL(1): node scripts/accept-invitation-issued-by.mjs
+OVERALL FAIL

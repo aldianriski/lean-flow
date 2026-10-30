@@ -1,0 +1,60 @@
+=== node scripts/accept-shared-auth-failure.mjs
+shared-auth-failure acceptance: 27 checks passed
+RESULT PASS: node scripts/accept-shared-auth-failure.mjs
+=== npm run typecheck
+
+> workdoo-factory-design@0.4.4 typecheck
+> tsc --noEmit && tsc -p server/tsconfig.json
+RESULT PASS: npm run typecheck
+=== npm run build
+[2mdist/[22m[36massets/CompanySimulation-DxwsFlSb.js          [39m[1m[2m 38.91 kB[22m[1m[22m[2m │ gzip:  10.33 kB[22m
+[2mdist/[22m[36massets/AccountMenu-B0wSPpfS.js                [39m[1m[2m 51.24 kB[22m[1m[22m[2m │ gzip:  13.78 kB[22m
+[2mdist/[22m[36massets/FactoryScene-CjlIPOH6.js               [39m[1m[2m 76.29 kB[22m[1m[22m[2m │ gzip:  24.10 kB[22m
+[2mdist/[22m[36massets/DeliveryWorkspace-C-94WQ8i.js          [39m[1m[2m138.57 kB[22m[1m[22m[2m │ gzip:  37.28 kB[22m
+[2mdist/[22m[36massets/react-runtime-wFuQnrTg.js              [39m[1m[2m148.45 kB[22m[1m[22m[2m │ gzip:  48.14 kB[22m
+[2mdist/[22m[36massets/WorkspaceApp-DcHLxntZ.js               [39m[1m[2m236.68 kB[22m[1m[22m[2m │ gzip:  62.84 kB[22m
+[2mdist/[22m[36massets/ViewContext-DkgdjEai.js                [39m[1m[2m261.44 kB[22m[1m[22m[2m │ gzip:  73.88 kB[22m
+[2mdist/[22m[36massets/App-Bs_9AZZM.js                        [39m[1m[33m835.58 kB[39m[22m[2m │ gzip: 216.93 kB[22m
+[2mdist/[22m[36massets/three-DRxSk_Up.js                      [39m[1m[33m862.82 kB[39m[22m[2m │ gzip: 231.95 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 28.17s[39m
+RESULT PASS: npm run build
+=== npm run verify:real-delivery:agents
+✔ shutdown waits for confirmed provider stop and records interruption (75.2544ms)
+✔ unconfirmed provider stop holds the durable host slot and blocks future kicks (87.3254ms)
+✔ two worker instances cannot dispatch the same durable queued claim twice (94.9638ms)
+✔ unchecked authentication and a running native readiness probe leave durable requests queued (91.2665ms)
+✔ worker heartbeats renew current claims and abort when the exact host grant is revoked (86.6481ms)
+✔ a failed durable claim starts no provider and remains retryable after database recovery (87.1754ms)
+✔ a failed heartbeat requests provider stop without escaping the timer or releasing its claim (86.756ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 930.7892
+RESULT PASS: npm run verify:real-delivery:agents
+=== npm run verify:workspace:agent
+✔ combined stdout and stderr are capped and terminate the single process (3.4625ms)
+✔ a 120 second deadline kills the process once and reports timeout (2.6595ms)
+✔ close cancels every active call and blocks new calls (2.7731ms)
+✔ spawn exceptions and asynchronous spawn failures stay sanitized (3.4248ms)
+✔ a broken output stream terminates safely instead of leaking a raw process error (1.9044ms)
+✔ UTF-8 output survives split chunks and reported cached input is included in usage (1.6662ms)
+✔ a malformed error marker cannot turn a failed envelope into a proposal (1.3866ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 54.0737
+RESULT PASS: npm run verify:workspace:agent
+OVERALL PASS

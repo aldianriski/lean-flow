@@ -1,0 +1,46 @@
+{
+  "id": "shared-auth-failure",
+  "category": "refactor",
+  "symptoms": [
+    "convention"
+  ],
+  "prompt": "The test that decides whether a Claude or Codex CLI failure means the server operator is signed out is copy-pasted: the same long regular expression lives in the planner runner and in the delivery specialist runner, and the two have drifted before. Make it one shared helper that both runners use, without changing what either of them reports. The helper should live in its own small server module, named for what it does, and be exported as authenticationFailure(text). Leave the separate login-status probe in the delivery runner alone.",
+  "layers": [
+    "server/providerFailure.ts",
+    "server/agentRunner.ts",
+    "server/deliveryAgentRunner.ts"
+  ],
+  "outOfScope": [
+    "Error codes, messages and HTTP statuses reported by either runner",
+    "The delivery runner login-status probe regex (not logged in|authentication required)",
+    "Rate-limit, timeout and invalid-output classification"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/accept-shared-auth-failure.mjs"
+    ],
+    "cmd": "node scripts/accept-shared-auth-failure.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:real-delivery:agents",
+      "cmd": "npm run verify:real-delivery:agents"
+    },
+    {
+      "name": "verify:workspace:agent",
+      "cmd": "npm run verify:workspace:agent"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ]
+}

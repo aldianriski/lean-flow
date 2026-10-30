@@ -1,0 +1,18 @@
+=== node scripts/accept-pilot-seat-limit.mjs
+AssertionError [ERR_ASSERTION]: Missing expected exception: A sixth operator seat is refused
+    at full (file:///D:/Research/ab-author-workdoo-b/scripts/accept-pilot-seat-limit.mjs:10:10)
+    at file:///D:/Research/ab-author-workdoo-b/scripts/accept-pilot-seat-limit.mjs:34:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: [Function (anonymous)],
+  operator: 'throws',
+  diff: 'simple'
+}
+
+Node.js v24.22.2
+RESULT FAIL(1): node scripts/accept-pilot-seat-limit.mjs
+OVERALL FAIL

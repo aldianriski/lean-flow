@@ -1,0 +1,47 @@
+{
+  "id": "reissue-invitation",
+  "category": "convention-bearing feature",
+  "symptoms": [
+    "convention",
+    "business-rule"
+  ],
+  "prompt": "Owners sometimes lose or never send an invitation link, and the only way to get a new one today is to revoke the old invitation and create another by hand. Add a way for a company owner to reissue an invitation from the Invitations server module (and expose it as an endpoint next to the existing revoke action): the owner picks an existing invitation and gets a fresh private link for the same email, and the old link must stop working. Reissuing should work for invitations that are still pending, that expired, or that were revoked, but not for ones already accepted. Follow how the existing invitation actions behave and are recorded.",
+  "layers": [
+    "server/invitations.ts",
+    "server/index.ts",
+    "docs/api/openapi.yaml"
+  ],
+  "outOfScope": [
+    "Existing createInvitation, revokeInvitation, inspectInvitation and acceptInvitation behaviour, error codes and recorded history",
+    "Invitation lifetime and the one-pending-invitation-per-email rule",
+    "Any change to roles, membership or the frontend"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/accept-reissue-invitation.mjs"
+    ],
+    "cmd": "node scripts/accept-reissue-invitation.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:workspace:access:api",
+      "cmd": "npm run verify:workspace:access:api"
+    },
+    {
+      "name": "verify:openapi",
+      "cmd": "npm run verify:openapi"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ]
+}

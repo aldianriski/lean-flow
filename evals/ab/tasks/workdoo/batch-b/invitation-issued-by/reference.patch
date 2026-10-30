@@ -1,0 +1,133 @@
+diff --git a/docs/api/openapi.yaml b/docs/api/openapi.yaml
+index bda6750..2eddc15 100644
+--- a/docs/api/openapi.yaml
++++ b/docs/api/openapi.yaml
+@@ -6229,7 +6229,8 @@
+           "email",
+           "status",
+           "createdAt",
+-          "expiresAt"
++          "expiresAt",
++          "issuedBy"
+         ],
+         "properties": {
+           "id": {
+@@ -6256,6 +6257,10 @@
+           "expiresAt": {
+             "type": "string",
+             "format": "date-time"
++          },
++          "issuedBy": {
++            "type": "string",
++            "description": "Display name of the member who issued the invitation."
+           }
+         }
+       },
+diff --git a/server/invitations.ts b/server/invitations.ts
+index efd1cca..b8c0477 100644
+--- a/server/invitations.ts
++++ b/server/invitations.ts
+@@ -4,12 +4,14 @@ import { ApiError, transaction, workspaceFor } from './store.ts';
+ import { companyActor, recordAccessEvent } from './companyCommands.ts';
+ 
+ export interface InvitationMetadata {
+-  id: string; email: string; status: 'pending' | 'accepted' | 'revoked' | 'expired'; createdAt: string; expiresAt: string;
++  id: string; email: string; status: 'pending' | 'accepted' | 'revoked' | 'expired'; createdAt: string; expiresAt: string; issuedBy: string;
+ }
+ interface InvitationRow {
+   id: string; organization_id: string; email: string; token_hash: string; status: InvitationMetadata['status'];
+-  created_at: string; expires_at: string; accepted_by_user_id: string | null; accepted_membership_id: string | null;
++  created_at: string; expires_at: string; accepted_by_user_id: string | null; accepted_membership_id: string | null; issued_by?: string;
+ }
++const invitationSelect = `SELECT i.*,u.name AS issued_by FROM organization_invitations i JOIN organization_memberships m ON m.organization_id=i.organization_id AND m.id=i.created_by_membership_id
++  JOIN user u ON u.id=m.user_id`;
+ function ownerWorkspace(db: DatabaseSync, userId: string, organizationId: string) {
+   const workspace = workspaceFor(db,userId,organizationId);
+   if (workspace.role !== 'owner') throw new ApiError(403,'INVITATION_DENIED','Only a company owner can manage invitations.');
+@@ -17,12 +19,12 @@ function ownerWorkspace(db: DatabaseSync, userId: string, organizationId: string
+ }
+ function metadata(row: InvitationRow): InvitationMetadata {
+   return {id:row.id,email:row.email,status:row.status==='pending' && row.expires_at<=new Date().toISOString() ? 'expired' : row.status,
+-    createdAt:row.created_at,expiresAt:row.expires_at};
++    createdAt:row.created_at,expiresAt:row.expires_at,issuedBy:row.issued_by ?? ''};
+ }
+ export function listInvitations(db: DatabaseSync, organizationId: string, userId: string): InvitationMetadata[] {
+   ownerWorkspace(db,userId,organizationId);
+-  return (db.prepare(`SELECT * FROM organization_invitations WHERE organization_id=?
+-    ORDER BY CASE WHEN status='pending' AND expires_at>? THEN 0 ELSE 1 END,created_at DESC,id LIMIT 100`)
++  return (db.prepare(`${invitationSelect} WHERE i.organization_id=?
++    ORDER BY CASE WHEN i.status='pending' AND i.expires_at>? THEN 0 ELSE 1 END,i.created_at DESC,i.id LIMIT 100`)
+     .all(organizationId,new Date().toISOString()) as unknown as InvitationRow[]).map(metadata);
+ }
+ export function createInvitation(db: DatabaseSync, organizationId: string, userId: string, body: Record<string,unknown>) {
+@@ -42,13 +44,14 @@ export function createInvitation(db: DatabaseSync, organizationId: string, userI
+     const pending = db.prepare("SELECT count(*) AS total FROM organization_invitations WHERE organization_id=? AND status='pending'").get(organizationId) as {total:number};
+     if (pending.total>=100) throw new ApiError(409,'INVITATION_LIMIT','Review pending invitations before creating another.');
+     const actor = db.prepare("SELECT id FROM organization_memberships WHERE organization_id=? AND user_id=? AND status='active'").get(organizationId,userId) as {id:string};
++    const issuedBy = companyActor(db, organizationId, userId).name;
+     const id = randomUUID();
+     const token = randomBytes(32).toString('base64url');
+     const expiresAt = new Date(Date.now()+7*24*60*60*1000).toISOString();
+     db.prepare(`INSERT INTO organization_invitations(id,organization_id,email,token_hash,status,created_by_membership_id,created_at,expires_at)
+       VALUES(?,?,?,?,'pending',?,?,?)`).run(id,organizationId,email,createHash('sha256').update(token).digest('hex'),actor.id,now,expiresAt);
+     recordAccessEvent(db, organizationId, companyActor(db, organizationId, userId), { type: 'invitation.created', invitationId: id, summary: `Private invitation created for ${email}. Acceptance grants onboarding operator access only.` });
+-    return {invitation:{id,email,status:'pending',createdAt:now,expiresAt} as InvitationMetadata,invitePath:`/workspace#invite=${token}`};
++    return {invitation:{id,email,status:'pending',createdAt:now,expiresAt,issuedBy} as InvitationMetadata,invitePath:`/workspace#invite=${token}`};
+   });
+ }
+ function unavailable(): never { throw new ApiError(404,'INVITATION_UNAVAILABLE','This invitation is unavailable for your account.'); }
+@@ -90,7 +93,7 @@ export function acceptInvitation(db: DatabaseSync, userId: string, token: unknow
+ export function revokeInvitation(db: DatabaseSync, organizationId: string, userId: string, invitationId: string) {
+   return transaction(db,()=>{
+     ownerWorkspace(db,userId,organizationId);
+-    const row = db.prepare('SELECT * FROM organization_invitations WHERE organization_id=? AND id=?').get(organizationId,invitationId) as unknown as InvitationRow | undefined;
++    const row = db.prepare(`${invitationSelect} WHERE i.organization_id=? AND i.id=?`).get(organizationId,invitationId) as unknown as InvitationRow | undefined;
+     if (!row) throw new ApiError(404,'NOT_FOUND','This resource is unavailable.');
+     if (row.status==='accepted') throw new ApiError(409,'INVITATION_ACCEPTED','This invitation has been accepted. Revoking it cannot remove company membership.');
+     if (row.status!=='revoked') {
+diff --git a/src/workspace/Brand.tsx b/src/workspace/Brand.tsx
+index 644d154..586369a 100644
+--- a/src/workspace/Brand.tsx
++++ b/src/workspace/Brand.tsx
+@@ -11,3 +11,7 @@ export function initials(name: string): string {
+ export function formatDate(value: string): string {
+   return new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T12:00:00Z`));
+ }
++
++export function formatDateTime(value: string): string {
++  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'UTC' }).format(new Date(value));
++}
+diff --git a/src/workspace/TeamAccess.tsx b/src/workspace/TeamAccess.tsx
+index bf7709a..75193cc 100644
+--- a/src/workspace/TeamAccess.tsx
++++ b/src/workspace/TeamAccess.tsx
+@@ -1,7 +1,7 @@
+ import { useEffect, useRef, useState, type FormEvent } from 'react';
+ import { Check, Copy, Link2, Loader2, RefreshCw, UserPlus } from 'lucide-react';
+ import { errorMessage, workspaceRequest } from './api';
+-import { formatDate } from './Brand';
++import { formatDateTime } from './Brand';
+ import type { WorkspaceInvitation } from './contracts';
+ import s from './WorkspaceApp.module.css';
+ 
+@@ -76,7 +76,7 @@ export function TeamAccess({ workspaceId, onIssue, onBusyChange }: Props) {
+     <form className={s.inviteForm} onSubmit={create}><label>Invite email<input name="inviteEmail" type="email" autoComplete="off" required maxLength={254} placeholder="teammate@company.com" disabled={busy || loading}/></label><button type="submit" className={s.secondary} disabled={busy || loading}>{busy ? <Loader2 size={16} className={s.spin}/> : <UserPlus size={16}/>}Create invitation link</button></form>
+     {privateLink && <div className={s.privateInvitation} data-private-invitation="true"><span className={s.privateInvitationTitle}><Link2 size={16}/>Share this link privately</span><label>Private invitation link<input ref={linkInput} value={privateLink} readOnly onFocus={event => event.currentTarget.select()} spellCheck={false}/></label><p>This link is shown once. Share it manually with the invited teammate; it expires in seven days.</p><div className={s.invitationActions}><button type="button" className={s.secondary} onClick={copy}>{copied ? <Check size={16}/> : <Copy size={16}/>} {copied ? 'Link copied' : 'Copy invitation link'}</button><button type="button" className={s.textButton} onClick={() => { setPrivateLink(''); setCopied(false); }}>Hide private link</button></div></div>}
+     <div className={s.invitationListHeading}><h3>Company invitations</h3><button type="button" className={s.iconButton} aria-label="Refresh invitations" disabled={busy || loading} onClick={() => setAttempt(value => value + 1)}><RefreshCw size={16}/></button></div>
+-    {loading ? <p className={s.ownersIntro} role="status">Loading invitations…</p> : invitations.length ? <ul className={s.invitationList}>{invitations.map(invitation => <li key={invitation.id}><div><strong>{invitation.email}</strong><span>{invitation.status === 'pending' ? `Pending · Expires ${formatDate(invitation.expiresAt.slice(0, 10))}` : invitation.status[0].toUpperCase() + invitation.status.slice(1)}</span></div>{invitation.status === 'pending' && <button type="button" className={s.textButton} disabled={busy} aria-label={`Revoke invitation for ${invitation.email}`} onClick={() => revoke(invitation)}>Revoke</button>}</li>)}</ul> : <p className={s.ownersIntro}>No invitations yet. Create a private link to bring a teammate into this company.</p>}
++    {loading ? <p className={s.ownersIntro} role="status">Loading invitations…</p> : invitations.length ? <ul className={s.invitationList}>{invitations.map(invitation => <li key={invitation.id}><div><strong>{invitation.email}</strong><span>{invitation.status === 'pending' ? `Pending · Issued by ${invitation.issuedBy} · Expires ${formatDateTime(invitation.expiresAt)} UTC` : `${invitation.status[0].toUpperCase() + invitation.status.slice(1)} · Issued by ${invitation.issuedBy}`}</span></div>{invitation.status === 'pending' && <button type="button" className={s.textButton} disabled={busy} aria-label={`Revoke invitation for ${invitation.email}`} onClick={() => revoke(invitation)}>Revoke</button>}</li>)}</ul> : <p className={s.ownersIntro}>No invitations yet. Create a private link to bring a teammate into this company.</p>}
+     {error && <p className={s.error} role="alert">{error}</p>}
+   </div>;
+ }
+diff --git a/src/workspace/contracts.ts b/src/workspace/contracts.ts
+index 2154f2a..21e950f 100644
+--- a/src/workspace/contracts.ts
++++ b/src/workspace/contracts.ts
+@@ -26,6 +26,7 @@ export interface WorkspaceInvitation {
+   status: 'pending' | 'accepted' | 'revoked' | 'expired';
+   createdAt: string;
+   expiresAt: string;
++  issuedBy: string;
+ }
+ export interface InspectedInvitation {
+   id: string;

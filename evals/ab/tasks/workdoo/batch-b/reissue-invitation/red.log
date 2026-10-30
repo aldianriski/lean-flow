@@ -1,0 +1,14 @@
+=== node scripts/accept-reissue-invitation.mjs
+file:///D:/Research/ab-author-workdoo-b/scripts/accept-reissue-invitation.mjs:27
+const second = invitations.reissueInvitation(db, company.id, 'owner', first.invitation.id);
+                           ^
+
+TypeError: invitations.reissueInvitation is not a function
+    at file:///D:/Research/ab-author-workdoo-b/scripts/accept-reissue-invitation.mjs:27:28
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.2
+RESULT FAIL(1): node scripts/accept-reissue-invitation.mjs
+OVERALL FAIL

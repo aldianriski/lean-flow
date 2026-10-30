@@ -1,0 +1,60 @@
+{
+  "id": "invitation-issued-by",
+  "category": "cross-layer change",
+  "symptoms": [
+    "convention",
+    "lost-detail"
+  ],
+  "prompt": "On the team access screen an owner sees the invited email and a status, but not who sent each invitation, which is confusing now that a company can have several owners, and only a bare expiry date. Show the issuer and the exact expiry time: every invitation returned by the invitations API should carry an issuedBy field with the display name of the member who issued it (it must be present whether the invitation comes from the list, from creating one, or from revoking one); the shared TypeScript contract and the published API description must say so; and the invitations list in the owner's team access panel should show the issuer and the expiry as date and time. Add a formatDateTime(value) helper next to formatDate in src/workspace/Brand.tsx for the time display.",
+  "layers": [
+    "server/invitations.ts",
+    "src/workspace/contracts.ts",
+    "src/workspace/TeamAccess.tsx",
+    "src/workspace/Brand.tsx",
+    "docs/api/openapi.yaml"
+  ],
+  "outOfScope": [
+    "Invitation secrets must never appear in listings",
+    "Invitation lifetime, status rules and access rules",
+    "Visual redesign of the panel"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/accept-invitation-issued-by.mjs"
+    ],
+    "cmd": "node scripts/accept-invitation-issued-by.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:workspace:access:api",
+      "cmd": "npm run verify:workspace:access:api"
+    },
+    {
+      "name": "verify:openapi",
+      "cmd": "npm run verify:openapi"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ],
+  "lostDetail": {
+    "fact": "Timestamps are stored as UTC ISO-8601 strings and users see dates and times in UTC in en-GB style (day before month, 24-hour clock), not in the viewer's local time zone or the neighbouring formatDate's US 'en' order.",
+    "grepTerms": [
+      "ISO-8601",
+      "iso8601",
+      "dates and times in UTC",
+      "en-GB style",
+      "UTC (en-GB"
+    ],
+    "hitsOutsideNotes": 0
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "pilot-seat-limit",
+  "category": "business-rule change",
+  "symptoms": [
+    "business-rule"
+  ],
+  "prompt": "The Workdoo pilot is a deliberately small closed team, but today an owner can keep issuing invitations until there are 100 pending ones, and nothing limits how many operators a company ends up with. Enforce the pilot's intended team size when an owner creates an invitation: operators who are already active, plus invitations still waiting to be accepted, are what use up the operator seats, and an invitation that would exceed the limit is refused with a 409 and a clear message (owners themselves do not use operator seats). Seats come back when an invitation is revoked or expires or an operator's access is disabled. Keep all existing invitation errors as they are.",
+  "layers": [
+    "server/invitations.ts"
+  ],
+  "outOfScope": [
+    "Existing invitation error codes (INVITATION_PENDING, ALREADY_MEMBER, MEMBERSHIP_DISABLED, INVITATION_LIMIT)",
+    "Owner seats and ownership transfer",
+    "Acceptance, revoke and inspect behaviour",
+    "Frontend changes"
+  ],
+  "acceptance": {
+    "files": [
+      "scripts/accept-pilot-seat-limit.mjs"
+    ],
+    "cmd": "node scripts/accept-pilot-seat-limit.mjs"
+  },
+  "graders": [
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck"
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build"
+    },
+    {
+      "name": "verify:workspace:access:api",
+      "cmd": "npm run verify:workspace:access:api"
+    },
+    {
+      "name": "lint",
+      "cmd": "not applicable"
+    }
+  ]
+}

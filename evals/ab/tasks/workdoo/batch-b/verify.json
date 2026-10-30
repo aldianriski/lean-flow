@@ -1,0 +1,141 @@
+[
+  {
+    "id": "invitation-issued-by",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:access:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:openapi",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "pilot-seat-limit",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:access:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "reissue-invitation",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:access:api",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:openapi",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "shared-auth-failure",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:real-delivery:agents",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "verify:workspace:agent",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "lint",
+        "code": "n/a",
+        "out": ""
+      }
+    ]
+  }
+]

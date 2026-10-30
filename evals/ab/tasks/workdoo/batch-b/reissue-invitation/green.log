@@ -1,0 +1,47 @@
+=== node scripts/accept-reissue-invitation.mjs
+reissue-invitation acceptance: 23 checks passed
+(node:19264) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+RESULT PASS: node scripts/accept-reissue-invitation.mjs
+=== npm run typecheck
+
+> workdoo-factory-design@0.4.4 typecheck
+> tsc --noEmit && tsc -p server/tsconfig.json
+RESULT PASS: npm run typecheck
+=== npm run build
+[2mdist/[22m[36massets/CompanySimulation-DxwsFlSb.js          [39m[1m[2m 38.91 kB[22m[1m[22m[2m │ gzip:  10.33 kB[22m
+[2mdist/[22m[36massets/AccountMenu-B0wSPpfS.js                [39m[1m[2m 51.24 kB[22m[1m[22m[2m │ gzip:  13.78 kB[22m
+[2mdist/[22m[36massets/FactoryScene-CjlIPOH6.js               [39m[1m[2m 76.29 kB[22m[1m[22m[2m │ gzip:  24.10 kB[22m
+[2mdist/[22m[36massets/DeliveryWorkspace-C-94WQ8i.js          [39m[1m[2m138.57 kB[22m[1m[22m[2m │ gzip:  37.28 kB[22m
+[2mdist/[22m[36massets/react-runtime-wFuQnrTg.js              [39m[1m[2m148.45 kB[22m[1m[22m[2m │ gzip:  48.14 kB[22m
+[2mdist/[22m[36massets/WorkspaceApp-DcHLxntZ.js               [39m[1m[2m236.68 kB[22m[1m[22m[2m │ gzip:  62.84 kB[22m
+[2mdist/[22m[36massets/ViewContext-DkgdjEai.js                [39m[1m[2m261.44 kB[22m[1m[22m[2m │ gzip:  73.88 kB[22m
+[2mdist/[22m[36massets/App-Bs_9AZZM.js                        [39m[1m[33m835.58 kB[39m[22m[2m │ gzip: 216.93 kB[22m
+[2mdist/[22m[36massets/three-DRxSk_Up.js                      [39m[1m[33m862.82 kB[39m[22m[2m │ gzip: 231.95 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 28.64s[39m
+RESULT PASS: npm run build
+=== npm run verify:workspace:access:api
+
+> workdoo-factory-design@0.4.4 verify:workspace:access:api
+> node scripts/verify-workspace-access-api.mjs
+
+Private company access API: 136 checks passed.
+RESULT PASS: npm run verify:workspace:access:api
+=== npm run verify:openapi
+
+> workdoo-factory-design@0.4.4 verify:openapi
+> node scripts/verify-openapi.mjs
+
+OpenAPI: 63 paths, 67 unique operations, 647 local references and strict command variants passed.
+RESULT PASS: npm run verify:openapi
+OVERALL PASS
+=== re-run under Node 24.22.2
+=== node scripts/accept-reissue-invitation.mjs
+reissue-invitation acceptance: 23 checks passed
+RESULT PASS: node scripts/accept-reissue-invitation.mjs
+OVERALL PASS

@@ -1,0 +1,49 @@
+diff --git a/server/agentRunner.ts b/server/agentRunner.ts
+index f7f21a1..cf30325 100644
+--- a/server/agentRunner.ts
++++ b/server/agentRunner.ts
+@@ -4,6 +4,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
+ import os from 'node:os';
+ import path from 'node:path';
+ import { ApiError } from './store.ts';
++import { authenticationFailure } from './providerFailure.ts';
+ 
+ export interface AgentStatus { configured: boolean; engine: 'claude-cli' | null; model: string | null }
+ export interface AgentResult {
+@@ -67,7 +68,6 @@ function inputTokens(usage: Record<string, unknown>, keys: [string, string, stri
+   const reportedCaches = keys.slice(1).filter(key => Object.hasOwn(usage, key)).map(key => metric(usage[key]));
+   return reportedCaches.some(value => value === null) ? null : input + reportedCaches.reduce<number>((sum, value) => sum + value!, 0);
+ }
+-function authenticationFailure(text: string): boolean { return /not logged in|authentication (?:failed|required)|unauthori[sz]ed|invalid.api.key|oauth[^\n]{0,80}(?:expired|invalid)|please[^\n]{0,40}(?:log|sign).?in|login required|\b401\b/i.test(text); }
+ function parseResult(stdout: string, stderr: string, exitCode: number | null, configuredModel: string): AgentResult {
+   if (exitCode !== 0) throw failure(authenticationFailure(`${stdout}\n${stderr}`) ? 'AI_AUTH_REQUIRED' : 'AI_UNAVAILABLE');
+   let envelope: unknown;
+diff --git a/server/deliveryAgentRunner.ts b/server/deliveryAgentRunner.ts
+index b527a20..223c004 100644
+--- a/server/deliveryAgentRunner.ts
++++ b/server/deliveryAgentRunner.ts
+@@ -7,6 +7,7 @@ import os from 'node:os';
+ import path from 'node:path';
+ import { isDeepStrictEqual } from 'node:util';
+ import { ApiError } from './store.ts';
++import { authenticationFailure } from './providerFailure.ts';
+ 
+ export type DeliveryProvider = 'claude-cli' | 'codex-cli';
+ export interface ProviderStatus {
+@@ -145,7 +146,7 @@ function parseClaude(stdout: string, stderr: string, code: number | null, reques
+   return { output, provider: 'claude-cli', requestedModel, observedModel, usage: { inputTokens: input !== null && caches.every(value => value !== null) ? input + caches.reduce<number>((sum, value) => sum + value!, 0) : null, outputTokens: metric(usage.output_tokens), costUsd: metric(envelope.total_cost_usd) } };
+ }
+ function processFailure(text: string): ApiError {
+-  if (/not logged in|authentication (?:failed|required)|unauthori[sz]ed|invalid.api.key|oauth[^\n]{0,80}(?:expired|invalid)|please[^\n]{0,40}(?:log|sign).?in|login required|\b401\b/i.test(text)) return failure('AUTH_REQUIRED');
++  if (authenticationFailure(text)) return failure('AUTH_REQUIRED');
+   if (/rate.?limit|usage.?limit|quota|\b429\b/i.test(text)) return failure('RATE_LIMITED');
+   if (/(?:invalid|unsupported|rejected)[^\n]{0,80}schema|schema[^\n]{0,160}(?:not permitted|unsupported|uniqueItems)/i.test(text)) return new ApiError(502, 'DELIVERY_AI_INVALID_OUTPUT', 'The provider rejected the structured response schema. No output was attached.');
+   return failure('UNAVAILABLE');
+diff --git a/server/providerFailure.ts b/server/providerFailure.ts
+new file mode 100644
+index 0000000..6063cc2
+--- /dev/null
++++ b/server/providerFailure.ts
+@@ -0,0 +1,2 @@
++// Shared by the planner and delivery specialist runners: does CLI output mean the server operator is signed out?
++export function authenticationFailure(text: string): boolean { return /not logged in|authentication (?:failed|required)|unauthori[sz]ed|invalid.api.key|oauth[^\n]{0,80}(?:expired|invalid)|please[^\n]{0,40}(?:log|sign).?in|login required|\b401\b/i.test(text); }
