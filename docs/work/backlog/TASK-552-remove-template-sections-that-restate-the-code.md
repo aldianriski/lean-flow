@@ -34,5 +34,8 @@ the core templates in lean-doc-generator
 - **blocked-by:** TASK-547 (it edits the same templates).
 - A removed section's content in an adopter's existing docs is left alone: `migrate` never deletes (TASK-553).
 
+- **open:** the CONTEXT.md template keeps its own Stack list (manifest-style) and a Patterns in Use section, which now overlap
+  the profile's Stack and Conventions in use (SPRINT-150 T2, Codex R1 T4): rule which one holds each fact and point the other at it.
+
 ## Tracker
 EPIC-023 Closed-when S1 · research §4 R1, R4, §9 · S1 intake (2026-10-30)
