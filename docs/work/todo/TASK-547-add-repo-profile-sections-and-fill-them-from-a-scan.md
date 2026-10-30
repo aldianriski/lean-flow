@@ -2,6 +2,7 @@
 id: TASK-547
 title: "Add the repo-profile sections to the core templates and fill stack and conventions from a scan"
 epic: EPIC-023
+sprint: SPRINT-150
 priority: P2
 size: M
 risk: med
