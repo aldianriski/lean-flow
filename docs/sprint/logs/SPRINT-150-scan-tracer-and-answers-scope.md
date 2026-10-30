@@ -64,3 +64,13 @@ Built inline (a one-line Done-when rewrite whose text was settled at G2). TASK-5
 `64a7a222`; /triage, run inside T1 under the owner's Q3 ruling and `y`, set it ready and removed its blocked-by line at
 `e4a5407f`. Self-review: the diff touches only box 2, the state line and the one blocked-by line; task-origin leg unchanged.
 The S0 chain (TASK-537..541) now waits only on TASK-536 itself.
+
+### 2026-10-30 | progress | T2 -- profile sections and the stack scan built and reviewed in one Codex round; boxes 1 and 2 ticked
+consequence · T2 · behaviour:material · governance:high
+A sonnet builder (main tree) committed `79f9ac6e`; the coordinator re-ran every check rather than reading the report:
+merge-check 5/5, doc-caps 0 FAIL (token budget unchanged), each new heading once, no "Non-functional requirements" left in the
+shipped skills, no maintainer path or id in the added lines. The coordinator found one gap the builder check missed: the
+CONTEXT.md template already carries its own Stack list and a Patterns in Use section, which the new sections now overlap.
+Codex R1 (altitude stated, cap 2): CLEAR on all five threat items. T4 ruled the overlap non-blocking, and it is deferred to
+TASK-552's template audit. Box 3 waits on the owner-driven real `init` on the portfolio-sveltekit snapshot.
+review · T2 · scoped-reviewer · behaviour:material · governance:high

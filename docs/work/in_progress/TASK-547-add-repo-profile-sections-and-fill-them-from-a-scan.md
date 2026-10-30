@@ -24,10 +24,10 @@ template work (research §8). G2 review-round cap: 2. Design source: `docs/resea
 the S1 intake rulings I-1..I-6 (2026-10-30).
 
 ## Done when
-- [ ] The core templates carry the profile as stable headings a later pointer can address: stack (architecture overview),
+- [x] The core templates carry the profile as stable headings a later pointer can address: stack (architecture overview), ✓ 79f9ac6e: Stack, Conventions in use, Business goal, Non-goals, Main flows, Invariants and Quality attributes each appear once with belongs and does-not-belong text; Codex R1 T1 CLEAR
   conventions in use (coding standards), and invariants · business goal · main flows · quality attributes · non-goals
   (requirements); each section says what belongs (facts a reader cannot get from the code) and what does not.
-- [ ] `init` reads code samples per layer, not only manifests, and fills stack and conventions in use with conventions the
+- [x] `init` reads code samples per layer, not only manifests, and fills stack and conventions in use with conventions the ✓ 79f9ac6e: init step 1 reads per-layer samples, holds them for step 2, one cited file per line, unconfirmed items under Not confirmed; Codex R1 T2 and T5 CLEAR
   repo actually follows, each citing a file it was seen in; a convention it cannot confirm is an open question, never invented.
 - [ ] A real `init` through the installed plugin on a portfolio-sveltekit snapshot fills those two sections with
   SvelteKit/Drizzle-specific conventions that the owner reads as specific to that repo, with no lean-flow-internal path in the output.
