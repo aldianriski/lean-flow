@@ -191,3 +191,11 @@ committed `ea58cec1` (freeze manifest, declared set of 22 added or modified path
 notes, S35). The coordinator re-ran tsc and selftest, 37 of 37. Copying the transcript into the repo was refused by the
 permission classifier, because it sits beside a copied credentials file, so it stays outside the repo and its path is recorded in the
 tick.
+
+### 2026-10-30 | progress | T8 -- second live calibration: 36 of 36 where a judge ran; 28 workdoo calls failed on the Windows command-line limit
+Run 2 used the judge file context (`8d02c88b`) and the fixed retry rules (`a0b61b70`): the coordinator re-ran tsc, selftest
+39 of 39, the fixture analysis and merge-check, and confirmed the new must-FAILs and their controls are present. All 32 clinic
+rows and the four rows of one workdoo task matched the construction, so the context removed run 1's Unknowns. The other 28
+workdoo rows came back UNKNOWN because the judge call failed (ENAMETOOLONG): the prompt, with up to 60 KB of context, was
+passed on the command line, which Windows caps near 32 KB. That is plumbing, not judgement. The fix sends judge prompts
+on stdin, with a must-FAIL, before run 3. Run 2 is kept as calibration-run2.md.
