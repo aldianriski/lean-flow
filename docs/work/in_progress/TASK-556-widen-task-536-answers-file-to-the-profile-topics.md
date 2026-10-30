@@ -25,9 +25,9 @@ under-measured. TASK-536's only blocker (TASK-535) is done. The decomposer never
 through `/triage`.
 
 ## Done when
-- [ ] TASK-536's DoD names the seven profile topics (stack · conventions in use · invariants · business goal · main flows ·
+- [x] TASK-536's DoD names the seven profile topics (stack · conventions in use · invariants · business goal · main flows · ✓ TASK-536 box 2 rewritten at 64a7a222 to name the seven profile topics as facts, not decided yet where the source is silent
   quality attributes · non-goals) as facts each answers file covers, with "not decided yet" where the source is silent.
-- [ ] TASK-536 is `state: ready`, and the edit is recorded by `/triage` before TASK-536 is promoted.
+- [x] TASK-536 is `state: ready`, and the edit is recorded by `/triage` before TASK-536 is promoted. ✓ C:/Program Files/Git/triage run inside T1 under owner y (ruling Q3) set TASK-536 ready at e4a5407f, before any promote of it
 
 ## Touches
 `docs/work/backlog/TASK-536-prepare-ab-answers-files-and-access-protocol.md`

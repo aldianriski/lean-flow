@@ -57,3 +57,10 @@ and rules that TASK-556's blocking content has landed.
 What broke: Q1 renames the requirements template's Non-functional requirements heading, and
 `skills/task-decomposer/references/prd-and-slices.md` names it in one line. Impact: one Layers token added to T2's Plan line;
 T1 shares nothing with it. Re-confirm G2: signed in the entry above (owner popup).
+
+### 2026-10-30 | progress | T1 -- TASK-536 widened and set ready; both boxes ticked
+consequence · T1 · behaviour:low · governance:low
+Built inline (a one-line Done-when rewrite whose text was settled at G2). TASK-536's box 2 names the seven profile topics at
+`64a7a222`; /triage, run inside T1 under the owner's Q3 ruling and `y`, set it ready and removed its blocked-by line at
+`e4a5407f`. Self-review: the diff touches only box 2, the state line and the one blocked-by line; task-origin leg unchanged.
+The S0 chain (TASK-537..541) now waits only on TASK-536 itself.
