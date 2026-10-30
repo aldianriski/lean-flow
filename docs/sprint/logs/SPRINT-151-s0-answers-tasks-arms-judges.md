@@ -199,3 +199,11 @@ rows and the four rows of one workdoo task matched the construction, so the cont
 workdoo rows came back UNKNOWN because the judge call failed (ENAMETOOLONG): the prompt, with up to 60 KB of context, was
 passed on the command line, which Windows caps near 32 KB. That is plumbing, not judgement. The fix sends judge prompts
 on stdin, with a must-FAIL, before run 3. Run 2 is kept as calibration-run2.md.
+
+### 2026-10-30 | progress | T8 -- third live calibration: 85.5% on judged rows, accepted by the owner; box 2 ticked
+Run 3 sent judge prompts on stdin (`a69a654a`; the coordinator first checked with one live call that the CLI reads a piped
+prompt). 47 of the 55 judged rows with an expectation matched the owner's read, 85.5% against the 80% bar. Fourteen calls on
+three workdoo tasks failed with an API error during a transient authentication drop, the same login expiry that ended the
+arms builder; the login worked again right after. Owner ruling: accept 85.5% and close box 2. The judged disagreements
+(three where the construction may be wrong, three cut off by the 400-line cap, one missed lost-detail fact) and the three
+unjudged tasks go to TASK-544 as open lines, since it freezes the prompts and the bar.

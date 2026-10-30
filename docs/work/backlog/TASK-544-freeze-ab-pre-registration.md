@@ -29,6 +29,12 @@ The decision procedure must be written, owner-signed and frozen before the first
 ## Assumes
 - **blocked-by:** TASK-537..543.
 - **note from SPRINT-148 close:** under `permissionMode: acceptEdits` in a headless run, a lean-flow arm's Bash call is denied, and the D9 protocol parks it as a popup. The P6 smoke re-run signed G2, then parked in phase 2 when the model tried to run the graders itself. The arms' permission mode (and an allow-list, if one is used) is a treatment control that the pre-registration must fix before any A1 trial; otherwise every lean-flow trial can park.
+- **open:** judge calibration (SPRINT-151 run 3, `evals/ab/judges/calibration.md`): 85.5% on 55 judged rows; before freezing the prompts,
+  re-rule three rows where the construction may be wrong (forecast-month-end reference scope, reissue-invitation reference
+  convention, access-activity-type-filter reference convention) and decide whether the 400-line context cap must grow (it cut
+  off self-onboarding-guard: three UNKNOWN). The business judge missed `en` vs `en-GB` in invitation-issued-by's wrong solution.
+- **open:** three workdoo tasks' calibration calls (self-onboarding-guard, shared-auth-failure, shared-timestamp-format) were lost
+  to a transient auth drop and are unjudged; re-run them if the freeze needs every task calibrated.
 
 ## Tracker
 research §7 · intake R-b, R-c
