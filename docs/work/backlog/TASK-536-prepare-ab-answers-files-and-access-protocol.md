@@ -10,7 +10,7 @@ class: decision
 tier: X
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-535, TASK-556]
 ---
 
@@ -28,7 +28,6 @@ The answers file stands in for the owner's interview at setup and, as `BUSINESS-
 `evals/ab/answers/` (new)
 
 ## Assumes
-- **blocked-by:** TASK-556 (widen this DoD to the seven profile topics, I-6); TASK-535 is done.
 
 ## Tracker
 research §7 Controls · intake R-a, A5
