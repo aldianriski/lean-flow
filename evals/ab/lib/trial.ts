@@ -73,10 +73,19 @@ export function pinsOf(arm: Arm, iso: Isolation, totals: Totals | null, streams:
   };
 }
 
+/**
+ * The ONE freeze preflight every run passes through (runTrial and the D9 protocol alike): the snapshot must match its manifest
+ * and be the source repo. A measured run additionally requires a frozen snapshot + manifest; smoke runs need none.
+ */
+export function freezePreflight(arm: Arm, srcRepo: string, measured: boolean): void {
+  const problems = checkArmSnapshot(arm);
+  if (arm.snapshot && path.resolve(srcRepo).toLowerCase() !== path.resolve(arm.snapshot).toLowerCase()) problems.push(`srcRepo ${srcRepo} is not the arm's snapshot ${arm.snapshot}`);
+  if (measured && (!arm.snapshot || !arm.manifest)) problems.push(`measured run: arm ${arm.id} has no frozen snapshot + manifest`);
+  if (problems.length > 0) throw new ArmRefused(problems);
+}
+
 export async function runTrial(o: TrialOpts): Promise<TrialResult> {
-  const drift = checkArmSnapshot(o.arm);
-  if (o.arm.snapshot && path.resolve(o.srcRepo).toLowerCase() !== path.resolve(o.arm.snapshot).toLowerCase()) drift.push(`srcRepo ${o.srcRepo} is not the arm's snapshot ${o.arm.snapshot}`);
-  if (drift.length > 0) throw new ArmRefused(drift);
+  freezePreflight(o.arm, o.srcRepo, !!o.measure);
   if (o.arm.plugin) {
     const reasons = verifyPin(o.arm.plugin);
     if (reasons.length > 0) throw new PinRefused(reasons);

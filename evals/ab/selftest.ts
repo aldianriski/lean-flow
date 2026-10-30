@@ -764,6 +764,16 @@ check("S22 calibration: recorded replies -> table with blank owner column and an
   assert(live.exitCode === 2, "--live together with --recorded must be refused before any call");
 });
 
+/** A smoke-repo copy frozen as an arm snapshot: the preflight every measured run must pass. */
+async function frozenSmoke(over: Partial<import("./lib/arm.ts").Arm> = {}) {
+  const { loadArm } = await import("./lib/arm.ts");
+  const { manifestOf } = await import("./lib/freeze.ts");
+  const src = await fixtureCopy(true);
+  const manifest = path.join(tmpdir("mf"), "manifest.json");
+  fs.writeFileSync(manifest, JSON.stringify(manifestOf(src)));
+  return { src, arm: { ...loadArm(ARM_FILE), snapshot: src, manifest, ...over } };
+}
+
 /** A measured trial over a recorded run; the runner may add files to the trial copy first. */
 async function measuredTrial(opts: { edit?: (cwd: string) => void; arm?: Partial<import("./lib/arm.ts").Arm>; mutate?: (events: Ev[]) => void; judge: import("./lib/protocol.ts").Judge; setup?: import("./lib/record.ts").Tok }) {
   const { loadArm } = await import("./lib/arm.ts");
@@ -775,7 +785,8 @@ async function measuredTrial(opts: { edit?: (cwd: string) => void; arm?: Partial
   };
   const dir = tmpdir("mtrial");
   const log = path.join(dir, "log.md");
-  const res = await runTrial({ arm: { ...loadArm(ARM_FILE), ...opts.arm }, srcRepo: await fixtureCopy(true), repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: log, tag: "smoke -- not a measurement", runner, measure: { judge: opts.judge, ...(opts.setup ? { setupTokens: opts.setup } : {}) } });
+  const fz = await frozenSmoke(opts.arm);
+  const res = await runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: log, tag: "smoke -- not a measurement", runner, measure: { judge: opts.judge, ...(opts.setup ? { setupTokens: opts.setup } : {}) } });
   return { res, log: fs.readFileSync(log, "utf8") };
 }
 const SONNET = "claude-sonnet-5-5";
@@ -866,7 +877,7 @@ check("S25 retry: harness crash / API / network / sandbox-before-action -> infra
   const { runTrial } = await import("./lib/trial.ts");
   const { loadArm } = await import("./lib/arm.ts");
   const dir = tmpdir("retry-trial");
-  const go = (runner: import("./lib/run.ts").Runner) => fixtureCopy(true).then(async (src) => runTrial({ arm: loadArm(ARM_FILE), srcRepo: src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke", runner, measure: { judge: recJudge(PASSV) } }));
+  const go = (runner: import("./lib/run.ts").Runner) => frozenSmoke().then(async (fz) => runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke", runner, measure: { judge: recJudge(PASSV) } }));
   const crash = await go(async () => { throw new Error("spawn failed"); });
   assert(crash.cls === "infra:harness-crash" && crash.row.measure?.attemptKind === "infra" && !crash.row.passed, "a measured trial survives a runner exception as infra");
   const api = await go(async (_c, o) => ({ stdout: [{ ...init, cwd: o.cwd }, res("API Error: 429")].map((e) => JSON.stringify(e)).join("\n"), stderr: "", exitCode: 1, wallMs: 1 }));
@@ -889,16 +900,17 @@ check("S26 validity: >5% infra-lost -> INVALID; >1 lost in a cell -> INVALID; sl
     }
     return slots;
   };
-  const control = runValidity(mk([{ trial: 1 }]));
+  const sched = (l: Parameters<typeof mk>[0] = []) => mk(l).map(({ arm, repo, task, trial }) => ({ arm, repo, task, trial }));
+  const control = runValidity(mk([{ trial: 1 }]), sched());
   assert(control.state === "VALID" && control.firstPassLost === 1 && control.expectedSlots === 24, `control (1 of 24 lost, 4.2%) must be VALID: ${JSON.stringify(control)}`);
-  const share = runValidity(mk([{ trial: 1 }, { task: "t2", trial: 1 }]));
+  const share = runValidity(mk([{ trial: 1 }, { task: "t2", trial: 1 }]), sched());
   assert(share.state === "INVALID" && share.findings.some((f) => f.includes("infra-lost share")), `8.3% lost must be INVALID: ${share.findings}`);
-  const cell = runValidity(mk([{ trial: 1 }, { trial: 2 }]));
+  const cell = runValidity(mk([{ trial: 1 }, { trial: 2 }]), sched());
   assert(cell.state === "INVALID" && cell.findings.some((f) => f.includes("lost 2 slots > 1")), `2 lost in one cell: ${cell.findings}`);
-  const cellOnly = runValidity(mk([{ trial: 1 }, { trial: 2 }]), { maxInfraShare: 0.2, cellLimit: 1, maxReplacementRounds: 2 });
+  const cellOnly = runValidity(mk([{ trial: 1 }, { trial: 2 }]), sched(), { maxInfraShare: 0.2, cellLimit: 1, maxReplacementRounds: 2 });
   assert(cellOnly.state === "INVALID" && cellOnly.findings.length === 1 && cellOnly.findings[0]!.includes("A0 x r/t1 lost 2"), `cell limit alone must be INVALID: ${cellOnly.findings}`);
-  assert(runValidity(mk([{ trial: 1 }, { trial: 2 }]), { maxInfraShare: 0.2, cellLimit: 2, maxReplacementRounds: 2 }).state === "VALID", "the cell limit is a parameter");
-  const failed = runValidity(mk([{ trial: 1, unfilled: true }]));
+  assert(runValidity(mk([{ trial: 1 }, { trial: 2 }]), sched(), { maxInfraShare: 0.2, cellLimit: 2, maxReplacementRounds: 2 }).state === "VALID", "the cell limit is a parameter");
+  const failed = runValidity(mk([{ trial: 1, unfilled: true }]), sched());
   assert(failed.state === "FAILED (owner decides)" && failed.expectedSlots === 24 && failed.finalUnfilled === 1, `an unfilled slot must FAIL the run: ${JSON.stringify(failed)}`);
 
   const slots = [{ id: "a", lost: true }, { id: "b", lost: true }, { id: "c", lost: false }];
@@ -910,48 +922,52 @@ check("S26 validity: >5% infra-lost -> INVALID; >1 lost in a cell -> INVALID; sl
 // S27 -- the analysis on fixture data: numbers, parameters, determinism; three must-FAIL audits; a green control.
 check("S27 analysis: primary/symptoms/pass@k/R-b/cost/A0-floor computed on fixture data; Unknown = not-passed and reported apart; must-FAIL: Unknown-as-pass, infra-lost in a symptom, reduced denominator; control audit empty", async () => {
   const { analyze, auditAnalysis, renderReport, DEFAULT_PARAMS } = await import("./lib/analyze.ts");
-  const { fixtureSlots } = await import("./lib/fixture-slots.ts");
+  const { fixtureSlots, fixtureSchedule } = await import("./lib/fixture-slots.ts");
+  const SCH = fixtureSchedule();
   const control = fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1 }], unknown: [{ arm: "A1", task: "t1", trial: 2 }] });
-  const rep = analyze(control);
+  const rep = analyze(control, SCH);
   assert(rep.state === "VALID" && rep.denominator === 48 && rep.expectedSlots === 48, `control must be VALID with all 48 slots: ${rep.state}`);
-  assert(auditAnalysis(control, rep).length === 0, `control audit must be empty: ${auditAnalysis(control, rep)}`);
+  assert(auditAnalysis(control, SCH, rep).length === 0, `control audit must be empty: ${auditAnalysis(control, SCH, rep)}`);
   const a1 = rep.arms!.A1!;
   assert(a1.passHatK <= a1.passAt1 + 1e-9 && a1.passAt1 <= a1.passAtK + 1e-9 && Math.abs(a1.passAt1 - a1.primary.value) < 1e-9, "pass^k <= pass@1 <= pass@k and pass@1 equals the primary endpoint");
   assert(a1.unknowns.business === 2 && rep.arms!.A0!.unknowns.business === 0, "the Unknown is reported apart, per arm");
-  const noUnknown = analyze(fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1 }] }));
+  const noUnknown = analyze(fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1 }] }), SCH);
   assert(noUnknown.arms!.A1!.primary.value > a1.primary.value || noUnknown.arms!.A1!.passHatK >= a1.passHatK, "an Unknown business verdict counts as not-passed");
   assert(a1.symptoms.business.nTrials === 5 && a1.symptoms.business.nTasks === 2, `the first-pass-lost slot is excluded from the business measure: ${JSON.stringify(a1.symptoms.business)}`);
-  assert(a1.primaryFirstPass.nTrials === 24 && a1.primary.nTrials === 24, "the lost slot counts (not-passed) in the first-pass primary and is filled in the final one");
-  assert(JSON.stringify(analyze(control).arms!.A1!.primary.ci) === JSON.stringify(a1.primary.ci), "a fixed seed gives the same interval");
+  assert(a1.primary.nTrials === 24 && a1.primaryReplaced.nTrials === 24, "the lost slot counts (not-passed) in the first-pass primary and is filled in the replaced secondary");
+  assert(JSON.stringify(analyze(control, SCH).arms!.A1!.primary.ci) === JSON.stringify(a1.primary.ci), "a fixed seed gives the same interval");
   assert(rep.spend!.infraUsd > 0 && Math.abs(rep.spend!.totalUsd - rep.spend!.scoredUsd - rep.spend!.infraUsd) < 1e-9, "total spend = scored + infra");
 
   // parameters are parameters
-  const w = analyze(control, { ...DEFAULT_PARAMS, tokenWeights: { input: 0, output: 1, cacheRead: 0, cacheWrite: 0 }, bootstrap: { resamples: 200, seed: 1, ci: 0.5 } });
+  const w = analyze(control, SCH, { ...DEFAULT_PARAMS, tokenWeights: { input: 0, output: 1, cacheRead: 0, cacheWrite: 0 }, bootstrap: { resamples: 200, seed: 1, ci: 0.5 } });
   assert(w.arms!.A1!.tokens.weightedMedian !== a1.tokens.weightedMedian && JSON.stringify(w.arms!.A1!.primary.ci) !== JSON.stringify(a1.primary.ci), "token weights and bootstrap settings come from the parameters");
 
   // decision rules
-  const hard = analyze(fixtureSlots({ arms: { A0: { success: 0.5, tokens: 1000 }, A1: { success: 0.2, tokens: 1000 }, A2: { success: 0.05, tokens: 2600 } }, k: 3 }));
+  const hardSpec = { arms: { A0: { success: 0.5, tokens: 1000 }, A1: { success: 0.2, tokens: 1000 }, A2: { success: 0.05, tokens: 2600 } }, k: 3 };
+  const hard = analyze(fixtureSlots(hardSpec), fixtureSchedule(hardSpec));
   assert(hard.rb!.business.defect && hard.rb!.lostDetail.defect, `A1 failing most tasks is a measured defect: ${JSON.stringify(hard.rb)}`);
   assert(hard.cost!.A2!.withinCeiling === false && hard.cost!.A2!.ratioVsA1 > 2, "A2 at 2.6x A1 tokens breaches the 2.0x ceiling");
   assert(hard.a0Floor!.A2!.fails && hard.a0Floor!.A1!.fails, "an arm below A0 on the primary fails the floor");
-  assert(!analyze(fixtureSlots({ arms: { A0: { success: 0.5, tokens: 1000 }, A1: { success: 1, tokens: 1000 } } })).rb!.business.defect, "a passing A1 is no defect");
+  const easySpec = { arms: { A0: { success: 0.5, tokens: 1000 }, A1: { success: 1, tokens: 1000 } } };
+  assert(!analyze(fixtureSlots(easySpec), fixtureSchedule(easySpec)).rb!.business.defect, "a passing A1 is no defect");
   const text = renderReport(rep);
   assert(/Unknown verdicts/.test(text) && /R-b/.test(text) && /pass\^k/.test(text) && /A0 floor/.test(text) && /Spend: scored/.test(text), "the report carries every section");
 
   // must-FAIL 1: Unknown counted as pass
   const asPass = control.map((s) => ({ ...s, first: s.first && { ...s.first, business: s.first.business === "UNKNOWN" ? ("PASS" as const) : s.first.business }, final: s.final && { ...s.final, business: s.final.business === "UNKNOWN" ? ("PASS" as const) : s.final.business } }));
-  assert(auditAnalysis(control, analyze(asPass)).some((f) => f.startsWith("unknown-counted-as-pass")), "Unknown counted as pass must report unknown-counted-as-pass");
+  assert(auditAnalysis(control, SCH, analyze(asPass, SCH)).some((f) => f.startsWith("unknown-counted-as-pass")), "Unknown counted as pass must report unknown-counted-as-pass");
   // must-FAIL 2: an infra-lost trial counted in a symptom measure
   const inSymptom = control.map((s) => ({ ...s, first: s.first ?? s.final }));
-  assert(auditAnalysis(control, analyze(inSymptom)).some((f) => f.startsWith("infra-lost-in-symptom")), "an infra-lost trial in a symptom measure must report infra-lost-in-symptom");
+  assert(auditAnalysis(control, SCH, analyze(inSymptom, SCH)).some((f) => f.startsWith("infra-lost-in-symptom")), "an infra-lost trial in a symptom measure must report infra-lost-in-symptom");
   // must-FAIL 3: a reduced denominator when a slot stays unfilled
   const unfilled = fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1, unfilled: true }] });
-  const honest = analyze(unfilled);
-  assert(honest.state === "FAILED (owner decides)" && honest.denominator === 48 && !honest.arms && auditAnalysis(unfilled, honest).length === 0 && /FAILED \(owner decides\)/.test(renderReport(honest)), `an unfilled slot FAILS the run at the full denominator: ${honest.state}`);
-  const shrunk = analyze(unfilled.filter((s) => s.final !== null));
-  assert(shrunk.state === "VALID" && auditAnalysis(unfilled, shrunk).some((f) => f.startsWith("denominator-reduced")), "a report over only the filled slots must report denominator-reduced");
+  const honest = analyze(unfilled, SCH);
+  assert(honest.state === "FAILED (owner decides)" && honest.denominator === 48 && !honest.arms && auditAnalysis(unfilled, SCH, honest).length === 0 && /FAILED \(owner decides\)/.test(renderReport(honest)), `an unfilled slot FAILS the run at the full denominator: ${honest.state}`);
+  const kept = unfilled.filter((s) => s.final !== null);
+  const shrunk = analyze(kept, kept); // the old flaw: the schedule derived from the data it is meant to check
+  assert(shrunk.state === "VALID" && auditAnalysis(unfilled, SCH, shrunk).some((f) => f.startsWith("denominator-reduced")), "a report over only the filled slots must report denominator-reduced");
   // validity limits surface through analyze too
-  const invalid = analyze(fixtureSlots({ lost: [0, 1, 2].map((i) => ({ arm: "A1", repo: "clinic", task: `t${i + 1}`, trial: 1 })) }));
+  const invalid = analyze(fixtureSlots({ lost: [0, 1, 2].map((i) => ({ arm: "A1", repo: "clinic", task: `t${i + 1}`, trial: 1 })) }), SCH);
   assert(invalid.state === "INVALID" && !invalid.arms && /INVALID: no ruling/.test(renderReport(invalid)), `3 of 48 lost (6.3%) is INVALID with no ruling: ${invalid.state}`);
 });
 
@@ -970,6 +986,174 @@ check("S28 wiring: analyze.ts --fixture runs and prints its verdict line; run-tr
   appendRow(log, { tag: "smoke", arm: "a1", repo: "r", task: "t", trial: 2, attempt: 1, graders: "g", tokens: null, costUsd: null, wallS: 1, exit: "ok", pins: {}, raw: {}, passed: true });
   const text = fs.readFileSync(log, "utf8");
   assert(text.includes("| g2 | park | measure |") && (text.match(/\| park \| measure \|/g) ?? []).length === 1 && text.includes(oldRow), "the 21-column header widens once to include measure; the earlier row is untouched");
+});
+
+// ---- TASK-543 review round: six High findings, each with its own must-FAIL (named finding) and green control ----
+
+// S29 (T1) -- one mandatory freeze preflight for every measured run, the D9 path included.
+check("S29 preflight: measured run (runTrial or D9) with an arm lacking snapshot + manifest -> ArmRefused 'measured run: ... no frozen snapshot', no spawn; frozen arm and unmeasured smoke runs -> run", async () => {
+  const { ArmRefused, freezePreflight } = await import("./lib/trial.ts");
+  const { runTrial } = await import("./lib/trial.ts");
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const { manifestOf } = await import("./lib/freeze.ts");
+  const smoke = loadArm(ARM_FILE);
+  const refusal = (fn: () => void) => {
+    try {
+      fn();
+      return "";
+    } catch (e) {
+      return e instanceof ArmRefused ? e.message : `other: ${e}`;
+    }
+  };
+  assert(/measured run: arm smoke-a0 has no frozen snapshot \+ manifest/.test(refusal(() => freezePreflight(smoke, SMOKE_REPO, true))), "preflight must refuse an unfrozen arm for a measured run");
+  assert(refusal(() => freezePreflight(smoke, SMOKE_REPO, false)) === "", "the same arm unmeasured (smoke) is not refused");
+  assert(/no manifest/.test(refusal(() => freezePreflight({ ...smoke, snapshot: SMOKE_REPO }, SMOKE_REPO, true))), "a snapshot with no manifest is refused");
+
+  const dir = tmpdir("pre");
+  const runs = replay();
+  let err: unknown;
+  await runTrial({ arm: smoke, srcRepo: await fixtureCopy(true), repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke", runner: runs.runner, measure: { judge: recJudge(PASSV) } }).catch((e) => (err = e));
+  assert(err instanceof ArmRefused && runs.calls.n === 0, `measured runTrial with an unfrozen arm must be refused before any spawn (spawns ${runs.calls.n})`);
+
+  const proto = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  let err2: unknown;
+  await runProtocolTrial({ arm: smoke, srcRepo: SMOKE_REPO, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l2.md"), tag: "smoke", runner: proto.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } }).catch((e) => (err2 = e));
+  assert(err2 instanceof ArmRefused && /measured run/.test(String(err2)) && proto.calls.n === 0, `measured D9 run with an unfrozen arm must be refused before any spawn (${err2}, spawns ${proto.calls.n})`);
+
+  // control: the D9 path runs measured on a frozen arm whose snapshot is the fixture repo; and a drifted snapshot is refused on that path too
+  const manifest = path.join(tmpdir("mf"), "m.json");
+  fs.writeFileSync(manifest, JSON.stringify(manifestOf(SMOKE_REPO)));
+  const frozen = { ...smoke, snapshot: SMOKE_REPO, manifest };
+  const okRun = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const res = await runProtocolTrial({ arm: frozen, srcRepo: SMOKE_REPO, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l3.md"), tag: "smoke", runner: okRun.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
+  assert(res.exit === "ok" && res.row.measure?.attemptKind === "scored" && okRun.calls.n === 2, `frozen arm: measured D9 run must complete: ${res.exit}`);
+  fs.writeFileSync(manifest, JSON.stringify({ ...manifestOf(SMOKE_REPO), "src/add.ts": "0".repeat(40) }));
+  const drift = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  let err3: unknown;
+  await runProtocolTrial({ arm: frozen, srcRepo: SMOKE_REPO, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l4.md"), tag: "smoke", runner: drift.runner, judge: judgeSays(SIGN).fn }).catch((e) => (err3 = e));
+  assert(err3 instanceof ArmRefused && drift.calls.n === 0, "the D9 path now refuses a drifted snapshot too");
+});
+
+// S30 (T2) -- arm ids shorter than 3 characters still blind the judges.
+check("S30 blind ids: a diff saying 'produced by A1' -> judge-prompt-leak, not sent; id 'A0' kept; lowercase variable a1 and token A10 -> clean", async () => {
+  const { blindProblems, blindTerms, buildPrompt, runJudges } = await import("./lib/judges.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const base = loadArm(ARM_FILE);
+  for (const id of ["A1", "workdoo-a1", "A0"]) {
+    const terms = blindTerms({ ...base, id });
+    const role = id.slice(-2).toUpperCase();
+    const leak = buildPrompt("scope", { task: JUDGE_TASK, diff: `+// produced by ${role}` });
+    assert(blindProblems(leak, terms).some((f) => f.startsWith("judge-prompt-leak") && f.includes(role)), `arm ${id}: "produced by ${role}" must be a leak (terms ${terms})`);
+    const clean = buildPrompt("scope", { task: JUDGE_TASK, diff: `+const a1 = 1; // ${role}0` });
+    assert(blindProblems(clean, terms).length === 0, `arm ${id}: a lowercase variable and a longer token are not leaks: ${blindProblems(clean, terms)}`);
+  }
+  const seen: string[] = [];
+  const r = await runJudges({ task: JUDGE_TASK, diff: "+// produced by A1" }, recJudge(PASSV, seen), blindTerms({ ...base, id: "A1" }));
+  assert((seen as string[]).length === 0 && Object.values(r.judges).every((j) => j.reason.startsWith("blind-breach")), "the leaking diff is never sent");
+});
+
+// S31 (T3) -- a phase without usage is incomplete, not a measured zero; the analysis never treats it as zero.
+check("S31 incomplete tokens: phase with no usage -> known usage kept + incomplete:true; flag stripped -> incomplete-not-marked; analysis excludes incomplete trials (incomplete-tokens-as-zero if not); complete control -> clean", async () => {
+  const { executionTokens, tokenProblems, buildMeasure } = await import("./lib/measure.ts");
+  const { parseStream } = await import("./lib/parse.ts");
+  const { analyze, auditAnalysis } = await import("./lib/analyze.ts");
+  const { fixtureSlots, fixtureSchedule } = await import("./lib/fixture-slots.ts");
+  const text = fs.readFileSync(path.join(AB, "fixtures", "recorded", "smoke-run.jsonl"), "utf8");
+  const full = parseStream(text);
+  const noUsage = parseStream(text.split("\n").filter((l) => !l.includes('"type":"result"')).join("\n") + '\n{"type":"result","is_error":false,"result":"done"}');
+  const both = executionTokens([full, noUsage]);
+  const one = executionTokens([full]);
+  assert(both.incomplete === true && both.output === one.output && both.output > 0 && both.input === one.input, `known usage kept, total marked incomplete: ${JSON.stringify(both)}`);
+  assert(one.incomplete === undefined, "a complete total carries no incomplete mark");
+  assert(executionTokens([noUsage]).incomplete === true && executionTokens([]).incomplete === true, "no usage at all is incomplete, not a zero measurement");
+  const raw = { phases: [{ modelUsage: full.result!.modelUsage }, { modelUsage: null }] };
+  assert(tokenProblems(both, raw).length === 0, `control: marked incomplete record is clean: ${tokenProblems(both, raw)}`);
+  const stripped = { ...both };
+  delete stripped.incomplete;
+  assert(tokenProblems(stripped, raw).some((f) => f.startsWith("incomplete-not-marked")), "a record that hides the missing phase must report incomplete-not-marked");
+  const m = await buildMeasure({ arm: (await import("./lib/arm.ts")).loadArm(ARM_FILE), task: await task("add-fn"), srcRepo: SMOKE_REPO, trialDir: SMOKE_REPO, changed: [], graded: undefined, streams: [noUsage], exit: "usage-missing", cls: "task-failure", judge: recJudge(PASSV) });
+  assert(m.measure.exec.incomplete === true, "buildMeasure marks an attempt without usage incomplete");
+
+  const inc = [1, 2, 3].flatMap((trial) => ["t1", "t2", "t3"].map((task) => ({ arm: "A1", task, trial })));
+  const slots = fixtureSlots({ incomplete: inc });
+  const SCH = fixtureSchedule();
+  const rep = analyze(slots, SCH);
+  const clean = analyze(fixtureSlots(), SCH);
+  assert(rep.arms!.A1!.tokens.incomplete === 18 && rep.arms!.A1!.tokens.trials === 6 && rep.arms!.A1!.tokens.weightedMedian === clean.arms!.A1!.tokens.weightedMedian && rep.arms!.A1!.tokens.weightedMedian > 0, `incomplete trials are left out of the cost, not zeroed: ${JSON.stringify(rep.arms!.A1!.tokens)}`);
+  assert(auditAnalysis(slots, SCH, rep).length === 0, `control audit empty: ${auditAnalysis(slots, SCH, rep)}`);
+  const zeroed = slots.map((s) => ({ ...s, final: s.final && { ...s.final, tokens: { ...s.final.tokens, incomplete: undefined } } }));
+  assert(analyze(zeroed as typeof slots, SCH).arms!.A1!.tokens.weightedMedian < clean.arms!.A1!.tokens.weightedMedian, "(the old behaviour drags the median toward zero)");
+  assert(auditAnalysis(slots, SCH, analyze(zeroed as typeof slots, SCH)).some((f) => f.startsWith("incomplete-tokens-as-zero")), "treating incomplete totals as zero must report incomplete-tokens-as-zero");
+});
+
+// S32 (T4) -- only the TERMINAL infrastructure evidence classifies; task prose and recovered retries never do.
+check("S32 terminal evidence: 'expected 200, got 500' prose / recovered earlier 429 / agent text about rate limits -> task-failure (task-prose-classified-as-infra otherwise); terminal API error / trailing system error -> infra", async () => {
+  const { classifyAttempt } = await import("./lib/retry.ts");
+  const { parseStream } = await import("./lib/parse.ts");
+  const init = { type: "system", subtype: "init", cwd: "x", plugins: [] };
+  const act = (text = "working") => ({ type: "assistant", message: { content: [{ type: "text", text }, { type: "tool_use", name: "Bash", input: {} }] } });
+  const res = (text: string, reason = "error") => ({ type: "result", is_error: true, result: text, terminal_reason: reason });
+  const run = (events: object[], stderr = "", exitCode = 1) => ({ stream: parseStream(events.map((e) => JSON.stringify(e)).join("\n")), raw: { stdout: "", stderr, exitCode, wallMs: 1 } });
+  const cls = (r: ReturnType<typeof run>) => classifyAttempt({ ...r, exit: "cli-error" });
+
+  assert(cls(run([init, act(), res("test failed: expected 200, got 500")])) === "task-failure", "task-prose-classified-as-infra: a failing test's prose is the task's");
+  assert(cls(run([init, { type: "system", subtype: "api_retry", error: "429 rate limit", attempt: 1 }, act(), res("Reached max turns", "max_turns")])) === "task-failure", "task-prose-classified-as-infra: an earlier recovered 429 is not terminal evidence");
+  assert(cls(run([init, act("the stub returns 429 rate limit errors, handling that"), res("Reached max turns", "max_turns")])) === "task-failure", "task-prose-classified-as-infra: assistant text about rate limits is not evidence");
+  assert(cls(run([init, act(), res("I could not finish: the API returned an overloaded error in my test")], "")) === "task-failure", "task-prose-classified-as-infra: result prose that does not start as a CLI error line is the task's");
+  assert(cls(run([init, act(), res("API Error: 429 rate limit exceeded")])) === "infra:api-error", "control: the terminal CLI error line is infra");
+  assert(cls(run([init, act()].concat([{ type: "system", subtype: "api_error", error: "overloaded 529" } as any]))) === "infra:api-error", "control: a trailing system error nothing followed is terminal evidence");
+  assert(cls(run([init], "log\nfetch failed: ECONNRESET")) === "infra:network" && cls(run([init, res("sandbox error: could not start")])) === "infra:sandbox-before-action", "controls: stderr exit cause and sandbox-before-action still classify");
+  assert(cls(run([init, act(), res("Reached max turns", "max_turns")], "")) === "task-failure", "control: max turns is the task's");
+});
+
+// S33 (T5) -- validity is judged against a frozen schedule passed separately from the data.
+check("S33 schedule: a scheduled slot missing from the data -> unfilled, FAILED (owner decides) at the scheduled count; unscheduled / duplicate data slot -> INVALID; duplicate schedule key -> refused; schedule derived from the data -> VALID (the old flaw)", async () => {
+  const { runValidity, slotId } = await import("./lib/validity.ts");
+  const { analyze, auditAnalysis } = await import("./lib/analyze.ts");
+  const { fixtureSlots, fixtureSchedule } = await import("./lib/fixture-slots.ts");
+  const SCH = fixtureSchedule();
+  const lostOf = (slots: ReturnType<typeof fixtureSlots>) => slots.map((s) => ({ ...s, firstLost: s.first === null, finalLost: s.final === null }));
+  const all = fixtureSlots();
+  const omitted = all.filter((s) => slotId(s) !== slotId({ arm: "A1", repo: "clinic", task: "t2", trial: 1 }));
+  assert(omitted.length === 47, "fixture omits one slot");
+  const v = runValidity(lostOf(omitted), SCH);
+  assert(v.state === "FAILED (owner decides)" && v.expectedSlots === 48 && v.finalUnfilled === 1 && v.findings.some((f) => f.includes("absent from the data")), `an omitted scheduled slot must FAIL the run at 48: ${JSON.stringify(v)}`);
+  const flawed = runValidity(lostOf(omitted), omitted);
+  assert(flawed.state === "VALID" && flawed.expectedSlots === 47, "(the old behaviour: a schedule taken from the data passes with 47)");
+  assert(runValidity(lostOf(all), SCH).state === "VALID", "control: the complete data is VALID");
+  const extra = runValidity(lostOf([...all, { ...all[0]!, trial: 9 }]), SCH);
+  assert(extra.state === "INVALID" && extra.findings.some((f) => f.startsWith("unscheduled slot")), "a slot outside the schedule is INVALID");
+  const twice = runValidity(lostOf([...all, all[0]!]), SCH);
+  assert(twice.state === "INVALID" && twice.findings.some((f) => f.startsWith("duplicate slot")), "a duplicate data slot is INVALID");
+  let threw = "";
+  try {
+    runValidity(lostOf(all), [...SCH, SCH[0]!]);
+  } catch (e) {
+    threw = String(e);
+  }
+  assert(/duplicate slot keys/.test(threw), "a schedule with duplicate keys is refused");
+  const rep = analyze(omitted, SCH);
+  assert(rep.state === "FAILED (owner decides)" && rep.denominator === 48 && !rep.arms && auditAnalysis(omitted, SCH, rep).length === 0, `analyze: an omitted slot FAILS at the scheduled denominator: ${rep.state} ${rep.denominator}`);
+  assert(auditAnalysis(omitted, SCH, analyze(omitted, omitted)).some((f) => f.startsWith("denominator-reduced")), "a report built on a data-derived schedule must report denominator-reduced");
+});
+
+// S34 (T6) -- the primary endpoint is the first-pass figure; the replaced view is a labelled secondary.
+check("S34 primary: infra-lost first-pass trial counts not-passed in the primary, its intervals, deltas and A0 floor; replaced view only as secondary; report built on the replaced view -> replaced-view-as-primary", async () => {
+  const { analyze, auditAnalysis, renderReport } = await import("./lib/analyze.ts");
+  const { fixtureSlots, fixtureSchedule } = await import("./lib/fixture-slots.ts");
+  const SCH = fixtureSchedule();
+  const slots = fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t4", trial: 1, replacementPasses: true }, { arm: "A1", repo: "workdoo", task: "t4", trial: 2, replacementPasses: true }] });
+  const rep = analyze(slots, SCH);
+  const a0 = rep.arms!.A0!;
+  const a1 = rep.arms!.A1!;
+  assert(rep.state === "VALID" && a1.primaryReplaced.value > a1.primary.value, `the replaced view is higher than the first-pass primary: ${a1.primaryReplaced.value} vs ${a1.primary.value}`);
+  assert(auditAnalysis(slots, SCH, rep).length === 0, `control audit empty: ${auditAnalysis(slots, SCH, rep)}`);
+  assert(Math.abs(rep.deltaVsA1!.A0!.pooled!.point - (a0.primary.value - a1.primary.value)) < 1e-9 && Math.abs(rep.a0Floor!.A1!.primary - a1.primary.value) < 1e-9 && a1.primary.ci.pooled!.point === a1.primary.value, "deltas, intervals and the A0 floor derive from the first-pass primary");
+  const replacedAsPrimary = analyze(slots.map((s) => ({ ...s, first: s.first ?? s.final })), SCH);
+  assert(replacedAsPrimary.arms!.A1!.primary.value > a1.primary.value && auditAnalysis(slots, SCH, replacedAsPrimary).some((f) => f.startsWith("replaced-view-as-primary")), "a primary computed on the replaced view must report replaced-view-as-primary");
+  const text = renderReport(rep);
+  assert(/primary endpoint \(first pass, infra-lost = not-passed\)/.test(text) && /secondary: after replacement/.test(text), "the report labels the primary and the secondary");
 });
 
 const paid = process.argv.includes("--paid");

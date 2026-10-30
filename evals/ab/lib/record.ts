@@ -14,7 +14,7 @@ export type Measure = {
   /** the three blind judges, in this order */
   judges: { convention: JudgeOut; business: JudgeOut; scope: JudgeOut };
   /** execution tokens summed over EVERY agent call the task triggered (session + sub-agents); judge and setup calls are not in it */
-  exec: Tok & { costUsd: number; subagents: number; models: string[] };
+  exec: Tok & { costUsd: number; subagents: number; models: string[]; /** a phase reported no usage: the known usage is kept, the total is NOT a measured figure */ incomplete?: boolean };
   /** one-off setup tokens (init / discovery), kept apart from execution */
   setup: Tok | null;
   /** the judges' own usage: measurement overhead, never execution */

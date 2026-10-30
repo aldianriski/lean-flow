@@ -52,16 +52,21 @@ export function lockProblems(lockFile = LOCK_FILE): string[] {
   return out;
 }
 
-/** Terms that identify the treatment; a judge prompt must carry none of them. */
+/**
+ * Terms that identify the treatment; a judge prompt must carry none of them. The arm id is kept whatever its length, and its
+ * role suffix (workdoo-a1 -> "A1") is added in capitals: a diff saying "produced by A1" is a leak, a variable `a1` is not.
+ */
 export function blindTerms(arm: Arm): string[] {
-  const t = [arm.id, arm.sessionModel, ...Object.values(arm.dispatch), "lean-flow", "lean flow", "leanflow"];
+  const t = [arm.id, arm.sessionModel, ...Object.values(arm.dispatch), "lean-flow", "lean flow", "leanflow"].filter((x) => x.length >= 3 || x === arm.id);
+  const role = /(?:^|[-_])([a-z]\d+)$/i.exec(arm.id);
+  if (role) t.push(role[1]!.toUpperCase());
   if (arm.plugin) t.push(arm.plugin.path);
-  return [...new Set(t.filter((x) => x.length >= 3))];
+  return [...new Set(t.filter((x) => x.length > 0))];
 }
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-/** Terms found in a prompt as whole tokens, case-insensitive. */
+/** Terms found in a prompt as whole tokens. Letter+digit terms in capitals (A0, A1) match case-sensitively, the rest case-insensitively. */
 export function blindProblems(prompt: string, terms: string[]): string[] {
-  return terms.filter((t) => new RegExp(`(?<![A-Za-z0-9])${esc(t)}(?![A-Za-z0-9])`, "i").test(prompt)).map((t) => `judge-prompt-leak: prompt carries "${t}"`);
+  return terms.filter((t) => new RegExp(`(?<![A-Za-z0-9])${esc(t)}(?![A-Za-z0-9])`, /^[A-Z]\d+$/.test(t) ? "" : "i").test(prompt)).map((t) => `judge-prompt-leak: prompt carries "${t}"`);
 }
 
 /** One clean verdict, else UNKNOWN. */

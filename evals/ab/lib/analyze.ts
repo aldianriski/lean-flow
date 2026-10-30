@@ -1,9 +1,9 @@
 // The analysis of a measured run (TASK-543), on fixture data now and on real rows after the pre-registration. Every analysis
 // choice is a PARAMETER with a proposed default; the pre-registration freezes the values, this file never does.
-import { runValidity, VALIDITY_DEFAULTS, type RunState, type SlotKey, type Validity, type ValidityParams } from "./validity.ts";
+import { runValidity, slotId, VALIDITY_DEFAULTS, type RunState, type SlotKey, type Validity, type ValidityParams } from "./validity.ts";
 import type { JudgeVerdict, Tok } from "./record.ts";
 
-export type Result = { graders: boolean; convention: JudgeVerdict; business: JudgeVerdict; scope: JudgeVerdict; tokens: Tok; costUsd: number };
+export type Result = { graders: boolean; convention: JudgeVerdict; business: JudgeVerdict; scope: JudgeVerdict; /** `incomplete`: a phase reported no usage; the figure is not a measurement and is never used as one */ tokens: Tok & { incomplete?: boolean }; costUsd: number };
 /** `first`: the first pass (null = infra-lost). `final`: after the replacement rounds (null = still unfilled). */
 export type Slot = SlotKey & { symptoms: string[]; first: Result | null; final: Result | null; infraCostUsd: number };
 
@@ -93,17 +93,17 @@ const meanStat = (get: (k: string) => number, sample: string[]) => mean(sample.m
 // ---- the report ----
 export type Measure4 = "convention" | "business" | "lostDetail" | "scope";
 export type ArmReport = {
-  /** after replacement: every slot filled */
+  /** THE primary endpoint: first pass, an infra-lost trial counted not-passed. Intervals, deltas and the A0 floor derive from it. */
   primary: Rate & { ci: Record<string, Interval> };
-  /** first pass, an infra-lost slot counted not-passed */
-  primaryFirstPass: Rate;
+  /** secondary, labelled: the same endpoint after replacement (every slot filled by its first non-infra attempt) */
+  primaryReplaced: Rate;
   passAt1: number;
   passAtK: number;
   passHatK: number;
   /** first pass, infra-lost excluded; Unknown = not passed */
   symptoms: Record<Measure4, Rate>;
   unknowns: Record<"convention" | "business" | "scope", number>;
-  tokens: { weightedMedian: number; parts: Tok; trials: number };
+  tokens: { weightedMedian: number; parts: Tok; trials: number; /** trials left out because a phase reported no usage */ incomplete: number };
 };
 export type Report = {
   state: RunState;
@@ -127,34 +127,36 @@ const SYMPTOMS: Record<Measure4, { pick: (r: Result) => boolean; only?: (s: Slot
   scope: { pick: (r) => r.scope === "PASS" },
 };
 
-export function analyze(slots: Slot[], params: Params = DEFAULT_PARAMS): Report {
-  const validity = runValidity(slots.map((s) => ({ ...s, firstLost: s.first === null, finalLost: s.final === null })), params);
-  const base = { state: validity.state, validity, params, expectedSlots: validity.expectedSlots, denominator: slots.length };
+/** `schedule` is the frozen arm x task x trial grid, passed separately from the data: a slot missing from `slots` stays unfilled. */
+export function analyze(slots: Slot[], schedule: SlotKey[], params: Params = DEFAULT_PARAMS): Report {
+  const validity = runValidity(slots.map((s) => ({ ...s, firstLost: s.first === null, finalLost: s.final === null })), schedule, params);
+  const base = { state: validity.state, validity, params, expectedSlots: validity.expectedSlots, denominator: validity.expectedSlots };
   if (validity.state !== "VALID") return base; // INVALID: no ruling. FAILED: the owner decides. Neither shrinks the denominator.
 
   const arms: Record<string, ArmReport> = {};
-  const finalMeans: Record<string, Map<string, number>> = {};
+  const firstMeans: Record<string, Map<string, number>> = {};
   const firstPassSuccess: Record<string, Map<string, number[]>> = {};
   for (const arm of [...new Set(slots.map((s) => s.arm))].sort()) {
     const fin = rowsOf(slots, "final", arm);
     const first = rowsOf(slots, "first-pass", arm);
-    const primM = taskMeans(fin, success, "fail");
-    finalMeans[arm] = scoresOf(primM);
+    const primM = taskMeans(first, success, "fail");
+    firstMeans[arm] = scoresOf(primM);
     firstPassSuccess[arm] = taskMeans(first, success, "exclude");
     const per = new Map<string, boolean[]>();
-    for (const { s, r } of fin) per.set(key(s), [...(per.get(key(s)) ?? []), !!r && success(r)]);
+    for (const { s, r } of first) per.set(key(s), [...(per.get(key(s)) ?? []), !!r && success(r)]);
     const tasks = [...per.values()];
     const unk = (d: "convention" | "business" | "scope") => fin.filter(({ r }) => r?.[d] === "UNKNOWN").length;
-    const w = fin.map(({ r }) => weighted(r!.tokens, params.tokenWeights));
+    const measured = fin.filter(({ r }) => !r!.tokens.incomplete); // an incomplete total is not a measurement, never a zero
+    const w = measured.map(({ r }) => weighted(r!.tokens, params.tokenWeights));
     arms[arm] = {
-      primary: { ...rateOf(primM), ci: intervals(finalMeans[arm], meanStat, params, `primary:${arm}`) },
-      primaryFirstPass: rateOf(taskMeans(first, success, "fail")),
+      primary: { ...rateOf(primM), ci: intervals(firstMeans[arm], meanStat, params, `primary:${arm}`) },
+      primaryReplaced: rateOf(taskMeans(fin, success, "fail")),
       passAt1: mean(tasks.map((t) => mean(t.map(Number)))),
       passAtK: mean(tasks.map((t) => Number(t.some(Boolean)))),
       passHatK: mean(tasks.map((t) => Number(t.every(Boolean)))),
       symptoms: Object.fromEntries((Object.keys(SYMPTOMS) as Measure4[]).map((k) => [k, rateOf(taskMeans(first, SYMPTOMS[k].pick, "exclude", SYMPTOMS[k].only))])) as Record<Measure4, Rate>,
       unknowns: { convention: unk("convention"), business: unk("business"), scope: unk("scope") },
-      tokens: { weightedMedian: median(w), parts: fin.reduce((t, { r }) => ({ input: t.input + r!.tokens.input, output: t.output + r!.tokens.output, cacheRead: t.cacheRead + r!.tokens.cacheRead, cacheWrite: t.cacheWrite + r!.tokens.cacheWrite }), { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }), trials: fin.length },
+      tokens: { weightedMedian: median(w), incomplete: fin.length - measured.length, parts: measured.reduce((t, { r }) => ({ input: t.input + r!.tokens.input, output: t.output + r!.tokens.output, cacheRead: t.cacheRead + r!.tokens.cacheRead, cacheWrite: t.cacheWrite + r!.tokens.cacheWrite }), { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }), trials: measured.length },
     };
   }
 
@@ -166,11 +168,11 @@ export function analyze(slots: Slot[], params: Params = DEFAULT_PARAMS): Report 
     report.cost = {};
     for (const arm of Object.keys(arms)) {
       if (arm === params.a1) continue;
-      const shared = [...finalMeans[arm]!.keys()].filter((k) => finalMeans[params.a1]!.has(k));
-      const diff = new Map(shared.map((k) => [k, finalMeans[arm]!.get(k)! - finalMeans[params.a1]!.get(k)!]));
+      const shared = [...firstMeans[arm]!.keys()].filter((k) => firstMeans[params.a1]!.has(k));
+      const diff = new Map(shared.map((k) => [k, firstMeans[arm]!.get(k)! - firstMeans[params.a1]!.get(k)!]));
       report.deltaVsA1[arm] = intervals(diff, meanStat, params, `delta:${arm}`);
       const ratio = arms[arm]!.tokens.weightedMedian / a1.tokens.weightedMedian;
-      report.cost[arm] = { ratioVsA1: ratio, withinCeiling: arm === params.a0 ? null : ratio <= params.costCeiling };
+      report.cost[arm] = { ratioVsA1: ratio, withinCeiling: arm === params.a0 || Number.isNaN(ratio) ? null : ratio <= params.costCeiling };
     }
     // R-b per symptom measure, on A1's first pass with infra-lost excluded; Unknown is a failure because it is not-passed
     report.rb = {} as NonNullable<Report["rb"]>;
@@ -196,23 +198,34 @@ export function analyze(slots: Slot[], params: Params = DEFAULT_PARAMS): Report 
 }
 
 /**
- * Independent re-derivation of the claims most easily broken, from the raw slots (a different code path from analyze).
- * Each finding carries its name: unknown-counted-as-pass | infra-lost-in-symptom | denominator-reduced | unfilled-slot-ruled.
+ * Independent re-derivation of the claims most easily broken, from the raw slots and the frozen schedule (a different code path
+ * from analyze). Findings are named: unknown-counted-as-pass | replaced-view-as-primary | infra-lost-in-symptom |
+ * incomplete-tokens-as-zero | denominator-reduced | unfilled-slot-ruled | primary-mismatch.
  */
-export function auditAnalysis(slots: Slot[], rep: Report): string[] {
+export function auditAnalysis(slots: Slot[], schedule: SlotKey[], rep: Report): string[] {
   const out: string[] = [];
-  if (rep.denominator !== slots.length) out.push(`denominator-reduced: report counts ${rep.denominator} of ${slots.length} slots`);
-  if (rep.state === "VALID" && slots.some((s) => s.final === null)) out.push("unfilled-slot-ruled: a slot is unfilled yet the run was ruled");
+  if (rep.denominator !== schedule.length) out.push(`denominator-reduced: report counts ${rep.denominator} of ${schedule.length} scheduled slots`);
+  const have = new Map(slots.map((s) => [slotId(s), s]));
+  if (rep.state === "VALID" && schedule.some((k) => !have.get(slotId(k))?.final)) out.push("unfilled-slot-ruled: a scheduled slot is unfilled or absent yet the run was ruled");
   if (!rep.arms) return out;
+  const near = (a: number, b: number) => Math.abs(a - b) < 1e-9;
   for (const [arm, ar] of Object.entries(rep.arms)) {
     const mine = slots.filter((s) => s.arm === arm);
     const tasks = [...new Set(mine.map(key))];
-    const strict = mean(tasks.map((t) => mean(mine.filter((s) => key(s) === t).map((s) => (s.final && s.final.graders && s.final.business === "PASS" ? 1 : 0)))));
-    if (Math.abs(strict - ar.primary.value) > 1e-9) out.push(`${strict < ar.primary.value && mine.some((s) => s.final?.business === "UNKNOWN") ? "unknown-counted-as-pass" : "primary-mismatch"}: ${arm} primary ${ar.primary.value.toFixed(4)}, strict recomputation ${strict.toFixed(4)}`);
+    const prim = (pick: (s: Slot) => number) => mean(tasks.map((t) => mean(mine.filter((s) => key(s) === t).map(pick))));
+    const strict = prim((s) => (s.first && s.first.graders && s.first.business === "PASS" ? 1 : 0));
+    if (!near(strict, ar.primary.value)) {
+      const replaced = prim((s) => ((s.first ?? s.final)?.graders && (s.first ?? s.final)?.business === "PASS" ? 1 : 0));
+      const unknownPass = prim((s) => (s.first && s.first.graders && s.first.business !== "FAIL" ? 1 : 0));
+      const name = near(replaced, ar.primary.value) ? "replaced-view-as-primary" : near(unknownPass, ar.primary.value) ? "unknown-counted-as-pass" : "primary-mismatch";
+      out.push(`${name}: ${arm} primary ${ar.primary.value.toFixed(4)}, first-pass strict recomputation ${strict.toFixed(4)}`);
+    }
     for (const k of Object.keys(SYMPTOMS) as Measure4[]) {
       const n = mine.filter((s) => s.first !== null && (SYMPTOMS[k].only?.(s) ?? true)).length;
       if (ar.symptoms[k].nTrials !== n) out.push(`${ar.symptoms[k].nTrials > n ? "infra-lost-in-symptom" : "symptom-count-mismatch"}: ${arm} ${k} counts ${ar.symptoms[k].nTrials} trials, ${n} are first-pass scored`);
     }
+    const inc = mine.filter((s) => s.final?.tokens.incomplete).length;
+    if (ar.tokens.trials !== mine.length - inc) out.push(`${ar.tokens.trials > mine.length - inc ? "incomplete-tokens-as-zero" : "token-count-mismatch"}: ${arm} token figures cover ${ar.tokens.trials} trials, ${mine.length - inc} have complete usage`);
   }
   return out;
 }
@@ -227,8 +240,8 @@ export function renderReport(rep: Report): string {
   if (!rep.arms) return `${L.join("\n")}\n\n${rep.state === "INVALID" ? "INVALID: no ruling." : "FAILED (owner decides): no ruling is computed."}\n`;
   const p = rep.params;
   L.push(``, `Parameters (proposed defaults, frozen at the pre-registration): token weights ${JSON.stringify(p.tokenWeights)}, bootstrap ${p.bootstrap.resamples} resamples seed ${p.bootstrap.seed} CI ${p.bootstrap.ci * 100}%, calibration bar ${pct(p.calibrationBar)}, cell limit ${p.cellLimit}, infra-lost limit ${pct(p.maxInfraShare)}, cost ceiling ${p.costCeiling}x.`, ``);
-  L.push(`## Primary endpoint and reliability`, ``, `| arm | primary (all slots filled) | 90% CI pooled | primary, first pass (lost = not-passed) | pass@1 | pass@k | pass^k |`, `|---|---|---|---|---|---|---|`);
-  for (const [a, r] of Object.entries(rep.arms)) L.push(`| ${a} | ${pct(r.primary.value)} | ${iv(r.primary.ci.pooled)} | ${pct(r.primaryFirstPass.value)} | ${pct(r.passAt1)} | ${pct(r.passAtK)} | ${pct(r.passHatK)} |`);
+  L.push(`## Primary endpoint and reliability`, ``, `| arm | primary endpoint (first pass, infra-lost = not-passed) | 90% CI pooled | secondary: after replacement | pass@1 | pass@k | pass^k |`, `|---|---|---|---|---|---|---|`);
+  for (const [a, r] of Object.entries(rep.arms)) L.push(`| ${a} | ${pct(r.primary.value)} | ${iv(r.primary.ci.pooled)} | ${pct(r.primaryReplaced.value)} | ${pct(r.passAt1)} | ${pct(r.passAtK)} | ${pct(r.passHatK)} |`);
   L.push(``, `Per-repo intervals: ${Object.entries(rep.arms).map(([a, r]) => `${a} ${Object.entries(r.primary.ci).filter(([k]) => k !== "pooled").map(([k, v]) => `${k} ${iv(v)}`).join("; ")}`).join(" | ")}`);
   L.push(``, `## Symptom measures (first pass, infra-lost excluded, Unknown = not passed)`, ``, `| arm | convention | business (business-rule tasks) | lost-detail success | scope |`, `|---|---|---|---|---|`);
   for (const [a, r] of Object.entries(rep.arms)) L.push(`| ${a} | ${(["convention", "business", "lostDetail", "scope"] as Measure4[]).map((k) => `${pct(r.symptoms[k].value)} (${r.symptoms[k].nTasks}t/${r.symptoms[k].nTrials}r)`).join(" | ")} |`);
@@ -240,6 +253,7 @@ export function renderReport(rep: Report): string {
   }
   L.push(``, `## Cost (D5: execution tokens only, median per trial vs ${p.a1})`, ``, `| arm | weighted median | input | output | cache-read | cache-write | ratio vs ${p.a1} | within ${p.costCeiling}x |`, `|---|---|---|---|---|---|---|---|`);
   for (const [a, r] of Object.entries(rep.arms)) L.push(`| ${a} | ${r.tokens.weightedMedian} | ${r.tokens.parts.input} | ${r.tokens.parts.output} | ${r.tokens.parts.cacheRead} | ${r.tokens.parts.cacheWrite} | ${rep.cost?.[a] ? rep.cost[a]!.ratioVsA1.toFixed(2) : "1.00"} | ${rep.cost?.[a]?.withinCeiling === null || !rep.cost?.[a] ? "-" : rep.cost[a]!.withinCeiling ? "yes" : "NO"} |`);
+  L.push(``, `Trials left out of the token figures because a phase reported no usage (never counted as zero): ${Object.entries(rep.arms).map(([a, r]) => `${a} ${r.tokens.incomplete}`).join(", ")}.`);
   if (rep.spend) L.push(``, `Spend: scored $${rep.spend.scoredUsd.toFixed(4)} (the only figure in D5) + infra $${rep.spend.infraUsd.toFixed(4)} (never in D5) = total $${rep.spend.totalUsd.toFixed(4)}.`);
   if (rep.rb) {
     L.push(``, `## R-b: baseline defect rule on ${p.a1} (fail >= ${pct(p.rb.failAt)} and ${p.bootstrap.ci * 100}% bootstrap lower bound > ${pct(p.rb.lowerAbove)})`, ``, `| measure | ${p.a1} fail rate | lower bound | measured defect |`, `|---|---|---|---|`);

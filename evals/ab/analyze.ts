@@ -2,14 +2,17 @@
 // Maintainer-only. --fixture uses deterministic fixture slots (not a measurement).
 import fs from "node:fs";
 import path from "node:path";
+import type { SlotKey } from "./lib/validity.ts";
 import { analyze, auditAnalysis, renderReport, type Slot } from "./lib/analyze.ts";
-import { fixtureSlots } from "./lib/fixture-slots.ts";
+import { fixtureSchedule, fixtureSlots } from "./lib/fixture-slots.ts";
 
 const argv = process.argv.slice(2);
 const flag = (n: string) => (argv.indexOf(`--${n}`) >= 0 ? argv[argv.indexOf(`--${n}`) + 1] : undefined);
 const slots: Slot[] = argv.includes("--fixture") ? fixtureSlots() : flag("data") ? JSON.parse(fs.readFileSync(path.resolve(flag("data")!), "utf8")) : (console.error("need --fixture or --data <slots.json>"), process.exit(2));
-const report = analyze(slots);
-const findings = auditAnalysis(slots, report);
+// the schedule is the frozen grid, passed separately from the data; --data needs --schedule <json of {arm,repo,task,trial}[]>
+const schedule: SlotKey[] = argv.includes("--fixture") ? fixtureSchedule() : flag("schedule") ? JSON.parse(fs.readFileSync(path.resolve(flag("schedule")!), "utf8")) : (console.error("--data needs --schedule <schedule.json>"), process.exit(2));
+const report = analyze(slots, schedule);
+const findings = auditAnalysis(slots, schedule, report);
 const text = renderReport(report) + (findings.length > 0 ? `\n## Audit findings\n\n${findings.map((f) => `- ${f}`).join("\n")}\n` : "");
 if (flag("out")) fs.writeFileSync(path.resolve(flag("out")!), text);
 else console.log(text);

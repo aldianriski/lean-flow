@@ -13,9 +13,11 @@ export function firstActionSeen(s: Stream): boolean {
   return s.events.some((e) => e.type === "assistant" && (e.message?.content ?? []).some((b: any) => b?.type === "tool_use" || (b?.type === "text" && String(b.text ?? "").trim() !== "")));
 }
 
-const API = /rate[ _-]?limit|\b429\b|overloaded|\b5(?:00|02|03|04|29)\b|api[ _]?error|api_error/i;
+const API = /rate[ _-]?limit|429|overloaded|5(?:00|02|03|04|29)|api[ _]?error/i;
 const NETWORK = /ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|socket hang up|fetch failed|network (?:error|unreachable)|getaddrinfo/i;
 const SANDBOX = /sandbox/i;
+/** The CLI's own terminal error line starts like this; an agent's prose ("test failed: expected 200, got 500") does not. */
+const CLI_ERROR = /^\s*(?:API Error|Error:|Request failed|Unable to connect|Connection (?:error|refused|reset)|rate_limit_error|overloaded_error|sandbox)/i;
 
 export type AttemptEvidence = {
   /** the runner threw (spawn failure, harness bug) */
@@ -27,7 +29,23 @@ export type AttemptEvidence = {
 };
 
 /**
- * Class of one attempt. A runner exception is a harness crash. A run that errored is infra when its evidence says API /
+ * The TERMINAL infrastructure evidence only: the result event's terminal_reason, its text when that text is the CLI's own error
+ * line, the stream's last event when it is a system error / retry that nothing followed, and the tail of stderr (the exit cause).
+ * Task prose, tool output and earlier retry events that the run recovered from are never evidence.
+ */
+function terminalEvidence(a: AttemptEvidence): string {
+  const s = a.stream;
+  const res = s?.result;
+  const parts: string[] = [String(res?.terminal_reason ?? "")];
+  if (res?.is_error && CLI_ERROR.test(String(res.result ?? ""))) parts.push(String(res.result));
+  const last = s?.events[s.events.length - 1];
+  if (last && !res && last.type === "system" && /error|retry/.test(String(last.subtype ?? ""))) parts.push(JSON.stringify(last));
+  parts.push((a.raw?.stderr ?? "").split("\n").slice(-5).join("\n"));
+  return parts.join("\n");
+}
+
+/**
+ * Class of one attempt. A runner exception is a harness crash. A run that errored is infra when its TERMINAL evidence says API /
  * rate-limit, network, or a sandbox error before the agent's first action; a run with no result event and no first action is a
  * harness crash. Everything else that did not finish ok -- including a run killed mid-work -- is the task's failure: not retried.
  */
@@ -37,7 +55,7 @@ export function classifyAttempt(a: AttemptEvidence): AttemptClass {
   const res = s?.result;
   const errored = a.raw ? a.raw.exitCode !== 0 || !!res?.is_error || !res : !!res?.is_error || !res;
   if (!errored) return a.exit === undefined || a.exit === "ok" ? "ok" : "task-failure";
-  const evidence = [String(res?.result ?? ""), String(res?.terminal_reason ?? ""), a.raw?.stderr ?? "", ...(s?.events ?? []).filter((e) => e.type === "system" && /error|retry/.test(String(e.subtype ?? ""))).map((e) => JSON.stringify(e))].join("\n");
+  const evidence = terminalEvidence(a);
   const acted = s ? firstActionSeen(s) : false;
   if (API.test(evidence)) return "infra:api-error";
   if (NETWORK.test(evidence)) return "infra:network";

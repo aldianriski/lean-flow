@@ -13,7 +13,7 @@ import { appendRow, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
 import { classifyAttempt, type AttemptClass } from "./retry.ts";
-import { PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
+import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
 export const DEVIATION = "D9 eval-only G2 exception -- never applies to product runs";
 /** pinned here, not drawn from the arm: the judge must not vary with the treatment */
@@ -124,6 +124,7 @@ export type ProtocolOpts = TrialOpts & { judge?: Judge };
 
 export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   assertFixtureOnly(o.srcRepo);
+  freezePreflight(o.arm, o.srcRepo, !!o.measure);
   if (!o.task.layers?.length || !o.task.outOfScope?.length) throw new Error(`task ${o.task.id}: a protocol trial needs layers and outOfScope`);
   if (o.arm.plugin) {
     const reasons = verifyPin(o.arm.plugin);

@@ -12,12 +12,36 @@ export const VALIDITY_DEFAULTS: ValidityParams = { maxInfraShare: 0.05, cellLimi
 export type RunState = "VALID" | "INVALID" | "FAILED (owner decides)";
 export type Validity = { state: RunState; findings: string[]; expectedSlots: number; firstPassLost: number; finalUnfilled: number };
 
-/** The state of a run from its slots. FAILED outranks INVALID: an unfilled slot needs the owner either way. */
-export function runValidity(slots: Lost[], p: ValidityParams = VALIDITY_DEFAULTS): Validity {
+export const slotId = (s: SlotKey) => `${s.arm}|${s.repo}|${s.task}|${s.trial}`;
+
+/**
+ * The state of a run, judged against an independently FROZEN schedule (arm x task x trial, unique keys) passed in separately
+ * from the data. A scheduled slot absent from `slots` is infra-lost on the first pass and unfilled after every round; the
+ * expected count is the schedule's, so omitting a slot can never shrink it. FAILED outranks INVALID: an unfilled slot needs the owner either way.
+ */
+export function runValidity(data: Lost[], schedule: SlotKey[], p: ValidityParams = VALIDITY_DEFAULTS): Validity {
+  const ids = schedule.map(slotId);
+  const dup = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dup.length > 0) throw new Error(`schedule has duplicate slot keys: ${[...new Set(dup)].join(", ")}`);
+  const known = new Set(ids);
+  const present = new Map<string, Lost>();
   const findings: string[] = [];
+  let invalid = false;
+  for (const d of data) {
+    const id = slotId(d);
+    if (!known.has(id)) {
+      invalid = true;
+      findings.push(`unscheduled slot in the data: ${id}`);
+    } else if (present.has(id)) {
+      invalid = true;
+      findings.push(`duplicate slot in the data: ${id}`);
+    } else present.set(id, d);
+  }
+  const slots: Lost[] = schedule.map((k) => present.get(slotId(k)) ?? { ...k, firstLost: true, finalLost: true });
+  const absent = ids.filter((id) => !present.has(id));
+  if (absent.length > 0) findings.push(`${absent.length} scheduled slot(s) absent from the data, counted unfilled: ${absent.slice(0, 5).join(", ")}${absent.length > 5 ? ", ..." : ""}`);
   const lost = slots.filter((s) => s.firstLost);
   const share = slots.length === 0 ? 0 : lost.length / slots.length;
-  let invalid = false;
   if (share > p.maxInfraShare) {
     invalid = true;
     findings.push(`infra-lost share ${(share * 100).toFixed(1)}% > ${(p.maxInfraShare * 100).toFixed(0)}% of scored trials (${lost.length}/${slots.length})`);
