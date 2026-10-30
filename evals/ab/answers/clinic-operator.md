@@ -13,13 +13,15 @@ Operator-only. Never copied into a trial.
 - Gateway composables: Vue components never call `fetch`. All API calls go through `use<Aggregate>Gateway` composables in `web/src/gateway/`, which return `{ data, fault }` and never throw.
 
 ## Setup answers
-- Which documentation tiers apply: the project has an HTTP API and a database, no authentication, and no external integrations (no payments, no notifications). Whether it counts as medium/complex (multi-developer, sustained) is not decided yet.
-- First milestone proof goal: not decided yet.
-- First milestone stopping condition: not decided yet.
-- Integration boundary and allowed side effects: no external services are involved; the boundary level (none, simulated, live) is not decided yet.
-- Main business-flow doc: the two flows are Book and Cancel; which one is the main flow, or whether to create one, is not decided yet.
-- Team size and code-of-conduct enforcement contact: not decided yet.
-- License (or private notice): not decided yet.
-- Security reporting contact: not decided yet.
+Decided by the owner during the A1 setup run (2026-10-30); the same answers are given at A2's setup.
+- Documentation tiers: backend/integration (an HTTP API and a database, no authentication, no external integrations), plus
+  the medium/complex tier with the booking flow doc.
+- First milestone proof goal: book and cancel work end to end.
+- First milestone stopping condition: the full test suite is green.
+- Integration boundary: live, against the local PostgreSQL.
+- Main business-flow doc: the booking flow (book and cancel).
+- License: a proprietary notice.
+- Team size: one person (so no CONTRIBUTING or code-of-conduct file is required).
+- Security reporting contact: aldian.mar@gmail.com.
 - Where an unrecognized doc belongs: not decided yet.
 - Owner role for documents, deployment target, release process: not decided yet.

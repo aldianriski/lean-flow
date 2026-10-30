@@ -79,3 +79,7 @@ Facts written (across clinic.md and clinic-operator.md): 35 sourced facts, plus 
 | C: fault codes and statuses | brief | answered | clinic.md: Business rules and facts the code does not show |
 
 Counts: questions covered 28 · answered 15 · not decided yet 13. Init/migrate line numbers are from the 102e8b76 files as printed by `git show`.
+
+## Owner decisions at A1 setup (2026-10-30)
+
+Seven setup questions that were "not decided yet" were decided by the owner while operating the A1 init: medium/complex tier with the booking flow doc, proof goal, stopping condition, live integration boundary, proprietary license, team of one, security contact. Source: the owner, recorded from the A1 init transcript (isolated config under D:\Researchb-init-clinic-a1). Owner ruling: adopt them as decisions so A2 setup gives the same answers.
