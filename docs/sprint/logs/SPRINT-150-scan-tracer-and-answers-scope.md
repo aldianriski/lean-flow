@@ -3,7 +3,7 @@ sprint: 150
 slug: scan-tracer-and-answers-scope
 owner: Maintainer
 last_updated: 2026-10-30
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -102,3 +102,12 @@ holds, and the leak goes to TASK-552 as an `open:` line by owner ruling. The REA
 ### 2026-10-30 | progress | T3 -- box 2 met: the owner sees all eight modes; T3 complete
 After the owner pushed `ec30d8d9`, the plugin was reinstalled and its installed copy carries both new hints. In a fresh
 session the owner typed `/lean-doc-generator` and was offered all eight modes.
+
+### 2026-10-30 | close | 3 of 3 members delivered (TASK-556, 547, 557), 7 of 7 DoD; system verify green off-host
+Close by reference: all three members in `done/`; the freeze holds for TASK-556 and 547 since `85cf1815`, and TASK-557 is
+admitted by its scope-change, frozen since `4706e0a` (`check-sprint-by-reference --close` 9/0). System verify through
+gate-remote at `e7fd79d7`: QA_FULL qa-check 336/0, bun test 589/0, exit 0. Handoff reconciliation: no `handoff` entry in this
+log. Retro buckets filed: Shipped under [Unreleased] (T2, T3), no new tech debt (two notes went to TASK-552), no follow-ups,
+learnings L-264 and L-265. Doc freshness: CONTEXT.md's triggers did not fire; the README names no template section or hint,
+so neither needs a refresh. Epic rollup: SPRINT-150's EPIC-023 row is completed at archive; every Closed-when line stays
+open (S0 on TASK-544/545, S1 on TASK-548..555).

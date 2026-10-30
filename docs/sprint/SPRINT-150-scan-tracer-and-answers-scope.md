@@ -4,7 +4,7 @@ slug: scan-tracer-and-answers-scope
 epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-10-30
-status: active
+status: closed
 plan_commit: 85cf1815
 gates_signed: G1,G2 @ ac776664
 update_trigger: sprint execute/close events
