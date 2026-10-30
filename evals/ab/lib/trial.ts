@@ -7,8 +7,10 @@ import { isolationEnv, makeIsolation, type Isolation } from "./isolate.ts";
 import { checkArmSnapshot } from "./freeze.ts";
 import { checkInitPlugins, verifyPin } from "./pin.ts";
 import { parseStream, totalsOf, type Stream, type Totals } from "./parse.ts";
-import { appendRow, type Row } from "./record.ts";
-import { buildCommand, spawnRunner, type Runner } from "./run.ts";
+import { appendRow, type Row, type Tok } from "./record.ts";
+import { classifyAttempt, type AttemptClass } from "./retry.ts";
+import type { Judge } from "./protocol.ts";
+import { buildCommand, spawnRunner, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
 import fs from "node:fs";
 
@@ -36,8 +38,10 @@ export type TrialOpts = {
   tag: string;
   runner?: Runner;
   timeoutMs?: number;
+  /** present = a measured run: the row carries the extended record. The judge defaults to the real one; tests pass recorded replies. */
+  measure?: { judge?: Judge; setupTokens?: Tok | null };
 };
-export type TrialResult = { exit: string; valid: boolean; grade: Grade; row: Row };
+export type TrialResult = { exit: string; valid: boolean; grade: Grade; row: Row; /** retry class; set on measured runs */ cls?: AttemptClass };
 
 /** Reasons a finished run is invalid: init must show the right plugins and the trial copy as cwd, and every model seen must be pinned. */
 export function validityProblems(streams: Stream[], arm: Arm, trialDir: string, totals: Totals | null): string[] {
@@ -80,10 +84,20 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   const before = manifest(o.srcRepo);
   const iso = makeIsolation(o.workRoot, o.arm);
   copyTree(o.srcRepo, iso.trialDir);
-  const raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? 300_000 });
+  let raw: RawRun;
+  let thrown: string | undefined;
+  try {
+    raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? 300_000 });
+  } catch (e) {
+    if (!o.measure) throw e;
+    thrown = (e as Error).message; // a measured run classifies a runner exception as a harness crash instead of dying
+    raw = { stdout: "", stderr: thrown, exitCode: -1, wallMs: 0 };
+  }
   fs.writeFileSync(path.join(iso.root, "stream.jsonl"), raw.stdout);
   const stream = parseStream(raw.stdout);
   const totals = totalsOf(stream.result);
+  // what the agent changed, taken before the graders run (they build into the copy)
+  const changed = o.measure ? diffManifest(before, manifest(iso.trialDir)) : [];
   const graded = await grade(o.task, iso.trialDir);
 
   const invalid = validityProblems([stream], o.arm, iso.trialDir, totals);
@@ -106,6 +120,14 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     passed: exit === "ok" && graded.passed,
     raw: { usage: stream.result?.usage ?? null, modelUsage: stream.result?.modelUsage ?? null, subagent_stats: stream.result?.subagent_stats ?? null },
   };
+  let cls: AttemptClass | undefined;
+  if (o.measure) {
+    cls = classifyAttempt({ thrown, raw, stream, exit });
+    const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol -> trial would otherwise cycle
+    const { realJudge } = await import("./protocol.ts");
+    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams: [stream], exit, cls, judge: o.measure.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
+    if (cls.startsWith("infra:")) row.passed = false;
+  }
   appendRow(o.logPath, row);
-  return { exit, valid: exit === "ok", grade: graded, row };
+  return { exit, valid: exit === "ok", grade: graded, row, ...(cls ? { cls } : {}) };
 }

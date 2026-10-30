@@ -12,6 +12,7 @@ import { verifyPin } from "./pin.ts";
 import { appendRow, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
+import { classifyAttempt, type AttemptClass } from "./retry.ts";
 import { PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
 export const DEVIATION = "D9 eval-only G2 exception -- never applies to product runs";
@@ -164,11 +165,14 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   }
 
   let graded: Grade | undefined;
+  let changed: string[] = [];
+  let lastRaw = raw1;
   let breach: string[] = [];
   if (!park && !refused) {
     clearSynced(iso.cfg);
     const raw2 = await run(buildCommand(o.arm, PHASE2_PROMPT, ["--resume", sid]), call);
     fs.writeFileSync(path.join(iso.root, "stream-phase2.jsonl"), raw2.stdout);
+    lastRaw = raw2;
     const s2 = parseStream(raw2.stdout);
     streams.push(s2);
     wallMs += raw2.wallMs;
@@ -177,6 +181,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     if (!park) {
       const touched = diffManifest(base, manifest(iso.trialDir)).map((d) => d.replace(/^\w+ /, ""));
       breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, o.task.layers!));
+      if (o.measure) changed = diffManifest(before, manifest(iso.trialDir));
       graded = await grade(o.task, iso.trialDir);
     }
   }
@@ -208,7 +213,14 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     g2,
     park: park && { tool: park.tool, input: park.input },
   };
+  let cls: AttemptClass | undefined;
+  if (o.measure) {
+    cls = classifyAttempt({ raw: lastRaw, stream: last, exit });
+    const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
+    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
+    if (cls.startsWith("infra:")) row.passed = false;
+  }
   appendRow(o.logPath, row);
   const valid = exit === "ok" || /^(g2-refused|parked|scope-breach):/.test(exit);
-  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row };
+  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, ...(cls ? { cls } : {}) };
 }

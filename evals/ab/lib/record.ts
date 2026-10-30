@@ -4,6 +4,27 @@ import path from "node:path";
 
 export const DEFAULT_LOG = path.join(import.meta.dir, "..", "..", "..", "docs", "research", "logs", "ab-measurements.md");
 
+export type Tok = { input: number; output: number; cacheRead: number; cacheWrite: number };
+export type JudgeVerdict = "PASS" | "FAIL" | "UNKNOWN";
+export type JudgeOut = { verdict: JudgeVerdict; reason: string };
+/** The measured-run extension of a row (TASK-543). Absent on smoke and protocol rows written before it existed. */
+export type Measure = {
+  /** every grader the task froze, with its result; lint is "not-applicable" when the task froze none */
+  graders: { name: string; result: "pass" | "fail" | "not-applicable" | "not-run" }[];
+  /** the three blind judges, in this order */
+  judges: { convention: JudgeOut; business: JudgeOut; scope: JudgeOut };
+  /** execution tokens summed over EVERY agent call the task triggered (session + sub-agents); judge and setup calls are not in it */
+  exec: Tok & { costUsd: number; subagents: number; models: string[] };
+  /** one-off setup tokens (init / discovery), kept apart from execution */
+  setup: Tok | null;
+  /** the judges' own usage: measurement overhead, never execution */
+  judgeOverhead: Tok & { costUsd: number };
+  /** an infra attempt is retried; only the first non-infra attempt is "scored" */
+  attemptKind: "scored" | "infra";
+  /** the retry class of the attempt: ok | task-failure | infra:<kind> */
+  attemptClass: string;
+};
+
 export type Row = {
   tag: string;
   arm: string;
@@ -29,10 +50,13 @@ export type Row = {
   g2?: { scope: string; judge: string; reason: string; designSha256: string; judgeUsage?: { input: number; output: number; cacheRead: number; cacheWrite: number; costUsd: number } | undefined } | undefined;
   /** protocol trials: the popup that parked the trial, verbatim */
   park?: unknown;
+  /** measured runs: the extended record */
+  measure?: Measure | undefined;
 };
 
 const BASE_COLUMNS = ["ts", "tag", "arm", "repo", "task", "trial", "attempt", "graders", "in", "out", "cache-read", "cache-write", "cost-usd", "wall-s", "exit", "pins", "raw"];
-const COLUMNS = [...BASE_COLUMNS, "passed", "deviation", "g2", "park"];
+const PROTOCOL_COLUMNS = [...BASE_COLUMNS, "passed", "deviation", "g2", "park"];
+const COLUMNS = [...PROTOCOL_COLUMNS, "measure"];
 const tableRow = (cols: string[]) => `| ${cols.join(" | ")} |`;
 
 const HEADER = `---
@@ -66,11 +90,13 @@ export function appendRow(logPath: string, row: Row, now = new Date()): string {
   }
   // a log written before the protocol columns existed gets its header widened; earlier rows stay as they are
   const sep = (cols: string[]) => `|${cols.map(() => "---").join("|")}|`;
-  const text = fs.readFileSync(logPath, "utf8");
-  const old = new RegExp(`(^|\\n)${tableRow(BASE_COLUMNS).replace(/[|]/g, "\\|")}(\\r?\\n)${sep(BASE_COLUMNS).replace(/[|]/g, "\\|")}(?=\\r?\\n)`);
-  if (old.test(text)) fs.writeFileSync(logPath, text.replace(old, (_m, a, nl) => `${a}${tableRow(COLUMNS)}${nl}${sep(COLUMNS)}`));
+  for (const gen of [BASE_COLUMNS, PROTOCOL_COLUMNS]) {
+    const old = new RegExp(`(^|\\n)${tableRow(gen).replace(/[|]/g, "\\|")}(\\r?\\n)${sep(gen).replace(/[|]/g, "\\|")}(?=\\r?\\n)`);
+    const cur = fs.readFileSync(logPath, "utf8");
+    if (old.test(cur)) fs.writeFileSync(logPath, cur.replace(old, (_m, a, nl) => `${a}${tableRow(COLUMNS)}${nl}${sep(COLUMNS)}`));
+  }
   const t = row.tokens;
-  const cells = [now.toISOString(), row.tag, row.arm, row.repo, row.task, row.trial, row.attempt, row.graders, t?.input ?? "none", t?.output ?? "none", t?.cacheRead ?? "none", t?.cacheWrite ?? "none", row.costUsd === null ? "none" : row.costUsd.toFixed(6), row.wallS.toFixed(1), row.exit, JSON.stringify(row.pins), JSON.stringify(row.raw), row.passed, row.deviation ?? "", row.g2 ? JSON.stringify(row.g2) : "", row.park === undefined ? "" : JSON.stringify(row.park)];
+  const cells = [now.toISOString(), row.tag, row.arm, row.repo, row.task, row.trial, row.attempt, row.graders, t?.input ?? "none", t?.output ?? "none", t?.cacheRead ?? "none", t?.cacheWrite ?? "none", row.costUsd === null ? "none" : row.costUsd.toFixed(6), row.wallS.toFixed(1), row.exit, JSON.stringify(row.pins), JSON.stringify(row.raw), row.passed, row.deviation ?? "", row.g2 ? JSON.stringify(row.g2) : "", row.park === undefined ? "" : JSON.stringify(row.park), row.measure ? JSON.stringify(row.measure) : ""];
   const line = `| ${cells.map(cell).join(" | ")} |\n`;
   const body = fs.readFileSync(logPath, "utf8");
   fs.appendFileSync(logPath, body.endsWith("\n") ? line : `\n${line}`);

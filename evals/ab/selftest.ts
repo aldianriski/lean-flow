@@ -662,6 +662,316 @@ check("S19 setup: launcher command carries claude-opus-5-5, no --effort, the inv
   assert(arm.sessionModel === "claude-haiku-5-5" && arm.effort === "low", "trial arms keep the trial inventory values");
 });
 
+// ---- TASK-543: blind judges, the measured-run record, retry, validity, analysis. Free; every must-FAIL names its finding. ----
+const PASSV = '{"verdict":"PASS","reason":"fine"}';
+const FAILV = '{"verdict":"FAIL","reason":"broken"}';
+const JUDGE_TASK = { prompt: "Show the time as HH:mm.", layers: ["src/a.ts"], outOfScope: ["the API"] };
+const recJudge = (reply: string | ((prompt: string) => string), seen: string[] = []): import("./lib/protocol.ts").Judge => async (p) => {
+  seen.push(p);
+  return typeof reply === "string" ? reply : reply(p);
+};
+
+// S20 -- the judges: prompt content, verdict parsing, model pin, usage kept apart, frozen prompt hashes.
+check("S20 judges: prompt carries task + diff (+ facts for business only); unparseable / wrong model / no usage -> UNKNOWN; usage is overhead; prompt lock holds and a changed prompt breaks it", async () => {
+  const { buildPrompt, parseVerdict, runJudges, DIMENSIONS, lockProblems, currentLock } = await import("./lib/judges.ts");
+  const { JUDGE_MODEL } = await import("./lib/protocol.ts");
+  const input = { task: JUDGE_TASK, diff: "+const marker = 1;", notes: "FACT-ALPHA only the business judge sees" };
+  const prompts = Object.fromEntries(DIMENSIONS.map((d) => [d, buildPrompt(d, input)]));
+  for (const d of DIMENSIONS) assert(prompts[d]!.includes(JUDGE_TASK.prompt) && prompts[d]!.includes("+const marker = 1;") && prompts[d]!.includes("the API") && prompts[d]!.includes("src/a.ts"), `${d} prompt must carry task, layers, out-of-scope and diff`);
+  assert(prompts.business!.includes("FACT-ALPHA") && !prompts.convention!.includes("FACT-ALPHA") && !prompts.scope!.includes("FACT-ALPHA"), "business facts reach the business judge only");
+
+  assert(parseVerdict(PASSV).verdict === "PASS" && parseVerdict(FAILV).verdict === "FAIL" && parseVerdict('{"verdict":"unknown","reason":"x"}').verdict === "UNKNOWN", "the three verdicts parse");
+  assert(parseVerdict("```json\n" + PASSV + "\n```").verdict === "PASS", "a fenced reply parses");
+  for (const bad of ["I think it passes", '{"verdict":"MAYBE"}', "[1]", "", '{"verdict":"PASS"} {"verdict":"FAIL"}']) assert(parseVerdict(bad).verdict === "UNKNOWN", `unparseable reply must be UNKNOWN: ${bad}`);
+
+  const usage = (models: string[], out = 10) => ({ text: PASSV, totals: { input: 5, output: out, cacheRead: 1, cacheWrite: 2, costUsd: 0.5, models } });
+  const ok = await runJudges(input, async () => usage([JUDGE_MODEL]));
+  assert(DIMENSIONS.every((d) => ok.judges[d].verdict === "PASS") && ok.overhead.output === 30 && Math.abs(ok.overhead.costUsd - 1.5) < 1e-9, `three PASS, overhead summed: ${JSON.stringify(ok.overhead)}`);
+  const wrong = await runJudges(input, async () => usage(["claude-haiku-5-5"]));
+  assert(DIMENSIONS.every((d) => wrong.judges[d].verdict === "UNKNOWN" && /not exactly/.test(wrong.judges[d].reason)), "a judge on another model must be UNKNOWN");
+  const none = await runJudges(input, async () => ({ text: PASSV, totals: null }));
+  assert(none.judges.scope.verdict === "UNKNOWN", "a judge with no usage report must be UNKNOWN");
+  const boom = await runJudges(input, async () => { throw new Error("down"); });
+  assert(boom.judges.business.verdict === "UNKNOWN" && /judge call failed/.test(boom.judges.business.reason), "a failing call is UNKNOWN");
+
+  assert(lockProblems().length === 0, `prompts.lock.json must match the prompts: ${lockProblems()}`);
+  const stale = path.join(tmpdir("lock"), "lock.json");
+  const lock = currentLock();
+  fs.writeFileSync(stale, JSON.stringify({ ...lock, prompts: { ...lock.prompts, scope: "0".repeat(64) } }));
+  assert(lockProblems(stale).some((p) => p.includes("scope")) && lockProblems(path.join(tmpdir("lock"), "none.json")).length === 1, "a changed prompt (or a missing lock) must be reported");
+});
+
+// S21 -- blindness: a prompt carrying an arm id is the must-FAIL; a leaking diff is never sent.
+check("S21 blind: prompt leaking the arm id / plugin path / lean-flow -> judge-prompt-leak; a diff that leaks is not sent (UNKNOWN); clean control -> no finding", async () => {
+  const { blindProblems, blindTerms, buildPrompt, runJudges } = await import("./lib/judges.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const arm = { ...loadArm(ARM_FILE), id: "workdoo-a1", plugin: { path: "C:\\plug\\lean-flow-pin", sha: "a".repeat(40), hash: "b".repeat(64) } };
+  const terms = blindTerms(arm);
+  const clean = buildPrompt("convention", { task: JUDGE_TASK, diff: "+const a1 = 2; // a variable, not the arm" });
+  assert(blindProblems(clean, terms).length === 0, `clean control must carry no finding: ${blindProblems(clean, terms)}`);
+  const leaked = `${clean}\nArm under test: workdoo-a1`;
+  assert(blindProblems(leaked, terms).some((f) => f.startsWith("judge-prompt-leak") && f.includes("workdoo-a1")), "a prompt carrying the arm id must report judge-prompt-leak");
+  assert(blindProblems(`${clean}\nloaded from C:\\plug\\lean-flow-pin`, terms).length > 0 && blindProblems(`${clean}\nthe Lean-Flow loop`, terms).length > 0, "plugin path and lean-flow material are leaks too");
+  assert(blindProblems(`${clean}\n${arm.sessionModel}`, terms).length > 0, "the session model is a leak");
+
+  const seen: string[] = [];
+  const r = await runJudges({ task: JUDGE_TASK, diff: "+// written under workdoo-a1" }, recJudge(PASSV, seen), terms);
+  assert(seen.length === 0 && Object.values(r.judges).every((j) => j.verdict === "UNKNOWN" && j.reason.startsWith("blind-breach")), `a leaking input must not be sent: ${seen.length} calls`);
+  const fine = await runJudges({ task: JUDGE_TASK, diff: "+const x = 1;" }, recJudge(PASSV, seen as string[]), terms);
+  assert((seen as string[]).length === 3 && Object.values(fine.judges).every((j) => j.verdict === "PASS"), "control: three calls, three PASS");
+});
+
+// S22 -- calibration: reference expected PASS, wrong expected FAIL; recorded replies; blank owner column; agreement figures; CLI runs.
+check("S22 calibration: recorded replies -> table with blank owner column and an agreement figure; a mis-read wrong solution lowers it; --score reads the owner column; CLI refuses a stale lock", async () => {
+  const { calibrate, renderCalibration, agreement, scoreCalibration, findTasks } = await import("./judges/calibrate.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const root = tmpdir("calib");
+  const mk = (repo: string, id: string, wrong: boolean) => {
+    const d = path.join(root, repo, "batch", id);
+    fs.mkdirSync(d, { recursive: true });
+    fs.writeFileSync(path.join(d, "task.json"), JSON.stringify({ id, prompt: `Ticket text for ${id}`, graders: [{ name: "g", cmd: "true" }], layers: ["src/"], outOfScope: ["x"] }));
+    fs.writeFileSync(path.join(d, "reference.patch"), `+++ b/src/${id}.ts\n+good ${id}\n`);
+    if (wrong) {
+      fs.writeFileSync(path.join(d, "wrong.patch"), `+++ b/src/${id}.ts\n+bad ${id}\n`);
+      fs.writeFileSync(path.join(d, "wrong.json"), JSON.stringify({ breaks: ["business"] }));
+    }
+  };
+  mk("clinic", "alpha", true);
+  mk("clinic", "beta", false);
+  assert(findTasks(root).length === 2, "tasks found");
+  const judgeFor = (misread: boolean) => () => async (p: string) => (p.includes("bad ") ? (misread ? PASSV : FAILV) : PASSV);
+  const base = { tasksDir: root, sample: 4, armFor: () => loadArm(ARM_FILE), notesFor: () => "facts" };
+  const good = await calibrate({ ...base, judgeFor: judgeFor(false) });
+  assert(good.cells.length === 9 && agreement(good.cells).of === 7 && agreement(good.cells).rate === 1, `9 cells, 7 with an expectation (3 + 1 + 3); got ${JSON.stringify(agreement(good.cells))}`);
+  assert(good.skipped.length === 1 && good.skipped[0]!.includes("beta"), "a task without wrong.patch is reported as skipped, not silently dropped");
+  const bad = await calibrate({ ...base, judgeFor: judgeFor(true) });
+  assert(agreement(bad.cells).hit === 6 && agreement(bad.cells).of === 7, "a wrong solution the judge passes must lower agreement");
+  const text = renderCalibration(good.cells, good.skipped, "recorded");
+  assert(/\| owner read \|/.test(text) && text.split("\n").filter((l) => /^\| clinic/.test(l)).every((l) => / {2}\|$/.test(l)), "every row ends with a blank owner-read cell");
+  assert(scoreCalibration(text).of === 0, "a blank owner column scores nothing");
+  const filled = text.split("\n").map((l, i) => (/^\| clinic/.test(l) ? l.replace(/\|\s*\|$/, `| ${i % 2 ? "PASS" : "FAIL"} |`) : l)).join("\n");
+  const sc = scoreCalibration(filled);
+  assert(sc.of === 9 && sc.hit >= 0 && sc.hit <= 9, `owner column scored: ${JSON.stringify(sc)}`);
+
+  const replies: Record<string, string> = {};
+  for (const [id, kind] of [["alpha", "reference"], ["alpha", "wrong"], ["beta", "reference"]]) for (const d of ["convention", "business", "scope"]) replies[`${id}|${kind}|${d}`] = kind === "wrong" && d === "business" ? FAILV : PASSV;
+  const rf = path.join(root, "replies.json");
+  fs.writeFileSync(rf, JSON.stringify(replies));
+  const out = path.join(root, "calibration.md");
+  const run = Bun.spawnSync(["bun", path.join(AB, "judges", "calibrate.ts"), "--recorded", rf, "--tasks", root, "--out", out], { cwd: AB });
+  assert(run.exitCode === 0 && /calibration: 7\/7 judge verdicts match/.test(run.stdout.toString()) && fs.existsSync(out), `CLI --recorded must run: exit ${run.exitCode} exists ${fs.existsSync(out)} ${out} ${run.stdout.toString()}${run.stderr.toString()}`);
+  const live = Bun.spawnSync(["bun", path.join(AB, "judges", "calibrate.ts"), "--live", "--recorded", rf], { cwd: AB });
+  assert(live.exitCode === 2, "--live together with --recorded must be refused before any call");
+});
+
+/** A measured trial over a recorded run; the runner may add files to the trial copy first. */
+async function measuredTrial(opts: { edit?: (cwd: string) => void; arm?: Partial<import("./lib/arm.ts").Arm>; mutate?: (events: Ev[]) => void; judge: import("./lib/protocol.ts").Judge; setup?: import("./lib/record.ts").Tok }) {
+  const { loadArm } = await import("./lib/arm.ts");
+  const { runTrial } = await import("./lib/trial.ts");
+  const r = replay(opts.mutate);
+  const runner: import("./lib/run.ts").Runner = async (cmd, o) => {
+    opts.edit?.(o.cwd);
+    return r.runner(cmd, o);
+  };
+  const dir = tmpdir("mtrial");
+  const log = path.join(dir, "log.md");
+  const res = await runTrial({ arm: { ...loadArm(ARM_FILE), ...opts.arm }, srcRepo: await fixtureCopy(true), repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: log, tag: "smoke -- not a measurement", runner, measure: { judge: opts.judge, ...(opts.setup ? { setupTokens: opts.setup } : {}) } });
+  return { res, log: fs.readFileSync(log, "utf8") };
+}
+const SONNET = "claude-sonnet-5-5";
+/** the recorded run, dispatching one sub-agent whose usage is a second model entry */
+const withSubagent = (events: Ev[]) => {
+  events.splice(events.findIndex((e) => e.type === "result"), 0, { type: "assistant", message: { content: [{ type: "tool_use", name: "Task", input: { prompt: "do part" } }] } });
+  const res = events.find((e) => e.type === "result")!;
+  res.modelUsage[SONNET] = { inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 1000, cacheCreationInputTokens: 200, costUSD: 0.02 };
+  res.subagent_stats = { spawned: 1, requested: { background: 0, foreground: 1, unset: 0 } };
+};
+
+// S23 -- the measured-run record: every frozen grader (lint not-applicable), three verdicts, execution tokens, setup apart, judge overhead apart.
+check("S23 record: measured trial -> row.measure with frozen graders + lint not-applicable, 3 blind verdicts, exec tokens, setup separate, judge usage kept out; the diff reaches the judges; unmeasured trials unchanged", async () => {
+  const seen: string[] = [];
+  const judge: import("./lib/protocol.ts").Judge = async (p) => {
+    seen.push(p);
+    return { text: PASSV, totals: { input: 7, output: 7, cacheRead: 0, cacheWrite: 0, costUsd: 0.1, models: ["claude-sonnet-5-5"] } };
+  };
+  const setup = { input: 11, output: 22, cacheRead: 33, cacheWrite: 44 };
+  const m = await measuredTrial({ edit: (cwd) => fs.appendFileSync(path.join(cwd, "src", "add.ts"), "// touched-by-trial\n"), judge, setup });
+  const meas = m.res.row.measure!;
+  assert(meas && m.res.row.exit === "ok" && m.res.cls === "ok", `measured row expected: ${m.res.row.exit}`);
+  assert(meas.graders.map((g) => `${g.name}:${g.result}`).join(",") === "typecheck:pass,acceptance:pass,build:pass,lint:not-applicable", `frozen graders + lint: ${JSON.stringify(meas.graders)}`);
+  assert(Object.values(meas.judges).every((j) => j.verdict === "PASS") && seen.length === 3, "three verdicts from three calls");
+  assert(seen.every((p) => p.includes("+// touched-by-trial") && !p.includes("smoke-a0")), "the diff the trial produced reaches every judge, the arm id none");
+  const t = m.res.row.tokens!;
+  assert(meas.exec.input === t.input && meas.exec.output === t.output && meas.exec.cacheRead === t.cacheRead, "execution tokens equal the run's usage");
+  assert(meas.judgeOverhead.output === 21 && meas.exec.output === t.output, "judge usage is overhead, not in execution tokens");
+  assert(JSON.stringify(meas.setup) === JSON.stringify(setup) && meas.attemptKind === "scored", "setup tokens are kept separate");
+  assert(/\| measure \|/.test(m.log) && m.log.includes('"judges"'), "the measure column is written");
+
+  const plain = await trialWith(replay());
+  assert(plain.res.row.measure === undefined, "an unmeasured trial writes no measure");
+  const lintTask = { ...(await task("add-fn")), graders: [{ name: "web lint", cmd: "true" }] };
+  const { buildMeasure } = await import("./lib/measure.ts");
+  const withLint = await buildMeasure({ arm: (await import("./lib/arm.ts")).loadArm(ARM_FILE), task: lintTask, srcRepo: SMOKE_REPO, trialDir: SMOKE_REPO, changed: [], graded: { passed: false, graders: [{ name: "web lint", passed: false, detail: "x" }] }, streams: [], exit: "cli-error: x", cls: "task-failure", judge: recJudge(PASSV) });
+  assert(withLint.measure.graders.length === 1 && withLint.measure.graders[0]!.result === "fail", "a task that froze lint records its result, no not-applicable entry");
+  assert(Object.values(withLint.measure.judges).every((j) => j.verdict === "UNKNOWN" && j.reason.startsWith("not-run")), "an attempt that did not finish ok is not judged");
+});
+
+// S24 -- sub-agent tokens are in the execution total; dropping them is the must-FAIL.
+check("S24 subagent: stream dispatching a sub-agent -> its tokens are in exec and listed; exec with them dropped -> subagent-tokens-missing; control -> no finding", async () => {
+  const { tokenProblems, costSummary } = await import("./lib/measure.ts");
+  const m = await measuredTrial({ arm: { dispatch: { subagent: SONNET } }, mutate: withSubagent, judge: recJudge(PASSV) });
+  const meas = m.res.row.measure!;
+  assert(m.res.row.exit === "ok" && meas.exec.subagents === 1 && meas.exec.models.includes(SONNET), `sub-agent run must be ok and counted: ${m.res.row.exit} ${JSON.stringify(meas.exec)}`);
+  const base = m.res.row.tokens!;
+  assert(meas.exec.output === base.output && base.output >= 377 + 50 && meas.exec.input >= 100 + 6, "execution tokens include the sub-agent's usage");
+  assert(tokenProblems(meas.exec, m.res.row.raw).length === 0, `control must carry no finding: ${tokenProblems(meas.exec, m.res.row.raw)}`);
+  const dropped = { ...meas.exec, output: meas.exec.output - 50, input: meas.exec.input - 100, cacheRead: meas.exec.cacheRead - 1000, cacheWrite: meas.exec.cacheWrite - 200, models: meas.exec.models.filter((x) => x !== SONNET) };
+  assert(tokenProblems(dropped, m.res.row.raw).some((f) => f.startsWith("subagent-tokens-missing") && f.includes(SONNET)), "a total without the sub-agent must report subagent-tokens-missing");
+  const c = costSummary([{ attemptKind: "infra", exec: { ...meas.exec, costUsd: 1 } }, { attemptKind: "scored", exec: { ...meas.exec, costUsd: 2 } }, { attemptKind: "infra", exec: { ...meas.exec, costUsd: 0.5 } }]);
+  assert(c.scoredUsd === 2 && c.infraUsd === 1.5 && c.totalUsd === 3.5, `scored vs infra vs total: ${JSON.stringify(c)}`);
+});
+
+// S25 -- retry classification: each infra class retries, a task failure never does, the third infra failure is infra-lost.
+check("S25 retry: harness crash / API / network / sandbox-before-action -> infra; sandbox after the first action, graded failure, killed mid-work -> not infra; task failure retried -> task-failure-retried; third infra -> infra-lost", async () => {
+  const { classifyAttempt, runWithRetry, retryAudit, firstActionSeen } = await import("./lib/retry.ts");
+  const { parseStream } = await import("./lib/parse.ts");
+  const init = { type: "system", subtype: "init", cwd: "x", plugins: [] };
+  const act = { type: "assistant", message: { content: [{ type: "tool_use", name: "Read", input: {} }] } };
+  const res = (text: string, reason = "error") => ({ type: "result", is_error: true, result: text, terminal_reason: reason });
+  const run = (events: object[], stderr = "", exitCode = 1) => ({ stream: parseStream(events.map((e) => JSON.stringify(e)).join("\n")), raw: { stdout: "", stderr, exitCode, wallMs: 1 } });
+  const cls = (r: ReturnType<typeof run>) => classifyAttempt({ ...r, exit: "cli-error" });
+
+  assert(classifyAttempt({ thrown: "spawn ENOENT" }) === "infra:harness-crash", "a runner exception is a harness crash");
+  assert(cls(run([init], "")) === "infra:harness-crash", "no result event and no first action is a harness crash");
+  assert(cls(run([init, res("API Error: 429 rate limit exceeded")])) === "infra:api-error" && cls(run([init, act, res("overloaded_error 529")])) === "infra:api-error", "rate-limit / API errors are infra, even after an action");
+  assert(cls(run([init], "fetch failed: ECONNRESET")) === "infra:network", "a network error is infra");
+  assert(cls(run([init, res("sandbox error: could not start")])) === "infra:sandbox-before-action", "a sandbox error before the first action is infra");
+  assert(cls(run([init, act, res("sandbox error: denied write")])) === "task-failure", "a sandbox error AFTER the first action is the task's");
+  assert(firstActionSeen(run([init, act]).stream) && !firstActionSeen(run([init]).stream), "first action = an assistant tool_use / text");
+  assert(cls(run([init, act, res("Reached max turns", "max_turns")])) === "task-failure" && cls(run([init, act], "", 143)) === "task-failure", "max turns and a run killed mid-work are the task's failures");
+  assert(classifyAttempt({ ...run([init, { type: "result", is_error: false, result: "done" }], "", 0), exit: "ok" }) === "ok", "a clean finish is not infra");
+
+  const infraTwice = await runWithRetry(async (n) => ({ cls: n < 3 ? ("infra:api-error" as const) : ("ok" as const), value: n }));
+  assert(infraTwice.attempts.length === 3 && infraTwice.scored?.n === 3 && !infraTwice.infraLost, "two infra failures retry; the third attempt is scored");
+  const lost = await runWithRetry(async () => ({ cls: "infra:network" as const }));
+  assert(lost.attempts.length === 3 && lost.infraLost && lost.scored === undefined, "a third infra failure is infra-lost (never a fourth attempt)");
+  const task1 = await runWithRetry(async () => ({ cls: "task-failure" as const }));
+  assert(task1.attempts.length === 1 && task1.scored?.n === 1 && retryAudit(task1.attempts.map((a) => a.cls)).length === 0, "a task failure never retries");
+  const thrown = await runWithRetry(async (n) => { if (n === 1) throw new Error("boom"); return { cls: "ok" as const }; });
+  assert(thrown.attempts[0]!.cls === "infra:harness-crash" && thrown.scored?.n === 2, "a throwing attempt is a harness crash and is retried");
+  const buggy = await runWithRetry(async (n) => ({ cls: n < 3 ? ("task-failure" as const) : ("ok" as const) }), { retryIf: () => true });
+  assert(retryAudit(buggy.attempts.map((a) => a.cls)).some((f) => f.startsWith("task-failure-retried")), "a policy that retries a task failure must report task-failure-retried");
+
+  // through the trial: a thrown runner and an API-error stream are classified, recorded as infra, and not-passed
+  const { runTrial } = await import("./lib/trial.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const dir = tmpdir("retry-trial");
+  const go = (runner: import("./lib/run.ts").Runner) => fixtureCopy(true).then(async (src) => runTrial({ arm: loadArm(ARM_FILE), srcRepo: src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke", runner, measure: { judge: recJudge(PASSV) } }));
+  const crash = await go(async () => { throw new Error("spawn failed"); });
+  assert(crash.cls === "infra:harness-crash" && crash.row.measure?.attemptKind === "infra" && !crash.row.passed, "a measured trial survives a runner exception as infra");
+  const api = await go(async (_c, o) => ({ stdout: [{ ...init, cwd: o.cwd }, res("API Error: 429")].map((e) => JSON.stringify(e)).join("\n"), stderr: "", exitCode: 1, wallMs: 1 }));
+  assert(api.cls === "infra:api-error" && api.row.measure?.attemptKind === "infra", `API error stream: ${api.cls}`);
+  let threw = false;
+  await trialWith({ runner: async () => { throw new Error("spawn failed"); } }).catch(() => (threw = true));
+  assert(threw, "an unmeasured trial still throws on a runner exception");
+});
+
+// S26 -- run validity on the first pass; replacement; R5 (a still-lost slot FAILS the run, never shrinks the denominator).
+check("S26 validity: >5% infra-lost -> INVALID; >1 lost in a cell -> INVALID; slot unfilled after 2 rounds -> FAILED (owner decides); control -> VALID; replacement keeps completed scores and stops at 2 rounds", async () => {
+  const { runValidity, replaceLost } = await import("./lib/validity.ts");
+  const mk = (lost: { arm?: string; task?: string; trial: number; unfilled?: boolean }[]) => {
+    const slots = [] as import("./lib/validity.ts").Lost[];
+    for (const arm of ["A0", "A1"]) for (const task of ["t1", "t2", "t3", "t4"]) for (let trial = 1; trial <= 3; trial++) slots.push({ arm, repo: "r", task, trial, firstLost: false, finalLost: false });
+    for (const l of lost) {
+      const s = slots.find((x) => x.arm === (l.arm ?? "A0") && x.task === (l.task ?? "t1") && x.trial === l.trial)!;
+      s.firstLost = true;
+      s.finalLost = !!l.unfilled;
+    }
+    return slots;
+  };
+  const control = runValidity(mk([{ trial: 1 }]));
+  assert(control.state === "VALID" && control.firstPassLost === 1 && control.expectedSlots === 24, `control (1 of 24 lost, 4.2%) must be VALID: ${JSON.stringify(control)}`);
+  const share = runValidity(mk([{ trial: 1 }, { task: "t2", trial: 1 }]));
+  assert(share.state === "INVALID" && share.findings.some((f) => f.includes("infra-lost share")), `8.3% lost must be INVALID: ${share.findings}`);
+  const cell = runValidity(mk([{ trial: 1 }, { trial: 2 }]));
+  assert(cell.state === "INVALID" && cell.findings.some((f) => f.includes("lost 2 slots > 1")), `2 lost in one cell: ${cell.findings}`);
+  const cellOnly = runValidity(mk([{ trial: 1 }, { trial: 2 }]), { maxInfraShare: 0.2, cellLimit: 1, maxReplacementRounds: 2 });
+  assert(cellOnly.state === "INVALID" && cellOnly.findings.length === 1 && cellOnly.findings[0]!.includes("A0 x r/t1 lost 2"), `cell limit alone must be INVALID: ${cellOnly.findings}`);
+  assert(runValidity(mk([{ trial: 1 }, { trial: 2 }]), { maxInfraShare: 0.2, cellLimit: 2, maxReplacementRounds: 2 }).state === "VALID", "the cell limit is a parameter");
+  const failed = runValidity(mk([{ trial: 1, unfilled: true }]));
+  assert(failed.state === "FAILED (owner decides)" && failed.expectedSlots === 24 && failed.finalUnfilled === 1, `an unfilled slot must FAIL the run: ${JSON.stringify(failed)}`);
+
+  const slots = [{ id: "a", lost: true }, { id: "b", lost: true }, { id: "c", lost: false }];
+  const calls: string[] = [];
+  const out = await replaceLost(slots, async (s, round) => { calls.push(`${s.id}@${round}`); return s.id === "a" && round === 2; });
+  assert(out.roundsUsed === 2 && calls.join() === "a@1,b@1,a@2,b@2" && !slots[0]!.lost && slots[1]!.lost, `only lost slots re-run, at most 2 rounds: ${calls}`);
+});
+
+// S27 -- the analysis on fixture data: numbers, parameters, determinism; three must-FAIL audits; a green control.
+check("S27 analysis: primary/symptoms/pass@k/R-b/cost/A0-floor computed on fixture data; Unknown = not-passed and reported apart; must-FAIL: Unknown-as-pass, infra-lost in a symptom, reduced denominator; control audit empty", async () => {
+  const { analyze, auditAnalysis, renderReport, DEFAULT_PARAMS } = await import("./lib/analyze.ts");
+  const { fixtureSlots } = await import("./lib/fixture-slots.ts");
+  const control = fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1 }], unknown: [{ arm: "A1", task: "t1", trial: 2 }] });
+  const rep = analyze(control);
+  assert(rep.state === "VALID" && rep.denominator === 48 && rep.expectedSlots === 48, `control must be VALID with all 48 slots: ${rep.state}`);
+  assert(auditAnalysis(control, rep).length === 0, `control audit must be empty: ${auditAnalysis(control, rep)}`);
+  const a1 = rep.arms!.A1!;
+  assert(a1.passHatK <= a1.passAt1 + 1e-9 && a1.passAt1 <= a1.passAtK + 1e-9 && Math.abs(a1.passAt1 - a1.primary.value) < 1e-9, "pass^k <= pass@1 <= pass@k and pass@1 equals the primary endpoint");
+  assert(a1.unknowns.business === 2 && rep.arms!.A0!.unknowns.business === 0, "the Unknown is reported apart, per arm");
+  const noUnknown = analyze(fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1 }] }));
+  assert(noUnknown.arms!.A1!.primary.value > a1.primary.value || noUnknown.arms!.A1!.passHatK >= a1.passHatK, "an Unknown business verdict counts as not-passed");
+  assert(a1.symptoms.business.nTrials === 5 && a1.symptoms.business.nTasks === 2, `the first-pass-lost slot is excluded from the business measure: ${JSON.stringify(a1.symptoms.business)}`);
+  assert(a1.primaryFirstPass.nTrials === 24 && a1.primary.nTrials === 24, "the lost slot counts (not-passed) in the first-pass primary and is filled in the final one");
+  assert(JSON.stringify(analyze(control).arms!.A1!.primary.ci) === JSON.stringify(a1.primary.ci), "a fixed seed gives the same interval");
+  assert(rep.spend!.infraUsd > 0 && Math.abs(rep.spend!.totalUsd - rep.spend!.scoredUsd - rep.spend!.infraUsd) < 1e-9, "total spend = scored + infra");
+
+  // parameters are parameters
+  const w = analyze(control, { ...DEFAULT_PARAMS, tokenWeights: { input: 0, output: 1, cacheRead: 0, cacheWrite: 0 }, bootstrap: { resamples: 200, seed: 1, ci: 0.5 } });
+  assert(w.arms!.A1!.tokens.weightedMedian !== a1.tokens.weightedMedian && JSON.stringify(w.arms!.A1!.primary.ci) !== JSON.stringify(a1.primary.ci), "token weights and bootstrap settings come from the parameters");
+
+  // decision rules
+  const hard = analyze(fixtureSlots({ arms: { A0: { success: 0.5, tokens: 1000 }, A1: { success: 0.2, tokens: 1000 }, A2: { success: 0.05, tokens: 2600 } }, k: 3 }));
+  assert(hard.rb!.business.defect && hard.rb!.lostDetail.defect, `A1 failing most tasks is a measured defect: ${JSON.stringify(hard.rb)}`);
+  assert(hard.cost!.A2!.withinCeiling === false && hard.cost!.A2!.ratioVsA1 > 2, "A2 at 2.6x A1 tokens breaches the 2.0x ceiling");
+  assert(hard.a0Floor!.A2!.fails && hard.a0Floor!.A1!.fails, "an arm below A0 on the primary fails the floor");
+  assert(!analyze(fixtureSlots({ arms: { A0: { success: 0.5, tokens: 1000 }, A1: { success: 1, tokens: 1000 } } })).rb!.business.defect, "a passing A1 is no defect");
+  const text = renderReport(rep);
+  assert(/Unknown verdicts/.test(text) && /R-b/.test(text) && /pass\^k/.test(text) && /A0 floor/.test(text) && /Spend: scored/.test(text), "the report carries every section");
+
+  // must-FAIL 1: Unknown counted as pass
+  const asPass = control.map((s) => ({ ...s, first: s.first && { ...s.first, business: s.first.business === "UNKNOWN" ? ("PASS" as const) : s.first.business }, final: s.final && { ...s.final, business: s.final.business === "UNKNOWN" ? ("PASS" as const) : s.final.business } }));
+  assert(auditAnalysis(control, analyze(asPass)).some((f) => f.startsWith("unknown-counted-as-pass")), "Unknown counted as pass must report unknown-counted-as-pass");
+  // must-FAIL 2: an infra-lost trial counted in a symptom measure
+  const inSymptom = control.map((s) => ({ ...s, first: s.first ?? s.final }));
+  assert(auditAnalysis(control, analyze(inSymptom)).some((f) => f.startsWith("infra-lost-in-symptom")), "an infra-lost trial in a symptom measure must report infra-lost-in-symptom");
+  // must-FAIL 3: a reduced denominator when a slot stays unfilled
+  const unfilled = fixtureSlots({ lost: [{ arm: "A1", repo: "clinic", task: "t2", trial: 1, unfilled: true }] });
+  const honest = analyze(unfilled);
+  assert(honest.state === "FAILED (owner decides)" && honest.denominator === 48 && !honest.arms && auditAnalysis(unfilled, honest).length === 0 && /FAILED \(owner decides\)/.test(renderReport(honest)), `an unfilled slot FAILS the run at the full denominator: ${honest.state}`);
+  const shrunk = analyze(unfilled.filter((s) => s.final !== null));
+  assert(shrunk.state === "VALID" && auditAnalysis(unfilled, shrunk).some((f) => f.startsWith("denominator-reduced")), "a report over only the filled slots must report denominator-reduced");
+  // validity limits surface through analyze too
+  const invalid = analyze(fixtureSlots({ lost: [0, 1, 2].map((i) => ({ arm: "A1", repo: "clinic", task: `t${i + 1}`, trial: 1 })) }));
+  assert(invalid.state === "INVALID" && !invalid.arms && /INVALID: no ruling/.test(renderReport(invalid)), `3 of 48 lost (6.3%) is INVALID with no ruling: ${invalid.state}`);
+});
+
+// S28 -- wiring: the CLI entry points exist and run, and an old protocol-width log widens once.
+check("S28 wiring: analyze.ts --fixture runs and prints its verdict line; run-trial.ts routes --measured through the retry loop; a 21-column protocol log widens to the measure column", async () => {
+  const run = Bun.spawnSync(["bun", path.join(AB, "analyze.ts"), "--fixture", "--out", path.join(tmpdir("an"), "report.md")], { cwd: AB });
+  assert(run.exitCode === 0 && /analysis: VALID/.test(run.stdout.toString()), `analyze --fixture: ${run.stdout.toString()}${run.stderr.toString()}`);
+  const src = fs.readFileSync(path.join(AB, "run-trial.ts"), "utf8");
+  assert(src.includes("--measured") && src.includes("runWithRetry") && src.includes("measure: {}"), "run-trial.ts must route --measured through runWithRetry with the measured record");
+  const { appendRow } = await import("./lib/record.ts");
+  const cols = ["ts", "tag", "arm", "repo", "task", "trial", "attempt", "graders", "in", "out", "cache-read", "cache-write", "cost-usd", "wall-s", "exit", "pins", "raw", "passed", "deviation", "g2", "park"];
+  const oldRow = "| 2026-10-29T00:00:00.000Z | smoke | a0 | r | t | 1 | 1 | g | 1 | 1 | 0 | 0 | 0.1 | 1.0 | ok | {} | {} | true |  |  |  |";
+  const log = path.join(tmpdir("rec2"), "log.md");
+  fs.writeFileSync(log, ["# log", "", `| ${cols.join(" | ")} |`, `|${cols.map(() => "---").join("|")}|`, oldRow, ""].join("\r\n"));
+  appendRow(log, { tag: "smoke", arm: "a1", repo: "r", task: "t", trial: 1, attempt: 1, graders: "g", tokens: null, costUsd: null, wallS: 1, exit: "ok", pins: {}, raw: {}, passed: true });
+  appendRow(log, { tag: "smoke", arm: "a1", repo: "r", task: "t", trial: 2, attempt: 1, graders: "g", tokens: null, costUsd: null, wallS: 1, exit: "ok", pins: {}, raw: {}, passed: true });
+  const text = fs.readFileSync(log, "utf8");
+  assert(text.includes("| g2 | park | measure |") && (text.match(/\| park \| measure \|/g) ?? []).length === 1 && text.includes(oldRow), "the 21-column header widens once to include measure; the earlier row is untouched");
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
