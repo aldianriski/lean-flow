@@ -123,6 +123,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-263 [tags: process] [status: active]: **A breakdown that splits one flow into per-component tasks needs one task whose acceptance runs the whole flow on real input; otherwise each task passes on its own part and nothing proves the outcome.** The EPIC-023 S1 intake sliced discovery into a scan task, a business-discovery task, three question-set tasks, a template audit and a migrate task, each exercised on real repos. Codex R1 found that none required the finished `init` to write the whole profile on an unprofiled stack: the scan task left the business sections as prompts by design, and no later task closed the gap. It was the one blocking High in the intake. L-020 asks whether a capability is wired into its callers; this asks whether the epic clause the slices add up to is itself some task's acceptance. At intake, map each clause of the Closed-when line to the one task whose Done-when proves it whole.
+- seen: 2026-10-30 (SPRINT-149, EPIC-023 S1 intake, Codex R1 finding F1; fixed as TASK-554's third box)
+- count: 1
+- promoted: no
+- related: L-020 (wired into callers) · L-186 (the population a guard covers)
+
+---
+
 ## L-262 [tags: process] [status: promoted]: **A builder brief that names the task's tests but not `tsc --noEmit` gets a commit that passes its tests and fails the typecheck leg.** SPRINT-148 had two sightings. The T3 builder committed gate-remote's new code with its file tests and the full `bun test` green, and the VPS gate went red on seven strict-index errors in that code. The T2 builder, in a worktree, never ran `tsc` at all, and nine `exactOptionalPropertyTypes` errors surfaced only when the coordinator's post-merge `merge-check` ran (L-218 working as written). Bun runs TypeScript without type-checking it, so a green test run says nothing about types. L-218 is the coordinator's side, catching it after the merge; this is the brief's side. Every dispatch brief that touches `.ts` names `bunx tsc --noEmit` among the checks to run before commit.
 - seen: 2026-10-29 (SPRINT-148 T3: red VPS typecheck at `54eed65d`, fixed in `cfbb748c` · T2: post-merge `merge-check` red, fixed in `c6503711`)
 - count: 2
