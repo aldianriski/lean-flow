@@ -24,11 +24,11 @@ promote, ruled that re-placing the rule is a task, not a promote edit (a shipped
 count 5, which admits it under ADR-053 if it adds machinery; as prose in an existing skill it is unfrozen.
 
 ## Done when
-- [ ] The rhythm (self-check before R1 · owner forks asked before R1 · altitude stated in the brief · at most 2 rounds,
+- [x] The rhythm (self-check before R1 · owner forks asked before R1 · altitude stated in the brief · at most 2 rounds, ✓ placed at 673f095d: review-scoping § Draft reviews, pointed to from task-decomposer step 6 and lean-doc-generator § Epic; the L-217 pointer names it, disposition move-to-reference; Codex R1 CLEAR (T1, T5)
   R2 blocking only on an outcome-changing High · the rest carried as G2 notes · fixes state what must be true) is placed
   where every flow that runs an intake or proposal review reads it, chosen by §10's placement test and named in the
   L-217 pointer line with its disposition.
-- [ ] The placement is consumer-safe: no maintainer-only path or Codex-specific wording leaks into a shipped skill.
+- [x] The placement is consumer-safe: no maintainer-only path or Codex-specific wording leaks into a shipped skill. ✓ consumer grep over the shipped section: 0 hits for maintainer paths, repo ids or Codex wording, control hits 1; Codex R1 T3 CLEAR
 - [ ] One real intake review run under the placed rule ends in at most 2 rounds, recorded in its log or commit.
 
 ## Touches

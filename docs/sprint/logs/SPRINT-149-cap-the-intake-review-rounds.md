@@ -58,3 +58,11 @@ What broke: G2 placed the rhythm in `skills/orchestrator/references/review-scopi
 `skills/lean-doc-generator/SKILL.md`, and DoD 3's vehicle writes new task files under `docs/work/backlog/`. None of the three
 was declared at promote. Impact: three Layers tokens added to T1's Plan line; `skills/task-decomposer/` stays (its pointer);
 one task, so no overlap. Re-confirm G2: signed in the entry above (owner popup).
+
+### 2026-10-30 | progress | T1 -- placement committed and reviewed in one Codex round; boxes 1 and 2 ticked
+consequence · T1 · behaviour:low · governance:high
+Built inline (the section text was approved verbatim at G2) at `673f095d`. The prose-density ratchet caught the step-6 pointer
+pushing a line past 400 characters; split onto its own line, then merge-check 4 green + 1 WIP skip, orchestrator-store 42/0,
+review-depth fixtures green, SKILL caps 133/139/140. Codex R1 under the placed rhythm (self-check done, no open fork, altitude in
+the brief, cap 2): CLEAR on all five threat items, so the review closed in 1 round. Box 3 waits on the S1 intake (D3).
+review · T1 · scoped-reviewer · behaviour:low · governance:high
