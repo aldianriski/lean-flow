@@ -10,7 +10,7 @@ class: decision
 tier: X
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-536]
 ---
 
@@ -32,7 +32,6 @@ Half of workdoo's frozen 8-task corpus; the task set is what the whole epic is j
 `evals/ab/tasks/workdoo/`
 
 ## Assumes
-- **blocked-by:** TASK-536 (answers file).
 - Trials and authoring run on `D:\Research\workdoo` copies, never `D:\Project\workdoo`.
 
 ## Tracker

@@ -10,7 +10,7 @@ class: decision
 tier: X
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-535, TASK-536]
 ---
 
@@ -32,7 +32,6 @@ Half of the clinic repo's frozen 8-task corpus. Not frozen under ADR-053: mainta
 `evals/ab/tasks/clinic/`
 
 ## Assumes
-- **blocked-by:** TASK-535 (complete clinic repo), TASK-536 (answers file).
 
 ## Tracker
 research §7 Tasks

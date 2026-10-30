@@ -10,7 +10,7 @@ class: decision
 tier: X
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-536]
 ---
 
@@ -32,7 +32,6 @@ The other half of workdoo's frozen 8-task corpus. Not frozen under ADR-053: main
 `evals/ab/tasks/workdoo/`
 
 ## Assumes
-- **blocked-by:** TASK-536 (answers file).
 
 ## Tracker
 research §7 Tasks

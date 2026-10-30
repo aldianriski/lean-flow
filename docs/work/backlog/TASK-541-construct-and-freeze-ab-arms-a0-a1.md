@@ -10,7 +10,7 @@ class: execution
 tier: G
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-533, TASK-536]
 ---
 
@@ -29,7 +29,6 @@ A1 is the 2.x reference every later arm is compared against, and A0 is the floor
 `evals/ab/arms/` (new) · `D:\Research\` snapshots
 
 ## Assumes
-- **blocked-by:** TASK-533 (harness), TASK-536 (answers files).
 
 ## Tracker
 research §7 Two phases · Artifact reuse

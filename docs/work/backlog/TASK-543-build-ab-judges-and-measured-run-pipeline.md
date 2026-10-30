@@ -10,7 +10,7 @@ class: decision
 tier: G
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-533, TASK-537, TASK-538, TASK-539, TASK-540]
 ---
 
@@ -31,7 +31,6 @@ Turns single smoke runs into scored, costed, analysable measurements; every deci
 `evals/ab/` · `docs/research/logs/`
 
 ## Assumes
-- **blocked-by:** TASK-533 (harness), TASK-537..540 (task corpus).
 - **G2 note (Codex intake R5, carried by owner ruling, not fixed at intake):** the "exactly 3 slots per cell (96)" denominator conflicts with the validity limits when a slot is still infra-lost after 2 replacement rounds (95 filled + 1 lost passes both limits). G2 rules one: every slot filled before any ruling (unfilled after round 2 → run failed), or a frozen reduced denominator.
 
 ## Tracker
