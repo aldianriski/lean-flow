@@ -213,3 +213,11 @@ What broke: TASK-558 box 3 (the next real promote that pulls a dependent uses th
 Impact: per the owner's G2 ruling, TASK-558 is scoped out at this close with boxes 1 and 2 ticked; its `sprint:` stamp and its
 Members line are removed, and it returns to the backlog to join the next sprint, whose promote meets box 3. Re-confirm
 G2: owner ruling at G2 (carry to the next promote).
+
+### 2026-10-30 | progress | close -- system verify found two FAILs: the corpus's app tests ran as lean-flow tests (fixed), and T8's early self-review record
+System verify through gate-remote at `a27eeaed`: qa-check 340 pass, 1 fail; bun test 589 pass, 3 fail. The three bun test
+failures were the clinic web acceptance tests stored in the task corpus, which `bun test` picked up as lean-flow tests (the
+same class as the typecheck exclusion at T5). The test config now ignores the corpus; bun test locally: 589 pass, 0 fail.
+The qa-check FAIL is review-depth: the log's first T8 record says self-review against behaviour:material. Two independent
+Codex rounds followed it, but the checker examines every self-review line on its own, and an append-only log cannot drop
+it. Owner ruling sought.

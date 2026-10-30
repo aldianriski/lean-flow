@@ -8,3 +8,5 @@
 # Domain and component tests must stay fast enough to run on every change (V3 §6 Layer 1-2).
 # A test that needs longer than this is an adapter/integration test and says so by failing here.
 timeout = 5000
+# The A/B task corpus stores other repos' acceptance tests as fixtures; they are never lean-flow's own tests.
+pathIgnorePatterns = ["evals/ab/tasks/**"]
