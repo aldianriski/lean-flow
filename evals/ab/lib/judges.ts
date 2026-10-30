@@ -13,7 +13,71 @@ import type { JudgeOut, JudgeVerdict } from "./record.ts";
 
 export const DIMENSIONS = ["convention", "business", "scope"] as const;
 export type Dimension = (typeof DIMENSIONS)[number];
-export type JudgeInput = { task: Pick<Task, "prompt" | "layers" | "outOfScope">; diff: string; notes?: string | undefined };
+/** A file as it reads AFTER the change, given to the judges as context only. */
+export type ContextFile = { path: string; content: string };
+export type JudgeInput = { task: Pick<Task, "prompt" | "layers" | "outOfScope">; diff: string; notes?: string | undefined; files?: ContextFile[] | undefined };
+
+export const CONTEXT_MAX_LINES = 400;
+export const CONTEXT_MAX_BYTES = 60_000;
+const ARMS_DIR = path.join(import.meta.dir, "..", "arms");
+
+/** Repo-relative paths of the lean-flow docs an arm adds (evals/ab/arms/<repo>-lf-docs.txt); none for an arm with no such list. */
+export function lfDocsOf(armId: string, armsDir = ARMS_DIR): Set<string> {
+  const f = path.join(armsDir, `${armId.replace(/[-_]a\d+$/i, "")}-lf-docs.txt`);
+  return new Set(fs.existsSync(f) ? fs.readFileSync(f, "utf8").split(/\r?\n/).map((l) => l.trim().replaceAll("\\", "/")).filter(Boolean) : []);
+}
+
+/** Files a unified diff writes to (new-side paths; deletions have none). */
+export function diffPaths(diff: string): string[] {
+  return [...new Set([...diff.matchAll(/^\+\+\+ b\/(.+?)\s*$/gm)].map((m) => m[1]!))];
+}
+
+/**
+ * Pack file contents as judge context: lean-flow docs and binary files left out, each file cut at CONTEXT_MAX_LINES, the whole
+ * context at CONTEXT_MAX_BYTES (a file that would cross the cap is cut there and the rest dropped), every cut marked.
+ */
+export function packContext(files: ContextFile[], excluded: Set<string>): ContextFile[] {
+  const out: ContextFile[] = [];
+  let bytes = 0;
+  for (const f of files) {
+    if (excluded.has(f.path) || f.content.includes("\u0000")) continue;
+    const lines = f.content.split("\n");
+    let text = f.content;
+    if (lines.length > CONTEXT_MAX_LINES) text = `${lines.slice(0, CONTEXT_MAX_LINES).join("\n")}\n[cut at ${CONTEXT_MAX_LINES} lines]`;
+    const room = CONTEXT_MAX_BYTES - bytes;
+    if (room <= 0) break;
+    if (Buffer.byteLength(text) > room) text = `${text.slice(0, room)}\n[context cut at ${CONTEXT_MAX_BYTES} bytes]`;
+    out.push({ path: f.path, content: text });
+    bytes += Buffer.byteLength(text);
+  }
+  return out;
+}
+
+/** Context from a tree: each touched path that exists there, as it reads now (a trial dir after the run). */
+export function contextFromTree(root: string, paths: string[], excluded: Set<string>): ContextFile[] {
+  return packContext(paths.filter((p) => !p.split("/").includes("..") && fs.existsSync(path.join(root, p)) && fs.statSync(path.join(root, p)).isFile()).map((p) => ({ path: p, content: fs.readFileSync(path.join(root, p), "utf8") })), excluded);
+}
+
+/** Context from a snapshot plus a patch: the touched files with the patch applied, in a scratch copy (calibration). Empty when the patch does not apply. */
+export function contextFromPatch(snapshot: string, patch: string, excluded: Set<string>): ContextFile[] {
+  const paths = diffPaths(patch);
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "ab-ctx-"));
+  try {
+    for (const p of paths) {
+      const src = path.join(snapshot, p);
+      if (p.split("/").includes("..") || !fs.existsSync(src)) continue;
+      fs.mkdirSync(path.dirname(path.join(tmp, p)), { recursive: true });
+      fs.copyFileSync(src, path.join(tmp, p));
+    }
+    const patchFile = path.join(tmp, ".ab-context.patch");
+    fs.writeFileSync(patchFile, patch);
+    const r = Bun.spawnSync(["git", "-c", "core.autocrlf=false", "apply", "--whitespace=nowarn", "--ignore-whitespace", patchFile], { cwd: tmp });
+    fs.rmSync(patchFile);
+    return r.exitCode === 0 ? contextFromTree(tmp, paths, excluded) : [];
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
 
 const REPLY = `Reply with one JSON line only: {"verdict":"PASS"|"FAIL"|"UNKNOWN","reason":"<one sentence>"}. Use UNKNOWN when the material given is not enough to decide; do not guess.`;
 
@@ -32,11 +96,12 @@ const section =(title: string, body: string) => `${title}\n<<<\n${body}\n>>>\n`;
 export function buildPrompt(dim: Dimension, i: JudgeInput): string {
   const parts = [`You are an isolated reviewer scoring a code change. ${RUBRIC[dim]}\n`, section("TASK", i.task.prompt), section("ALLOWED LAYERS", (i.task.layers ?? []).join("\n") || "(none declared)"), section("OUT OF SCOPE", (i.task.outOfScope ?? []).map((o) => `- ${o}`).join("\n") || "(none declared)")];
   if (dim === "business") parts.push(section("BUSINESS FACTS", i.notes?.trim() || "(none provided)"));
+  parts.push(section("FILES AFTER THE CHANGE (context only: the surrounding code the diff sits in; judge the diff)", (i.files ?? []).map((f) => `=== ${f.path} ===\n${f.content}`).join("\n") || "(none provided)"));
   parts.push(section("DIFF", i.diff || "(empty diff)"), REPLY);
   return parts.join("\n");
 }
 
-const SENTINEL: JudgeInput = { task: { prompt: "<task>", layers: ["<layer>"], outOfScope: ["<out-of-scope>"] }, diff: "<diff>", notes: "<notes>" };
+const SENTINEL: JudgeInput = { task: { prompt: "<task>", layers: ["<layer>"], outOfScope: ["<out-of-scope>"] }, diff: "<diff>", notes: "<notes>", files: [{ path: "<path>", content: "<content>" }] };
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 /** Hash of a dimension's prompt frame rendered over fixed sentinels: freezes rubric, framing and reply contract. */
 export const promptHash = (dim: Dimension): string => sha256(buildPrompt(dim, SENTINEL));
@@ -91,9 +156,10 @@ export async function runJudges(input: JudgeInput, judge: Judge, blind: string[]
   const overhead: JudgeUsage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, costUsd: 0 };
   const judges = {} as Record<Dimension, JudgeOut>;
   const prompts = {} as Record<Dimension, string>;
+  const ctxLeak = (input.files ?? []).flatMap((f) => blindProblems(`${f.path}\n${f.content}`, blind).map((x) => `judge-context-leak: ${f.path}: ${x.replace("judge-prompt-leak: ", "")}`));
   for (const dim of DIMENSIONS) {
     const prompt = (prompts[dim] = buildPrompt(dim, input));
-    const leak = blindProblems(prompt, blind);
+    const leak = [...ctxLeak, ...blindProblems(prompt, blind)];
     if (leak.length > 0) {
       judges[dim] = { verdict: "UNKNOWN", reason: `blind-breach, not sent: ${leak.join("; ")}` };
       continue;

@@ -13,7 +13,7 @@ import path from "node:path";
 import { DEFAULT_PARAMS } from "../lib/analyze.ts";
 import { loadArm, type Arm } from "../lib/arm.ts";
 import { loadTask } from "../lib/grade.ts";
-import { blindTerms, currentLock, DIMENSIONS, dimensionOf, lockProblems, LOCK_FILE, runJudges, type Dimension } from "../lib/judges.ts";
+import { blindTerms, contextFromPatch, currentLock, DIMENSIONS, dimensionOf, lfDocsOf, lockProblems, LOCK_FILE, runJudges, type Dimension } from "../lib/judges.ts";
 import { notesOf } from "../lib/measure.ts";
 import { realJudge, type Judge } from "../lib/protocol.ts";
 
@@ -41,6 +41,7 @@ export function pickSample<T>(xs: T[], n: number): T[] {
 }
 
 export type CalibrateOpts = { tasksDir: string; sample: number; judgeFor: (repo: string, taskId: string, kind: Kind) => Judge; armFor: (repo: string) => Arm; notesFor: (repo: string) => string | undefined };
+export const contextOf = (arm: Arm, patch: string) => (arm.snapshot && fs.existsSync(arm.snapshot) ? contextFromPatch(arm.snapshot, patch, lfDocsOf(arm.id)) : []);
 export async function calibrate(o: CalibrateOpts): Promise<{ cells: Cell[]; skipped: string[] }> {
   const cells: Cell[] = [];
   const skipped: string[] = [];
@@ -50,7 +51,7 @@ export async function calibrate(o: CalibrateOpts): Promise<{ cells: Cell[]; skip
     if (fs.existsSync(path.join(t.dir, "wrong.patch"))) kinds.push({ kind: "wrong", diff: fs.readFileSync(path.join(t.dir, "wrong.patch"), "utf8"), breaks: (JSON.parse(fs.readFileSync(path.join(t.dir, "wrong.json"), "utf8")) as { breaks: Dimension[] }).breaks });
     else skipped.push(`${t.repo}/${t.id}: no wrong.patch yet (the coordinator derives one by breaking the rule the task tests)`);
     for (const k of kinds) {
-      const j = await runJudges({ task, diff: k.diff, notes: o.notesFor(t.repo) }, o.judgeFor(t.repo, t.id, k.kind), blindTerms(o.armFor(t.repo)));
+      const j = await runJudges({ task, diff: k.diff, notes: o.notesFor(t.repo), files: contextOf(o.armFor(t.repo), k.diff) }, o.judgeFor(t.repo, t.id, k.kind), blindTerms(o.armFor(t.repo)));
       for (const dim of DIMENSIONS) cells.push({ task: `${t.repo}/${t.id}`, kind: k.kind, dim, expected: k.kind === "reference" ? "PASS" : k.breaks.includes(dim) ? "FAIL" : "-", verdict: j.judges[dim].verdict, reason: j.judges[dim].reason });
     }
   }

@@ -1197,6 +1197,64 @@ check("S36 retry regex + stderr: terminal 'Request failed: HTTP 503' -> infra (r
   assert(cls(run([init], `${tail}\nrate_limit_error: 429`)) === "infra:api-error", "control: a run that died with no result event is classified from its stderr tail");
 });
 
+// S37 -- judge file context: post-change files, caps, lean-flow docs excluded, leak check over the context, prompts re-hashed.
+check("S37 judge context: post-change files from the trial dir / snapshot+patch, 400-line + 60 KB caps, lf-docs and binaries left out, in all three prompts; context carrying an arm id or lean-flow -> judge-context-leak, not sent; clean control -> sent", async () => {
+  const j = await import("./lib/judges.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const root = tmpdir("ctx");
+  const w = (p: string, c: string | Buffer) => {
+    fs.mkdirSync(path.dirname(path.join(root, p)), { recursive: true });
+    fs.writeFileSync(path.join(root, p), c);
+  };
+  w("src/a.ts", "export const a = 1;\n// post-change-marker\n");
+  w("src/long.ts", Array.from({ length: 500 }, (_v, i) => `line ${i + 1}`).join("\n"));
+  w(".claude/CLAUDE.md", "lean-flow project instructions");
+  w("img.bin", Buffer.from([1, 0, 2]));
+  const ctx = j.contextFromTree(root, ["src/a.ts", "src/long.ts", ".claude/CLAUDE.md", "img.bin", "gone.ts", "../escape"], new Set([".claude/CLAUDE.md"]));
+  assert(ctx.map((f) => f.path).join() === "src/a.ts,src/long.ts", `lf-docs, binaries, missing files and traversal are left out: ${ctx.map((f) => f.path)}`);
+  const long = ctx[1]!.content;
+  assert(long.includes("line 400") && !long.includes("line 401") && long.includes("[cut at 400 lines]"), "a file is cut at 400 lines and marked");
+  const big = j.packContext(Array.from({ length: 5 }, (_v, i) => ({ path: `f${i}.ts`, content: "x".repeat(25_000) })), new Set());
+  const bytes = big.reduce((n, f) => n + Buffer.byteLength(f.content), 0);
+  assert(bytes <= 60_000 + 60 && big.length === 3 && big[2]!.content.includes("[context cut at 60000 bytes]"), `the whole context is capped at 60 KB: ${bytes} bytes, ${big.length} files`);
+
+  // armsDir lookup: <repo>-lf-docs.txt for arm <repo>-a1
+  const arms = path.join(root, "arms");
+  fs.mkdirSync(arms);
+  fs.writeFileSync(path.join(arms, "demo-lf-docs.txt"), ".claude/CLAUDE.md\nAGENTS.md\n");
+  assert(j.lfDocsOf("demo-a1", arms).has("AGENTS.md") && j.lfDocsOf("smoke-a0", arms).size === 0, "the exclusion list comes from arms/<repo>-lf-docs.txt, none for an arm without one");
+  assert(j.lfDocsOf("clinic-a1").has(".claude/CLAUDE.md"), "the committed clinic list is read");
+
+  // calibration: snapshot + patch -> the file as it reads AFTER the patch
+  const patch = "diff --git a/src/a.ts b/src/a.ts\n--- a/src/a.ts\n+++ b/src/a.ts\n@@ -1,2 +1,3 @@\n export const a = 1;\n // post-change-marker\n+export const b = 2;\n";
+  const post = j.contextFromPatch(root, patch, new Set());
+  assert(post.length === 1 && post[0]!.content.includes("export const b = 2;") && post[0]!.content.includes("post-change-marker"), `snapshot + patch gives the post-change file: ${JSON.stringify(post)}`);
+  assert(j.contextFromPatch(root, patch.replace(" export const a = 1;", " export const z = 9;"), new Set()).length === 0, "a patch that does not apply gives no context, not a wrong one");
+  assert(j.diffPaths(patch).join() === "src/a.ts", "touched paths come from the diff");
+
+  // the prompts carry it, in all three dimensions, and are re-hashed
+  const input = { task: JUDGE_TASK, diff: patch, files: post };
+  for (const d of j.DIMENSIONS) assert(j.buildPrompt(d, input).includes("export const b = 2;") && j.buildPrompt(d, input).includes("FILES AFTER THE CHANGE"), `${d} prompt must carry the context`);
+  assert(j.lockProblems().length === 0, `prompts.lock.json must match the re-hashed prompts: ${j.lockProblems()}`);
+
+  // leak check over the context
+  const arm = { ...loadArm(ARM_FILE), id: "workdoo-a1" };
+  const terms = j.blindTerms(arm);
+  for (const leak of ["// generated for workdoo-a1", "see the lean-flow docs", "// produced by A1"]) {
+    const seen: string[] = [];
+    const r = await j.runJudges({ task: JUDGE_TASK, diff: "+x", files: [{ path: "src/a.ts", content: leak }] }, recJudge(PASSV, seen), terms);
+    assert((seen as string[]).length === 0 && Object.values(r.judges).every((x) => x.verdict === "UNKNOWN" && x.reason.includes("judge-context-leak: src/a.ts")), `context "${leak}" must report judge-context-leak and not be sent`);
+  }
+  const seen2: string[] = [];
+  const fine = await j.runJudges({ task: JUDGE_TASK, diff: "+x", files: post }, recJudge(PASSV, seen2), terms);
+  assert((seen2 as string[]).length === 3 && Object.values(fine.judges).every((x) => x.verdict === "PASS"), "control: clean context is sent to all three judges");
+
+  // a measured trial hands the judges the touched file as it reads after the run
+  const sent: string[] = [];
+  const m = await measuredTrial({ edit: (cwd) => fs.appendFileSync(path.join(cwd, "src", "add.ts"), "// touched-by-trial\n"), judge: recJudge(PASSV, sent) });
+  assert(m.res.row.exit === "ok" && sent.length === 3 && sent.every((p) => p.includes("=== src/add.ts ===") && p.split("=== src/add.ts ===")[1]!.includes("// touched-by-trial")), "the trial's judges see the post-change file");
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it

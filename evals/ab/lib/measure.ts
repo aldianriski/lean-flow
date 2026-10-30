@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./arm.ts";
 import type { Grade, Task } from "./grade.ts";
-import { blindTerms, runJudges, trialDiff } from "./judges.ts";
+import { blindTerms, contextFromTree, diffPaths, lfDocsOf, runJudges, trialDiff } from "./judges.ts";
 import { totalsOf, type Stream } from "./parse.ts";
 import type { Judge } from "./protocol.ts";
 import type { Measure, Tok } from "./record.ts";
@@ -105,7 +105,8 @@ export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; 
   let prompts: Record<string, string> = {};
   if (o.exit === "ok" && o.graded) {
     const diff = trialDiff(o.srcRepo, o.trialDir, o.changed);
-    const r = await runJudges({ task: o.task, diff, notes: notesOf(o.srcRepo) }, o.judge, blindTerms(o.arm));
+    const files = contextFromTree(o.trialDir, diffPaths(diff), lfDocsOf(o.arm.id)); // post-change files from the trial dir, lean-flow docs left out
+    const r = await runJudges({ task: o.task, diff, notes: notesOf(o.srcRepo), files }, o.judge, blindTerms(o.arm));
     judges = r.judges;
     overhead = r.overhead;
     prompts = r.prompts;

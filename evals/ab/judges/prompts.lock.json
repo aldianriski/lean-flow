@@ -1,8 +1,8 @@
 {
   "judgeModel": "claude-sonnet-5-5",
   "prompts": {
-    "convention": "1091b5a2ca933faf25395a6e61493675fc888c72f3a50613b424dc0d1b1f048d",
-    "business": "db9b9806ff6391e0fda73dd7f8073bb0a970a00a5463555238ab93c4cafd531e",
-    "scope": "778e8d881ec098e8e6711069e0e89e062ea585e13f2fef8e304bf05755f582ce"
+    "convention": "3b48f11be43c8771e692df71750adba0e300cab0e94865bfdaafa703109e3b7a",
+    "business": "f0bfa5ebe1b8788444284ce76f316b14c67151601e0d4c3cbed3671781f28f65",
+    "scope": "fa0554eca8741d0f644ec55c923ce84bbd597ec9c178c732ada18f06489f7c21"
   }
 }
