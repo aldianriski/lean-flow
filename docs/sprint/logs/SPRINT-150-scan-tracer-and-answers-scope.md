@@ -74,3 +74,11 @@ CONTEXT.md template already carries its own Stack list and a Patterns in Use sec
 Codex R1 (altitude stated, cap 2): CLEAR on all five threat items. T4 ruled the overlap non-blocking, and it is deferred to
 TASK-552's template audit. Box 3 waits on the owner-driven real `init` on the portfolio-sveltekit snapshot.
 review · T2 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-10-30 | scope-change | T3 -- TASK-557 joins the sprint: two skill argument hints omit modes
+What broke: during T2's box-3 run the owner typed `/lean-doc-generator` and was offered only type-subject, promote and close.
+The skill's argument hint lists 4 of its 8 modes. A 15-skill audit found one more gap, humanizer's audit mode; the other 13
+match. Impact: one S task joins as T3, touching `skills/lean-doc-generator/SKILL.md`, `skills/humanizer/SKILL.md` and
+`CHANGELOG.md`, none of which T1 or T2 declares; Members and Plan gain T3. Re-confirm G2: T3's G1 (full checklist, origin
+manual) and G2 signed by owner popup; the design is the two literal hint values.
+- builder-check · T3 · not run (design is the two literal values; owner signed knowing it did not run)

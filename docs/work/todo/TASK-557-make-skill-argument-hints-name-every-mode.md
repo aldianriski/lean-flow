@@ -1,6 +1,7 @@
 ---
 id: TASK-557
 title: "Make the lean-doc-generator and humanizer argument hints name every mode"
+sprint: SPRINT-150
 priority: P2
 size: S
 risk: low

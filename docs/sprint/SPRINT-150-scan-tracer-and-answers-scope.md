@@ -29,6 +29,7 @@ TASK-489 (blocked) · TASK-367, 402, 498 (blocked) · TASK-507, 523 (`needs-info
 
 - docs/work/todo/TASK-556-widen-task-536-answers-file-to-the-profile-topics.md
 - docs/work/todo/TASK-547-add-repo-profile-sections-and-fill-them-from-a-scan.md
+- docs/work/todo/TASK-557-make-skill-argument-hints-name-every-mode.md
 
 ## Plan
 
@@ -62,6 +63,19 @@ exercised on a stack no profile matches. Shipped skill and template work: not fr
 
 **Acceptance:** a real `init` through the installed plugin on a portfolio-sveltekit snapshot writes stack and conventions in
 use that cite the files they were seen in, and the owner reads them as specific to that repo.
+
+### T3 — Make the lean-doc-generator and humanizer argument hints name every mode `[size: S · risk: low · class: execution · HITL · J2]`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/humanizer/SKILL.md` · `CHANGELOG.md`
+  · `docs/work/todo/TASK-557-make-skill-argument-hints-name-every-mode.md`
+  · `docs/work/in_progress/TASK-557-make-skill-argument-hints-name-every-mode.md`
+  · `docs/work/done/TASK-557-make-skill-argument-hints-name-every-mode.md`
+Depends-on: T2 (`CHANGELOG.md` is shared, T2 first)
+Cites: `TASK-557`
+
+Joined by scope-change. A consumer types a skill name and sees its argument hint; a mode the hint omits cannot be found from
+the prompt. A defect fix in shipped frontmatter.
+
+**Acceptance:** typing `/lean-doc-generator` in a fresh session on the reinstalled plugin offers all eight modes.
 
 ## Decisions (pre-locked)
 
