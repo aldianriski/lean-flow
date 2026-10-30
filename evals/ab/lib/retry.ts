@@ -13,7 +13,7 @@ export function firstActionSeen(s: Stream): boolean {
   return s.events.some((e) => e.type === "assistant" && (e.message?.content ?? []).some((b: any) => b?.type === "tool_use" || (b?.type === "text" && String(b.text ?? "").trim() !== "")));
 }
 
-const API = /rate[ _-]?limit|429|overloaded|5(?:00|02|03|04|29)|api[ _]?error/i;
+const API = /rate[ _-]?limit|\b429\b|overloaded|\b5(?:00|02|03|04|29)\b|api[ _]?error/i;
 const NETWORK = /ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|socket hang up|fetch failed|network (?:error|unreachable)|getaddrinfo/i;
 const SANDBOX = /sandbox/i;
 /** The CLI's own terminal error line starts like this; an agent's prose ("test failed: expected 200, got 500") does not. */
@@ -29,17 +29,21 @@ export type AttemptEvidence = {
 };
 
 /**
- * The TERMINAL infrastructure evidence only: the result event's terminal_reason, its text when that text is the CLI's own error
- * line, the stream's last event when it is a system error / retry that nothing followed, and the tail of stderr (the exit cause).
- * Task prose, tool output and earlier retry events that the run recovered from are never evidence.
+ * The TERMINAL infrastructure evidence only. A run that ended with a result event is classified from that event alone (its
+ * terminal_reason, and its text when that text is the CLI's own error line). Only a run that left NO result event (the CLI
+ * died) adds the stream's trailing system error and the tail of stderr, its exit cause. Task prose, tool output, earlier retry
+ * events and earlier stderr lines that the run recovered from are never evidence.
  */
 function terminalEvidence(a: AttemptEvidence): string {
   const s = a.stream;
   const res = s?.result;
   const parts: string[] = [String(res?.terminal_reason ?? "")];
-  if (res?.is_error && CLI_ERROR.test(String(res.result ?? ""))) parts.push(String(res.result));
+  if (res) {
+    if (res.is_error && CLI_ERROR.test(String(res.result ?? ""))) parts.push(String(res.result));
+    return parts.join("\n");
+  }
   const last = s?.events[s.events.length - 1];
-  if (last && !res && last.type === "system" && /error|retry/.test(String(last.subtype ?? ""))) parts.push(JSON.stringify(last));
+  if (last && last.type === "system" && /error|retry/.test(String(last.subtype ?? ""))) parts.push(JSON.stringify(last));
   parts.push((a.raw?.stderr ?? "").split("\n").slice(-5).join("\n"));
   return parts.join("\n");
 }

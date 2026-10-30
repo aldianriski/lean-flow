@@ -1178,6 +1178,25 @@ check("S35 clinic: both snapshots match their manifests; A0 == pre-init manifest
   assert(JSON.stringify(diff) === JSON.stringify([...set].sort()), `A1 vs A0 must be exactly the set (diff ${diff.length}, set ${set.length})`);
 });
 
+// S36 -- retry classification review: real word boundaries in the API pattern; stderr counts only when the run left no result event.
+check("S36 retry regex + stderr: terminal 'Request failed: HTTP 503' -> infra (red on a regex with backspace bytes); retry.ts holds no U+0008; errored task result with a rate_limit_error stderr tail -> task-failure; no-result run with that tail -> infra", async () => {
+  const { classifyAttempt } = await import("./lib/retry.ts");
+  const { parseStream } = await import("./lib/parse.ts");
+  const src = fs.readFileSync(path.join(AB, "lib", "retry.ts"), "utf8");
+  assert(!src.includes("\u0008"), "retry.ts must contain no U+0008 byte (a lost backslash turned \\b into a backspace)");
+  const init = { type: "system", subtype: "init", cwd: "x", plugins: [] };
+  const act = { type: "assistant", message: { content: [{ type: "tool_use", name: "Bash", input: {} }] } };
+  const res = (text: string, reason = "error") => ({ type: "result", is_error: true, result: text, terminal_reason: reason });
+  const run = (events: object[], stderr = "", exitCode = 1) => ({ stream: parseStream(events.map((e) => JSON.stringify(e)).join("\n")), raw: { stdout: "", stderr, exitCode, wallMs: 1 } });
+  const cls = (r: ReturnType<typeof run>) => classifyAttempt({ ...r, exit: "cli-error" });
+
+  assert(cls(run([init, act, res("Request failed: HTTP 503")])) === "infra:api-error", "a terminal 'Request failed: HTTP 503' must classify infra (real \\b boundaries)");
+  assert(cls(run([init, act, res("Request failed: HTTP 5031 widgets")])) === "task-failure", "control: 5031 is not a 503 (the boundary holds)");
+  const tail = "retrying after rate_limit_error (attempt 1)\nrecovered\nok\nnext\nmore";
+  assert(cls(run([init, act, res("Reached max turns", "max_turns")], `${tail}\nrate_limit_error: 429`)) === "task-failure", "an errored task result with a rate_limit_error in the stderr tail is the task's (stderr is not read when a result exists)");
+  assert(cls(run([init], `${tail}\nrate_limit_error: 429`)) === "infra:api-error", "control: a run that died with no result event is classified from its stderr tail");
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
