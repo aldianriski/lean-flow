@@ -24,7 +24,7 @@ audit of all 15 skills' hints against their documented modes found one more gap:
 other 13 match. A defect fix in shipped frontmatter, so it is not frozen under ADR-053.
 
 ## Done when
-- [ ] lean-doc-generator's `argument-hint` names every mode its Modes table documents (blank · `<type> <subject>` · `promote` ·
+- [x] lean-doc-generator's `argument-hint` names every mode its Modes table documents (blank · `<type> <subject>` · `promote` · ✓ 933bf01b: lean-doc-generator hint names all eight modes and humanizer's names pasted text, file and audit; YAML parse confirmed; Codex R1 CLEAR
   `close` · `epic "<outcome>"` · `prd` · `migrate` · `init`), and humanizer's names its pasted-text, file and audit modes.
 - [ ] A fresh session on the reinstalled plugin shows the full lean-doc-generator suggestion when `/lean-doc-generator` is typed,
   confirmed by the owner.

@@ -82,3 +82,10 @@ match. Impact: one S task joins as T3, touching `skills/lean-doc-generator/SKILL
 `CHANGELOG.md`, none of which T1 or T2 declares; Members and Plan gain T3. Re-confirm G2: T3's G1 (full checklist, origin
 manual) and G2 signed by owner popup; the design is the two literal hint values.
 - builder-check · T3 · not run (design is the two literal values; owner signed knowing it did not run)
+
+### 2026-10-30 | progress | T3 -- both argument hints fixed and reviewed in one Codex round; box 1 ticked
+consequence · T3 · behaviour:low · governance:low
+Built inline at `933bf01b` (two literal frontmatter values plus one CHANGELOG line). A YAML parse renders both hints as
+intended; no harness reads `argument-hint`; merge-check green, token budget unchanged. Codex R1: CLEAR on all three items.
+Box 2 (the owner sees the full suggestion in a fresh session) waits on the next push and reinstall, at close.
+review · T3 · scoped-reviewer · behaviour:low · governance:low
