@@ -75,3 +75,14 @@ state change, and a failed blocker removes it by scope-change. The SKILL.md prom
 (139 lines). merge-check green; the prose-density ratchet unchanged (the file's 10 dense lines predate this change); token
 budget unchanged. Codex R1: CLEAR on all four items. Box 3 waits for the next real promote that pulls a dependent.
 review · T2 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-10-30 | progress | T1 -- answers files and access protocol landed; all three boxes ticked
+consequence · T1 · behaviour:low · governance:low
+Two sonnet drafters wrote clinic (from its spec, 35 facts, 34 citations spot-checked against the spec) and workdoo (from its
+own docs, 87 facts, 9 owner-interview gaps). The coordinator found that both facts files still held tool-facing content:
+setup answers, the lean-flow loop and ADR rule, and the stack and conventions. Under R-a (A0 = raw facts without lean-flow)
+those move to an operator-only file. Owner rulings: BUSINESS-NOTES carries business facts only (stack and conventions stay
+operator-only, so the convention-adherence gap S1 targets stays measurable), and the nine workdoo interview answers. A sonnet
+agent restructured each repo into facts, operator and provenance files plus the protocol; the coordinator re-checked the facts
+files for tool, process and stack terms and trimmed one stack word. Committed at `f81e0214`. Self-review: maintainer-only
+data, no code. Wave 1 is released.
