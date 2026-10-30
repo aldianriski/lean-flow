@@ -24,6 +24,7 @@ status: current
 - **Added** — a review of a draft before the owner approves it (a `/task-decomposer` breakdown before `approve`, an epic or other proposal before activation) now runs in a fixed rhythm: self-check first, the owner's forks asked before round 1, the altitude stated in the brief, at most two rounds with round 2 blocking only on an outcome-changing high, and every other finding carried to the later gate as a note. It lives in the orchestrator's `review-scoping.md` § Draft reviews; both skills point there (SPRINT-149, TASK-546).
 - **Added** — `init` reads code samples per layer and writes two cited sections, Stack (architecture overview) and Conventions in use (coding standards); the requirements template gains Main flows and Invariants and renames Problem → Business goal, Out of scope → Non-goals and Non-functional requirements → Quality attributes (new scaffolds only; existing docs are untouched) (SPRINT-150, TASK-547).
 - **Fixed** — `/lean-doc-generator` now suggests all eight of its modes when typed (it showed four: `init`, `migrate`, `epic` and `prd` were missing), and `/humanizer` names its audit mode (SPRINT-150, TASK-557).
+- **Changed** — `promote` can pull a still-blocked task together with its blockers: when every open blocker joins the same sprint, the dependent joins in a later wave with no state change, and leaves by scope-change if a blocker fails (SPRINT-151, TASK-558).
 
 ## v2.19.1 — three guards report only what they saw (2026-10-28)
 

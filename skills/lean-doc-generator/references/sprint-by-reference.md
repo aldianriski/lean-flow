@@ -9,6 +9,12 @@ to tick, mirror or drift (ADR-047). This file is the procedure behind the `promo
 
 1. Pick the `state: ready` tasks from `docs/work/backlog/` (governance review and size-check first, as
    the lifecycle row says).
+   **A dependent may join with its blockers.** A task still `blocked` may join too, with no state change, when every
+   open blocker in its `depends-on:` (one not yet in `done/` or `cancel/`) is joining this same sprint. Its Plan block's
+   `Depends-on:` names those blockers, which places it in a later **wave**: the tasks whose blockers are all done start
+   together, and each finished wave releases the next. A blocker that is open but not joining (still in another sprint's
+   `todo/` to `review/`, or left in the backlog) keeps the dependent out. If a blocker fails or is scoped out mid-sprint,
+   each dependent waiting on it leaves the same way, by its own `scope-change` entry.
 2. **Move** each member `backlog/ → todo/`. The git case: `git mv`, all moves in **their own commit** — a
    status change never shares a commit with a content edit (ADR-045). With no git: plain file moves.
    Git-less mode is detected, never declared: `git rev-parse --git-dir` fails at the repo root (ADR-054).
