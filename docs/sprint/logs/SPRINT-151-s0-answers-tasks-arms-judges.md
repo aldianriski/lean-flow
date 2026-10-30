@@ -3,7 +3,7 @@ sprint: 151
 slug: s0-answers-tasks-arms-judges
 owner: Maintainer
 last_updated: 2026-10-30
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -221,3 +221,14 @@ same class as the typecheck exclusion at T5). The test config now ignores the co
 The qa-check FAIL is review-depth: the log's first T8 record says self-review against behaviour:material. Two independent
 Codex rounds followed it, but the checker examines every self-review line on its own, and an append-only log cannot drop
 it. Owner ruling sought.
+
+### 2026-10-31 | close | 7 of 8 members delivered (TASK-536, 537, 538, 539, 540, 541, 543), TASK-558 scoped out; system verify ruled by the owner
+Close by reference: the seven delivered members are in `done/`, and TASK-558 left by its scope-change
+(`check-sprint-by-reference --close` 17/0). System verify through gate-remote at `a27eeaed`: qa-check 340 pass, 1 fail;
+bun test 589 pass, 3 fail. The three test failures were the corpus's app tests run as lean-flow tests, fixed in `bb7c91fd`
+(local bun test 589/0). The one qa-check FAIL is review-depth on T8's first record, a self-review line written before the
+wave review; two independent Codex rounds followed it, recorded as scoped-reviewer. Owner override (ADR-021): the FAIL is
+surfaced, the independent review is on record, and the checker fix is filed as TASK-559 (L-268). Handoff reconciliation: no
+`handoff` entry in this log. Retro buckets filed. Doc freshness: CONTEXT.md's triggers did not fire (roster, loop, gates and
+modes unchanged; promote's dependent rule lives in its procedure reference); README names no promote detail. Epic rollup:
+SPRINT-151's EPIC-023 row is completed at archive; Closed-when line 1 (S0) stays open on TASK-544 and TASK-545.
