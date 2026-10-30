@@ -3,7 +3,7 @@ sprint: 149
 slug: cap-the-intake-review-rounds
 owner: Maintainer
 last_updated: 2026-10-30
-status: active
+status: closed
 plan_commit: 3c940554
 gates_signed: G1,G2 @ 594f04c1
 update_trigger: sprint execute/close events

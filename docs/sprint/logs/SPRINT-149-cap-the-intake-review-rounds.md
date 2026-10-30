@@ -3,7 +3,7 @@ sprint: 149
 slug: cap-the-intake-review-rounds
 owner: Maintainer
 last_updated: 2026-10-30
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -79,3 +79,10 @@ in the commit. Follow-up for /triage: widen TASK-536 to the seven profile topics
 What broke: T1 declared the generated index at promote, but no T1 commit changed it (the L-217 pointer edit left the index
 unchanged), and an unused token fails the layers-observed check at close (L-240). Impact: one token removed from T1's Plan
 line; nothing else changes. Re-confirm G2: not needed, the design is unchanged.
+
+### 2026-10-30 | close | 1 of 1 member delivered (TASK-546), 3 of 3 DoD; system verify green off-host
+Close by reference: TASK-546 in `done/`, freeze holds since `3c940554` (`check-sprint-by-reference --close` 4/0). System verify
+through gate-remote at `5d7f421d`: QA_FULL qa-check 332/0, bun test 589/0, exit 0. Handoff reconciliation: no `handoff` entry
+in this log. Retro buckets filed: Shipped in CHANGELOG (T1), no new tech debt, follow-up TASK-556, learning L-263. Doc
+freshness: CONTEXT.md's triggers did not fire (roster, loop, gates, modes and tiers unchanged), and README names no review
+detail, so neither needs a refresh.
