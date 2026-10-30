@@ -34,3 +34,26 @@ Promote governance checklist, signed by the owner by popup:
 Intake: `/triage` (`bcdfdff1`, owner `y`) put TASK-536 behind TASK-556. Composition by owner popup: TASK-556 (S, close-retro
 from SPRINT-149, so G1 takes the full checklist) and TASK-547 (M, decomposer). Size check: no `L`. Epic: EPIC-023 (both).
 `promote-check`: 7 pass, 0 fail. Pre-dispatch preflight: CLEAR by inspection (two tasks, no shared file, no dependency).
+
+### 2026-10-30 | G2 | G1 (T1 full checklist, T2 fast-path) + batch G2 signed for T1-T2 (owner popup), `gates_signed: G1,G2 @ ac776664`
+G1: T1 is `origin: close-retro`, so the full checklist ran: done when TASK-536's box 2 names the seven profile topics and 536 is
+ready; size S; one file; out of scope: every other S0 task and the answers files themselves. T2 is `origin: decomposer`,
+scope unchanged since approval. G2 designs: T1 rewrites TASK-536 box 2 in the Done-when's own words, then runs /triage, which
+flips 536 to ready (state and blocked-by lines only) under an owner y. T2 adds Stack (architecture overview) and Conventions
+in use (coding standards); renames the overlapping requirements headings (Problem to Business goal, Out of scope to its own
+Non-goals section, Non-functional requirements to Quality attributes) and adds Main flows and Invariants, each section saying
+what belongs and what does not. It also makes init read code samples per layer and hold the scan until step 2 writes, and
+exercises it on a portfolio-sveltekit snapshot copied without its env file, node_modules or build output.
+Owner rulings: Q1 rename the overlaps; Q2 reinstall the plugin from this checkout for the DoD 3 run; Q3 /triage runs inside T1
+and rules that TASK-556's blocking content has landed.
+- builder-check · T1 · 2 contradictions · 3 questions · settled in the design: box-2 text uses the Done-when's own words; exact blocked-by
+  replacement fixed; the /triage record is the owner's Q3 ruling; the task-origin leg exists and checks the origin field only
+- builder-check · T2 · 5 contradictions · 5 questions · settled in the design: every section gets belongs and does-not text; Stack excludes
+  external systems (Key Integration Points keeps them); scan held until step 2 writes; unconfirmed conventions are listed, and
+  asking about them is TASK-549's; no doc or README cites the renamed headings; reference files are uncapped; the snapshot
+  excludes the env file; the internal-path grep uses lean-flow markers; intent → popup (Q1, Q2)
+
+### 2026-10-30 | scope-change | T2 -- the decomposer's PRD reference joins T2's `Layers:`
+What broke: Q1 renames the requirements template's Non-functional requirements heading, and
+`skills/task-decomposer/references/prd-and-slices.md` names it in one line. Impact: one Layers token added to T2's Plan line;
+T1 shares nothing with it. Re-confirm G2: signed in the entry above (owner popup).

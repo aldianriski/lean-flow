@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-10-30
 status: active
 plan_commit: 85cf1815
+gates_signed: G1,G2 @ ac776664
 update_trigger: sprint execute/close events
 ---
 
@@ -49,6 +50,7 @@ Layers: `skills/lean-doc-generator/references/init.md`
   · `skills/lean-doc-generator/templates/architecture-overview.md.template`
   · `skills/lean-doc-generator/templates/development-coding-standards.md.template`
   · `skills/lean-doc-generator/templates/product-requirements.md.template` · `CHANGELOG.md`
+  · `skills/task-decomposer/references/prd-and-slices.md`
   · `docs/work/todo/TASK-547-add-repo-profile-sections-and-fill-them-from-a-scan.md`
   · `docs/work/in_progress/TASK-547-add-repo-profile-sections-and-fill-them-from-a-scan.md`
   · `docs/work/done/TASK-547-add-repo-profile-sections-and-fill-them-from-a-scan.md`
