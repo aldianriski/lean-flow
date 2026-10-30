@@ -98,3 +98,7 @@ questions are listed as Not confirmed (indentation, unused atoms and molecules, 
 in the output, and the owner read both sections as specific to that repo. Two more findings came from the run. 15 templates
 carry an HTML comment citing lean-flow's ADR-012, which `init` copies into every consumer doc; the id is not a path, so box 3
 holds, and the leak goes to TASK-552 as an `open:` line by owner ruling. The README replacement was owner-approved in the run.
+
+### 2026-10-30 | progress | T3 -- box 2 met: the owner sees all eight modes; T3 complete
+After the owner pushed `ec30d8d9`, the plugin was reinstalled and its installed copy carries both new hints. In a fresh
+session the owner typed `/lean-doc-generator` and was offered all eight modes.
