@@ -1,0 +1,4 @@
+# clinic/internal/clinic_test [clinic/internal/clinic.test]
+internal\clinic\offset_test.go:23:20: undefined: clinic.OffsetFromMidnight
+FAIL	clinic/internal/clinic [build failed]
+FAIL

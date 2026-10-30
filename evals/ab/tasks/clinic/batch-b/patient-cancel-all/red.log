@@ -1,0 +1,9 @@
+--- FAIL: TestCancelAllForPatient (1.25s)
+    cancel_all_test.go:66: status 404 body map[fault:map[code:NOT_FOUND detail:no such route]]
+--- FAIL: TestCancelAllWithNothingToCancel (0.17s)
+    cancel_all_test.go:88: 404 map[fault:map[code:NOT_FOUND detail:no such route]]
+--- FAIL: TestCancelAllRefusals (0.16s)
+    cancel_all_test.go:96: unknown patient: 404 map[fault:map[code:NOT_FOUND detail:no such route]]
+FAIL
+FAIL	clinic/internal/http	3.644s
+FAIL

@@ -1,0 +1,133 @@
+diff --git a/internal/booking/booking.go b/internal/booking/booking.go
+index 2a79668..057688c 100644
+--- a/internal/booking/booking.go
++++ b/internal/booking/booking.go
+@@ -114,3 +114,15 @@ func (s *Service) Cancel(ctx context.Context, now time.Time, id int64) (rules.Ve
+ 	}
+ 	return rules.Pass(), nil
+ }
++
++// Find returns the appointment, or an UNKNOWN_APPOINTMENT verdict when there is none.
++func (s *Service) Find(ctx context.Context, id int64) (rules.Verdict, model.Appointment, error) {
++	a, found, err := s.Appointments.FetchAppointment(ctx, id)
++	if err != nil {
++		return rules.Fail(faults.Internal), a, err
++	}
++	if !found {
++		return rules.Fail(faults.UnknownAppointment), a, nil
++	}
++	return rules.Pass(), a, nil
++}
+diff --git a/internal/http/appointments.go b/internal/http/appointments.go
+index 7042abe..0960ccc 100644
+--- a/internal/http/appointments.go
++++ b/internal/http/appointments.go
+@@ -54,3 +54,21 @@ func (h *handlers) cancelAppointment(w http.ResponseWriter, r *http.Request) {
+ 	}
+ 	w.WriteHeader(http.StatusNoContent)
+ }
++
++func (h *handlers) getAppointment(w http.ResponseWriter, r *http.Request) {
++	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
++	if err != nil || id <= 0 {
++		writeFault(w, faults.InvalidRequest, "appointment id must be a positive integer")
++		return
++	}
++	v, appt, err := h.booking.Find(r.Context(), id)
++	if err != nil {
++		writeFault(w, faults.Internal, "internal error")
++		return
++	}
++	if !v.OK {
++		writeFault(w, v.Fault, "lookup refused")
++		return
++	}
++	writeJSON(w, http.StatusOK, map[string]any{"appointment": appt})
++}
+diff --git a/internal/http/router.go b/internal/http/router.go
+index e8aca25..49f2029 100644
+--- a/internal/http/router.go
++++ b/internal/http/router.go
+@@ -35,6 +35,7 @@ func NewRouter(d Deps) http.Handler {
+ 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+ 	})
+ 	r.Post("/api/appointments", h.bookAppointment)
++	r.Get("/api/appointments/{id}", h.getAppointment)
+ 	r.Post("/api/appointments/{id}/cancel", h.cancelAppointment)
+ 	return r
+ }
+diff --git a/web/src/gateway/useAppointmentGateway.ts b/web/src/gateway/useAppointmentGateway.ts
+index 01065fe..e9571ae 100644
+--- a/web/src/gateway/useAppointmentGateway.ts
++++ b/web/src/gateway/useAppointmentGateway.ts
+@@ -24,13 +24,13 @@ export function useAppointmentGateway(baseUrl = '') {
+   const cancelledId = ref<number | null>(null)
+ 
+   // send performs one API call and never throws: a refusal or a network failure lands in `fault`.
+-  async function send(path: string, body?: unknown): Promise<unknown | null> {
++  async function send(path: string, body?: unknown, method = 'POST'): Promise<unknown | null> {
+     data.value = null
+     fault.value = null
+     cancelledId.value = null
+     try {
+       const res = await fetch(`${baseUrl}${path}`, {
+-        method: 'POST',
++        method,
+         headers: { 'Content-Type': 'application/json' },
+         body: body === undefined ? undefined : JSON.stringify(body),
+       })
+@@ -52,5 +52,10 @@ export function useAppointmentGateway(baseUrl = '') {
+     if (await send(`/api/appointments/${id}/cancel`)) cancelledId.value = id
+   }
+ 
+-  return { data, fault, cancelledId, book, cancel }
++  async function lookup(id: number): Promise<void> {
++    const body = (await send(`/api/appointments/${id}`, undefined, 'GET')) as { appointment: Appointment } | null
++    if (body) data.value = body.appointment
++  }
++
++  return { data, fault, cancelledId, book, cancel, lookup }
+ }
+diff --git a/web/src/pages/CancelAppointment.vue b/web/src/pages/CancelAppointment.vue
+index 9402d82..dc6c130 100644
+--- a/web/src/pages/CancelAppointment.vue
++++ b/web/src/pages/CancelAppointment.vue
+@@ -2,10 +2,14 @@
+ import { ref } from 'vue'
+ import { useAppointmentGateway } from '../gateway/useAppointmentGateway'
+ 
+-const { fault, cancelledId, cancel } = useAppointmentGateway()
++const { data, fault, cancelledId, cancel, lookup } = useAppointmentGateway()
+ 
+ const appointmentId = ref<number>(1)
+ 
++async function find() {
++  await lookup(appointmentId.value)
++}
++
+ async function submit() {
+   await cancel(appointmentId.value)
+ }
+@@ -19,9 +23,22 @@ async function submit() {
+       name="appointmentId"
+       type="number"
+     ></label>
++    <button
++      name="lookup"
++      type="button"
++      @click="find"
++    >
++      Look up
++    </button>
+     <button type="submit">
+       Cancel appointment
+     </button>
++    <p
++      v-if="data"
++      class="found"
++    >
++      Appointment {{ data.id }}: doctor {{ data.doctorId }}, patient {{ data.patientId }}
++    </p>
+     <p
+       v-if="cancelledId"
+       class="cancelled"

@@ -1,0 +1,45 @@
+### acceptance: go test ./internal/http -run 'TestBookingLeadTime|TestLeadTimeDoesNotAffectCancelling' -count=1
+ok  	clinic/internal/http	3.099s
+### acceptance exit=0
+### go-test: go test ./... -count=1
+?   	clinic/cmd/api	[no test files]
+?   	clinic/cmd/migrate	[no test files]
+?   	clinic/internal/booking	[no test files]
+?   	clinic/internal/clinic	[no test files]
+?   	clinic/internal/db	[no test files]
+?   	clinic/internal/faults	[no test files]
+ok  	clinic/internal/http	11.471s
+?   	clinic/internal/model	[no test files]
+ok  	clinic/internal/rules	0.455s
+?   	clinic/internal/store	[no test files]
+?   	clinic/web/node_modules/flatted/golang/pkg/flatted	[no test files]
+### go-test exit=0
+### go-vet: go vet ./...
+### go-vet exit=0
+### web-typecheck: cd web && npm run typecheck
+
+> clinic-web@0.0.0 typecheck
+> vue-tsc --noEmit
+
+### web-typecheck exit=0
+### web-lint: cd web && npm run lint
+
+> clinic-web@0.0.0 lint
+> eslint .
+
+### web-lint exit=0
+### web-build: cd web && npm run build
+
+> clinic-web@0.0.0 build
+> vue-tsc --noEmit && vite build
+
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 16 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                 0.31 kB │ gzip:  0.23 kB
+dist/assets/index-CuZ59Hr2.js  67.11 kB │ gzip: 26.29 kB
+
+[32m✓ built in 453ms[39m
+### web-build exit=0

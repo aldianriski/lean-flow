@@ -1,0 +1,10 @@
+--- FAIL: TestBookingLeadTime (0.55s)
+    --- FAIL: TestBookingLeadTime/2h_minus_one_second_is_refused (0.00s)
+        lead_time_test.go:34: want 422 SLOT_TOO_SOON, got 201 map[appointment:map[doctorId:1 id:2 patientId:1 slotStart:2030-01-01T01:59:59Z]]
+    --- FAIL: TestBookingLeadTime/30_minutes_ahead_is_refused (0.00s)
+        lead_time_test.go:34: want 422 SLOT_TOO_SOON, got 201 map[appointment:map[doctorId:1 id:3 patientId:1 slotStart:2030-01-01T00:30:00Z]]
+    --- FAIL: TestBookingLeadTime/a_slot_already_started_is_refused (0.00s)
+        lead_time_test.go:34: want 422 SLOT_TOO_SOON, got 201 map[appointment:map[doctorId:1 id:4 patientId:1 slotStart:2029-12-31T10:00:00Z]]
+FAIL
+FAIL	clinic/internal/http	3.669s
+FAIL

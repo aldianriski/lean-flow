@@ -1,0 +1,25 @@
+{
+  "id": "booking-lead-time",
+  "category": "business-rule change",
+  "symptoms": ["business-rule", "convention"],
+  "prompt": "Staff have been booking patients into slots that start in a few minutes, and the doctor is never ready in time. From now on an appointment must be booked at least 2 hours before its slot starts; a slot starting exactly 2 hours from now is still fine. A booking that is too late must be refused with a new fault code, SLOT_TOO_SOON, which the UI can show like the other refusals (use the status that fits the other rule refusals about timing). Nothing else about booking or cancelling changes.",
+  "layers": ["internal/rules", "internal/booking", "internal/clinic", "internal/faults", "internal/http"],
+  "outOfScope": [
+    "existing fault codes and their HTTP statuses",
+    "the cancellation window and the cancel endpoint",
+    "working-hours, daily-cap, slot-uniqueness and patient-record rules",
+    "database schema",
+    "existing tests are not edited"
+  ],
+  "acceptance": {
+    "files": ["internal/http/lead_time_test.go"],
+    "cmd": "go test ./internal/http -run 'TestBookingLeadTime|TestLeadTimeDoesNotAffectCancelling' -count=1"
+  },
+  "graders": [
+    { "name": "go-test", "cmd": "go test ./... -count=1" },
+    { "name": "go-vet", "cmd": "go vet ./..." },
+    { "name": "web-typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web-lint", "cmd": "cd web && npm run lint" },
+    { "name": "web-build", "cmd": "cd web && npm run build" }
+  ]
+}

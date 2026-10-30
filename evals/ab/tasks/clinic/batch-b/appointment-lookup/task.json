@@ -1,0 +1,30 @@
+{
+  "id": "appointment-lookup",
+  "category": "cross-layer change",
+  "symptoms": ["convention"],
+  "prompt": "Staff often cancel the wrong appointment because they only have an ID in front of them. Let them check an appointment before cancelling it.\n\nAPI: add GET /api/appointments/{id}, returning 200 with {\"appointment\": {...}} (the same appointment shape the book endpoint returns), and the usual refusals for an unknown or malformed ID. Web: on the Cancel page add a \"Look up\" button (button name=\"lookup\", next to the ID field, not a submit button) that loads the appointment through the page's gateway composable by calling a new lookup(id) on it, which puts the result in the composable's existing data ref (a refusal goes to fault as for every other call). When data is set, the page shows a line with class \"found\" saying which doctor and patient the appointment is for, in the form \"doctor 7\" and \"patient 3\". Looking up must not cancel anything.",
+  "layers": ["internal/http", "internal/booking", "internal/store", "web/src/gateway", "web/src/pages"],
+  "outOfScope": [
+    "the cancel endpoint, its 204 response and the Cancel button's behaviour",
+    "the book endpoint and the Book page",
+    "booking rules, fault codes and statuses that exist today",
+    "database schema",
+    "existing tests are not edited"
+  ],
+  "acceptance": {
+    "files": [
+      "internal/http/lookup_test.go",
+      "web/src/pages/CancelLookup.test.ts",
+      "web/src/gateway/lookupGateway.test.ts"
+    ],
+    "cmd": "rc=0; go test ./internal/http -run TestGetAppointment -count=1 || rc=1; (cd web && npx vitest run src/pages/CancelLookup.test.ts src/gateway/lookupGateway.test.ts) || rc=1; exit $rc"
+  },
+  "graders": [
+    { "name": "go-test", "cmd": "go test ./... -count=1" },
+    { "name": "go-vet", "cmd": "go vet ./..." },
+    { "name": "web-typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web-lint", "cmd": "cd web && npm run lint" },
+    { "name": "web-test", "cmd": "cd web && npm run test" },
+    { "name": "web-build", "cmd": "cd web && npm run build" }
+  ]
+}

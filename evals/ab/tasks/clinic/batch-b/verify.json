@@ -1,0 +1,151 @@
+[
+  {
+    "id": "booking-lead-time",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go-test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go-vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "one-offset-helper",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go-test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go-vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "patient-cancel-all",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go-test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go-vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "appointment-lookup",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go-test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go-vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web-build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  }
+]

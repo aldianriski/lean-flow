@@ -1,0 +1,77 @@
+--- FAIL: TestGetAppointment (0.71s)
+    lookup_test.go:14: status 404 body map[fault:map[code:NOT_FOUND detail:no such route]]
+--- FAIL: TestGetAppointmentRefusals (0.17s)
+    lookup_test.go:29: unknown: 404 map[fault:map[code:NOT_FOUND detail:no such route]]
+FAIL
+FAIL	clinic/internal/http	3.738s
+FAIL
+
+ RUN  v5.0.5 D:/Research/ab-author-clinic-b/web
+
+ ❯ src/gateway/lookupGateway.test.ts (2 tests | 2 failed) 11ms
+   ❯ useAppointmentGateway lookup (2)
+     × GETs the appointment and exposes it as data 7ms
+     × puts the fault in fault, never throws, for an unknown appointment 2ms
+ ❯ src/pages/CancelLookup.test.ts (2 tests | 2 failed) 54ms
+   ❯ CancelAppointment look-up (2)
+     × looks the appointment up without cancelling it 45ms
+     × shows the doctor and patient of the appointment found 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/gateway/lookupGateway.test.ts > useAppointmentGateway lookup > GETs the appointment and exposes it as data
+TypeError: g.lookup is not a function
+ ❯ src/gateway/lookupGateway.test.ts:12:13
+     10|     vi.stubGlobal('fetch', fetchMock)
+     11|     const g = useAppointmentGateway()
+     12|     await g.lookup(7)
+       |             ^
+     13|     const [url, init] = fetchMock.mock.calls[0] as unknown as [string,…
+     14|     expect(url).toBe('/api/appointments/7')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/gateway/lookupGateway.test.ts > useAppointmentGateway lookup > puts the fault in fault, never throws, for an unknown appointment
+TypeError: g.lookup is not a function
+ ❯ src/gateway/lookupGateway.test.ts:24:13
+     22|     vi.stubGlobal('fetch', async () => new Response(JSON.stringify(bod…
+     23|     const g = useAppointmentGateway()
+     24|     await g.lookup(99)
+       |             ^
+     25|     expect(g.data.value).toBeNull()
+     26|     expect(g.fault.value?.code).toBe('UNKNOWN_APPOINTMENT')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/pages/CancelLookup.test.ts > CancelAppointment look-up > looks the appointment up without cancelling it
+Error: Cannot call trigger on an empty DOMWrapper.
+ ❯ Object.get node_modules/@vue/test-utils/dist/vue-test-utils.cjs.js:1488:27
+ ❯ src/pages/CancelLookup.test.ts:18:40
+     16|     const w = mount(CancelAppointment)
+     17|     await w.find('input[name=appointmentId]').setValue('42')
+     18|     await w.find('button[name=lookup]').trigger('click')
+       |                                        ^
+     19|     expect(lookup).toHaveBeenCalledWith(42)
+     20|     expect(cancel).not.toHaveBeenCalled()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/pages/CancelLookup.test.ts > CancelAppointment look-up > shows the doctor and patient of the appointment found
+Error: Cannot call text on an empty DOMWrapper.
+ ❯ Object.get node_modules/@vue/test-utils/dist/vue-test-utils.cjs.js:1488:27
+ ❯ src/pages/CancelLookup.test.ts:25:57
+     23|   it('shows the doctor and patient of the appointment found', () => {
+     24|     data.value = { id: 42, doctorId: 7, patientId: 3, slotStart: '2030…
+     25|     const text = mount(CancelAppointment).find('.found').text()
+       |                                                         ^
+     26|     expect(text).toContain('42')
+     27|     expect(text).toContain('doctor 7')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed (4)
+   Start at  18:08:55
+   Duration  25.81s (environment 98%, import 1%)
+

@@ -1,0 +1,29 @@
+{
+  "id": "patient-cancel-all",
+  "category": "convention-bearing feature",
+  "symptoms": ["convention", "business-rule", "lost-detail"],
+  "prompt": "Front desk keeps getting patients who are leaving the clinic and want every appointment they hold cancelled. Doing it one appointment at a time is slow.\n\nAdd an API endpoint, POST /api/patients/{id}/cancel-all, that cancels all of a patient's appointments in one call. On success respond 200 with a JSON body {\"cancelled\": [...], \"kept\": [...]}: the IDs of the appointments that were cancelled and the IDs of those that were not, each list ascending by ID and an empty list (never null) when there are none. Refusals must look like every other refusal the API returns. No web UI change is needed.",
+  "layers": ["internal/http", "internal/booking", "internal/store", "internal/rules", "internal/faults"],
+  "outOfScope": [
+    "POST /api/appointments/{id}/cancel keeps its current behaviour, statuses and fault codes",
+    "booking rules, fault codes and statuses that exist today",
+    "database schema (no migration is needed)",
+    "existing tests are not edited"
+  ],
+  "acceptance": {
+    "files": ["internal/http/cancel_all_test.go"],
+    "cmd": "go test ./internal/http -run TestCancelAll -count=1"
+  },
+  "graders": [
+    { "name": "go-test", "cmd": "go test ./... -count=1" },
+    { "name": "go-vet", "cmd": "go vet ./..." },
+    { "name": "web-typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web-lint", "cmd": "cd web && npm run lint" },
+    { "name": "web-build", "cmd": "cd web && npm run build" }
+  ],
+  "lostDetail": {
+    "fact": "A cancelled appointment is deleted, not kept as history (BUSINESS-NOTES.md, business rules): after cancel-all the cancelled rows must be gone, not flagged; its slot and daily-cap place are bookable again immediately.",
+    "grepTerms": ["history", "soft delete", "soft-delete", "audit", "status column"],
+    "hitsOutsideNotes": 0
+  }
+}

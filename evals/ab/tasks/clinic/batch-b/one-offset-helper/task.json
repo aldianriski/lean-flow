@@ -1,0 +1,24 @@
+{
+  "id": "one-offset-helper",
+  "category": "refactor",
+  "symptoms": ["convention"],
+  "prompt": "Working hours are compared as an offset from midnight, and the arithmetic that turns a wall-clock time into that offset is written twice: once in internal/rules/hours.go and once as a private offset() in internal/store/doctors.go. They have already drifted (one keeps the sub-second part, the other drops it). Pull it into a single exported helper, clinic.OffsetFromMidnight(t time.Time) time.Duration, in internal/clinic, that keeps the sub-second part, and make both places use it. Pure refactor: every booking verdict and API response stays exactly as it is, and no copy of the arithmetic is left behind.",
+  "layers": ["internal/clinic", "internal/rules", "internal/store"],
+  "outOfScope": [
+    "any change to booking verdicts, fault codes, HTTP statuses or API responses",
+    "the working-hours boundary: start bookable, end not, in the clinic zone",
+    "database schema",
+    "existing tests are not edited"
+  ],
+  "acceptance": {
+    "files": ["internal/clinic/offset_test.go"],
+    "cmd": "go test ./internal/clinic -count=1"
+  },
+  "graders": [
+    { "name": "go-test", "cmd": "go test ./... -count=1" },
+    { "name": "go-vet", "cmd": "go vet ./..." },
+    { "name": "web-typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web-lint", "cmd": "cd web && npm run lint" },
+    { "name": "web-build", "cmd": "cd web && npm run build" }
+  ]
+}
