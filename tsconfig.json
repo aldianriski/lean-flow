@@ -4,5 +4,8 @@
     "test/**/*.ts",
     "scripts/**/*.ts",
     "evals/**/*.ts"
+  ],
+  "exclude": [
+    "evals/ab/tasks/**"
   ]
 }

@@ -1,0 +1,60 @@
+$ go test ./internal/http -run 'TestSeries' -count=1
+ok  	clinic/internal/http	5.155s
+exit=0
+$ go test ./...
+?   	clinic/cmd/api	[no test files]
+?   	clinic/cmd/migrate	[no test files]
+?   	clinic/internal/booking	[no test files]
+?   	clinic/internal/clinic	[no test files]
+?   	clinic/internal/db	[no test files]
+?   	clinic/internal/faults	[no test files]
+ok  	clinic/internal/http	18.548s
+?   	clinic/internal/model	[no test files]
+ok  	clinic/internal/rules	(cached)
+?   	clinic/internal/store	[no test files]
+?   	clinic/web/node_modules/flatted/golang/pkg/flatted	[no test files]
+exit=0
+$ go vet ./...
+exit=0
+$ cd web && npm run typecheck
+
+> clinic-web@0.0.0 typecheck
+> vue-tsc --noEmit
+
+exit=0
+$ cd web && npm run lint
+
+> clinic-web@0.0.0 lint
+> eslint .
+
+exit=0
+$ cd web && npm run build
+
+> clinic-web@0.0.0 build
+> vue-tsc --noEmit && vite build
+
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 16 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                 0.31 kB │ gzip:  0.23 kB
+dist/assets/index-CuZ59Hr2.js  67.11 kB │ gzip: 26.29 kB
+
+[32m✓ built in 431ms[39m
+exit=0
+$ cd web && npm run test
+
+> clinic-web@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 D:/Research/ab-author-clinic-a/web
+
+
+ Test Files  3 passed (3)
+      Tests  14 passed (14)
+   Start at  17:33:54
+   Duration  22.48s (environment 76%, tests 22%, import 1%, transform 1%)
+
+exit=0

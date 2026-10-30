@@ -94,3 +94,16 @@ only `evals/ab/arms/`; merge-check's layers-observed FAILed on T7's commits. Imp
 `evals/ab/run-trial.ts`, `evals/ab/selftest.ts`, `evals/ab/setup-a1.ts` and `evals/ab/fixtures/arm-freeze/`. T8 also declares
 the whole harness folder but depends on T7, so T7 owns these first; no wave-1 author writes this repo. Re-confirm G2: not needed, the files
 are the ones the signed design named.
+
+### 2026-10-30 | scope-change | T5 T6 -- clinic lost-detail facts are partly readable from code; owner accepts it as the clinic's limit
+What broke: TASK-539 and TASK-540 box 5 ask for a lost-detail task whose acceptance depends on a fact found only in
+`BUSINESS-NOTES.md`. The clinic repo was built test-first from its spec, so every fact in the notes also shows in its code or
+tests: the clinic-local display rule, for instance, is in its zone code. The authors found no fully absent fact. Impact: the
+box is read as "the fact's statement is notes-only, its behaviour may be partly visible in code" for clinic; the Done-when
+text is not reworded. Re-confirm G2: owner ruling by popup (accepted as the clinic's limit, recorded in each batch's notes).
+
+### 2026-10-30 | scope-change | T5 -- the root TypeScript config joins T5's `Layers:` to exclude the stored A/B tasks
+What broke: the first copied batch put the clinic app's acceptance tests under the task corpus, and the repo-wide typecheck
+compiled them as lean-flow code (they import the app's test runner), so merge-check FAILed with 7 errors. Impact:
+`tsconfig.json` gains an exclude for the task corpus; the batches are fixtures of other repos, never compiled here. Re-confirm
+G2: not needed, no design change.

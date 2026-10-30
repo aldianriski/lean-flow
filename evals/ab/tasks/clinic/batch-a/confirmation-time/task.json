@@ -1,0 +1,25 @@
+{
+  "id": "confirmation-time",
+  "category": "bug",
+  "symptoms": ["lost-detail", "convention"],
+  "prompt": "Bug report from reception: after booking, the page confirms with `Booked appointment 12 at 2030-01-02T03:00:00Z`. Staff in our other offices read that raw timestamp as their own time and double-check the schedule with the wrong hours. Show the appointment time in the confirmation as a readable `YYYY-MM-DD HH:mm` (24-hour) instead of the raw timestamp, so every member of staff reads the hour the appointment really starts at. Only the confirmation text changes; what the page sends to the API stays as it is.",
+  "layers": ["web/src/pages/BookAppointment.vue", "web/src"],
+  "outOfScope": ["the request the page sends to the API", "the Go API", "the cancel page", "the fault message display"],
+  "acceptance": {
+    "files": ["web/src/pages/BookAppointment.confirmation.acceptance.test.ts"],
+    "cmd": "cd web && npx vitest run src/pages/BookAppointment.confirmation.acceptance.test.ts"
+  },
+  "graders": [
+    { "name": "go test", "cmd": "go test ./..." },
+    { "name": "go vet", "cmd": "go vet ./..." },
+    { "name": "web typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web lint", "cmd": "cd web && npm run lint" },
+    { "name": "web build", "cmd": "cd web && npm run build" },
+    { "name": "web test", "cmd": "cd web && npm run test" }
+  ],
+  "lostDetail": {
+    "fact": "Staff-facing times are the clinic's fixed local time (Asia/Jakarta, UTC+7) wherever the browser runs; the browser's own zone is never the reference.",
+    "grepTerms": ["wherever the browser", "browser or server"],
+    "hitsOutsideNotes": 0
+  }
+}

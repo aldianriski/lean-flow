@@ -1,0 +1,19 @@
+{
+  "id": "closed-independence-day",
+  "category": "business-rule change",
+  "symptoms": ["business-rule", "convention"],
+  "prompt": "The clinic now closes every year on 17 August (Independence Day). No appointment can be booked for that date, whatever the doctor's configured working hours are. Staff who try should be refused exactly as they already are when they pick a time outside the doctor's working hours. Everything else about booking stays as it is.",
+  "layers": ["internal/rules", "internal/booking", "internal/http"],
+  "outOfScope": ["cancellation behaviour (existing appointments are not touched)", "existing fault codes and HTTP statuses", "database schema (no migration)", "working-hours semantics on every other date"],
+  "acceptance": {
+    "files": ["internal/http/closed_holiday_acceptance_test.go"],
+    "cmd": "go test ./internal/http -run 'TestClosedOnIndependenceDay' -count=1"
+  },
+  "graders": [
+    { "name": "go test", "cmd": "go test ./..." },
+    { "name": "go vet", "cmd": "go vet ./..." },
+    { "name": "web typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web lint", "cmd": "cd web && npm run lint" },
+    { "name": "web build", "cmd": "cd web && npm run build" }
+  ]
+}

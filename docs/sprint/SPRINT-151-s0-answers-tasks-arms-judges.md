@@ -87,7 +87,7 @@ Wave 1, parallel with the other batches and the arms.
 **Acceptance:** four more workdoo tasks, same bar, realism review signed.
 
 ### T5 — Author clinic A/B task batch A `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `evals/ab/tasks/clinic/batch-a/`
+Layers: `evals/ab/tasks/clinic/batch-a/` · `tsconfig.json`
   · `docs/work/todo/TASK-539-author-clinic-ab-task-batch-a.md`
   · `docs/work/in_progress/TASK-539-author-clinic-ab-task-batch-a.md`
   · `docs/work/done/TASK-539-author-clinic-ab-task-batch-a.md`

@@ -1,0 +1,68 @@
+$ cd web && npx vitest run src/pages/BookAppointment.confirmation.acceptance.test.ts
+
+ RUN  v5.0.5 D:/Research/ab-author-clinic-a/web
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  17:30:26
+   Duration  1.77s (environment 74%, import 10%, tests 9%, transform 7%)
+
+exit=0
+$ go test ./...
+?   	clinic/cmd/api	[no test files]
+?   	clinic/cmd/migrate	[no test files]
+?   	clinic/internal/booking	[no test files]
+?   	clinic/internal/clinic	[no test files]
+?   	clinic/internal/db	[no test files]
+?   	clinic/internal/faults	[no test files]
+ok  	clinic/internal/http	(cached)
+?   	clinic/internal/model	[no test files]
+ok  	clinic/internal/rules	(cached)
+?   	clinic/internal/store	[no test files]
+?   	clinic/web/node_modules/flatted/golang/pkg/flatted	[no test files]
+exit=0
+$ go vet ./...
+exit=0
+$ cd web && npm run typecheck
+
+> clinic-web@0.0.0 typecheck
+> vue-tsc --noEmit
+
+exit=0
+$ cd web && npm run lint
+
+> clinic-web@0.0.0 lint
+> eslint .
+
+exit=0
+$ cd web && npm run build
+
+> clinic-web@0.0.0 build
+> vue-tsc --noEmit && vite build
+
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 16 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                 0.31 kB │ gzip:  0.22 kB
+dist/assets/index-JmvRkfrF.js  67.23 kB │ gzip: 26.36 kB
+
+[32m✓ built in 197ms[39m
+exit=0
+$ cd web && npm run test
+
+> clinic-web@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 D:/Research/ab-author-clinic-a/web
+
+
+ Test Files  4 passed (4)
+      Tests  20 passed (20)
+   Start at  17:30:43
+   Duration  5.75s (environment 50%, tests 42%, import 7%, transform 1%)
+
+exit=0

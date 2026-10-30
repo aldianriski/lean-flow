@@ -1,0 +1,18 @@
+$ go test ./internal/http -run 'TestSeries' -count=1
+--- FAIL: TestSeriesBooksEverySlotInOrder (0.30s)
+    series_booking_acceptance_test.go:33: status 404 body map[fault:map[code:NOT_FOUND detail:no such route]]
+--- FAIL: TestSeriesIsAllOrNothing (1.08s)
+    --- FAIL: TestSeriesIsAllOrNothing/a_slot_already_taken (0.36s)
+        series_booking_acceptance_test.go:77: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 409 SLOT_TAKEN
+    --- FAIL: TestSeriesIsAllOrNothing/the_same_slot_listed_twice (0.16s)
+        series_booking_acceptance_test.go:77: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 409 SLOT_TAKEN
+    --- FAIL: TestSeriesIsAllOrNothing/the_series_itself_would_pass_the_daily_cap (0.40s)
+        series_booking_acceptance_test.go:77: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 409 DAILY_CAP_REACHED
+    --- FAIL: TestSeriesIsAllOrNothing/a_slot_outside_working_hours (0.17s)
+        series_booking_acceptance_test.go:77: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 422 OUTSIDE_WORKING_HOURS
+--- FAIL: TestSeriesRefusals (0.19s)
+    series_booking_acceptance_test.go:89: unknown doctor: 404 map[fault:map[code:NOT_FOUND detail:no such route]]
+FAIL
+FAIL	clinic/internal/http	4.482s
+FAIL
+exit=1

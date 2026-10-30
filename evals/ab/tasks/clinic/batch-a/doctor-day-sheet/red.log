@@ -1,0 +1,20 @@
+$ go test ./internal/http -run 'TestDoctorDaySheet' -count=1
+--- FAIL: TestDoctorDaySheet (1.33s)
+    day_sheet_acceptance_test.go:44: status 404 body map[fault:map[code:NOT_FOUND detail:no such route]]
+--- FAIL: TestDoctorDaySheetRefusals (0.14s)
+    --- FAIL: TestDoctorDaySheetRefusals/unknown_doctor (0.00s)
+        day_sheet_acceptance_test.go:76: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 404 UNKNOWN_DOCTOR
+    --- FAIL: TestDoctorDaySheetRefusals/missing_date (0.00s)
+        day_sheet_acceptance_test.go:76: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 400 INVALID_REQUEST
+    --- FAIL: TestDoctorDaySheetRefusals/malformed_date (0.00s)
+        day_sheet_acceptance_test.go:76: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 400 INVALID_REQUEST
+    --- FAIL: TestDoctorDaySheetRefusals/impossible_date (0.00s)
+        day_sheet_acceptance_test.go:76: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 400 INVALID_REQUEST
+    --- FAIL: TestDoctorDaySheetRefusals/non-numeric_doctor_id (0.00s)
+        day_sheet_acceptance_test.go:76: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 400 INVALID_REQUEST
+    --- FAIL: TestDoctorDaySheetRefusals/wrong_method (0.00s)
+        day_sheet_acceptance_test.go:76: got 404 map[fault:map[code:NOT_FOUND detail:no such route]], want 405 METHOD_NOT_ALLOWED
+FAIL
+FAIL	clinic/internal/http	3.833s
+FAIL
+exit=1

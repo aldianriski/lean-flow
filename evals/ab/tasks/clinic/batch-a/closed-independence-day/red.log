@@ -1,0 +1,14 @@
+$ go test ./internal/http -run 'TestClosedOnIndependenceDay' -count=1
+--- FAIL: TestClosedOnIndependenceDay (0.62s)
+    --- FAIL: TestClosedOnIndependenceDay/17_Aug_morning_local,_still_16_Aug_in_UTC (0.00s)
+        closed_holiday_acceptance_test.go:36: 2030-08-16T23:00:00Z must be refused as outside working hours: 201 map[appointment:map[doctorId:1 id:2 patientId:1 slotStart:2030-08-16T23:00:00Z]]
+    --- FAIL: TestClosedOnIndependenceDay/17_Aug_midday_local (0.00s)
+        closed_holiday_acceptance_test.go:36: 2030-08-17T03:00:00Z must be refused as outside working hours: 201 map[appointment:map[doctorId:1 id:3 patientId:1 slotStart:2030-08-17T03:00:00Z]]
+    --- FAIL: TestClosedOnIndependenceDay/17_Aug_late_evening_local (0.00s)
+        closed_holiday_acceptance_test.go:36: 2030-08-17T15:00:00Z must be refused as outside working hours: 201 map[appointment:map[doctorId:1 id:4 patientId:1 slotStart:2030-08-17T15:00:00Z]]
+    --- FAIL: TestClosedOnIndependenceDay/every_year,_not_just_2030 (0.00s)
+        closed_holiday_acceptance_test.go:36: 2031-08-17T03:00:00Z must be refused as outside working hours: 201 map[appointment:map[doctorId:1 id:7 patientId:1 slotStart:2031-08-17T03:00:00Z]]
+FAIL
+FAIL	clinic/internal/http	3.479s
+FAIL
+exit=1

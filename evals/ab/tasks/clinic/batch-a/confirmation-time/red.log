@@ -1,0 +1,60 @@
+$ cd web && npx vitest run src/pages/BookAppointment.confirmation.acceptance.test.ts
+
+ RUN  v5.0.5 D:/Research/ab-author-clinic-a/web
+
+ ❯ src/pages/BookAppointment.confirmation.acceptance.test.ts (6 tests | 6 failed) 87ms
+   ❯ confirmation time with the browser in America/New_York (2)
+     × shows 2030-01-02T03:00:00.000Z as 2030-01-02 10:00 45ms
+     × shows 2030-01-02T18:30:00Z as 2030-01-03 01:30 12ms
+   ❯ confirmation time with the browser in Pacific/Auckland (2)
+     × shows 2030-01-02T03:00:00.000Z as 2030-01-02 10:00 5ms
+     × shows 2030-01-02T18:30:00Z as 2030-01-03 01:30 6ms
+   ❯ confirmation time with the browser in UTC (2)
+     × shows 2030-01-02T03:00:00.000Z as 2030-01-02 10:00 8ms
+     × shows 2030-01-02T18:30:00Z as 2030-01-03 01:30 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/BookAppointment.confirmation.acceptance.test.ts > confirmation time with the browser in America/New_York > shows 2030-01-02T03:00:00.000Z as 2030-01-02 10:00
+ FAIL  src/pages/BookAppointment.confirmation.acceptance.test.ts > confirmation time with the browser in Pacific/Auckland > shows 2030-01-02T03:00:00.000Z as 2030-01-02 10:00
+ FAIL  src/pages/BookAppointment.confirmation.acceptance.test.ts > confirmation time with the browser in UTC > shows 2030-01-02T03:00:00.000Z as 2030-01-02 10:00
+AssertionError: expected 'Booked appointment 12 at 2030-01-02T0…' to contain '2030-01-02 10:00'
+
+Expected: "2030-01-02 10:00"
+Received: "Booked appointment 12 at 2030-01-02T03:00:00.000Z"
+
+ ❯ src/pages/BookAppointment.confirmation.acceptance.test.ts:23:18
+     21|     const text = w.find('.booked').text()
+     22|     expect(text).toContain('12')
+     23|     expect(text).toContain(expected)
+       |                  ^
+     24|     expect(text).not.toContain(iso)
+     25|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/pages/BookAppointment.confirmation.acceptance.test.ts > confirmation time with the browser in America/New_York > shows 2030-01-02T18:30:00Z as 2030-01-03 01:30
+ FAIL  src/pages/BookAppointment.confirmation.acceptance.test.ts > confirmation time with the browser in Pacific/Auckland > shows 2030-01-02T18:30:00Z as 2030-01-03 01:30
+ FAIL  src/pages/BookAppointment.confirmation.acceptance.test.ts > confirmation time with the browser in UTC > shows 2030-01-02T18:30:00Z as 2030-01-03 01:30
+AssertionError: expected 'Booked appointment 12 at 2030-01-02T1…' to contain '2030-01-03 01:30'
+
+Expected: "2030-01-03 01:30"
+Received: "Booked appointment 12 at 2030-01-02T18:30:00Z"
+
+ ❯ src/pages/BookAppointment.confirmation.acceptance.test.ts:23:18
+     21|     const text = w.find('.booked').text()
+     22|     expect(text).toContain('12')
+     23|     expect(text).toContain(expected)
+       |                  ^
+     24|     expect(text).not.toContain(iso)
+     25|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  17:30:22
+   Duration  1.92s (environment 81%, import 9%, tests 5%, transform 4%)
+
+exit=1

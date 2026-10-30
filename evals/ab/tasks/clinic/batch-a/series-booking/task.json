@@ -1,0 +1,19 @@
+{
+  "id": "series-booking",
+  "category": "under-documented area",
+  "symptoms": ["convention", "business-rule"],
+  "prompt": "Staff often book a whole course of treatment for one patient with one doctor. Add `POST /api/appointments/series` taking `{\"doctorId\": 1, \"patientId\": 1, \"slotStarts\": [\"2030-01-02T03:00:00Z\", ...]}` (RFC 3339 timestamps, in any order). Either every slot is booked, answered with 201 and `{\"appointments\": [...]}` in the order requested, each entry shaped like a single booking's appointment; or none is booked and the response is the refusal the first failing slot would have got as a single booking. A series must never leave part of itself behind, and all the usual booking rules apply to every slot in it.",
+  "layers": ["internal/booking", "internal/http", "internal/store"],
+  "outOfScope": ["single booking behaviour and its fault codes", "cancellation", "database schema (no migration)", "the web app"],
+  "acceptance": {
+    "files": ["internal/http/series_booking_acceptance_test.go"],
+    "cmd": "go test ./internal/http -run 'TestSeries' -count=1"
+  },
+  "graders": [
+    { "name": "go test", "cmd": "go test ./..." },
+    { "name": "go vet", "cmd": "go vet ./..." },
+    { "name": "web typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web lint", "cmd": "cd web && npm run lint" },
+    { "name": "web build", "cmd": "cd web && npm run build" }
+  ]
+}

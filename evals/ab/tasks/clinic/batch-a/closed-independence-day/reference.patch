@@ -1,0 +1,14 @@
+diff --git a/internal/rules/hours.go b/internal/rules/hours.go
+index 85cd232..b7b3d1e 100644
+--- a/internal/rules/hours.go
++++ b/internal/rules/hours.go
+@@ -13,6 +13,9 @@ func WithinWorkingHours(now time.Time, slot time.Time, workStart, workEnd time.D
+ 	s := slot.In(zone)
+ 	offset := time.Duration(s.Hour())*time.Hour + time.Duration(s.Minute())*time.Minute +
+ 		time.Duration(s.Second())*time.Second + time.Duration(s.Nanosecond())
++	if s.Month() == time.August && s.Day() == 17 { // closed every year on Independence Day, in clinic time
++		return Fail(faults.OutsideHours)
++	}
+ 	if offset < workStart || offset >= workEnd {
+ 		return Fail(faults.OutsideHours)
+ 	}

@@ -1,0 +1,151 @@
+[
+  {
+    "id": "closed-independence-day",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "confirmation-time",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web build",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web test",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "doctor-day-sheet",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  },
+  {
+    "id": "series-booking",
+    "ok": true,
+    "red": 1,
+    "apply": 0,
+    "applyOut": "",
+    "green": 0,
+    "greenOut": "",
+    "graders": [
+      {
+        "name": "go test",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "go vet",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web typecheck",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web lint",
+        "code": 0,
+        "out": ""
+      },
+      {
+        "name": "web build",
+        "code": 0,
+        "out": ""
+      }
+    ]
+  }
+]

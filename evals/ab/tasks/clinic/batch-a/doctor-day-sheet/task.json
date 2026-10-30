@@ -1,0 +1,19 @@
+{
+  "id": "doctor-day-sheet",
+  "category": "convention-bearing feature",
+  "symptoms": ["convention", "business-rule"],
+  "prompt": "Reception wants a printable day sheet per doctor. Add an API endpoint that lists one doctor's appointments for a given day: `GET /api/doctors/{id}/appointments?date=YYYY-MM-DD`. A successful response is 200 with `{\"appointments\": [...]}`, each entry in the same shape the booking endpoint returns for an appointment, earliest first; a day with no appointments gives an empty list. Refuse a doctor that does not exist and a missing or invalid date the same way the rest of this API refuses bad input.",
+  "layers": ["internal/http", "internal/booking", "internal/store"],
+  "outOfScope": ["booking and cancellation behaviour, fault codes and their HTTP statuses", "database schema (no migration)", "the web app"],
+  "acceptance": {
+    "files": ["internal/http/day_sheet_acceptance_test.go"],
+    "cmd": "go test ./internal/http -run 'TestDoctorDaySheet' -count=1"
+  },
+  "graders": [
+    { "name": "go test", "cmd": "go test ./..." },
+    { "name": "go vet", "cmd": "go vet ./..." },
+    { "name": "web typecheck", "cmd": "cd web && npm run typecheck" },
+    { "name": "web lint", "cmd": "cd web && npm run lint" },
+    { "name": "web build", "cmd": "cd web && npm run build" }
+  ]
+}
