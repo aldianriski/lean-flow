@@ -115,3 +115,10 @@ went red before the reference and green after, every grader passing (`verify.jso
 sixteen for a harness reason, not a task reason: GNU tar read the drive letter as a remote host. That was fixed and re-run.
 Owner realism review signed, with the clinic lost-detail limit accepted (scope-change above). Committed at `5b3f731f`; the batch
 folder is marked `-text` so a reference patch keeps its line endings. Self-review: maintainer-only fixtures, no code.
+
+### 2026-10-30 | progress | T6 -- clinic batch B verified, signed and committed; all seven boxes ticked
+consequence · T6 · behaviour:low · governance:low
+Two of the author's tasks overlapped batch A and were replaced on the coordinator's request: a 17-August closing rule became
+a 2-hour booking lead time, and a clinic-local confirmation time became an appointment lookup. Every final task was re-run by
+the coordinator in a fresh baseline (verify.json, 4 of 4). Owner realism review signed, including the replacement. Committed
+at `ca5769c5`, folder marked `-text`. Self-review: maintainer-only fixtures, no code.
