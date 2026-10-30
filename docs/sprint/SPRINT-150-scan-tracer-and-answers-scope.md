@@ -104,8 +104,46 @@ the prompt. A defect fix in shipped frontmatter.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/work/backlog/TASK-536-prepare-ab-answers-files-and-access-protocol.md` | T1 | box 2 covers the seven profile topics; set ready by /triage | Low | diff limited to box 2, state, blocked-by |
+| the architecture-overview, coding-standards and product-requirements templates | T2 | Stack and Conventions in use added; Problem, Out of scope and Non-functional renamed; Main flows and Invariants added | Med | Codex R1 CLEAR; owner's real init on a snapshot |
+| `skills/lean-doc-generator/references/init.md` | T2 | step 1 reads code samples per layer and holds them for step 2; Verify checks citations | Med | same |
+| `skills/task-decomposer/references/prd-and-slices.md` | T2 | one pointer follows the Quality attributes rename | Low | grep: 0 old names in the shipped skills |
+| `skills/lean-doc-generator/SKILL.md` · `skills/humanizer/SKILL.md` | T3 | argument hints name every mode | Low | YAML parse; owner saw eight modes after reinstall |
+| `CHANGELOG.md` | T2 · T3 | Added (profile and scan) and Fixed (hints) lines under [Unreleased] | Low | — |
+| `docs/work/backlog/TASK-552-remove-template-sections-that-restate-the-code.md` | coordinator | two open lines: the CONTEXT-template overlap and the ADR-012 comment leak | Low | merge-check 5/5 |
+| `docs/LEARNINGS.md` · `docs/knowledge-index.md` | close | L-264 and L-265 filed; index regenerated | Low | — |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 3 of 3 members delivered (TASK-556, 547, and 557, which joined by scope-change); 7 of 7 DoD boxes ticked.
+TASK-536 now covers the seven profile topics and is ready, so the S0 chain can move. S1's tracer holds: on an unprofiled
+SvelteKit repo, through the installed plugin, `init` wrote 7 Stack and 9 Conventions lines, each citing a real file, and the
+owner read them as specific to that repo. `/lean-doc-generator` now suggests all eight of its modes. System verify: VPS 336/0
++ 589/0 at `e7fd79d7`.
+
+**Retrieval check** — one miss: the builder check read only the files the task touched and missed a duplicate Stack section in
+the untouched CONTEXT template; a coordinator count across all templates caught it (L-264). The scope-change rule (L-229) and
+the coordinator-write rule (L-238) both fired as written when T3 joined and when TASK-552 gained its notes.
+
+**Cost** — coordinator plus sub-agents: three builder checks about 157k tokens; the T2 builder about 70k; three Codex review
+passes about 47k. About 274k sub-agent tokens in all. Two pushes and two reinstalls by the owner for the real runs. One VPS gate
+run, green. The coordinator session is unmetered.
+
+**Worked**
+- The real run on a repo no profile matches gave the evidence that matters: the scan cited files a generic skeleton never
+  would (Paraglide pipeline, Lucia demo actions, Tailwind v4 `@theme`) and asked three honest questions instead of guessing.
+- Codex closed all three task reviews in one round each, with the altitude stated in every brief.
+
+**Friction**
+- The installed plugin comes from GitHub, and an unreleased change keeps the same version string, so every real run needed a
+  push, a marketplace update and an uninstall-reinstall. Prime's freshness row compares only the version string (L-021).
+- Two shipped SKILL.md files sit at 139 and 140 of 140 lines; T3 changed a frontmatter value in place, so neither grew.
+
+**Pattern candidate**
+- L-264: count a new heading across the whole template set, not only the touched files.
+- L-265: a skill's argument hint is a second copy of its mode table; change both in one change.
+
+**Buckets routed** — Shipped: the T2 Added and T3 Fixed lines under [Unreleased]. Tech debt: none new; the ADR-012 comment
+leak and the CONTEXT-template overlap are `open:` lines on TASK-552. Follow-ups: none. Learnings: L-264, L-265.

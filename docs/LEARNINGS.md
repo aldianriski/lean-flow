@@ -123,6 +123,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-265 [tags: process] [status: active]: **A skill's `argument-hint` is a second copy of its mode table, and it drifts silently: nothing compares the two.** `/lean-doc-generator` documented eight modes and its hint offered four (`init`, `migrate`, `epic` and `prd` missing) for as long as those modes had shipped. A consumer cannot find a mode the prompt does not suggest. The owner found it by typing the command during SPRINT-150, not through any check. A 15-skill audit found one more (humanizer's audit mode). When a change adds or renames a mode, update the hint in the same change; a matcher would compare each hint with its skill's Modes table.
+- seen: 2026-10-30 (SPRINT-150, owner observation during T2's init run; fixed as TASK-557)
+- count: 1
+- promoted: no
+- related: L-020 (shipped is not wired) · STANDARD §10 "every hygiene rule gets a matcher"
+
+---
+
+## L-264 [tags: edit-safety] [status: active]: **A new heading's uniqueness is counted across the whole template set, not only the files the task touched.** SPRINT-150 T2 added Stack and Conventions in use to two templates; the builder counted each heading inside its own file (once each) and the G2 builder check read only the touched paths. The coordinator's count across all templates returned `## Stack` twice: the CONTEXT.md template already had a Stack list and a Patterns in Use section, so a consumer gets two homes for one fact. Codex ruled it non-blocking, and it went to TASK-552. The check was scoped to the change, and the duplicate sat in an untouched sibling. L-186 is the same shape for guards: count the population, not the selection.
+- seen: 2026-10-30 (SPRINT-150 T2, coordinator re-check of `79f9ac6e`)
+- count: 1
+- promoted: no
+- related: L-186 (the population a guard covers) · L-198 (vary the selection) · TASK-552
+
+---
+
 ## L-263 [tags: process] [status: active]: **A breakdown that splits one flow into per-component tasks needs one task whose acceptance runs the whole flow on real input; otherwise each task passes on its own part and nothing proves the outcome.** The EPIC-023 S1 intake sliced discovery into a scan task, a business-discovery task, three question-set tasks, a template audit and a migrate task, each exercised on real repos. Codex R1 found that none required the finished `init` to write the whole profile on an unprofiled stack: the scan task left the business sections as prompts by design, and no later task closed the gap. It was the one blocking High in the intake. L-020 asks whether a capability is wired into its callers; this asks whether the epic clause the slices add up to is itself some task's acceptance. At intake, map each clause of the Closed-when line to the one task whose Done-when proves it whole.
 - seen: 2026-10-30 (SPRINT-149, EPIC-023 S1 intake, Codex R1 finding F1; fixed as TASK-554's third box)
 - count: 1
