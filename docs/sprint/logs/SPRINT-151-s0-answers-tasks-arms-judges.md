@@ -153,3 +153,13 @@ Analysis choices are parameters with proposed defaults for the pre-registration.
 waits for a deliberately wrong solution per task and a live, owner-approved judge run. Review: coordinator re-run per the
 one-review-per-wave lever (maintainer-only, Other G).
 review · T8 · self-review · behaviour:material · governance:low
+
+### 2026-10-30 | progress | revise · T8 -- independent wave review R1 NOT CLEAR on six Highs; one bounded builder retry fired
+consequence · T7 · behaviour:material · governance:low
+The review-depth check refused T8's self-review record (a material change needs an independent pass), so Codex reviewed
+the wave's harness code from `plan_commit` (T7's arm freeze, T8's judges and pipeline; about 1,100 lines). R1 was NOT CLEAR
+on six Highs, all confirmed by the coordinator against the rules. A measured D9 run skips the freeze, and a missing
+snapshot passes. Short arm ids slip the blindness filter. A missing-usage phase zeroes known spend. Infra keywords in task
+prose cause a retry. The expected slots come from the data itself. The primary endpoint used the post-replacement results.
+One bounded retry was sent to the T8 builder: all six fixes, each with its own must-FAIL fixture. T6 follows the signed
+brief, so the primary endpoint counts the first pass. R2 is the last round and blocks only on an outcome-changing High.
