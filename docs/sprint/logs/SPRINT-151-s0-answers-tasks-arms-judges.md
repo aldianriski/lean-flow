@@ -171,3 +171,14 @@ its named dimension. The live run (96 judge calls) matched 48 of 64 expected ver
 UNKNOWN, and the judges' own reasons name the cause: a diff alone cannot show whether a change follows the repo's
 conventions. Owner ruling: judges also see the post-change content of the touched files, capped, with lean-flow docs
 excluded for blindness; the prompts are re-hashed and calibration re-runs live. Run 1 is kept as calibration-run1.md.
+
+### 2026-10-30 | progress | revise · T8 -- wave review R2 (final): five of six closed; two outcome-changing Highs left in retry.ts, fixed by owner ruling
+The first R2 run died when C: filled up. The owner had the disk cleaned (old session temp, npm and Go caches; tool caches now
+go to D: per command), and R2 was re-run. Result: T1, T2, T3, T5 and T6 CLOSED. T4 is still open: a recovered rate-limit
+line in the stderr tail still turns a later task failure into infra. T7 is new: the regex in retry.ts holds literal
+backspace bytes where word boundaries were meant, so a terminal HTTP 503 is scored as a task failure. The coordinator
+confirmed both in the file. The round cap was reached; owner ruling: fix both now, each with a must-FAIL, no further round
+(stderr counts only when the run left no result event; real word boundaries, written with the edit tool, never a shell
+heredoc).
+review · T7 · scoped-reviewer · behaviour:material · governance:low
+review · T8 · scoped-reviewer · behaviour:material · governance:low
