@@ -84,7 +84,7 @@ export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunn
     const jarm: Arm = { ...arm, sessionModel: JUDGE_MODEL, effort: "low", plugin: undefined };
     const iso = makeIsolation(workRoot, jarm);
     clearSynced(iso.cfg);
-    const raw = await runner(buildCommand(jarm, prompt, ["--tools", ""]), { cwd: iso.trialDir, env: isolationEnv(iso, jarm), timeoutMs: 180_000 });
+    const raw = await runner(buildCommand(jarm, prompt, ["--tools", ""], { promptViaStdin: true }), { cwd: iso.trialDir, env: isolationEnv(iso, jarm), timeoutMs: 180_000, stdin: prompt });
     const res = parseStream(raw.stdout).result;
     if (!res || res.is_error) throw new Error(`judge run failed: exit ${raw.exitCode}, ${res?.terminal_reason ?? "no result event"}`);
     return { text: String(res.result ?? ""), totals: totalsOf(res) };

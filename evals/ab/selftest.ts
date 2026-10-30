@@ -1255,6 +1255,42 @@ check("S37 judge context: post-change files from the trial dir / snapshot+patch,
   assert(m.res.row.exit === "ok" && sent.length === 3 && sent.every((p) => p.includes("=== src/add.ts ===") && p.split("=== src/add.ts ===")[1]!.includes("// touched-by-trial")), "the trial's judges see the post-change file");
 });
 
+// S38 -- judge prompts ride on stdin, not argv (Windows caps a command line near 32 KB).
+check("S38 judge stdin: a >40 KB judge prompt -> no argv element over 8 KB and the full prompt on stdin (red when the prompt is in argv); trial prompts stay in argv; spawnRunner pipes stdin for real", async () => {
+  const { realJudge } = await import("./lib/protocol.ts");
+  const { buildCommand, spawnRunner } = await import("./lib/run.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  const arm = loadArm(ARM_FILE);
+  const prompt = `${"judge context line\n".repeat(2500)}END`;
+  assert(prompt.length > 40_000, "fixture prompt is over 40 KB");
+  const stream = (model: string) => [{ type: "result", is_error: false, result: PASSV, modelUsage: { [model]: { inputTokens: 1, outputTokens: 1, cacheReadInputTokens: 0, cacheCreationInputTokens: 0, costUSD: 0 } }, usage: { input_tokens: 1 } }].map((e) => JSON.stringify(e)).join("\n");
+  const seen: { cmd: string[]; stdin: string | undefined }[] = [];
+  const runner: import("./lib/run.ts").Runner = async (cmd, o) => {
+    seen.push({ cmd, stdin: o.stdin });
+    return { stdout: stream("claude-sonnet-5-5"), stderr: "", exitCode: 0, wallMs: 1 };
+  };
+  const reply = await realJudge(tmpdir("judge-stdin"), arm, runner)(prompt);
+  const call = seen[0]!;
+  const longest = Math.max(...call.cmd.map((a) => a.length));
+  assert(longest <= 8_192, `no argv element may exceed 8 KB, the longest is ${longest}`);
+  assert(call.stdin === prompt && !call.cmd.includes(prompt), "the full prompt arrives on stdin");
+  assert(call.cmd[1] === "-p" && call.cmd[2] === "--model", `-p carries no argument so the CLI reads stdin: ${call.cmd.slice(0, 4)}`);
+  assert(typeof reply !== "string" && reply.text.includes("PASS"), "the reply is still parsed");
+
+  // the old command put the prompt in argv: the same assertions go red on it
+  const old = buildCommand(arm, prompt, ["--tools", ""]);
+  assert(Math.max(...old.map((a) => a.length)) > 8_192 && old.includes(prompt), "(control: without promptViaStdin the prompt rides in argv)");
+  assert(buildCommand(arm, "short task prompt")[2] === "short task prompt", "trial prompts stay in argv");
+
+  // spawnRunner really pipes stdin (and still ignores it when none is given)
+  const script = path.join(tmpdir("stdin-script"), "echo.ts");
+  fs.writeFileSync(script, "const t = await Bun.stdin.text();\nconsole.log(`len=${t.length} tail=${t.slice(-3)}`);\n");
+  const piped = await spawnRunner(["bun", script], { cwd: path.dirname(script), env: { ...process.env } as Record<string, string>, timeoutMs: 60_000, stdin: prompt });
+  assert(piped.exitCode === 0 && piped.stdout.trim() === `len=${prompt.length} tail=END`, `spawnRunner must deliver the whole prompt on stdin: ${piped.stdout}${piped.stderr}`);
+  const ignored = await spawnRunner(["bun", script], { cwd: path.dirname(script), env: { ...process.env } as Record<string, string>, timeoutMs: 60_000 });
+  assert(ignored.exitCode === 0 && ignored.stdout.trim() === "len=0 tail=", `no stdin option keeps stdin ignored: ${ignored.stdout}`);
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
