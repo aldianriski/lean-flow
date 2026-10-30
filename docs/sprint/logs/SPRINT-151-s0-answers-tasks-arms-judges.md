@@ -182,3 +182,12 @@ confirmed both in the file. The round cap was reached; owner ruling: fix both no
 heredoc).
 review · T7 · scoped-reviewer · behaviour:material · governance:low
 review · T8 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-30 | progress | T7 -- clinic A1 frozen after the owner's init and clinic A0 built; all four boxes ticked
+The owner operated the A1 clinic init through the isolated launcher on Opus 5.5. The coordinator read every popup in the
+transcript: seven answers differed from the sheet's "not decided yet", and by owner ruling they became the owner's setup
+decisions in the operator file, so the transcript matches the file and A2's setup gives the same answers. The arms builder
+committed `ea58cec1` (freeze manifest, declared set of 22 added or modified paths, A0 equal to the pre-init copy plus the
+notes, S35). The coordinator re-ran tsc and selftest, 37 of 37. Copying the transcript into the repo was refused by the
+permission classifier, because it sits beside a copied credentials file, so it stays outside the repo and its path is recorded in the
+tick.
