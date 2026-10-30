@@ -1,0 +1,126 @@
+diff --git a/internal/booking/booking.go b/internal/booking/booking.go
+index 2a79668..5a826ad 100644
+--- a/internal/booking/booking.go
++++ b/internal/booking/booking.go
+@@ -97,6 +97,23 @@ func (s *Service) book(ctx context.Context, tx pgx.Tx, now time.Time, r Request)
+ 	return rules.Pass(), a, nil
+ }
+ 
++// DaySheet lists a doctor's appointments on the clinic-local calendar day that contains day.
++func (s *Service) DaySheet(ctx context.Context, doctorID int64, day time.Time) (rules.Verdict, []model.Appointment, error) {
++	_, found, err := s.Doctors.FetchDoctor(ctx, doctorID)
++	if err != nil {
++		return rules.Fail(faults.Internal), nil, err
++	}
++	if !found {
++		return rules.Fail(faults.UnknownDoctor), nil, nil
++	}
++	from, to := rules.ClinicDayBounds(day, time.UTC)
++	list, err := s.Appointments.FetchDayAppointments(ctx, doctorID, from, to)
++	if err != nil {
++		return rules.Fail(faults.Internal), nil, err
++	}
++	return rules.Pass(), list, nil
++}
++
+ // Cancel drops the appointment unless its slot starts inside the cancellation window.
+ func (s *Service) Cancel(ctx context.Context, now time.Time, id int64) (rules.Verdict, error) {
+ 	a, found, err := s.Appointments.FetchAppointment(ctx, id)
+diff --git a/internal/http/appointments.go b/internal/http/appointments.go
+index 7042abe..28a8728 100644
+--- a/internal/http/appointments.go
++++ b/internal/http/appointments.go
+@@ -7,6 +7,7 @@ import (
+ 	"time"
+ 
+ 	"clinic/internal/booking"
++	"clinic/internal/clinic"
+ 	"clinic/internal/faults"
+ 	"github.com/go-chi/chi/v5"
+ )
+@@ -37,6 +38,29 @@ func (h *handlers) bookAppointment(w http.ResponseWriter, r *http.Request) {
+ 	writeJSON(w, http.StatusCreated, map[string]any{"appointment": appt})
+ }
+ 
++func (h *handlers) doctorDaySheet(w http.ResponseWriter, r *http.Request) {
++	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
++	if err != nil || id <= 0 {
++		writeFault(w, faults.InvalidRequest, "doctor id must be a positive integer")
++		return
++	}
++	day, err := time.ParseInLocation("2006-01-02", r.URL.Query().Get("date"), clinic.Zone)
++	if err != nil {
++		writeFault(w, faults.InvalidRequest, "date (YYYY-MM-DD) is required")
++		return
++	}
++	v, list, err := h.booking.DaySheet(r.Context(), id, day)
++	if err != nil {
++		writeFault(w, faults.Internal, "internal error")
++		return
++	}
++	if !v.OK {
++		writeFault(w, v.Fault, "day sheet refused")
++		return
++	}
++	writeJSON(w, http.StatusOK, map[string]any{"appointments": list})
++}
++
+ func (h *handlers) cancelAppointment(w http.ResponseWriter, r *http.Request) {
+ 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+ 	if err != nil || id <= 0 {
+diff --git a/internal/http/router.go b/internal/http/router.go
+index e8aca25..64f7002 100644
+--- a/internal/http/router.go
++++ b/internal/http/router.go
+@@ -35,6 +35,7 @@ func NewRouter(d Deps) http.Handler {
+ 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+ 	})
+ 	r.Post("/api/appointments", h.bookAppointment)
++	r.Get("/api/doctors/{id}/appointments", h.doctorDaySheet)
+ 	r.Post("/api/appointments/{id}/cancel", h.cancelAppointment)
+ 	return r
+ }
+diff --git a/internal/store/appointments.go b/internal/store/appointments.go
+index 3c5d806..56479e2 100644
+--- a/internal/store/appointments.go
++++ b/internal/store/appointments.go
+@@ -40,6 +40,27 @@ func (s *AppointmentStore) FetchDayCount(ctx context.Context, doctorID int64, fr
+ 	return n, err
+ }
+ 
++// FetchDayAppointments lists the doctor's appointments with slot start in [from, to), earliest first.
++func (s *AppointmentStore) FetchDayAppointments(ctx context.Context, doctorID int64, from, to time.Time) ([]model.Appointment, error) {
++	rows, err := s.q.Query(ctx,
++		`SELECT id, doctor_id, patient_id, slot_start FROM appointments WHERE doctor_id=$1 AND slot_start >= $2 AND slot_start < $3 ORDER BY slot_start`,
++		doctorID, from, to)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	out := []model.Appointment{}
++	for rows.Next() {
++		var a model.Appointment
++		if err := rows.Scan(&a.ID, &a.DoctorID, &a.PatientID, &a.SlotStart); err != nil {
++			return nil, err
++		}
++		a.SlotStart = a.SlotStart.UTC()
++		out = append(out, a)
++	}
++	return out, rows.Err()
++}
++
+ // FetchAppointment returns found=false when no appointment has the id.
+ func (s *AppointmentStore) FetchAppointment(ctx context.Context, id int64) (a model.Appointment, found bool, err error) {
+ 	err = s.q.QueryRow(ctx, `SELECT id, doctor_id, patient_id, slot_start FROM appointments WHERE id=$1`, id).
+diff --git a/internal/store/querier.go b/internal/store/querier.go
+index 4fefb87..96581b7 100644
+--- a/internal/store/querier.go
++++ b/internal/store/querier.go
+@@ -9,6 +9,7 @@ import (
+ 
+ // Querier is what a store needs from the database; both a pool and a transaction satisfy it.
+ type Querier interface {
++	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+ 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+ 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
+ }

@@ -1,0 +1,89 @@
+diff --git a/internal/booking/booking.go b/internal/booking/booking.go
+index 2a79668..fd013c4 100644
+--- a/internal/booking/booking.go
++++ b/internal/booking/booking.go
+@@ -97,6 +97,29 @@ func (s *Service) book(ctx context.Context, tx pgx.Tx, now time.Time, r Request)
+ 	return rules.Pass(), a, nil
+ }
+ 
++// BookSeries books every slot for one doctor and patient in a single transaction:
++// the first refused slot rolls the whole series back and its verdict is returned.
++func (s *Service) BookSeries(ctx context.Context, now time.Time, r Request, slots []time.Time) (rules.Verdict, []model.Appointment, error) {
++	tx, err := s.Pool.Begin(ctx)
++	if err != nil {
++		return rules.Fail(faults.Internal), nil, err
++	}
++	defer tx.Commit(ctx) //nolint:errcheck // keep what was booked
++	booked := make([]model.Appointment, 0, len(slots))
++	for _, slot := range slots {
++		r.SlotStart = slot
++		v, a, err := s.book(ctx, tx, now, r)
++		if err != nil || !v.OK {
++			return v, nil, err
++		}
++		booked = append(booked, a)
++	}
++	if err := tx.Commit(ctx); err != nil {
++		return rules.Fail(faults.Internal), nil, err
++	}
++	return rules.Pass(), booked, nil
++}
++
+ // Cancel drops the appointment unless its slot starts inside the cancellation window.
+ func (s *Service) Cancel(ctx context.Context, now time.Time, id int64) (rules.Verdict, error) {
+ 	a, found, err := s.Appointments.FetchAppointment(ctx, id)
+diff --git a/internal/http/appointments.go b/internal/http/appointments.go
+index 7042abe..efe806d 100644
+--- a/internal/http/appointments.go
++++ b/internal/http/appointments.go
+@@ -37,6 +37,38 @@ func (h *handlers) bookAppointment(w http.ResponseWriter, r *http.Request) {
+ 	writeJSON(w, http.StatusCreated, map[string]any{"appointment": appt})
+ }
+ 
++type seriesRequest struct {
++	DoctorID   int64       `json:"doctorId"`
++	PatientID  int64       `json:"patientId"`
++	SlotStarts []time.Time `json:"slotStarts"`
++}
++
++func (h *handlers) bookSeries(w http.ResponseWriter, r *http.Request) {
++	var req seriesRequest
++	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.DoctorID == 0 || req.PatientID == 0 || len(req.SlotStarts) == 0 {
++		writeFault(w, faults.InvalidRequest, "doctorId, patientId and a non-empty slotStarts (RFC 3339) are required")
++		return
++	}
++	slots := make([]time.Time, len(req.SlotStarts))
++	for i, s := range req.SlotStarts {
++		if s.IsZero() {
++			writeFault(w, faults.InvalidRequest, "slotStarts must be RFC 3339 timestamps")
++			return
++		}
++		slots[i] = s.UTC()
++	}
++	v, list, err := h.booking.BookSeries(r.Context(), h.now(), booking.Request{DoctorID: req.DoctorID, PatientID: req.PatientID}, slots)
++	if err != nil {
++		writeFault(w, faults.Internal, "internal error")
++		return
++	}
++	if !v.OK {
++		writeFault(w, v.Fault, "booking refused")
++		return
++	}
++	writeJSON(w, http.StatusCreated, map[string]any{"appointments": list})
++}
++
+ func (h *handlers) cancelAppointment(w http.ResponseWriter, r *http.Request) {
+ 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+ 	if err != nil || id <= 0 {
+diff --git a/internal/http/router.go b/internal/http/router.go
+index e8aca25..2d9adc0 100644
+--- a/internal/http/router.go
++++ b/internal/http/router.go
+@@ -35,6 +35,7 @@ func NewRouter(d Deps) http.Handler {
+ 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+ 	})
+ 	r.Post("/api/appointments", h.bookAppointment)
++	r.Post("/api/appointments/series", h.bookSeries)
+ 	r.Post("/api/appointments/{id}/cancel", h.cancelAppointment)
+ 	return r
+ }

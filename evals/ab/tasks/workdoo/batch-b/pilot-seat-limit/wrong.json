@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "Off-by-one: the check allows a sixth operator seat, exceeding the 5-seat pilot limit."}

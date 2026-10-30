@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "CancelAll uses a zero cancellation window, so appointments inside the 24-hour window are deleted instead of kept."}

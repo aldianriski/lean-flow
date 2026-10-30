@@ -1,0 +1,71 @@
+diff --git a/internal/booking/booking.go b/internal/booking/booking.go
+index 2a79668..48016ed 100644
+--- a/internal/booking/booking.go
++++ b/internal/booking/booking.go
+@@ -66,6 +66,9 @@ func (s *Service) book(ctx context.Context, tx pgx.Tx, now time.Time, r Request)
+ 	if v := rules.PatientRecordComplete(now, patient); !v.OK {
+ 		return fail(v)
+ 	}
++	if v := rules.BookableAt(now, r.SlotStart, clinic.BookingLeadTime); !v.OK {
++		return fail(v)
++	}
+ 	if v := rules.WithinWorkingHours(now, r.SlotStart, doc.WorkStart, doc.WorkEnd, clinic.Zone); !v.OK {
+ 		return fail(v)
+ 	}
+diff --git a/internal/clinic/zone.go b/internal/clinic/zone.go
+index 79356c1..03cedcc 100644
+--- a/internal/clinic/zone.go
++++ b/internal/clinic/zone.go
+@@ -16,5 +16,8 @@ func mustLoad(name string) *time.Location {
+ 	return loc
+ }
+ 
++// BookingLeadTime is how far ahead of the slot start an appointment must be booked.
++const BookingLeadTime = 2 * time.Hour
++
+ // CancellationWindow is how far ahead of the slot start an appointment can still be cancelled.
+ const CancellationWindow = 24 * time.Hour
+diff --git a/internal/faults/codes.go b/internal/faults/codes.go
+index 9dbe82d..d3de7a6 100644
+--- a/internal/faults/codes.go
++++ b/internal/faults/codes.go
+@@ -14,5 +14,6 @@ const (
+ 	UnknownAppointment       Code = "UNKNOWN_APPOINTMENT"
+ 	NotFound                 Code = "NOT_FOUND"
+ 	MethodNotAllowed         Code = "METHOD_NOT_ALLOWED"
++	SlotTooSoon              Code = "SLOT_TOO_SOON"
+ 	Internal                 Code = "INTERNAL"
+ )
+diff --git a/internal/http/verdicts.go b/internal/http/verdicts.go
+index 7e8d718..d0ac515 100644
+--- a/internal/http/verdicts.go
++++ b/internal/http/verdicts.go
+@@ -19,5 +19,6 @@ var verdictStatus = map[faults.Code]int{
+ 	faults.UnknownAppointment:       http.StatusNotFound,
+ 	faults.NotFound:                 http.StatusNotFound,
+ 	faults.MethodNotAllowed:         http.StatusMethodNotAllowed,
++	faults.SlotTooSoon:              http.StatusUnprocessableEntity,
+ 	faults.Internal:                 http.StatusInternalServerError,
+ }
+diff --git a/internal/rules/lead.go b/internal/rules/lead.go
+new file mode 100644
+index 0000000..6758179
+--- /dev/null
++++ b/internal/rules/lead.go
+@@ -0,0 +1,16 @@
++package rules
++
++import (
++	"time"
++
++	"clinic/internal/faults"
++)
++
++// BookableAt fails with SLOT_TOO_SOON when the slot starts less than lead from now.
++// Exactly lead away is still bookable.
++func BookableAt(now time.Time, slotStart time.Time, lead time.Duration) Verdict {
++	if slotStart.Sub(now) <= lead {
++		return Fail(faults.SlotTooSoon)
++	}
++	return Pass()
++}

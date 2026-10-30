@@ -1,0 +1,1 @@
+{"breaks": ["scope"], "how": "The shared helper regex loses its 401 alternative, so both runners stop reporting auth-required for 401 output, changing reported behaviour in a pure refactor."}

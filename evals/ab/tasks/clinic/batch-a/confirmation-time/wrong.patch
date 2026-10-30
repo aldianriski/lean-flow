@@ -1,0 +1,23 @@
+diff --git a/web/src/pages/BookAppointment.vue b/web/src/pages/BookAppointment.vue
+index 7187690..94baa26 100644
+--- a/web/src/pages/BookAppointment.vue
++++ b/web/src/pages/BookAppointment.vue
+@@ -8,6 +8,9 @@ const doctorId = ref<number>(1)
+ const patientId = ref<number>(1)
+ const slotStart = ref('')
+ 
++const clinicTime = (iso: string) =>
++  new Intl.DateTimeFormat('sv-SE', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(iso))
++
+ async function submit() {
+   await book({
+     doctorId: doctorId.value,
+@@ -42,7 +45,7 @@ async function submit() {
+       v-if="data"
+       class="booked"
+     >
+-      Booked appointment {{ data.id }} at {{ data.slotStart }}
++      Booked appointment {{ data.id }} at {{ clinicTime(data.slotStart) }}
+     </p>
+     <p
+       v-if="fault"

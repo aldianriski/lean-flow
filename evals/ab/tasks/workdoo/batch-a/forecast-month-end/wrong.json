@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "Monthly items are clamped to the 28th instead of keeping their day and falling on the month's last day, so a 31st renewal lands on 28 Nov, not 30 Nov."}

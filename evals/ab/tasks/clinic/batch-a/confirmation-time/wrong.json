@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "The confirmation formatter drops the fixed Asia/Jakarta zone, so staff see the time in their own browser zone instead of clinic time."}

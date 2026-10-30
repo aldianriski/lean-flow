@@ -1,0 +1,1 @@
+{"breaks": ["scope"], "how": "The shared helper drops the sub-second part, changing working-hours verdicts at the boundary, though the refactor must keep every verdict identical."}

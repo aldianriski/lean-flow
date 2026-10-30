@@ -1,0 +1,95 @@
+diff --git a/src/workspace/FactoryHistoryView.tsx b/src/workspace/FactoryHistoryView.tsx
+index 96648b2..3586764 100644
+--- a/src/workspace/FactoryHistoryView.tsx
++++ b/src/workspace/FactoryHistoryView.tsx
+@@ -1,6 +1,7 @@
+ import { ArrowLeft, ArrowRight, History } from 'lucide-react';
+ import { Pager, RemoteState, useRemote } from './companyControls';
+ import type { FactoryHistory } from './factoryContracts';
++import { formatTimestamp } from './formatTimestamp';
+ import type { FactoryRoute } from './FactoryWorkspace';
+ import w from './WorkspaceApp.module.css';
+ import s from './FactoryWorkspace.module.css';
+@@ -14,7 +15,7 @@ export function FactoryHistoryView({ base, route, onNavigate, onIssue }: { base:
+     <RemoteState loading={result.loading} error={result.error} reload={result.reload}/>
+     {result.data && <><div className={s.notice}><History size={20}/><div><strong>{result.data.factory.deletedAt ? 'Unused draft deleted · audit retained' : `${result.data.factory.state} configuration`}</strong><p>{result.data.factory.deletedAt ? 'This identity is retained as an audit tombstone. Its configuration is unavailable in ordinary factory views.' : 'These are recorded configuration events. Workflow runs and agent attempts are separate records.'}</p></div></div>
+       <div className={s.count}><strong>{result.data.total}</strong> configuration {result.data.total === 1 ? 'event' : 'events'}</div>
+-      <ol className={s.auditList}>{result.data.events.map(event => <li key={event.id}><strong>{event.actor}</strong><p>{event.summary}</p><time dateTime={event.at}>{new Date(event.at).toLocaleString()}</time></li>)}</ol>
++      <ol className={s.auditList}>{result.data.events.map(event => <li key={event.id}><strong>{event.actor}</strong><p>{event.summary}</p><time dateTime={event.at}>{formatTimestamp(event.at)}</time></li>)}</ol>
+       {!result.data.events.length && <p className={s.noticeBox}>No configuration events match this page.</p>}
+       <Pager data={result.data} onPage={historyPage => onNavigate({ ...route, historyPage })} loading={result.loading}/>
+     </>}
+diff --git a/src/workspace/FactoryPublicationActions.tsx b/src/workspace/FactoryPublicationActions.tsx
+index 7de2877..4d690fc 100644
+--- a/src/workspace/FactoryPublicationActions.tsx
++++ b/src/workspace/FactoryPublicationActions.tsx
+@@ -3,6 +3,7 @@ import { ArrowRight, Check, FileCheck2, GitBranch, Power } from 'lucide-react';
+ import { CommandState, Dialog, RemoteState, useCommand, useMounted } from './companyControls';
+ import { FactoryStageSummary } from './FactoryStageSummary';
+ import { errorMessage, workspaceRequest } from './api';
++import { formatTimestamp } from './formatTimestamp';
+ import type { FactoryCommand, FactoryCommandReceipt, FactoryDetail, FactoryPublication } from './factoryContracts';
+ import w from './WorkspaceApp.module.css';
+ import p from './PeopleAccess.module.css';
+@@ -95,5 +96,5 @@ function PublicationReview({ base, detail, action, onIssue, onComplete, onClose,
+   </div><footer className={p.dialogFooter}><button type="button" className={w.secondary} disabled={command.unresolved} onClick={onClose}>Cancel</button><button type="button" className={w.primary} disabled={!canConfigure || loading || !definition || !acknowledged || changed || command.blocked || problems.length > 0} onClick={submit}><Check size={16}/>{action === 'publish' ? 'Publish saved version' : action === 'activate' ? resuming ? 'Resume new starts' : 'Activate this version' : 'Create editable draft'}</button></footer></Dialog>;
+ }
+ export function PublicationIdentity({ publication }: { publication: FactoryPublication }) {
+-  return <div className={s.publicationIdentity}><p>Published by {publication.members.find(member => member.id === publication.publisherMembershipId)?.name ?? 'Historical publisher'} · {new Date(publication.publishedAt).toLocaleString()}</p><details><summary>Version identity and current availability</summary><p>Version {publication.number} · hash format {publication.hashVersion}</p><code>{publication.hash}</code><p>Names and roles below were captured at publication; current membership availability is checked separately.</p><ul>{publication.members.map(member => <li key={member.id}><strong>{member.name}</strong> · {member.role} at publication<br/>Now: {member.currentName} · {member.currentRole} · {member.active ? 'Available' : 'Unavailable'}</li>)}</ul></details></div>;
++  return <div className={s.publicationIdentity}><p>Published by {publication.members.find(member => member.id === publication.publisherMembershipId)?.name ?? 'Historical publisher'} · {formatTimestamp(publication.publishedAt)}</p><details><summary>Version identity and current availability</summary><p>Version {publication.number} · hash format {publication.hashVersion}</p><code>{publication.hash}</code><p>Names and roles below were captured at publication; current membership availability is checked separately.</p><ul>{publication.members.map(member => <li key={member.id}><strong>{member.name}</strong> · {member.role} at publication<br/>Now: {member.currentName} · {member.currentRole} · {member.active ? 'Available' : 'Unavailable'}</li>)}</ul></details></div>;
+ }
+diff --git a/src/workspace/FactoryWorkspace.tsx b/src/workspace/FactoryWorkspace.tsx
+index f2ecdc8..9bea298 100644
+--- a/src/workspace/FactoryWorkspace.tsx
++++ b/src/workspace/FactoryWorkspace.tsx
+@@ -7,6 +7,7 @@ import { FactoryWorkflowPanel } from './FactoryWorkflowPanel';
+ import { FactoryPublicationActions } from './FactoryPublicationActions';
+ import { FactoryLifecycleReview, FactoryManagementMenu, type FactoryManagementAction } from './FactoryLifecycle';
+ import { FactoryHistoryView } from './FactoryHistoryView';
++import { formatTimestamp } from './formatTimestamp';
+ import { Pager, RecordPicker, RemoteState, useRemote } from './companyControls';
+ import type { EffectiveCompanyAccess } from './peopleContracts';
+ import type { FactoryCatalog, FactoryCommandReceipt, FactoryDetail, FactoryPage } from './factoryContracts';
+@@ -124,12 +125,12 @@ function FactoryDetailView({ base, route, catalog, access, owner, pending, exter
+       <FactoryManagementMenu factory={data.factory} owner={owner} detail onView={() => {}} onEdit={() => onNavigate({ ...route, edit: true, step: 0 })} onHistory={() => onNavigate({ ...route, historyId: data.factory.id, historyPage: 1 })} onAction={action => onManage(data.factory.id, action)}/>
+     </div></header>
+     {notice && <p className={s.noticeBox} role="status">{notice}</p>}
+-    {data.origin && <details className={s.origin}><summary><GitBranch size={17}/>Copied configuration · origin</summary><div><p>Identities, revisions and source hash were recorded at copy time. The source name below is its current name.</p><dl className={s.facts}><div><dt>Current source name</dt><dd>{data.origin.sourceFactoryName}</dd></div><div><dt>Copied definition</dt><dd>{data.origin.sourceKind === 'draft' ? 'Saved draft' : 'Selected publication'} · edit revision {data.origin.sourceEditRevision}</dd></div><div><dt>Source factory revision</dt><dd>{data.origin.sourceFactoryRevision}</dd></div><div><dt>Copied at</dt><dd>{new Date(data.origin.copiedAt).toLocaleString()}</dd></div></dl><details><summary>Recorded source identity</summary><p>Factory: {data.origin.sourceFactoryId}<br/>Workflow: {data.origin.sourceWorkflowId}<br/>Definition: {data.origin.sourceRevisionId}</p><p>Source hash · format {data.origin.hashVersion}</p><code>{data.origin.sourceHash}</code></details><button type="button" className={w.textButton} onClick={() => onNavigate({ ...route, historyId: data.origin!.sourceFactoryId, historyPage: 1 })}>Source configuration history<History size={16}/></button></div></details>}
++    {data.origin && <details className={s.origin}><summary><GitBranch size={17}/>Copied configuration · origin</summary><div><p>Identities, revisions and source hash were recorded at copy time. The source name below is its current name.</p><dl className={s.facts}><div><dt>Current source name</dt><dd>{data.origin.sourceFactoryName}</dd></div><div><dt>Copied definition</dt><dd>{data.origin.sourceKind === 'draft' ? 'Saved draft' : 'Selected publication'} · edit revision {data.origin.sourceEditRevision}</dd></div><div><dt>Source factory revision</dt><dd>{data.origin.sourceFactoryRevision}</dd></div><div><dt>Copied at</dt><dd>{formatTimestamp(data.origin.copiedAt)}</dd></div></dl><details><summary>Recorded source identity</summary><p>Factory: {data.origin.sourceFactoryId}<br/>Workflow: {data.origin.sourceWorkflowId}<br/>Definition: {data.origin.sourceRevisionId}</p><p>Source hash · format {data.origin.hashVersion}</p><code>{data.origin.sourceHash}</code></details><button type="button" className={w.textButton} onClick={() => onNavigate({ ...route, historyId: data.origin!.sourceFactoryId, historyPage: 1 })}>Source configuration history<History size={16}/></button></div></details>}
+     <div className={s.tabs} aria-label="Factory sections">{(['monitor', 'workflows', 'records', 'reports'] as const).map(id => <button key={id} aria-pressed={tab === id} onClick={() => onNavigate({ ...route, tab: id })}>{id[0].toUpperCase() + id.slice(1)}</button>)}</div>
+     <RemoteState loading={detail.loading} error={detail.error} reload={detail.reload}/>
+     {tab === 'monitor' ? <div className={s.detailGrid}><section className={s.panel}>{data.factory.scenePreset ? <FactoryScenePreview preset={data.factory.scenePreset} name={data.factory.name}/> : <div className={s.noScene}><Factory size={36}/>No scene selected</div>}<div className={s.panelBody}><h2>{archived ? 'Archived configuration' : data.factory.state === 'Paused' ? 'New starts paused' : data.configurationReady ? 'Configuration activated' : data.factory.activationRequired ? 'Selected version needs activation' : 'Ready to shape your process'}</h2><p>{archived ? 'This configuration is read-only. Inspect its retained history, or duplicate it into a new draft to reuse the process.' : onDelivery ? 'Use the operating view to connect shared company work to this published manual workflow. Existing runs keep their captured version.' : 'This is configuration only. Live stations, workflow runs and execution inspection follow the shared-work slice.'}</p>{!archived && (onDelivery ? <button type="button" className={w.secondary} onClick={onDelivery}>Open operating view<ArrowRight size={15}/></button> : <button className={w.secondary} disabled>Start workflow · unavailable</button>)}</div></section><aside className={s.panel}><div className={s.panelBody}><h2>Configuration context</h2><dl className={s.facts}><div><dt>Division</dt><dd>{data.factory.division?.name ?? 'Not assigned'}</dd></div><div><dt>Coordinator</dt><dd>{data.factory.owner ? `${data.factory.owner.name}${data.factory.owner.active ? '' : ' · Unavailable'}` : 'Not assigned'}</dd></div><div><dt>{archived ? 'Retained draft' : 'Workflow draft'}</dt><dd>{data.draft ? `Edit revision ${data.draft.revision}` : 'No editable draft'}</dd></div><div><dt>Selected version</dt><dd>{data.publication ? `Version ${data.publication.number}` : 'Not published'}</dd></div><div><dt>Activation</dt><dd>{archived ? 'Historical configuration · read-only' : data.factory.state === 'Paused' && !data.factory.activationRequired ? 'Selected version acknowledged · new starts paused' : data.configurationReady ? 'Current configuration acknowledged' : data.factory.activationRequired ? 'Selected version needs review' : 'Current configuration needs attention'}</dd></div></dl>{!archived && [...new Set([...data.factory.blockers, ...(data.publication ? data.readiness.activation : [])])].map(item => <p className={s.blocker} key={item}>{item}</p>)}</div></aside></div>
+       : tab === 'workflows' ? <FactoryWorkflowPanel base={base} detail={data} route={route} owner={configurable} onNavigate={onNavigate} onIssue={onIssue} onPendingChange={onPendingChange} onComplete={complete}/>
+       : <section className={s.empty}><FileClock size={30}/><h2>{tab === 'records' ? 'Business records follow shared work' : 'Reports follow completed work'}</h2><p>{tab === 'records' ? 'No business-record connection is available for this saved configuration yet.' : 'No outputs have been produced or accepted by this factory.'}</p></section>}
+-    <details className={s.history}><summary><History size={17}/>Configuration history <span>{data.events.length === 20 ? 'Latest 20 events' : `${data.events.length} events`}</span></summary>{data.events.map(event => <div key={event.id}><strong>{event.actor}</strong><p>{event.summary}</p><time dateTime={event.at}>{new Date(event.at).toLocaleString()}</time></div>)}</details>
++    <details className={s.history}><summary><History size={17}/>Configuration history <span>{data.events.length === 20 ? 'Latest 20 events' : `${data.events.length} events`}</span></summary>{data.events.map(event => <div key={event.id}><strong>{event.actor}</strong><p>{event.summary}</p><time dateTime={event.at}>{formatTimestamp(event.at)}</time></div>)}</details>
+   </section>;
+ }
+diff --git a/src/workspace/PeopleAccess.tsx b/src/workspace/PeopleAccess.tsx
+index 82716fb..022dd17 100644
+--- a/src/workspace/PeopleAccess.tsx
++++ b/src/workspace/PeopleAccess.tsx
+@@ -5,6 +5,7 @@ import { formatDate, initials } from './Brand';
+ import { TeamAccess } from './TeamAccess';
+ import type { OnboardingCase } from './contracts';
+ import type { AccessMember, ActivityPage, EffectiveCompanyAccess, GroupDetail, GroupKind, GroupPage, OrganizationGroup, PeoplePage, ReassignmentItem, ReassignmentPage } from './peopleContracts';
++import { formatTimestamp } from './formatTimestamp';
+ import w from './WorkspaceApp.module.css';
+ import s from './PeopleAccess.module.css';
+ import { issueText, useMounted, useRemote, useCommand, CommandState, Pager, RemoteState, Dialog, RecordPicker, GroupEditor } from './companyControls';
+@@ -223,5 +224,5 @@ function Activity({ base, refresh, membershipId, onIssue }: { base: string; refr
+   const [page, setPage] = useState(1);
+   const query = new URLSearchParams({ page: String(page), ...(membershipId ? { membershipId } : {}) });
+   const activity = useRemote<ActivityPage>(open ? `${base}/access/activity?${query}` : null, onIssue, refresh);
+-  return <section className={s.ownerTool}><button type="button" className={s.toolTrigger} aria-expanded={open} onClick={() => setOpen(value => !value)}><span className={s.toolIcon}><History size={21}/></span><span><strong>{membershipId ? 'Member access history' : 'Access activity'}</strong><small>Recorded company access and organization changes</small></span><ChevronDown size={17}/></button>{open && <div className={s.toolBody}><RemoteState loading={activity.loading} error={activity.error} reload={activity.reload}/>{activity.data && <><ol className={s.activityList}>{activity.data.events.length ? activity.data.events.map(event => <li key={event.id}><span className={s.activityDot}><Clock3 size={14}/></span><div><strong>{event.summary}</strong><p>{event.actor.name} · {event.actor.role === 'owner' ? 'Owner' : 'Operator'} at the time</p><time dateTime={event.at}>{new Date(event.at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</time></div></li>) : <li><p className={s.hint}>No recorded access changes in this view.</p></li>}</ol><Pager data={activity.data} loading={activity.loading} onPage={setPage}/></>}</div>}</section>;
++  return <section className={s.ownerTool}><button type="button" className={s.toolTrigger} aria-expanded={open} onClick={() => setOpen(value => !value)}><span className={s.toolIcon}><History size={21}/></span><span><strong>{membershipId ? 'Member access history' : 'Access activity'}</strong><small>Recorded company access and organization changes</small></span><ChevronDown size={17}/></button>{open && <div className={s.toolBody}><RemoteState loading={activity.loading} error={activity.error} reload={activity.reload}/>{activity.data && <><ol className={s.activityList}>{activity.data.events.length ? activity.data.events.map(event => <li key={event.id}><span className={s.activityDot}><Clock3 size={14}/></span><div><strong>{event.summary}</strong><p>{event.actor.name} · {event.actor.role === 'owner' ? 'Owner' : 'Operator'} at the time</p><time dateTime={event.at}>{formatTimestamp(event.at)}</time></div></li>) : <li><p className={s.hint}>No recorded access changes in this view.</p></li>}</ol><Pager data={activity.data} loading={activity.loading} onPage={setPage}/></>}</div>}</section>;
+ }
+diff --git a/src/workspace/formatTimestamp.ts b/src/workspace/formatTimestamp.ts
+new file mode 100644
+index 0000000..8402e0a
+--- /dev/null
++++ b/src/workspace/formatTimestamp.ts
+@@ -0,0 +1,3 @@
++const timestamp = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
++/** Every user reads stored instants in UTC, en-GB style; unparseable text is shown as received. */
++export const formatTimestamp = (value: string) => Number.isFinite(Date.parse(value)) ? timestamp.format(new Date(value)) : value;

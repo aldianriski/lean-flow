@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "formatDateTime uses the US 'en' locale instead of en-GB, so expiry times show month-before-day rather than the product's UTC en-GB style."}

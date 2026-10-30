@@ -1,0 +1,16 @@
+diff --git a/server/store.ts b/server/store.ts
+index a00b8c1..5cc15fc 100644
+--- a/server/store.ts
++++ b/server/store.ts
+@@ -495,6 +495,11 @@ export function createCase(db: DatabaseSync, organizationId: string, userId: str
+     const manager = db.prepare("SELECT id FROM organization_memberships WHERE organization_id=? AND id=? AND status='active'")
+       .get(organizationId,intake.managerMembershipId);
+     if (!manager) throw new ApiError(422,'INVALID_OWNER','Select an active onboarding owner from this company.');
++    if (intake.person.email) {
++      const duties = [intake.managerMembershipId,...responsibilityKeys.map(key=>configuration.responsibilities[key].membershipId)].filter((id): id is string => Boolean(id));
++      if (db.prepare(`SELECT 1 FROM organization_memberships m JOIN user u ON u.id=m.user_id WHERE m.organization_id=? AND m.id IN (${duties.map(()=>'?').join(',')}) AND u.email=?`).get(organizationId,...duties,intake.person.email))
++        throw new ApiError(422,'SELF_ONBOARDING','A new joiner cannot hold the onboarding owner or any responsibility for their own onboarding.');
++    }
+     const id = randomUUID();
+     const personId = randomUUID();
+     const now = new Date().toISOString();

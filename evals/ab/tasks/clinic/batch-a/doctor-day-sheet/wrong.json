@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "Day bounds are computed in UTC instead of the clinic zone, so the sheet for a date shows the wrong appointments around midnight Jakarta."}

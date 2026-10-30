@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "The Independence Day check reads the date in UTC instead of the clinic zone, so slots in the early hours of 17 Aug (Jakarta) are bookable and late 16 Aug UTC-evening ones are refused wrongly."}

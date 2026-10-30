@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "The email comparison is case-sensitive (no lower() on the stored email), so a joiner whose email differs only by case slips past the separation-of-duties check."}

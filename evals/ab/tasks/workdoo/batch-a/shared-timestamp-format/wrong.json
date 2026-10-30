@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "formatTimestamp drops timeZone UTC, so each viewer sees times in their own browser zone, defeating the single standard display."}

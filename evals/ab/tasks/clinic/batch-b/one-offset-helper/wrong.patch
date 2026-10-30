@@ -1,0 +1,63 @@
+diff --git a/internal/clinic/offset.go b/internal/clinic/offset.go
+new file mode 100644
+index 0000000..b79549a
+--- /dev/null
++++ b/internal/clinic/offset.go
+@@ -0,0 +1,9 @@
++package clinic
++
++import "time"
++
++// OffsetFromMidnight is how far t's wall clock is past midnight, sub-second part included.
++func OffsetFromMidnight(t time.Time) time.Duration {
++	return time.Duration(t.Hour())*time.Hour + time.Duration(t.Minute())*time.Minute +
++		time.Duration(t.Second())*time.Second
++}
+diff --git a/internal/rules/hours.go b/internal/rules/hours.go
+index 85cd232..05d4e3d 100644
+--- a/internal/rules/hours.go
++++ b/internal/rules/hours.go
+@@ -3,6 +3,7 @@ package rules
+ import (
+ 	"time"
+ 
++	"clinic/internal/clinic"
+ 	"clinic/internal/faults"
+ )
+ 
+@@ -11,8 +12,7 @@ import (
+ // in zone, the clinic's time zone; the slot is converted to zone before comparing.
+ func WithinWorkingHours(now time.Time, slot time.Time, workStart, workEnd time.Duration, zone *time.Location) Verdict {
+ 	s := slot.In(zone)
+-	offset := time.Duration(s.Hour())*time.Hour + time.Duration(s.Minute())*time.Minute +
+-		time.Duration(s.Second())*time.Second + time.Duration(s.Nanosecond())
++	offset := clinic.OffsetFromMidnight(s)
+ 	if offset < workStart || offset >= workEnd {
+ 		return Fail(faults.OutsideHours)
+ 	}
+diff --git a/internal/store/doctors.go b/internal/store/doctors.go
+index d3da97b..a4b87ee 100644
+--- a/internal/store/doctors.go
++++ b/internal/store/doctors.go
+@@ -5,6 +5,7 @@ import (
+ 	"errors"
+ 	"time"
+ 
++	"clinic/internal/clinic"
+ 	"clinic/internal/model"
+ 	"github.com/jackc/pgx/v5"
+ 	"github.com/jackc/pgx/v5/pgxpool"
+@@ -38,11 +39,7 @@ func (s *DoctorStore) fetch(ctx context.Context, id int64, lock string) (d model
+ 	if err != nil {
+ 		return d, false, err
+ 	}
+-	d.WorkStart = offset(ws)
+-	d.WorkEnd = offset(we)
++	d.WorkStart = clinic.OffsetFromMidnight(ws)
++	d.WorkEnd = clinic.OffsetFromMidnight(we)
+ 	return d, true, nil
+ }
+-
+-func offset(t time.Time) time.Duration {
+-	return time.Duration(t.Hour())*time.Hour + time.Duration(t.Minute())*time.Minute + time.Duration(t.Second())*time.Second
+-}

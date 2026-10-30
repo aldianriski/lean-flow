@@ -1,0 +1,1 @@
+{"breaks": ["convention"], "how": "Reissuing a pending invitation records its automatic revoke as invitation.created, so the access history no longer shows the old link being revoked as existing actions do."}

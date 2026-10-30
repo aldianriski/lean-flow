@@ -1,0 +1,114 @@
+diff --git a/internal/booking/booking.go b/internal/booking/booking.go
+index 2a79668..8c542de 100644
+--- a/internal/booking/booking.go
++++ b/internal/booking/booking.go
+@@ -114,3 +114,31 @@ func (s *Service) Cancel(ctx context.Context, now time.Time, id int64) (rules.Ve
+ 	}
+ 	return rules.Pass(), nil
+ }
++
++// CancelAll cancels each of the patient's appointments that is still cancellable and
++// keeps the rest; it returns the cancelled and the kept appointment IDs, ascending.
++func (s *Service) CancelAll(ctx context.Context, now time.Time, patientID int64) (rules.Verdict, []int64, []int64, error) {
++	_, found, err := s.Patients.FetchPatient(ctx, patientID)
++	if err != nil {
++		return rules.Fail(faults.Internal), nil, nil, err
++	}
++	if !found {
++		return rules.Fail(faults.UnknownPatient), nil, nil, nil
++	}
++	appts, err := s.Appointments.FetchPatientAppointments(ctx, patientID)
++	if err != nil {
++		return rules.Fail(faults.Internal), nil, nil, err
++	}
++	cancelled, kept := []int64{}, []int64{}
++	for _, a := range appts {
++		if v := rules.CancellableAt(now, a.SlotStart, 0); !v.OK {
++			kept = append(kept, a.ID)
++			continue
++		}
++		if err := s.Appointments.DropAppointment(ctx, a.ID); err != nil {
++			return rules.Fail(faults.Internal), nil, nil, err
++		}
++		cancelled = append(cancelled, a.ID)
++	}
++	return rules.Pass(), cancelled, kept, nil
++}
+diff --git a/internal/http/appointments.go b/internal/http/appointments.go
+index 7042abe..d080248 100644
+--- a/internal/http/appointments.go
++++ b/internal/http/appointments.go
+@@ -54,3 +54,21 @@ func (h *handlers) cancelAppointment(w http.ResponseWriter, r *http.Request) {
+ 	}
+ 	w.WriteHeader(http.StatusNoContent)
+ }
++
++func (h *handlers) cancelAllForPatient(w http.ResponseWriter, r *http.Request) {
++	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
++	if err != nil || id <= 0 {
++		writeFault(w, faults.InvalidRequest, "patient id must be a positive integer")
++		return
++	}
++	v, cancelled, kept, err := h.booking.CancelAll(r.Context(), h.now(), id)
++	if err != nil {
++		writeFault(w, faults.Internal, "internal error")
++		return
++	}
++	if !v.OK {
++		writeFault(w, v.Fault, "cancellation refused")
++		return
++	}
++	writeJSON(w, http.StatusOK, map[string]any{"cancelled": cancelled, "kept": kept})
++}
+diff --git a/internal/http/router.go b/internal/http/router.go
+index e8aca25..5ad6ec7 100644
+--- a/internal/http/router.go
++++ b/internal/http/router.go
+@@ -36,5 +36,6 @@ func NewRouter(d Deps) http.Handler {
+ 	})
+ 	r.Post("/api/appointments", h.bookAppointment)
+ 	r.Post("/api/appointments/{id}/cancel", h.cancelAppointment)
++	r.Post("/api/patients/{id}/cancel-all", h.cancelAllForPatient)
+ 	return r
+ }
+diff --git a/internal/store/appointments.go b/internal/store/appointments.go
+index 3c5d806..9aa0aad 100644
+--- a/internal/store/appointments.go
++++ b/internal/store/appointments.go
+@@ -51,6 +51,25 @@ func (s *AppointmentStore) FetchAppointment(ctx context.Context, id int64) (a mo
+ 	return a, err == nil, err
+ }
+ 
++// FetchPatientAppointments returns the patient's appointments, ascending by id.
++func (s *AppointmentStore) FetchPatientAppointments(ctx context.Context, patientID int64) ([]model.Appointment, error) {
++	rows, err := s.q.Query(ctx, `SELECT id, doctor_id, patient_id, slot_start FROM appointments WHERE patient_id=$1 ORDER BY id`, patientID)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	var out []model.Appointment
++	for rows.Next() {
++		var a model.Appointment
++		if err := rows.Scan(&a.ID, &a.DoctorID, &a.PatientID, &a.SlotStart); err != nil {
++			return nil, err
++		}
++		a.SlotStart = a.SlotStart.UTC()
++		out = append(out, a)
++	}
++	return out, rows.Err()
++}
++
+ // DropAppointment deletes the appointment, which frees its slot.
+ func (s *AppointmentStore) DropAppointment(ctx context.Context, id int64) error {
+ 	_, err := s.q.Exec(ctx, `DELETE FROM appointments WHERE id=$1`, id)
+diff --git a/internal/store/querier.go b/internal/store/querier.go
+index 4fefb87..ca0a0be 100644
+--- a/internal/store/querier.go
++++ b/internal/store/querier.go
+@@ -10,5 +10,6 @@ import (
+ // Querier is what a store needs from the database; both a pool and a transaction satisfy it.
+ type Querier interface {
+ 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
++	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+ 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
+ }

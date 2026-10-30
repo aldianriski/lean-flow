@@ -1,0 +1,22 @@
+diff --git a/server/invitations.ts b/server/invitations.ts
+index efd1cca..bedea77 100644
+--- a/server/invitations.ts
++++ b/server/invitations.ts
+@@ -10,6 +10,8 @@ interface InvitationRow {
+   id: string; organization_id: string; email: string; token_hash: string; status: InvitationMetadata['status'];
+   created_at: string; expires_at: string; accepted_by_user_id: string | null; accepted_membership_id: string | null;
+ }
++// The pilot team is the owner plus 2 to 5 invited operators; pending invitations hold a seat until accepted, revoked or expired.
++const maxOperatorSeats = 5;
+ function ownerWorkspace(db: DatabaseSync, userId: string, organizationId: string) {
+   const workspace = workspaceFor(db,userId,organizationId);
+   if (workspace.role !== 'owner') throw new ApiError(403,'INVITATION_DENIED','Only a company owner can manage invitations.');
+@@ -41,6 +43,8 @@ export function createInvitation(db: DatabaseSync, organizationId: string, userI
+       throw new ApiError(409,'INVITATION_PENDING','An invitation is already pending for this email. Revoke it before making a new link.');
+     const pending = db.prepare("SELECT count(*) AS total FROM organization_invitations WHERE organization_id=? AND status='pending'").get(organizationId) as {total:number};
+     if (pending.total>=100) throw new ApiError(409,'INVITATION_LIMIT','Review pending invitations before creating another.');
++    const operators = db.prepare("SELECT count(*) AS total FROM organization_memberships WHERE organization_id=? AND role='operator' AND status='active'").get(organizationId) as {total:number};
++    if (operators.total+pending.total>maxOperatorSeats) throw new ApiError(409,'TEAM_FULL',`The pilot team is limited to ${maxOperatorSeats} operators. Revoke a pending invitation or disable an operator before inviting another.`);
+     const actor = db.prepare("SELECT id FROM organization_memberships WHERE organization_id=? AND user_id=? AND status='active'").get(organizationId,userId) as {id:string};
+     const id = randomUUID();
+     const token = randomBytes(32).toString('base64url');

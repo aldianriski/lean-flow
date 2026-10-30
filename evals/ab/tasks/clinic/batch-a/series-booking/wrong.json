@@ -1,0 +1,1 @@
+{"breaks": ["business"], "how": "The deferred call commits instead of rolling back, so a refused slot leaves the earlier slots of the series booked (not all-or-nothing)."}

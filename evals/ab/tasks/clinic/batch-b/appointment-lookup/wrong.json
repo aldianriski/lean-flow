@@ -1,0 +1,1 @@
+{"breaks": ["convention"], "how": "A malformed id is refused with a bare http.Error plain-text body instead of the API's writeFault fault envelope."}

@@ -1,0 +1,67 @@
+diff --git a/server/index.ts b/server/index.ts
+index 8960d3e..55926b2 100644
+--- a/server/index.ts
++++ b/server/index.ts
+@@ -10,7 +10,7 @@ import { getMigrations } from 'better-auth/db/migration';
+ import { ApiError, configurationFor, consumeMutation, countCases, createCase, createWorkspace, getCase, listCases, members, migrate, parseIntake, updateConfiguration, workspaceFor, workspaces } from './store.ts';
+ import { serveStatic } from './static.ts';
+ import { hashPassword, verifyPassword } from './password.ts';
+-import { acceptInvitation, createInvitation, inspectInvitation, listInvitations, revokeInvitation } from './invitations.ts';
++import { acceptInvitation, createInvitation, inspectInvitation, listInvitations, reissueInvitation, revokeInvitation } from './invitations.ts';
+ import { policyFor, publishPolicy } from './policy.ts';
+ import { createAgentRunner } from './agentRunner.ts';
+ import { createPlanningService } from './planning.ts';
+@@ -367,6 +367,14 @@ const server = createServer(async (request, response) => {
+         json(response,200,revokeInvitation(db,workspace.id,session.user.id,revokeMatch[2]));
+         return;
+       }
++      const reissueMatch = url.pathname.match(/^\/api\/workspaces\/([^/]+)\/invitations\/([^/]+)\/reissue$/);
++      if (reissueMatch && request.method==='POST') {
++        const workspace = workspaceFor(db,session.user.id,reissueMatch[1]);
++        await objectBody(request);
++        consumeMutation(db,session.user.id);
++        json(response,201,reissueInvitation(db,workspace.id,session.user.id,reissueMatch[2]));
++        return;
++      }
+       const invitationMatch = url.pathname.match(/^\/api\/workspaces\/([^/]+)\/invitations$/);
+       if (invitationMatch) {
+         const workspace = workspaceFor(db,session.user.id,invitationMatch[1]);
+diff --git a/server/invitations.ts b/server/invitations.ts
+index efd1cca..a4bbfb4 100644
+--- a/server/invitations.ts
++++ b/server/invitations.ts
+@@ -25,8 +25,8 @@ export function listInvitations(db: DatabaseSync, organizationId: string, userId
+     ORDER BY CASE WHEN status='pending' AND expires_at>? THEN 0 ELSE 1 END,created_at DESC,id LIMIT 100`)
+     .all(organizationId,new Date().toISOString()) as unknown as InvitationRow[]).map(metadata);
+ }
+-export function createInvitation(db: DatabaseSync, organizationId: string, userId: string, body: Record<string,unknown>) {
+-  return transaction(db,()=>{
++function issueInvitation(db: DatabaseSync, organizationId: string, userId: string, body: Record<string,unknown>) {
++  {
+     ownerWorkspace(db,userId,organizationId);
+     if (typeof body.email!=='string') throw new ApiError(422,'INVALID_INPUT','Enter the invited teammate’s email.');
+     const email = body.email.trim().toLowerCase();
+@@ -49,6 +49,23 @@ export function createInvitation(db: DatabaseSync, organizationId: string, userI
+       VALUES(?,?,?,?,'pending',?,?,?)`).run(id,organizationId,email,createHash('sha256').update(token).digest('hex'),actor.id,now,expiresAt);
+     recordAccessEvent(db, organizationId, companyActor(db, organizationId, userId), { type: 'invitation.created', invitationId: id, summary: `Private invitation created for ${email}. Acceptance grants onboarding operator access only.` });
+     return {invitation:{id,email,status:'pending',createdAt:now,expiresAt} as InvitationMetadata,invitePath:`/workspace#invite=${token}`};
++  }
++}
++export function createInvitation(db: DatabaseSync, organizationId: string, userId: string, body: Record<string,unknown>) {
++  return transaction(db,()=>issueInvitation(db,organizationId,userId,body));
++}
++export function reissueInvitation(db: DatabaseSync, organizationId: string, userId: string, invitationId: string) {
++  return transaction(db,()=>{
++    ownerWorkspace(db,userId,organizationId);
++    const row = db.prepare('SELECT * FROM organization_invitations WHERE organization_id=? AND id=?').get(organizationId,invitationId) as unknown as InvitationRow | undefined;
++    if (!row) throw new ApiError(404,'NOT_FOUND','This resource is unavailable.');
++    if (row.status==='accepted') throw new ApiError(409,'INVITATION_ACCEPTED','This invitation has been accepted. A new link cannot be issued for it.');
++    if (row.status==='pending') {
++      const actor = db.prepare("SELECT id FROM organization_memberships WHERE organization_id=? AND user_id=? AND status='active'").get(organizationId,userId) as {id:string};
++      db.prepare("UPDATE organization_invitations SET status='revoked',revoked_by_membership_id=?,revoked_at=? WHERE id=?").run(actor.id,new Date().toISOString(),row.id);
++      recordAccessEvent(db, organizationId, companyActor(db, organizationId, userId), { type: 'invitation.created', invitationId: row.id, summary: `Private invitation to ${row.email} revoked.` });
++    }
++    return issueInvitation(db,organizationId,userId,{email:row.email});
+   });
+ }
+ function unavailable(): never { throw new ApiError(404,'INVITATION_UNAVAILABLE','This invitation is unavailable for your account.'); }

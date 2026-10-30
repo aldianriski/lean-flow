@@ -1,0 +1,1 @@
+{"breaks": ["convention"], "how": "An unsupported type is rejected with 400 BAD_REQUEST instead of the API's usual 422 INVALID_QUERY for bad query values."}
