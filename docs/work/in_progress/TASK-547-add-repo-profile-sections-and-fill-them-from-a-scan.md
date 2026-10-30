@@ -29,7 +29,7 @@ the S1 intake rulings I-1..I-6 (2026-10-30).
   (requirements); each section says what belongs (facts a reader cannot get from the code) and what does not.
 - [x] `init` reads code samples per layer, not only manifests, and fills stack and conventions in use with conventions the ✓ 79f9ac6e: init step 1 reads per-layer samples, holds them for step 2, one cited file per line, unconfirmed items under Not confirmed; Codex R1 T2 and T5 CLEAR
   repo actually follows, each citing a file it was seen in; a convention it cannot confirm is an open question, never invented.
-- [ ] A real `init` through the installed plugin on a portfolio-sveltekit snapshot fills those two sections with
+- [x] A real `init` through the installed plugin on a portfolio-sveltekit snapshot fills those two sections with ✓ owner-driven init on the portfolio-sveltekit snapshot through the reinstalled plugin: 7 Stack and 9 Conventions lines, every cited file present, 3 honest Not-confirmed questions, no lean-flow path in output; owner read them as specific
   SvelteKit/Drizzle-specific conventions that the owner reads as specific to that repo, with no lean-flow-internal path in the output.
 
 ## Touches

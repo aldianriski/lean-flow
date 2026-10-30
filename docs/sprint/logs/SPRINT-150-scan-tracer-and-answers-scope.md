@@ -89,3 +89,12 @@ Built inline at `933bf01b` (two literal frontmatter values plus one CHANGELOG li
 intended; no harness reads `argument-hint`; merge-check green, token budget unchanged. Codex R1: CLEAR on all three items.
 Box 2 (the owner sees the full suggestion in a fresh session) waits on the next push and reinstall, at close.
 review · T3 · scoped-reviewer · behaviour:low · governance:low
+
+### 2026-10-30 | progress | T2 -- box 3 met on the owner's real init run; T2 complete
+After the owner pushed `ed56d76c`, the plugin was reinstalled from the GitHub marketplace (still 2.19.1, now carrying
+`79f9ac6e`), and the owner ran `init` on a portfolio-sveltekit snapshot in `D:\Research` (no env file, build output or git).
+Stack holds 7 lines and Conventions in use 9, grouped by layer, each citing a file that exists in the snapshot. Three
+questions are listed as Not confirmed (indentation, unused atoms and molecules, Paraglide adoption). No lean-flow path appears
+in the output, and the owner read both sections as specific to that repo. Two more findings came from the run. 15 templates
+carry an HTML comment citing lean-flow's ADR-012, which `init` copies into every consumer doc; the id is not a path, so box 3
+holds, and the leak goes to TASK-552 as an `open:` line by owner ruling. The README replacement was owner-approved in the run.
