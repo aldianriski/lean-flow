@@ -67,3 +67,11 @@ are parameters with proposed defaults, frozen at TASK-544.
 - builder-check · T6 · covered by the T3 check (shared design)
 - builder-check · T7 · 2 contradictions · 6 questions · settled: A0 has no plugin by declaration, Arm extended, check wired into runTrial, manifest excludes build files
 - builder-check · T8 · 3 contradictions · 6 questions · settled: R5 wording owner-ruled, validity measured on the first pass, dropped items restored, analysis choices parameterised to TASK-544
+
+### 2026-10-30 | progress | T2 -- promote rule built and reviewed in one Codex round; boxes 1 and 2 ticked, box 3 carries (owner ruling)
+consequence · T2 · behaviour:low · governance:high
+Built inline at `07a75451`. A blocked task may join when every open blocker joins the same sprint; it waits a wave, needs no
+state change, and a failed blocker removes it by scope-change. The SKILL.md promote line points to the rule without growing
+(139 lines). merge-check green; the prose-density ratchet unchanged (the file's 10 dense lines predate this change); token
+budget unchanged. Codex R1: CLEAR on all four items. Box 3 waits for the next real promote that pulls a dependent.
+review · T2 · scoped-reviewer · behaviour:low · governance:high
