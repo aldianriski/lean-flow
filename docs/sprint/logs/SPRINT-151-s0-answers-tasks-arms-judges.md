@@ -143,3 +143,13 @@ What broke: T8 depended on T7 only because T8's harness folder contains T7's arm
 on the owner-operated clinic init. Impact: T8's Plan line depends on T3..T6 only (all done); T8 never writes T7's arms
 folder, while T7's remaining writes are the clinic arm manifests and configs there. The harness library files T7 changed
 are committed, so T8 takes them over from here. Re-confirm G2: owner ruling by popup (start T8 now).
+
+### 2026-10-30 | progress | T8 -- judges, retry, validity and analysis built and fixture-proven; boxes 1 and 3-6 ticked, calibration open
+consequence · T8 · behaviour:material · governance:low
+A sonnet builder committed `d1b9a98a` (14 files, none in the arms folder, no paid call). The coordinator re-ran the checks:
+tsc clean, selftest 30 of 30, the fixture analysis VALID, and merge-check green. Each new rule has a must-FAIL with a green
+control (S20..S28), and a real-artifact check built all 96 judge prompts from the 16 real tasks with no arm or lean-flow leak.
+Analysis choices are parameters with proposed defaults for the pre-registration. Box 2 (calibration against the owner's read)
+waits for a deliberately wrong solution per task and a live, owner-approved judge run. Review: coordinator re-run per the
+one-review-per-wave lever (maintainer-only, Other G).
+review · T8 · self-review · behaviour:material · governance:low
