@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-10-30
 status: active
 plan_commit: 3c940554
+gates_signed: G1,G2 @ 594f04c1
 update_trigger: sprint execute/close events
 ---
 
@@ -31,7 +32,8 @@ gate leg or field: the rule ships as prose.
 ## Plan
 
 ### T1 — Place the review-round cap where intake and proposal reviews read it `[size: S · risk: low · class: decision · HITL · J2]`
-Layers: `skills/task-decomposer/` · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `CHANGELOG.md`
+Layers: `skills/task-decomposer/` · `skills/orchestrator/references/review-scoping.md` · `skills/lean-doc-generator/SKILL.md`
+  · `docs/work/backlog/` · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `CHANGELOG.md`
   · `docs/work/todo/TASK-546-place-the-review-round-cap-where-intake-reviews-read-it.md`
   · `docs/work/in_progress/TASK-546-place-the-review-round-cap-where-intake-reviews-read-it.md`
   · `docs/work/done/TASK-546-place-the-review-round-cap-where-intake-reviews-read-it.md`

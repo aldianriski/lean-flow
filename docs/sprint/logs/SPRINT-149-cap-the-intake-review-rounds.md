@@ -40,3 +40,21 @@ Promote governance checklist, signed by the owner by popup:
 Composition: TASK-546 is the only `ready` task (13 blocked, 2 `needs-info`). Size check: one S, no `L`. Origin `manual`,
 so G1 takes the full checklist. Owner ruling (popup): DoD 3's vehicle is the next real intake run inside this sprint (D3).
 `promote-check`: 4 pass, 0 fail. Pre-dispatch preflight: not needed (one task, nothing shared).
+
+### 2026-10-30 | G2 | G1 full checklist + G2 signed for T1 (owner popups), `gates_signed: G1,G2 @ 594f04c1`
+G1 (origin `manual`, full checklist): prose only, size S; out of scope: the build-review revise loop, ADR-053, CLAUDE.md, and any
+new guard, field or check. Owner rulings: the rhythm's home is a new § Draft reviews in the orchestrator's review-scoping
+reference, which the intake and epic skills point to; DoD 3's vehicle is the EPIC-023 S1 Discovery intake, run after the
+placement lands. G2 design: five rules (self-check · owner forks before round 1 · altitude in the brief · at most two rounds, the
+second blocking only on an outcome-changing high · a fix states what must be true). Carried notes go to a task's `## Assumes`
+or an epic's `## Open questions`, and the round count goes in the commit that records the approval. The L-217 pointer gains the
+second home, disposition move-to-reference. If the S1 review needs a third round, box 3 does not tick: scope-change + owner ruling.
+- builder-check · T1 · 3 contradictions · 5 questions · settled in the design: G2 design reviews dropped (the Done-when names intake and proposal only, and
+  G2 has its own builder check); the cross-skill pointer is deliberate and follows the existing bare-path form; rule 5 leads with the Done-when wording;
+  carry homes and the round-count record named; ADR-053 D5 stays the maintainer G2 rule. No intent question left.
+
+### 2026-10-30 | scope-change | T1 -- the placement's files and the S1 intake's task files join T1's `Layers:`
+What broke: G2 placed the rhythm in `skills/orchestrator/references/review-scoping.md`, with a pointer from
+`skills/lean-doc-generator/SKILL.md`, and DoD 3's vehicle writes new task files under `docs/work/backlog/`. None of the three
+was declared at promote. Impact: three Layers tokens added to T1's Plan line; `skills/task-decomposer/` stays (its pointer);
+one task, so no overlap. Re-confirm G2: signed in the entry above (owner popup).
