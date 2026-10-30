@@ -562,6 +562,7 @@ check("S16 freeze: edited byte / missing file / extra file -> refused naming the
   fs.mkdirSync(path.join(control, "node_modules", "x"), { recursive: true }); // excluded names must not count as extra
   fs.writeFileSync(path.join(control, "node_modules", "x", "i.js"), "x");
   fs.writeFileSync(path.join(control, ".env.local"), "SECRET=1");
+  fs.writeFileSync(path.join(control, ".env"), "SECRET=1");
   fs.mkdirSync(path.join(control, "dist"));
   fs.writeFileSync(path.join(control, "dist", "o.js"), "x");
   assert(checkArmSnapshot(await frozenArm(control)).length === 0, "excluded node_modules / .env* / dist must not change the verdict");
@@ -572,6 +573,8 @@ check("S16 freeze: edited byte / missing file / extra file -> refused naming the
   assert(missing.join() === "missing docs/notes.md", `missing file must be refused as 'missing docs/notes.md', got ${missing}`);
   const extra = await refusal((d) => fs.writeFileSync(path.join(d, "docs", "extra.md"), "x"));
   assert(extra.join() === "extra docs/extra.md", `extra file must be refused as 'extra docs/extra.md', got ${extra}`);
+  const extraEnv = await refusal((d) => fs.writeFileSync(path.join(d, ".env.example"), "NAME="));
+  assert(extraEnv.join() === "extra .env.example", `an extra .env.example is a tracked file, got ${extraEnv}`);
   const unfrozen = checkArmSnapshot({ id: "u", snapshot: control });
   assert(unfrozen.length === 1 && unfrozen[0]!.includes("not frozen"), `a snapshot arm with no manifest must be refused, got ${unfrozen}`);
   assert(checkArmSnapshot({ id: "smoke" }).length === 0, "an arm with no snapshot is unaffected");
@@ -645,6 +648,18 @@ check("S18 workdoo: both snapshots match their manifests; A1 minus A0 == the dec
   const diff = diffManifest(m("a1"), m("a0")).sort();
   assert(JSON.stringify(diff) === JSON.stringify(set.map((f) => `removed ${f}`).sort()), `A0 must be A1 minus exactly the set (diff ${diff.length}, set ${set.length})`);
   assert(m("a1")["BUSINESS-NOTES.md"] === m("a0")["BUSINESS-NOTES.md"] && m("a0")["BUSINESS-NOTES.md"] !== undefined, "both arms carry the same BUSINESS-NOTES.md");
+});
+
+// S19 -- setup sessions use the owner-ruled setup model, no effort flag; trial arms keep the inventory's trial values.
+check("S19 setup: launcher command carries claude-opus-5-5, no --effort, the inventory permission mode; trial arms unchanged", async () => {
+  const { loadArm } = await import("./lib/arm.ts");
+  const { setupCommand } = await import("./lib/setup.ts");
+  const arm = loadArm(path.join(AB, "arms", "clinic-a1.json"));
+  const cmd = setupCommand(arm);
+  assert(cmd[cmd.indexOf("--model") + 1] === "claude-opus-5-5", `setup model: ${cmd.join(" ")}`);
+  assert(!cmd.includes("--effort"), `setup must not pass --effort: ${cmd.join(" ")}`);
+  assert(cmd[cmd.indexOf("--permission-mode") + 1] === arm.permissionMode && cmd.includes(arm.plugin!.path), "permission mode and pinned plugin must be carried");
+  assert(arm.sessionModel === "claude-haiku-5-5" && arm.effort === "low", "trial arms keep the trial inventory values");
 });
 
 const paid = process.argv.includes("--paid");

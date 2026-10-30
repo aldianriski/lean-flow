@@ -8,6 +8,7 @@ import path from "node:path";
 import { loadArm } from "./lib/arm.ts";
 import { manifestOf, REPO_ROOT } from "./lib/freeze.ts";
 import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
+import { setupCommand } from "./lib/setup.ts";
 import { verifyPin } from "./lib/pin.ts";
 import { diffManifest } from "./lib/snapshot.ts";
 
@@ -25,7 +26,7 @@ else if (!process.argv.includes("--resume")) {
 }
 if (problems.length > 0) (console.error(`REFUSED: ${problems.join("; ")}`), process.exit(2));
 
-const claude = ["claude", "--plugin-dir", arm.plugin.path, "--model", arm.sessionModel, "--effort", arm.effort, "--permission-mode", arm.permissionMode];
+const claude = setupCommand(arm);
 if (!run) {
   console.log(`plugin  ${arm.plugin.path}  (verified: pinned hash matches, tree clean)\nsnapshot ${arm.snapshot}  (verified: still the pre-init copy)`);
   console.log(`\nRun:\n  bun ${path.relative(REPO_ROOT, path.join(import.meta.dir, "setup-a1.ts")).split(path.sep).join("/")} --run [--resume]\n`);
