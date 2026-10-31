@@ -254,3 +254,13 @@ scratch file written outside the trial copy). Ruling: both arms also allow the W
 class beyond Amendment 3's shell; `evals/ab/arms/inventory.json` and `evals/ab/PREREGISTRATION.md` change, the owner re-signs,
 and the four second re-pilot rows are voided. Then straight to the full run: the driver re-runs the four pilot slots first and
 stops there for one last look, and the owner's continue runs the remaining 92. TASK-545's Done-when text is unchanged.
+
+### 2026-10-31 | progress | T4 Amendment 4 merged and re-signed; second re-pilot voided; full baseline launched
+Built on an isolated worktree and merged at `e1a101cb`: the measured arms allow `Skill(lean-flow:*)`, `Bash`, `PowerShell`,
+`Write` and `Edit`, identical across arms (proven on the fixture: a Write and an Edit outside the trial copy with no permission
+denial; a Read of such a file is denied without parking). The coordinator verified the diff (two tool names, the selftest
+pinning all five) and, on main, typecheck clean, selftest 61 of 61, the document hash by the tool and the committed blob, only
+the inventory hash changed. Owner re-signed by popup: superseding freeze sha256
+`ac0b934e89647b7a7c48b6113adbf854cd1570026399e34825cf42eab138760e` at 12:07:44Z, accepted by the freeze guard; the four second
+re-pilot rows (11:39 to 11:56) voided. The full baseline starts: the driver re-runs the four pilot slots and stops for the
+owner's last look; the owner's continue runs the remaining 92.
