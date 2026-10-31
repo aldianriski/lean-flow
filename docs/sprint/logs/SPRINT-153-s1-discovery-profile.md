@@ -235,3 +235,15 @@ Round 1 (Claude stand-in, Sonnet) cleared it: nothing blocking, PATCH confirmed 
 raised one fix, now taken: a topic CONTEXT or CLAUDE settles is written as its heading plus a one-line citation, never reported
 "nothing added". Left for close: the comment in `scripts/lib/conformance-engine.sh` still quotes the old §2 cell (comment only, a
 consequential-G file).
+
+### 2026-11-01 | progress | T6 done: the kalasuara re-run wrote the profile and kept every decision; TASK-553 in done
+The owner ran `migrate` (plugin `a991c393`) on a fresh kalasuara copy. It added `## Stack` to overview.md, citing its source files. It
+created requirements.md: Main flows, Invariants and Non-goals cite CLAUDE.md and CONTEXT.md, and Business goal and Quality
+attributes came from the owner's answers. Coordinator recompute against the untouched snapshot: 49 of 49 ADR files, 23 of 23
+PRD files, 49 of 49 DECISIONS rows and 7 of 7 Closed-when sets identical; 8 of 8 cited pointers resolve; the leak scan is
+clean. Owner ruling by popup: the sections are specific to the site. Three defects, fixed in the map by owner ruling with no
+re-run: migrate ran the repo's test harness during Verify, which rebuilt 2,227 HTML files and the feeds, sitemap and robots.txt
+while its report said nothing old changed (Verify now reads and greps only, and names any gate as unrun for the owner); its
+own inventory left out docs/prd/ (the population now names folders); its report gave no status for Conventions (now all seven
+topics). Review round 2 (Claude stand-in, Sonnet): CLEAR, one wording fix taken.
+review · T6 · scoped-reviewer · behaviour:material · governance:material

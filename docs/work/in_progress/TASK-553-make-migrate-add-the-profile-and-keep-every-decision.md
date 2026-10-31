@@ -23,12 +23,12 @@ adopters broken". The epic's S1 Closed-when line requires a real 2.x `migrate` t
 under ADR-053. G2 review-round cap: 2.
 
 ## Done when
-- [ ] `migrate` on a 2.x repo adds the profile sections, filled from the scan, the repo's existing docs and any matched set, and
-  asks only what none of them settles.
-- [ ] A before/after inventory shows every ADR, owner ruling and settled requirement present before is still present, not
-  reworded; every pointer `migrate` writes resolves.
-- [ ] A real `migrate` through the installed plugin on the kalasuara snapshot passes both, with no lean-flow-internal path in the
-  output, and the owner reads the added sections as specific to that site.
+- [x] `migrate` on a 2.x repo adds the profile sections, filled from the scan, the repo's existing docs and any matched set, and
+  asks only what none of them settles. ✓ kalasuara re-run (plugin a991c393): `## Stack` added to overview.md, requirements.md created; topics CLAUDE/CONTEXT settle are cited, only Business goal and Quality attributes asked
+- [x] A before/after inventory shows every ADR, owner ruling and settled requirement present before is still present, not
+  reworded; every pointer `migrate` writes resolves. ✓ coordinator recompute vs the untouched snapshot: 49/49 ADR, 23/23 PRD, 49/49 DECISIONS rows, 7/7 Closed-when identical; 8/8 cited `§ heading` pointers resolve
+- [x] A real `migrate` through the installed plugin on the kalasuara snapshot passes both, with no lean-flow-internal path in the
+  output, and the owner reads the added sections as specific to that site. ✓ leak scan clean; owner ruled the sections site-specific (popup 2026-11-01)
 
 ## Touches
 lean-doc-generator migration-map reference
