@@ -81,7 +81,7 @@ export async function policyCheck(design: string, outOfScope: string[], judge: J
 /** The real judge: a fresh `claude -p` in its own isolated config dir and empty cwd, no tools, the pinned judge model. */
 export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunner): Judge {
   return async (prompt) => {
-    const jarm: Arm = { ...arm, sessionModel: JUDGE_MODEL, effort: "low", plugin: undefined };
+    const jarm: Arm = { ...arm, sessionModel: JUDGE_MODEL, effort: "low", plugin: undefined, allowedTools: [] };
     const iso = makeIsolation(workRoot, jarm);
     clearSynced(iso.cfg);
     const raw = await runner(buildCommand(jarm, prompt, ["--tools", ""], { promptViaStdin: true }), { cwd: iso.trialDir, env: isolationEnv(iso, jarm), timeoutMs: 180_000, stdin: prompt });

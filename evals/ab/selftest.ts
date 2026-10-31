@@ -644,7 +644,7 @@ check("S18 workdoo: both snapshots match their manifests; A1 minus A0 == the dec
     assert(r.length === 0, `workdoo-${n} snapshot differs from its manifest: ${r.slice(0, 5)}`);
   }
   const m = (n: string) => JSON.parse(fs.readFileSync(path.join(dir, `workdoo-${n}.manifest.json`), "utf8")) as Record<string, string>;
-  const set = fs.readFileSync(path.join(dir, "workdoo-lf-docs.txt"), "utf8").split("\n").filter(Boolean);
+  const set = fs.readFileSync(path.join(dir, "workdoo-lf-docs.txt"), "utf8").split(/\r?\n/).filter(Boolean);
   const diff = diffManifest(m("a1"), m("a0")).sort();
   assert(JSON.stringify(diff) === JSON.stringify(set.map((f) => `removed ${f}`).sort()), `A0 must be A1 minus exactly the set (diff ${diff.length}, set ${set.length})`);
   assert(m("a1")["BUSINESS-NOTES.md"] === m("a0")["BUSINESS-NOTES.md"] && m("a0")["BUSINESS-NOTES.md"] !== undefined, "both arms carry the same BUSINESS-NOTES.md");
@@ -659,7 +659,32 @@ check("S19 setup: launcher command carries claude-opus-5-5, no --effort, the inv
   assert(cmd[cmd.indexOf("--model") + 1] === "claude-opus-5-5", `setup model: ${cmd.join(" ")}`);
   assert(!cmd.includes("--effort"), `setup must not pass --effort: ${cmd.join(" ")}`);
   assert(cmd[cmd.indexOf("--permission-mode") + 1] === arm.permissionMode && cmd.includes(arm.plugin!.path), "permission mode and pinned plugin must be carried");
-  assert(arm.sessionModel === "claude-haiku-5-5" && arm.effort === "low", "trial arms keep the trial inventory values");
+  assert(arm.sessionModel === "claude-opus-5-5" && arm.effort === "default" && arm.dispatch.subagent === undefined, "measured arms load the measured inventory (Opus 5.5, default effort, subagents unpinned)");
+});
+
+// S19b -- TASK-544 M2/M3: measured arms carry the model SET and one allow-list per repo; the command passes both pins.
+check("S19b inventory: measured arms allow the 3-model set, no subagent pin, default effort, one --allowedTools list per repo (A0 == A1, no blanket Bash); a model outside the set invalidates", async () => {
+  const { loadArm, modelInventory } = await import("./lib/arm.ts");
+  const { buildCommand } = await import("./lib/run.ts");
+  const { validityProblems } = await import("./lib/trial.ts");
+  const { isolationEnv } = await import("./lib/isolate.ts");
+  const dir = path.join(AB, "arms");
+  for (const repo of ["workdoo", "clinic"]) {
+    const [a0, a1] = ["a0", "a1"].map((n) => loadArm(path.join(dir, `${repo}-${n}.json`))) as [import("./lib/arm.ts").Arm, import("./lib/arm.ts").Arm];
+    assert(a0.allowedTools.length > 0 && JSON.stringify(a0.allowedTools) === JSON.stringify(a1.allowedTools), `${repo}: A0 and A1 must share one non-empty allow-list`);
+    assert(!a0.allowedTools.some((t) => /^Bash(\(\*\))?$/.test(t)), `${repo}: no blanket Bash`);
+    const cmd = buildCommand(a1, "p");
+    assert(cmd.includes("--allowedTools") && a1.allowedTools.every((t) => cmd.includes(t)), `${repo}: command carries the allow-list`);
+    assert(!cmd.includes("--effort"), `${repo}: default effort passes no --effort flag`);
+    assert(!("CLAUDE_CODE_SUBAGENT_MODEL" in isolationEnv({ home: "h", cfg: "c" } as never, a1)), `${repo}: subagents unpinned`);
+    const set = [...modelInventory(a1)].sort().join();
+    assert(set === "claude-haiku-5-5,claude-opus-5-5,claude-sonnet-5-5", `${repo}: inventory set is ${set}`);
+    const totals = (models: string[]) => ({ models }) as never;
+    assert(validityProblems([], a1, "x", totals(["claude-sonnet-5-5", "claude-haiku-5-5"])).every((p) => !p.includes("pinned inventory")), "sonnet and haiku subagents are inside the set");
+    assert(validityProblems([], a1, "x", totals(["claude-opus-4-1"])).some((p) => p.includes("claude-opus-4-1")), "a model outside the set invalidates");
+  }
+  const smoke = loadArm(path.join(dir, "smoke-a1.json"));
+  assert(smoke.sessionModel === "claude-haiku-5-5" && smoke.effort === "low" && !modelInventory(smoke).has("claude-opus-5-5"), "smoke arms keep their Haiku/low inventory");
 });
 
 // ---- TASK-543: blind judges, the measured-run record, retry, validity, analysis. Free; every must-FAIL names its finding. ----
@@ -1172,7 +1197,7 @@ check("S35 clinic: both snapshots match their manifests; A0 == pre-init manifest
     assert(r.length === 0, `clinic-${n} snapshot differs from its manifest: ${r.slice(0, 5)}`);
   }
   const rd = (f: string) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")) as Record<string, string>;
-  const set = fs.readFileSync(path.join(dir, "clinic-lf-docs.txt"), "utf8").split("\n").filter(Boolean);
+  const set = fs.readFileSync(path.join(dir, "clinic-lf-docs.txt"), "utf8").split(/\r?\n/).filter(Boolean);
   assert(diffManifest(rd("clinic-a1.pre-init.manifest.json"), rd("clinic-a0.manifest.json")).length === 0, "A0 must equal the pre-init copy");
   const diff = diffManifest(rd("clinic-a0.manifest.json"), rd("clinic-a1.manifest.json")).map((d) => d.replace(/^\S+ /, "")).sort();
   assert(JSON.stringify(diff) === JSON.stringify([...set].sort()), `A1 vs A0 must be exactly the set (diff ${diff.length}, set ${set.length})`);
@@ -1198,7 +1223,7 @@ check("S36 retry regex + stderr: terminal 'Request failed: HTTP 503' -> infra (r
 });
 
 // S37 -- judge file context: post-change files, caps, lean-flow docs excluded, leak check over the context, prompts re-hashed.
-check("S37 judge context: post-change files from the trial dir / snapshot+patch, 400-line + 60 KB caps, lf-docs and binaries left out, in all three prompts; context carrying an arm id or lean-flow -> judge-context-leak, not sent; clean control -> sent", async () => {
+check("S37 judge context: post-change files from the trial dir / snapshot+patch, line + 60 KB caps, lf-docs and binaries left out, in all three prompts; context carrying an arm id or lean-flow -> judge-context-leak, not sent; clean control -> sent", async () => {
   const j = await import("./lib/judges.ts");
   const { loadArm } = await import("./lib/arm.ts");
   const root = tmpdir("ctx");
@@ -1207,13 +1232,15 @@ check("S37 judge context: post-change files from the trial dir / snapshot+patch,
     fs.writeFileSync(path.join(root, p), c);
   };
   w("src/a.ts", "export const a = 1;\n// post-change-marker\n");
-  w("src/long.ts", Array.from({ length: 500 }, (_v, i) => `line ${i + 1}`).join("\n"));
+  const cap = j.CONTEXT_MAX_LINES;
+  w("src/long.ts", Array.from({ length: cap + 100 }, (_v, i) => `line ${i + 1}`).join("\n"));
   w(".claude/CLAUDE.md", "lean-flow project instructions");
   w("img.bin", Buffer.from([1, 0, 2]));
   const ctx = j.contextFromTree(root, ["src/a.ts", "src/long.ts", ".claude/CLAUDE.md", "img.bin", "gone.ts", "../escape"], new Set([".claude/CLAUDE.md"]));
   assert(ctx.map((f) => f.path).join() === "src/a.ts,src/long.ts", `lf-docs, binaries, missing files and traversal are left out: ${ctx.map((f) => f.path)}`);
   const long = ctx[1]!.content;
-  assert(long.includes("line 400") && !long.includes("line 401") && long.includes("[cut at 400 lines]"), "a file is cut at 400 lines and marked");
+  assert(long.includes(`line ${cap}\n`) && !long.includes(`line ${cap + 1}\n`) && long.includes(`[cut at ${cap} lines]`), `a file is cut at ${cap} lines and marked`);
+  assert(cap >= 518, "the cap fits self-onboarding-guard's patched server/store.ts (518 lines)");
   const big = j.packContext(Array.from({ length: 5 }, (_v, i) => ({ path: `f${i}.ts`, content: "x".repeat(25_000) })), new Set());
   const bytes = big.reduce((n, f) => n + Buffer.byteLength(f.content), 0);
   assert(bytes <= 60_000 + 60 && big.length === 3 && big[2]!.content.includes("[context cut at 60000 bytes]"), `the whole context is capped at 60 KB: ${bytes} bytes, ${big.length} files`);
