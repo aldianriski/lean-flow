@@ -16,7 +16,7 @@ status: current
 
 ## Authentication model [CUSTOMIZE]
 - Who verifies identity: [e.g. an identity provider, this service's own auth module]
-- Credential type: [e.g. password + [MFA method], SSO, API key]
+- Why this scheme: [the credential scheme in use, and the constraint that led to it]
 - Session/token shape: [e.g. short-lived JWT + refresh token; opaque session id] — concept only,
   never the signing secret or implementation.
 
@@ -27,7 +27,7 @@ status: current
 | `[role_one]` | [permission summary] | [explicit boundary] | [which data it reaches — own records · one tenant/site/workspace · all] |
 | `[role_two]` | [permission summary] | [explicit boundary] | [data scope] |
 
-Permissions are enforced at the application boundary; hiding a control in the UI is not enforcement.
+[Where this repo enforces permissions, seen in `[path/to/file]`, and why there.]
 
 ## Token / session lifecycle [CUSTOMIZE — optional]
 

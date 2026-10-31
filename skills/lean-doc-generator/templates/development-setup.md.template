@@ -7,8 +7,8 @@ status: current
 
 # [Project Name] — Setup [CUSTOMIZE]
 
-> Only what the manifest and `.env.example` do not show. If `install`, `dev` and `test` are plain
-> manifest scripts, say so in one line and stop.
+> Only what the manifest and `.env.example` do not show. Do not repeat `install`, `dev` and `test`
+> when they are plain manifest scripts; services, accounts and env values are still asked for.
 
 ## Prerequisites [CUSTOMIZE]
 <!-- Belongs: a toolchain or service the manifest does not pin (a system library, a running database,

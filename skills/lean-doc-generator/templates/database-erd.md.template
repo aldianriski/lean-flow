@@ -26,11 +26,13 @@ erDiagram
 
 ## Main entities [CUSTOMIZE]
 
-| Entity | Responsibility | Key relations |
-|:-------|:----------------|:---------------|
-| `[ENTITY_ONE]` | [what this entity represents] | [related entity + cardinality] |
-| `[ENTITY_TWO]` | [what this entity represents] | [related entity + cardinality] |
-| `[ENTITY_THREE]` | [what this entity represents] | [related entity + cardinality] |
+| Entity | Responsibility | Non-obvious relations |
+|:-------|:----------------|:-----------------------|
+| `[ENTITY_ONE]` | [what this entity represents] | [a relation the migrations do not make obvious, and why — or "none"] |
+| `[ENTITY_TWO]` | [what this entity represents] | [non-obvious relation and why — or "none"] |
+| `[ENTITY_THREE]` | [what this entity represents] | [non-obvious relation and why — or "none"] |
+
+Cardinality and foreign keys live in the migrations.
 
 Conventions (naming, soft-delete, audit fields) → `database/schema.md`. How migrations run/roll
 back → `database/migration-guide.md`.

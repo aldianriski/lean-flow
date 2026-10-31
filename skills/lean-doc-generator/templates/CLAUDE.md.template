@@ -22,18 +22,15 @@ New tasks are born in `docs/work/backlog/` (written there by `/task-decomposer`;
 
 ## Where things live
 File layout → `docs/architecture/overview.md` § Why this split. Naming and conventions →
-`docs/development/coding-standards.md`. Not repeated here.
+`docs/development/coding-standards.md` (when the repo has code). Not repeated here.
 
 ## Anti-Patterns (Avoid) [CUSTOMIZE]
+<!-- The one home for patterns this project rejects: what a reader cannot infer from the code. -->
 ❌ [A pattern this project rejects — and the reason]
 ❌ Skipping the G1 Scope / G2 Design gates
 
-## Commands [CUSTOMIZE]
-Install, run and test → `docs/development/setup.md`. List only commands a reader cannot find in the
-manifest (e.g. a non-obvious gate or generator):
-```bash
-[command the manifest does not show — and when to run it]
-```
+## Commands
+Install, run, test and any non-obvious command → `docs/development/setup.md`. Not repeated here.
 
 ## Definition of Done [CUSTOMIZE]
 - [ ] Typecheck passes

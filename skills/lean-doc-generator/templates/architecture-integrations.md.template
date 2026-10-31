@@ -21,7 +21,7 @@ status: current
 | `[service name]` | [why this system depends on it] | [inbound/outbound/both] | [e.g. API key, OAuth, mTLS] | [what happens when it's unreachable — retry, degrade, hard-fail] |
 
 ## Webhook / event conventions [CUSTOMIZE]
-- Inbound webhooks: [verification method, e.g. signature header] — endpoint(s) at `[path]`.
+- Inbound webhooks: [only what the code does not show — e.g. the trust assumption behind verifying them].
 - Outbound events: [what triggers one, delivery guarantee — at-least-once/exactly-once].
 - Retry/backoff policy: [summary, e.g. exponential, capped at N attempts].
 

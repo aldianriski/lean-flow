@@ -16,7 +16,7 @@ status: current
 
 ## Running migrations [CUSTOMIZE]
 [Policy only: when migrations run (deploy step, manually, in CI) and who runs them. The command is
-in the manifest scripts — not repeated here.]
+in the manifest or build file (package scripts, Makefile, task runner) — not repeated here.]
 
 ## Ordering & rollback policy [CUSTOMIZE]
 - Migrations apply in [ordering rule, e.g. filename/timestamp order] and are never reordered

@@ -19,7 +19,7 @@ status: current
      convention seen nowhere in the code. -->
 
 **[Layer — e.g. data access]**
-- [Convention the code follows] — seen in `[path/to/file]`
+- [The convention chosen, seen in `[path/to/file]`, and why — the part the code alone does not settle]
 
 **Not confirmed:**
 - [A convention the scan could not settle — asked, not assumed]
@@ -39,8 +39,7 @@ dependency rule — not duplicated here.
 
 ## Logging [CUSTOMIZE]
 - [The shape this repo uses, seen in `[path/to/file]` — what gets logged, at what level, and why]
-- Restrictions: see [`SECURITY.md`](../../SECURITY.md) § Logging restrictions — never log
-  secrets, tokens, or full PII.
+- Restrictions: see [`SECURITY.md`](../../SECURITY.md) § Logging restrictions.
 
 ## Validation [CUSTOMIZE]
 [Where validation happens in this repo, seen in `[path/to/file]`, and why there.]

@@ -29,8 +29,7 @@ status: current
      use. Keep only what the imports alone do not make obvious. -->
 [Which direction imports point in this repo, seen in `[path/to/file]` — and why that direction.]
 
-- [Module or boundary]: [what it is responsible for + what it imports from]
-- [Module or boundary]: [what it is responsible for + what it imports from]
+- [Module or boundary]: [why the direction holds here, and what has been kept from importing what]
 
 ## Why this split [CUSTOMIZE]
 <!-- Belongs: why the code is divided as it is, and what must not cross a boundary. Does not belong:
@@ -44,4 +43,4 @@ External systems and their failure modes → [`integrations.md`](integrations.md
 
 ## Decision Records
 
-See [`DECISIONS.md`](DECISIONS.md) (the ADR index) → `docs/adr/` for the decisions behind this structure.
+See [`DECISIONS.md`](../DECISIONS.md) (the ADR index) → `docs/adr/` for the decisions behind this structure.

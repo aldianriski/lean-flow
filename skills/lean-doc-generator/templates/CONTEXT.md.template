@@ -7,18 +7,13 @@ status: current
 
 # [Project Name] — Context [CUSTOMIZE]
 
-> The project's vocabulary for the AI: the **domain glossary** and the patterns it rejects. A project
+> The project's vocabulary for the AI: the **domain glossary**. A project
 > that runs the lean-flow loop also records its gates / modes / roster here (this file is the SSOT).
 
 ## Where the rest lives
 Stack and architecture → `docs/architecture/overview.md`. Conventions in use →
-`docs/development/coding-standards.md` § Conventions in use. Not repeated here.
-
-## Anti-Patterns to Avoid [CUSTOMIZE]
-<!-- Belongs: patterns this project has rejected, and why — what a reader cannot infer from the code.
-     Does not belong: a rule a linter enforces, or a style the code already shows. -->
-❌ [A pattern this project rejects — and the reason]
-❌ [Anti-pattern 2 — and the reason]
+`docs/development/coding-standards.md` § Conventions in use (when the repo has code). Patterns this
+project rejects → `CLAUDE.md` § Anti-Patterns. Not repeated here.
 
 ## Domain Glossary [CUSTOMIZE]
 <!-- Only terms specific to THIS project's domain. General programming concepts (timeout, retry,

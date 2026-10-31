@@ -22,7 +22,7 @@ surface gets integration tests, critical user paths get a thin end-to-end layer.
 | Integration | [multiple modules, real or in-process deps] |
 | End-to-end | [full path through the running system] |
 
-Runner commands live in the manifest scripts — not repeated here.
+Runner commands live in the manifest or build file (package scripts, Makefile, task runner) — not repeated here.
 
 ## Test data [CUSTOMIZE]
 - Fixtures are **sanitized, synthetic data only** — never real customer/production data, even

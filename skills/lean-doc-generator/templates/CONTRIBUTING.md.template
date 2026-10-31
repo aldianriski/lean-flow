@@ -39,7 +39,7 @@ without a passing test suite is not mergeable."] [CUSTOMIZE]
 
 ## Definition of Done
 
-See `CLAUDE.md` § Definition of Done — the one home for it.
+See `.claude/CLAUDE.md` § Definition of Done — the one home for it.
 
 ## Reporting bugs [CUSTOMIZE]
 

@@ -35,9 +35,9 @@ flowchart LR
 
 ## Path → components → persistence [CUSTOMIZE]
 
-| Path | Components touched | Persistence |
-|:-----|:--------------------|:-------------|
-| [path name] | [component list] | [store touched, or "none"] |
-| [path name] | [component list] | [store touched, or "none"] |
+| Path | Non-obvious hop, and why | Persistence |
+|:-----|:--------------------------|:-------------|
+| [path name] | [a hop the code does not make obvious (async, cross-service) and why it is there] | [store touched, or "none"] |
+| [path name] | [non-obvious hop, and why] | [store touched, or "none"] |
 
 Full component map → `architecture/overview.md`.
