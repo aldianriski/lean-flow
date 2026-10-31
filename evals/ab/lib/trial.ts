@@ -11,6 +11,7 @@ import { appendRow, type Row, type Tok } from "./record.ts";
 import { classifyAttempt, terminalText, type AttemptClass } from "./retry.ts";
 import type { Judge } from "./protocol.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
+import { applyProvision, graderEnv, PROVISION_CLASS, PROVISION_EXIT, provisionTrial, setupTrial, type Provisioner } from "./provision.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
 import fs from "node:fs";
 
@@ -38,6 +39,8 @@ export type TrialOpts = {
   tag: string;
   runner?: Runner;
   timeoutMs?: number;
+  /** builds the trial environment before the clock starts (Amendment 2); injectable so the free self-tests need no npm or Postgres */
+  provision?: Provisioner;
   /** present = a measured run: the row carries the extended record. The judge defaults to the real one; tests pass recorded replies. */
   measure?: { judge?: Judge; setupTokens?: Tok | null };
 };
@@ -95,27 +98,39 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   const before = manifest(o.srcRepo);
   const iso = makeIsolation(o.workRoot, o.arm);
   copyTree(o.srcRepo, iso.trialDir);
+  // Amendment 2: the environment is built before the clock starts, for both arms alike, and torn down after grading whatever happened
+  const setup = await setupTrial(o.provision ?? provisionTrial, { trialDir: iso.trialDir, root: iso.root });
+  if (setup.failed !== undefined && !o.measure) throw new Error(`provisioning failed: ${setup.failed}`);
   let raw: RawRun;
   let thrown: string | undefined;
+  let graded: Grade | undefined;
+  let changed: string[] = [];
   try {
-    raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? TRIAL_TIMEOUT_MS });
-  } catch (e) {
-    if (!o.measure) throw e;
-    thrown = (e as Error).message; // a measured run classifies a runner exception as a harness crash instead of dying
-    raw = { stdout: "", stderr: thrown, exitCode: -1, wallMs: 0 };
+    if (setup.failed !== undefined) raw = { stdout: "", stderr: `provisioning failed: ${setup.failed}`, exitCode: -1, wallMs: 0 };
+    else {
+      try {
+        raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: applyProvision(isolationEnv(iso, o.arm), setup.prov!), timeoutMs: o.timeoutMs ?? TRIAL_TIMEOUT_MS });
+      } catch (e) {
+        if (!o.measure) throw e;
+        thrown = (e as Error).message; // a measured run classifies a runner exception as a harness crash instead of dying
+        raw = { stdout: "", stderr: thrown, exitCode: -1, wallMs: 0 };
+      }
+    }
+    fs.writeFileSync(path.join(iso.root, "stream.jsonl"), raw.stdout);
+    // what the agent changed, taken before the graders run (they build into the copy)
+    changed = o.measure ? diffManifest(before, manifest(iso.trialDir)) : [];
+    // a killed run is not graded or judged (Amendment 1), nor is a trial that never started: not-passed, judge verdicts Unknown
+    graded = raw.timedOut || setup.failed !== undefined ? undefined : await grade(o.task, iso.trialDir, graderEnv(setup.prov));
+  } finally {
+    await setup.prov?.teardown();
   }
-  fs.writeFileSync(path.join(iso.root, "stream.jsonl"), raw.stdout);
   const stream = parseStream(raw.stdout);
   const totals = totalsOf(stream.result);
-  // what the agent changed, taken before the graders run (they build into the copy)
-  const changed = o.measure ? diffManifest(before, manifest(iso.trialDir)) : [];
-  // a killed run is not graded or judged (Amendment 1): not-passed, judge verdicts Unknown
-  const graded = raw.timedOut ? undefined : await grade(o.task, iso.trialDir);
 
   const invalid = validityProblems([stream], o.arm, iso.trialDir, totals);
   const mutated = diffManifest(before, manifest(o.srcRepo));
 
-  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : raw.timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : raw.exitCode !== 0 || stream.result?.is_error ? `cli-error: exit ${raw.exitCode}, ${stream.result?.terminal_reason ?? "no result event"}` : "ok";
+  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : setup.failed !== undefined ? `${PROVISION_EXIT}: ${setup.failed}` : raw.timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : raw.exitCode !== 0 || stream.result?.is_error ? `cli-error: exit ${raw.exitCode}, ${stream.result?.terminal_reason ?? "no result event"}` : "ok";
   const row: Row = {
     tag: o.tag,
     arm: o.arm.id,
@@ -123,7 +138,7 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     task: o.task.id,
     trial: o.trial,
     attempt: o.attempt,
-    graders: graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : "not-run:timeout",
+    graders: graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : `not-run:${setup.failed !== undefined ? PROVISION_EXIT : "timeout"}`,
     tokens: totals && { input: totals.input, output: totals.output, cacheRead: totals.cacheRead, cacheWrite: totals.cacheWrite },
     costUsd: totals?.costUsd ?? null,
     wallS: raw.wallMs / 1000,
@@ -134,12 +149,12 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   };
   let cls: AttemptClass | undefined;
   if (o.measure) {
-    cls = classifyAttempt({ thrown, raw, stream, exit });
+    cls = setup.failed !== undefined ? PROVISION_CLASS : classifyAttempt({ thrown, raw, stream, exit });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol -> trial would otherwise cycle
     const { realJudge } = await import("./protocol.ts");
-    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams: [stream], exit, cls, judge: o.measure.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
+    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams: [stream], exit, cls, judge: o.measure.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 })).measure;
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
-  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: terminalText(stream, raw), ...(cls ? { cls } : {}) };
+  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: setup.failed !== undefined ? "" : terminalText(stream, raw), ...(cls ? { cls } : {}) };
 }

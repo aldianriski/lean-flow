@@ -26,11 +26,12 @@ export function findTsc(from = import.meta.dir): string {
   }
 }
 
-export async function grade(task: Task, dir: string): Promise<Grade> {
+/** `env`, when given, is the graders' whole environment (the provisioned one, Amendment 2); otherwise the host's. */
+export async function grade(task: Task, dir: string, env?: Record<string, string>): Promise<Grade> {
   const verdicts: Verdict[] = [];
   for (const g of task.graders) {
     const cmd = g.cmd.replace("{TSC}", `"${findTsc()}"`);
-    const p = Bun.spawn(["sh", "-c", cmd], { cwd: dir, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
+    const p = Bun.spawn(["sh", "-c", cmd], { cwd: dir, ...(env ? { env } : {}), stdin: "ignore", stdout: "pipe", stderr: "pipe" });
     const out = (await new Response(p.stdout).text()) + (await new Response(p.stderr).text());
     const code = await p.exited;
     const missing = g.artifact !== undefined && !fs.existsSync(path.join(dir, g.artifact));

@@ -88,6 +88,8 @@ export type MeasureOpts = {
   cls: AttemptClass;
   judge: Judge;
   setupTokens?: Tok | null | undefined;
+  /** wall time of provisioning the trial environment (Amendment 2), outside the trial deadline */
+  setupWallS?: number | undefined;
 };
 
 /** The extended record for one attempt. Judges run only on a finished, ok attempt; otherwise they are UNKNOWN with the reason. */
@@ -111,5 +113,5 @@ export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; 
     overhead = r.overhead;
     prompts = r.prompts;
   }
-  return { measure: { graders, judges, exec, setup: o.setupTokens ?? null, judgeOverhead: overhead, attemptKind: isInfra(o.cls) ? "infra" : "scored", attemptClass: o.cls }, prompts };
+  return { measure: { graders, judges, exec, setup: o.setupTokens ?? null, judgeOverhead: overhead, attemptKind: isInfra(o.cls) ? "infra" : "scored", attemptClass: o.cls, ...(o.setupWallS !== undefined ? { setupWallS: o.setupWallS } : {}) }, prompts };
 }
