@@ -35,55 +35,74 @@ don't hand-reconcile, and you're not lost in your own existing code.
      "owner approves the per-file plan". Then halt. A prose-only "waiting on your approval" ends the
      session with **no artifact that migrate ran at all**, which is what an overnight owner wakes up
      to: the safety property held, and nothing recorded that it did (TD-017 · night-run.md Part 0).
-   - **Profile pass** — on a repo whose targets lack the profile, the plan carries it as items (below);
-     **Preserve inventory** — recorded before the first write (below).
+   - **Profile pass** and **Preserve inventory** (both below) — the plan carries the profile as items. In a run
+     that has an inventory, an inventory item may only be **kept**, **relocated** or **archived**, content
+     unchanged. A reformat, split, consolidate, rich-ADR conversion or retire proposed for one (including the
+     `DECISIONS.md` and decision-notes rows of the mappings below) is listed **DEFERRED**, not applied — the
+     owner can run it later as a separate, explicitly approved change.
 3. **Apply incrementally** — preserve **content**; change only format / placement / wiring. Update
    cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, sprint `status: active` + `## Members`,
    `/prime` read-order). Flag anything ambiguous instead of guessing.
    - **After each relocate/rename**: `grep` the old filename/path across the repo and fix every inbound link before moving to the next file.
-   - **After Apply** — run the inventory comparison and the pointer check (§ Preserve inventory).
+   - **After each apply action** — compare the inventory (§ Preserve inventory); the first difference stops all further writes.
 4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, every sprint `## Members` id resolves to a task file — a genuinely missing one is an owner-action in the report, not a failed run (§ v1 → v2, by-reference sprint).
 
 ## Profile pass (Plan/Apply — repo without the profile)
 
-Adds the site-specific profile to a repo that has none. It reuses init's procedure by pointer
+Adds the site-specific profile. It reuses init's procedure by pointer
 (`${CLAUDE_SKILL_DIR}/references/init.md`) — do not restate it: **step 1** scan (Stack · Conventions in
-use) · **1b** business evidence · **1c** question sets · the **step-3** business and conventions rounds
-(ask only what nothing settles) · the **step-5** citation rule. Migrate's deltas only:
+use) · **1b** business evidence · **1c** question sets · the **step-3** business and conventions rounds ·
+the **step-5** citation rule. Migrate's deltas only:
 
-- **Targets** — the profile headings are `## Stack` (`docs/architecture/overview.md`), `## Conventions in
-  use` (`docs/development/coding-standards.md`), and Business goal · Main flows · Invariants · Quality
-  attributes · Non-goals (`docs/product/requirements.md`). Where the target file exists, **add** the
-  missing headings as new sections — never rewrite, reorder or reword existing text. Where it is absent,
-  create it from its template.
-- **Cite, don't copy** — a fact already stated in an existing doc is cited there
-  (`(from <path> § <heading>)`), not duplicated.
-- **Own home** — write each profile section in its own target file. An existing section elsewhere that
-  overlaps it (e.g. a stack list in `CONTEXT.md`) stays untouched; propose a **consolidate** plan item for
-  the owner, not applied in this pass.
-- **Has the profile** — the target headings already exist → report deltas only (§ Re-run); never re-add.
-- **Report** — list each profile topic as `settled (<path> § <heading>)` or `asked`.
-- **Headless** — unchanged: park with the plan; nothing is written.
+- **Targets** — `## Stack` (`docs/architecture/overview.md`), `## Conventions in use`
+  (`docs/development/coding-standards.md`), and Business goal · Main flows · Invariants · Quality attributes ·
+  Non-goals (`docs/product/requirements.md`). First milestone is init-only, not part of this pass.
+- **Existing target file** — add the missing headings as **new** sections; never rewrite, reorder or reword
+  existing text. **Absent** — create it from its template; coding-standards only when the repo has code (init's
+  row).
+- **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. A target section whose body is only template
+  placeholders is present-but-unfilled: the pass may fill it. If another section in the same file already
+  covers a topic (e.g. `## Problem` for Business goal, `## Non-functional requirements` for Quality
+  attributes), add nothing and report the topic `settled (<path> § <heading>)`. Partial profile → add only
+  the missing targets; all targets present → deltas only (§ Re-run).
+- **Cite, don't copy** — a fact already in an existing doc is cited `(from <path> § <heading>)`. Answers given
+  here cite `(owner, migrate)` or `(owner, migrate; drafted from <path> § <heading>)`.
+- **Own home** — an existing section elsewhere that overlaps (e.g. a stack list in `CONTEXT.md`) stays
+  untouched; propose a **consolidate** plan item, not applied in this pass.
+- **Rounds** — the business and conventions rounds run after the plan is approved (no tier popup); ask only
+  what nothing settles. Headless is unchanged: park with the plan; nothing is written.
+- **Report** — each topic (Stack and Conventions lines count) as `settled (<source>)` · `asked (answered)` ·
+  `asked (not decided yet)`.
 
-## Preserve inventory (before Apply, compared after)
+## Preserve inventory (backup before Apply, compared after each action)
 
-Before the first write, record this population with a hash per item:
+**Backup point first.** In a git repo the working tree must be clean: ask the owner to commit first, never
+commit for them. Without git, copy every inventory item to a backup folder **outside** the repo and report
+its path.
+
+**Record** before the first write, item → sha256, and write that list to a file **outside** the repo
+(report its path) so a second party can recompute. Hash input: LF line endings, trailing whitespace stripped
+per line, trailing blank lines trimmed. Population:
 
 - every file under `docs/adr/` — the whole file;
-- every row of `docs/DECISIONS.md` — the row text;
-- every PRD / requirements / acceptance file (`docs/prd/**`, `docs/product/**`, and any doc the business
-  scan treated as requirements) — the whole file; if the profile pass adds sections to it, hash each
-  **pre-existing** section body instead;
-- every epic `§ Closed when` line — the line text.
+- every `docs/DECISIONS.md` row — each table data row (not header or separator) or list item, by its text;
+- every requirements file — a doc whose path names requirements / PRD / product / acceptance (never the root
+  `README`) — the whole file; if the profile pass adds sections to it, instead the preamble before the first
+  heading, the section order, and each pre-existing section's heading text + body;
+- every epic (`EPIC-*.md` under `docs/epic/`, `archive/` included) — the line set under a heading matching
+  "Closed when" (case-insensitive).
 
-After Apply, compare. Each item is byte-identical, or moved by an approved plan item with its content
-unchanged. **Any other difference stops further writes**: report it item by item; no automatic rollback —
-the owner decides. Also check that **every pointer migrate wrote resolves** (the path exists and the
-`§ heading` exists), and report the inventory counts before and after. The profile pass never consolidates
-or moves an inventory item.
+An empty population reports 0/0.
 
-**Output rule** — nothing migrate writes into the adopter repo contains a path into the plugin
-(`${CLAUDE_SKILL_DIR}`, `skills/`, `references/`).
+**Compare after EACH apply action.** Each item is byte-identical (as hashed), or moved/archived by an approved
+plan item with content unchanged. The first difference stops all further writes: report it item by item,
+with how to restore from the backup point. No automatic rollback — the owner decides. Also check that every
+pointer migrate wrote resolves (path and `§ heading` exist) and report the inventory counts before and
+after. The profile pass never consolidates or moves an inventory item.
+
+**Output rule** — nothing migrate writes into the adopter repo contains a path that resolves into the
+plugin's own directory (`${CLAUDE_SKILL_DIR}`, the plugin's `skills/`, `references/`); the adopter's own
+paths (e.g. `docs/references/x.md`) are fine.
 
 ## Re-run (update sync — report-only)
 
