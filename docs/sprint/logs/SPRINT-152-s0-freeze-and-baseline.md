@@ -183,3 +183,21 @@ TASK-545's Done-when text is unchanged. Re-confirm G2: owner rulings by popup th
 check and up to two independent review rounds.
 Host facts for the brief: the path's Node is 22.22.3 while workdoo needs 24.16 or later (the authors used a Node 24 under
 `D:\Research\ab-tools`); Postgres binaries and Go are on the path.
+
+### 2026-10-31 | progress | T4 Amendment 2 built, reviewed twice and merged; awaiting the owner's re-sign before the voids and the re-pilot
+Built on an isolated worktree and merged at `ef9a66bc`. A: every trial in both arms is provisioned before its clock with the
+authors' environment (Node 24 first on the path, a lockfile install, clinic's own fresh Postgres cluster migrated), the
+environment identical for the agent and the graders, provisioning failure classed as infra and never scored; a dry-run on
+throwaway copies of the A0 snapshots passed every build, typecheck, lint and test grader on the unmodified code, with the
+acceptance tests failing as authored (setup about 33 to 41 s). B: a directory layer matches everything under it in the G2 and
+breach checks. C: one G2 revise round within the deadline. D: owner-reasoned voids. E (builder-found, for the owner's
+signature): all eight workdoo tasks freeze a lint grader whose command is the words "not applicable", which the harness ran
+as a shell command and failed in every workdoo trial of both arms; it is now recorded as not applicable, as frozen §11
+already reads. Trial work moved to D:, each trial copy deleted after its row with its stream kept, and stale trial
+directories swept at driver start. Review round 1 (independent): nothing blocking; three should-fix (the before-manifest was
+taken before provisioning, so setup writes could be charged to the agent; no cleanup after a killed driver; a void did not
+echo its target) and the first G2 signer missing from overhead; one revision closed all four. Review round 2: all closed,
+nothing new. On main: typecheck clean, selftest 60 of 60, the document hash reproduces by the tool and by the committed
+blob (`ce811aa31e2fbf04eef0179976a30800aecd454ab56256d09236efdb124c266c`); the other hashed files are unchanged.
+Operating rule: never run a hand `run-trial.ts` while the driver runs (the driver's startup sweep treats every trial
+directory as stale).
