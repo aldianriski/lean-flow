@@ -12,7 +12,7 @@ import { applyProvision, graderEnv, PROVISION_CLASS, PROVISION_EXIT, provisionTr
 import { verifyPin } from "./pin.ts";
 import { appendRow, type G2, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
-import { copyTree, diffManifest, manifest } from "./snapshot.ts";
+import { copyTree, diffManifest, manifest, withoutProvisioned } from "./snapshot.ts";
 import { classifyAttempt, firstActionSeen, terminalText, type AttemptClass } from "./retry.ts";
 import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
@@ -161,9 +161,10 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   copyTree(o.srcRepo, iso.trialDir);
   const layers = resolveLayers(o.task.layers, o.srcRepo);
   const taskHash = writeTaskFile(iso.trialDir, o.task);
-  const base = manifest(iso.trialDir);
+  const pre = manifest(iso.trialDir);
   // Amendment 2: the environment is built before the clock starts, for both arms alike, and torn down after grading whatever happened
   const setup = await setupTrial(o.provision ?? provisionTrial, { trialDir: iso.trialDir, root: iso.root });
+  const base = manifest(iso.trialDir); // after provisioning: what it wrote (go.sum, tool caches) is neither a breach nor the agent's change
   if (setup.failed !== undefined && !o.measure) {
     cleanupIsolation(iso, o.workRoot);
     throw new Error(`provisioning failed: ${setup.failed}`);
@@ -252,9 +253,10 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
         if (raw2.timedOut) timedOut = true;
         park = timedOut ? undefined : detectPopups(s2)[0];
         if (!park && !timedOut) {
-          const touched = diffManifest(base, manifest(iso.trialDir)).map((d) => d.replace(/^\w+ /, ""));
+          const now = manifest(iso.trialDir);
+          const touched = diffManifest(base, now).map((d) => d.replace(/^\w+ /, ""));
           breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, layers));
-          if (o.measure) changed = diffManifest(before, manifest(iso.trialDir));
+          if (o.measure) changed = withoutProvisioned(diffManifest(before, now), pre, base, now);
           graded = await grade(o.task, iso.trialDir, graderEnv(setup.prov));
         }
       }
@@ -300,6 +302,12 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     cls = setup.failed !== undefined ? PROVISION_CLASS : classifyAttempt({ raw: lastRaw, stream: last, exit, trialActed: streams.some(firstActionSeen) });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
     row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 })).measure;
+    // the G2 signer(s) are judge calls: overhead, never execution (section 9). A revise round has two, the first in g2.firstRound.
+    for (const u of [g2?.judgeUsage, g2?.firstRound?.judgeUsage]) {
+      if (!u) continue;
+      const jo = row.measure.judgeOverhead;
+      row.measure.judgeOverhead = { input: jo.input + u.input, output: jo.output + u.output, cacheRead: jo.cacheRead + u.cacheRead, cacheWrite: jo.cacheWrite + u.cacheWrite, costUsd: jo.costUsd + u.costUsd };
+    }
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);

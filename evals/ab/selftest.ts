@@ -2232,6 +2232,75 @@ check("S54 work root: unsafe roots (drive root, the repo, a parent of it) refuse
   assert(p.exit === "ok" && l.iso.length === 0 && l.kept.sort().join() === "stream-phase1.jsonl,stream-phase2.jsonl", `protocol: ${p.exit} ${JSON.stringify(l)}`);
 });
 
+check("S55 review round: provisioning writes (go.sum) are neither the agent's change nor a scope breach; a dead driver's iso dir is swept at start (cluster stop attempted, streams kept); --void echoes the row it voids; both G2 signers' usage is judge overhead", async () => {
+  // 1. a provisioner that writes go.sum into the trial copy
+  const goSum: import("./lib/provision.ts").Provisioner = async ({ trialDir }) => {
+    fs.writeFileSync(path.join(trialDir, "go.sum"), "h1:x\n");
+    return { vars: {}, pathFirst: [], setupMs: 1, teardown: async () => {} };
+  };
+  const seen: string[] = [];
+  const m = await (async () => {
+    const { runTrial } = await import("./lib/trial.ts");
+    const fz = await frozenSmoke();
+    const dir = tmpdir("gosum");
+    const base = replay();
+    return runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner: async (c, o) => (buildOk(o.cwd), base.runner(c, o)), provision: goSum, measure: { judge: recJudge(PASSV, seen) } });
+  })();
+  assert(m.exit === "ok" && seen.length > 0 && seen.every((p) => !p.includes("go.sum")) && seen.some((p) => p.includes("add.ts")), `plain trial: go.sum is not in what the judges are shown: ${m.exit}, ${seen.length} prompts`);
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const pSeen: string[] = [];
+  const fz = await frozenSmoke();
+  const wr = tmpdir("gosum-proto");
+  const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const p = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner: rep.runner, judge: judgeSays(SIGN).fn, provision: goSum, measure: { judge: recJudge(PASSV, pSeen) } });
+  assert(p.exit === "ok" && pSeen.length > 0 && pSeen.every((x) => !x.includes("go.sum")), `protocol: no scope-breach for go.sum, not in the judges' diff: ${p.exit}`);
+  const ctl = await (async () => {
+    const dir = tmpdir("gosum-ctl");
+    const fz2 = await frozenSmoke();
+    const rep2 = protoReplay({ design: designOf(["src/add.ts"]), build: (cwd) => (buildOk(cwd), fs.writeFileSync(path.join(cwd, "go.sum"), "agent wrote this\n")) });
+    return runProtocolTrial({ arm: fz2.arm, srcRepo: fz2.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner: rep2.runner, judge: judgeSays(SIGN).fn, provision: goSum, measure: { judge: recJudge(PASSV) } });
+  })();
+  assert(ctl.exit === "scope-breach: go.sum", `control: the AGENT writing go.sum is still a breach: ${ctl.exit}`);
+
+  // 2. sweep
+  const { sweepStale } = await import("./lib/isolate.ts");
+  const root = tmpdir("sweep");
+  const dead = path.join(root, "iso-dead01");
+  fs.mkdirSync(path.join(dead, "trial", "node_modules"), { recursive: true });
+  fs.mkdirSync(path.join(dead, "pgdata"), { recursive: true });
+  fs.writeFileSync(path.join(dead, "stream-phase1.jsonl"), "{}");
+  fs.writeFileSync(path.join(dead, "pgdata", "PG_VERSION"), "18");
+  fs.mkdirSync(path.join(root, "keepme"));
+  const said: string[] = [];
+  const swept = sweepStale(root, (l) => said.push(l));
+  assert(swept.join() === "iso-dead01" && !fs.existsSync(dead) && fs.existsSync(path.join(root, "keepme")) && fs.existsSync(path.join(root, "kept", "iso-dead01", "stream-phase1.jsonl")) && said.length === 1 && /swept stale iso-dead01 \(cluster stopped\)/.test(said[0]!), `sweep: ${swept} ${said}`);
+  assert(sweepStale(root).length === 0, "a second sweep finds nothing (kept/ is not an iso dir)");
+
+  // 3. void echo
+  const { appendRow } = await import("./lib/record.ts");
+  const log = path.join(tmpdir("voidecho"), "log.md");
+  appendRow(log, specRow({ tag: "measured round 0", arm: "workdoo-a0", task: "t1", trial: 1, attempt: 1, exit: "ok", cls: "ok", g: "pass", j: "PPP" }), new Date(T0));
+  const out = Bun.spawnSync(["bun", path.join(AB, "run-baseline.ts"), "--log", log, "--void", new Date(T0).toISOString(), "--reason", "no env"], { stdout: "pipe", stderr: "pipe" });
+  assert(out.exitCode === 0 && /voiding workdoo-a0 t1 #1 attempt 1: exit "ok", graders "x", reason "no env"/.test(out.stdout.toString()), `echo before appending: ${out.stdout}${out.stderr}`);
+
+  // 4. signer usage
+  const tot = (n: number) => ({ text: n === 1 ? REFUSE : SIGN, totals: { input: 10, output: 20, cacheRead: 30, cacheWrite: 40, costUsd: 0.5, models: ["claude-sonnet-5-5"] } });
+  let jn = 0;
+  const { runProtocolTrial: rpt } = await import("./lib/protocol.ts");
+  const wr2 = tmpdir("signer-usage");
+  const rep3 = protoReplay({ design: designOf(["src/add.ts"]), build: undefined as never });
+  const r3: import("./lib/run.ts").Runner = async (c, o) => {
+    const n = rep3.calls.n + 1;
+    if (n === 3) buildOk(o.cwd);
+    return rep3.runner(c, o);
+  };
+  const fz3 = await frozenSmoke();
+  const u = await rpt({ arm: fz3.arm, srcRepo: fz3.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr2, logPath: path.join(wr2, "l.md"), tag: "measured round 0", runner: r3, judge: async () => tot(++jn) as any, measure: { judge: recJudge(PASSV) } });
+  assert(u.exit === "ok" && u.row.g2?.firstRound?.judge === "refuse", `a revise round happened: ${u.exit} ${JSON.stringify(u.row.g2)}`);
+  const jo = u.row.measure!.judgeOverhead;
+  assert(jo.input === 20 && jo.output === 40 && jo.cacheRead === 60 && jo.cacheWrite === 80 && Math.abs(jo.costUsd - 1) < 1e-9, `both signers' usage is in the judge overhead: ${JSON.stringify(jo)}`);
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it

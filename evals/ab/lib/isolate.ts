@@ -1,5 +1,6 @@
 // Config and access isolation. A trial sees: its own copy of the repo, a temp home, an isolated config dir.
 // The one thing taken from the real user config is the credentials file, as a byte copy that is never read.
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -57,6 +58,28 @@ export function assertWorkRoot(root: string): void {
   if (path.parse(r).root === r) throw new Error(`work root ${r} is a drive root`);
   const rel = path.relative(r, REPO_ROOT);
   if (rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel))) throw new Error(`work root ${r} is the repo or contains it`);
+}
+
+/**
+ * A driver that died mid-trial leaves its isolation dir (and maybe a running cluster). Called by the driver once it holds the lock, so
+ * every `iso-*` dir in the work root is stale: stop any cluster in its `pgdata` (failure ignored), keep its stream*.jsonl under kept/,
+ * delete it. Returns what was swept.
+ */
+export function sweepStale(workRoot: string, say: (line: string) => void = () => {}): string[] {
+  assertWorkRoot(workRoot);
+  if (!fs.existsSync(workRoot)) return [];
+  const swept: string[] = [];
+  for (const d of fs.readdirSync(workRoot)) {
+    const root = path.join(workRoot, d);
+    if (!/^iso-/.test(d) || !fs.statSync(root).isDirectory()) continue;
+    const data = path.join(root, "pgdata");
+    const stopped = fs.existsSync(data);
+    if (stopped) spawnSync("pg_ctl", ["-D", data, "-m", "fast", "-w", "stop"], { stdio: "ignore" });
+    cleanupIsolation({ root } as Isolation, workRoot);
+    swept.push(d);
+    say(`swept stale ${d}${stopped ? " (cluster stopped)" : ""}${fs.existsSync(root) ? " -- could not be removed" : ""}`);
+  }
+  return swept;
 }
 
 /**

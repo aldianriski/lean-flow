@@ -29,6 +29,13 @@ export function manifest(dir: string): Record<string, string> {
   return out;
 }
 
+/** `diff` (source -> now) without what provisioning wrote (`pre` -> `post`) and the agent did not touch afterwards (go.sum from a migrate, tool caches). */
+export function withoutProvisioned(diff: string[], pre: Record<string, string>, post: Record<string, string>, now: Record<string, string>): string[] {
+  const rel = (d: string) => d.replace(/^\w+ /, "");
+  const prov = new Set(diffManifest(pre, post).map(rel));
+  return diff.filter((d) => !(prov.has(rel(d)) && post[rel(d)] === now[rel(d)]));
+}
+
 /** Human-readable differences between two manifests; empty when identical. */
 export function diffManifest(before: Record<string, string>, after: Record<string, string>): string[] {
   const diffs: string[] = [];

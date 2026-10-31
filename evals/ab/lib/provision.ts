@@ -87,7 +87,14 @@ const realExec: Exec = async (cmd, { cwd, env, timeoutMs }) => {
 // a driver that dies mid-trial must not leave a cluster running: the live ones are stopped on the way out
 const live = new Set<string>();
 process.on("exit", () => {
-  for (const data of live) spawnSync("pg_ctl", ["-D", data, "-m", "immediate", "stop"], { stdio: "ignore" });
+  for (const data of live) {
+    spawnSync("pg_ctl", ["-D", data, "-m", "immediate", "-w", "stop"], { stdio: "ignore" });
+    try {
+      fs.rmSync(data, { recursive: true, force: true });
+    } catch {
+      /* the next driver start sweeps it */
+    }
+  }
 });
 
 const lastLine = (s: string) => s.trim().split(/\r?\n/).filter(Boolean).at(-1) ?? "";

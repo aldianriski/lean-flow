@@ -12,7 +12,7 @@ import { classifyAttempt, terminalText, type AttemptClass } from "./retry.ts";
 import type { Judge } from "./protocol.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { applyProvision, graderEnv, PROVISION_CLASS, PROVISION_EXIT, provisionTrial, setupTrial, type Provisioner } from "./provision.ts";
-import { copyTree, diffManifest, manifest } from "./snapshot.ts";
+import { copyTree, diffManifest, manifest, withoutProvisioned } from "./snapshot.ts";
 import fs from "node:fs";
 
 export class PinRefused extends Error {
@@ -98,8 +98,10 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   const before = manifest(o.srcRepo);
   const iso = makeIsolation(o.workRoot, o.arm);
   copyTree(o.srcRepo, iso.trialDir);
+  const pre = manifest(iso.trialDir);
   // Amendment 2: the environment is built before the clock starts, for both arms alike, and torn down after grading whatever happened
   const setup = await setupTrial(o.provision ?? provisionTrial, { trialDir: iso.trialDir, root: iso.root });
+  const post = manifest(iso.trialDir); // what provisioning wrote (go.sum, tool caches) is not the agent's change
   if (setup.failed !== undefined && !o.measure) {
     cleanupIsolation(iso, o.workRoot);
     throw new Error(`provisioning failed: ${setup.failed}`);
@@ -125,7 +127,10 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     }
     fs.writeFileSync(path.join(iso.root, "stream.jsonl"), raw.stdout);
     // what the agent changed, taken before the graders run (they build into the copy)
-    changed = o.measure ? diffManifest(before, manifest(iso.trialDir)) : [];
+    if (o.measure) {
+      const now = manifest(iso.trialDir);
+      changed = withoutProvisioned(diffManifest(before, now), pre, post, now);
+    }
     // a killed run is not graded or judged (Amendment 1), nor is a trial that never started: not-passed, judge verdicts Unknown
     graded = raw.timedOut || setup.failed !== undefined ? undefined : await grade(o.task, iso.trialDir, graderEnv(setup.prov));
   } finally {

@@ -24,7 +24,7 @@ import os from "node:os";
 import path from "node:path";
 import { taskFile } from "./build-slots.ts";
 import { loadArm } from "./lib/arm.ts";
-import { defaultWorkRoot } from "./lib/isolate.ts";
+import { defaultWorkRoot, sweepStale } from "./lib/isolate.ts";
 import { loadTask } from "./lib/grade.ts";
 import { freezeProblem, isInfraRow, liveRows, measuredTag, parseTag, readRows, voidTag, voidIndex, type LogRow } from "./lib/log.ts";
 import { runProtocolTrial } from "./lib/protocol.ts";
@@ -211,6 +211,7 @@ if (import.meta.main) {
         const target = rows.find((r) => r.ts === voidTs && parseTag(r.tag).kind === "measured");
         if (!target) throw new Refused(`no measured attempt row stamped ${voidTs} in ${log}`);
         if (voidIndex(rows).voided.has(target)) throw new Refused(`the attempt stamped ${voidTs} is already voided`);
+        console.log(`run-baseline: voiding ${target.arm} ${target.task} #${target.trial} attempt ${target.attempt}: exit ${JSON.stringify(target.exit)}, graders ${JSON.stringify(target.graders)}${reason === undefined ? "" : `, reason ${JSON.stringify(reason)}`}`);
         appendVoid(log, target, reason);
         console.log(`run-baseline: void row appended for ${target.arm} ${target.task} #${target.trial} attempt ${target.attempt} (${voidTs})`);
       });
@@ -223,7 +224,10 @@ if (import.meta.main) {
       run: realRun(path.resolve(flag("tasks") ?? path.join(AB, "tasks")), log),
       say: (l) => console.log(l),
     };
-    const r = await withLock(lockPathFor(log), () => runBaseline(Number(flag("round") ?? 0), deps));
+    const r = await withLock(lockPathFor(log), async () => {
+      sweepStale(defaultWorkRoot(), (l) => console.log(`run-baseline: ${l}`)); // the lock is ours, so every iso-* dir is a dead driver's
+      return runBaseline(Number(flag("round") ?? 0), deps);
+    });
     console.log(`run-baseline: ${r.stop}: ${r.message} (${r.ran.length} attempt(s) this start)`);
     process.exit(EXIT_CODE[r.stop]);
   } catch (e) {
