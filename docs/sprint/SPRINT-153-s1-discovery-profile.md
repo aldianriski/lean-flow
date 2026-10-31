@@ -100,7 +100,7 @@ Wave 3. The Go chi fixture is written fresh outside this repo, never copied from
 **Acceptance:** both sets load on the fresh chi fixture, and neither loads on a stack without them unless Postgres is detected.
 
 ### T6 — Make migrate add the profile and keep every decision `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `skills/lean-doc-generator/references/migration-map.md`
+Layers: `skills/lean-doc-generator/references/migration-map.md` · `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/architecture/overview.md`
   · `docs/work/todo/TASK-553-make-migrate-add-the-profile-and-keep-every-decision.md`
   · `docs/work/in_progress/TASK-553-make-migrate-add-the-profile-and-keep-every-decision.md`
   · `docs/work/done/TASK-553-make-migrate-add-the-profile-and-keep-every-decision.md`

@@ -211,3 +211,27 @@ inventory items), closed by a backup point, a compare after each action and defe
 only). A fresh kalasuara copy and the plugin build wait on the VPS for the owner's migrate run.
 consequence · T6 · behaviour:material · governance:low
 review · T6 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-31 | progress | T6 box 3 run: inventory held, the profile pass did not run
+The owner ran `migrate` on the kalasuara copy. Coordinator recompute against the untouched snapshot: 49 of 49 ADR files,
+23 of 23 PRD files, 50 of 50 DECISIONS rows and every epic Closed-when line are identical. The backup and the before, after
+and final inventories sit outside the repo on the VPS, and the leak scan is clean. The profile pass failed, though: migrate
+listed it under DEFERRED with the content changes, so it wrote no `## Stack`. It asked no business round. It skipped
+`requirements.md`, citing STANDARD §2 ("skipped on an existing repo whose AI-context files already ARE the spec"). Box 2's
+inventory holds. Boxes 1 and 3 are open.
+Owner rulings by popup: the profile wins over the §2 skip, so a repo whose CONTEXT.md and CLAUDE.md carry the spec still gets
+`requirements.md`, citing those files topic by topic and asking only the rest. The map is fixed so profile items are apply
+items, never DEFERRED. One more owner `migrate` run follows on a fresh kalasuara copy.
+
+### 2026-10-31 | scope-change | T6: the standard's requirements row and its version join T6's layers
+What broke: STANDARD §2 told migrate to skip `requirements.md` on a repo whose AI-context files already carry the spec, while
+T6's design writes the profile there. Impact: T6 Layers add `spec/STANDARD.md`, `spec/CHANGELOG.md` and
+`docs/architecture/overview.md`, the last for the spec version it states. The row now says such a repo's file cites those files
+and never copies them. This is spec PATCH 0.18.2: §6 owes the file on every dev repo, the engine reads §6, not §2's
+create column, and no verdict moves. Re-confirm G2: signed by the owner's ruling above. The review becomes governance:material.
+consequence · T6 · behaviour:material · governance:material
+review · T6 · scoped-reviewer · behaviour:material · governance:material
+Round 1 (Claude stand-in, Sonnet) cleared it: nothing blocking, PATCH confirmed (§6 Base owes the file and the engine reads §6). It
+raised one fix, now taken: a topic CONTEXT or CLAUDE settles is written as its heading plus a one-line citation, never reported
+"nothing added". Left for close: the comment in `scripts/lib/conformance-engine.sh` still quotes the old §2 cell (comment only, a
+consequential-G file).
