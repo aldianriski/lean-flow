@@ -172,6 +172,18 @@ run_case_anywhere "vocab-key-pre-t1-fails" 1 "key 'pre-T1' is not one task" -- \
 run_case_anywhere "vocab-key-multi-with-review-fails" 1 "key 'T2,T3' is not one task" -- \
   sh "$checker" "$fx/vocab-key-multi-with-review/docs/sprint/logs/SPRINT-971-vocab-key-multi-with-review.md"
 
+# --- cases 26-28: TASK-559 -- the LATEST `review · Tn` line per task is the one judged ---------------
+# SPRINT-151 T8 logged self-review then scoped-reviewer and failed on the superseded line (L-268).
+# 26 and 27 differ only in line order: a later self-review FAILs even after an independent pass, a
+# later independent pass clears an earlier self-review. 28 varies the selection: another task's later
+# line must not clear this one.
+run_case_anywhere "latest-self-review-after-scoped-fails" 1 "review-depth-material-self-reviewed" -- \
+  sh "$checker" "$fx/latest-self-review-after-scoped/docs/sprint/logs/SPRINT-972-latest-self-review.md"
+run_case_anywhere "latest-scoped-after-self-review-passes" 0 "examined and cleared on consequence" -- \
+  sh "$checker" "$fx/latest-scoped-after-self-review/docs/sprint/logs/SPRINT-973-latest-scoped.md"
+run_case_anywhere "interleaved-other-task-later-fails" 1 "T1 records 'self-review' against behaviour:material" -- \
+  sh "$checker" "$fx/interleaved-other-task-later/docs/sprint/logs/SPRINT-974-interleaved.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVIEW-DEPTH FIXTURES: all green"; else echo "REVIEW-DEPTH FIXTURES: at least one FAIL"; fi
 exit $fail

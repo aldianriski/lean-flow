@@ -35,6 +35,12 @@
 #     claim that the change was trivial -- same reasoning as `no-gate-risk-unmarked` (ADR-033): absence
 #     read as consent is how the defect returns silently, for every run that simply forgot the marker.
 #
+# --- the LATEST line per task is the one graded (TASK-559, SPRINT-151 T8 / L-268) -------------------
+# A task can legitimately log `self-review` and then a `scoped-reviewer` (or deeper) pass; logs are
+# append-only, so the superseded draft stays in the file. Only the last `review · Tn` line per task id
+# is graded above. A self-review that is the latest line is graded exactly as before; another task's
+# later line never clears this one; an unknown depth token on the latest line counts as superseding.
+#
 # --- TD-085: the absence branch itself was the blind spot -----------------------------------------
 # The block above only ever grades a `review ·` line that EXISTS. A governance:high/behaviour:material
 # task that closes with no `review ·` line at all used to fall straight through to "nothing to verify"
@@ -256,7 +262,21 @@ EOF
     continue
   fi
 
-  # Examine each self-review record on its own line: one log holds many tasks, and a governance
+  # TASK-559: only the LATEST `review · Tn` line per task is graded (last in file order, keyed by the
+  # token between the first two ` · `). A self-review followed by a scoped-reviewer line for the same
+  # task is a superseded draft, not a violation; logs are append-only so the earlier line stays.
+  # Per-task, so another task's later line never clears this one. An unknown depth token counts as
+  # superseding (depth tokens are not validated here).
+  latest=$(awk '
+    /^review · [^ ]+ · / {
+      split($0, a, " · ")
+      if (!(a[2] in last)) order[++n] = a[2]
+      last[a[2]] = $0
+    }
+    END { for (i = 1; i <= n; i++) if (last[order[i]] ~ /^review · [^ ]+ · self-review( |$)/) print last[order[i]] }
+  ' "$lg" 2>/dev/null)
+
+  # Examine each latest self-review record on its own line: one log holds many tasks, and a governance
   # violation on T3 must not be masked by an honest self-review on T1 (the whole-file grep that would
   # do exactly that is the bug this loop exists to avoid).
   while IFS= read -r line; do
@@ -282,13 +302,13 @@ EOF
       bad "review-depth-material-self-reviewed: $lg $tid records 'self-review' against behaviour:material -- the running system does something different and no independent pass examined it"; filefail=1
     fi
   done <<EOF
-$(grep -E '^review · [^ ]+ · self-review( |$)' "$lg" 2>/dev/null)
+$latest
 EOF
 
   # A negative assertion needs a positive witness (L-156): report the denominator, so a control that
   # examined nothing is visibly untested rather than quietly green.
   total=$(grep -cE '^review · ' "$lg" 2>/dev/null)
-  selfn=$(grep -cE '^review · [^ ]+ · self-review( |$)' "$lg" 2>/dev/null)
+  selfn=$(printf '%s\n' "$latest" | grep -cE '^review · ')
   if [ "$filefail" -eq 0 ]; then
     ok "review depth $lg ($total review record(s), $selfn self-review examined and cleared on consequence)"
   fi
