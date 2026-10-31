@@ -71,9 +71,9 @@
     "ok": true,
     "red": 1,
     "apply": 0,
-    "applyOut": "",
+    "applyOut": "patching file server/index.ts\npatching file server/invitations.ts",
     "green": 0,
-    "greenOut": "",
+    "greenOut": "reissue-invitation acceptance: 23 checks passed",
     "graders": [
       {
         "name": "typecheck",
@@ -100,7 +100,12 @@
         "code": "n/a",
         "out": ""
       }
-    ]
+    ],
+    "wrong": {
+      "apply": 0,
+      "acceptance": 1
+    },
+    "reverified": "SPRINT-152 T3 M4: reference re-ruled by the owner; fresh baseline copy, Node 24.22.2, patch -p1 -l"
   },
   {
     "id": "shared-auth-failure",

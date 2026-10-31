@@ -687,6 +687,30 @@ check("S19b inventory: measured arms allow the 3-model set, no subagent pin, def
   assert(smoke.sessionModel === "claude-haiku-5-5" && smoke.effort === "low" && !modelInventory(smoke).has("claude-opus-5-5"), "smoke arms keep their Haiku/low inventory");
 });
 
+// S19c -- TASK-544 M6: the pre-registration hash tooling. A corpus change changes the corpus hash; a line-ending change does not.
+check("S19c hash-prereg: one changed corpus file -> corpus sha256 changes; CRLF vs LF checkout -> same; a new file -> changes; blob id equals git's for a known string", async () => {
+  const h = await import("./hash-prereg.ts");
+  const root = tmpdir("corpus");
+  const w = (p: string, c: string) => {
+    fs.mkdirSync(path.dirname(path.join(root, p)), { recursive: true });
+    fs.writeFileSync(path.join(root, p), c);
+  };
+  w("evals/ab/tasks/r/t1/task.json", '{"id":"t1"}\n');
+  w("evals/ab/answers/r.md", "fact one\nfact two\n");
+  const dirs = ["evals/ab/tasks", "evals/ab/answers"];
+  const base = h.corpusManifest(root, dirs);
+  assert(h.corpusManifest(root, dirs).sha256 === base.sha256, "the corpus hash must be stable");
+  w("evals/ab/answers/r.md", "fact one\r\nfact two\r\n");
+  assert(h.corpusManifest(root, dirs).sha256 === base.sha256, "a CRLF checkout must hash like the LF one");
+  w("evals/ab/answers/r.md", "fact one\nfact TWO\n");
+  assert(h.corpusManifest(root, dirs).sha256 !== base.sha256, "one changed corpus file must change the corpus hash");
+  w("evals/ab/answers/r.md", "fact one\nfact two\n");
+  w("evals/ab/tasks/r/t1/extra.patch", "x\n");
+  assert(h.corpusManifest(root, dirs).sha256 !== base.sha256, "an added corpus file must change the corpus hash");
+  assert(h.blobId(Buffer.from("hello\n")) === "ce013625030ba8dba906f756967f9e9ca394464a", "blob id must equal `git hash-object` of 'hello\\n'");
+  assert(Object.keys(h.pinnedHashes()).length === h.PINNED_FILES.length, "every pinned file must exist and hash");
+});
+
 // ---- TASK-543: blind judges, the measured-run record, retry, validity, analysis. Free; every must-FAIL names its finding. ----
 const PASSV = '{"verdict":"PASS","reason":"fine"}';
 const FAILV = '{"verdict":"FAIL","reason":"broken"}';
