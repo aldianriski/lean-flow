@@ -26,7 +26,8 @@ line in `## Conventions in use`.
    config module or scattered across files.
 7. **Client/global state** — where app-wide UI state lives, apart from server state. Marker: `zustand`,
    `jotai`, `redux`/`@reduxjs/toolkit`, `recoil`, `mobx` in `package.json`, or a top-level Context
-   provider holding app state. None of these and only local `useState` → settled as local state only.
+   provider holding app state. None of these and only local `useState` → settled as local state only
+   (the one question where finding none settles it).
 8. **Routing and data loading** — the router, and whether data loads in route loaders or in components.
    Marker: `react-router(-dom)` (`createBrowserRouter`, `loader`), `@tanstack/react-router`, `wouter`
    in `package.json`; loader functions versus fetches in component effects.
