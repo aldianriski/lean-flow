@@ -115,3 +115,10 @@ placeholders and marker; three real conflicts between the docs and the code rais
 omits, a normalisation S2's resolver must handle). The owner confirmed the business sections are correct for compass.
 consequence · T2 · behaviour:material · governance:low
 review · T2 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-31 | progress | T3 G2 signed (React/Vite question set, sets loaded by stack)
+builder-check · T3 · 0 contradictions · 5 questions · settled: the exercises run on the VPS snapshots by the owner's ruling; every set question is a conventions-in-use topic inside the seven profile topics; the load announcement prints right after the scan, before anything is written or asked, so a headless run reaches it; headless writes nothing; each question names the marker that settles it and init searches for that marker before asking
+Owner ruling by popup: T3 G2 signed. One file per set under the generator's profiles folder with a detect rule; init
+announces the loaded sets before any popup; a conventions popup asks only what the scan and a targeted search left open,
+never generating answers; answers land in Conventions in use with their source. The owner reviews the drafted question list
+before merge. Box 3: the owner runs init on talixa-hris (load), the coordinator runs the portfolio no-load check headless.
