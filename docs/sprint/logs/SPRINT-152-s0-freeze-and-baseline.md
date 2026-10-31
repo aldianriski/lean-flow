@@ -208,3 +208,22 @@ Owner re-signed by popup, item E included. The superseding freeze (sha256
 header and the shared freeze guard accepts it. The four pilot rows (07:33:48, 07:35:31, 07:38:29, 07:39:51) are voided by
 appended void rows, reason "harness defect, owner ruling, Amendment 2"; each void echoed its target before the append and
 all four matched. The driver re-runs the same four pilot slots from round 0, one at a time, and stops for the owner.
+
+### 2026-10-31 | surprise | T4 re-pilot: the environment fix holds, and both A1 trials parked on the allow-list
+The four pilot slots re-ran under Amendment 2 and the driver stopped for the owner (exit 10). Both A0 trials passed every
+grader (workdoo five of five with lint not applicable, clinic six of six), so the environment fix holds; setup took 26 to
+40 s before each clock. Judges: workdoo A0 convention PASS, business UNKNOWN (the calibrated case: the recorder code is not
+in view), scope FAIL (a verify script outside the layers and a narrowed response field); clinic A0 convention and business
+PASS, scope FAIL (BUSINESS-NOTES, edited existing tests, and the web build output). Both A1 trials parked on a permission
+prompt, scored not-passed as frozen: workdoo A1 called the PowerShell tool, which the allow-list does not cover; clinic A1
+ran a compound command exporting the database URL and running the migrate step, not on the list. Notional cost: A0 0.69 and
+0.88 USD plus 0.36 and 0.86 of judges; A1 2.08 and 2.45 USD before parking. Two findings: a curated allow-list measures what
+the agent improvises rather than lean-flow, and the changed set shown to the judges counted build output the agent itself
+produced as an edit, though the freeze manifest already excludes it.
+
+### 2026-10-31 | scope-change | T4: Amendment 3 to the pre-registration (shell permissions, build output) before any further trial
+Owner rulings by popup: both arms keep acceptEdits and allow the Bash and PowerShell tools wholesale (the curated list is
+dropped; only genuine popups park, per D9), the risk of a command outside the trial copy recorded and accepted; build output
+(dist, build, .svelte-kit, coverage) is excluded from the agent's changed set and from the scope-breach check, matching the
+freeze manifest. `evals/ab/arms/inventory.json` and `evals/ab/PREREGISTRATION.md` change, so §19 re-hashes and the owner
+re-signs before the next re-pilot. TASK-545's Done-when text is unchanged.
