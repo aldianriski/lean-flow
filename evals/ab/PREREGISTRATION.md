@@ -269,14 +269,14 @@ of each run must list exactly the pinned plugin.
 ## 16. Permissions (R2) and the allow-list
 
 `permissionMode: acceptEdits` for every measured arm, plus **one `--allowedTools` list, passed by `lib/run.ts`, identical for A0 and A1
-of both repos** (Amendment 3): `Bash`, `PowerShell`, `Skill(lean-flow:*)`. `Bash` and `PowerShell` with no pattern allow every command of
-that tool; the curated per-repo command list that this section held before Amendment 3 is dropped. The lists are still built from
+of both repos** (Amendments 3 and 4): `Bash`, `PowerShell`, `Write`, `Edit`, `Skill(lean-flow:*)`. `Bash` and `PowerShell` with no pattern
+allow every command of that tool; `Write` and `Edit` with no pattern allow those tools on any path (Amendment 4); the curated per-repo command list that this section held before Amendment 3 is dropped. The lists are still built from
 `inventory.json` `allow.common` + `allow.<repo>` by the repo name in the arm id, so the two arms of a repo cannot differ. Signature of
 the owner on this section is signature of the list. The trial environment of Amendment 2 (Node 24 first on the path, the database
 variables) is the same for both arms and adds nothing to the list.
 
 ```
-Bash        PowerShell        Skill(lean-flow:*)
+Bash        PowerShell        Write        Edit        Skill(lean-flow:*)
 ```
 
 Why `Skill(lean-flow:*)` stays: the protocol's first call is a Skill call that otherwise parks. Why the shell is open: a curated list
@@ -288,6 +288,11 @@ not prevent it.
 Evidence that the open shell does not park (fixture only, Amendment 3): a smoke trial on `evals/ab/fixtures/smoke-repo` under the
 measured inventory (copied), whose agent ran a compound Bash command (`export ... && echo ... && ls src`) and a PowerShell command, ended
 `exit: ok` with an empty `permission_denials` (row tagged `smoke -- not a measurement` in `docs/research/logs/ab-measurements.md`).
+
+Evidence that Write and Edit outside the trial copy do not park (fixture only, Amendment 4): a smoke trial on the same fixture under a
+copy of the measured allow-list, whose agent wrote `D:/ab-work/proof-outside/amend4/scratch.txt` with the `Write` tool and changed it with
+the `Edit` tool, ended `exit: ok` with an empty `permission_denials` (stream: tool calls `Write` and `Edit` on that path, no shell). A
+`Read` of a path outside the copy is not on the list and is auto-denied without parking the trial.
 
 ## 17. Judges and calibration (R3)
 
@@ -359,7 +364,7 @@ Any later edit to any hashed file voids this section.**
 | `evals/ab/arms/clinic-a0.manifest.json` | `f1cd523931691828d8a1323b4e38d2e0c8574227e812f596687c60a675133e4f` |
 | `evals/ab/arms/clinic-a1.json` | `8a0ddbcc05d85db1b38a3c9cb41addd1c91d3c66a803f4ea5567dcc65117f773` |
 | `evals/ab/arms/clinic-a1.manifest.json` | `c746aa2b180a69eca37bfda9463a35458f6df1dea298511f17127c8ff9209f5c` |
-| `evals/ab/arms/inventory.json` | `a8beacab0ccc08328316ba1091fd05a6db2d1ff41e605d8ba10bd87b900b090b` |
+| `evals/ab/arms/inventory.json` | `afe379e2d405dead89f4fc051ce6a3d24a50d4a0781d756f29cf0d832c58a96a` |
 | `evals/ab/judges/prompts.lock.json` | `68681da287501cdfb8ed800cf903f7c8e6418c00c3e2ce6b06a3795bffa0014b` |
 | `evals/ab/schedule.json` | `82bbd6e26af0a47d588eea346ba4ab626d14e485b46124a8c04a64a3a19d627d` |
 | plugin pin (A1) sha / content hash | `4714da50...` / `6875071c...` (full values in section 15) |
@@ -471,3 +476,21 @@ No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, p
 permission mode, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. Of the
 section 19 hashes, only `evals/ab/arms/inventory.json` changes (section 19 is updated last); this file's own sha256 changes and is
 recorded at the owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
+
+## Amendment 4 (2026-10-31, after the second re-pilot, before the full run)
+
+What changed: the measured arms (A0 and A1, both repos) additionally allow the `Write` and `Edit` tools wholesale, with no path pattern,
+identical across all four arms (`inventory.json`, hashed in section 19). The one allow-list of section 16 is now `Bash`, `PowerShell`,
+`Write`, `Edit`, `Skill(lean-flow:*)`. Smoke arms keep their own list.
+
+Why: the second re-pilot (the A1 rows in `docs/research/logs/ab-measurements.md`, `2026-10-31`): clinic A1 ran clean end to end, but
+workdoo A1 parked on the `Write` tool writing a scratch check script to `C:\Users\Public\workdoo-type-filter-check\check.mjs`, a path
+outside its trial copy. Only a genuine popup should park a trial (section 12); a scratch file is not one.
+
+Risk: no new class beyond Amendment 3. The open shell of Amendment 3 already writes anywhere on the host, so letting the agent's file tools
+write anywhere adds no reach. The isolated HOME and config directory and the `D:/ab-work` copies mitigate this and do not prevent it.
+
+No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, plugin pin, models, judges and their prompts, the permission
+mode, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. Of the section 19
+hashes, only `evals/ab/arms/inventory.json` changes (section 19 is updated last); this file's own sha256 changes and is recorded at the
+owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
