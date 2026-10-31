@@ -42,14 +42,16 @@ bounded by the safe-scaffold allowlist (ADR-012).
      leaves that field `[CUSTOMIZE]`; boundary `none` writes side effects `none`. Never invent an answer.
      The section is written only from this round's answers; headless, it parks with the rest (below) and
      nothing is written.
-   - **Business round** (its own popup, after the tier + First milestone popup) — its intro lists the
-     settled facts with sources init will write, so the owner sees them unasked. Ask ONLY open topics
+   - **Business round** (its own popup, after the tier + First milestone popup) — a message just before
+     it shows the settled facts with sources init will write (if every topic is settled and no popup
+     is needed, init still reports them in a message before writing). Ask ONLY open topics
      (for quality attributes, only the uncovered rows) in one frontier round: a *frontier round* asks
      together every question whose prerequisites are settled; only a question depending on an earlier
      answer waits. The topics are independent, so split only at the 4-questions-per-popup limit. Options
      are *not decided yet* plus drafted options quoted from evidence (at most three; recommended when
      one source) — init never generates candidate answers. With no evidence the second option is a
-     neutral *I'll describe it*, routing to the free-text Other answer; never a guessed fact.
+     neutral *I'll describe it*: picking it triggers one free-text follow-up question for that topic; if
+     no text comes back the topic is *not decided yet*. Never fill it otherwise.
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
      `architecture/authentication.md` (auth exists). Templates → table below.
@@ -96,8 +98,8 @@ bounded by the safe-scaffold allowlist (ADR-012).
    **Citation rule** — every fact init writes into `requirements.md` ends with its source:
    `(from <path> § <heading>)` for a doc, `(owner, init)` for an answer, `(owner, init; drafted from
    <path> § <heading>)` for an accepted drafted option (Source column for quality rows). *Not decided
-   yet* keeps the placeholder and `[CUSTOMIZE]`; a section keeps the marker until every part is filled
-   or answered, then drops it. Main flows: name each flow with its source; add the
+   yet* keeps both the placeholder and `[CUSTOMIZE]`; a section keeps the marker until every part is
+   filled, then drops it. Main flows: name each flow with its source; add the
    `→ docs/flows/<slug>.md` pointer only when that flow doc exists or init writes it.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
    file's ownership header + placement match STANDARD §2/§3; every Stack and Conventions-in-use line cites a repo file; every `requirements.md` fact cites a doc § heading or the owner's answer; report the full file list, including
