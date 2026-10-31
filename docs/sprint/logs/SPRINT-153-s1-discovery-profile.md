@@ -159,3 +159,7 @@ Impact: owner ruling by popup, fix in this sprint. TASK-560 is filed (P1, S, ori
 Layers the init reference only (no file shared with T4, T5 or T6). T7 gains a dependency on T8, so the final init and /flow
 runs exercise the guard. Members, Plan and D1 change accordingly. Re-confirm G2: T8 gets its own builder check and G2 in
 the wave-3 popup.
+
+### 2026-10-31 | scope-change | T8: depends on T3 (shared init reference)
+The preflight found T8 shares the init reference with T2 and T3 with no ownership edge, and the plan check found T8's text
+naming T3. T8's Depends-on becomes T3 (already done), giving the chain T2 then T3 then T8 on that file.
