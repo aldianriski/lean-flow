@@ -7,36 +7,24 @@ status: current
 
 # [Project Name] — Setup [CUSTOMIZE]
 
+> Only what the manifest and `.env.example` do not show. Do not repeat `install`, `dev` and `test`
+> when they are plain manifest scripts; services, accounts and env values are still asked for.
+
 ## Prerequisites [CUSTOMIZE]
+<!-- Belongs: a toolchain or service the manifest does not pin (a system library, a running database,
+     an account). Does not belong: a runtime version the manifest already declares. -->
+- [Toolchain or service the manifest does not pin — and why it is needed]
 
-<!-- Example (filled in): -->
-- Node.js ≥18 — https://nodejs.org
-- [Other toolchain / service the project needs]
-
-## Install [CUSTOMIZE]
-
+## Install, run and test [CUSTOMIZE]
+<!-- Belongs: a step that is not a manifest script, or an order that matters (a seed, a generator, a
+     second process). Does not belong: `install` / `dev` / `test` when they are plain manifest scripts. -->
 ```bash
-git clone https://github.com/[org]/[repo]
-cd [repo]
-[install command]
-cp .env.example .env
-```
-
-## Run [CUSTOMIZE]
-
-```bash
-[run command]        # production
-[dev command]        # development (watch mode)
-```
-
-## Test [CUSTOMIZE]
-
-```bash
-[test command]       # full suite
+[non-obvious step — and when to run it]
 ```
 
 ## Environment Variables [CUSTOMIZE]
+<!-- Names live in `.env.example`; this table adds only what it cannot say. -->
 
 | Variable | Required | Description |
 |:---------|:---------|:------------|
-| `[VAR_NAME]` | [yes/no] | [description] |
+| `[VAR_NAME]` | [yes/no] | [what it controls, and where to get a value] |

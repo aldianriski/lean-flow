@@ -5,7 +5,7 @@ update_trigger: Deploy flow, environment matrix, or release verification changes
 status: current
 ---
 
-<!-- Lives at docs/deployment/deployment-guide.md (STANDARD §2, ADR-012). Operational, not
+<!-- Lives at docs/deployment/deployment-guide.md (lean-flow STANDARD §2). Operational, not
      code-HOW. Rollback owns its own file — see deployment-rollback.md.template. -->
 
 # [Project] — Deployment Guide [CUSTOMIZE]
@@ -22,11 +22,12 @@ status: current
 - [ ] Tests / build green from a clean checkout — gate on the **exit code**, not filtered output. [L-016]
 
 ## Deploy flow
-1. [ordered, copy-pasteable steps — bump · tag · publish/push · propagate]
-2. …
+[Only the manual steps and their order — what a pipeline or script does not do for you. If the
+deploy is fully automated, name the trigger in one line and stop.]
+1. [manual step — and why it is manual]
 
-## Environment differences / matrix
-[table or list of what differs per environment — config, secrets, scaling, feature flags]
+## Environment differences
+[Only what is not visible in the config files: what differs per environment, and why.]
 
 | Environment | Differs from prod by |
 |:------------|:----------------------|
@@ -36,7 +37,8 @@ status: current
 [the order deploy artifacts / DB migrations / dependent services must land in, and why — WHY, not the migration code itself]
 
 ## Health checks
-[what a real "it's up" signal is for this project — endpoint, process, dashboard]
+[Only a signal the code does not show — what "it's up" really means here and where to see it. A
+`/health` route visible in the code is not repeated.]
 
 ## Verify — by a real signal, not a proxy
 - [ ] Confirm the new version is *actually* live — check the deployed artifact's version / build-id / PID,

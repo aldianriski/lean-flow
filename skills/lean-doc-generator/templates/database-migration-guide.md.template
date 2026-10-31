@@ -5,7 +5,7 @@ update_trigger: Migration or seed process changes
 status: current
 ---
 
-<!-- Lives at docs/database/migration-guide.md (STANDARD §2, ADR-012). DB-exists
+<!-- Lives at docs/database/migration-guide.md (lean-flow STANDARD §2). DB-exists
      substrate-conditional row. Policy level only — WHAT to run and WHY, never the migration
      tool's internal HOW. Companion: database-erd.md.template · database-schema.md.template. -->
 
@@ -15,10 +15,8 @@ status: current
 > the migration tool itself.
 
 ## Running migrations [CUSTOMIZE]
-```bash
-[command to apply pending migrations]
-[command to check migration status]
-```
+[Policy only: when migrations run (deploy step, manually, in CI) and who runs them. The command is
+in the manifest or build file (package scripts, Makefile, task runner) — not repeated here.]
 
 ## Ordering & rollback policy [CUSTOMIZE]
 - Migrations apply in [ordering rule, e.g. filename/timestamp order] and are never reordered
@@ -28,10 +26,7 @@ status: current
 ## Seed data [CUSTOMIZE]
 - Seed fixtures live at `[path/to/seeds]` and contain **sanitized data only** — never a
   production export or real user data.
-- Apply with: `[seed command]`
 
-## Migration DO / DON'T
-- DO keep each migration reversible where practical.
-- DO review a migration's blast radius before it touches a table with production data.
-- DON'T edit a migration that already shipped — write a new one.
+## Migration DO / DON'T [CUSTOMIZE]
+- [A rule this project's migrations follow, and why — e.g. a table whose migration needs a review]
 - DON'T seed with production data, even scrubbed-looking — sanitize from a fixture, not a dump.

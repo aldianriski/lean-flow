@@ -5,7 +5,7 @@ update_trigger: A documented data path changes
 status: current
 ---
 
-<!-- Lives at docs/architecture/data-flow.md (STANDARD §2, ADR-012). Fires once a non-trivial
+<!-- Lives at docs/architecture/data-flow.md (lean-flow STANDARD §2). Fires once a non-trivial
      data path exists (backend/integration tier, or spawned off architecture-overview.md at its
      cap-hit per the §2 growth rule). Companion to architecture-overview.md.template. -->
 
@@ -35,9 +35,9 @@ flowchart LR
 
 ## Path → components → persistence [CUSTOMIZE]
 
-| Path | Components touched | Persistence |
-|:-----|:--------------------|:-------------|
-| [path name] | [component list] | [store touched, or "none"] |
-| [path name] | [component list] | [store touched, or "none"] |
+| Path | Non-obvious hop, and why | Persistence |
+|:-----|:--------------------------|:-------------|
+| [path name] | [a hop the code does not make obvious (async, cross-service) and why it is there] | [store touched, or "none"] |
+| [path name] | [non-obvious hop, and why] | [store touched, or "none"] |
 
-Full component map → `architecture/overview.md`.
+Why the code is split as it is → `docs/architecture/overview.md` § Why this split.

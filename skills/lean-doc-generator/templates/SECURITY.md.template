@@ -31,7 +31,6 @@ See [`docs/architecture/authentication.md`](docs/architecture/authentication.md)
 ## Dependency management [CUSTOMIZE]
 
 - [Update cadence — e.g. "patch releases reviewed weekly"]
-- [Vulnerability scanning tool, if any]
 
 ## Logging restrictions [CUSTOMIZE]
 

@@ -5,7 +5,7 @@ update_trigger: An integration is added or changed
 status: current
 ---
 
-<!-- Lives at docs/architecture/integrations.md (STANDARD §2, ADR-012). Backend/integration
+<!-- Lives at docs/architecture/integrations.md (lean-flow STANDARD §2). Backend/integration
      tier row — fires on the first external integration. Companion to architecture-overview.md;
      API contract itself lives at api/openapi.yaml (placement rule, no template). -->
 
@@ -16,12 +16,12 @@ status: current
 
 ## Integrations [CUSTOMIZE]
 
-| Service | Purpose | Direction | Auth method | Failure mode |
+| Service | Purpose | Direction | Credential owner / rotation | Failure mode |
 |:--------|:--------|:----------|:-------------|:--------------|
-| `[service name]` | [why this system depends on it] | [inbound/outbound/both] | [e.g. API key, OAuth, mTLS] | [what happens when it's unreachable — retry, degrade, hard-fail] |
+| `[service name]` | [why this system depends on it] | [inbound/outbound/both] | [who owns the credential and how it is rotated — not the auth scheme the code shows] | [what happens when it's unreachable — retry, degrade, hard-fail] |
 
 ## Webhook / event conventions [CUSTOMIZE]
-- Inbound webhooks: [verification method, e.g. signature header] — endpoint(s) at `[path]`.
+- Inbound webhooks: [only what the code does not show — e.g. the trust assumption behind verifying them].
 - Outbound events: [what triggers one, delivery guarantee — at-least-once/exactly-once].
 - Retry/backoff policy: [summary, e.g. exponential, capped at N attempts].
 

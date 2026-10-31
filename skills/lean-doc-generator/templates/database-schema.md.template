@@ -5,7 +5,7 @@ update_trigger: A migration lands
 status: current
 ---
 
-<!-- Lives at docs/database/schema.md (STANDARD §2, ADR-012). DB-exists substrate-conditional row.
+<!-- Lives at docs/database/schema.md (lean-flow STANDARD §2). DB-exists substrate-conditional row.
      States WHY/conventions only — the migration files are the schema SSOT; never duplicate DDL
      here. Companion: database-erd.md.template (map) · database-migration-guide.md.template
      (process). -->
@@ -16,29 +16,25 @@ status: current
 > and types, read the migration files at `[path/to/migrations]`; this doc never duplicates them.
 
 ## Naming conventions [CUSTOMIZE]
-- Tables: [convention, e.g. snake_case, plural]
-- Columns: [convention, e.g. snake_case, singular]
-- Foreign keys: [convention, e.g. `<singular_table>_id`]
-- Indexes/constraints: [naming pattern]
+<!-- Belongs: the rule the names alone do not show, and where the schema breaks it. Does not belong:
+     a convention every table in the migrations already follows visibly. -->
+- [Naming rule the migrations do not make obvious — why it exists]
+- [Exception — where the schema departs from the rule, and why]
 
 ## Soft-delete rule [CUSTOMIZE]
 [State whether rows are ever hard-deleted, and the condition under which soft-delete applies —
 e.g. "user-owned records are soft-deleted via `deleted_at`; system/log tables are hard-deleted."]
 
 ## Audit fields [CUSTOMIZE]
-Every [table category] carries:
-
-| Field | Type | Rule |
-|:------|:-----|:-----|
-| `created_at` | [type] | [set-once rule] |
-| `updated_at` | [type] | [refresh rule — trigger / app-layer] |
-| `deleted_at` | [type, nullable] | [null = active; set = soft-deleted] |
+[Which table categories carry audit fields, the rule for how each is set, and the tables that are
+exceptions. The field names and types are in the migrations — not repeated here.]
 
 ## Important indexes [CUSTOMIZE]
+<!-- Only the Why is non-derivable: the index definitions are in the migrations. -->
 
-| Index | Table | Why |
-|:------|:------|:----|
-| `[index_name]` | `[table]` | [query pattern it serves] |
+| Index | Why |
+|:------|:----|
+| `[index_name]` | [query pattern it serves] |
 
 ## Schema SSOT
 The migration files at `[path/to/migrations]` are the schema source of truth. This doc records

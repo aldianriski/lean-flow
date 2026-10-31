@@ -1,33 +1,19 @@
 ---
 owner: [role — not personal name]
 last_updated: YYYY-MM-DD
-update_trigger: Stack changes, new domain concept introduced, or glossary updated
+update_trigger: New domain concept introduced, or glossary updated
 status: current
 ---
 
 # [Project Name] — Context [CUSTOMIZE]
 
-> The project's vocabulary + conventions for the AI: stack · patterns · **domain glossary**. A project
+> The project's vocabulary for the AI: the **domain glossary**. A project
 > that runs the lean-flow loop also records its gates / modes / roster here (this file is the SSOT).
 
-## Stack [CUSTOMIZE]
-- **Language**: [e.g. TypeScript 5]
-- **Runtime**: [e.g. Node.js 20]
-- **Framework**: [e.g. Express 4]
-- **Database**: [e.g. PostgreSQL 15 via Prisma]
-- **Test runner**: [e.g. Vitest]
-
-## Architecture [CUSTOMIZE]
-[2–3 sentences on high-level structure. e.g. "Layered service: HTTP layer delegates to the service
-layer which delegates to the repository. No business logic in controllers."]
-
-## Patterns in Use [CUSTOMIZE]
-- **[Pattern name]**: [where/how used — one line]
-- **[Pattern name]**: [where/how used — one line]
-
-## Anti-Patterns to Avoid [CUSTOMIZE]
-❌ [e.g. No SQL queries in controllers]
-❌ [Anti-pattern 2]
+## Where the rest lives
+Stack and architecture → `docs/architecture/overview.md`. Conventions in use →
+`docs/development/coding-standards.md` § Conventions in use (when the repo has code). Patterns this
+project rejects → `.claude/CLAUDE.md` § Anti-Patterns (Avoid). Not repeated here.
 
 ## Domain Glossary [CUSTOMIZE]
 <!-- Only terms specific to THIS project's domain. General programming concepts (timeout, retry,
