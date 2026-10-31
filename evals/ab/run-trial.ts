@@ -58,6 +58,7 @@ try {
   } else r = await one(opts);
   console.log(`graders: ${r.row.graders}\nexit: ${r.exit}\npassed: ${r.row.passed}`);
   if (r.exit === "usage-missing") console.error("STOP: the CLI reported no usage. A usage-missing row was logged; this needs an owner ruling.");
+  if (r.exit === "timeout") console.error("TIMEOUT: killed at the 45-minute whole-trial limit; scored not-passed (graders and judges not run), partial usage kept and flagged incomplete.");
   process.exit(r.valid ? 0 : 1);
 } catch (e) {
   console.error(e instanceof PinRefused || e instanceof ArmRefused ? `REFUSED: ${e.message}` : `ERROR: ${(e as Error).message}`);

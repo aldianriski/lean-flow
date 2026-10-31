@@ -2,7 +2,10 @@
 // free self-tests can replay recorded output instead of calling a model.
 import type { Arm } from "./arm.ts";
 
-export type RawRun = { stdout: string; stderr: string; exitCode: number; wallMs: number };
+/** The whole-trial wall-clock limit (pre-registration Amendment 1): 45 minutes, identical for A0 and A1; A1's phases share it. */
+export const TRIAL_TIMEOUT_MS = 45 * 60 * 1000;
+/** `timedOut`: the runner killed the process at its deadline (a killed run has no result event). */
+export type RawRun = { stdout: string; stderr: string; exitCode: number; wallMs: number; timedOut?: boolean };
 /** `stdin`, when given, is piped to the process (the CLI reads the prompt from it when `-p` has no argument); otherwise stdin is ignored. */
 export type Runner = (cmd: string[], opts: { cwd: string; env: Record<string, string>; timeoutMs: number; stdin?: string }) => Promise<RawRun>;
 
@@ -13,11 +16,15 @@ export const spawnRunner: Runner = async (cmd, { cwd, env, timeoutMs, stdin }) =
     p.stdin!.write(stdin);
     await p.stdin!.end();
   }
-  const timer = setTimeout(() => p.kill(), timeoutMs);
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    p.kill();
+  }, timeoutMs);
   const [stdout, stderr] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text()]);
   const exitCode = await p.exited;
   clearTimeout(timer);
-  return { stdout, stderr, exitCode, wallMs: Date.now() - t0 };
+  return { stdout, stderr, exitCode, wallMs: Date.now() - t0, ...(timedOut ? { timedOut } : {}) };
 };
 
 /** `extra` carries per-call flags: --session-id / --resume for the two protocol phases, --tools "" for the judge. */

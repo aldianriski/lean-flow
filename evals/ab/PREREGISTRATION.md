@@ -154,6 +154,8 @@ Source `evals/ab/lib/retry.ts`. An attempt is exactly one of: `ok`, `task-failur
 "api error" in the terminal evidence), `network` (ECONNRESET, ETIMEDOUT, DNS and similar), `sandbox-before-action`. Only the
 terminal evidence classifies; task prose, tool output and recovered earlier retries never do. **Infra failures retry at most
 `MAX_RETRIES = 2` times (3 attempts); only the first non-infra attempt is scored; a task failure is never retried** (`retry.ts:9`).
+A trial killed at the whole-trial limit (section 18, Amendment 1) is classified by the kill alone, never by stderr text: killed after the
+agent's first action (in any phase) = `task-failure`; killed before it = `infra:harness-crash`.
 
 ## 11. Run validity and slot replacement
 
@@ -209,6 +211,7 @@ never mixed across rounds. Within one slot and round the attempts run in order a
 | `g2-refused: scope\|policy: ...` | A1 | `task-failure` | scored **not-passed**; graders `not-run:g2-refused`; not retried, not replaced |
 | `scope-breach: <files>` | A1 | `task-failure` | scored **not-passed** (graders ran and are recorded, but the business verdict is Unknown); not retried, not replaced |
 | `cli-error: exit N, <reason>` | both | by terminal evidence: `infra:api-error`, `infra:network`, `infra:sandbox-before-action`, or `infra:harness-crash` (no result event and no action) when the evidence says so; otherwise `task-failure` | infra: **retry up to twice, then replace**; task-failure: scored not-passed |
+| `timeout` (Amendment 1) | both | `task-failure` when the agent had acted (any phase) before the kill; `infra:harness-crash` when it had not | task-failure: scored **not-passed**, not retried, not replaced, no owner stop; graders `not-run:timeout`, all three judges Unknown (`not-run: timeout`); the usage the phases reported is kept and the total is flagged incomplete (section 9). Infra (kill before the first action): retried up to twice, then replaced |
 | `usage-missing` | both | by the same evidence (usually `task-failure`) | the row is logged and scored like any non-ok exit; **owner-ruling stop**: `run-trial.ts` prints "STOP ... needs an owner ruling" and the record text says the trial stops for one, so the operator halts the run at the first such row |
 | `source-mutated: <files>` | both | by the same evidence (usually `task-failure`) | integrity failure of the frozen snapshot; **owner-ruling stop** as above; scored not-passed if the run is allowed to stand |
 | `invalid: <reasons>` (a model outside the allowed set, a plugin other than the pinned one, init cwd not the trial copy, no init event) | both | by the same evidence (usually `task-failure`) | **owner-ruling stop** as above; scored not-passed if the run is allowed to stand |
@@ -335,6 +338,10 @@ is in the common list because the protocol's first call is a Skill call that oth
   attempt.
 - **3 consecutive infra failures abort** the run for an owner ruling. "Consecutive" counts infra-classed attempts **in run order
   across slots**, retries included; any scored attempt resets the count to zero.
+- **Whole-trial time limit (Amendment 1): 45 minutes** of wall time per trial, identical for A0 and A1 (`TRIAL_TIMEOUT_MS`,
+  `lib/run.ts`). It covers every phase of the trial: A1's phase 1, the G2 signer and the build phase share the one deadline, each call
+  receives the time left, and the signer's own 180 s cap never extends it. A trial past it is killed and exits `timeout` (section 12).
+  A trial that is still running is never scored on a partial result.
 - Notional `cost-usd` is reported per run; **there is no dollar cap**.
 - No trial runs on an A/B repo or a task-set task before this document's hash is recorded (R-c). The log before the freeze line
   holds only rows tagged `smoke -- not a measurement`, on `evals/ab/fixtures/smoke-repo`.
@@ -370,3 +377,15 @@ The corpus, the four measured arm files and manifests, `inventory.json`, `prompt
 section 19, and this file is hashed separately at signature. Any edit to any of them after the hash is recorded voids it and
 needs a new owner signature. Harness code (`evals/ab/lib/*.ts`) is not
 hashed; a change to a rule this document restates (a threshold, a constant, the allow-list) must be reflected here first.
+
+## Amendment 1 (2026-10-31, before any trial)
+
+What changed: a **45-minute whole-trial time limit** and the `timeout` exit with its scoring (sections 10, 12, 18). Nothing else in this
+document changed except section 19's hashes (this file's own sha256 is, as before, not inside it).
+
+Why: the freeze of the first version did not state any trial time limit. The harness then in place killed a trial (and each D9 protocol
+phase) at 300 s, and a killed run has no result event, so it was logged `usage-missing`: not-passed plus an owner-ruling stop, every time.
+A session running lean-flow's loop on a real task often needs more than five minutes, so the baseline would have measured the kill, mostly
+on A1. A frozen value that changes what is measured has to be written down before any trial; no trial ran before this amendment (the log
+holds smoke rows only). The limit is the same for A0 and A1, and the scoring keeps the frozen classification: a run killed mid-work is the
+task's failure, a run killed before it acted is infra.

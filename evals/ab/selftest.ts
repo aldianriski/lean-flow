@@ -1370,6 +1370,121 @@ check("S38 judge stdin: a >40 KB judge prompt -> no argv element over 8 KB and t
   assert(ignored.exitCode === 0 && ignored.stdout.trim() === "len=0 tail=", `no stdin option keeps stdin ignored: ${ignored.stdout}`);
 });
 
+// S39 (T4 M1) -- Amendment 1: the 45-minute whole-trial deadline and the `timeout` exit. Label AND attempt class AND retry behaviour.
+check("S39 timeout: a killed run -> exit timeout (not usage-missing), graders/judges not run, partial usage kept + incomplete; mid-work kill = task-failure (no retry), kill before the first action = infra:harness-crash (retried); A1 phases + signer share one deadline", async () => {
+  const { TRIAL_TIMEOUT_MS, spawnRunner } = await import("./lib/run.ts");
+  const { runTrial } = await import("./lib/trial.ts");
+  const { runProtocolTrial, realJudge } = await import("./lib/protocol.ts");
+  const { runWithRetry, retryAudit } = await import("./lib/retry.ts");
+  const { loadArm } = await import("./lib/arm.ts");
+  assert(TRIAL_TIMEOUT_MS === 45 * 60 * 1000, "the whole-trial limit is 45 minutes");
+
+  // spawnRunner really kills at its deadline and says so
+  const script = path.join(tmpdir("sleep-script"), "sleep.ts");
+  fs.writeFileSync(script, "await new Promise((r) => setTimeout(r, 30000));\n");
+  const killed = await spawnRunner(["bun", script], { cwd: path.dirname(script), env: { ...process.env } as Record<string, string>, timeoutMs: 500 });
+  assert(killed.timedOut === true && killed.wallMs < 20_000, `a process past its deadline is killed and flagged timedOut: ${JSON.stringify({ t: killed.timedOut, w: killed.wallMs })}`);
+  const fine = await spawnRunner(["bun", "-e", "1"], { cwd: path.dirname(script), env: { ...process.env } as Record<string, string>, timeoutMs: 60_000 });
+  assert(fine.timedOut === undefined, "a process that finishes in time is not flagged");
+
+  // A0 path: truncate the recorded stream (no result event) and flag the kill
+  const killedRunner = (keep: number, stderr = "", timedOut = true): import("./lib/run.ts").Runner => {
+    const r = replay((events) => { events.length = keep; });
+    return async (c, o) => ({ ...(await r.runner(c, o)), exitCode: 143, stderr, ...(timedOut ? { timedOut } : {}) });
+  };
+  const go = async (runner: import("./lib/run.ts").Runner) => {
+    const fz = await frozenSmoke();
+    const dir = tmpdir("timeout-trial");
+    const r = await runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner, measure: { judge: recJudge(PASSV) } });
+    return r;
+  };
+  const MID = 4; // init, commands_changed, assistant tool_use, tool_result: the agent has acted
+  const mid = await go(killedRunner(MID));
+  assert(mid.exit === "timeout", `a killed run is exit timeout, not usage-missing: ${mid.exit}`);
+  assert(mid.cls === "task-failure" && mid.row.measure?.attemptClass === "task-failure" && mid.row.measure.attemptKind === "scored", `killed mid-work is a scored task failure: ${mid.cls}`);
+  assert(!mid.row.passed && mid.row.graders === "not-run:timeout" && mid.row.measure.graders.every((g) => g.result === "not-run" || g.result === "not-applicable"), `graders not run: ${mid.row.graders}`);
+  assert(Object.values(mid.row.measure.judges).every((j) => j.verdict === "UNKNOWN" && j.reason === "not-run: timeout"), "judges not run: Unknown with the reason");
+  assert(mid.row.measure.exec.incomplete === true && mid.row.tokens === null && mid.row.costUsd === null, "no usage reached the log: flagged incomplete, never a measured zero");
+  const retried = await runWithRetry(async () => { const t = await go(killedRunner(MID)); return { cls: t.cls!, value: t }; });
+  assert(retried.attempts.length === 1 && retried.scored?.n === 1 && !retried.infraLost && retryAudit(retried.attempts.map((a) => a.cls)).length === 0, "a mid-work kill is not retried and is not infra-lost (so never replaced)");
+
+  const mutedByStderr = await go(killedRunner(MID, "fetch failed: ECONNRESET"));
+  assert(mutedByStderr.cls === "task-failure", `a kill is classified by the kill, not by stderr noise: ${mutedByStderr.cls}`);
+  const early = await go(killedRunner(2));
+  assert(early.exit === "timeout" && early.cls === "infra:harness-crash" && early.row.measure?.attemptKind === "infra" && !early.row.passed, `killed before the first action is a harness crash: ${early.exit} ${early.cls}`);
+  const retriedEarly = await runWithRetry(async () => { const t = await go(killedRunner(2)); return { cls: t.cls!, value: t }; });
+  assert(retriedEarly.attempts.length === 3 && retriedEarly.infraLost, "a kill before the first action retries twice and is then infra-lost");
+  const control = await go(killedRunner(MID, "", false)); // the same truncated stream WITHOUT the kill flag keeps its old label
+  assert(control.exit === "usage-missing", `control: without the kill flag the label stays usage-missing: ${control.exit}`);
+  const fullRun = await go(replay().runner);
+  assert(fullRun.exit === "ok" && fullRun.cls === "ok", "control: a run that finishes is untouched");
+
+  // A1 path: one deadline for phase 1, the signer and phase 2
+  const fx = async () => ({ fz: await frozenSmoke(), task: await protoTask() });
+  const proto = async (opts: { p1Min: number; signMin: number; killPhase2: boolean }) => {
+    const { fz, task: t } = await fx();
+    let now = 1_000_000;
+    const asked: number[] = [];
+    const base = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: (events, call) => { if (call === 2 && opts.killPhase2) events.length = MID; } });
+    const runner: import("./lib/run.ts").Runner = async (cmd, o) => {
+      asked.push(o.timeoutMs);
+      const r = await base.runner(cmd, o);
+      if (base.calls.n === 1) now += opts.p1Min * 60_000;
+      return base.calls.n === 2 && opts.killPhase2 ? { ...r, exitCode: 143, timedOut: true } : r;
+    };
+    const dir = tmpdir("timeout-proto");
+    const judge = async (p: string) => (now += opts.signMin * 60_000, SIGN);
+    const res = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: t, trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner, judge, clock: () => now, measure: { judge: recJudge(PASSV) } });
+    return { res, asked, calls: base.calls.n };
+  };
+  const shared = await proto({ p1Min: 30, signMin: 10, killPhase2: true });
+  assert(shared.asked[0] === TRIAL_TIMEOUT_MS && shared.asked[1] === 5 * 60_000, `phase 2 gets what is left of the one deadline (45 - 30 - 10 = 5 min): ${shared.asked}`);
+  assert(shared.res.exit === "timeout" && shared.res.cls === "task-failure", `a phase-2 kill after phase-1 work is a task failure (the trial acted): ${shared.res.exit} ${shared.res.cls}`);
+  assert(shared.res.row.measure?.exec.incomplete === true && shared.res.row.measure.exec.output > 0, "phase 1's usage is kept in the incomplete total");
+  assert(shared.res.row.graders === "not-run:timeout" && Object.values(shared.res.row.measure.judges).every((j) => j.verdict === "UNKNOWN"), "graders and judges not run");
+  const starved = await proto({ p1Min: 30, signMin: 20, killPhase2: false });
+  assert(starved.calls === 1 && starved.res.exit === "timeout" && starved.res.cls === "task-failure", `the signer ran the deadline out: phase 2 is never spawned, exit timeout: ${starved.calls} ${starved.res.exit}`);
+  const inTime = await proto({ p1Min: 10, signMin: 1, killPhase2: false });
+  assert(inTime.res.exit === "ok" && inTime.asked[1] === 34 * 60_000, `control: a trial inside the deadline completes: ${inTime.res.exit} ${inTime.asked}`);
+
+  // the signer's own 180 s cap stays but never extends the deadline
+  const seen: number[] = [];
+  const spy: import("./lib/run.ts").Runner = async (_c, o) => (seen.push(o.timeoutMs), { stdout: "", stderr: "", exitCode: 1, wallMs: 0 });
+  const arm = loadArm(ARM_FILE);
+  const wr = tmpdir("judge-cap");
+  await realJudge(wr, arm, spy, () => 60_000)("p").catch(() => {});
+  await realJudge(wr, arm, spy, () => 10 * 60_000)("p").catch(() => {});
+  await realJudge(wr, arm, spy)("p").catch(() => {});
+  assert(seen.join(",") === "60000,180000,180000", `signer cap = min(180 s, time left): ${seen}`);
+  const none = await realJudge(wr, arm, spy, () => 0)("p").catch((e) => String(e));
+  assert(/deadline exhausted/.test(String(none)) && seen.length === 3, "no time left: the signer is not even spawned");
+});
+
+// S40 (T4 M2) -- assertFixtureOnly is lifted for measured protocol trials only; smoke protocol trials stay on the fixtures.
+check("S40 fixture-only lift: an unmeasured D9 trial on a repo outside evals/ab/fixtures -> FixtureOnly before any spawn (also through run-trial.ts without --measured); the same repo measured -> runs", async () => {
+  const { runProtocolTrial, FixtureOnly } = await import("./lib/protocol.ts");
+  const fz = await frozenSmoke(); // a frozen snapshot that is NOT under evals/ab/fixtures
+  const t = await protoTask();
+  const dir = tmpdir("lift");
+  const base = { arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: t, trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke -- not a measurement" };
+
+  const smoke = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  let err: unknown;
+  await runProtocolTrial({ ...base, runner: smoke.runner, judge: judgeSays(SIGN).fn }).catch((e) => (err = e));
+  assert(err instanceof FixtureOnly && smoke.calls.n === 0, `smoke (unmeasured) outside the fixtures must still be refused with no spawn: ${err}`);
+
+  const measured = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const res = await runProtocolTrial({ ...base, tag: "measured round 0", runner: measured.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
+  assert(res.exit === "ok" && measured.calls.n === 2, `measured outside the fixtures must run: ${res.exit}, spawns ${measured.calls.n}`);
+
+  // the CLI path: no --measured -> refused before any spawn (the arm is never run, so no model is called)
+  const taskFile = path.join(dir, "task.json");
+  fs.writeFileSync(taskFile, JSON.stringify(t));
+  const cli = Bun.spawnSync(["bun", path.join(AB, "run-trial.ts"), "--arm", ARM_FILE, "--task", taskFile, "--repo", fz.src, "--protocol", "d9", "--log", path.join(dir, "cli.md")], { stdout: "pipe", stderr: "pipe" });
+  const out = cli.stdout.toString() + cli.stderr.toString();
+  assert(cli.exitCode !== 0 && /protocol trials run on evals\/ab\/fixtures\/ only/.test(out) && !fs.existsSync(path.join(dir, "cli.md")), `run-trial.ts --protocol d9 without --measured must refuse outside the fixtures: ${out}`);
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
