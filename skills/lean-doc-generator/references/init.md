@@ -13,7 +13,7 @@ bounded by the safe-scaffold allowlist (ADR-012).
    files — and hold what they show for step 2, which writes `## Stack` (architecture overview) and
    `## Conventions in use` (coding standards, written only on a repo with code, as that row is) with
    one cited file per line. Anything the sample cannot confirm goes under `Not confirmed`, never
-   invented. An unknown stack gets this scan alone (curated question sets for known stacks come later).
+   invented. An unknown stack gets this scan alone (step 1c may add a question set).
 1b. **Read the business evidence** — code shows the stack, not the business. Before asking, find what
    the repo already says. Candidates, matched by **path or filename only** (never open files to read
    titles; code such as `*.spec.*` is excluded): the root `README` plus markdown under `docs/`
@@ -26,6 +26,11 @@ bounded by the safe-scaffold allowlist (ADR-012).
    summarised. A backlog or wish-list is not a non-goal. Docs that disagree → the topic is open, each
    source a drafted option (at most three). Quality attributes stay open while any row is uncovered.
    Hold the result for step 3's business round and step 5's write.
+1c. **Match a question set** — check every file in `references/profiles/` against its DETECT rule;
+   any number may match, none → scan only. Then print, before step 2 writes or any popup asks:
+   `Question sets loaded: <names> (detected: <evidence>)` or `No question set matches this stack; scan
+   only.` For each loaded set, run its questions' marker searches over the whole tree (not only step
+   1's sample); a question with a clear answer is settled and cited, the rest stay open for step 3.
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
@@ -52,6 +57,10 @@ bounded by the safe-scaffold allowlist (ADR-012).
      one source) — init never generates candidate answers. With no evidence the second option is a
      neutral *I'll describe it*: picking it triggers one free-text follow-up question for that topic; if
      no text comes back the topic is *not decided yet*. Never fill it otherwise.
+   - **Conventions round** (its own popup, after the business round; only when a set is loaded and
+     questions remain open) — one frontier round of the still-open set questions, split at the
+     4-questions limit. Options are *not decided yet* plus the observed options from the code as drafted
+     choices; init never generates candidates. The same *I'll describe it* free-text path applies.
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
      `architecture/authentication.md` (auth exists). Templates → table below.
@@ -99,7 +108,8 @@ bounded by the safe-scaffold allowlist (ADR-012).
    `(from <path> § <heading>)` for a doc, `(owner, init)` for an answer, `(owner, init; drafted from
    <path> § <heading>)` for an accepted drafted option (Source column for quality rows). *Not decided
    yet* keeps both the placeholder and `[CUSTOMIZE]`; a section keeps the marker until every part is
-   filled, then drops it. Main flows: name each flow with its source; add the
+   filled, then drops it. A set answer is one line in `## Conventions in use` ending `(owner, init)` or
+   `(owner, init; drafted from <file>)`; *not decided yet* goes under `Not confirmed`. Main flows: name each flow with its source; add the
    `→ docs/flows/<slug>.md` pointer only when that flow doc exists or init writes it.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
    file's ownership header + placement match STANDARD §2/§3; every Stack and Conventions-in-use line cites a repo file; every `requirements.md` fact cites a doc § heading or the owner's answer; report the full file list, including
@@ -169,4 +179,5 @@ non-doc file stay **banned** from init — no exceptions.
 - Placement matches STANDARD §2 exactly — root vs `.claude/` vs the `docs/` tree.
 - Every Stack and Conventions-in-use line cites a repo file it was seen in.
 - Every fact in `requirements.md` cites a doc `§ heading` or the owner's answer; none is invented.
+- A loaded set's questions were asked only where the scan and the marker search left them open.
 - Report: files written · files skipped (pre-existing) · any WARN (missing template).
