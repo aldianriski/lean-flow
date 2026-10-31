@@ -31,8 +31,11 @@ value lives only here (the thresholds and the stop rule), this document is its s
 | plugin SHA per arm | 15 |
 | permission mode + allow-list (R2) | 16 |
 | judges and calibration (R3) | 17 |
-| spend ceiling + stop rule (R6) | 18 |
-| task-corpus manifest hash, arm manifest hashes, prompts lock hash, this document | 19 |
+| spend ceiling + stop rule (R6), operator procedure | 18 |
+| frozen schedule and how log rows become slots | 2, 11 |
+| every trial exit and how it scores | 12 |
+| decision rules for A1 against A0 (gain, interval, regression, floor) | 4, 8 |
+| task-corpus manifest hash, arm manifest hashes, prompts lock hash, schedule hash, this document | 19 |
 
 ## 2. What is measured
 
@@ -47,7 +50,12 @@ value lives only here (the thresholds and the stop rule), this document is its s
   clinic: closed-independence-day, confirmation-time, doctor-day-sheet, series-booking, appointment-lookup, booking-lead-time,
   one-offset-helper, patient-cancel-all. The task corpus is pinned by hash (section 19).
 - Trials per task and arm: **k = 3** (foundation section 7: A0/A1 at k = 3). The frozen schedule is therefore
-  2 arms x 16 tasks x 3 trials = **96 slots**; this is also the spend ceiling's slot count (section 18).
+  4 measured arm ids x their 8 tasks x 3 trials = **96 slots** (24 per arm id), written in execution order in
+  **`evals/ab/schedule.json`** (hashed, section 19; entries `{arm, repo, task, trial}` with `arm` the arm id as logged, e.g.
+  `workdoo-a1`). The first four entries are the pilot: trial 1 of each repo's first task (alphabetical), one per arm x repo
+  (`workdoo-a0`, `workdoo-a1`, `clinic-a0`, `clinic-a1`); then trials 1, 2, 3 in turn, workdoo before clinic, tasks alphabetical, A0
+  before A1. A slot is exactly one entry. The analysis arms `A0` / `A1` are the arm ids with the repo prefix removed and upper-cased.
+  This is also the spend ceiling's slot count (section 18).
 - The unit of analysis, the endpoints and the thresholds below apply to A1 against A0 in this run. They are written once so that
   later arms (A2 and up) compared against A1 use the same rules.
 
@@ -73,11 +81,19 @@ Each is computed per arm on the first pass, infra-lost trials excluded (not zero
 
 - **Minimum worthwhile gain: +10 percentage points** on the primary endpoint (decision D11).
 - **Regression limit: -5 percentage points** on each of the four symptom measures (D11).
-- A hypothesis (an arm compared with its comparator) **holds** only if its targeted measure improves by at least +10 pp with a
-  90% interval above zero and no symptom measure regresses past -5 pp. These two numbers are applied by the person reading the
-  report; they are not encoded in `analyze.ts`, which computes the deltas and intervals they are applied to.
-- In this run the comparison is A1 against A0: the delta reported for a pair is `arm - A1` (`deltaVsA1`, `lib/analyze.ts`), so the
-  gain of A1 over A0 is the negative of the `A0` entry, with the interval's ends swapped.
+- **Decision rules for A1 against A0 in this run.** The targeted measure is the **primary endpoint**. Everything below is read from
+  the **pooled** figures (both repos, 16 tasks); per-repo figures are reported and decide nothing, as in R5.
+  - **Gain** = pooled primary of A1 minus pooled primary of A0 (the `pooled` entry of `gainVsA0` in the report, bootstrap over tasks,
+    90% interval).
+  - The hypothesis **holds** iff the point gain is **>= +0.10 (inclusive)** AND the lower end of the 90% interval is **> 0 (strict)**
+    AND no symptom measure regresses (next point). Otherwise the result is **inconclusive** (section 8) or, with a regression,
+    **regressed**.
+  - **Regression test** for each of the four symptom measures: the point difference of the pooled rate, **A1 minus A0**; it is a
+    regression when strictly **below -0.05**. Each rate is computed over that arm's own set of tasks, which are the tasks with a
+    first-pass trial for the measure; because an infra-lost trial is excluded, the two arms' sets can differ. Unknown counts as
+    not-passed in both rates.
+  - These thresholds are applied by the person reading the report; `analyze.ts` computes the gain and its interval and the rates
+    they are applied to, and does not encode +0.10 or -0.05.
 
 ## 5. Baseline defect rule (R-b), pooled
 
@@ -91,7 +107,10 @@ reported alongside and do not decide.
 The unit is the **task**, not the trial: trials estimate each task's reliability. Uncertainty is a **bootstrap over tasks**:
 **10 000 resamples, seed 20261030, 90% interval** (`bootstrap: { resamples: 10_000, seed: 20261030, ci: 0.9 }`,
 `lib/analyze.ts:25`), reported pooled and per repo. Each interval's resample salt is derived from its measure label, so a rerun on the same
-data gives the same interval.
+data gives the same interval. The quantile rule is the code's index rule (`quantile`, `lib/analyze.ts`): sort the resampled
+statistics ascending and take element `min(n-1, max(0, floor(q*n)))`, with `q = 0.05` for the lower end and `q = 0.95` for the upper
+end. A resample whose statistic is NaN (an empty task set) is dropped before sorting; the point estimate is the statistic of the
+unresampled tasks. A measure with no tasks is reported `n/a` and decides nothing.
 
 ## 7. Unknown verdicts
 
@@ -102,15 +121,22 @@ that failed, is Unknown (`lib/judges.ts` `parseVerdict`, `runJudges`).
 
 ## 8. Inconclusive rule and never-worse-than-A0
 
-- A delta below +10 pp, or whose 90% interval spans zero, is **inconclusive**: the comparison does not ship as a quality claim.
-- A **regression** is a symptom measure whose delta is below -5 pp.
-- **Never worse than A0:** an arm whose primary endpoint is below A0's fails regardless of its delta over A1
-  (`a0Floor`, `lib/analyze.ts`).
+- A gain that is not "holds" under section 4 is **inconclusive**: the point gain is below +0.10, or the lower end of its 90%
+  interval is not above zero (an interval that spans zero is the second case). The comparison does not ship as a quality claim.
+- A **regression** is a symptom measure whose pooled point difference (A1 minus A0) is strictly below -0.05.
+- **Never worse than A0:** a point comparison of the **pooled** primary endpoints: an arm whose pooled primary is strictly below
+  A0's fails regardless of its delta over A1 (`a0Floor`, `lib/analyze.ts`). For A1 against A0 this is the sign of the gain.
 
 ## 9. Cost (D5) and the cost accounting formula
 
-- Comparator: **A1's median execution tokens per task**. Ceiling: **2.0x A1** (`costCeiling: 2.0`, `lib/analyze.ts:27`); it is
-  applied to every arm other than A0 and A1.
+- Comparator: **A1's median execution tokens per task**, computed exactly as: for each task, the **mean over its trials** of the
+  per-trial figure below; the arm's figure is the **median over tasks** of those means (even count: the mean of the two middle
+  values). View: the **first pass**, the same one the primary endpoint uses; an infra-lost slot has no figure, a trial with
+  incomplete usage is excluded (below), and a task with no complete trial is left out. Both counts are reported
+  (`tokens.trials`, `tokens.tasks`, `tokens.incomplete`). Code: `weightedMedian`, `lib/analyze.ts`; pinned by selftest S31.
+- Ceiling: **2.0x A1** (`costCeiling: 2.0`, `lib/analyze.ts:27`). It applies to arms other than A0 and A1, i.e. to later arms. **For
+  A1 against A0 in this run no cost verdict exists:** A1's cost relative to A0 is reported (ratio of the figures above), never
+  judged against the ceiling or used in the gain decision.
 - Execution tokens of a trial = the sum of `modelUsage` (input, output, cache-read, cache-write) **over every model and every
   phase** of the run, so each sub-agent the task dispatched is included (`executionTokens`, `lib/measure.ts:21`).
 - One figure per trial: `input*1 + output*1 + cacheRead*1 + cacheWrite*1`, **weights {1,1,1,1}** (`tokenWeights`,
@@ -132,12 +158,35 @@ terminal evidence classifies; task prose, tool output and recovered earlier retr
 ## 11. Run validity and slot replacement
 
 Source `evals/ab/lib/validity.ts:10`: `maxInfraShare: 0.05`, `cellLimit: 1`, `maxReplacementRounds: 2`, judged on the first pass
-against the frozen 96-slot schedule.
+against the frozen 96-slot schedule `evals/ab/schedule.json` (section 2). A slot is one schedule entry; the data is judged against
+the file, never against itself.
 
 - First-pass infra-lost share above 5% of slots, or more than 1 lost slot in any arm x task cell: the run is **INVALID** (no ruling).
 - Replacement: only infra-lost slots re-run, completed scores are kept, each slot is filled by its first non-infra attempt, at most 2
   rounds. A slot still lost after the rounds makes the run **FAILED (owner decides)**; the denominator is never shrunk.
 - A slot absent from the data counts as lost; an unscheduled or duplicate slot in the data makes the run INVALID.
+
+**How log rows become a slot's `first` and `final` (the rule the log-to-slots builder implements).** Rows come from the
+measurements log, keyed by (arm id, repo, task, trial); each row carries `attempt` (1..3, restarting at 1 in every round) and the
+operator passes `--tag "measured round <r>"` with `r = 0` for the first pass and `r = 1, 2` for the replacement rounds, so rows are
+never mixed across rounds. Within one slot and round the attempts run in order and stop at the first non-infra attempt
+(`runWithRetry`).
+
+1. An attempt row is **infra** when its `measure.attemptClass` starts with `infra:`; otherwise it is **scored**. There is no
+   other test.
+2. `first` = the first scored attempt of the slot's round 0, as a result `{graders, convention, business, scope, tokens, costUsd}`
+   with `graders` = every grader in `measure.graders` is `pass` (`not-applicable` ignored; `fail` or `not-run` makes it false),
+   the three verdicts from `measure.judges`, `tokens` and `costUsd` from `measure.exec` (carrying its `incomplete` flag), and the
+   slot's symptom tags from `task.json`. If all three attempts of round 0 are infra, `first = null` (infra-lost).
+3. `final` = the first scored attempt over rounds 0, 1, 2 in that order (equal to `first` when `first` is not null); `null` if
+   every attempt of every round was infra. A replacement round re-runs only slots whose `first` is null.
+4. **Which exits are scored:** every row whose attempt class is not infra is scored, whatever its exit: `ok`, `parked`,
+   `g2-refused`, `scope-breach`, `cli-error` that classification judged a task failure, and so on (the table in section 12). Their
+   judge verdicts are Unknown because the judges did not run, so such a slot is not-passed, counts in the denominators of every
+   symptom measure and in the Unknown counts, and is not retried or replaced.
+5. `infraCostUsd` of a slot = the sum of `measure.exec.costUsd` over its infra attempts (0 when unknown); it enters the spend
+   report and never D5.
+6. A scheduled slot with no row at all is absent: it counts as lost in both views.
 
 ## 12. D9 policy, G1/G2 in trials, and parked trials
 
@@ -150,6 +199,25 @@ against the frozen 96-slot schedule.
 - A0 receives the plain task prompt and no lean-flow loop.
 - **Any other popup a trial raises is parked and the trial is scored not-passed**, with the parked tool and input recorded. A
   parked trial is a task outcome, not an infra failure: it is not retried and not replaced.
+- **Every trial exit and how it scores** (exit words from `lib/trial.ts` for A0 and `lib/protocol.ts` for A1; attempt class from
+  `lib/retry.ts` `classifyAttempt`, which looks at the CLI's terminal evidence, never at the exit word):
+
+| Exit | Produced by | Attempt class | Scoring |
+|---|---|---|---|
+| `ok` | both | `ok` | scored; passes iff every grader passes and the business judge says PASS; all three judges ran |
+| `parked: popup <tool>: ...` | A1 | `task-failure` (a CLI that ended cleanly) | scored **not-passed**; graders `not-run:parked`; not retried, not replaced |
+| `g2-refused: scope\|policy: ...` | A1 | `task-failure` | scored **not-passed**; graders `not-run:g2-refused`; not retried, not replaced |
+| `scope-breach: <files>` | A1 | `task-failure` | scored **not-passed** (graders ran and are recorded, but the business verdict is Unknown); not retried, not replaced |
+| `cli-error: exit N, <reason>` | both | by terminal evidence: `infra:api-error`, `infra:network`, `infra:sandbox-before-action`, or `infra:harness-crash` (no result event and no action) when the evidence says so; otherwise `task-failure` | infra: **retry up to twice, then replace**; task-failure: scored not-passed |
+| `usage-missing` | both | by the same evidence (usually `task-failure`) | the row is logged and scored like any non-ok exit; **owner-ruling stop**: `run-trial.ts` prints "STOP ... needs an owner ruling" and the record text says the trial stops for one, so the operator halts the run at the first such row |
+| `source-mutated: <files>` | both | by the same evidence (usually `task-failure`) | integrity failure of the frozen snapshot; **owner-ruling stop** as above; scored not-passed if the run is allowed to stand |
+| `invalid: <reasons>` (a model outside the allowed set, a plugin other than the pinned one, init cwd not the trial copy, no init event) | both | by the same evidence (usually `task-failure`) | **owner-ruling stop** as above; scored not-passed if the run is allowed to stand |
+
+  The two "owner-ruling stop" rows are operator procedure, not enforced by the harness, which only logs and scores them. Judge
+  verdicts exist only for `ok` rows (`buildMeasure` runs the judges only when the exit is `ok`); for every other exit all three
+  are Unknown with reason `not-run: <exit>`. Such a slot therefore counts as not-passed in the primary endpoint, appears in the
+  denominator of every symptom measure it is tagged for (not excluded: only an infra-lost slot is excluded), and is added to the
+  Unknown counts.
 - Protocol trials are restricted to `evals/ab/fixtures/` by `assertFixtureOnly` (`protocol.ts`); that restriction is lifted by an
   edit to the code after signing and is not part of any hashed file.
 
@@ -251,16 +319,22 @@ is in the common list because the protocol's first call is a Skill call that oth
   Run: `bun evals/ab/judges/calibrate.ts --live --sample 1000`, judge `claude-sonnet-5-5`, prompt hashes convention `3b48f11be43c`,
   business `71bd1effd440`, scope `fa0554eca874`; the table is `evals/ab/judges/calibration.md`. No call was lost, so no call was
   re-run. A row marked "-" (no expectation) is not counted. The owner-read column of that table is still blank; the figures above
-  are agreement with the expectation, not with an owner read. The previous prompts scored 85.5% on 55 judged rows (SPRINT-151).
+  are agreement with the expectation, not with an owner read. **The 100% figure is in-sample:** the business prompt and three
+  reference solutions were changed after reading verdicts on these same rows, so it shows the prompts and references now agree
+  with each other, not how the judges will perform on unseen diffs. The previous prompts scored 85.5% on 55 judged rows (SPRINT-151).
 
 ## 18. Spend ceiling and stop rule (R6)
 
-- At most **96 slots** (section 2); at most **2 infra retries per slot**; at most **2 replacement rounds**.
-- **Pilot pause:** after the first 4 slots (one per arm x repo) the run stops for an owner review of cost and behaviour, and
-  resumes only on the owner's word.
+- At most **96 slots** (the entries of `evals/ab/schedule.json`, section 2); at most **2 infra retries per slot**; at most **2
+  replacement rounds**.
+- **Operator procedure, not harness-enforced:** the three rules below are followed by whoever runs the trials; the harness
+  (`run-trial.ts`, `lib/retry.ts`) enforces the retry limit but has no pilot pause, usage-limit pause or abort counter.
+- **Pilot pause:** after the first 4 schedule entries (the pilot, one per arm x repo) the run stops for an owner review of cost and
+  behaviour, and resumes only on the owner's word.
 - A subscription **usage limit pauses** the run without scoring any slot; the paused slots are re-run afterwards from their first
   attempt.
-- **3 consecutive infra failures abort** the run for an owner ruling.
+- **3 consecutive infra failures abort** the run for an owner ruling. "Consecutive" counts infra-classed attempts **in run order
+  across slots**, retries included; any scored attempt resets the count to zero.
 - Notional `cost-usd` is reported per run; **there is no dollar cap**.
 - No trial runs on an A/B repo or a task-set task before this document's hash is recorded (R-c). The log before the freeze line
   holds only rows tagged `smoke -- not a measurement`, on `evals/ab/fixtures/smoke-repo`.
@@ -284,6 +358,7 @@ Any later edit to any hashed file voids this section.**
 | `evals/ab/arms/clinic-a1.manifest.json` | `c746aa2b180a69eca37bfda9463a35458f6df1dea298511f17127c8ff9209f5c` |
 | `evals/ab/arms/inventory.json` | `b04840fdd43326519735c8ba32c95bfd1c194cd6f93038aad58684b2b633e3e7` |
 | `evals/ab/judges/prompts.lock.json` | `68681da287501cdfb8ed800cf903f7c8e6418c00c3e2ce6b06a3795bffa0014b` |
+| `evals/ab/schedule.json` | `82bbd6e26af0a47d588eea346ba4ab626d14e485b46124a8c04a64a3a19d627d` |
 | plugin pin (A1) sha / content hash | `4714da50...` / `6875071c...` (full values in section 15) |
 
 The sha256 of this document is not inside it: it is printed by `bun evals/ab/hash-prereg.ts --doc evals/ab/PREREGISTRATION.md` and
@@ -291,6 +366,7 @@ recorded in `docs/research/logs/ab-measurements.md` at signature.
 
 ## 20. Change control
 
-This file, the corpus, the four measured arm files and manifests, `inventory.json` and `prompts.lock.json` are hashed above. Any
-edit to any of them after the hash is recorded voids it and needs a new owner signature. Harness code (`evals/ab/lib/*.ts`) is not
+The corpus, the four measured arm files and manifests, `inventory.json`, `prompts.lock.json` and `schedule.json` are hashed in
+section 19, and this file is hashed separately at signature. Any edit to any of them after the hash is recorded voids it and
+needs a new owner signature. Harness code (`evals/ab/lib/*.ts`) is not
 hashed; a change to a rule this document restates (a threshold, a constant, the allow-list) must be reflected here first.

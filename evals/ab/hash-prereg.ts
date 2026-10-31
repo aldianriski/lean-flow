@@ -2,7 +2,7 @@
 //   bun evals/ab/hash-prereg.ts [--doc <path>]
 // (a) task-corpus manifest: every file under evals/ab/tasks/ and evals/ab/answers/, sorted by repo-relative path, as
 //     "<path> <blob id>" lines, plus the sha256 of that listing;
-// (b) sha256 of each measured arm json + manifest, the measured inventory and judges/prompts.lock.json;
+// (b) sha256 of each measured arm json + manifest, the measured inventory, judges/prompts.lock.json and schedule.json;
 // (c) with --doc, the sha256 of that document.
 // Line-ending convention: a text file is hashed as if every CRLF were LF, so a CRLF checkout (Windows autocrlf) and an LF
 // checkout give the same value; a file holding a NUL byte is binary and hashed as it is. A blob id is git's:
@@ -43,7 +43,7 @@ export function corpusManifest(base: string, dirs: string[]): { listing: string;
 
 export const MEASURED_ARMS = ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1"];
 /** Repo-relative (to evals/ab) files whose sha256 is pinned besides the corpus. */
-export const PINNED_FILES = [...MEASURED_ARMS.flatMap((a) => [`arms/${a}.json`, `arms/${a}.manifest.json`]), "arms/inventory.json", "judges/prompts.lock.json"];
+export const PINNED_FILES = [...MEASURED_ARMS.flatMap((a) => [`arms/${a}.json`, `arms/${a}.manifest.json`]), "arms/inventory.json", "judges/prompts.lock.json", "schedule.json"];
 
 export function pinnedHashes(ab: string = AB): Record<string, string> {
   return Object.fromEntries(PINNED_FILES.map((f) => [`evals/ab/${f}`, sha256(canonicalBytes(path.join(ab, f)))]));

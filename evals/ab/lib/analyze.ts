@@ -103,7 +103,8 @@ export type ArmReport = {
   /** first pass, infra-lost excluded; Unknown = not passed */
   symptoms: Record<Measure4, Rate>;
   unknowns: Record<"convention" | "business" | "scope", number>;
-  tokens: { weightedMedian: number; parts: Tok; trials: number; /** trials left out because a phase reported no usage */ incomplete: number };
+  /** weightedMedian: median over tasks of the per-task mean of weighted execution tokens (first pass, complete trials); tasks: tasks with a figure */
+  tokens: { weightedMedian: number; parts: Tok; trials: number; tasks: number; /** first-pass trials left out because a phase reported no usage */ incomplete: number };
 };
 export type Report = {
   state: RunState;
@@ -114,6 +115,8 @@ export type Report = {
   denominator: number;
   arms?: Record<string, ArmReport>;
   deltaVsA1?: Record<string, Record<string, Interval>>;
+  /** A1 minus A0 on the primary endpoint, pooled and per repo (the pre-registration's gain test reads `pooled`) */
+  gainVsA0?: Record<string, Interval>;
   cost?: Record<string, { ratioVsA1: number; withinCeiling: boolean | null }>;
   rb?: Record<Measure4, { failRate: number; lower: number; defect: boolean }>;
   a0Floor?: Record<string, { primary: number; a0: number; fails: boolean }>;
@@ -146,8 +149,11 @@ export function analyze(slots: Slot[], schedule: SlotKey[], params: Params = DEF
     for (const { s, r } of first) per.set(key(s), [...(per.get(key(s)) ?? []), !!r && success(r)]);
     const tasks = [...per.values()];
     const unk = (d: "convention" | "business" | "scope") => fin.filter(({ r }) => r?.[d] === "UNKNOWN").length;
-    const measured = fin.filter(({ r }) => !r!.tokens.incomplete); // an incomplete total is not a measurement, never a zero
-    const w = measured.map(({ r }) => weighted(r!.tokens, params.tokenWeights));
+    // cost view = the primary's (first pass): an infra-lost slot has no row; an incomplete total is not a measurement, never a zero
+    const measured = first.filter(({ r }) => r !== null && !r.tokens.incomplete);
+    const perTask = new Map<string, number[]>();
+    for (const { s, r } of measured) perTask.set(key(s), [...(perTask.get(key(s)) ?? []), weighted(r!.tokens, params.tokenWeights)]);
+    const w = [...perTask.values()].map(mean); // per task: mean over its complete trials; the arm's figure is the median over tasks
     arms[arm] = {
       primary: { ...rateOf(primM), ci: intervals(firstMeans[arm], meanStat, params, `primary:${arm}`) },
       primaryReplaced: rateOf(taskMeans(fin, success, "fail")),
@@ -156,7 +162,7 @@ export function analyze(slots: Slot[], schedule: SlotKey[], params: Params = DEF
       passHatK: mean(tasks.map((t) => Number(t.every(Boolean)))),
       symptoms: Object.fromEntries((Object.keys(SYMPTOMS) as Measure4[]).map((k) => [k, rateOf(taskMeans(first, SYMPTOMS[k].pick, "exclude", SYMPTOMS[k].only))])) as Record<Measure4, Rate>,
       unknowns: { convention: unk("convention"), business: unk("business"), scope: unk("scope") },
-      tokens: { weightedMedian: median(w), incomplete: fin.length - measured.length, parts: measured.reduce((t, { r }) => ({ input: t.input + r!.tokens.input, output: t.output + r!.tokens.output, cacheRead: t.cacheRead + r!.tokens.cacheRead, cacheWrite: t.cacheWrite + r!.tokens.cacheWrite }), { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }), trials: measured.length },
+      tokens: { weightedMedian: median(w), tasks: w.length, incomplete: first.filter(({ r }) => r?.tokens.incomplete).length, parts: measured.reduce((t, { r }) => ({ input: t.input + r!.tokens.input, output: t.output + r!.tokens.output, cacheRead: t.cacheRead + r!.tokens.cacheRead, cacheWrite: t.cacheWrite + r!.tokens.cacheWrite }), { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }), trials: measured.length },
     };
   }
 
@@ -166,6 +172,11 @@ export function analyze(slots: Slot[], schedule: SlotKey[], params: Params = DEF
   if (a1) {
     report.deltaVsA1 = {};
     report.cost = {};
+    if (a0) {
+      // the decision quantity for A1 against A0: A1 minus A0 per task on the first-pass primary, bootstrapped over tasks
+      const shared = [...firstMeans[params.a1]!.keys()].filter((k) => firstMeans[params.a0]!.has(k));
+      report.gainVsA0 = intervals(new Map(shared.map((k) => [k, firstMeans[params.a1]!.get(k)! - firstMeans[params.a0]!.get(k)!])), meanStat, params, `gain:${params.a1}`);
+    }
     for (const arm of Object.keys(arms)) {
       if (arm === params.a1) continue;
       const shared = [...firstMeans[arm]!.keys()].filter((k) => firstMeans[params.a1]!.has(k));
@@ -224,8 +235,8 @@ export function auditAnalysis(slots: Slot[], schedule: SlotKey[], rep: Report): 
       const n = mine.filter((s) => s.first !== null && (SYMPTOMS[k].only?.(s) ?? true)).length;
       if (ar.symptoms[k].nTrials !== n) out.push(`${ar.symptoms[k].nTrials > n ? "infra-lost-in-symptom" : "symptom-count-mismatch"}: ${arm} ${k} counts ${ar.symptoms[k].nTrials} trials, ${n} are first-pass scored`);
     }
-    const inc = mine.filter((s) => s.final?.tokens.incomplete).length;
-    if (ar.tokens.trials !== mine.length - inc) out.push(`${ar.tokens.trials > mine.length - inc ? "incomplete-tokens-as-zero" : "token-count-mismatch"}: ${arm} token figures cover ${ar.tokens.trials} trials, ${mine.length - inc} have complete usage`);
+    const complete = mine.filter((s) => s.first !== null && !s.first.tokens.incomplete).length;
+    if (ar.tokens.trials !== complete) out.push(`${ar.tokens.trials > complete ? "incomplete-tokens-as-zero" : "token-count-mismatch"}: ${arm} token figures cover ${ar.tokens.trials} trials, ${complete} first-pass trials have complete usage`);
   }
   return out;
 }
@@ -251,7 +262,8 @@ export function renderReport(rep: Report): string {
     L.push(``, `## Delta vs ${p.a1} (primary, bootstrap over tasks)`, ``);
     for (const [a, d] of Object.entries(rep.deltaVsA1)) L.push(`- ${a}: ${Object.entries(d).map(([k, v]) => `${k} ${iv(v)}`).join("; ")}`);
   }
-  L.push(``, `## Cost (D5: execution tokens only, median per trial vs ${p.a1})`, ``, `| arm | weighted median | input | output | cache-read | cache-write | ratio vs ${p.a1} | within ${p.costCeiling}x |`, `|---|---|---|---|---|---|---|---|`);
+  if (rep.gainVsA0) L.push(``, `## Gain of ${p.a1} over ${p.a0} (primary, ${p.a1} minus ${p.a0}; the pooled line decides)`, ``, `- ${Object.entries(rep.gainVsA0).map(([k, v]) => `${k} ${iv(v)}`).join("; ")}`);
+  L.push(``, `## Cost (D5: execution tokens only, median over tasks of the per-task mean (first pass) vs ${p.a1})`, ``, `| arm | weighted median | input | output | cache-read | cache-write | ratio vs ${p.a1} | within ${p.costCeiling}x |`, `|---|---|---|---|---|---|---|---|`);
   for (const [a, r] of Object.entries(rep.arms)) L.push(`| ${a} | ${r.tokens.weightedMedian} | ${r.tokens.parts.input} | ${r.tokens.parts.output} | ${r.tokens.parts.cacheRead} | ${r.tokens.parts.cacheWrite} | ${rep.cost?.[a] ? rep.cost[a]!.ratioVsA1.toFixed(2) : "1.00"} | ${rep.cost?.[a]?.withinCeiling === null || !rep.cost?.[a] ? "-" : rep.cost[a]!.withinCeiling ? "yes" : "NO"} |`);
   L.push(``, `Trials left out of the token figures because a phase reported no usage (never counted as zero): ${Object.entries(rep.arms).map(([a, r]) => `${a} ${r.tokens.incomplete}`).join(", ")}.`);
   if (rep.spend) L.push(``, `Spend: scored $${rep.spend.scoredUsd.toFixed(4)} (the only figure in D5) + infra $${rep.spend.infraUsd.toFixed(4)} (never in D5) = total $${rep.spend.totalUsd.toFixed(4)}.`);

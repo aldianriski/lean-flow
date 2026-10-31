@@ -711,6 +711,21 @@ check("S19c hash-prereg: one changed corpus file -> corpus sha256 changes; CRLF 
   assert(Object.keys(h.pinnedHashes()).length === h.PINNED_FILES.length, "every pinned file must exist and hash");
 });
 
+// S19d -- TASK-544: the frozen schedule is the full grid, unique, in pilot order, over real tasks.
+check("S19d schedule: 96 unique slots = 4 measured arms x their 8 tasks x trials 1..3; the first four are one per arm x repo; every task exists; runValidity accepts it", async () => {
+  const sched = JSON.parse(fs.readFileSync(path.join(AB, "schedule.json"), "utf8")) as { arm: string; repo: string; task: string; trial: number }[];
+  const { runValidity, slotId } = await import("./lib/validity.ts");
+  assert(sched.length === 96 && new Set(sched.map(slotId)).size === 96, "96 unique slots");
+  assert(new Set(sched.slice(0, 4).map((s) => s.arm)).size === 4 && sched.slice(0, 4).every((s) => s.trial === 1), "the pilot is the first four slots, one per arm x repo");
+  for (const s of sched) {
+    assert(["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1"].includes(s.arm) && s.arm.startsWith(`${s.repo}-`) && [1, 2, 3].includes(s.trial), `slot ${slotId(s)} is malformed`);
+    const dirs = ["batch-a", "batch-b"].map((b) => path.join(AB, "tasks", s.repo, b, s.task, "task.json"));
+    assert(dirs.some((d) => fs.existsSync(d)), `slot ${slotId(s)} names no task`);
+  }
+  for (const arm of ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1"]) assert(sched.filter((s) => s.arm === arm).length === 24, `${arm} has 24 slots`);
+  assert(runValidity(sched.map((s) => ({ ...s, firstLost: false, finalLost: false })), sched).state === "VALID", "a fully filled run over this schedule is VALID");
+});
+
 // ---- TASK-543: blind judges, the measured-run record, retry, validity, analysis. Free; every must-FAIL names its finding. ----
 const PASSV = '{"verdict":"PASS","reason":"fine"}';
 const FAILV = '{"verdict":"FAIL","reason":"broken"}';
@@ -1131,9 +1146,22 @@ check("S31 incomplete tokens: phase with no usage -> known usage kept + incomple
   const clean = analyze(fixtureSlots(), SCH);
   assert(rep.arms!.A1!.tokens.incomplete === 18 && rep.arms!.A1!.tokens.trials === 6 && rep.arms!.A1!.tokens.weightedMedian === clean.arms!.A1!.tokens.weightedMedian && rep.arms!.A1!.tokens.weightedMedian > 0, `incomplete trials are left out of the cost, not zeroed: ${JSON.stringify(rep.arms!.A1!.tokens)}`);
   assert(auditAnalysis(slots, SCH, rep).length === 0, `control audit empty: ${auditAnalysis(slots, SCH, rep)}`);
-  const zeroed = slots.map((s) => ({ ...s, final: s.final && { ...s.final, tokens: { ...s.final.tokens, incomplete: undefined } } }));
+  const unflag = (r: typeof slots[number]["first"]) => r && { ...r, tokens: { ...r.tokens, incomplete: undefined } };
+  const zeroed = slots.map((s) => ({ ...s, first: unflag(s.first), final: unflag(s.final) }));
   assert(analyze(zeroed as typeof slots, SCH).arms!.A1!.tokens.weightedMedian < clean.arms!.A1!.tokens.weightedMedian, "(the old behaviour drags the median toward zero)");
   assert(auditAnalysis(slots, SCH, analyze(zeroed as typeof slots, SCH)).some((f) => f.startsWith("incomplete-tokens-as-zero")), "treating incomplete totals as zero must report incomplete-tokens-as-zero");
+
+  const g = clean.gainVsA0!.pooled!;
+  const dA0 = clean.deltaVsA1!.A0!.pooled!;
+  assert(g.n === dA0.n && Math.abs(g.point + dA0.point) < 1e-12 && g.hi >= g.lo, `gainVsA0 is A1 minus A0 over the same tasks: ${JSON.stringify(g)} vs ${JSON.stringify(dA0)}`);
+
+  // D5 comparator: per task the MEAN of its trials, then the MEDIAN over tasks (not the median of trials), on the first pass.
+  const base = clean.arms!.A1!.tokens.weightedMedian;
+  const spiked = fixtureSlots().map((s) => (s.arm === "A1" && s.repo === "clinic" && s.trial === 1 && s.final && s.first ? { ...s, first: { ...s.first, tokens: { ...s.first.tokens, input: s.first.tokens.input + 3_000_000 } } } : s));
+  const sp = analyze(spiked, SCH).arms!.A1!.tokens;
+  assert(Math.abs(sp.weightedMedian - (base + (base + 1_000_000)) / 2) < 1e-6, `one spiked trial in each of 4 tasks moves the median over task means to the midpoint (a median over trials would stay ${base}): ${sp.weightedMedian}`);
+  const postReplacement = fixtureSlots().map((s) => (s.arm === "A1" && s.final ? { ...s, final: { ...s.final, tokens: { ...s.final.tokens, input: s.final.tokens.input + 3_000_000 } } } : s));
+  assert(analyze(postReplacement, SCH).arms!.A1!.tokens.weightedMedian === base, "the cost view is the first pass, like the primary: a change only in the post-replacement rows does not move it");
 });
 
 // S32 (T4) -- only the TERMINAL infrastructure evidence classifies; task prose and recovered retries never do.
