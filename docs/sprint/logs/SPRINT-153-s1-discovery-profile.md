@@ -141,3 +141,13 @@ rule in one line, and init's step 1c reads the index and the listed set files, n
 file plus one index line. The index is coordinator-owned from here: T4 and T5 each report their one index line and the
 coordinator writes it at merge-back, so wave 3 keeps running in parallel. T3's Layers line gains the index path.
 Re-confirm G2: a defect fix inside T3's signed intent (data-driven sets); no owner decision changes.
+
+### 2026-10-31 | progress | T3 merged and reviewed; the no-load half of box 3 holds headless on portfolio
+T3 built on an isolated worktree, two review rounds by a Claude stand-in (Codex would not launch): round 1 six should-fixes
+(a cwd-relative loader path that would report "no set" in any adopter repo, owner answers rejected by the cite rule, a loose
+detect rule, misfiring markers, missing round guards), all closed; round 2 nothing open. The owner approved the question
+list and added three questions (nine in all). Merged at `096ab05a`. The coordinator's headless no-load check then found a
+real defect: a headless run cannot list the plugin's profiles folder, so step 1c reported "not evaluated"; fixed by the
+index file (`9e6d45d1`, scope-change above). Re-run headless on a fresh portfolio copy with that build: the park record reads
+"Question sets (step 1c): none loaded. I read the index … No question set matches this stack; scan only." and nothing but
+the park record was written. The load half (talixa-hris) is the owner's interactive run.
