@@ -129,7 +129,7 @@ Layers: `skills/lean-doc-generator/references/init.md`
   · `docs/work/in_progress/TASK-560-init-never-overwrites-existing-docs-and-offers-migrate.md`
   · `docs/work/done/TASK-560-init-never-overwrites-existing-docs-and-offers-migrate.md`
 Depends-on: T3
-Cites: `TASK-560`
+Cites: `TASK-560` · `CLAUDE.md` · `CONTEXT.md` · `AGENTS.md` (adopter files init looks for, never touched here)
 
 Wave 3, joined by scope-change after T3's exercise lost four hand-written facts from an existing CLAUDE.md.
 
