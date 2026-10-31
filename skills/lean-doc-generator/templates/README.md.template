@@ -52,11 +52,12 @@
 
 ## Quick start
 
-<!-- Copy-pasteable: install → first command. If there's a longer setup, link out — don't
-     inline it here. -->
+<!-- Only what the manifest's scripts do not already say. A published package: the line a user runs to
+     install and use it. An app: the first-run steps no script covers (a service to start, an env file
+     to copy, a seed), or nothing — never the install/dev/test scripts restated. Setup lives in
+     docs/development/setup.md; this section is never a second home for it. -->
 ```bash
-[install command]
-[first command that produces visible output]
+[a step the manifest's scripts do not show — or delete this block]
 ```
 
 Full setup: [`docs/development/setup.md`](docs/development/setup.md)
