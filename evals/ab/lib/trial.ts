@@ -2,7 +2,7 @@
 // is untouched -> append the run record. The only model call is the injectable `runner`.
 import path from "node:path";
 import { modelInventory, type Arm } from "./arm.ts";
-import { grade, type Grade, type Task } from "./grade.ts";
+import { grade, verdictWord, type Grade, type Task } from "./grade.ts";
 import { isolationEnv, makeIsolation, type Isolation } from "./isolate.ts";
 import { checkArmSnapshot } from "./freeze.ts";
 import { checkInitPlugins, verifyPin } from "./pin.ts";
@@ -138,7 +138,7 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     task: o.task.id,
     trial: o.trial,
     attempt: o.attempt,
-    graders: graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : `not-run:${setup.failed !== undefined ? PROVISION_EXIT : "timeout"}`,
+    graders: graded ? graded.graders.map((g) => `${g.name}:${verdictWord(g)}`).join(",") : `not-run:${setup.failed !== undefined ? PROVISION_EXIT : "timeout"}`,
     tokens: totals && { input: totals.input, output: totals.output, cacheRead: totals.cacheRead, cacheWrite: totals.cacheWrite },
     costUsd: totals?.costUsd ?? null,
     wallS: raw.wallMs / 1000,

@@ -2170,6 +2170,18 @@ check("S52 reasoned void: --void <ts> --reason appends `void: owner-ruled: <reas
   assert(plain.exitCode === 0 && readRows(a.log).at(-1)!.exit === "void: usage-limit", "without --reason the void is the usage-limit one, as before");
 });
 
+check("S53 `not applicable` grader (every workdoo task freezes `lint` so): not run, not failed, recorded as not-applicable and ignored by the pass rule; a real failing grader beside it still fails", async () => {
+  const { grade, verdictWord } = await import("./lib/grade.ts");
+  const t = await task("add-fn");
+  const withLint = { ...t, graders: [...t.graders, { name: "lint", cmd: "not applicable" }] };
+  const solved = await grade(withLint, await fixtureCopy(true));
+  assert(solved.passed && solved.graders.map(verdictWord).join() === "pass,pass,pass,not-applicable", `control: ${solved.graders.map(verdictWord)}`);
+  const unsolved = await grade(withLint, await fixtureCopy(false));
+  assert(!unsolved.passed && verdictWord(unsolved.graders.at(-1)!) === "not-applicable" && verdictWord(unsolved.graders[1]!) === "fail", "a failing grader still fails the grade");
+  const m = await measuredTrial({ judge: recJudge(PASSV), edit: buildOk });
+  assert(m.res.row.measure!.graders.some((g) => g.name === "lint" && g.result === "not-applicable"), "a task with no lint grader records lint as not-applicable, as before");
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it

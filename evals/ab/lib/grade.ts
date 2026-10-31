@@ -6,7 +6,9 @@ import path from "node:path";
 export type Grader = { name: string; cmd: string; artifact?: string };
 /** layers / outOfScope are required only by a protocol trial (D9): repo-relative paths or `dir/` prefixes, and the task's Out-of-scope behaviours */
 export type Task = { id: string; prompt: string; graders: Grader[]; layers?: string[]; outOfScope?: string[] };
-export type Verdict = { name: string; passed: boolean; detail: string };
+/** `notApplicable`: the task froze the grader as `not applicable` (workdoo has no linter); it is not run and does not fail the grade (PREREGISTRATION section 11: not-applicable is ignored). */
+export type Verdict = { name: string; passed: boolean; detail: string; notApplicable?: boolean };
+export const verdictWord = (v: Verdict): "pass" | "fail" | "not-applicable" => (v.notApplicable ? "not-applicable" : v.passed ? "pass" : "fail");
 export type Grade = { passed: boolean; graders: Verdict[] };
 
 export function loadTask(file: string): Task {
@@ -30,6 +32,10 @@ export function findTsc(from = import.meta.dir): string {
 export async function grade(task: Task, dir: string, env?: Record<string, string>): Promise<Grade> {
   const verdicts: Verdict[] = [];
   for (const g of task.graders) {
+    if (/^not applicable$/i.test(g.cmd.trim())) {
+      verdicts.push({ name: g.name, passed: true, detail: "not applicable", notApplicable: true });
+      continue;
+    }
     const cmd = g.cmd.replace("{TSC}", `"${findTsc()}"`);
     const p = Bun.spawn(["sh", "-c", cmd], { cwd: dir, ...(env ? { env } : {}), stdin: "ignore", stdout: "pipe", stderr: "pipe" });
     const out = (await new Response(p.stdout).text()) + (await new Response(p.stderr).text());

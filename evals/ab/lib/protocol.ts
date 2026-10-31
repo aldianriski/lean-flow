@@ -5,7 +5,7 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./arm.ts";
-import { grade, type Grade, type Task } from "./grade.ts";
+import { grade, verdictWord, type Grade, type Task } from "./grade.ts";
 import { isolationEnv, makeIsolation } from "./isolate.ts";
 import { detectPopups, parseStream, totalsOf, type Popup, type Stream, type Totals } from "./parse.ts";
 import { applyProvision, graderEnv, PROVISION_CLASS, PROVISION_EXIT, provisionTrial, setupTrial } from "./provision.ts";
@@ -268,7 +268,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const errored = exitCode !== 0 || streams.some((s) => s.result?.is_error);
   const last = streams[streams.length - 1]!;
   const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : setup.failed !== undefined ? `${PROVISION_EXIT}: ${setup.failed}` : timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : park ? `parked: popup ${park.tool}: ${popupText(park)}` : refused ? `g2-refused: ${refused}` : errored ? `cli-error: exit ${exitCode}, ${last.result?.terminal_reason ?? "no result event"}` : breach.length > 0 ? `scope-breach: ${breach.join(", ")}` : "ok";
-  const graders = graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : `not-run:${setup.failed !== undefined ? PROVISION_EXIT : timedOut ? "timeout" : park ? "parked" : "g2-refused"}`;
+  const graders = graded ? graded.graders.map((g) => `${g.name}:${verdictWord(g)}`).join(",") : `not-run:${setup.failed !== undefined ? PROVISION_EXIT : timedOut ? "timeout" : park ? "parked" : "g2-refused"}`;
   const row: Row = {
     tag: o.tag,
     arm: o.arm.id,
