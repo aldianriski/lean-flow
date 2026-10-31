@@ -12,7 +12,7 @@ import { verifyPin } from "./pin.ts";
 import { appendRow, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
-import { classifyAttempt, firstActionSeen, terminalText, type AttemptClass } from "./retry.ts";
+import { classifyAttempt, terminalText, type AttemptClass } from "./retry.ts";
 import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
 export const DEVIATION = "D9 eval-only G2 exception -- never applies to product runs";
@@ -21,6 +21,7 @@ export const JUDGE_MODEL = "claude-sonnet-5-5";
 const POLICY = "approve as written unless the design leaves task scope";
 const DESIGN_FILE = ".ab/g2-design.md";
 const FIXTURES = path.join(import.meta.dir, "..", "fixtures");
+const SIGNER_CAP_MS = 180_000;
 
 export class FixtureOnly extends Error {}
 /** R-c freeze: an unmeasured (smoke) protocol trial runs on a repo under evals/ab/fixtures/ only; a measured run (--measured) is exempt (the lift the pre-registration describes). */
@@ -81,7 +82,7 @@ export async function policyCheck(design: string, outOfScope: string[], judge: J
 /** The real judge: a fresh `claude -p` in its own isolated config dir and empty cwd, no tools, the pinned judge model. */
 export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunner, remainingMs?: () => number): Judge {
   return async (prompt) => {
-    const cap = Math.min(180_000, remainingMs ? remainingMs() : Infinity); // the signer's own cap never extends the trial deadline
+    const cap = Math.min(SIGNER_CAP_MS, remainingMs ? remainingMs() : Infinity); // the signer's own cap never extends the trial deadline
     if (cap <= 0) throw new Error("trial deadline exhausted before the judge call");
     const jarm: Arm = { ...arm, sessionModel: JUDGE_MODEL, effort: "low", plugin: undefined, allowedTools: [] };
     const iso = makeIsolation(workRoot, jarm);
@@ -166,8 +167,10 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     g2 = { scope: scope.ok ? "pass" : `fail: ${scope.reason}`, judge: "not-asked", reason: "", designSha256: design === undefined ? "" : sha256(design) };
     if (!scope.ok) refused = `scope: ${scope.reason}`;
     else {
+      const capped = remaining() < SIGNER_CAP_MS; // the deadline, not the signer's own cap, bounds this call
       const verdict = await policyCheck(design!, o.task.outOfScope, o.judge ?? realJudge(o.workRoot, o.arm, undefined, remaining));
-      if (remaining() <= 0) timedOut = true; // the signer ran the deadline out: the trial timed out, whatever the verdict
+      // the signer ran the deadline out (or was cut by it): the trial timed out, whatever the verdict; policyCheck already turned a failed call into a refusal
+      if (remaining() <= 0 || (capped && !verdict.sign && /^judge (?:reply unusable|ran|run failed)/.test(verdict.reason))) timedOut = true;
       g2.judge = verdict.sign ? "sign" : "refuse";
       g2.reason = verdict.reason;
       g2.judgeUsage = verdict.usage;
@@ -227,7 +230,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   };
   let cls: AttemptClass | undefined;
   if (o.measure) {
-    cls = classifyAttempt({ raw: lastRaw, stream: last, exit, timedOut, acted: streams.some(firstActionSeen) });
+    cls = classifyAttempt({ raw: lastRaw, stream: last, exit });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
     row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
     if (cls.startsWith("infra:")) row.passed = false;

@@ -1409,8 +1409,8 @@ check("S39 timeout: a killed run -> exit timeout (not usage-missing), graders/ju
   const retried = await runWithRetry(async () => { const t = await go(killedRunner(MID)); return { cls: t.cls!, value: t }; });
   assert(retried.attempts.length === 1 && retried.scored?.n === 1 && !retried.infraLost && retryAudit(retried.attempts.map((a) => a.cls)).length === 0, "a mid-work kill is not retried and is not infra-lost (so never replaced)");
 
-  const mutedByStderr = await go(killedRunner(MID, "fetch failed: ECONNRESET"));
-  assert(mutedByStderr.cls === "task-failure", `a kill is classified by the kill, not by stderr noise: ${mutedByStderr.cls}`);
+  const withEvidence = await go(killedRunner(MID, "fetch failed: ECONNRESET"));
+  assert(withEvidence.exit === "timeout" && withEvidence.cls === "infra:network", `the frozen classification is unchanged: a kill whose terminal evidence names the network is infra, as for any run: ${withEvidence.cls}`);
   const early = await go(killedRunner(2));
   assert(early.exit === "timeout" && early.cls === "infra:harness-crash" && early.row.measure?.attemptKind === "infra" && !early.row.passed, `killed before the first action is a harness crash: ${early.exit} ${early.cls}`);
   const retriedEarly = await runWithRetry(async () => { const t = await go(killedRunner(2)); return { cls: t.cls!, value: t }; });
@@ -1440,7 +1440,7 @@ check("S39 timeout: a killed run -> exit timeout (not usage-missing), graders/ju
   };
   const shared = await proto({ p1Min: 30, signMin: 10, killPhase2: true });
   assert(shared.asked[0] === TRIAL_TIMEOUT_MS && shared.asked[1] === 5 * 60_000, `phase 2 gets what is left of the one deadline (45 - 30 - 10 = 5 min): ${shared.asked}`);
-  assert(shared.res.exit === "timeout" && shared.res.cls === "task-failure", `a phase-2 kill after phase-1 work is a task failure (the trial acted): ${shared.res.exit} ${shared.res.cls}`);
+  assert(shared.res.exit === "timeout" && shared.res.cls === "task-failure", `a phase-2 kill after the agent acted in that phase is a task failure: ${shared.res.exit} ${shared.res.cls}`);
   assert(shared.res.row.measure?.exec.incomplete === true && shared.res.row.measure.exec.output > 0, "phase 1's usage is kept in the incomplete total");
   assert(shared.res.row.graders === "not-run:timeout" && Object.values(shared.res.row.measure.judges).every((j) => j.verdict === "UNKNOWN"), "graders and judges not run");
   const starved = await proto({ p1Min: 30, signMin: 20, killPhase2: false });
@@ -1487,7 +1487,7 @@ check("S40 fixture-only lift: an unmeasured D9 trial on a repo outside evals/ab/
 });
 
 // ---- T4 M3/M4: the baseline driver and the log-to-slots builder, on compact row specs (no model call) ----
-type Spec = { tag: string; arm: string; repo?: string; task: string; trial: number; attempt: number; exit: string; cls: string; g?: "pass" | "fail" | "not-run"; j?: string; tok?: [number, number, number, number]; incomplete?: boolean; cost?: number; nomeasure?: boolean };
+type Spec = { tag: string; arm: string; repo?: string; task: string; trial: number; attempt: number; exit: string; cls: string; g?: "pass" | "fail" | "not-run"; j?: string; tok?: [number, number, number, number]; incomplete?: boolean; cost?: number; nomeasure?: boolean; /** a void row: the index (in the spec list) of the attempt it voids */ voids?: number };
 const VERDICT: Record<string, "PASS" | "FAIL" | "UNKNOWN"> = { P: "PASS", F: "FAIL", U: "UNKNOWN" };
 /** One log row from a compact spec: the exit, the retry class, the grader result, the three verdicts (P/F/U), usage and cost. */
 function specRow(s: Spec): import("./lib/record.ts").Row {
@@ -1506,11 +1506,16 @@ function specRow(s: Spec): import("./lib/record.ts").Row {
   return { tag: s.tag, arm: s.arm, repo: s.repo ?? s.arm.split("-")[0]!, task: s.task, trial: s.trial, attempt: s.attempt, graders: "x", tokens: s.tok ? { input: t[0], output: t[1], cacheRead: t[2], cacheWrite: t[3] } : null, costUsd: cost, wallS: 1, exit: s.exit, pins: {}, raw: {}, passed: s.exit === "ok", ...(s.nomeasure ? {} : { measure }) };
 }
 const T0 = Date.parse("2026-11-01T00:00:00Z");
+/** The void row of the attempt at spec index `idx`: quotes that row's ts (T0 + idx seconds, as logOf stamps it). A `ts` override names a row that does not exist. */
+function voidRowOf(target: Spec, idx: number, ts = new Date(T0 + idx * 1000).toISOString()): import("./lib/record.ts").Row {
+  const round = /round (\d+)/.exec(target.tag)![1];
+  return { tag: `measured round ${round} void ${ts}`, arm: target.arm, repo: target.repo ?? target.arm.split("-")[0]!, task: target.task, trial: target.trial, attempt: target.attempt, graders: "void", tokens: null, costUsd: null, wallS: 0, exit: "void: usage-limit", pins: {}, raw: {}, passed: false };
+}
 /** A log file of the specs in order, one second apart from `T0` (the file the real harness would have appended). */
 async function logOf(specs: Spec[], header?: string): Promise<string> {
   const { appendRow } = await import("./lib/record.ts");
   const file = path.join(tmpdir("slots-log"), "log.md");
-  specs.forEach((s, i) => appendRow(file, specRow(s), new Date(T0 + i * 1000)));
+  specs.forEach((s, i) => appendRow(file, s.voids === undefined ? specRow(s) : voidRowOf(specs[s.voids]!, s.voids), new Date(T0 + i * 1000)));
   if (header) fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("\n| ts |", `\n${header}\n\n| ts |`));
   return file;
 }
@@ -1530,7 +1535,7 @@ check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / r
   const built = await run(fxRows());
   assertEq(built.findings, []);
   assertEq(JSON.parse(JSON.stringify(built.slots)), JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "expected.json"), "utf8")));
-  assert(built.notes.some((n) => /1 smoke row/.test(n)) && built.notes.some((n) => /2 usage-limit attempt/.test(n)), `notes: ${built.notes}`);
+  assert(built.notes.some((n) => /1 smoke row/.test(n)) && built.notes.some((n) => /2 usage-limit attempt\(s\) voided/.test(n)) && built.voidedUsd === 1, `notes: ${built.notes}, voided ${built.voidedUsd}`);
   const timeoutSlot = built.slots.find((s) => s.task === "forecast-month-end" && s.arm === "A0")!;
   assert(timeoutSlot.first !== null && timeoutSlot.first.graders === false && timeoutSlot.first.tokens.incomplete === true, "a timeout row is a scored task failure: first is set (never replaced), usage flagged incomplete");
   assert(!built.slots.some((s) => s.task === "booking-lead-time" && s.arm === "A0"), "a slot with only usage-limit-marked attempts is not emitted (re-run from its first attempt)");
@@ -1547,12 +1552,31 @@ check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / r
   assert(/ran after the scored attempt/.test(await finding([{ ...rows[1]!, attempt: 2 }])), "an attempt after the scored one is a finding");
   assert(/without a measure column/.test(await finding([{ ...rows[1]!, task: "pilot-seat-limit", arm: "workdoo-a0", trial: 2, nomeasure: true }])), "a measured row without a measure column is a finding");
   assert(/4 attempts > 3/.test(await finding(["1", "2", "3", "4"].map((a, i) => ({ ...rows[1]!, task: "shared-auth-failure", arm: "workdoo-a1", attempt: i + 1, exit: "cli-error: exit 1, network", cls: "infra:network" })))), "more than three attempts in a round is a finding");
-  // the usage-limit mark matters: with the marks removed the same rows duplicate attempt numbers
-  const unmarked = rows.map((r) => ({ ...r, tag: r.tag.replace(" usage-limit", "") }));
-  assert(/duplicate attempt numbers/.test((await run(unmarked)).findings.join(" | ")), "control: without the usage-limit mark the re-run attempt is a duplicate");
   // an unscheduled slot is emitted (the analysis rules it INVALID), named in the notes
   const extra = await run([...rows, { ...rows[1]!, task: "shared-auth-failure", arm: "workdoo-a1" }]);
   assert(extra.notes.some((n) => /not in the schedule/.test(n)) && extra.slots.some((s) => s.task === "shared-auth-failure"), "an unscheduled slot is kept and named");
+
+  // void rows (append-only): without them the same rows are duplicate attempts; one naming no row is reported; a crash between the
+  // attempt row and its void row leaves a gap that the repair (append the void row) closes without touching any earlier line
+  const { appendRow } = await import("./lib/record.ts");
+  const { appendVoid } = await import("./run-baseline.ts");
+  const noVoids = rows.filter((r) => r.voids === undefined);
+  assert(/duplicate attempt numbers/.test((await run(noVoids)).findings.join(" | ")), "control: without the void row the re-run attempt is a duplicate");
+  const orphanLog = await logOf(rows);
+  appendRow(orphanLog, voidRowOf(rows[1]!, 1, "2030-01-01T00:00:00.000Z"), new Date(T0 + 99_000));
+  assert(/names "2030-01-01T00:00:00.000Z", which is no measured row/.test(buildSlots(readRows(orphanLog), fxSchedule(), tasks).findings.join(" | ")), "a void row naming a ts that is no row of that attempt is reported");
+  const gapLog = await logOf(noVoids);
+  const before = fs.readFileSync(gapLog, "utf8");
+  for (const r of readRows(gapLog).filter((x) => /usage limit/.test(x.exit))) appendVoid(gapLog, r);
+  assert(fs.readFileSync(gapLog, "utf8").startsWith(before), "the repair only appends: every earlier byte of the log is unchanged");
+  const repaired = buildSlots(readRows(gapLog), fxSchedule(), tasks);
+  assertEq(repaired.findings, []);
+  assertEq(JSON.parse(JSON.stringify(repaired.slots)), JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "expected.json"), "utf8")));
+  // a report section with tables of its own below the table is never read as rows
+  const reportLog = await logOf(rows);
+  const plain = readRows(reportLog).length;
+  fs.appendFileSync(reportLog, "\n## Report 2026-11-09\n\n| ts | arm | note |\n|---|---|---|\n| 2026-11-09 | workdoo-a1 | not a row |\n\n| symptom | rate |\n|---|---|\n| scope | 0.5 |\n");
+  assert(readRows(reportLog).length === plain && buildSlots(readRows(reportLog), fxSchedule(), tasks).findings.length === 0, "rows stop at the end of the table; a trailing report table is not parsed");
 
   // the CLI writes a file the analysis reads with the real schedule's argument shape
   const dir = tmpdir("slots-cli");
@@ -1562,6 +1586,7 @@ check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / r
   assert(cli.exitCode === 0 && /build-slots: 13 slots of 15 scheduled \(2 infra-lost on the first pass\)/.test(cli.stderr.toString()), `build-slots CLI: ${cli.stderr.toString()}`);
   const an = Bun.spawnSync(["bun", path.join(AB, "analyze.ts"), "--data", path.join(dir, "slots.json"), "--schedule", sched], { stdout: "pipe", stderr: "pipe" });
   assert(/analysis: (VALID|INVALID|FAILED)/.test(an.stdout.toString()) && !/audit finding/.test(an.stdout.toString()), `analyze.ts reads the built slots: ${an.stdout.toString().slice(-300)}`);
+  assert(/Usage-limit attempts voided[^\n]*1\.0000 USD/.test(an.stdout.toString()), `the voided attempts' spend is its own reported line: ${an.stdout.toString().slice(-400)}`);
   const smokeOnly = await logOf(rows.slice(0, 1));
   const refused = Bun.spawnSync(["bun", path.join(AB, "build-slots.ts"), "--log", smokeOnly, "--schedule", sched], { stdout: "pipe", stderr: "pipe" });
   assert(refused.exitCode === 2 && /REFUSED: no measured rows/.test(refused.stderr.toString()), "the CLI refuses a smoke-only log");
@@ -1614,7 +1639,7 @@ const sid = (s: import("./lib/validity.ts").SlotKey | undefined, attempt = 1) =>
 const INFRA: Partial<Spec> = { exit: "cli-error: exit 1, API Error: 529", cls: "infra:api-error", g: "not-run", j: "UUU" };
 
 check("S42 baseline driver (fake runner, real schedule): schedule order + pilot stop after 4 + resume + 96 slots -> built and analysed VALID; owner stops; 3 consecutive infra; mid-work timeout does not count; usage-limit pause; rounds; freeze refusals; one at a time", async () => {
-  const { Refused, markUsageLimit, withLock, isUsageLimit } = await import("./run-baseline.ts");
+  const { Refused, withLock, isUsageLimit, lockPathFor } = await import("./run-baseline.ts");
   const { parseTag, readRows } = await import("./lib/log.ts");
   const S = REAL_SCHEDULE;
 
@@ -1679,25 +1704,44 @@ check("S42 baseline driver (fake runner, real schedule): schedule order + pilot 
   const resumed = await g.go(0, () => INFRA);
   assert(resumed.stop === "abort" && resumed.calls.length === 1 && resumed.calls[0]!.attempt === 3, `resume continues at attempt 3 (keyed by slot + round) with the streak of 2 from the log -> abort: ${resumed.stop} ${ids(resumed.calls)}`);
 
-  // ---- usage limit: the attempt is marked, nothing is scored, budget and streak are untouched ----
+  // ---- usage limit: the attempt is voided by an APPENDED void row, nothing is scored, budget and streak are untouched ----
   assert(isUsageLimit("Claude AI usage limit reached|1730000000") && isUsageLimit("You've hit your limit") && !isUsageLimit("API Error: 429 rate limit exceeded") && !isUsageLimit(undefined), "usage-limit recognition (and an API rate limit is not one)");
   const h = await dryRun();
   await h.go(0);
   const limited = await h.go(0, (ctx) => (ctx.slot === S[4] ? { exit: "cli-error: exit 1, limit", cls: "task-failure", terminal: "Claude AI usage limit reached|1730000000" } : {}));
   assert(limited.stop === "usage-limit" && limited.calls.length === 1, `pauses on the signal: ${limited.stop}`);
-  const tail = readRows(h.log).at(-1)!;
-  assert(tail.tag === "measured round 0 usage-limit" && parseTag(tail.tag).kind === "measured" && (parseTag(tail.tag) as { usageLimit: boolean }).usageLimit, `the attempt carries the mark in its tag: ${tail.tag}`);
+  const hRows = readRows(h.log);
+  const voidRow = hRows.at(-1)!;
+  const attemptRow = hRows.at(-2)!;
+  assert(attemptRow.tag === "measured round 0" && attemptRow.exit.startsWith("cli-error") && parseTag(voidRow.tag).kind === "void" && voidRow.tag === `measured round 0 void ${attemptRow.ts}` && voidRow.attempt === attemptRow.attempt && voidRow.task === attemptRow.task, `the attempt row is left as it was and a void row quoting its ts is appended: ${voidRow.tag}`);
   const again = await h.go(0);
-  assert(again.stop === "done" && again.calls[0]!.slot === S[4] && again.calls[0]!.attempt === 1, "the paused slot re-runs from its first attempt (the marked attempt is outside the budget)");
+  assert(again.stop === "done" && again.calls[0]!.slot === S[4] && again.calls[0]!.attempt === 1, "the voided slot re-runs from its first attempt (the voided attempt is outside the budget)");
+  // a deadline kill is ours: never voided as a usage limit, even if its text mentions one
+  const k = await dryRun();
+  await k.go(0);
+  const killed = await k.go(0, (ctx) => (ctx.slot === S[4] ? { exit: "timeout", cls: "task-failure", g: "not-run", j: "UUU", terminal: "usage limit reached" } : {}));
+  assert(killed.stop === "done" && readRows(k.log).every((r) => parseTag(r.tag).kind !== "void") && readRows(k.log).some((r) => r.exit === "timeout"), "a timeout row is scored, never voided");
+  // a crash between the attempt row and its void row leaves a gap (the attempt counts as scored); the repair appends the void row
+  const g2 = await dryRun();
+  await g2.go(0);
+  await g2.go(0, (ctx) => (ctx.slot === S[4] ? { exit: "cli-error: exit 1, limit", cls: "task-failure", terminal: "usage limit reached" } : {}));
+  const full = fs.readFileSync(g2.log, "utf8");
+  const gapText = full.slice(0, full.trimEnd().lastIndexOf("\n") + 1); // the log as the crash would have left it: no void row
+  fs.writeFileSync(g2.log, gapText);
+  const gapTs = readRows(g2.log).at(-1)!.ts;
+  assert((await g2.go(0)).calls[0]!.slot === S[5], "the gap: the unvoided limit attempt counts as the slot's scored attempt");
+  const repairCli = (ts: string) => Bun.spawnSync(["bun", path.join(AB, "run-baseline.ts"), "--void", ts, "--log", g2.log], { stdout: "pipe", stderr: "pipe" });
+  const bad = repairCli("2030-01-01T00:00:00.000Z");
+  assert(bad.exitCode === 2 && /no measured attempt row stamped/.test(bad.stderr.toString()), "--void with a ts that is no attempt row is refused");
+  const fixed = repairCli(gapTs);
+  assert(fixed.exitCode === 0 && /void row appended/.test(fixed.stdout.toString()) && repairCli(gapTs).exitCode === 2, `the repair appends the void row once: ${fixed.stdout}${fixed.stderr}`);
+  assert((await g2.go(0)).calls[0]?.slot === S[4], "after the repair the slot is pending again and re-runs from its first attempt");
   const i = await dryRun();
   await i.go(0);
   const mixed = await i.go(0, (ctx) => (ctx.slot === S[4] ? (ctx.attempt < 3 ? INFRA : { exit: "cli-error: exit 1, limit", cls: "task-failure", terminal: "weekly limit reached" }) : {}));
   assert(mixed.stop === "usage-limit" && mixed.calls.length === 3, "two infra attempts then a usage limit on the third");
   const noAbort = await i.go(0, (ctx) => (ctx.slot === S[4] ? INFRA : {}));
   assert(noAbort.calls[0]!.attempt === 3 && noAbort.stop === "abort" && noAbort.calls.length === 1, `the marked attempt is neither a third infra nor a reset: the next attempt (3) is the third infra and aborts: ${noAbort.stop} ${ids(noAbort.calls)}`);
-  let missing = "";
-  try { markUsageLimit(h.log, { slot: S[90]!, round: 0, attempt: 1, tag: "measured round 0" }); } catch (er) { missing = String(er); }
-  assert(/no row of/.test(missing), "marking an attempt that left no row is an error, not a silent no-op");
 
   // ---- rounds: only the slots every earlier round lost; resume keyed by (slot, round) ----
   const r = await dryRun();
@@ -1739,6 +1783,102 @@ check("S42 baseline driver (fake runner, real schedule): schedule order + pilot 
   const lock = path.join(tmpdir("lock"), "l.lock");
   const inner = await withLock(lock, async () => withLock(lock, async () => "second").then(() => "ran", (er) => (er instanceof Refused ? "refused" : String(er))));
   assert(inner === "refused" && !fs.existsSync(lock), "a second driver on the same log is refused while the first runs, and the lock is released after");
+  // the lock lives in the OS temp dir, one per log path, never beside the log; a lock whose pid is dead is stale
+  const lp = lockPathFor("D:/some/where/docs/research/logs/ab-measurements.md");
+  assert(path.dirname(lp) === os.tmpdir() && lp !== lockPathFor("D:/other/log.md") && lp === lockPathFor("D:/SOME/where/docs/research/logs/ab-measurements.md"), `lock path: ${lp}`);
+  const dead = Bun.spawn(["bun", "-e", "1"], { stdout: "ignore", stderr: "ignore" });
+  await dead.exited;
+  const staleLock = path.join(tmpdir("lock"), "stale.lock");
+  fs.writeFileSync(staleLock, String(dead.pid));
+  const notes: string[] = [];
+  assert((await withLock(staleLock, async () => "got it", (l) => notes.push(l))) === "got it" && notes.length === 1 && /stale lock/.test(notes[0]!) && !fs.existsSync(staleLock), "a lock whose pid is dead is removed with a note and the driver proceeds");
+  fs.writeFileSync(staleLock, String(process.pid));
+  assert(await withLock(staleLock, async () => "x").then(() => "ran", (er) => (er instanceof Refused ? String(er.message) : String(er))).then((m) => /held by pid/.test(m)) && fs.existsSync(staleLock), "a lock whose pid is alive is respected (and left in place)");
+});
+
+// S44 (T4 review) -- the D9 signer cut by the deadline yields a timeout row, never an exception out of the trial.
+check("S44 signer at the deadline: a judge that dies past the deadline, a judge cut by a deadline that leaves less than its own cap, and the real judge killed on the deadline -> exit timeout row (no throw); a judge failing with time to spare -> the frozen g2-refused", async () => {
+  const { runProtocolTrial, realJudge } = await import("./lib/protocol.ts");
+  const armOf = (await import("./lib/arm.ts")).loadArm(ARM_FILE);
+  const run = async (judgeFor: (tick: (ms: number) => void, remaining: () => number) => import("./lib/protocol.ts").Judge, p1Min: number) => {
+    const fz = await frozenSmoke();
+    let now = 1_000_000;
+    const base = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+    const runner: import("./lib/run.ts").Runner = async (cmd, o) => {
+      const r = await base.runner(cmd, o);
+      if (base.calls.n === 1) now += p1Min * 60_000;
+      return r;
+    };
+    const deadline = now + 45 * 60_000;
+    const dir = tmpdir("signer-deadline");
+    const res = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner, judge: judgeFor((ms) => (now += ms), () => deadline - now), clock: () => now, measure: { judge: recJudge(PASSV) } });
+    return { res, spawns: base.calls.n };
+  };
+  const pastDeadline = await run((tick) => async () => { tick(10 * 60_000); throw new Error("judge run failed: exit 1, killed"); }, 40);
+  assert(pastDeadline.res.exit === "timeout" && pastDeadline.spawns === 1, `judge died after the deadline: ${pastDeadline.res.exit}, spawns ${pastDeadline.spawns}`);
+  // 2 minutes left after phase 1, so the signer is capped by the deadline, not by its own 180 s; it fails just short of the clock reaching zero
+  const cutShort = await run((tick) => async () => { tick(119_000); throw new Error("judge run failed: exit 143, no result event"); }, 43);
+  assert(cutShort.res.exit === "timeout" && cutShort.spawns === 1, `judge cut by a deadline tighter than its cap: ${cutShort.res.exit}`);
+  // the real judge, its runner killed on the deadline: realJudge throws, policyCheck turns it into a refusal, the trial turns it into a timeout
+  const spy: import("./lib/run.ts").Runner = async () => ({ stdout: "", stderr: "", exitCode: 143, wallMs: 1, timedOut: true });
+  const real = await run((tick, remaining) => { const j = realJudge(tmpdir("rj"), armOf, spy, remaining); return async (p) => { tick(119_000); return j(p); }; }, 43);
+  assert(real.res.exit === "timeout" && real.spawns === 1, `real judge killed on the deadline: ${real.res.exit}`);
+  // control: the same failure with plenty of time left is the frozen judge-failure handling
+  const early = await run(() => async () => { throw new Error("judge run failed: exit 1, boom"); }, 1);
+  assert(early.res.exit.startsWith("g2-refused: policy: judge reply unusable") && early.spawns === 1, `control: a failing signer with time to spare is g2-refused: ${early.res.exit}`);
+});
+
+
+// S43 (T4 review) -- the kill bounds wall time even when a grandchild keeps the pipes open, and takes the grandchild down.
+check("S43 kill tree: a child whose grandchild holds stdout/stderr and sleeps -> spawnRunner returns near the deadline with timedOut and the partial output, and the grandchild is dead", async () => {
+  const { spawnRunner } = await import("./lib/run.ts");
+  const dir = tmpdir("grandchild");
+  const pidFile = path.join(dir, "grandchild.pid");
+  const grand = path.join(dir, "grand.ts");
+  const child = path.join(dir, "child.ts");
+  fs.writeFileSync(grand, `import fs from "node:fs";\nfs.writeFileSync(${JSON.stringify(pidFile)}, String(process.pid));\nawait new Promise((r) => setTimeout(r, 60000));\n`);
+  fs.writeFileSync(child, `console.log("partial output");\n(await import("node:child_process")).spawn("bun", [${JSON.stringify(grand)}], { stdio: ["ignore", "inherit", "inherit"], detached: true }).unref();\nawait new Promise((r) => setTimeout(r, 60000));\n`);
+  const t0 = Date.now();
+  const r = await spawnRunner(["bun", child], { cwd: dir, env: { ...process.env } as Record<string, string>, timeoutMs: 1500 });
+  const took = Date.now() - t0;
+  assert(r.timedOut === true && took < 15_000, `wall time is bounded by the deadline plus a short grace, not by the grandchild's 60 s: ${took} ms`);
+  assert(r.stdout.includes("partial output"), `output produced before the kill is kept: ${JSON.stringify(r.stdout)}`);
+  const gpid = Number(fs.readFileSync(pidFile, "utf8"));
+  const alive = () => { try { process.kill(gpid, 0); return true; } catch { return false; } };
+  for (let i = 0; i < 30 && alive(); i++) await new Promise((res) => setTimeout(res, 200));
+  assert(!alive(), `the grandchild (pid ${gpid}) was killed with the tree`);
+});
+
+// S45 (T4 review) -- the freeze line format, and the same guard on a hand-run `run-trial.ts --measured`.
+check("S45 freeze guard: only a paragraph LEADING with `frozen <instant>` and holding a sha256 is a freeze line (a later instant or a mention is not); run-trial.ts --measured refuses with no freeze line / a changed document, before any spawn", async () => {
+  const { readFreezes, latestFreeze, docSha256 } = await import("./lib/log.ts");
+  const sha1 = "a".repeat(64);
+  const sha2 = "b".repeat(64);
+  const header = [
+    "> Append-only. Notes mentioning a freeze of 2026-01-01T00:00:00Z and sha256 `" + "c".repeat(64) + "`.",
+    ">",
+    "> **Pre-registration frozen 2026-10-31T03:12:56Z (owner-signed, test):** `evals/ab/PREREGISTRATION.md` sha256",
+    "> `" + sha1 + "`, at commit `abc`. Superseded later on 2027-01-01T00:00:00Z.",
+    "",
+    "> **Pre-registration frozen 2026-11-01T09:00:00Z (Amendment 1, owner re-signed):** `evals/ab/PREREGISTRATION.md` sha256 `" + sha2 + "`.",
+    "",
+    "> The earlier freeze was voided at 2026-12-01T00:00:00Z, sha256 `" + "d".repeat(64) + "`.",
+  ].join("\n");
+  const log = await logOf([SMOKE_SPEC], header);
+  const found = readFreezes(log);
+  assert(JSON.stringify(found) === JSON.stringify([{ ts: "2026-10-31T03:12:56Z", sha256: sha1 }, { ts: "2026-11-01T09:00:00Z", sha256: sha2 }]), `leading instants only, paragraphs apart: ${JSON.stringify(found)}`);
+  assert(latestFreeze(found)!.sha256 === sha2 && readFreezes(path.join(tmpdir("nolog"), "missing.md")).length === 0, "the latest instant wins; a missing log has no freeze line");
+
+  const prereg = path.join(tmpdir("prereg-cli"), "P.md");
+  fs.writeFileSync(prereg, "doc\n");
+  const cli = (logFile: string) => Bun.spawnSync(["bun", path.join(AB, "run-trial.ts"), "--measured", "--arm", ARM_FILE, "--task", path.join(AB, "fixtures", "smoke-tasks", "add-fn.json"), "--repo", SMOKE_REPO, "--log", logFile, "--prereg", prereg], { stdout: "pipe", stderr: "pipe" });
+  const noFreeze = cli(await logOf([SMOKE_SPEC]));
+  assert(noFreeze.exitCode === 2 && /REFUSED: no freeze line/.test(noFreeze.stderr.toString()), `no freeze line: ${noFreeze.stderr.toString()}`);
+  const wrong = cli(await logOf([SMOKE_SPEC], `> **Pre-registration frozen 2026-10-31T03:12:56Z (test):** \`x\` sha256 \`${sha1}\`.`));
+  assert(wrong.exitCode === 2 && /changed after the freeze/.test(wrong.stderr.toString()), `document differs from the freeze line: ${wrong.stderr.toString()}`);
+  const okLog = await logOf([SMOKE_SPEC], `> **Pre-registration frozen 2026-10-31T03:12:56Z (test):** \`x\` sha256 \`${docSha256(prereg)}\`.`);
+  const { freezeProblem } = await import("./lib/log.ts");
+  assert(freezeProblem({ log: okLog, prereg }) === undefined, "control: a matching freeze line admits a measured start");
 });
 
 const paid = process.argv.includes("--paid");

@@ -1,23 +1,32 @@
 // The A0 + A1 baseline driver (SPRINT-152 T4): walks evals/ab/schedule.json in order, one trial at a time, and runs each slot through the
 // documented trial path (A1: the D9 protocol, A0: the plain trial, both measured), tagging every attempt `measured round <r>`.
 //   bun evals/ab/run-baseline.ts [--round 0|1|2] [--log <md>] [--schedule <json>] [--prereg <md>] [--tasks <dir>]
+//   bun evals/ab/run-baseline.ts --void <ts> [--log <md>]     (repair: append the void row of the attempt row stamped <ts>)
 // Round 0 is the schedule; rounds 1 and 2 re-run only the slots every earlier round lost to infrastructure (PREREGISTRATION section 11).
 // It resumes from the log (slot + round), so it is safe to start again after any stop. It stops, mechanically, for the operator rules of
 // section 18 and section 12; each stop has its own exit code:
 //   0 round complete   10 pilot done (owner review)   11 usage-missing / source-mutated / invalid:* (owner ruling)
-//   12 three consecutive infra attempts (owner ruling)   3 subscription usage limit (attempt marked, nothing scored; start again later)
+//   12 three consecutive infra attempts (owner ruling)   3 subscription usage limit (attempt voided, nothing scored; start again later)
 //   2 refused (freeze, lock, round, pin)   1 error
 // It refuses to start any slot before the freeze line in the log header, and while the pre-registration differs from the latest freeze.
+// An owner-stop row (usage-missing / source-mutated / invalid:*) that classifies as infra is still an infra attempt: after the stop, a new
+// start retries that slot (frozen behaviour, section 12); one that classifies as a task failure is scored and the slot stands.
+// The log is append-only. A subscription usage limit is recorded by APPENDING a void row after the attempt's row, tagged
+// `measured round <r> void <ts of the attempt row>` with the same arm / task / trial / attempt; every count (budget, streak, slots) skips the
+// attempt a void row names. If the driver dies between the attempt row and its void row, that attempt counts as a normal one until the gap is
+// repaired by hand: find the attempt's `ts` in the log and run `bun evals/ab/run-baseline.ts --void <ts>` (or append the void row yourself).
+// A deadline kill (exit `timeout`) is never voided as a usage limit: the deadline is ours, not the subscription's.
 // Maintainer-only and paid: every attempt is a real Opus session. Never part of `bun test` or the gate.
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { taskFile } from "./build-slots.ts";
 import { loadArm } from "./lib/arm.ts";
 import { loadTask } from "./lib/grade.ts";
-import { docSha256, isInfraRow, latestFreeze, measuredTag, parseTag, readFreezes, readRows, type LogRow } from "./lib/log.ts";
+import { freezeProblem, isInfraRow, liveRows, measuredTag, parseTag, readRows, voidTag, voidIndex, type LogRow } from "./lib/log.ts";
 import { runProtocolTrial } from "./lib/protocol.ts";
-import { DEFAULT_LOG } from "./lib/record.ts";
+import { appendRow, DEFAULT_LOG } from "./lib/record.ts";
 import { isInfra, MAX_RETRIES, type AttemptClass } from "./lib/retry.ts";
 import { ArmRefused, PinRefused, runTrial } from "./lib/trial.ts";
 import type { SlotKey } from "./lib/validity.ts";
@@ -50,21 +59,8 @@ export type Result = { stop: StopKind; message: string; ran: Ctx[] };
 const slotName = (s: SlotKey) => `${s.arm} ${s.task} #${s.trial}`;
 const sameSlot = (r: LogRow, s: SlotKey) => r.arm === s.arm && r.task === s.task && r.trial === s.trial;
 
-/** The freeze preflight, before every slot: a freeze line exists, its instant has passed, and the pre-registration still has its hash. */
-export function freezeProblem(d: Pick<Deps, "log" | "prereg" | "now">): string | undefined {
-  const f = latestFreeze(readFreezes(d.log));
-  if (!f) return `no freeze line in the header of ${d.log}: no measured slot may start`;
-  if ((d.now ?? Date.now)() < Date.parse(f.ts)) return `the freeze is recorded for ${f.ts}, which has not happened yet`;
-  const now = docSha256(d.prereg);
-  if (now !== f.sha256) return `${path.basename(d.prereg)} is ${now}, but the latest freeze line (${f.ts}) records ${f.sha256}: it changed after the freeze, or the superseding freeze is not recorded yet`;
-  return undefined;
-}
-
-/** Measured, unmarked rows of the log, in run order: the only rows that count toward budgets, resume and the infra streak. */
-const countedRows = (log: string): LogRow[] => readRows(log).filter((r) => {
-  const t = parseTag(r.tag);
-  return t.kind === "measured" && !t.usageLimit;
-});
+/** Measured, un-voided rows of the log, in run order: the only rows that count toward budgets, resume and the infra streak. */
+const countedRows = (log: string): LogRow[] => liveRows(readRows(log));
 const roundOf = (r: LogRow) => (parseTag(r.tag) as { round: number }).round;
 
 type SlotState = { scored: boolean; infra: number };
@@ -93,15 +89,19 @@ export function pendingSlots(rows: LogRow[], schedule: SlotKey[], round: number)
   return out;
 }
 
-/** Rewrite the tag of the attempt's own row (the last row it appended) to carry the usage-limit mark. */
-export function markUsageLimit(log: string, ctx: Ctx): void {
-  const from = `| ${ctx.tag} | ${ctx.slot.arm} | `;
-  const text = fs.readFileSync(log, "utf8");
-  const at = text.lastIndexOf(from);
-  const lineStart = text.lastIndexOf("\n", at) + 1;
-  const cells = text.slice(lineStart, text.indexOf("\n", at) < 0 ? text.length : text.indexOf("\n", at));
-  if (at < 0 || !new RegExp(`\\| ${ctx.slot.task} \\| ${ctx.slot.trial} \\| ${ctx.attempt} \\|`).test(cells)) throw new Error(`no row of ${slotName(ctx.slot)} attempt ${ctx.attempt} tagged "${ctx.tag}" to mark`);
-  fs.writeFileSync(log, text.slice(0, at) + `| ${measuredTag(ctx.round, true)} | ${ctx.slot.arm} | ` + text.slice(at + from.length));
+/** Append the void row of an attempt row (never edits the log): same arm / repo / task / trial / attempt, the attempt's `ts` in its tag. */
+export function appendVoid(log: string, attempt: LogRow): void {
+  const t = parseTag(attempt.tag);
+  if (t.kind !== "measured") throw new Error(`row ${attempt.ts} is not a measured attempt (tag ${JSON.stringify(attempt.tag)})`);
+  appendRow(log, { tag: voidTag(t.round, attempt.ts), arm: attempt.arm, repo: attempt.repo, task: attempt.task, trial: attempt.trial, attempt: attempt.attempt, graders: "void", tokens: null, costUsd: null, wallS: 0, exit: "void: usage-limit", pins: {}, raw: {}, passed: false });
+}
+
+/** The row the attempt just appended: the last measured row of this slot, round and attempt. */
+function rowOfAttempt(log: string, ctx: Ctx): LogRow {
+  const mine = readRows(log).filter((r) => r.tag === ctx.tag && r.arm === ctx.slot.arm && r.task === ctx.slot.task && r.trial === ctx.slot.trial && r.attempt === ctx.attempt);
+  const last = mine.at(-1);
+  if (!last) throw new Error(`no row of ${slotName(ctx.slot)} attempt ${ctx.attempt} tagged "${ctx.tag}" to void`);
+  return last;
 }
 
 export async function runBaseline(round: number, d: Deps): Promise<Result> {
@@ -132,9 +132,10 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
       say(`round ${round}: ${slotName(slot)} attempt ${attempt}`);
       const out = await d.run(ctx);
       ran.push(ctx);
-      if (out.cls !== "ok" && isUsageLimit(out.terminal)) {
-        markUsageLimit(d.log, ctx);
-        return stop("usage-limit", `subscription usage limit on ${slotName(slot)} attempt ${attempt}: the attempt is marked, nothing was scored; start again later (the slot re-runs from this attempt)`);
+      // only a run that ended on its own can be a usage limit; a deadline kill (exit timeout) is ours and is scored as the amendment says
+      if (out.cls !== "ok" && out.exit !== "timeout" && isUsageLimit(out.terminal)) {
+        appendVoid(d.log, rowOfAttempt(d.log, ctx));
+        return stop("usage-limit", `subscription usage limit on ${slotName(slot)} attempt ${attempt}: the attempt is voided (void row appended), nothing was scored; start again later (the slot re-runs from this attempt)`);
       }
       streak = isInfra(out.cls) ? streak + 1 : 0;
       if (OWNER_STOP.test(out.exit)) return stop("owner", `${slotName(slot)} ended ${out.exit.split(":")[0]}: this needs an owner ruling (PREREGISTRATION section 12); start again to let the slot stand as not-passed and continue`);
@@ -146,13 +147,32 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
   return stop("done", `round ${round} complete`);
 }
 
-/** One trial at a time, enforced across processes: the lock file is created exclusively and removed when the run ends. */
-export async function withLock<T>(lock: string, fn: () => Promise<T>): Promise<T> {
-  let fd: number;
+/** The lock lives in the OS temp dir (never beside the log in docs/), one per log path. */
+export const lockPathFor = (log: string): string => path.join(os.tmpdir(), `ab-baseline-${createHash("sha1").update(path.resolve(log).toLowerCase()).digest("hex").slice(0, 12)}.lock`);
+const pidAlive = (pid: number): boolean => {
   try {
-    fd = fs.openSync(lock, "wx");
-  } catch {
-    throw new Refused(`${lock} exists: another driver is running (or died; delete the file if no driver runs)`);
+    process.kill(pid, 0);
+    return true;
+  } catch (e) {
+    return (e as NodeJS.ErrnoException).code === "EPERM";
+  }
+};
+
+/** One trial at a time, enforced across processes: the lock file holds the owner's pid, is created exclusively and removed when the run ends. A lock whose pid is dead is stale: removed with a note. */
+export async function withLock<T>(lock: string, fn: () => Promise<T>, note: (line: string) => void = (l) => console.error(l)): Promise<T> {
+  let fd: number | undefined;
+  for (let tries = 0; fd === undefined; tries++) {
+    try {
+      fd = fs.openSync(lock, "wx");
+    } catch {
+      const pid = Number(fs.existsSync(lock) ? fs.readFileSync(lock, "utf8").trim() : NaN);
+      if (tries === 0 && Number.isInteger(pid) && pid > 0 && !pidAlive(pid)) {
+        note(`note: removed a stale lock ${lock} (pid ${pid} is not running)`);
+        fs.rmSync(lock, { force: true });
+        continue;
+      }
+      throw new Refused(`${lock} is held by pid ${Number.isFinite(pid) ? pid : "?"}: another driver is running`);
+    }
   }
   try {
     fs.writeSync(fd, String(process.pid));
@@ -181,6 +201,18 @@ if (import.meta.main) {
   const flag = (n: string) => (argv.indexOf(`--${n}`) >= 0 ? argv[argv.indexOf(`--${n}`) + 1] : undefined);
   try {
     const log = path.resolve(flag("log") ?? DEFAULT_LOG);
+    const voidTs = flag("void");
+    if (voidTs !== undefined) {
+      await withLock(lockPathFor(log), async () => {
+        const rows = readRows(log);
+        const target = rows.find((r) => r.ts === voidTs && parseTag(r.tag).kind === "measured");
+        if (!target) throw new Refused(`no measured attempt row stamped ${voidTs} in ${log}`);
+        if (voidIndex(rows).voided.has(target)) throw new Refused(`the attempt stamped ${voidTs} is already voided`);
+        appendVoid(log, target);
+        console.log(`run-baseline: void row appended for ${target.arm} ${target.task} #${target.trial} attempt ${target.attempt} (${voidTs})`);
+      });
+      process.exit(0);
+    }
     const deps: Deps = {
       log,
       prereg: path.resolve(flag("prereg") ?? path.join(AB, "PREREGISTRATION.md")),
@@ -188,7 +220,7 @@ if (import.meta.main) {
       run: realRun(path.resolve(flag("tasks") ?? path.join(AB, "tasks")), log),
       say: (l) => console.log(l),
     };
-    const r = await withLock(`${log}.lock`, () => runBaseline(Number(flag("round") ?? 0), deps));
+    const r = await withLock(lockPathFor(log), () => runBaseline(Number(flag("round") ?? 0), deps));
     console.log(`run-baseline: ${r.stop}: ${r.message} (${r.ran.length} attempt(s) this start)`);
     process.exit(EXIT_CODE[r.stop]);
   } catch (e) {

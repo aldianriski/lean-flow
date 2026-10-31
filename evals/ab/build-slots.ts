@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Result, Slot } from "./lib/analyze.ts";
-import { analysisArm, isInfraRow, latestFreeze, parseTag, readFreezes, readRows, type LogRow } from "./lib/log.ts";
+import { analysisArm, isInfraRow, latestFreeze, parseTag, readFreezes, readRows, voidIndex, type LogRow } from "./lib/log.ts";
 import { MAX_RETRIES } from "./lib/retry.ts";
 import type { SlotKey } from "./lib/validity.ts";
 import { DEFAULT_LOG } from "./lib/record.ts";
@@ -42,7 +42,8 @@ export function resultOf(r: LogRow): Result {
   };
 }
 
-export type Built = { slots: Slot[]; findings: string[]; notes: string[] };
+/** `voidedUsd`: notional spend of the voided (usage-limit) attempts, reported as its own line of the total spend and in no D5 or scored figure. */
+export type Built = { slots: Slot[]; findings: string[]; notes: string[]; voidedUsd: number };
 
 /**
  * `schedule` is only used to attach the scheduled repo to a row (and to name an unscheduled slot, which the analysis then rules INVALID);
@@ -54,7 +55,7 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
   const bad = rows.filter((r) => parseTag(r.tag).kind === "other");
   if (bad.length > 0) throw new BuildRefused(`${bad.length} row(s) carry a tag that is neither "measured round <r>" nor smoke, first: ${JSON.stringify(bad[0]!.tag)} (${bad[0]!.arm} ${bad[0]!.task} #${bad[0]!.trial})`);
   const measured = rows.filter((r) => parseTag(r.tag).kind === "measured");
-  const smoke = rows.length - measured.length;
+  const smoke = rows.filter((r) => parseTag(r.tag).kind === "smoke").length;
   if (measured.length === 0) throw new BuildRefused(`no measured rows: ${smoke} smoke row(s) are not measurements`);
   if (smoke > 0) notes.push(`${smoke} smoke row(s) skipped`);
   if (freezeTs !== undefined) {
@@ -62,10 +63,12 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
     if (early.length > 0) throw new BuildRefused(`${early.length} measured row(s) predate the freeze ${freezeTs}, first at ${early[0]!.ts}`);
   }
 
-  // usage-limit-marked attempts leave the retry budget, the consecutive-infra counter and the infra share: they are dropped here
-  const kept = measured.filter((r) => !(parseTag(r.tag) as { usageLimit: boolean }).usageLimit);
-  const limited = measured.filter((r) => !kept.includes(r));
-  if (limited.length > 0) notes.push(`${limited.length} usage-limit attempt(s) excluded (their cost, ${limited.reduce((n, r) => n + (r.costUsd ?? 0), 0).toFixed(4)} USD, is in no figure)`);
+  // an attempt a usage limit cut short is voided by an appended void row: it leaves the retry budget, the consecutive-infra counter and the infra share
+  const { voided, orphans } = voidIndex(rows);
+  for (const v of orphans) findings.push(`void row at ${v.ts} (${v.arm} ${v.task} #${v.trial} attempt ${v.attempt}) names ${JSON.stringify((parseTag(v.tag) as { ts: string }).ts)}, which is no measured row of that attempt`);
+  const kept = measured.filter((r) => !voided.has(r));
+  const voidedUsd = [...voided].reduce((n, r) => n + (r.measure?.exec.costUsd ?? r.costUsd ?? 0), 0);
+  if (voided.size > 0) notes.push(`${voided.size} usage-limit attempt(s) voided (their cost, ${voidedUsd.toFixed(4)} USD, is reported apart from every figure)`);
 
   const groups = new Map<string, LogRow[]>();
   for (const r of kept) {
@@ -116,7 +119,7 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
     const infraCostUsd = g.filter(isInfraRow).reduce((n, r) => n + (Number.isFinite(r.measure!.exec.costUsd) ? r.measure!.exec.costUsd : 0), 0);
     slots.push({ arm: analysisArm(head.arm), repo, task: head.task, trial: head.trial, symptoms, first, final, infraCostUsd });
   }
-  return { slots, findings, notes };
+  return { slots, findings, notes, voidedUsd };
 }
 
 if (import.meta.main) {
@@ -133,7 +136,7 @@ if (import.meta.main) {
       console.error(`build-slots: ${built.findings.length} finding(s); nothing written`);
       process.exit(1);
     }
-    const text = JSON.stringify(built.slots, null, 1);
+    const text = JSON.stringify({ slots: built.slots, voidedUsd: built.voidedUsd }, null, 1);
     if (flag("out")) fs.writeFileSync(path.resolve(flag("out")!), text);
     else console.log(text);
     const lost = built.slots.filter((s) => s.first === null).length;

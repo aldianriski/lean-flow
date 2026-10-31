@@ -154,8 +154,9 @@ Source `evals/ab/lib/retry.ts`. An attempt is exactly one of: `ok`, `task-failur
 "api error" in the terminal evidence), `network` (ECONNRESET, ETIMEDOUT, DNS and similar), `sandbox-before-action`. Only the
 terminal evidence classifies; task prose, tool output and recovered earlier retries never do. **Infra failures retry at most
 `MAX_RETRIES = 2` times (3 attempts); only the first non-infra attempt is scored; a task failure is never retried** (`retry.ts:9`).
-A trial killed at the whole-trial limit (section 18, Amendment 1) is classified by the kill alone, never by stderr text: killed after the
-agent's first action (in any phase) = `task-failure`; killed before it = `infra:harness-crash`.
+A trial killed at the whole-trial limit (section 18, Amendment 1) is classified by exactly the rules above, unchanged: a kill leaves no
+result event, so it is `infra:harness-crash` when the agent had not acted, an infra kind when the terminal evidence names one, and
+otherwise `task-failure`. Only the exit label is new (section 12).
 
 ## 11. Run validity and slot replacement
 
@@ -211,7 +212,7 @@ never mixed across rounds. Within one slot and round the attempts run in order a
 | `g2-refused: scope\|policy: ...` | A1 | `task-failure` | scored **not-passed**; graders `not-run:g2-refused`; not retried, not replaced |
 | `scope-breach: <files>` | A1 | `task-failure` | scored **not-passed** (graders ran and are recorded, but the business verdict is Unknown); not retried, not replaced |
 | `cli-error: exit N, <reason>` | both | by terminal evidence: `infra:api-error`, `infra:network`, `infra:sandbox-before-action`, or `infra:harness-crash` (no result event and no action) when the evidence says so; otherwise `task-failure` | infra: **retry up to twice, then replace**; task-failure: scored not-passed |
-| `timeout` (Amendment 1) | both | `task-failure` when the agent had acted (any phase) before the kill; `infra:harness-crash` when it had not | task-failure: scored **not-passed**, not retried, not replaced, no owner stop; graders `not-run:timeout`, all three judges Unknown (`not-run: timeout`); the usage the phases reported is kept and the total is flagged incomplete (section 9). Infra (kill before the first action): retried up to twice, then replaced |
+| `timeout` (Amendment 1) | both | by the same evidence, unchanged: `task-failure` for a run killed after it acted (the usual case), `infra:harness-crash` for one killed before its first action, an infra kind if the terminal evidence names one | task-failure: scored **not-passed**, not retried, not replaced, no owner stop; graders `not-run:timeout`, all three judges Unknown (`not-run: timeout`); the usage the phases reported is kept and the total is flagged incomplete (section 9). Infra (kill before the first action): retried up to twice, then replaced |
 | `usage-missing` | both | by the same evidence (usually `task-failure`) | the row is logged and scored like any non-ok exit; **owner-ruling stop**: `run-trial.ts` prints "STOP ... needs an owner ruling" and the record text says the trial stops for one, so the operator halts the run at the first such row |
 | `source-mutated: <files>` | both | by the same evidence (usually `task-failure`) | integrity failure of the frozen snapshot; **owner-ruling stop** as above; scored not-passed if the run is allowed to stand |
 | `invalid: <reasons>` (a model outside the allowed set, a plugin other than the pinned one, init cwd not the trial copy, no init event) | both | by the same evidence (usually `task-failure`) | **owner-ruling stop** as above; scored not-passed if the run is allowed to stand |
@@ -380,7 +381,8 @@ hashed; a change to a rule this document restates (a threshold, a constant, the 
 
 ## Amendment 1 (2026-10-31, before any trial)
 
-What changed: a **45-minute whole-trial time limit** and the `timeout` exit with its scoring (sections 10, 12, 18). Nothing else in this
+What changed: a **45-minute whole-trial time limit** and the `timeout` exit label, which wins over `usage-missing` (and loses to
+`source-mutated`) for a killed run, with graders and judges not run (sections 10, 12, 18). The retry classification is unchanged. Nothing else in this
 document changed except section 19's hashes (this file's own sha256 is, as before, not inside it).
 
 Why: the freeze of the first version did not state any trial time limit. The harness then in place killed a trial (and each D9 protocol
@@ -392,5 +394,6 @@ task's failure, a run killed before it acted is infra.
 
 The operator procedure of section 18 (pilot pause, usage-limit pause, the 3-infra abort) and the owner-ruling stops of section 12 are
 run mechanically by `bun evals/ab/run-baseline.ts`, and its attempts become slots through `bun evals/ab/build-slots.ts` (section 11).
-Neither adds a rule; a usage-limit attempt is marked `measured round <r> usage-limit` in its tag and the builder leaves it out of every
-attempt count.
+Neither adds a rule. A usage-limit attempt is voided by an appended void row (`measured round <r> void <ts of the attempt row>`; the log is
+never edited) and the builder leaves the voided attempt out of every attempt count; its notional spend is reported as its own line of the
+total spend and in no scored or D5 figure. A deadline kill is never voided as a usage limit.

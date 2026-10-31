@@ -34,10 +34,6 @@ export type AttemptEvidence = {
   stream?: Stream | undefined;
   /** the finished attempt's own verdict word: "ok" or any task-level exit */
   exit?: string | undefined;
-  /** the trial was killed at its whole-trial deadline (Amendment 1): classified by the kill alone, never by stderr noise */
-  timedOut?: boolean | undefined;
-  /** the agent acted in ANY phase of the trial; defaults to the stream's own first action */
-  acted?: boolean | undefined;
 };
 
 /**
@@ -67,8 +63,6 @@ function terminalEvidence(a: AttemptEvidence): string {
  */
 export function classifyAttempt(a: AttemptEvidence): AttemptClass {
   if (a.thrown !== undefined) return "infra:harness-crash";
-  // a killed run: mid-work is the task's failure, a kill before the first action is a harness crash (section 10, Amendment 1)
-  if (a.timedOut) return (a.acted ?? (a.stream ? firstActionSeen(a.stream) : false)) ? "task-failure" : "infra:harness-crash";
   const s = a.stream;
   const res = s?.result;
   const errored = a.raw ? a.raw.exitCode !== 0 || !!res?.is_error || !res : !!res?.is_error || !res;

@@ -134,7 +134,7 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   };
   let cls: AttemptClass | undefined;
   if (o.measure) {
-    cls = classifyAttempt({ thrown, raw, stream, exit, timedOut: raw.timedOut });
+    cls = classifyAttempt({ thrown, raw, stream, exit });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol -> trial would otherwise cycle
     const { realJudge } = await import("./protocol.ts");
     row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams: [stream], exit, cls, judge: o.measure.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
