@@ -163,3 +163,12 @@ the wave-3 popup.
 ### 2026-10-31 | scope-change | T8: depends on T3 (shared init reference)
 The preflight found T8 shares the init reference with T2 and T3 with no ownership edge, and the plan check found T8's text
 naming T3. T8's Depends-on becomes T3 (already done), giving the chain T2 then T3 then T8 on that file.
+
+### 2026-10-31 | progress | wave 3 G2 signed (T4, T5, T8 together; T6 after its builder check)
+builder-check · T4 · 0 contradictions · 2 questions · factual, settled: template-vue is the positive case (compass is Nuxt; the Done when allows either), talixa-hris is React + Vite, every question is a conventions-in-use topic
+builder-check · T5 · 4 contradictions · 3 questions · settled: an example env file is dropped as Postgres evidence (init never opens env files; a driver or a compose image suffices); the fixture is written fresh in D:\Research by the builder and copied to the VPS; no compile is needed, so Go is not installed on the VPS
+builder-check · T8 · 6 contradictions · 1 questions · settled: the existing-docs check and the migrate offer are their own popup right after the set announcement, before step 2 writes; continue mode writes absent files only and never fills sections of existing files; .claude/CLAUDE.md is skipped beside a root CLAUDE.md; a docs folder counts when it holds a markdown file
+Owner rulings by popup: wave 3 G2 signed for T4, T5 and T8; the Vue set takes its seven topics plus the three React extras
+(env and config, component test level, UI error handling); the Go/chi and Postgres sets as listed; T6's preserve inventory
+is every ADR file, every DECISIONS row, every PRD or requirements file and every epic Closed-when line. The profiles index is
+coordinator-owned (T4 and T5 report their index lines).
