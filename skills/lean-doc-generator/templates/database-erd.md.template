@@ -15,13 +15,13 @@ status: current
 > source of truth. The actual migration files are canonical; if this diagram and a migration
 > disagree, the migration wins and this doc is stale.
 
-## Diagram [CUSTOMIZE]
-<!-- Belongs: only relations the migrations do not make obvious (polymorphic, soft links, cross-
-     service references). Does not belong: every table and column — the migration files list them. -->
+## Diagram [CUSTOMIZE — optional]
+<!-- Illustrative only, and optional: the table below is the one home for non-obvious relations.
+     Draw nothing the migrations already show; no cardinality — it lives in the migrations. -->
 
 ```mermaid
 erDiagram
-    [ENTITY_ONE] ||--o{ [ENTITY_TWO] : "[non-obvious relationship, and why]"
+    [ENTITY_ONE] }|..|{ [ENTITY_TWO] : "[non-obvious relationship, and why]"
 ```
 
 ## Main entities [CUSTOMIZE]

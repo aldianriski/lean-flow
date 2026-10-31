@@ -16,9 +16,9 @@ status: current
 
 ## Integrations [CUSTOMIZE]
 
-| Service | Purpose | Direction | Auth method | Failure mode |
+| Service | Purpose | Direction | Credential owner / rotation | Failure mode |
 |:--------|:--------|:----------|:-------------|:--------------|
-| `[service name]` | [why this system depends on it] | [inbound/outbound/both] | [e.g. API key, OAuth, mTLS] | [what happens when it's unreachable — retry, degrade, hard-fail] |
+| `[service name]` | [why this system depends on it] | [inbound/outbound/both] | [who owns the credential and how it is rotated — not the auth scheme the code shows] | [what happens when it's unreachable — retry, degrade, hard-fail] |
 
 ## Webhook / event conventions [CUSTOMIZE]
 - Inbound webhooks: [only what the code does not show — e.g. the trust assumption behind verifying them].

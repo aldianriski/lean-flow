@@ -15,10 +15,10 @@ status: current
 > implementation. Policy → `SECURITY.md`.
 
 ## Authentication model [CUSTOMIZE]
-- Who verifies identity: [e.g. an identity provider, this service's own auth module]
+- Why identity is verified where it is: [the choice, and the constraint behind it]
 - Why this scheme: [the credential scheme in use, and the constraint that led to it]
-- Session/token shape: [e.g. short-lived JWT + refresh token; opaque session id] — concept only,
-  never the signing secret or implementation.
+- Why this session/token shape: [the choice and its constraint] — concept only, never the signing
+  secret or implementation.
 
 ## Authorization model [CUSTOMIZE]
 

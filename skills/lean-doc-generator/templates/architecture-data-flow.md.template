@@ -40,4 +40,4 @@ flowchart LR
 | [path name] | [a hop the code does not make obvious (async, cross-service) and why it is there] | [store touched, or "none"] |
 | [path name] | [non-obvious hop, and why] | [store touched, or "none"] |
 
-Full component map → `architecture/overview.md`.
+Why the code is split as it is → `docs/architecture/overview.md` § Why this split.

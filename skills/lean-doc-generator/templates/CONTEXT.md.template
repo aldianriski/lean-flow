@@ -13,7 +13,7 @@ status: current
 ## Where the rest lives
 Stack and architecture → `docs/architecture/overview.md`. Conventions in use →
 `docs/development/coding-standards.md` § Conventions in use (when the repo has code). Patterns this
-project rejects → `CLAUDE.md` § Anti-Patterns. Not repeated here.
+project rejects → `.claude/CLAUDE.md` § Anti-Patterns (Avoid). Not repeated here.
 
 ## Domain Glossary [CUSTOMIZE]
 <!-- Only terms specific to THIS project's domain. General programming concepts (timeout, retry,
