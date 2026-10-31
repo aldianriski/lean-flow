@@ -157,6 +157,8 @@ terminal evidence classifies; task prose, tool output and recovered earlier retr
 A trial killed at the whole-trial limit (section 18, Amendment 1) is classified by exactly the rules above, unchanged: a kill leaves no
 result event, so it is `infra:harness-crash` when the agent had not acted, an infra kind when the terminal evidence names one, and
 otherwise `task-failure`. Only the exit label is new (section 12).
+A failure to provision the trial environment (Amendment 2) is `infra:sandbox-before-action`, set by the harness whatever the error text
+says: the sandbox failed before the agent's first action, no agent call was made, and the attempt is never scored.
 
 ## 11. Run validity and slot replacement
 
@@ -197,7 +199,9 @@ never mixed across rounds. Within one slot and round the attempts run in order a
   is produced inside the trial, so it cannot be pre-signed; it is signed under the owner's eval-only exception D9**, by a blind
   isolated signer with the policy, verbatim: `approve as written unless the design leaves task scope`
   (`POLICY`, `evals/ab/lib/protocol.ts:21`), plus a mechanical check that the design's `Files:` are inside the task's allowed
-  layers. A refusal ends the trial (`g2-refused`). The row records the deviation text `D9 eval-only G2 exception -- never applies to
+  layers (a layer that names a directory of the snapshot covers every file under it; a file layer matches that file only; Amendment 2).
+  **A first refusal, mechanical or policy, is fed back to the same session once and the agent revises its design (Amendment 2); the
+  revised design is checked again; a second refusal ends the trial (`g2-refused`).** The row records the deviation text `D9 eval-only G2 exception -- never applies to
   product runs` (`protocol.ts:18`). The signer model is pinned independent of the arm: `claude-sonnet-5-5` (`protocol.ts:20`).
 - A0 receives the plain task prompt and no lean-flow loop.
 - **Any other popup a trial raises is parked and the trial is scored not-passed**, with the parked tool and input recorded. A
@@ -209,7 +213,8 @@ never mixed across rounds. Within one slot and round the attempts run in order a
 |---|---|---|---|
 | `ok` | both | `ok` | scored; passes iff every grader passes and the business judge says PASS; all three judges ran |
 | `parked: popup <tool>: ...` | A1 | `task-failure` (a CLI that ended cleanly) | scored **not-passed**; graders `not-run:parked`; not retried, not replaced |
-| `g2-refused: scope\|policy: ...` | A1 | `task-failure` | scored **not-passed**; graders `not-run:g2-refused`; not retried, not replaced |
+| `g2-refused: scope\|policy: ...` | A1 | `task-failure` | scored **not-passed**; graders `not-run:g2-refused`; not retried, not replaced. Only a SECOND refusal (after the one revise round) produces this exit; the reason is the second refusal's |
+| `provision-failed: <step>: ...` (Amendment 2) | both | `infra:sandbox-before-action`, always | **never scored**; graders `not-run:provision-failed`, judges Unknown; no agent call was made; retried up to twice, then replaced |
 | `scope-breach: <files>` | A1 | `task-failure` | scored **not-passed** (graders ran and are recorded, but the business verdict is Unknown); not retried, not replaced |
 | `cli-error: exit N, <reason>` | both | by terminal evidence: `infra:api-error`, `infra:network`, `infra:sandbox-before-action`, or `infra:harness-crash` (no result event and no action) when the evidence says so; otherwise `task-failure` | infra: **retry up to twice, then replace**; task-failure: scored not-passed |
 | `timeout` (Amendment 1) | both | by the same evidence, unchanged: `task-failure` for a run killed after it acted (the usual case), `infra:harness-crash` for one killed before its first action, an infra kind if the terminal evidence names one | task-failure: scored **not-passed**, not retried, not replaced, no owner stop; graders `not-run:timeout`, all three judges Unknown (`not-run: timeout`); the usage the phases reported is kept and the total is flagged incomplete (section 9). Infra (kill before the first action): retried up to twice, then replaced |
@@ -267,7 +272,8 @@ of each run must list exactly the pinned plugin.
 identical for A0 and A1 of that repo** (the lists are built from `inventory.json` `allow.common` + `allow.<repo>` by the repo name
 in the arm id, so the two arms cannot differ). Drafted from each repo's grader commands (`task.json`), its package scripts, `go`
 tooling, and the read-plus-commit git and file commands the lean-flow 2.19.1 skills tell an agent to run. No blanket `Bash(*)`;
-no `git push`; no `git worktree`. Signature of the owner on this section is signature of the lists.
+no `git push`; no `git worktree`. Signature of the owner on this section is signature of the lists. The trial environment of Amendment 2
+(Node 24 first on the path, the database variables) is the same for both arms and adds nothing to the lists.
 
 Common to both repos:
 
@@ -342,7 +348,10 @@ is in the common list because the protocol's first call is a Skill call that oth
 - **Whole-trial time limit (Amendment 1): 45 minutes** of wall time per trial, identical for A0 and A1 (`TRIAL_TIMEOUT_MS`,
   `lib/run.ts`). It covers every phase of the trial: A1's phase 1, the G2 signer and the build phase share the one deadline, each call
   receives the time left, and the signer's own 180 s cap never extends it. A trial past it is killed and exits `timeout` (section 12).
-  A trial that is still running is never scored on a partial result.
+  A trial that is still running is never scored on a partial result. **The clock starts after provisioning (Amendment 2):** the time
+  spent building the trial environment is outside the 45 minutes and is recorded per attempt as setup wall time (`measure.setupWallS`).
+  A voided attempt may also be an owner-ruled harness defect (`run-baseline.ts --void <ts> --reason "<text>"`, Amendment 2), recorded as
+  `void: owner-ruled: <text>`; it leaves every count exactly as a usage-limit void does, and its slot re-runs from round 0.
 - Notional `cost-usd` is reported per run; **there is no dollar cap**.
 - No trial runs on an A/B repo or a task-set task before this document's hash is recorded (R-c). The log before the freeze line
   holds only rows tagged `smoke -- not a measurement`, on `evals/ab/fixtures/smoke-repo`.
@@ -397,3 +406,56 @@ run mechanically by `bun evals/ab/run-baseline.ts`, and its attempts become slot
 Neither adds a rule. A usage-limit attempt is voided by an appended void row (`measured round <r> void <ts of the attempt row>`; the log is
 never edited) and the builder leaves the voided attempt out of every attempt count; its notional spend is reported as its own line of the
 total spend and in no scored or D5 figure. A deadline kill is never voided as a usage limit.
+
+## Amendment 2 (2026-10-31, after the pilot, before any further trial)
+
+What changed, four owner rulings (A-D) and one builder-found item (E), all in the trial harness' behaviour; each is stated here before any
+trial under it runs:
+
+- **A. Trial environment.** Every trial, both arms identically, is provisioned **before its 45-minute clock starts**; the provisioning
+  time is outside the deadline and is recorded per attempt as setup wall time (`measure.setupWallS`). The environment is the one the
+  task authors used (their BRIEF.md Setup section and the clinic README): Node 24 (`D:\Research\ab-tools\node24\bin`) first on the path
+  for the agent AND the graders (the host's own Node is 22.22.3; workdoo needs 24.16 or later); dependencies installed from the lockfile
+  (`npm ci --prefer-offline` from the shared cache `D:/cache/npm`; workdoo at the repo root, clinic in `web/`); Go caches on D:
+  (`GOCACHE=D:/cache/go`, `GOMODCACHE=D:/cache/gomod`); and for clinic its OWN fresh Postgres cluster per trial (`initdb` into the
+  trial's isolation directory, a free port, databases `clinic` and `clinic_test` created and migrated with `go run ./cmd/migrate`),
+  exported to the agent and the graders as `DATABASE_URL` (the `clinic_test` database, which `go test` and the web gateway test use)
+  plus `PGHOST`, `PGPORT`, `PGUSER`. The cluster is stopped and removed after grading, also on a kill, a timeout or an error. The
+  repo kind is read from the trial copy's lockfiles, not from the arm, so the two arms of a repo cannot differ; a copy with neither
+  lockfile (the smoke fixture) is provisioned with nothing. A provisioning failure is `infra:sandbox-before-action` (section 10), exit
+  `provision-failed: <step>: ...` (section 12): no agent call, never scored, retried up to twice, then replaced. Installed
+  `node_modules` are not part of the manifest diff of what the agent changed.
+- **B. Directory layers.** A task layer that names a directory existing in the snapshot (or ending in `/`) matches every file under that
+  directory, in the D9 G2 mechanical scope check and in the post-run `scope-breach` check alike; a file layer matches exactly that file.
+  The refusals of `..` segments and absolute paths in a design's `Files:` are kept.
+- **C. One G2 revise round (changes the owner's D9 ruling, by the owner).** When the first G2 check of a design is refused, by the
+  mechanical scope check or by the policy signer, the refusal reason is fed back to the same session once
+  (`revisePrompt`, `lib/protocol.ts`); the agent revises its design; the revised design is checked again; a second refusal ends the trial
+  as `g2-refused` (scored exactly as before, with the second refusal's reason; the row's `g2.firstRound` keeps the first check). The
+  revise call and the second signer call share the one 45-minute deadline of Amendment 1; a revise call killed at the deadline is a
+  `timeout`. The policy text and the signer model are unchanged.
+- **D. Voids for owner-ruled harness defects.** `run-baseline.ts --void <ts> --reason "<text>"` appends a void row
+  (`measured round <r> void <ts>`) whose exit is `void: owner-ruled: <text>`; without `--reason` the void is the usage-limit one, as
+  before. A voided attempt leaves the retry budget, the consecutive-infra counter and every slot count, and its notional cost is reported
+  apart from every figure (build-slots names both kinds). A slot whose only attempts are voided re-runs from round 0 as attempt 1, as
+  if never run. The four pilot rows (log timestamps `2026-10-31T07:33:48.831Z`, `07:35:31.922Z`, `07:38:29.744Z`, `07:39:51.537Z`) are
+  voided under this rule by the coordinator, not by this amendment's commit.
+- **E. A grader frozen as `not applicable` (builder-found; the owner confirms it with this signature).** Every workdoo `task.json`
+  freezes a grader `lint` whose command is the text `not applicable`. The harness ran that text as a shell command (exit 127), so the
+  grader read `fail`, and with it `graders` in section 11 rule 2 could never be true for a workdoo slot: the pilot row at
+  `07:33:48.831Z` records `lint:fail`. The harness now neither runs nor fails such a grader and records it `not-applicable`, which
+  section 11 rule 2 already says is ignored. No task file changed.
+
+Why: the pilot (four slots, one per arm and repo; rows at the timestamps above) was the first end-to-end run of the harness on a real
+A/B task, because R-c had kept every earlier run on the fixture. Both A0 rows exited `ok` with business and convention judged PASS, yet
+every Node grader failed (`07:33:48.831Z`: typecheck, build, verify:workspace:access:api, verify:openapi, lint; `07:38:29.744Z`: go
+test, web typecheck, web lint, web test, web build), because the trial copy had no dependencies, no database and the wrong Node, which the
+agent could not run either. Both A1 rows were refused at the G2 scope check (`07:35:31.922Z`, `07:39:51.537Z`), the clinic one because the
+matcher took a layer for a directory only with a trailing slash while `task.json` writes directory layers without one, which also made
+the post-run `scope-breach` check misfire; workdoo's refusal was a real out-of-layer edit that A0 made too and paid for only in its scope
+verdict, which the revise round (C) answers. Under these conditions the pilot measured the harness, not the arms.
+
+No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, plugin pin, models, judges and their prompts, the
+allow-lists, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every other exit are as frozen. Of the
+section 19 hashes, none changes (the corpus, arms, manifests, inventory, prompts lock and schedule files are untouched); this file's own
+sha256 changes and is recorded at the owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
