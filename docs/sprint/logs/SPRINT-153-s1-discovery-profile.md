@@ -151,3 +151,11 @@ real defect: a headless run cannot list the plugin's profiles folder, so step 1c
 index file (`9e6d45d1`, scope-change above). Re-run headless on a fresh portfolio copy with that build: the park record reads
 "Question sets (step 1c): none loaded. I read the index … No question set matches this stack; scan only." and nothing but
 the park record was written. The load half (talixa-hris) is the owner's interactive run.
+
+### 2026-10-31 | scope-change | T7, T8: TASK-560 joins as T8 (init never overwrites existing docs); T7 waits for it
+What broke: T3's owner-run init on talixa-hris removed the repo's existing root CLAUDE.md and wrote a new one, losing four
+hand-written facts; init has no rule against overwriting an existing doc and never offers migrate for a repo that has docs.
+Impact: owner ruling by popup, fix in this sprint. TASK-560 is filed (P1, S, origin manual) and joins as T8 in wave 3, its
+Layers the init reference only (no file shared with T4, T5 or T6). T7 gains a dependency on T8, so the final init and /flow
+runs exercise the guard. Members, Plan and D1 change accordingly. Re-confirm G2: T8 gets its own builder check and G2 in
+the wave-3 popup.

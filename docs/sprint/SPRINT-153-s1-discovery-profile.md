@@ -35,6 +35,7 @@ TASK-489, 367, 402, 498 (blocked) · TASK-507, 523 (`needs-info`).
 - docs/work/todo/TASK-551-ship-go-chi-and-postgres-question-sets-on-a-chi-fixture.md
 - docs/work/todo/TASK-553-make-migrate-add-the-profile-and-keep-every-decision.md
 - docs/work/todo/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md
+- docs/work/todo/TASK-560-init-never-overwrites-existing-docs-and-offers-migrate.md
 
 ## Plan
 
@@ -115,16 +116,28 @@ Layers: `skills/flow/SKILL.md` · `skills/prime/SKILL.md` · `skills/lean-doc-ge
   · `docs/work/todo/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md`
   · `docs/work/in_progress/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md`
   · `docs/work/done/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md`
-Depends-on: T4 T5 T6
+Depends-on: T4 T5 T6 T8
 Cites: `TASK-554`
 
 Wave 4. Shipping is not wiring: every entry that triggers `init` or `migrate` must reach the new discovery on a real run.
 
 **Acceptance:** a real `/flow` run reaches the new discovery, and a fresh `init` on an unprofiled stack writes all seven profile topics with evidence or an explicit "not decided yet".
 
+### T8 — Make init never overwrite an existing doc, and offer migrate `[size: S · risk: high · class: decision · HITL · J2]`
+Layers: `skills/lean-doc-generator/references/init.md`
+  · `docs/work/todo/TASK-560-init-never-overwrites-existing-docs-and-offers-migrate.md`
+  · `docs/work/in_progress/TASK-560-init-never-overwrites-existing-docs-and-offers-migrate.md`
+  · `docs/work/done/TASK-560-init-never-overwrites-existing-docs-and-offers-migrate.md`
+Depends-on: none
+Cites: `TASK-560`
+
+Wave 3, joined by scope-change after T3's exercise lost four hand-written facts from an existing CLAUDE.md.
+
+**Acceptance:** init leaves every pre-existing file untouched, and on a repo that has docs it offers migrate before writing.
+
 ## Decisions (pre-locked)
 
-- **D1** — Waves: W0 = T1 · W1 = T2 · W2 = T3 · W3 = T4 ∥ T5 ∥ T6 · W4 = T7. The order is forced by shared files (the
+- **D1** — Waves: W0 = T1 · W1 = T2 · W2 = T3 · W3 = T4 ∥ T5 ∥ T6 ∥ T8 · W4 = T7. The order is forced by shared files (the
   product-requirements template, the init reference); the question sets each own one file. T4 to T6 may build in
   parallel worktrees. TASK-550, 551, 553 and 554 join with their in-sprint blockers under the dependent-pull rule.
 - **D2** — Streams: this is stream s1-discovery beside SPRINT-152 (s0-baseline). Every commit carries `sprint(153)` or
