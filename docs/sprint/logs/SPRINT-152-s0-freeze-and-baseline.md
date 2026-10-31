@@ -89,3 +89,20 @@ SPRINT-151 FAIL to PASS, 83 PASS kept, 21 FAIL kept, none PASS to FAIL. One inde
 a pre-existing gap (a CRLF line ending exactly at the depth token is never graded), not introduced here.
 consequence · T2 · behaviour:material · governance:high
 review · T2 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-10-31 | progress | T3 phase 1 built (pin, measured inventory, allow-list, judge cap and locale clause); three calibration rows re-ruled before the re-run
+Phase 1 on the builder's worktree (commits `a70c7e38`, `9a56d5cf`, not yet merged): the A1 pin copied to a durable path with
+its sha and hash unchanged; a measured inventory (Opus 5.5 session, default effort, subagents unpinned, three-model allowed
+set) apart from the smoke one; one allow-list per repo shared by A0 and A1; the judge line cap raised from 400 to 600 (the
+self-onboarding-guard store file is 518 lines after its patch); a locale clause in the business rubric. The smoke A1 run on
+the fixture repo now completes; three selftests stay red only until the new prompt lock is written in M5.
+Owner rulings by popup, each recorded before the full calibration re-run (with its reason):
+- forecast-month-end, reference scope: narrow the reference to a forecast-local helper. The judge was right that the shared
+  helper also moved the renew action's stored date and a leap-day annual case, against "only the forecast timing".
+- reissue-invitation, reference convention: clean up the reference (one shared revoke helper for both actions, no bare
+  block). The duplication the judge named was real, though minor.
+- access-activity-type-filter, reference convention: add the 14-value enum to the reference's API parameter, matching the
+  sibling closed-set parameters. The judge's doc point was right; its hardcoded-list point was not.
+- access-activity-type-filter, reference business: expectation stays PASS; the UNKNOWN is the judge declining without the
+  recorder code (all 14 types confirmed by a server grep), counted as not-passed and reported as Unknown.
+Agreement will be reported with and without these three tasks, since the references were changed after reading the judge.
