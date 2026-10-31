@@ -16,7 +16,7 @@ status: current
 <!-- Belongs: conventions the code actually follows, grouped by layer, each with the file it was
      seen in. A convention the scan could not settle goes under Not confirmed as an open question,
      never invented. Does not belong: anything a linter or formatter config enforces, or a
-     convention seen nowhere in the code. -->
+     convention seen nowhere in the code, unless the owner stated it, cited `(owner, init)`. -->
 
 **[Layer — e.g. data access]**
 - [The convention chosen, seen in `[path/to/file]`, and why — the part the code alone does not settle]
