@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-29
+last_updated: 2026-10-31
 update_trigger: An epic slice (S0-S4) promotes or closes, an A/B arm reports, or an owner ruling changes D1-D12
 status: current
 id: lean-flow-3-foundation
@@ -71,8 +71,8 @@ trimming caused the owner's symptoms. 3.0 therefore tests three hypotheses:
 
 | H | Hypothesis | Mechanism under test |
 |---|---|---|
-| H1 Specificity | Recording the repo's *non-derivable* facts (chosen conventions, invariants, domain rules, goal, non-goals, quality bar) improves outcomes on the three symptoms over 2.x | S2 discovery + profiles |
-| H2 Carry-through | Delivering those facts to the step that needs them, by resolved section pointer, improves outcomes over the same facts left in docs | S3 pointer contract |
+| H1 Specificity | Recording the repo's *non-derivable* facts (chosen conventions, invariants, domain rules, goal, non-goals, quality bar) improves outcomes on the three symptoms over 2.x | S1 discovery + profiles |
+| H2 Carry-through | Delivering those facts to the step that needs them, by resolved section pointer, improves outcomes over the same facts left in docs | S2 pointer contract |
 | H3 Expertise | Specialist briefs / reviewers / tiers / agents improve outcomes beyond H1+H2 within the cost cap | S3 candidates, admitted at S4 |
 
 A hypothesis **holds** only when (§7): the primary endpoint gains ≥ the minimum worthwhile gain, the
