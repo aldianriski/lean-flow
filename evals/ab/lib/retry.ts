@@ -13,6 +13,14 @@ export function firstActionSeen(s: Stream): boolean {
   return s.events.some((e) => e.type === "assistant" && (e.message?.content ?? []).some((b: any) => b?.type === "tool_use" || (b?.type === "text" && String(b.text ?? "").trim() !== "")));
 }
 
+/** What the CLI itself said when it ended: the result's terminal reason, its error text, and (no result event) the stderr tail. Evidence only. */
+export function terminalText(s: Stream | undefined, raw: RawRun | undefined): string {
+  const res = s?.result;
+  const parts = [String(res?.terminal_reason ?? ""), res?.is_error ? String(res.result ?? "") : ""];
+  if (!res) parts.push((raw?.stderr ?? "").split("\n").slice(-5).join("\n"));
+  return parts.filter((p) => p !== "").join("\n");
+}
+
 const API = /rate[ _-]?limit|\b429\b|overloaded|\b5(?:00|02|03|04|29)\b|api[ _]?error/i;
 const NETWORK = /ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|socket hang up|fetch failed|network (?:error|unreachable)|getaddrinfo/i;
 const SANDBOX = /sandbox/i;
@@ -26,6 +34,8 @@ export type AttemptEvidence = {
   stream?: Stream | undefined;
   /** the finished attempt's own verdict word: "ok" or any task-level exit */
   exit?: string | undefined;
+  /** the agent acted in ANY phase of the trial (protocol path); consulted only for "no result event and no first action" */
+  trialActed?: boolean | undefined;
 };
 
 /**
@@ -64,7 +74,7 @@ export function classifyAttempt(a: AttemptEvidence): AttemptClass {
   if (API.test(evidence)) return "infra:api-error";
   if (NETWORK.test(evidence)) return "infra:network";
   if (SANDBOX.test(evidence) && !acted) return "infra:sandbox-before-action";
-  if (!res && !acted) return "infra:harness-crash";
+  if (!res && !(acted || a.trialActed)) return "infra:harness-crash";
   return "task-failure";
 }
 

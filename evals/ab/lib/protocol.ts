@@ -10,9 +10,9 @@ import { isolationEnv, makeIsolation } from "./isolate.ts";
 import { detectPopups, parseStream, totalsOf, type Popup, type Totals } from "./parse.ts";
 import { verifyPin } from "./pin.ts";
 import { appendRow, type Row } from "./record.ts";
-import { buildCommand, spawnRunner, type Runner } from "./run.ts";
+import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
-import { classifyAttempt, type AttemptClass } from "./retry.ts";
+import { classifyAttempt, firstActionSeen, terminalText, type AttemptClass } from "./retry.ts";
 import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
 export const DEVIATION = "D9 eval-only G2 exception -- never applies to product runs";
@@ -21,9 +21,10 @@ export const JUDGE_MODEL = "claude-sonnet-5-5";
 const POLICY = "approve as written unless the design leaves task scope";
 const DESIGN_FILE = ".ab/g2-design.md";
 const FIXTURES = path.join(import.meta.dir, "..", "fixtures");
+const SIGNER_CAP_MS = 180_000;
 
 export class FixtureOnly extends Error {}
-/** R-c freeze: protocol trials run on a repo under evals/ab/fixtures/ until the pre-registration lifts it by editing this check. */
+/** R-c freeze: an unmeasured (smoke) protocol trial runs on a repo under evals/ab/fixtures/ only; a measured run (--measured) is exempt (the lift the pre-registration describes). */
 export function assertFixtureOnly(srcRepo: string): void {
   const rel = path.relative(fs.realpathSync.native(FIXTURES), fs.realpathSync.native(srcRepo));
   if (rel === "" || rel.startsWith("..") || path.isAbsolute(rel)) throw new FixtureOnly(`protocol trials run on evals/ab/fixtures/ only, not ${srcRepo}`);
@@ -79,12 +80,14 @@ export async function policyCheck(design: string, outOfScope: string[], judge: J
 }
 
 /** The real judge: a fresh `claude -p` in its own isolated config dir and empty cwd, no tools, the pinned judge model. */
-export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunner): Judge {
+export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunner, remainingMs?: () => number): Judge {
   return async (prompt) => {
+    const cap = Math.min(SIGNER_CAP_MS, remainingMs ? remainingMs() : Infinity); // the signer's own cap never extends the trial deadline
+    if (cap <= 0) throw new Error("trial deadline exhausted before the judge call");
     const jarm: Arm = { ...arm, sessionModel: JUDGE_MODEL, effort: "low", plugin: undefined, allowedTools: [] };
     const iso = makeIsolation(workRoot, jarm);
     clearSynced(iso.cfg);
-    const raw = await runner(buildCommand(jarm, prompt, ["--tools", ""], { promptViaStdin: true }), { cwd: iso.trialDir, env: isolationEnv(iso, jarm), timeoutMs: 180_000, stdin: prompt });
+    const raw = await runner(buildCommand(jarm, prompt, ["--tools", ""], { promptViaStdin: true }), { cwd: iso.trialDir, env: isolationEnv(iso, jarm), timeoutMs: cap, stdin: prompt });
     const res = parseStream(raw.stdout).result;
     if (!res || res.is_error) throw new Error(`judge run failed: exit ${raw.exitCode}, ${res?.terminal_reason ?? "no result event"}`);
     return { text: String(res.result ?? ""), totals: totalsOf(res) };
@@ -120,10 +123,11 @@ const popupText = (p: Popup) => {
   return String(i?.questions?.[0]?.question ?? i?.plan ?? JSON.stringify(i ?? "")).replace(/\s+/g, " ").slice(0, 120);
 };
 
-export type ProtocolOpts = TrialOpts & { judge?: Judge };
+/** `clock` is injectable so the shared deadline can be tested without waiting (default Date.now). */
+export type ProtocolOpts = TrialOpts & { judge?: Judge; clock?: () => number };
 
 export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
-  assertFixtureOnly(o.srcRepo);
+  if (!o.measure) assertFixtureOnly(o.srcRepo); // only a measured run (--measured) may leave the fixtures; smoke stays fixture-only
   freezePreflight(o.arm, o.srcRepo, !!o.measure);
   if (!o.task.layers?.length || !o.task.outOfScope?.length) throw new Error(`task ${o.task.id}: a protocol trial needs layers and outOfScope`);
   if (o.arm.plugin) {
@@ -136,28 +140,37 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const taskHash = writeTaskFile(iso.trialDir, o.task);
   const base = manifest(iso.trialDir);
   const run = o.runner ?? spawnRunner;
-  const call = { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? 300_000 };
+  // ONE deadline for the whole trial (Amendment 1): the phases and the signer share it; each call gets what is left
+  const clock = o.clock ?? Date.now;
+  const deadline = clock() + (o.timeoutMs ?? TRIAL_TIMEOUT_MS);
+  const remaining = () => deadline - clock();
+  const call = () => ({ cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: remaining() });
   const sid = randomUUID();
+  let timedOut = false;
 
   clearSynced(iso.cfg);
-  const raw1 = await run(buildCommand(o.arm, phase1Prompt(o.task), ["--session-id", sid]), call);
+  const raw1 = await run(buildCommand(o.arm, phase1Prompt(o.task), ["--session-id", sid]), call());
   fs.writeFileSync(path.join(iso.root, "stream-phase1.jsonl"), raw1.stdout);
   const s1 = parseStream(raw1.stdout);
   const streams = [s1];
   let wallMs = raw1.wallMs;
   let exitCode = raw1.exitCode;
+  if (raw1.timedOut || remaining() <= 0) timedOut = true;
 
-  let park: Popup | undefined = detectPopups(s1)[0];
+  let park: Popup | undefined = timedOut ? undefined : detectPopups(s1)[0];
   let refused: string | undefined;
   let g2: Row["g2"];
-  if (!park) {
+  if (!park && !timedOut) {
     const designPath = path.join(iso.trialDir, DESIGN_FILE);
     const design = fs.existsSync(designPath) ? fs.readFileSync(designPath, "utf8") : undefined;
     const scope = scopeCheck(design, o.task.layers);
     g2 = { scope: scope.ok ? "pass" : `fail: ${scope.reason}`, judge: "not-asked", reason: "", designSha256: design === undefined ? "" : sha256(design) };
     if (!scope.ok) refused = `scope: ${scope.reason}`;
     else {
-      const verdict = await policyCheck(design!, o.task.outOfScope, o.judge ?? realJudge(o.workRoot, o.arm));
+      const capped = remaining() < SIGNER_CAP_MS; // the deadline, not the signer's own cap, bounds this call
+      const verdict = await policyCheck(design!, o.task.outOfScope, o.judge ?? realJudge(o.workRoot, o.arm, undefined, remaining));
+      // the signer ran the deadline out (or was cut by it): the trial timed out, whatever the verdict; policyCheck already turned a failed call into a refusal
+      if (remaining() <= 0 || (capped && !verdict.sign && /^judge (?:reply unusable|ran|run failed)/.test(verdict.reason))) timedOut = true;
       g2.judge = verdict.sign ? "sign" : "refuse";
       g2.reason = verdict.reason;
       g2.judgeUsage = verdict.usage;
@@ -169,17 +182,18 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   let changed: string[] = [];
   let lastRaw = raw1;
   let breach: string[] = [];
-  if (!park && !refused) {
+  if (!park && !refused && !timedOut) {
     clearSynced(iso.cfg);
-    const raw2 = await run(buildCommand(o.arm, PHASE2_PROMPT, ["--resume", sid]), call);
+    const raw2 = await run(buildCommand(o.arm, PHASE2_PROMPT, ["--resume", sid]), call());
     fs.writeFileSync(path.join(iso.root, "stream-phase2.jsonl"), raw2.stdout);
     lastRaw = raw2;
     const s2 = parseStream(raw2.stdout);
     streams.push(s2);
     wallMs += raw2.wallMs;
     exitCode = exitCode || raw2.exitCode;
-    park = detectPopups(s2)[0];
-    if (!park) {
+    if (raw2.timedOut) timedOut = true;
+    park = timedOut ? undefined : detectPopups(s2)[0];
+    if (!park && !timedOut) {
       const touched = diffManifest(base, manifest(iso.trialDir)).map((d) => d.replace(/^\w+ /, ""));
       breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, o.task.layers!));
       if (o.measure) changed = diffManifest(before, manifest(iso.trialDir));
@@ -193,8 +207,8 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const mutated = diffManifest(before, manifest(o.srcRepo));
   const errored = exitCode !== 0 || streams.some((s) => s.result?.is_error);
   const last = streams[streams.length - 1]!;
-  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : park ? `parked: popup ${park.tool}: ${popupText(park)}` : refused ? `g2-refused: ${refused}` : errored ? `cli-error: exit ${exitCode}, ${last.result?.terminal_reason ?? "no result event"}` : breach.length > 0 ? `scope-breach: ${breach.join(", ")}` : "ok";
-  const graders = graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : `not-run:${park ? "parked" : "g2-refused"}`;
+  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : park ? `parked: popup ${park.tool}: ${popupText(park)}` : refused ? `g2-refused: ${refused}` : errored ? `cli-error: exit ${exitCode}, ${last.result?.terminal_reason ?? "no result event"}` : breach.length > 0 ? `scope-breach: ${breach.join(", ")}` : "ok";
+  const graders = graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : `not-run:${timedOut ? "timeout" : park ? "parked" : "g2-refused"}`;
   const row: Row = {
     tag: o.tag,
     arm: o.arm.id,
@@ -216,12 +230,12 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   };
   let cls: AttemptClass | undefined;
   if (o.measure) {
-    cls = classifyAttempt({ raw: lastRaw, stream: last, exit });
+    cls = classifyAttempt({ raw: lastRaw, stream: last, exit, trialActed: streams.some(firstActionSeen) });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
     row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
   const valid = exit === "ok" || /^(g2-refused|parked|scope-breach):/.test(exit);
-  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, ...(cls ? { cls } : {}) };
+  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: terminalText(last, lastRaw), ...(cls ? { cls } : {}) };
 }

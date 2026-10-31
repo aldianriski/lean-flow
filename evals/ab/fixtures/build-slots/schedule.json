@@ -1,0 +1,17 @@
+[
+  {"arm": "workdoo-a0", "repo": "workdoo", "task": "access-activity-type-filter", "trial": 1},
+  {"arm": "workdoo-a1", "repo": "workdoo", "task": "access-activity-type-filter", "trial": 1},
+  {"arm": "clinic-a0", "repo": "clinic", "task": "appointment-lookup", "trial": 1},
+  {"arm": "clinic-a1", "repo": "clinic", "task": "appointment-lookup", "trial": 1},
+  {"arm": "workdoo-a0", "repo": "workdoo", "task": "forecast-month-end", "trial": 1},
+  {"arm": "workdoo-a1", "repo": "workdoo", "task": "forecast-month-end", "trial": 1},
+  {"arm": "clinic-a0", "repo": "clinic", "task": "booking-lead-time", "trial": 1},
+  {"arm": "clinic-a1", "repo": "clinic", "task": "booking-lead-time", "trial": 1},
+  {"arm": "workdoo-a0", "repo": "workdoo", "task": "invitation-issued-by", "trial": 1},
+  {"arm": "workdoo-a1", "repo": "workdoo", "task": "invitation-issued-by", "trial": 1},
+  {"arm": "workdoo-a0", "repo": "workdoo", "task": "pilot-seat-limit", "trial": 1},
+  {"arm": "workdoo-a1", "repo": "workdoo", "task": "pilot-seat-limit", "trial": 1},
+  {"arm": "clinic-a0", "repo": "clinic", "task": "one-offset-helper", "trial": 1},
+  {"arm": "clinic-a1", "repo": "clinic", "task": "one-offset-helper", "trial": 1},
+  {"arm": "workdoo-a0", "repo": "workdoo", "task": "self-onboarding-guard", "trial": 1}
+]

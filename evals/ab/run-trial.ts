@@ -1,6 +1,6 @@
 // One pinned, isolated, measured trial:
 //   bun evals/ab/run-trial.ts --arm <arm.json> --task <task.json> --repo <dir> [--trial 1] [--attempt 1] [--log <md>] [--tag <text>] [--protocol d9]
-//   add --measured for a measured run: blind judges + the extended record, infra failures retried (max 2), only the first non-infra attempt is scored
+//   add --measured for a measured run (refused before the freeze line in the log header, and while PREREGISTRATION.md differs from it; --prereg <md> overrides the document): blind judges + the extended record, infra failures retried (max 2), only the first non-infra attempt is scored
 //   bun evals/ab/run-trial.ts --print-pin <plugin-dir>     (prints the sha + content hash to paste into an arm)
 // Maintainer-only and paid; never part of `bun test` or the gate.
 import fs from "node:fs";
@@ -9,6 +9,7 @@ import path from "node:path";
 import { loadArm } from "./lib/arm.ts";
 import { loadTask } from "./lib/grade.ts";
 import { computePin } from "./lib/pin.ts";
+import { freezeProblem } from "./lib/log.ts";
 import { DEFAULT_LOG } from "./lib/record.ts";
 import { runProtocolTrial } from "./lib/protocol.ts";
 import { ArmRefused, PinRefused, runTrial } from "./lib/trial.ts";
@@ -47,6 +48,9 @@ try {
   const one = flag("protocol") === "d9" ? runProtocolTrial : runTrial;
   let r;
   if (argv.includes("--measured")) {
+    // the same freeze guard as run-baseline.ts: a hand run cannot start a measured trial before the freeze, or on a changed pre-registration
+    const frozen = freezeProblem({ log: opts.logPath, prereg: path.resolve(flag("prereg") ?? path.join(import.meta.dir, "PREREGISTRATION.md")) });
+    if (frozen) (console.error(`REFUSED: ${frozen}`), process.exit(2));
     // infra failures retry (max 2); a task failure never does; the scored trial is the first non-infra attempt
     const run = await runWithRetry((n) => one({ ...opts, attempt: n, measure: {} }).then((t) => ({ cls: t.cls!, value: t })));
     console.log(`attempts: ${run.attempts.map((a) => `#${a.n} ${a.cls}`).join(", ")}`);
@@ -58,6 +62,7 @@ try {
   } else r = await one(opts);
   console.log(`graders: ${r.row.graders}\nexit: ${r.exit}\npassed: ${r.row.passed}`);
   if (r.exit === "usage-missing") console.error("STOP: the CLI reported no usage. A usage-missing row was logged; this needs an owner ruling.");
+  if (r.exit === "timeout") console.error("TIMEOUT: killed at the 45-minute whole-trial limit; scored not-passed (graders and judges not run), partial usage kept and flagged incomplete.");
   process.exit(r.valid ? 0 : 1);
 } catch (e) {
   console.error(e instanceof PinRefused || e instanceof ArmRefused ? `REFUSED: ${e.message}` : `ERROR: ${(e as Error).message}`);

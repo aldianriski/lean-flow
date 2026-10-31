@@ -8,9 +8,9 @@ import { checkArmSnapshot } from "./freeze.ts";
 import { checkInitPlugins, verifyPin } from "./pin.ts";
 import { parseStream, totalsOf, type Stream, type Totals } from "./parse.ts";
 import { appendRow, type Row, type Tok } from "./record.ts";
-import { classifyAttempt, type AttemptClass } from "./retry.ts";
+import { classifyAttempt, terminalText, type AttemptClass } from "./retry.ts";
 import type { Judge } from "./protocol.ts";
-import { buildCommand, spawnRunner, type RawRun, type Runner } from "./run.ts";
+import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
 import fs from "node:fs";
 
@@ -41,7 +41,7 @@ export type TrialOpts = {
   /** present = a measured run: the row carries the extended record. The judge defaults to the real one; tests pass recorded replies. */
   measure?: { judge?: Judge; setupTokens?: Tok | null };
 };
-export type TrialResult = { exit: string; valid: boolean; grade: Grade; row: Row; /** retry class; set on measured runs */ cls?: AttemptClass };
+export type TrialResult = { exit: string; valid: boolean; grade: Grade; row: Row; /** retry class; set on measured runs */ cls?: AttemptClass; /** the CLI's own terminal text (reason, error line, stderr tail): evidence for the driver's usage-limit check, not a row field */ terminal?: string };
 
 /** Reasons a finished run is invalid: init must show the right plugins and the trial copy as cwd, and every model seen must be pinned. */
 export function validityProblems(streams: Stream[], arm: Arm, trialDir: string, totals: Totals | null): string[] {
@@ -98,7 +98,7 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   let raw: RawRun;
   let thrown: string | undefined;
   try {
-    raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? 300_000 });
+    raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: o.timeoutMs ?? TRIAL_TIMEOUT_MS });
   } catch (e) {
     if (!o.measure) throw e;
     thrown = (e as Error).message; // a measured run classifies a runner exception as a harness crash instead of dying
@@ -109,12 +109,13 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   const totals = totalsOf(stream.result);
   // what the agent changed, taken before the graders run (they build into the copy)
   const changed = o.measure ? diffManifest(before, manifest(iso.trialDir)) : [];
-  const graded = await grade(o.task, iso.trialDir);
+  // a killed run is not graded or judged (Amendment 1): not-passed, judge verdicts Unknown
+  const graded = raw.timedOut ? undefined : await grade(o.task, iso.trialDir);
 
   const invalid = validityProblems([stream], o.arm, iso.trialDir, totals);
   const mutated = diffManifest(before, manifest(o.srcRepo));
 
-  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : raw.exitCode !== 0 || stream.result?.is_error ? `cli-error: exit ${raw.exitCode}, ${stream.result?.terminal_reason ?? "no result event"}` : "ok";
+  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : raw.timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : raw.exitCode !== 0 || stream.result?.is_error ? `cli-error: exit ${raw.exitCode}, ${stream.result?.terminal_reason ?? "no result event"}` : "ok";
   const row: Row = {
     tag: o.tag,
     arm: o.arm.id,
@@ -122,13 +123,13 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     task: o.task.id,
     trial: o.trial,
     attempt: o.attempt,
-    graders: graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(","),
+    graders: graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : "not-run:timeout",
     tokens: totals && { input: totals.input, output: totals.output, cacheRead: totals.cacheRead, cacheWrite: totals.cacheWrite },
     costUsd: totals?.costUsd ?? null,
     wallS: raw.wallMs / 1000,
     exit,
     pins: pinsOf(o.arm, iso, totals, [stream]),
-    passed: exit === "ok" && graded.passed,
+    passed: exit === "ok" && !!graded?.passed,
     raw: { usage: stream.result?.usage ?? null, modelUsage: stream.result?.modelUsage ?? null, subagent_stats: stream.result?.subagent_stats ?? null },
   };
   let cls: AttemptClass | undefined;
@@ -140,5 +141,5 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
-  return { exit, valid: exit === "ok", grade: graded, row, ...(cls ? { cls } : {}) };
+  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: terminalText(stream, raw), ...(cls ? { cls } : {}) };
 }
