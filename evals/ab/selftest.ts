@@ -264,17 +264,17 @@ check("S9 refused: out-of-Layers design / policy refusal / missing design -> not
   const scope = protoReplay({ design: designOf(["src/index.ts"]), build: buildOk });
   const js = judgeSays(SIGN);
   const a = await protoTrial(scope, js);
-  assert(scope.calls.n === 1 && js.n === 0, `scope refusal must spawn once and not consult the judge: spawns ${scope.calls.n}, judge ${js.n}`);
+  assert(scope.calls.n === 2 && js.n === 0, `scope refusal (twice: the unrevised design stands) must spawn the session and its one revise round and not consult the judge: spawns ${scope.calls.n}, judge ${js.n}`);
   assert(!a.row.passed && a.res.exit === "g2-refused: scope: outside Layers: src/index.ts" && a.row.graders === "not-run:g2-refused" && a.res.valid, `scope refusal row wrong: ${a.res.exit} / ${a.row.graders} / valid ${a.res.valid}`);
   assert(String(a.row.deviation).includes("D9") && a.log.includes("g2-refused"), "a refused trial still logs the deviation");
 
   const policy = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
   const b = await protoTrial(policy, judgeSays(REFUSE));
-  assert(policy.calls.n === 1 && !b.row.passed && b.res.exit === "g2-refused: policy: renames an existing function", `policy refusal wrong: spawns ${policy.calls.n}, ${b.res.exit}`);
+  assert(policy.calls.n === 2 && !b.row.passed && b.res.exit === "g2-refused: policy: renames an existing function", `policy refusal wrong: spawns ${policy.calls.n}, ${b.res.exit}`);
 
   const none = protoReplay({ build: buildOk });
   const c = await protoTrial(none, judgeSays(SIGN));
-  assert(none.calls.n === 1 && !c.row.passed && c.res.exit === "g2-refused: scope: no design", `missing design must be refused: ${c.res.exit}`);
+  assert(none.calls.n === 2 && !c.row.passed && c.res.exit === "g2-refused: scope: no design", `missing design must be refused: ${c.res.exit}`);
 
   const ok = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
   const d = await protoTrial(ok, judgeSays(SIGN));
@@ -1535,7 +1535,7 @@ check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / r
   const built = await run(fxRows());
   assertEq(built.findings, []);
   assertEq(JSON.parse(JSON.stringify(built.slots)), JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "expected.json"), "utf8")));
-  assert(built.notes.some((n) => /1 smoke row/.test(n)) && built.notes.some((n) => /2 usage-limit attempt\(s\) voided/.test(n)) && built.voidedUsd === 1, `notes: ${built.notes}, voided ${built.voidedUsd}`);
+  assert(built.notes.some((n) => /1 smoke row/.test(n)) && built.notes.some((n) => /2 attempt\(s\) voided \(2 usage-limit, 0 owner-ruled/.test(n)) && built.voidedUsd === 1, `notes: ${built.notes}, voided ${built.voidedUsd}`);
   const timeoutSlot = built.slots.find((s) => s.task === "forecast-month-end" && s.arm === "A0")!;
   assert(timeoutSlot.first !== null && timeoutSlot.first.graders === false && timeoutSlot.first.tokens.incomplete === true, "a timeout row is a scored task failure: first is set (never replaced), usage flagged incomplete");
   assert(!built.slots.some((s) => s.task === "booking-lead-time" && s.arm === "A0"), "a slot with only usage-limit-marked attempts is not emitted (re-run from its first attempt)");
@@ -1825,7 +1825,7 @@ check("S44 signer at the deadline: a judge that dies past the deadline, a judge 
   assert(real.res.exit === "timeout" && real.spawns === 1, `real judge killed on the deadline: ${real.res.exit}`);
   // control: the same failure with plenty of time left is the frozen judge-failure handling
   const early = await run(() => async () => { throw new Error("judge run failed: exit 1, boom"); }, 1);
-  assert(early.res.exit.startsWith("g2-refused: policy: judge reply unusable") && early.spawns === 1, `control: a failing signer with time to spare is g2-refused: ${early.res.exit}`);
+  assert(early.res.exit.startsWith("g2-refused: policy: judge reply unusable") && early.spawns === 2, `control: a failing signer with time to spare is g2-refused: ${early.res.exit}`);
 });
 
 
@@ -1903,6 +1903,402 @@ check("S46 phase-2 classification: phase 1 acted, phase 2 killed with no action 
   assert(none.exit === "timeout" && none.cls === "infra:harness-crash", `control: no phase acted and no result event: ${none.exit} ${none.cls}`);
   const net = await go(2, "fetch failed: ECONNRESET");
   assert(net.cls === "infra:network", `terminal evidence still classifies exactly as frozen: ${net.cls}`);
+});
+
+// ---- SPRINT-152 T4 Amendment 2: trial environment (A), directory layers (B), one G2 revise round (C), reasoned voids (D). Free; no model call. ----
+const NODE24_FAKE = "D:\\fake\\node24";
+/** A trial copy shaped like the clinic repo (go.mod + web lockfile) or workdoo (root lockfile), for the provisioner's own logic. */
+function repoShape(kind: "clinic" | "node"): string {
+  const dir = path.join(tmpdir("shape"), "trial");
+  fs.mkdirSync(path.join(dir, "web"), { recursive: true });
+  if (kind === "clinic") {
+    fs.writeFileSync(path.join(dir, "go.mod"), "module x\n");
+    fs.writeFileSync(path.join(dir, "web", "package-lock.json"), "{}");
+  } else fs.writeFileSync(path.join(dir, "package-lock.json"), "{}");
+  return dir;
+}
+/** A fake command runner for the provisioner: records every command, `fail` makes the first command whose text contains it exit 1, `node` is what `node --version` prints. */
+function fakeExec(o: { fail?: string; node?: string } = {}) {
+  const cmds: { cmd: string; env: Record<string, string>; cwd: string }[] = [];
+  const exec: import("./lib/provision.ts").Exec = async (cmd, { cwd, env }) => {
+    const text = cmd.join(" ");
+    cmds.push({ cmd: text, env, cwd });
+    if (cmd[0] === "node" && cmd[1] === "--version") return { code: 0, out: o.node ?? "v24.22.2" };
+    if (cmd[0] === "initdb") fs.mkdirSync(cmd[cmd.indexOf("-D") + 1]!, { recursive: true });
+    if (o.fail !== undefined && text.includes(o.fail)) return { code: 1, out: `step output\nERROR: ${o.fail} broke` };
+    return { code: 0, out: "" };
+  };
+  return { exec, cmds };
+}
+const provOver = (exec: import("./lib/provision.ts").Exec) => ({ exec, node24Dir: NODE24_FAKE, freePort: async () => 54999, npmCli: () => "D:\\fake\\npm-cli.js" });
+
+check("S47 provisioner: clinic -> Node 24 first on the path, npm ci from the cache, own Postgres on a free port, both databases migrated, DATABASE_URL exported; teardown stops and removes the cluster; any step failing (or Node not 24) -> ProvisionFailed naming the step, cluster cleaned up", async () => {
+  const { makeProvisioner, applyProvision, ProvisionFailed } = await import("./lib/provision.ts");
+  const root = tmpdir("provroot");
+  const fx = fakeExec();
+  const p = await makeProvisioner(provOver(fx.exec))({ trialDir: repoShape("clinic"), root });
+  const text = fx.cmds.map((c) => c.cmd);
+  assert(text.some((t) => t.includes("npm-cli.js ci --prefer-offline")) && fx.cmds.find((c) => c.cmd.includes(" ci "))!.cwd.endsWith("web"), `npm ci runs in web/, from the cache: ${text}`);
+  assert(text.some((t) => t.startsWith("initdb ")) && text.some((t) => t.startsWith("pg_ctl") && t.includes("-p 54999") && t.endsWith("start")), `own cluster on the free port: ${text}`);
+  const migrations = fx.cmds.filter((c) => c.cmd === "go run ./cmd/migrate");
+  assert(migrations.length === 2 && migrations[0]!.env.DATABASE_URL === "postgres://postgres@127.0.0.1:54999/clinic" && migrations[1]!.env.DATABASE_URL === "postgres://postgres@127.0.0.1:54999/clinic_test", `both databases migrated: ${migrations.map((m) => m.env.DATABASE_URL)}`);
+  assert(text.some((t) => t.startsWith("psql") && t.includes("create database clinic") && t.includes("create database clinic_test")), "both databases created");
+  const env = applyProvision({ PATH: "C:\\host;C:\\bin", HOME: "x" }, p);
+  assert(env.PATH!.split(";")[0] === NODE24_FAKE && env.PATH!.includes("C:\\host"), `Node 24 first on the path: ${env.PATH}`);
+  assert(env.DATABASE_URL === "postgres://postgres@127.0.0.1:54999/clinic_test" && env.PGPORT === "54999" && env.GOCACHE === "D:/cache/go" && env.GOMODCACHE === "D:/cache/gomod" && env.npm_config_cache === "D:/cache/npm", `database and cache variables: ${JSON.stringify(p.vars)}`);
+  assert(applyProvision({ Path: "C:\\host" }, p).Path!.startsWith(NODE24_FAKE) && !("PATH" in applyProvision({ Path: "C:\\host" }, p)), "a host that spells it Path keeps one path variable");
+  assert(fs.existsSync(path.join(root, "pgdata")), "cluster dir exists while the trial runs");
+  await p.teardown();
+  await p.teardown(); // idempotent
+  assert(!fs.existsSync(path.join(root, "pgdata")) && fx.cmds.filter((c) => c.cmd.includes("pg_ctl") && c.cmd.includes(" stop")).length >= 1, "teardown stops the cluster and removes it, twice is safe");
+
+  // workdoo: root install only, no database
+  const fw = fakeExec();
+  const w = await makeProvisioner(provOver(fw.exec))({ trialDir: repoShape("node"), root: tmpdir("provroot") });
+  assert(!fw.cmds.some((c) => /initdb|pg_ctl|psql|migrate/.test(c.cmd)) && w.vars.DATABASE_URL === undefined && fw.cmds.some((c) => c.cmd.includes("ci --prefer-offline") && !c.cwd.endsWith("web")), `workdoo installs at the root and starts no database: ${fw.cmds.map((c) => c.cmd)}`);
+  // a copy with no lockfile (the smoke fixture) is left exactly as it was
+  const none = await makeProvisioner(provOver(fakeExec().exec))({ trialDir: SMOKE_REPO, root: tmpdir("provroot") });
+  assert(none.setupMs === 0 && Object.keys(none.vars).length === 0 && none.pathFirst.length === 0, "the smoke fixture needs no environment");
+
+  for (const fail of ["ci --prefer-offline", "initdb", "start", "create database", "go run ./cmd/migrate"]) {
+    const root2 = tmpdir("provroot");
+    const f = fakeExec({ fail });
+    let err: unknown;
+    await makeProvisioner(provOver(f.exec))({ trialDir: repoShape("clinic"), root: root2 }).catch((e) => (err = e));
+    assert(err instanceof ProvisionFailed && /exit 1: ERROR: /.test(err.message), `${fail}: must fail as ProvisionFailed with the step's last line: ${err}`);
+    assert(!fs.existsSync(path.join(root2, "pgdata")), `${fail}: a failed provisioning leaves no cluster directory behind`);
+  }
+  let wrongNode: unknown;
+  await makeProvisioner(provOver(fakeExec({ node: "v22.22.3" }).exec))({ trialDir: repoShape("node"), root: tmpdir("provroot") }).catch((e) => (wrongNode = e));
+  assert(wrongNode instanceof ProvisionFailed && /expected Node 24/.test(wrongNode.message), `a Node that is not 24 is refused: ${wrongNode}`);
+});
+
+/** An injected provisioner: records the teardown and carries a fake database url and a Node dir. */
+function fakeProvision(o: { fail?: boolean } = {}) {
+  const state = { calls: 0, teardowns: 0 };
+  const provision: import("./lib/provision.ts").Provisioner = async () => {
+    state.calls++;
+    if (o.fail) throw new (await import("./lib/provision.ts")).ProvisionFailed("npm ci: exit 1: ERESOLVE boom");
+    return { vars: { DATABASE_URL: "postgres://t/clinic_test" }, pathFirst: [NODE24_FAKE], setupMs: 4200, teardown: async () => void state.teardowns++ };
+  };
+  return { state, provision };
+}
+const envTask = async () => ({ ...(await task("add-fn")), graders: [{ name: "env", cmd: 'test "$DATABASE_URL" = "postgres://t/clinic_test"' }] });
+
+check("S48 trial environment: the agent AND the graders get Node 24 first + the database env, identically; teardown runs after grading, on a kill and on a runner exception; setup wall time is recorded; a provisioning failure is infra:sandbox-before-action, spawns nothing, is never scored and retries", async () => {
+  const { runTrial } = await import("./lib/trial.ts");
+  const { runWithRetry } = await import("./lib/retry.ts");
+  const seen: Record<string, string>[] = [];
+  const base = replay();
+  const runner: import("./lib/run.ts").Runner = async (cmd, o) => (seen.push(o.env), base.runner(cmd, o));
+  const go = async (over: { runner?: import("./lib/run.ts").Runner; fail?: boolean; timedOut?: boolean; measure?: boolean } = {}) => {
+    const fz = await frozenSmoke();
+    const fp = fakeProvision({ ...(over.fail ? { fail: true } : {}) });
+    const dir = tmpdir("env-trial");
+    const run = over.timedOut ? async () => ({ stdout: "", stderr: "", exitCode: 143, wallMs: 1, timedOut: true }) : over.runner ?? runner;
+    const res = await runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await envTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner: run, provision: fp.provision, measure: { judge: recJudge(PASSV) } });
+    return { res, ...fp.state };
+  };
+  const a = await go();
+  const pathKey = Object.keys(seen[0]!).find((k) => k.toLowerCase() === "path")!;
+  assert(seen[0]![pathKey]!.split(";")[0] === NODE24_FAKE && seen[0]!.DATABASE_URL === "postgres://t/clinic_test", `the agent sees Node 24 first and the database env: ${seen[0]![pathKey]!.slice(0, 40)} ${seen[0]!.DATABASE_URL}`);
+  assert(a.res.grade.graders[0]!.passed, `the grader sees the same database env: ${JSON.stringify(a.res.grade.graders)}`);
+  assert(a.teardowns === 1 && a.res.row.measure!.setupWallS === 4.2, `teardown once after grading, setup wall recorded: ${a.teardowns} ${a.res.row.measure?.setupWallS}`);
+  const killed = await go({ timedOut: true });
+  assert(killed.res.exit === "timeout" && killed.teardowns === 1, `a killed run still tears down: ${killed.res.exit} ${killed.teardowns}`);
+  const threw = await go({ runner: async () => { throw new Error("spawn exploded"); } });
+  assert(threw.teardowns === 1 && threw.res.cls === "infra:harness-crash", `a runner exception still tears down: ${threw.teardowns} ${threw.res.cls}`);
+
+  const spawned: number[] = [];
+  const failing = await go({ fail: true, runner: async (cmd, o) => (spawned.push(1), base.runner(cmd, o)) });
+  assert(spawned.length === 0 && failing.res.exit.startsWith("provision-failed: npm ci: exit 1: ERESOLVE boom") && failing.res.cls === "infra:sandbox-before-action" && !failing.res.row.passed && failing.res.row.graders === "not-run:provision-failed" && !failing.res.valid, `provisioning failure: no agent call, infra class, unscored: ${failing.res.exit} ${failing.res.cls} ${failing.res.row.graders}`);
+  assert(failing.res.row.measure!.attemptKind === "infra" && failing.res.row.measure!.judges.business.verdict === "UNKNOWN", "recorded as an infra attempt, judges not run");
+  const retried = await runWithRetry(async () => { const t = await go({ fail: true }); return { cls: t.res.cls!, value: t }; });
+  assert(retried.attempts.length === 3 && retried.infraLost && !retried.scored, `a provisioning failure retries twice and is then infra-lost, never scored: ${retried.attempts.map((x) => x.cls)}`);
+  const fz0 = await frozenSmoke();
+  const unmeasured = await runTrial({ arm: fz0.arm, srcRepo: fz0.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: tmpdir("env-trial"), logPath: path.join(tmpdir("env-log"), "l.md"), tag: "smoke -- not a measurement", runner, provision: fakeProvision({ fail: true }).provision }).catch((e) => e);
+  assert(unmeasured instanceof Error && /provisioning failed/.test(unmeasured.message), "an unmeasured run refuses loudly instead of logging a row");
+});
+
+check("S49 protocol trials: both phases and the graders get the provisioned env; the provisioning is outside the 45-minute deadline; teardown after grading and on a kill; a provisioning failure spawns nothing", async () => {
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const call = async (o: { fail?: boolean; kill?: boolean; slowSetup?: boolean } = {}) => {
+    const fz = await frozenSmoke();
+    const fp = fakeProvision({ ...(o.fail ? { fail: true } : {}) });
+    let now = 1_000_000;
+    const envs: Record<string, string>[] = [];
+    const timeouts: number[] = [];
+    const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+    const runner: import("./lib/run.ts").Runner = async (cmd, opts) => {
+      envs.push(opts.env);
+      timeouts.push(opts.timeoutMs);
+      const r = await rep.runner(cmd, opts);
+      return o.kill && rep.calls.n === 2 ? { ...r, stdout: "", exitCode: 143, timedOut: true } : r;
+    };
+    const provision: import("./lib/provision.ts").Provisioner = async (d) => {
+      const p = await fp.provision(d);
+      if (o.slowSetup) now += 20 * 60_000; // provisioning time, before the clock
+      return p;
+    };
+    const dir = tmpdir("env-proto");
+    const task = { ...(await protoTask()), graders: (await envTask()).graders };
+    const res = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task, trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner, judge: judgeSays(SIGN).fn, provision, clock: () => now, measure: { judge: recJudge(PASSV) } });
+    return { res, envs, timeouts, spawns: rep.calls.n, ...fp.state };
+  };
+  const ok = await call({ slowSetup: true });
+  const key = Object.keys(ok.envs[0]!).find((k) => k.toLowerCase() === "path")!;
+  assert(ok.res.exit === "ok" && ok.envs.length === 2 && ok.envs.every((e) => e[key]!.split(";")[0] === NODE24_FAKE && e.DATABASE_URL === "postgres://t/clinic_test"), `both phases run under the provisioned env: ${ok.res.exit} ${ok.envs.length}`);
+  assert(ok.timeouts[0] === 45 * 60_000 && ok.res.row.passed && ok.teardowns === 1, `20 minutes of setup did not eat the deadline; graders passed on the provisioned env: first call ${ok.timeouts[0]}, passed ${ok.res.row.passed}, teardowns ${ok.teardowns}`);
+  const killed = await call({ kill: true });
+  assert(killed.res.exit === "timeout" && killed.teardowns === 1, `a kill still tears down: ${killed.res.exit} ${killed.teardowns}`);
+  const failed = await call({ fail: true });
+  assert(failed.spawns === 0 && failed.res.exit.startsWith("provision-failed:") && failed.res.cls === "infra:sandbox-before-action" && !failed.res.row.passed && failed.res.row.graders === "not-run:provision-failed", `protocol provisioning failure: ${failed.res.exit} ${failed.res.cls}`);
+});
+
+check("S50 directory layers: a layer naming a directory of the snapshot matches everything under it, with or without a trailing slash; a file layer is exact; `..`, absolute paths and sibling prefixes stay refused; the post-run scope-breach check uses the same matcher", async () => {
+  const { resolveLayers, scopeCheck, runProtocolTrial } = await import("./lib/protocol.ts");
+  const snap = tmpdir("layers");
+  fs.mkdirSync(path.join(snap, "internal", "http"), { recursive: true });
+  fs.mkdirSync(path.join(snap, "internal", "httpx"), { recursive: true });
+  fs.writeFileSync(path.join(snap, "internal", "http", "a.go"), "x");
+  fs.writeFileSync(path.join(snap, "main.go"), "x");
+  assert(resolveLayers(["internal/http", "internal/http/", "main.go", "nope/dir", "../internal", "/abs"], snap).join() === "internal/http/,internal/http/,main.go,nope/dir,../internal,/abs", "only layers that are directories of the snapshot gain the slash");
+  for (const layer of ["internal/http", "internal/http/"]) {
+    const l = resolveLayers([layer], snap);
+    assert(scopeCheck(designOf(["internal/http/new.go", "internal/http/sub/deep.go"]), l).ok, `${layer}: files under the directory pass`);
+    const out = scopeCheck(designOf(["internal/httpx/a.go"]), l);
+    assert(!out.ok && out.reason === "outside Layers: internal/httpx/a.go", `${layer}: a sibling sharing the prefix is outside: ${JSON.stringify(out)}`);
+    assert(!scopeCheck(designOf(["internal/http/../httpx/a.go"]), l).ok && !scopeCheck(designOf(["/internal/http/a.go"]), l).ok, `${layer}: .. and absolute paths are refused`);
+  }
+  const file = resolveLayers(["main.go"], snap);
+  assert(scopeCheck(designOf(["main.go"]), file).ok && !scopeCheck(designOf(["main.go.bak"]), file).ok && !scopeCheck(designOf(["main.go/x"]), file).ok, "a file layer matches exactly that file");
+
+  // the same matcher after the run: a dir layer ("src", no slash) lets the build touch src/ files and breaches only outside it
+  const run = async (build: (cwd: string) => void) => {
+    const rep = protoReplay({ design: designOf(["src/index.ts"]), build });
+    const fz = await frozenSmoke();
+    const dir = tmpdir("dirlayer");
+    return runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: { ...(await protoTask()), layers: ["src"] }, trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke -- not a measurement", runner: rep.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
+  };
+  const inside = await run((cwd) => (buildOk(cwd), fs.writeFileSync(path.join(cwd, "src", "extra.ts"), "export const e = 1;\n")));
+  assert(inside.exit === "ok", `files under the directory layer are no breach: ${inside.exit}`);
+  const outside = await run((cwd) => (buildOk(cwd), fs.mkdirSync(path.join(cwd, "scripts")), fs.writeFileSync(path.join(cwd, "scripts", "v.mjs"), "x")));
+  assert(outside.exit === "scope-breach: scripts/v.mjs", `a file outside it is: ${outside.exit}`);
+});
+
+/** A protocol trial whose scripted runner can rewrite the design on its calls; returns what each call was asked. */
+async function reviseTrial(o: { first: string[]; second?: string[]; judge: (n: number) => string; clock?: { now: number; p1Min?: number; reviseMin?: number; reviseKilled?: boolean } }) {
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const rep = protoReplay({ design: designOf(o.first) });
+  const calls: { cmd: string[]; timeoutMs: number }[] = [];
+  const runner: import("./lib/run.ts").Runner = async (cmd, opts) => {
+    calls.push({ cmd, timeoutMs: opts.timeoutMs });
+    const n = calls.length;
+    if (n === 2 && o.second) fs.writeFileSync(path.join(opts.cwd, ".ab", "g2-design.md"), designOf(o.second));
+    if (n === 3) buildOk(opts.cwd);
+    const r = await rep.runner(cmd, opts);
+    if (o.clock) o.clock.now += (n === 1 ? o.clock.p1Min ?? 0 : n === 2 ? o.clock.reviseMin ?? 0 : 0) * 60_000;
+    return n === 2 && o.clock?.reviseKilled ? { ...r, stdout: "", exitCode: 143, timedOut: true } : r;
+  };
+  let jn = 0;
+  const prompts: string[] = [];
+  const judge = async (p: string) => (prompts.push(p), o.judge(++jn));
+  const fz = await frozenSmoke();
+  const dir = tmpdir("revise");
+  const res = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke -- not a measurement", runner, judge, ...(o.clock ? { clock: () => o.clock!.now } : {}), measure: { judge: recJudge(PASSV) } });
+  return { res, calls, judged: jn, prompts };
+}
+
+check("S51 G2 revise round: scope refusal -> the reason is fed back to the same session -> revised design passes -> builds; policy refusal likewise; two refusals -> g2-refused (one revise only); the deadline is shared with the revise call", async () => {
+  const { revisePrompt } = await import("./lib/protocol.ts");
+  const sidOf = (cmd: string[], flag: string) => cmd[cmd.indexOf(flag) + 1];
+  const a = await reviseTrial({ first: ["src/index.ts"], second: ["src/add.ts"], judge: () => SIGN });
+  assert(a.res.exit === "ok" && a.res.row.passed && a.calls.length === 3, `scope refusal then a clean revision: ${a.res.exit}, calls ${a.calls.length}`);
+  assert(sidOf(a.calls[1]!.cmd, "--resume") === sidOf(a.calls[0]!.cmd, "--session-id") && sidOf(a.calls[2]!.cmd, "--resume") === sidOf(a.calls[0]!.cmd, "--session-id"), "the revise call and phase 2 resume the SAME session");
+  assert(a.calls[1]!.cmd[2] === revisePrompt("scope: outside Layers: src/index.ts") && a.calls[1]!.cmd[2]!.includes("outside Layers: src/index.ts"), `the refusal reason is in the revise prompt: ${a.calls[1]!.cmd[2]}`);
+  assert(a.res.row.g2?.scope === "pass" && a.res.row.g2?.judge === "sign" && a.res.row.g2?.firstRound?.scope === "fail: outside Layers: src/index.ts" && a.res.row.g2?.firstRound?.judge === "not-asked", `row.g2 is the final check with the refused one beside it: ${JSON.stringify(a.res.row.g2)}`);
+  assert(a.res.row.raw && (a.res.row.raw as any).phases.length === 3, "the revise call's usage is a phase of the row");
+
+  const b = await reviseTrial({ first: ["src/add.ts"], judge: (n) => (n === 1 ? REFUSE : SIGN) });
+  assert(b.res.exit === "ok" && b.calls.length === 3 && b.judged === 2 && b.calls[1]!.cmd[2]!.includes("policy: renames an existing function"), `policy refusal then a signed revision: ${b.res.exit}, calls ${b.calls.length}, judged ${b.judged}`);
+  assert(b.res.row.g2?.firstRound?.judge === "refuse", `first policy refusal recorded: ${JSON.stringify(b.res.row.g2?.firstRound)}`);
+
+  const c = await reviseTrial({ first: ["src/index.ts"], second: ["src/other.ts"], judge: () => SIGN });
+  assert(c.calls.length === 2 && c.judged === 0 && c.res.exit === "g2-refused: scope: outside Layers: src/other.ts" && !c.res.row.passed && c.res.valid && c.res.row.graders === "not-run:g2-refused", `a second refusal ends the trial (no third call), scored as before: ${c.res.exit}, calls ${c.calls.length}`);
+  const d = await reviseTrial({ first: ["src/add.ts"], judge: () => REFUSE });
+  assert(d.calls.length === 2 && d.judged === 2 && d.res.exit === "g2-refused: policy: renames an existing function", `two policy refusals: ${d.res.exit}, calls ${d.calls.length}`);
+
+  const clk = { now: 5_000_000, p1Min: 40, reviseMin: 6, reviseKilled: true };
+  const e = await reviseTrial({ first: ["src/index.ts"], second: ["src/add.ts"], judge: () => SIGN, clock: clk });
+  assert(e.calls[0]!.timeoutMs === 45 * 60_000 && e.calls[1]!.timeoutMs === 5 * 60_000, `the revise call gets only what is left of the one deadline: ${e.calls.map((x) => x.timeoutMs)}`);
+  assert(e.res.exit === "timeout" && e.calls.length === 2, `a revise call killed at the deadline is a timeout, not a refusal: ${e.res.exit}`);
+  const ok = await reviseTrial({ first: ["src/add.ts"], judge: () => SIGN });
+  assert(ok.res.exit === "ok" && ok.calls.length === 2 && ok.judged === 1, `control: a design signed first time spends no revise call: ${ok.res.exit}, calls ${ok.calls.length}`);
+});
+
+check("S52 reasoned void: --void <ts> --reason appends `void: owner-ruled: <reason>` (usage-limit voids unchanged); the voided pilot slots re-run from round 0 as if never run; no reason / unknown ts / already voided -> refused", async () => {
+  const { appendVoid } = await import("./run-baseline.ts");
+  const { readRows, voidIndex, parseTag, liveRows } = await import("./lib/log.ts");
+  const S = REAL_SCHEDULE;
+  const a = await dryRun();
+  const p1 = await a.go(0);
+  assert(p1.stop === "pilot" && p1.calls.length === 4, "pilot ran");
+  const rows = readRows(a.log).filter((r) => parseTag(r.tag).kind === "measured");
+  appendVoid(a.log, rows[0]!, "no trial environment (harness defect, owner-ruled)");
+  appendVoid(a.log, rows[1]!);
+  const voidRows = readRows(a.log).filter((r) => parseTag(r.tag).kind === "void");
+  assert(voidRows[0]!.exit === "void: owner-ruled: no trial environment (harness defect, owner-ruled)" && voidRows[1]!.exit === "void: usage-limit", `exit words: ${voidRows.map((v) => v.exit)}`);
+  const all = readRows(a.log);
+  assert(voidIndex(all).voided.size === 2 && voidIndex(all).orphans.length === 0 && liveRows(all).length === 2, "both attempts are voided and nothing is orphaned");
+  const again = await a.go(0);
+  assert(again.stop === "pilot" && again.calls.length === 2 && ids(again.calls).join() === [sid(S[0]), sid(S[1])].join(), `the voided slots re-run as attempt 1 of round 0, in schedule order, then the pilot stops again: ${again.stop} ${ids(again.calls)}`);
+
+  // the command line
+  const cli = (...args: string[]) => Bun.spawnSync(["bun", path.join(AB, "run-baseline.ts"), "--log", a.log, ...args], { stdout: "pipe", stderr: "pipe" });
+  const live = liveRows(readRows(a.log));
+  const noReason = cli("--void", live[0]!.ts, "--reason", "");
+  assert(noReason.exitCode === 2 && /--reason needs/.test(noReason.stderr.toString()), `empty reason refused: ${noReason.stderr}`);
+  const unknown = cli("--void", "2000-01-01T00:00:00.000Z", "--reason", "x");
+  assert(unknown.exitCode === 2 && /no measured attempt row/.test(unknown.stderr.toString()), "unknown ts refused");
+  const done = cli("--void", live[0]!.ts, "--reason", "owner ruling | with a pipe");
+  assert(done.exitCode === 0, `reasoned void via the CLI: ${done.stderr}`);
+  const last = readRows(a.log).at(-1)!;
+  assert(last.exit === "void: owner-ruled: owner ruling | with a pipe" && (parseTag(last.tag) as { ts: string }).ts === live[0]!.ts, `the reason (pipe included) is carried in the row: ${last.exit}`);
+  const twice = cli("--void", live[0]!.ts, "--reason", "again");
+  assert(twice.exitCode === 2 && /already voided/.test(twice.stderr.toString()), "voiding twice is refused");
+  const plain = cli("--void", live[1]!.ts);
+  assert(plain.exitCode === 0 && readRows(a.log).at(-1)!.exit === "void: usage-limit", "without --reason the void is the usage-limit one, as before");
+});
+
+check("S53 `not applicable` grader (every workdoo task freezes `lint` so): not run, not failed, recorded as not-applicable and ignored by the pass rule; a real failing grader beside it still fails", async () => {
+  const { grade, verdictWord } = await import("./lib/grade.ts");
+  const t = await task("add-fn");
+  const withLint = { ...t, graders: [...t.graders, { name: "lint", cmd: "not applicable" }] };
+  const solved = await grade(withLint, await fixtureCopy(true));
+  assert(solved.passed && solved.graders.map(verdictWord).join() === "pass,pass,pass,not-applicable", `control: ${solved.graders.map(verdictWord)}`);
+  const unsolved = await grade(withLint, await fixtureCopy(false));
+  assert(!unsolved.passed && verdictWord(unsolved.graders.at(-1)!) === "not-applicable" && verdictWord(unsolved.graders[1]!) === "fail", "a failing grader still fails the grade");
+  const m = await measuredTrial({ judge: recJudge(PASSV), edit: buildOk });
+  assert(m.res.row.measure!.graders.some((g) => g.name === "lint" && g.result === "not-applicable"), "a task with no lint grader records lint as not-applicable, as before");
+});
+
+check("S54 work root: unsafe roots (drive root, the repo, a parent of it) refused, AB_WORK_ROOT honoured, nothing outside the root is deleted; after the row is appended the trial copy (dependencies, cluster dir) is gone and stream*.jsonl is kept under kept/ -- on ok, timeout, provision-failed and for a protocol trial", async () => {
+  const { assertWorkRoot, defaultWorkRoot, cleanupIsolation, makeIsolation } = await import("./lib/isolate.ts");
+  const { REPO_ROOT } = await import("./lib/freeze.ts");
+  for (const bad of [path.parse(REPO_ROOT).root, REPO_ROOT, path.dirname(REPO_ROOT), path.join(REPO_ROOT, "evals", "ab", "..", "..")]) {
+    let err: unknown;
+    try { assertWorkRoot(bad); } catch (e) { err = e; }
+    assert(err instanceof Error && /drive root|repo/.test(err.message), `${bad} must be refused: ${err}`);
+  }
+  const ok = tmpdir("wr");
+  assertWorkRoot(ok);
+  assert(defaultWorkRoot({ AB_WORK_ROOT: ok }) === path.resolve(ok), "AB_WORK_ROOT is honoured");
+  let envErr: unknown;
+  try { defaultWorkRoot({ AB_WORK_ROOT: REPO_ROOT }); } catch (e) { envErr = e; }
+  assert(envErr instanceof Error, "an unsafe AB_WORK_ROOT is refused");
+  const other = tmpdir("wr-other");
+  const stray = makeIsolation(other, { auth: "api-key" });
+  cleanupIsolation(stray, ok); // an isolation dir outside the given work root
+  assert(fs.existsSync(stray.root), "nothing outside the work root is deleted");
+
+  const left = (wr: string) => ({ iso: fs.readdirSync(wr).filter((d) => d.startsWith("iso-")), kept: fs.existsSync(path.join(wr, "kept")) ? fs.readdirSync(path.join(wr, "kept")).flatMap((d) => fs.readdirSync(path.join(wr, "kept", d))) : [] });
+  const { runTrial } = await import("./lib/trial.ts");
+  const run = async (o: { fail?: boolean; timedOut?: boolean }) => {
+    const fz = await frozenSmoke();
+    const wr = tmpdir("wr-trial");
+    const fp = fakeProvision({ ...(o.fail ? { fail: true } : {}) });
+    const base = replay();
+    const runner: import("./lib/run.ts").Runner = async (cmd, opts) => {
+      fs.mkdirSync(path.join(opts.cwd, "node_modules", "x"), { recursive: true });
+      fs.writeFileSync(path.join(opts.cwd, "node_modules", "x", "i.js"), "1");
+      return o.timedOut ? { stdout: "", stderr: "", exitCode: 143, wallMs: 1, timedOut: true } : base.runner(cmd, opts);
+    };
+    const res = await runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner, provision: fp.provision, measure: { judge: recJudge(PASSV) } });
+    return { res, ...left(wr) };
+  };
+  const a = await run({});
+  assert(a.res.row && a.iso.length === 0 && a.kept.join() === "stream.jsonl", `ok: trial copy gone, stream kept: ${JSON.stringify({ iso: a.iso, kept: a.kept })}`);
+  const b = await run({ timedOut: true });
+  assert(b.res.exit === "timeout" && b.iso.length === 0 && b.kept.includes("stream.jsonl"), `timeout: ${JSON.stringify(b)}`);
+  const c = await run({ fail: true });
+  assert(c.res.exit.startsWith("provision-failed") && c.iso.length === 0, `provision-failed: ${JSON.stringify(c)}`);
+
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const fz = await frozenSmoke();
+  const wr = tmpdir("wr-proto");
+  const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const p = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner: rep.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
+  const l = left(wr);
+  assert(p.exit === "ok" && l.iso.length === 0 && l.kept.sort().join() === "stream-phase1.jsonl,stream-phase2.jsonl", `protocol: ${p.exit} ${JSON.stringify(l)}`);
+});
+
+check("S55 review round: provisioning writes (go.sum) are neither the agent's change nor a scope breach; a dead driver's iso dir is swept at start (cluster stop attempted, streams kept); --void echoes the row it voids; both G2 signers' usage is judge overhead", async () => {
+  // 1. a provisioner that writes go.sum into the trial copy
+  const goSum: import("./lib/provision.ts").Provisioner = async ({ trialDir }) => {
+    fs.writeFileSync(path.join(trialDir, "go.sum"), "h1:x\n");
+    return { vars: {}, pathFirst: [], setupMs: 1, teardown: async () => {} };
+  };
+  const seen: string[] = [];
+  const m = await (async () => {
+    const { runTrial } = await import("./lib/trial.ts");
+    const fz = await frozenSmoke();
+    const dir = tmpdir("gosum");
+    const base = replay();
+    return runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner: async (c, o) => (buildOk(o.cwd), base.runner(c, o)), provision: goSum, measure: { judge: recJudge(PASSV, seen) } });
+  })();
+  assert(m.exit === "ok" && seen.length > 0 && seen.every((p) => !p.includes("go.sum")) && seen.some((p) => p.includes("add.ts")), `plain trial: go.sum is not in what the judges are shown: ${m.exit}, ${seen.length} prompts`);
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const pSeen: string[] = [];
+  const fz = await frozenSmoke();
+  const wr = tmpdir("gosum-proto");
+  const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const p = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner: rep.runner, judge: judgeSays(SIGN).fn, provision: goSum, measure: { judge: recJudge(PASSV, pSeen) } });
+  assert(p.exit === "ok" && pSeen.length > 0 && pSeen.every((x) => !x.includes("go.sum")), `protocol: no scope-breach for go.sum, not in the judges' diff: ${p.exit}`);
+  const ctl = await (async () => {
+    const dir = tmpdir("gosum-ctl");
+    const fz2 = await frozenSmoke();
+    const rep2 = protoReplay({ design: designOf(["src/add.ts"]), build: (cwd) => (buildOk(cwd), fs.writeFileSync(path.join(cwd, "go.sum"), "agent wrote this\n")) });
+    return runProtocolTrial({ arm: fz2.arm, srcRepo: fz2.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner: rep2.runner, judge: judgeSays(SIGN).fn, provision: goSum, measure: { judge: recJudge(PASSV) } });
+  })();
+  assert(ctl.exit === "scope-breach: go.sum", `control: the AGENT writing go.sum is still a breach: ${ctl.exit}`);
+
+  // 2. sweep
+  const { sweepStale } = await import("./lib/isolate.ts");
+  const root = tmpdir("sweep");
+  const dead = path.join(root, "iso-dead01");
+  fs.mkdirSync(path.join(dead, "trial", "node_modules"), { recursive: true });
+  fs.mkdirSync(path.join(dead, "pgdata"), { recursive: true });
+  fs.writeFileSync(path.join(dead, "stream-phase1.jsonl"), "{}");
+  fs.writeFileSync(path.join(dead, "pgdata", "PG_VERSION"), "18");
+  fs.mkdirSync(path.join(root, "keepme"));
+  const said: string[] = [];
+  const swept = sweepStale(root, (l) => said.push(l));
+  assert(swept.join() === "iso-dead01" && !fs.existsSync(dead) && fs.existsSync(path.join(root, "keepme")) && fs.existsSync(path.join(root, "kept", "iso-dead01", "stream-phase1.jsonl")) && said.length === 1 && /swept stale iso-dead01 \(cluster stopped\)/.test(said[0]!), `sweep: ${swept} ${said}`);
+  assert(sweepStale(root).length === 0, "a second sweep finds nothing (kept/ is not an iso dir)");
+
+  // 3. void echo
+  const { appendRow } = await import("./lib/record.ts");
+  const log = path.join(tmpdir("voidecho"), "log.md");
+  appendRow(log, specRow({ tag: "measured round 0", arm: "workdoo-a0", task: "t1", trial: 1, attempt: 1, exit: "ok", cls: "ok", g: "pass", j: "PPP" }), new Date(T0));
+  const out = Bun.spawnSync(["bun", path.join(AB, "run-baseline.ts"), "--log", log, "--void", new Date(T0).toISOString(), "--reason", "no env"], { stdout: "pipe", stderr: "pipe" });
+  assert(out.exitCode === 0 && /voiding workdoo-a0 t1 #1 attempt 1: exit "ok", graders "x", reason "no env"/.test(out.stdout.toString()), `echo before appending: ${out.stdout}${out.stderr}`);
+
+  // 4. signer usage
+  const tot = (n: number) => ({ text: n === 1 ? REFUSE : SIGN, totals: { input: 10, output: 20, cacheRead: 30, cacheWrite: 40, costUsd: 0.5, models: ["claude-sonnet-5-5"] } });
+  let jn = 0;
+  const { runProtocolTrial: rpt } = await import("./lib/protocol.ts");
+  const wr2 = tmpdir("signer-usage");
+  const rep3 = protoReplay({ design: designOf(["src/add.ts"]), build: undefined as never });
+  const r3: import("./lib/run.ts").Runner = async (c, o) => {
+    const n = rep3.calls.n + 1;
+    if (n === 3) buildOk(o.cwd);
+    return rep3.runner(c, o);
+  };
+  const fz3 = await frozenSmoke();
+  const u = await rpt({ arm: fz3.arm, srcRepo: fz3.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr2, logPath: path.join(wr2, "l.md"), tag: "measured round 0", runner: r3, judge: async () => tot(++jn) as any, measure: { judge: recJudge(PASSV) } });
+  assert(u.exit === "ok" && u.row.g2?.firstRound?.judge === "refuse", `a revise round happened: ${u.exit} ${JSON.stringify(u.row.g2)}`);
+  const jo = u.row.measure!.judgeOverhead;
+  assert(jo.input === 20 && jo.output === 40 && jo.cacheRead === 60 && jo.cacheWrite === 80 && Math.abs(jo.costUsd - 1) < 1e-9, `both signers' usage is in the judge overhead: ${JSON.stringify(jo)}`);
 });
 
 const paid = process.argv.includes("--paid");

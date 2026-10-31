@@ -68,7 +68,10 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
   for (const v of orphans) findings.push(`void row at ${v.ts} (${v.arm} ${v.task} #${v.trial} attempt ${v.attempt}) names ${JSON.stringify((parseTag(v.tag) as { ts: string }).ts)}, which is no measured row of that attempt`);
   const kept = measured.filter((r) => !voided.has(r));
   const voidedUsd = [...voided].reduce((n, r) => n + (r.measure?.exec.costUsd ?? r.costUsd ?? 0), 0);
-  if (voided.size > 0) notes.push(`${voided.size} usage-limit attempt(s) voided (their cost, ${voidedUsd.toFixed(4)} USD, is reported apart from every figure)`);
+  if (voided.size > 0) {
+    const owner = rows.filter((v) => parseTag(v.tag).kind === "void" && v.exit.startsWith("void: owner-ruled")).length;
+    notes.push(`${voided.size} attempt(s) voided (${voided.size - owner} usage-limit, ${owner} owner-ruled harness defect; their cost, ${voidedUsd.toFixed(4)} USD, is reported apart from every figure)`);
+  }
 
   const groups = new Map<string, LogRow[]>();
   for (const r of kept) {

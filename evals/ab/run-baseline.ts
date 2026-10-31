@@ -2,6 +2,7 @@
 // documented trial path (A1: the D9 protocol, A0: the plain trial, both measured), tagging every attempt `measured round <r>`.
 //   bun evals/ab/run-baseline.ts [--round 0|1|2] [--log <md>] [--schedule <json>] [--prereg <md>] [--tasks <dir>]
 //   bun evals/ab/run-baseline.ts --void <ts> [--log <md>]     (repair: append the void row of the attempt row stamped <ts>)
+//   bun evals/ab/run-baseline.ts --void <ts> --reason "<text>" [--log <md>]     (owner-ruled harness defect, Amendment 2: the void row carries the reason as `void: owner-ruled: <text>`; the slot re-runs from round 0 as if never run)
 // Round 0 is the schedule; rounds 1 and 2 re-run only the slots every earlier round lost to infrastructure (PREREGISTRATION section 11).
 // It resumes from the log (slot + round), so it is safe to start again after any stop. It stops, mechanically, for the operator rules of
 // section 18 and section 12; each stop has its own exit code:
@@ -23,6 +24,7 @@ import os from "node:os";
 import path from "node:path";
 import { taskFile } from "./build-slots.ts";
 import { loadArm } from "./lib/arm.ts";
+import { defaultWorkRoot, sweepStale } from "./lib/isolate.ts";
 import { loadTask } from "./lib/grade.ts";
 import { freezeProblem, isInfraRow, liveRows, measuredTag, parseTag, readRows, voidTag, voidIndex, type LogRow } from "./lib/log.ts";
 import { runProtocolTrial } from "./lib/protocol.ts";
@@ -90,10 +92,10 @@ export function pendingSlots(rows: LogRow[], schedule: SlotKey[], round: number)
 }
 
 /** Append the void row of an attempt row (never edits the log): same arm / repo / task / trial / attempt, the attempt's `ts` in its tag. */
-export function appendVoid(log: string, attempt: LogRow): void {
+export function appendVoid(log: string, attempt: LogRow, reason?: string): void {
   const t = parseTag(attempt.tag);
   if (t.kind !== "measured") throw new Error(`row ${attempt.ts} is not a measured attempt (tag ${JSON.stringify(attempt.tag)})`);
-  appendRow(log, { tag: voidTag(t.round, attempt.ts), arm: attempt.arm, repo: attempt.repo, task: attempt.task, trial: attempt.trial, attempt: attempt.attempt, graders: "void", tokens: null, costUsd: null, wallS: 0, exit: "void: usage-limit", pins: {}, raw: {}, passed: false });
+  appendRow(log, { tag: voidTag(t.round, attempt.ts), arm: attempt.arm, repo: attempt.repo, task: attempt.task, trial: attempt.trial, attempt: attempt.attempt, graders: "void", tokens: null, costUsd: null, wallS: 0, exit: reason === undefined ? "void: usage-limit" : `void: owner-ruled: ${reason}`, pins: {}, raw: {}, passed: false });
 }
 
 /** The row the attempt just appended: the last measured row of this slot, round and attempt. */
@@ -185,8 +187,7 @@ export async function withLock<T>(lock: string, fn: () => Promise<T>, note: (lin
 
 /** The real attempt: the same calls run-trial.ts makes for `--measured` (A1 with `--protocol d9`), one attempt, the repo column set to the scheduled repo. */
 export function realRun(tasksDir: string, log: string): Deps["run"] {
-  const workRoot = path.join(os.tmpdir(), "ab-work");
-  fs.mkdirSync(workRoot, { recursive: true });
+  const workRoot = defaultWorkRoot();
   return async (ctx) => {
     const arm = loadArm(path.join(AB, "arms", `${ctx.slot.arm}.json`));
     if (!arm.snapshot) throw new Refused(`arm ${arm.id} has no frozen snapshot`);
@@ -202,13 +203,16 @@ if (import.meta.main) {
   try {
     const log = path.resolve(flag("log") ?? DEFAULT_LOG);
     const voidTs = flag("void");
+    const reason = flag("reason")?.trim();
+    if (reason !== undefined && (reason === "" || voidTs === undefined)) throw new Refused("--reason needs --void <ts> and a non-empty text");
     if (voidTs !== undefined) {
       await withLock(lockPathFor(log), async () => {
         const rows = readRows(log);
         const target = rows.find((r) => r.ts === voidTs && parseTag(r.tag).kind === "measured");
         if (!target) throw new Refused(`no measured attempt row stamped ${voidTs} in ${log}`);
         if (voidIndex(rows).voided.has(target)) throw new Refused(`the attempt stamped ${voidTs} is already voided`);
-        appendVoid(log, target);
+        console.log(`run-baseline: voiding ${target.arm} ${target.task} #${target.trial} attempt ${target.attempt}: exit ${JSON.stringify(target.exit)}, graders ${JSON.stringify(target.graders)}${reason === undefined ? "" : `, reason ${JSON.stringify(reason)}`}`);
+        appendVoid(log, target, reason);
         console.log(`run-baseline: void row appended for ${target.arm} ${target.task} #${target.trial} attempt ${target.attempt} (${voidTs})`);
       });
       process.exit(0);
@@ -220,7 +224,10 @@ if (import.meta.main) {
       run: realRun(path.resolve(flag("tasks") ?? path.join(AB, "tasks")), log),
       say: (l) => console.log(l),
     };
-    const r = await withLock(lockPathFor(log), () => runBaseline(Number(flag("round") ?? 0), deps));
+    const r = await withLock(lockPathFor(log), async () => {
+      sweepStale(defaultWorkRoot(), (l) => console.log(`run-baseline: ${l}`)); // the lock is ours, so every iso-* dir is a dead driver's
+      return runBaseline(Number(flag("round") ?? 0), deps);
+    });
     console.log(`run-baseline: ${r.stop}: ${r.message} (${r.ran.length} attempt(s) this start)`);
     process.exit(EXIT_CODE[r.stop]);
   } catch (e) {

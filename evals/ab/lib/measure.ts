@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./arm.ts";
-import type { Grade, Task } from "./grade.ts";
+import { verdictWord, type Grade, type Task } from "./grade.ts";
 import { blindTerms, contextFromTree, diffPaths, lfDocsOf, runJudges, trialDiff } from "./judges.ts";
 import { totalsOf, type Stream } from "./parse.ts";
 import type { Judge } from "./protocol.ts";
@@ -88,6 +88,8 @@ export type MeasureOpts = {
   cls: AttemptClass;
   judge: Judge;
   setupTokens?: Tok | null | undefined;
+  /** wall time of provisioning the trial environment (Amendment 2), outside the trial deadline */
+  setupWallS?: number | undefined;
 };
 
 /** The extended record for one attempt. Judges run only on a finished, ok attempt; otherwise they are UNKNOWN with the reason. */
@@ -95,7 +97,7 @@ export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; 
   const exec = executionTokens(o.streams);
   const verdict = (name: string) => {
     const g = o.graded?.graders.find((x) => x.name === name);
-    return g ? (g.passed ? "pass" : "fail") : "not-run";
+    return g ? verdictWord(g) : "not-run";
   };
   const graders: Measure["graders"] = o.task.graders.map((g) => ({ name: g.name, result: verdict(g.name) }));
   if (!o.task.graders.some((g) => /lint/i.test(g.name))) graders.push({ name: "lint", result: "not-applicable" });
@@ -111,5 +113,5 @@ export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; 
     overhead = r.overhead;
     prompts = r.prompts;
   }
-  return { measure: { graders, judges, exec, setup: o.setupTokens ?? null, judgeOverhead: overhead, attemptKind: isInfra(o.cls) ? "infra" : "scored", attemptClass: o.cls }, prompts };
+  return { measure: { graders, judges, exec, setup: o.setupTokens ?? null, judgeOverhead: overhead, attemptKind: isInfra(o.cls) ? "infra" : "scored", attemptClass: o.cls, ...(o.setupWallS !== undefined ? { setupWallS: o.setupWallS } : {}) }, prompts };
 }

@@ -5,13 +5,14 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./arm.ts";
-import { grade, type Grade, type Task } from "./grade.ts";
-import { isolationEnv, makeIsolation } from "./isolate.ts";
-import { detectPopups, parseStream, totalsOf, type Popup, type Totals } from "./parse.ts";
+import { grade, verdictWord, type Grade, type Task } from "./grade.ts";
+import { cleanupIsolation, isolationEnv, makeIsolation } from "./isolate.ts";
+import { detectPopups, parseStream, totalsOf, type Popup, type Stream, type Totals } from "./parse.ts";
+import { applyProvision, graderEnv, PROVISION_CLASS, PROVISION_EXIT, provisionTrial, setupTrial } from "./provision.ts";
 import { verifyPin } from "./pin.ts";
-import { appendRow, type Row } from "./record.ts";
+import { appendRow, type G2, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
-import { copyTree, diffManifest, manifest } from "./snapshot.ts";
+import { copyTree, diffManifest, manifest, withoutProvisioned } from "./snapshot.ts";
 import { classifyAttempt, firstActionSeen, terminalText, type AttemptClass } from "./retry.ts";
 import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
@@ -53,6 +54,22 @@ export function scopeCheck(design: string | undefined, layers: string[]): Scope 
   return outside.length > 0 ? { ok: false, reason: `outside Layers: ${outside.join(", ")}`, files } : { ok: true, reason: "pass", files };
 }
 const inLayers = (f: string, layers: string[]) => !path.posix.isAbsolute(f) && !f.split("/").includes("..") && layers.some((l) => (l.endsWith("/") ? f.startsWith(l) : f === l));
+
+/**
+ * Amendment 2: a layer that names a directory of the snapshot matches every file under it. Directory layers are written without a
+ * trailing slash in task.json, so each one that is a directory in `snapshot` gets its slash here; a file layer stays exact. A layer
+ * with `..` or an absolute path is left alone (it never matches a clean design path).
+ */
+export function resolveLayers(layers: string[], snapshot: string): string[] {
+  return layers.map((l) => {
+    if (l.endsWith("/") || path.posix.isAbsolute(l) || path.win32.isAbsolute(l) || l.split(/[\\/]/).includes("..")) return l;
+    try {
+      return fs.statSync(path.join(snapshot, l)).isDirectory() ? `${l}/` : l;
+    } catch {
+      return l;
+    }
+  });
+}
 
 export type JudgeReply = { text: string; totals: Totals | null };
 /** a plain string is a recorded reply (free checks); a JudgeReply carries the judge run's own usage */
@@ -114,6 +131,11 @@ export function writeTaskFile(dir: string, task: Task): string {
 
 export const phase1Prompt = (task: Task) =>
   `Run this task through the workflow you have installed, unattended. The task file is docs/work/todo/${task.id}.md; its G1 (Scope) gate is pre-signed. Your G2 (Design) gate is signed by the evaluation harness under an eval-only exception, outside this session. Do not ask the user anything. Write your design to ${DESIGN_FILE} with two parts: a "Files:" list (one repo-relative path per line, every file you will touch) and a "Behaviour:" paragraph. Then end your turn without implementing.\n\nTask: ${task.prompt}`;
+/** Amendment 2: the one revise round. The refusal reason is fed back to the same session; a second refusal ends the trial. */
+export const revisePrompt = (reason: string) =>
+  `The evaluation harness refused your G2 design: ${reason}
+
+Revise the design in ${DESIGN_FILE} (the same format: a "Files:" list, one repo-relative path per line, then a "Behaviour:" paragraph) so that it stays inside the task's scope, then end your turn without implementing. This is the only revision; a second refusal ends the trial.`;
 export const PHASE2_PROMPT = "G2 is signed. Implement the design you wrote, touching only the files in its Files: list, then stop.";
 
 const HARNESS = (p: string) => p.startsWith(".ab/") || p.startsWith("docs/work/");
@@ -137,69 +159,116 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const before = manifest(o.srcRepo);
   const iso = makeIsolation(o.workRoot, o.arm);
   copyTree(o.srcRepo, iso.trialDir);
+  const layers = resolveLayers(o.task.layers, o.srcRepo);
   const taskHash = writeTaskFile(iso.trialDir, o.task);
-  const base = manifest(iso.trialDir);
+  const pre = manifest(iso.trialDir);
+  // Amendment 2: the environment is built before the clock starts, for both arms alike, and torn down after grading whatever happened
+  const setup = await setupTrial(o.provision ?? provisionTrial, { trialDir: iso.trialDir, root: iso.root });
+  const base = manifest(iso.trialDir); // after provisioning: what it wrote (go.sum, tool caches) is neither a breach nor the agent's change
+  if (setup.failed !== undefined && !o.measure) {
+    cleanupIsolation(iso, o.workRoot);
+    throw new Error(`provisioning failed: ${setup.failed}`);
+  }
   const run = o.runner ?? spawnRunner;
   // ONE deadline for the whole trial (Amendment 1): the phases and the signer share it; each call gets what is left
   const clock = o.clock ?? Date.now;
   const deadline = clock() + (o.timeoutMs ?? TRIAL_TIMEOUT_MS);
   const remaining = () => deadline - clock();
-  const call = () => ({ cwd: iso.trialDir, env: isolationEnv(iso, o.arm), timeoutMs: remaining() });
+  const call = () => ({ cwd: iso.trialDir, env: applyProvision(isolationEnv(iso, o.arm), setup.prov!), timeoutMs: remaining() });
   const sid = randomUUID();
+  const judge = o.judge ?? realJudge(o.workRoot, o.arm, undefined, remaining);
   let timedOut = false;
 
-  clearSynced(iso.cfg);
-  const raw1 = await run(buildCommand(o.arm, phase1Prompt(o.task), ["--session-id", sid]), call());
-  fs.writeFileSync(path.join(iso.root, "stream-phase1.jsonl"), raw1.stdout);
-  const s1 = parseStream(raw1.stdout);
-  const streams = [s1];
-  let wallMs = raw1.wallMs;
-  let exitCode = raw1.exitCode;
-  if (raw1.timedOut || remaining() <= 0) timedOut = true;
-
-  let park: Popup | undefined = timedOut ? undefined : detectPopups(s1)[0];
-  let refused: string | undefined;
-  let g2: Row["g2"];
-  if (!park && !timedOut) {
+  /** One G2 check of the design now on disk: the mechanical scope check, then the isolated policy judge. */
+  const gate = async (): Promise<{ g2: G2; refused?: string }> => {
     const designPath = path.join(iso.trialDir, DESIGN_FILE);
     const design = fs.existsSync(designPath) ? fs.readFileSync(designPath, "utf8") : undefined;
-    const scope = scopeCheck(design, o.task.layers);
-    g2 = { scope: scope.ok ? "pass" : `fail: ${scope.reason}`, judge: "not-asked", reason: "", designSha256: design === undefined ? "" : sha256(design) };
-    if (!scope.ok) refused = `scope: ${scope.reason}`;
-    else {
-      const capped = remaining() < SIGNER_CAP_MS; // the deadline, not the signer's own cap, bounds this call
-      const verdict = await policyCheck(design!, o.task.outOfScope, o.judge ?? realJudge(o.workRoot, o.arm, undefined, remaining));
-      // the signer ran the deadline out (or was cut by it): the trial timed out, whatever the verdict; policyCheck already turned a failed call into a refusal
-      if (remaining() <= 0 || (capped && !verdict.sign && /^judge (?:reply unusable|ran|run failed)/.test(verdict.reason))) timedOut = true;
-      g2.judge = verdict.sign ? "sign" : "refuse";
-      g2.reason = verdict.reason;
-      g2.judgeUsage = verdict.usage;
-      if (!verdict.sign) refused = `policy: ${verdict.reason}`;
-    }
-  }
+    const scope = scopeCheck(design, layers);
+    const g2: G2 = { scope: scope.ok ? "pass" : `fail: ${scope.reason}`, judge: "not-asked", reason: "", designSha256: design === undefined ? "" : sha256(design) };
+    if (!scope.ok) return { g2, refused: `scope: ${scope.reason}` };
+    const capped = remaining() < SIGNER_CAP_MS; // the deadline, not the signer's own cap, bounds this call
+    const verdict = await policyCheck(design!, o.task.outOfScope!, judge);
+    // the signer ran the deadline out (or was cut by it): the trial timed out, whatever the verdict; policyCheck already turned a failed call into a refusal
+    if (remaining() <= 0 || (capped && !verdict.sign && /^judge (?:reply unusable|ran|run failed)/.test(verdict.reason))) timedOut = true;
+    g2.judge = verdict.sign ? "sign" : "refuse";
+    g2.reason = verdict.reason;
+    g2.judgeUsage = verdict.usage;
+    return verdict.sign ? { g2 } : { g2, refused: `policy: ${verdict.reason}` };
+  };
 
+  let raw1: RawRun = { stdout: "", stderr: `provisioning failed: ${setup.failed}`, exitCode: -1, wallMs: 0 };
+  let streams: Stream[] = [];
+  let wallMs = 0;
+  let exitCode = 0;
+  let park: Popup | undefined;
+  let refused: string | undefined;
+  let g2: G2 | undefined;
   let graded: Grade | undefined;
   let changed: string[] = [];
   let lastRaw = raw1;
   let breach: string[] = [];
-  if (!park && !refused && !timedOut) {
-    clearSynced(iso.cfg);
-    const raw2 = await run(buildCommand(o.arm, PHASE2_PROMPT, ["--resume", sid]), call());
-    fs.writeFileSync(path.join(iso.root, "stream-phase2.jsonl"), raw2.stdout);
-    lastRaw = raw2;
-    const s2 = parseStream(raw2.stdout);
-    streams.push(s2);
-    wallMs += raw2.wallMs;
-    exitCode = exitCode || raw2.exitCode;
-    if (raw2.timedOut) timedOut = true;
-    park = timedOut ? undefined : detectPopups(s2)[0];
-    if (!park && !timedOut) {
-      const touched = diffManifest(base, manifest(iso.trialDir)).map((d) => d.replace(/^\w+ /, ""));
-      breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, o.task.layers!));
-      if (o.measure) changed = diffManifest(before, manifest(iso.trialDir));
-      graded = await grade(o.task, iso.trialDir);
+  try {
+    if (setup.failed === undefined) {
+      clearSynced(iso.cfg);
+      raw1 = lastRaw = await run(buildCommand(o.arm, phase1Prompt(o.task), ["--session-id", sid]), call());
+      fs.writeFileSync(path.join(iso.root, "stream-phase1.jsonl"), raw1.stdout);
+      streams = [parseStream(raw1.stdout)];
+      wallMs = raw1.wallMs;
+      exitCode = raw1.exitCode;
+      if (raw1.timedOut || remaining() <= 0) timedOut = true;
+
+      park = timedOut ? undefined : detectPopups(streams[0]!)[0];
+      if (!park && !timedOut) {
+        const first = await gate();
+        g2 = first.g2;
+        refused = first.refused;
+        // Amendment 2: ONE revise round. The refusal reason goes back to the same session; the revised design is checked again; a second refusal ends the trial.
+        if (refused !== undefined && !timedOut) {
+          clearSynced(iso.cfg);
+          const rawR = (lastRaw = await run(buildCommand(o.arm, revisePrompt(refused), ["--resume", sid]), call()));
+          fs.writeFileSync(path.join(iso.root, "stream-revise.jsonl"), rawR.stdout);
+          const sR = parseStream(rawR.stdout);
+          streams.push(sR);
+          wallMs += rawR.wallMs;
+          exitCode = exitCode || rawR.exitCode;
+          if (rawR.timedOut || remaining() <= 0) timedOut = true;
+          park = timedOut ? undefined : detectPopups(sR)[0];
+          if (!park && !timedOut) {
+            const second = await gate();
+            g2 = { ...second.g2, firstRound: first.g2 };
+            refused = second.refused;
+          }
+        }
+      }
+
+      if (!park && !refused && !timedOut) {
+        clearSynced(iso.cfg);
+        const raw2 = await run(buildCommand(o.arm, PHASE2_PROMPT, ["--resume", sid]), call());
+        fs.writeFileSync(path.join(iso.root, "stream-phase2.jsonl"), raw2.stdout);
+        lastRaw = raw2;
+        const s2 = parseStream(raw2.stdout);
+        streams.push(s2);
+        wallMs += raw2.wallMs;
+        exitCode = exitCode || raw2.exitCode;
+        if (raw2.timedOut) timedOut = true;
+        park = timedOut ? undefined : detectPopups(s2)[0];
+        if (!park && !timedOut) {
+          const now = manifest(iso.trialDir);
+          const touched = diffManifest(base, now).map((d) => d.replace(/^\w+ /, ""));
+          breach = touched.filter((f) => !HARNESS(f) && !inLayers(f, layers));
+          if (o.measure) changed = withoutProvisioned(diffManifest(before, now), pre, base, now);
+          graded = await grade(o.task, iso.trialDir, graderEnv(setup.prov));
+        }
+      }
     }
+  } catch (e) {
+    await setup.prov?.teardown(); // an escaping error: no row is written, so nothing reads the trial copy again
+    cleanupIsolation(iso, o.workRoot);
+    throw e;
+  } finally {
+    await setup.prov?.teardown();
   }
+  if (streams.length === 0) streams = [parseStream("")];
 
   const ts = streams.map((s) => totalsOf(s.result));
   const totals = ts.some((t) => t === null) ? null : ts.reduce((acc, t) => addTotals(acc!, t!));
@@ -207,8 +276,8 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const mutated = diffManifest(before, manifest(o.srcRepo));
   const errored = exitCode !== 0 || streams.some((s) => s.result?.is_error);
   const last = streams[streams.length - 1]!;
-  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : park ? `parked: popup ${park.tool}: ${popupText(park)}` : refused ? `g2-refused: ${refused}` : errored ? `cli-error: exit ${exitCode}, ${last.result?.terminal_reason ?? "no result event"}` : breach.length > 0 ? `scope-breach: ${breach.join(", ")}` : "ok";
-  const graders = graded ? graded.graders.map((g) => `${g.name}:${g.passed ? "pass" : "fail"}`).join(",") : `not-run:${timedOut ? "timeout" : park ? "parked" : "g2-refused"}`;
+  const exit = mutated.length > 0 ? `source-mutated: ${mutated.join(", ")}` : setup.failed !== undefined ? `${PROVISION_EXIT}: ${setup.failed}` : timedOut ? "timeout" : !totals ? "usage-missing" : invalid.length > 0 ? `invalid: ${invalid.join("; ")}` : park ? `parked: popup ${park.tool}: ${popupText(park)}` : refused ? `g2-refused: ${refused}` : errored ? `cli-error: exit ${exitCode}, ${last.result?.terminal_reason ?? "no result event"}` : breach.length > 0 ? `scope-breach: ${breach.join(", ")}` : "ok";
+  const graders = graded ? graded.graders.map((g) => `${g.name}:${verdictWord(g)}`).join(",") : `not-run:${setup.failed !== undefined ? PROVISION_EXIT : timedOut ? "timeout" : park ? "parked" : "g2-refused"}`;
   const row: Row = {
     tag: o.tag,
     arm: o.arm.id,
@@ -230,12 +299,19 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   };
   let cls: AttemptClass | undefined;
   if (o.measure) {
-    cls = classifyAttempt({ raw: lastRaw, stream: last, exit, trialActed: streams.some(firstActionSeen) });
+    cls = setup.failed !== undefined ? PROVISION_CLASS : classifyAttempt({ raw: lastRaw, stream: last, exit, trialActed: streams.some(firstActionSeen) });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
-    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
+    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 })).measure;
+    // the G2 signer(s) are judge calls: overhead, never execution (section 9). A revise round has two, the first in g2.firstRound.
+    for (const u of [g2?.judgeUsage, g2?.firstRound?.judgeUsage]) {
+      if (!u) continue;
+      const jo = row.measure.judgeOverhead;
+      row.measure.judgeOverhead = { input: jo.input + u.input, output: jo.output + u.output, cacheRead: jo.cacheRead + u.cacheRead, cacheWrite: jo.cacheWrite + u.cacheWrite, costUsd: jo.costUsd + u.costUsd };
+    }
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
+  cleanupIsolation(iso, o.workRoot); // the cluster is already down; the trial copy and its dependencies go, the stream files stay under kept/
   const valid = exit === "ok" || /^(g2-refused|parked|scope-breach):/.test(exit);
-  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: terminalText(last, lastRaw), ...(cls ? { cls } : {}) };
+  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: setup.failed !== undefined ? "" : terminalText(last, lastRaw), ...(cls ? { cls } : {}) };
 }

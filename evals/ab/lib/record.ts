@@ -23,7 +23,12 @@ export type Measure = {
   attemptKind: "scored" | "infra";
   /** the retry class of the attempt: ok | task-failure | infra:<kind> */
   attemptClass: string;
+  /** wall seconds spent provisioning the trial environment (Amendment 2): outside the 45-minute deadline, recorded per attempt */
+  setupWallS?: number;
 };
+
+/** One G2 check of a design. After a revise round (Amendment 2) the row's g2 is the FINAL check and `firstRound` the refused one. */
+export type G2 = { scope: string; judge: string; reason: string; designSha256: string; judgeUsage?: { input: number; output: number; cacheRead: number; cacheWrite: number; costUsd: number } | undefined; firstRound?: Omit<G2, "firstRound"> };
 
 export type Row = {
   tag: string;
@@ -47,7 +52,7 @@ export type Row = {
   /** protocol trials: the D9 exception, logged on every use */
   deviation?: string;
   /** protocol trials: scope result, judge verdict + reason, design sha256 */
-  g2?: { scope: string; judge: string; reason: string; designSha256: string; judgeUsage?: { input: number; output: number; cacheRead: number; cacheWrite: number; costUsd: number } | undefined } | undefined;
+  g2?: G2 | undefined;
   /** protocol trials: the popup that parked the trial, verbatim */
   park?: unknown;
   /** measured runs: the extended record */
