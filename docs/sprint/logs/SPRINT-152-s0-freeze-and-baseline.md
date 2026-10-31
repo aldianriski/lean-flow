@@ -238,3 +238,12 @@ exclusions, harmless today since the pin holds no such folder), noted rather tha
 re-signed by popup; superseding freeze sha256 `60e7e1414fde7b192951712be3ce33f4ecf0fc9158577c0624b6c1da46aae456` at
 11:34:21Z, accepted by the freeze guard; the four re-pilot rows (10:51 to 11:05) voided with echoed targets. The driver re-runs
 the four pilot slots and stops for the owner.
+
+### 2026-10-31 | progress | T4 second re-pilot (Amendment 3): three of four slots run clean; one A1 parked on a write outside its copy
+The driver ran the four pilot slots and stopped for the owner (exit 10). clinic A1 is the first full lean-flow trial: G1, the
+D9 G2 and the build ran end to end, every grader passed, all three judges PASS, one Sonnet subagent dispatched by 2.x routing
+(models seen: Opus 5.5 and Sonnet 5.5), 263 s, 3.24 USD notional. clinic A0: every grader and judge PASS, 153 s, 0.68 USD.
+workdoo A0: graders pass, business PASS, scope FAIL (two files outside the layers), 142 s, 0.77 USD. workdoo A1 parked on a
+Write permission prompt: the agent tried to write a scratch check script to a public folder outside its trial copy, which
+acceptEdits does not cover; scored not-passed as frozen, 264 s, 2.49 USD before parking. Judges about 0.2 to 0.4 USD per
+scored trial. A1 costs about four times A0 per trial so far.
