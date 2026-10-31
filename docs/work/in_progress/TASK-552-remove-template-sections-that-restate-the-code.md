@@ -23,10 +23,10 @@ research §9 names this audit as the mitigation for "richer docs reproduce the p
 TASK-547, so it follows it. Not frozen under ADR-053. G2 review-round cap: 2.
 
 ## Done when
-- [ ] Every core template section whose content a reader gets from the manifest, file tree or code is removed or reworded to
+- [x] Every core template section whose content a reader gets from the manifest, file tree or code is removed or reworded to ✓ 131b49f6: 14 core templates reworded or trimmed, 20 unchanged of 34 audited; change list with reasons in the SPRINT-153 log
   ask only for the part they cannot; the change list names each section and the reason.
-- [ ] No template section prescribes an architecture (the architecture-baselines verdict stands).
-- [ ] A re-run `init` on the portfolio-sveltekit snapshot writes no section that only restates its manifest or file tree.
+- [x] No template section prescribes an architecture (the architecture-baselines verdict stands). ✓ no named-architecture menu or always/never layer rule left (grep, Codex round 1 and a Claude round 2); judgment tick
+- [x] A re-run `init` on the portfolio-sveltekit snapshot writes no section that only restates its manifest or file tree. ✓ 753728d6: owner-run init on a fresh portfolio-sveltekit copy on the VPS, 0 of 87 sections restate the manifest or tree (independent judge, after the README fix and one re-run)
 
 ## Touches
 the core templates in lean-doc-generator
