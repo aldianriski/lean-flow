@@ -6,6 +6,9 @@ bounded by the safe-scaffold allowlist (ADR-012).
 
 ## Procedure
 
+**Standing rule** — init never deletes, moves or overwrites a file that existed before it ran. Every
+planned write to an existing path is skipped and listed under "skipped (pre-existing)" in the report.
+
 1. **Detect substrate and read the stack** — read `package.json` / `pyproject.toml` / `go.mod` / etc.
    and the existing file tree to infer stack, and whether a database or auth substrate is present. If
    inaccessible, ask the user to paste the manifest + file tree. Then read a small sample of real files
@@ -32,6 +35,15 @@ bounded by the safe-scaffold allowlist (ADR-012).
    `Question sets loaded: <names> (detected: <evidence>)` or `No question set matches this stack; scan
    only.` For each loaded set, run its questions' marker searches over the whole tree (not only step
    1's sample); a question with a clear answer is settled and cited, the rest stay open for step 3.
+1d. **Detect existing docs** — after 1c, before step 2 writes anything. Existing docs = a `CLAUDE.md` or
+   `CONTEXT.md` at the root or under `.claude/` · an `AGENTS.md` · a `docs/` folder holding at least one
+   markdown file. If any is found, list them in a message, then ask in its OWN popup, before the tier
+   popup: "This repo already has docs — run `/lean-doc-generator migrate` instead (recommended), or
+   continue init writing only absent files?" **migrate** → write nothing, stop, and tell the user to run
+   `/lean-doc-generator migrate`. **continue** → write only absent files; never fill or append sections
+   inside an existing file (that is migrate's job); a root `CLAUDE.md` counts as the repo's AI context,
+   so `.claude/CLAUDE.md` is not written beside it. Headless: no popup; the park record (step 3) also
+   lists the existing docs found and the migrate offer.
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
