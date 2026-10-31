@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-30
+last_updated: 2026-10-31
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -54,7 +54,7 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ❌ A **scope-change entry that names a path no task declares** — the scope-change leg attributes an entry by its **heading**, so the heading names every `Tn` whose paths its body names, and every path the body names sits in one of those tasks' `Layers:` (touched) or `Cites:` (only named). The log is append-only, so a slip costs a `Cites:` fix and a second full gate. After appending one, run the leg (`bun scripts/lib/check-sprint-by-reference.ts <sprint> --scope-change`, or `bun scripts/merge-check.ts`) and read the verdict line it prints before committing (L-234 ×2). The leg reads every backticked file- or folder-shaped span in the body as a path, so write each path in full and leave folder words as plain prose (L-257 ×2). The same holds in every governed field a guard parses (tick evidence, a log entry's paths, Plan lines): a backticked, path-shaped token there is a claim the guard will check, so use one only for a file the task touches or cites, and plain words otherwise (L-261 ×2).
 
-❌ **Ticking a box with only part of the checks that read the touched file** — before ticking a task that changed a shipped file, run every check that reads it: the `evals/` harnesses that name it **and** the gate legs that scan it (prose density, doc caps). Run each one as itself; an ad-hoc command that re-derives its rule is not that check, and a ratchet against a baseline is exactly what a re-derived threshold misses (L-251 ×2). A dispatch brief names those checks for its builder, typecheck included: Bun runs TypeScript without type-checking it, so a green `bun test` says nothing about types, and every brief that touches `.ts` names `bunx tsc --noEmit` among the checks to run before commit (L-262 ×2).
+❌ **Ticking a box with only part of the checks that read the touched file** — before ticking a task that changed a shipped file, run every check that reads it: the `evals/` harnesses that name it **and** the gate legs that scan it (prose density, doc caps). Run each one as itself; an ad-hoc command that re-derives its rule is not that check, and a ratchet against a baseline is exactly what a re-derived threshold misses (L-251 ×2). A dispatch brief names those checks for its builder, typecheck included: Bun runs TypeScript without type-checking it, so a green `bun test` says nothing about types, and every brief that touches `.ts` names `bunx tsc --noEmit` among the checks to run before commit (L-262 ×2). The population runs the other way too: a corpus of another repo's code landed as fixtures is read by every repo-wide tool that globs the tree, so in the same change list each one (typecheck, test runner, linters, prose and cap checks) and exclude the corpus from it (L-267 ×2).
 
 ❌ **Ticking a member that sits in a folder its task's `Layers:` does not name, under a `Tn:` subject** — the tick is a write the leg cannot attribute to that task, so it fails `layers observed` at close. Commit it as a bare `sprint(N):` coordinator write, as L-238 already rules for status moves. Declaring `review/` at promote instead guesses the route and fails whichever way the guess goes (L-258 ×2).
 
@@ -131,10 +131,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-267 [tags: tooling] [status: active]: **A corpus of another repo's files stored as fixtures is picked up by every repo-wide tool of the host: exclude it from each one when it lands.** SPRINT-151 stored 16 A/B tasks, each with its app's acceptance tests, under the eval tree. First the repo typecheck compiled the clinic tests as lean-flow code (7 errors; fixed by an exclude at T5). Then, at close, `bun test` ran three of them as lean-flow tests (3 failures; fixed by a test ignore pattern). Both tools glob the whole tree, and neither was checked when the corpus landed. When a fixture corpus of foreign code lands, list every repo-wide tool that globs (typecheck, test runner, linters, prose and cap checks) and exclude the corpus from each in the same change.
+## L-267 [tags: tooling] [status: promoted]: **A corpus of another repo's files stored as fixtures is picked up by every repo-wide tool of the host: exclude it from each one when it lands.** SPRINT-151 stored 16 A/B tasks, each with its app's acceptance tests, under the eval tree. First the repo typecheck compiled the clinic tests as lean-flow code (7 errors; fixed by an exclude at T5). Then, at close, `bun test` ran three of them as lean-flow tests (3 failures; fixed by a test ignore pattern). Both tools glob the whole tree, and neither was checked when the corpus landed. When a fixture corpus of foreign code lands, list every repo-wide tool that globs (typecheck, test runner, linters, prose and cap checks) and exclude the corpus from each in the same change.
 - seen: 2026-10-30 (SPRINT-151 T5 merge-check typecheck FAIL) · 2026-10-30 (SPRINT-151 close, system verify bun test 3 FAIL)
 - count: 2
-- promoted: no
+- **L-267 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — appended to the run-every-check line (L-251's, L-262's): a foreign fixture corpus is excluded from every repo-wide globbing tool in the change that lands it (SPRINT-152 promote)
 - related: L-264 (count across the whole set, not the touched files)
 
 ---
