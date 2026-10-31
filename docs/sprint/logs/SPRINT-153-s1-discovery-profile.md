@@ -35,3 +35,9 @@ TASK-548 and TASK-552 both touch the product-requirements template) made five, a
 two S and five M, no `L`. Origins: seven decomposer. Epic: EPIC-023 (all seven).
 Dependent pull: TASK-550, 551, 553 and 554 join beside their in-sprint blockers under the promote rule, with no state ruling;
 TASK-555 stays out (its blocker TASK-545 is in SPRINT-152, a different sprint).
+
+### 2026-10-31 | progress | VPS readiness read before G1: CLI present with a login file, Node 24, no Go
+Read-only check over ssh: the ubuntu user has the Claude CLI 2.1.291 with a credentials file present (not opened), Node
+24.22.1, bun 1.3.14, 64 GB free disk and 7.6 GB memory. Go is not installed, which T5's fresh chi fixture needs (its G2
+decides where to install it). A3 holds pending one cheap live call at T1's G2. Merge legs green across both streams after
+the plan lock (layers observed runs per sprint and skips the sibling's commits).
