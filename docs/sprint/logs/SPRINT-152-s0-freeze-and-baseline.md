@@ -155,3 +155,17 @@ retained fixture. Coordinator re-ran on main: typecheck clean, selftest 51 of 51
 Owner re-signed by popup; the superseding freeze (sha256 `83750fc4f4cc34c096da0b77c79f48e4733937be938f78678f84dcf3e2f6909e`)
 is recorded in the measurement log header and the shared freeze guard accepts it. The pilot (four slots, one per arm and
 repo) runs next, one trial at a time, and stops for the owner's review.
+
+### 2026-10-31 | surprise | T4 pilot ran (four slots) and found two harness defects that void it as a measurement
+The pilot ran one slot per arm and repo and stopped as designed (driver exit 10). Wall time 49 to 157 s per trial, notional
+cost 0.57 to 0.86 USD per trial plus about 0.35 USD of judges per scored A0 trial. Results: both A0 trials exited ok, their
+judges rated business and convention PASS, yet every Node grader failed (typecheck, build, lint, the verify scripts; clinic's
+go test too). Both A1 trials were refused at the D9 G2 scope check. Root causes, read from the code and the task briefs:
+(1) the arm snapshots carry no dependencies and the trial path never provisions the environment the task authors used
+(workdoo: an npm install; clinic: an npm install in web and a fresh Postgres cluster with both databases migrated), so no
+Node grader can pass in either arm; (2) the D9 scope matcher treats a layer as a directory only when it ends in a slash,
+while the task schema writes directory layers without one, so every clinic A1 design touching its own directories is
+refused, and the post-run scope-breach check shares the matcher. Workdoo's A1 refusal was a real out-of-layer edit (a
+verify script), the same edit A0 made, which A0 paid for only in its scope verdict: a D9 asymmetry for the owner to weigh.
+The harness had never run end to end on a real A/B task before this pilot, because R-c limited every earlier run to the
+fixture. No further slot runs until the owner rules.
