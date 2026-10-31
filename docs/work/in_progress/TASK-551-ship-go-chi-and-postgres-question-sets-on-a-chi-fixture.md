@@ -22,10 +22,10 @@ D12's backend profiles. No non-A/B repo on this machine uses chi, so the task bu
 under ADR-053. G2 review-round cap: 2.
 
 ## Done when
-- [ ] Short curated Go/chi and Postgres question sets ship; the Postgres set loads on any repo with a Postgres substrate,
+- [x] Short curated Go/chi and Postgres question sets ship; the Postgres set loads on any repo with a Postgres substrate, ✓ 99d8aeec: go-chi.md and postgres.md; postgres detects drivers or ORM dialects across Go, npm, Python, Ruby, JVM, .NET, Rust, Elixir and hosted clients, or a Postgres image the app uses
   whatever its language.
-- [ ] A minimal Go chi + pgx + SQL-migrations fixture repo exists in D:\Research, written fresh, not copied from clinic-ab.
-- [ ] A real `init` through the installed plugin on that fixture loads both sets, and on the portfolio-sveltekit snapshot loads
+- [x] A minimal Go chi + pgx + SQL-migrations fixture repo exists in D:\Research, written fresh, not copied from clinic-ab. ✓ D:\Research\chi-fixture written fresh (chi v5 + pgx v5 + SQL migrations + postgres compose, no env file); independent review found it unlike clinic-ab
+- [x] A real `init` through the installed plugin on that fixture loads both sets, and on the portfolio-sveltekit snapshot loads ✓ headless init (build b341d47d): the chi fixture loaded go-chi and postgres; portfolio-sveltekit loaded postgres only (it has Postgres), not go-chi
   neither unless it detects Postgres.
 
 ## Touches

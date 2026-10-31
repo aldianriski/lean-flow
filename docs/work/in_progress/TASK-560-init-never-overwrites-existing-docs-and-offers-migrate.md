@@ -25,12 +25,12 @@ are write-if-absent) and never routes a repo that already has docs to `migrate`,
 init on an existing repo silently loses part of their docs. Defect fix of a shipped skill: not frozen under ADR-053.
 
 ## Done when
-- [ ] `init` never deletes, moves or overwrites a file that existed before it ran; a file it would write that already exists
+- [x] `init` never deletes, moves or overwrites a file that existed before it ran; a file it would write that already exists ✓ d8975960: a standing rule, init never deletes, moves or overwrites a pre-existing file; planned writes to existing paths are skipped and listed (portfolio run listed them)
   is skipped and listed in its report.
-- [ ] When the repo already has AI-context or core docs (a `CLAUDE.md` at the root or under `.claude/`, `CONTEXT.md`,
+- [x] When the repo already has AI-context or core docs (a `CLAUDE.md` at the root or under `.claude/`, `CONTEXT.md`, ✓ step 1d lists existing docs and offers migrate in its own popup before the tier popup and before any write; talixa and compass runs recorded the offer
   `AGENTS.md`, or a `docs/` tree with content), `init` says so before writing anything and offers `migrate` as the path,
   continuing as `init` (absent files only) only on the owner's choice.
-- [ ] A real `init` through the plugin under test on a fresh talixa-hris copy leaves its original root `CLAUDE.md`
+- [x] A real `init` through the plugin under test on a fresh talixa-hris copy leaves its original root `CLAUDE.md` ✓ headless init on a fresh talixa-hris copy: root CLAUDE.md sha256 9230d93f… unchanged after the run; the park record names it and the migrate offer
   byte-identical, and its record shows the existing docs found and the `migrate` offer.
 
 ## Touches

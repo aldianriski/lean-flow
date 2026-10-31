@@ -22,8 +22,8 @@ D12's second frontend profile; content only, on TASK-549's match-and-load mechan
 review-round cap: 2.
 
 ## Done when
-- [ ] A short curated Vue/Vite question set ships beside the React/Vite one, in the same shape.
-- [ ] A real `init` through the installed plugin loads it on a compass or template-vue snapshot (Vue + Vite) and does not on a
+- [x] A short curated Vue/Vite question set ships beside the React/Vite one, in the same shape. ✓ 43722942: vue-vite.md in the same shape as react-vite.md (DETECT, clear-answer rule, ten owner-approved marker questions), listed in the profiles index
+- [x] A real `init` through the installed plugin loads it on a compass or template-vue snapshot (Vue + Vite) and does not on a ✓ headless init (build b341d47d, VPS): template-vue loaded vue-vite; talixa-hris (React + Vite) loaded react-vite only; compass (Nuxt) loaded none
   React + Vite snapshot.
 
 ## Touches
