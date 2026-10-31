@@ -78,3 +78,14 @@ scoring, and three consecutive infra failures aborting for a ruling. T3 G2 signe
 T2 built in an isolated worktree (commits `28c34056`, `1002581f`) and merged at `5e982d0b`; the review-depth fixtures
 re-run green on the main tree. Builder's archived-log comparison, 105 logs: 83 PASS to PASS, 21 FAIL to FAIL, SPRINT-151
 FAIL to PASS, none PASS to FAIL; SPRINT-119 dropped from three findings to two (a duplicate self-review line now graded once).
+
+### 2026-10-31 | progress | T2 done: review-depth grades the latest review line per task; TASK-559 in done
+`scripts/lib/check-review-depth.sh` now keeps the last review line per task id and grades only that one; finding names and
+the PASS wording are unchanged. Three retained fixtures (cases 26 to 28): a later self-review FAILs, an earlier self-review
+followed by scoped-reviewer PASSes as the control, and an interleaved two-task log FAILs on T1. The coordinator re-ran on
+main: review-depth fixtures all green, system-verify fixtures all green, emitter-column 9/0, and the live log PASS. The
+archived-log comparison was re-derived by exit code over the same 105 copies and matched the builder's finding-count route:
+SPRINT-151 FAIL to PASS, 83 PASS kept, 21 FAIL kept, none PASS to FAIL. One independent scoped review: no findings; it noted
+a pre-existing gap (a CRLF line ending exactly at the depth token is never graded), not introduced here.
+consequence · T2 · behaviour:material · governance:high
+review · T2 · scoped-reviewer · behaviour:material · governance:high
