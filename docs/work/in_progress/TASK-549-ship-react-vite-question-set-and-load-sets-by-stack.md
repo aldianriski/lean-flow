@@ -23,10 +23,10 @@ builds how a set is matched and loaded, so TASK-550 and TASK-551 only add conten
 review-round cap: 2.
 
 ## Done when
-- [ ] A short curated React/Vite question set ships in the lean-doc-generator skill, asking only about conventions a scan cannot
+- [x] A short curated React/Vite question set ships in the lean-doc-generator skill, asking only about conventions a scan cannot ✓ 096ab05a+9e6d45d1: nine-question React/Vite set in the generator's profiles folder with a detect rule, found through an index; no match -> scan only, unchanged
   settle; `init` loads a set only when detection matches its stack, and otherwise runs scan-only, unchanged.
-- [ ] A set question is asked only when the scan left it open; its answer lands in conventions in use with its source.
-- [ ] A real `init` through the installed plugin loads the set on a talixa-hris or temidev-project snapshot (React + Vite), and
+- [x] A set question is asked only when the scan left it open; its answer lands in conventions in use with its source. ✓ owner-run init on talixa-hris (VPS): the scan settled six conventions with cited files; the open folder rule was asked and landed '(owner, init; drafted from src/modules/hr/)'; two deferred to Not confirmed
+- [x] A real `init` through the installed plugin loads the set on a talixa-hris or temidev-project snapshot (React + Vite), and ✓ build 9e6d45d1: the set loaded on talixa-hris (owner run, its question asked) and did not on portfolio-sveltekit (headless run: 'none loaded ... scan only')
   does not on the portfolio-sveltekit snapshot.
 
 ## Touches
