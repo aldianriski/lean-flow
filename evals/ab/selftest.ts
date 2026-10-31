@@ -3,6 +3,7 @@
 // Free checks S* make no model call; paid checks P* run a few headless haiku trials.
 import fs from "node:fs";
 import os from "node:os";
+import { deepStrictEqual } from "node:assert";
 import path from "node:path";
 
 export const AB = import.meta.dir;
@@ -1483,6 +1484,261 @@ check("S40 fixture-only lift: an unmeasured D9 trial on a repo outside evals/ab/
   const cli = Bun.spawnSync(["bun", path.join(AB, "run-trial.ts"), "--arm", ARM_FILE, "--task", taskFile, "--repo", fz.src, "--protocol", "d9", "--log", path.join(dir, "cli.md")], { stdout: "pipe", stderr: "pipe" });
   const out = cli.stdout.toString() + cli.stderr.toString();
   assert(cli.exitCode !== 0 && /protocol trials run on evals\/ab\/fixtures\/ only/.test(out) && !fs.existsSync(path.join(dir, "cli.md")), `run-trial.ts --protocol d9 without --measured must refuse outside the fixtures: ${out}`);
+});
+
+// ---- T4 M3/M4: the baseline driver and the log-to-slots builder, on compact row specs (no model call) ----
+type Spec = { tag: string; arm: string; repo?: string; task: string; trial: number; attempt: number; exit: string; cls: string; g?: "pass" | "fail" | "not-run"; j?: string; tok?: [number, number, number, number]; incomplete?: boolean; cost?: number; nomeasure?: boolean };
+const VERDICT: Record<string, "PASS" | "FAIL" | "UNKNOWN"> = { P: "PASS", F: "FAIL", U: "UNKNOWN" };
+/** One log row from a compact spec: the exit, the retry class, the grader result, the three verdicts (P/F/U), usage and cost. */
+function specRow(s: Spec): import("./lib/record.ts").Row {
+  const t = s.tok ?? [0, 0, 0, 0];
+  const cost = s.cost ?? 0;
+  const v = (s.j ?? "UUU").split("").map((c) => ({ verdict: VERDICT[c]!, reason: "fixture" }));
+  const measure: import("./lib/record.ts").Measure = {
+    graders: [...["typecheck", "build", "acceptance"].map((name) => ({ name, result: s.g ?? "not-run" })), { name: "lint", result: "not-applicable" }],
+    judges: { convention: v[0]!, business: v[1]!, scope: v[2]! },
+    exec: { input: t[0], output: t[1], cacheRead: t[2], cacheWrite: t[3], costUsd: cost, subagents: 0, models: [], ...(s.incomplete ? { incomplete: true } : {}) },
+    setup: null,
+    judgeOverhead: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, costUsd: 0 },
+    attemptKind: s.cls.startsWith("infra:") ? "infra" : "scored",
+    attemptClass: s.cls,
+  };
+  return { tag: s.tag, arm: s.arm, repo: s.repo ?? s.arm.split("-")[0]!, task: s.task, trial: s.trial, attempt: s.attempt, graders: "x", tokens: s.tok ? { input: t[0], output: t[1], cacheRead: t[2], cacheWrite: t[3] } : null, costUsd: cost, wallS: 1, exit: s.exit, pins: {}, raw: {}, passed: s.exit === "ok", ...(s.nomeasure ? {} : { measure }) };
+}
+const T0 = Date.parse("2026-11-01T00:00:00Z");
+/** A log file of the specs in order, one second apart from `T0` (the file the real harness would have appended). */
+async function logOf(specs: Spec[], header?: string): Promise<string> {
+  const { appendRow } = await import("./lib/record.ts");
+  const file = path.join(tmpdir("slots-log"), "log.md");
+  specs.forEach((s, i) => appendRow(file, specRow(s), new Date(T0 + i * 1000)));
+  if (header) fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("\n| ts |", `\n${header}\n\n| ts |`));
+  return file;
+}
+const FX_SLOTS = path.join(AB, "fixtures", "build-slots");
+const fxRows = (): Spec[] => JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "rows.json"), "utf8"));
+const fxSchedule = () => JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "schedule.json"), "utf8"));
+
+// S41 (T4 M4) -- the log-to-slots builder implements section 11 and the usage-limit exclusion; the fixture covers every exit kind.
+check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / replacement rounds / lost after 2 rounds / usage-limit-marked / timeout) -> the expected slots exactly; smoke-only, odd tags, pre-freeze rows, re-run of a scored slot, duplicate / trailing attempts, a row without measure -> refused or a finding", async () => {
+  const { buildSlots, BuildRefused } = await import("./build-slots.ts");
+  const assertEq = (a: unknown, b: unknown): void => deepStrictEqual(a, b);
+  const { readRows } = await import("./lib/log.ts");
+  const tasks = path.join(AB, "tasks");
+  const run = async (specs: Spec[], freezeTs?: string) => buildSlots(readRows(await logOf(specs)), fxSchedule(), tasks, freezeTs);
+  const refusal = async (specs: Spec[], freezeTs?: string) => run(specs, freezeTs).then(() => "", (e) => (e instanceof BuildRefused ? e.message : `other: ${e}`));
+
+  const built = await run(fxRows());
+  assertEq(built.findings, []);
+  assertEq(JSON.parse(JSON.stringify(built.slots)), JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "expected.json"), "utf8")));
+  assert(built.notes.some((n) => /1 smoke row/.test(n)) && built.notes.some((n) => /2 usage-limit attempt/.test(n)), `notes: ${built.notes}`);
+  const timeoutSlot = built.slots.find((s) => s.task === "forecast-month-end" && s.arm === "A0")!;
+  assert(timeoutSlot.first !== null && timeoutSlot.first.graders === false && timeoutSlot.first.tokens.incomplete === true, "a timeout row is a scored task failure: first is set (never replaced), usage flagged incomplete");
+  assert(!built.slots.some((s) => s.task === "booking-lead-time" && s.arm === "A0"), "a slot with only usage-limit-marked attempts is not emitted (re-run from its first attempt)");
+
+  // must-FAIL: each broken input is refused or reported with its named finding
+  const rows = fxRows();
+  assert(/no measured rows: 1 smoke row/.test(await refusal(rows.slice(0, 1))), "smoke rows alone are refused as not measurements");
+  assert(/neither "measured round <r>" nor smoke/.test(await refusal([...rows, { ...rows[1]!, tag: "measured rnd 0" }])), "a tag that is neither measured nor smoke is refused");
+  assert(/predate the freeze/.test(await refusal(rows, "2026-11-02T00:00:00Z")), "measured rows older than the freeze are refused");
+  assert((await run(rows, "2026-11-01T00:00:00Z")).findings.length === 0, "control: rows at or after the freeze are accepted");
+  const finding = async (extra: Spec[]) => (await run([...rows, ...extra])).findings.join(" | ");
+  assert(/already scored in an earlier round/.test(await finding([{ ...rows[1]!, tag: "measured round 1" }])), "a replacement round that re-runs a scored slot is a finding");
+  assert(/duplicate attempt numbers/.test(await finding([{ ...rows[1]! }])), "two unmarked attempts with one number are a finding");
+  assert(/ran after the scored attempt/.test(await finding([{ ...rows[1]!, attempt: 2 }])), "an attempt after the scored one is a finding");
+  assert(/without a measure column/.test(await finding([{ ...rows[1]!, task: "pilot-seat-limit", arm: "workdoo-a0", trial: 2, nomeasure: true }])), "a measured row without a measure column is a finding");
+  assert(/4 attempts > 3/.test(await finding(["1", "2", "3", "4"].map((a, i) => ({ ...rows[1]!, task: "shared-auth-failure", arm: "workdoo-a1", attempt: i + 1, exit: "cli-error: exit 1, network", cls: "infra:network" })))), "more than three attempts in a round is a finding");
+  // the usage-limit mark matters: with the marks removed the same rows duplicate attempt numbers
+  const unmarked = rows.map((r) => ({ ...r, tag: r.tag.replace(" usage-limit", "") }));
+  assert(/duplicate attempt numbers/.test((await run(unmarked)).findings.join(" | ")), "control: without the usage-limit mark the re-run attempt is a duplicate");
+  // an unscheduled slot is emitted (the analysis rules it INVALID), named in the notes
+  const extra = await run([...rows, { ...rows[1]!, task: "shared-auth-failure", arm: "workdoo-a1" }]);
+  assert(extra.notes.some((n) => /not in the schedule/.test(n)) && extra.slots.some((s) => s.task === "shared-auth-failure"), "an unscheduled slot is kept and named");
+
+  // the CLI writes a file the analysis reads with the real schedule's argument shape
+  const dir = tmpdir("slots-cli");
+  const log = await logOf(fxRows());
+  const sched = path.join(FX_SLOTS, "schedule.json");
+  const cli = Bun.spawnSync(["bun", path.join(AB, "build-slots.ts"), "--log", log, "--schedule", sched, "--out", path.join(dir, "slots.json")], { stdout: "pipe", stderr: "pipe" });
+  assert(cli.exitCode === 0 && /build-slots: 13 slots of 15 scheduled \(2 infra-lost on the first pass\)/.test(cli.stderr.toString()), `build-slots CLI: ${cli.stderr.toString()}`);
+  const an = Bun.spawnSync(["bun", path.join(AB, "analyze.ts"), "--data", path.join(dir, "slots.json"), "--schedule", sched], { stdout: "pipe", stderr: "pipe" });
+  assert(/analysis: (VALID|INVALID|FAILED)/.test(an.stdout.toString()) && !/audit finding/.test(an.stdout.toString()), `analyze.ts reads the built slots: ${an.stdout.toString().slice(-300)}`);
+  const smokeOnly = await logOf(rows.slice(0, 1));
+  const refused = Bun.spawnSync(["bun", path.join(AB, "build-slots.ts"), "--log", smokeOnly, "--schedule", sched], { stdout: "pipe", stderr: "pipe" });
+  assert(refused.exitCode === 2 && /REFUSED: no measured rows/.test(refused.stderr.toString()), "the CLI refuses a smoke-only log");
+});
+
+// S42 (T4 M3) -- the baseline driver over the REAL 96-slot schedule with a fake runner: order, pilot stop, resume, every stop rule, rounds, freeze refusals.
+const REAL_SCHEDULE: import("./lib/validity.ts").SlotKey[] = JSON.parse(fs.readFileSync(path.join(AB, "schedule.json"), "utf8"));
+const FREEZE_TS = "2026-10-31T03:12:56Z";
+const NOW_OK = Date.parse("2026-11-01T00:00:00Z");
+const freezeLine = (ts: string, sha: string) => `> **Pre-registration frozen ${ts} (test):** \`evals/ab/PREREGISTRATION.md\` sha256\n> \`${sha}\`, at commit \`abc\`.`;
+const SMOKE_SPEC: Spec = { tag: "smoke -- not a measurement", arm: "smoke-a0", repo: "smoke-repo", task: "add-fn", trial: 1, attempt: 1, exit: "ok", cls: "ok", g: "pass", j: "PPP", cost: 0.01 };
+
+/** A log with one smoke row and the freeze header, a pre-registration file, and a fake runner that appends the row an attempt would. */
+async function dryRun(o: { header?: (sha: string) => string } = {}) {
+  const { appendRow } = await import("./lib/record.ts");
+  const { docSha256 } = await import("./lib/log.ts");
+  const prereg = path.join(tmpdir("prereg"), "PREREGISTRATION.md");
+  fs.writeFileSync(prereg, "frozen text\n");
+  const sha = docSha256(prereg);
+  const log = await logOf([SMOKE_SPEC], o.header ? o.header(sha) : freezeLine(FREEZE_TS, sha));
+  const calls: import("./run-baseline.ts").Ctx[] = [];
+  let clock = NOW_OK;
+  let busy = false;
+  let overlapped = false;
+  type Plan = (ctx: import("./run-baseline.ts").Ctx, n: number) => Partial<Spec> & { terminal?: string; throws?: boolean };
+  const go = async (round: number, plan: Plan = () => ({}), now: () => number = () => NOW_OK) => {
+    const { runBaseline } = await import("./run-baseline.ts");
+    const before = calls.length;
+    const run: import("./run-baseline.ts").Deps["run"] = async (ctx) => {
+      if (busy) overlapped = true;
+      busy = true;
+      try {
+        calls.push(ctx);
+        const p = plan(ctx, calls.length - 1);
+        if (p.throws) throw new Error("driver killed");
+        const spec: Spec = { tag: ctx.tag, arm: ctx.slot.arm, task: ctx.slot.task, trial: ctx.slot.trial, attempt: ctx.attempt, exit: "ok", cls: "ok", g: "pass", j: "PPP", tok: [1, 2, 3, 4], cost: 1, ...p };
+        appendRow(log, specRow(spec), new Date((clock += 1000)));
+        return { exit: spec.exit, cls: spec.cls as import("./lib/retry.ts").AttemptClass, terminal: p.terminal };
+      } finally {
+        busy = false;
+      }
+    };
+    const r = await runBaseline(round, { log, prereg, schedule: REAL_SCHEDULE, run, now });
+    return { ...r, calls: calls.slice(before) };
+  };
+  return { log, prereg, sha, calls, go, overlapped: () => overlapped };
+}
+const ids = (cs: { slot: import("./lib/validity.ts").SlotKey; attempt: number }[]) => cs.map((c) => `${c.slot.arm}|${c.slot.task}|${c.slot.trial}#${c.attempt}`);
+const sid = (s: import("./lib/validity.ts").SlotKey | undefined, attempt = 1) => `${s!.arm}|${s!.task}|${s!.trial}#${attempt}`;
+const INFRA: Partial<Spec> = { exit: "cli-error: exit 1, API Error: 529", cls: "infra:api-error", g: "not-run", j: "UUU" };
+
+check("S42 baseline driver (fake runner, real schedule): schedule order + pilot stop after 4 + resume + 96 slots -> built and analysed VALID; owner stops; 3 consecutive infra; mid-work timeout does not count; usage-limit pause; rounds; freeze refusals; one at a time", async () => {
+  const { Refused, markUsageLimit, withLock, isUsageLimit } = await import("./run-baseline.ts");
+  const { parseTag, readRows } = await import("./lib/log.ts");
+  const S = REAL_SCHEDULE;
+
+  // ---- order, pilot stop, resume, the whole schedule ----
+  const a = await dryRun();
+  const p1 = await a.go(0);
+  assert(p1.stop === "pilot" && p1.calls.length === 4 && ids(p1.calls).join() === S.slice(0, 4).map((s) => sid(s)).join(), `stops after the 4 pilot slots, in schedule order: ${p1.stop} ${ids(p1.calls)}`);
+  assert(new Set(S.slice(0, 4).map((s) => s.arm)).size === 4 && p1.calls.every((c) => c.tag === "measured round 0"), "the pilot is one slot per arm x repo, tagged measured round 0");
+  const p2 = await a.go(0);
+  assert(p2.stop === "done" && p2.calls.length === 92 && ids(p2.calls).join() === S.slice(4).map((s) => sid(s)).join(), `a second start sees the pilot scored, does not stop again, and runs slots 5..96 in order: ${p2.stop} ${p2.calls.length}`);
+  const p3 = await a.go(0);
+  assert(p3.stop === "done" && p3.calls.length === 0, "a third start has nothing left to run (resume keyed by slot + round)");
+  assert(!a.overlapped(), "one trial at a time");
+  const scored = readRows(a.log).filter((r) => parseTag(r.tag).kind === "measured");
+  assert(scored.length === 96 && new Set(scored.map((r) => `${r.arm}|${r.task}|${r.trial}`)).size === 96, "96 measured rows, one per slot");
+  const dir = tmpdir("dry-e2e");
+  const slotsFile = path.join(dir, "slots.json");
+  const bs = Bun.spawnSync(["bun", path.join(AB, "build-slots.ts"), "--log", a.log, "--out", slotsFile], { stdout: "pipe", stderr: "pipe" });
+  assert(bs.exitCode === 0 && /96 slots of 96 scheduled/.test(bs.stderr.toString()), `build-slots over the dry-run log: ${bs.stderr.toString()}`);
+  const an = Bun.spawnSync(["bun", path.join(AB, "analyze.ts"), "--data", slotsFile, "--schedule", path.join(AB, "schedule.json")], { stdout: "pipe", stderr: "pipe" });
+  assert(/analysis: VALID\s*$/.test(an.stdout.toString().trim()) && an.exitCode === 0, `analyze.ts --data <built slots> --schedule evals/ab/schedule.json -> VALID: ${an.stdout.toString().slice(-200)}`);
+
+  // ---- owner-ruling stops: usage-missing / source-mutated / invalid; the slot stands, the next start goes on ----
+  for (const exit of ["usage-missing", "source-mutated: changed src/x.ts", "invalid: init cwd is not the trial copy"]) {
+    const b = await dryRun();
+    await b.go(0); // pilot
+    const stopped = await b.go(0, (ctx) => (sid(ctx.slot) === sid(S[6]!) ? { exit, cls: "task-failure", g: "not-run", j: "UUU" } : {}));
+    assert(stopped.stop === "owner" && ids(stopped.calls).at(-1) === sid(S[6]!) && stopped.calls.length === 3, `${exit}: stops at the first such row (slots 5..7 ran): ${stopped.stop} ${stopped.calls.length}`);
+    const next = await b.go(0);
+    assert(next.stop === "done" && ids(next.calls)[0] === sid(S[7]!) && !ids(next.calls).includes(sid(S[6]!)), `${exit}: the slot stands as scored, the run goes on with the next: ${ids(next.calls)[0]}`);
+  }
+
+  // ---- 3 consecutive infra attempts abort; a scored attempt resets; a mid-work timeout is a scored task failure, not infra ----
+  const c = await dryRun();
+  await c.go(0);
+  const t = S[4]!;
+  const abort = await c.go(0, (ctx) => (sid(ctx.slot) === sid(t) || ctx.slot === t ? INFRA : {}));
+  assert(abort.stop === "abort" && abort.calls.length === 3 && ids(abort.calls).join() === [1, 2, 3].map((n) => sid(t, n)).join(), `3 infra attempts of one slot abort the run (no 4th attempt): ${abort.stop} ${abort.calls.length}`);
+  const afterAbort = await c.go(0);
+  assert(afterAbort.stop === "done" && ids(afterAbort.calls)[0] === sid(S[5]!), `after the owner's ruling the start goes on; the lost slot is not re-run in round 0: ${ids(afterAbort.calls)[0]}`);
+
+  const d = await dryRun();
+  await d.go(0);
+  const reset = await d.go(0, (ctx) => (ctx.slot === S[4] && ctx.attempt < 3 ? INFRA : ctx.slot === S[5] && ctx.attempt < 3 ? INFRA : {}));
+  assert(reset.stop === "done" && ids(reset.calls).slice(0, 6).join() === [sid(S[4], 1), sid(S[4], 2), sid(S[4], 3), sid(S[5], 1), sid(S[5], 2), sid(S[5], 3)].join(), "two infra then a scored attempt resets the streak (4 infra in all, no abort)");
+
+  const e = await dryRun();
+  await e.go(0);
+  const killedMid = await e.go(0, (ctx) => (ctx.slot === S[4] ? (ctx.attempt < 3 ? INFRA : { exit: "timeout", cls: "task-failure", g: "not-run", j: "UUU" }) : {}));
+  assert(killedMid.stop === "done" && ids(killedMid.calls).slice(0, 3).join() === [1, 2, 3].map((n) => sid(S[4]!, n)).join(), `a third attempt killed mid-work (timeout, task-failure) is scored and does not reach 3 infra: ${killedMid.stop}`);
+  const f = await dryRun();
+  await f.go(0);
+  const killedEarly = await f.go(0, (ctx) => (ctx.slot === S[4] ? (ctx.attempt < 3 ? INFRA : { exit: "timeout", cls: "infra:harness-crash", g: "not-run", j: "UUU" }) : {}));
+  assert(killedEarly.stop === "abort" && killedEarly.calls.length === 3, `control: the same kill BEFORE the first action is infra and is the third in a row: ${killedEarly.stop}`);
+
+  // the streak survives a restart: two infra attempts, the process dies, the next start aborts on the third
+  const g = await dryRun();
+  await g.go(0);
+  let died = "";
+  await g.go(0, (ctx) => (ctx.attempt === 2 && ctx.slot === S[4] ? { ...INFRA, throws: false } : ctx.attempt === 1 && ctx.slot === S[4] ? INFRA : ctx.attempt === 3 && ctx.slot === S[4] ? { throws: true } : {})).catch((er) => (died = String(er)));
+  assert(/driver killed/.test(died), "the driver process died mid-slot");
+  const resumed = await g.go(0, () => INFRA);
+  assert(resumed.stop === "abort" && resumed.calls.length === 1 && resumed.calls[0]!.attempt === 3, `resume continues at attempt 3 (keyed by slot + round) with the streak of 2 from the log -> abort: ${resumed.stop} ${ids(resumed.calls)}`);
+
+  // ---- usage limit: the attempt is marked, nothing is scored, budget and streak are untouched ----
+  assert(isUsageLimit("Claude AI usage limit reached|1730000000") && isUsageLimit("You've hit your limit") && !isUsageLimit("API Error: 429 rate limit exceeded") && !isUsageLimit(undefined), "usage-limit recognition (and an API rate limit is not one)");
+  const h = await dryRun();
+  await h.go(0);
+  const limited = await h.go(0, (ctx) => (ctx.slot === S[4] ? { exit: "cli-error: exit 1, limit", cls: "task-failure", terminal: "Claude AI usage limit reached|1730000000" } : {}));
+  assert(limited.stop === "usage-limit" && limited.calls.length === 1, `pauses on the signal: ${limited.stop}`);
+  const tail = readRows(h.log).at(-1)!;
+  assert(tail.tag === "measured round 0 usage-limit" && parseTag(tail.tag).kind === "measured" && (parseTag(tail.tag) as { usageLimit: boolean }).usageLimit, `the attempt carries the mark in its tag: ${tail.tag}`);
+  const again = await h.go(0);
+  assert(again.stop === "done" && again.calls[0]!.slot === S[4] && again.calls[0]!.attempt === 1, "the paused slot re-runs from its first attempt (the marked attempt is outside the budget)");
+  const i = await dryRun();
+  await i.go(0);
+  const mixed = await i.go(0, (ctx) => (ctx.slot === S[4] ? (ctx.attempt < 3 ? INFRA : { exit: "cli-error: exit 1, limit", cls: "task-failure", terminal: "weekly limit reached" }) : {}));
+  assert(mixed.stop === "usage-limit" && mixed.calls.length === 3, "two infra attempts then a usage limit on the third");
+  const noAbort = await i.go(0, (ctx) => (ctx.slot === S[4] ? INFRA : {}));
+  assert(noAbort.calls[0]!.attempt === 3 && noAbort.stop === "abort" && noAbort.calls.length === 1, `the marked attempt is neither a third infra nor a reset: the next attempt (3) is the third infra and aborts: ${noAbort.stop} ${ids(noAbort.calls)}`);
+  let missing = "";
+  try { markUsageLimit(h.log, { slot: S[90]!, round: 0, attempt: 1, tag: "measured round 0" }); } catch (er) { missing = String(er); }
+  assert(/no row of/.test(missing), "marking an attempt that left no row is an error, not a silent no-op");
+
+  // ---- rounds: only the slots every earlier round lost; resume keyed by (slot, round) ----
+  const r = await dryRun();
+  await r.go(0);
+  await r.go(0, (ctx) => (ctx.slot === S[9] ? INFRA : {})).then((x) => assert(x.stop === "abort", "the lost slot aborts round 0"));
+  await r.go(0);
+  const early = await r.go(1).catch((er) => er);
+  assert(early.stop === "done" && early.calls.length === 1 && early.calls[0].slot === S[9] && early.calls[0].tag === "measured round 1" && early.calls[0].attempt === 1, `round 1 re-runs only the lost slot, tagged measured round 1, attempts restarting at 1: ${JSON.stringify(early.calls ?? early.message)}`);
+  assert((await r.go(1)).calls.length === 0, "round 1 resumes: nothing left");
+  const round2 = await r.go(2);
+  assert(round2.stop === "done" && round2.calls.length === 0, "round 2 has nothing to replace once round 1 scored the slot");
+  const unfinished = await dryRun();
+  await unfinished.go(0);
+  assert(await unfinished.go(1).then(() => "", (er) => (er instanceof Refused ? er.message : String(er))).then((m) => /unfinished in round 0/.test(m)), "a replacement round refuses while round 0 is unfinished");
+  assert(await unfinished.go(3).then(() => "", (er) => (er instanceof Refused ? "refused" : String(er))).then((m) => m === "refused"), "--round beyond 2 is refused");
+
+  // ---- the freeze: no slot starts before the recorded instant, or while the document differs from the latest freeze line ----
+  const refusal = async (x: Awaited<ReturnType<typeof dryRun>>, now?: () => number) => x.go(0, () => ({}), now).then(() => "", (er) => (er instanceof Refused ? er.message : `other: ${er}`));
+  const none = await dryRun({ header: () => "> No freeze recorded yet." });
+  assert(/no freeze line/.test(await refusal(none)) && none.calls.length === 0, "no freeze line -> refused, no slot started");
+  const future = await dryRun();
+  assert(/has not happened yet/.test(await refusal(future, () => Date.parse("2026-10-30T00:00:00Z"))) && future.calls.length === 0, "before the freeze instant -> refused, no slot started");
+  const edited = await dryRun();
+  fs.writeFileSync(edited.prereg, "frozen text, edited\n");
+  assert(/changed after the freeze/.test(await refusal(edited)) && edited.calls.length === 0, "the pre-registration differs from the freeze line's sha256 -> refused, no slot started");
+  const stale = await dryRun();
+  fs.writeFileSync(stale.prereg, "amended text\n");
+  const { docSha256: sha256Of } = await import("./lib/log.ts");
+  const text = fs.readFileSync(stale.log, "utf8").replace("\n| ts |", `\n${freezeLine("2026-10-31T09:00:00Z", sha256Of(stale.prereg))}\n\n| ts |`);
+  fs.writeFileSync(stale.log, text);
+  assert((await stale.go(0)).calls.length === 4, "a superseding freeze line (latest instant) with the amended document's hash is accepted");
+  fs.writeFileSync(stale.prereg, "frozen text\n"); // the old document again: it matches only the superseded line
+  assert(/changed after the freeze/.test(await refusal(stale)), "the superseded sha256 no longer admits a slot");
+  const mid = await dryRun();
+  const midRun = await mid.go(0, (ctx) => { if (ctx.slot === S[0]) fs.writeFileSync(mid.prereg, "edited during the run\n"); return {}; }).then(() => "", (er) => (er instanceof Refused ? er.message : String(er)));
+  assert(/changed after the freeze/.test(midRun) && mid.calls.length === 1, `an edit during the run stops it before the next slot: ${midRun}`);
+
+  // ---- one driver at a time ----
+  const lock = path.join(tmpdir("lock"), "l.lock");
+  const inner = await withLock(lock, async () => withLock(lock, async () => "second").then(() => "ran", (er) => (er instanceof Refused ? "refused" : String(er))));
+  assert(inner === "refused" && !fs.existsSync(lock), "a second driver on the same log is refused while the first runs, and the lock is released after");
 });
 
 const paid = process.argv.includes("--paid");

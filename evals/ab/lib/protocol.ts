@@ -12,7 +12,7 @@ import { verifyPin } from "./pin.ts";
 import { appendRow, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
-import { classifyAttempt, firstActionSeen, type AttemptClass } from "./retry.ts";
+import { classifyAttempt, firstActionSeen, terminalText, type AttemptClass } from "./retry.ts";
 import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
 export const DEVIATION = "D9 eval-only G2 exception -- never applies to product runs";
@@ -234,5 +234,5 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   }
   appendRow(o.logPath, row);
   const valid = exit === "ok" || /^(g2-refused|parked|scope-breach):/.test(exit);
-  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, ...(cls ? { cls } : {}) };
+  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: terminalText(last, lastRaw), ...(cls ? { cls } : {}) };
 }

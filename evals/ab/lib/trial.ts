@@ -8,7 +8,7 @@ import { checkArmSnapshot } from "./freeze.ts";
 import { checkInitPlugins, verifyPin } from "./pin.ts";
 import { parseStream, totalsOf, type Stream, type Totals } from "./parse.ts";
 import { appendRow, type Row, type Tok } from "./record.ts";
-import { classifyAttempt, type AttemptClass } from "./retry.ts";
+import { classifyAttempt, terminalText, type AttemptClass } from "./retry.ts";
 import type { Judge } from "./protocol.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
@@ -41,7 +41,7 @@ export type TrialOpts = {
   /** present = a measured run: the row carries the extended record. The judge defaults to the real one; tests pass recorded replies. */
   measure?: { judge?: Judge; setupTokens?: Tok | null };
 };
-export type TrialResult = { exit: string; valid: boolean; grade: Grade; row: Row; /** retry class; set on measured runs */ cls?: AttemptClass };
+export type TrialResult = { exit: string; valid: boolean; grade: Grade; row: Row; /** retry class; set on measured runs */ cls?: AttemptClass; /** the CLI's own terminal text (reason, error line, stderr tail): evidence for the driver's usage-limit check, not a row field */ terminal?: string };
 
 /** Reasons a finished run is invalid: init must show the right plugins and the trial copy as cwd, and every model seen must be pinned. */
 export function validityProblems(streams: Stream[], arm: Arm, trialDir: string, totals: Totals | null): string[] {
@@ -141,5 +141,5 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
-  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, ...(cls ? { cls } : {}) };
+  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: terminalText(stream, raw), ...(cls ? { cls } : {}) };
 }

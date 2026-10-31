@@ -389,3 +389,8 @@ A session running lean-flow's loop on a real task often needs more than five min
 on A1. A frozen value that changes what is measured has to be written down before any trial; no trial ran before this amendment (the log
 holds smoke rows only). The limit is the same for A0 and A1, and the scoring keeps the frozen classification: a run killed mid-work is the
 task's failure, a run killed before it acted is infra.
+
+The operator procedure of section 18 (pilot pause, usage-limit pause, the 3-infra abort) and the owner-ruling stops of section 12 are
+run mechanically by `bun evals/ab/run-baseline.ts`, and its attempts become slots through `bun evals/ab/build-slots.ts` (section 11).
+Neither adds a rule; a usage-limit attempt is marked `measured round <r> usage-limit` in its tag and the builder leaves it out of every
+attempt count.
