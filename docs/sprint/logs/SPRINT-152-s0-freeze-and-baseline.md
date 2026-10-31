@@ -125,3 +125,19 @@ verbatim (with the round tag the operator passes); exact equality at the +10 pp 
 read the post-replacement view; the fixture-only guard on protocol trials is lifted by a code edit after the freeze.
 consequence · T3 · behaviour:material · governance:high
 review · T3 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-10-31 | scope-change | T4: the frozen pre-registration gains a trial timeout before any trial; TASK-545's first box then reads against the re-signed document
+What broke: the pre-registration froze every scoring rule but not the trial timeout. The harness kills a trial at 300 s, and
+a killed run carries no usage, so it logs as usage-missing: not-passed plus an operator stop each time, which would have
+made the baseline measure the timeout, mostly on A1. Impact: `evals/ab/PREREGISTRATION.md` is amended before any trial (one
+45-minute cap on a trial's whole wall time, all phases included, identical for both arms; a distinct timeout exit label),
+re-hashed and re-signed by the owner, and recorded as a superseding freeze. The scoring stays as frozen: killed mid-work is
+the task's failure (not-passed, not retried), killed before the first action is infra. TASK-545's Done-when text is
+unchanged; its "frozen pre-registration" means the superseding signed document. Re-confirm G2: done by popup below.
+
+### 2026-10-31 | progress | T4 G2 signed; every task's G2 now signed
+builder-check · T4 · 3 contradictions · 6 questions · contradictions settled (the frozen kill classification kept, the check asserts class and no retry, the parallelism ruling asked), four factual questions settled (rounds keyed by slot and round from the log tag, pilot completion read from the log, infra retries stay in their slot, usage-limit attempts marked by the driver and excluded from retry budget, abort counter and infra share), three intent questions to the owner
+Owner rulings by popup: trial timeout 45 minutes on the whole trial, identical for A0 and A1; a timed-out trial keeps the
+frozen classification under its own label, graders and judges not run, partial usage kept and flagged incomplete; one
+trial at a time. T4 G2 signed: M1 timeout amendment (its own re-sign popup), M2 lift the fixture-only guard, M3 driver, M4
+log-to-slots builder, M5 pilot with owner review, M6 full run, M7 analysis and symptom rulings, M8 wiring closure, M9 epic.
