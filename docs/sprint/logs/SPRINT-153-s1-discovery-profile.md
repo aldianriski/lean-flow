@@ -174,3 +174,13 @@ is every ADR file, every DECISIONS row, every PRD or requirements file and every
 coordinator-owned (T4 and T5 report their index lines).
 builder-check · T6 · 6 contradictions · 5 questions · settled: owner ruling = the four kinds the owner ruled; hashing per item, pre-existing sections only for a requirements file the pass adds to; the profile pass never consolidates an inventory item; has-the-profile = target headings exist (deltas only); the report lists each topic settled or asked; overlapping existing sections stay untouched with a consolidation plan item; an inventory difference stops writes with no automatic rollback; the leak check is plugin paths in written files
 T6 G2 signed with the owner's inventory ruling (popup above).
+
+### 2026-10-31 | progress | T5 merged (Go/chi and Postgres sets); index lines written by the coordinator
+T5 built in an isolated worktree (`e84ecd0b`, `2fc0c3ad`) and merged at `99d8aeec`. Review round 1 (Claude stand-in): nothing
+blocking; should-fixes (Postgres detection named three ecosystems while claiming any language; a pool question that could
+never be asked) and notes (indirect chi requirement, driver error sentinels, logger rule) fixed in one revision, which the
+coordinator verified line by line against the settlements instead of a second round. The fresh chi fixture is at
+D:\Research\chi-fixture (chi v5 and pgx v5, SQL migrations, a postgres compose service, no env file) and copied to the VPS.
+The coordinator wrote the two index lines, as the index's owner.
+consequence · T5 · behaviour:material · governance:low
+review · T5 · scoped-reviewer · behaviour:material · governance:low
