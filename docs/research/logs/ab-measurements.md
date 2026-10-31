@@ -19,6 +19,11 @@ related: [EPIC-023]
 > **Pre-registration frozen 2026-10-31T03:12:56Z (owner-signed, SPRINT-152 T3):** `evals/ab/PREREGISTRATION.md` sha256
 > `e72002cf1d1be69586833ca37133c6bcb64fc47655d51270a2dba122cd64393b`, at commit `bc1ddf4a`. Every row with a `ts` before
 > that instant is tagged smoke and ran on the fixture repo (13 of 13 at the freeze); a measured trial is valid only after it.
+>
+> **Pre-registration re-frozen 2026-10-31T07:30:00Z (owner re-signed, SPRINT-152 T4, Amendment 1):** `evals/ab/PREREGISTRATION.md` sha256
+> `83750fc4f4cc34c096da0b77c79f48e4733937be938f78678f84dcf3e2f6909e`, at commit `eab31280`; supersedes the line above. The
+> amendment adds a 45-minute whole-trial deadline and a `timeout` exit label; the classification is unchanged. No trial ran
+> between the two freezes: the 13 rows below are all smoke runs on the fixture repo.
 
 | ts | tag | arm | repo | task | trial | attempt | graders | in | out | cache-read | cache-write | cost-usd | wall-s | exit | pins | raw | passed | deviation | g2 | park | measure |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
