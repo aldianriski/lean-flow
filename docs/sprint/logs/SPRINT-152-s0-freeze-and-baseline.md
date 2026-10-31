@@ -141,3 +141,17 @@ Owner rulings by popup: trial timeout 45 minutes on the whole trial, identical f
 frozen classification under its own label, graders and judges not run, partial usage kept and flagged incomplete; one
 trial at a time. T4 G2 signed: M1 timeout amendment (its own re-sign popup), M2 lift the fixture-only guard, M3 driver, M4
 log-to-slots builder, M5 pilot with owner review, M6 full run, M7 analysis and symptom rulings, M8 wiring closure, M9 epic.
+
+### 2026-10-31 | progress | T4 M1-M4 built and merged; pre-registration re-frozen with Amendment 1; pilot launched
+Built on an isolated worktree and merged at `eab31280`: the 45-minute whole-trial deadline shared by every phase, a timeout
+exit label with the frozen classification unchanged, the measured-trial guard lift, the baseline driver (one trial at a
+time, pilot stop, owner stops, three-in-a-row infra abort, usage-limit pause by an appended void row, refusal before a
+matching freeze line) and the log-to-slots builder. Review round 1 (independent): one blocker (the driver rewrote a log row in
+place) and five should-fixes (the timeout narrowed the frozen classification, a signer killed at the deadline crashed the
+driver, an unbounded kill on Windows, table parsing, voided spend and a stale lock); one revision closed them all. Review
+round 2: all closed, nothing blocking. Its last should-fix (the protocol path read "no first action" from the final phase
+only, so a silent phase-2 kill retried A1) went to the owner with the cap spent; owner ruled to fix it, verified by a
+retained fixture. Coordinator re-ran on main: typecheck clean, selftest 51 of 51, the document and hashed files reproduce.
+Owner re-signed by popup; the superseding freeze (sha256 `83750fc4f4cc34c096da0b77c79f48e4733937be938f78678f84dcf3e2f6909e`)
+is recorded in the measurement log header and the shared freeze guard accepts it. The pilot (four slots, one per arm and
+repo) runs next, one trial at a time, and stops for the owner's review.
