@@ -169,3 +169,17 @@ refused, and the post-run scope-breach check shares the matcher. Workdoo's A1 re
 verify script), the same edit A0 made, which A0 paid for only in its scope verdict: a D9 asymmetry for the owner to weigh.
 The harness had never run end to end on a real A/B task before this pilot, because R-c limited every earlier run to the
 fixture. No further slot runs until the owner rules.
+
+### 2026-10-31 | scope-change | T4: Amendment 2 to the pre-registration (trial environment, directory layers, one G2 revise round, pilot void) before any further trial
+What broke: the pilot showed the trial harness provides none of the environment the task authors used, and the D9 scope
+matcher misreads directory layers. Impact: the four pilot rows are voided by appended void rows (owner ruling: harness
+defect), and `evals/ab/PREREGISTRATION.md` gains Amendment 2 before any further trial: (1) every trial, both arms, is
+provisioned before its 45-minute clock starts with the authors' environment (Node 24 first on the path, dependencies
+installed from the lockfile, clinic's own fresh Postgres cluster with both databases migrated); (2) a layer that names a
+directory in the snapshot matches everything under it, in the G2 check and the post-run scope-breach check alike; (3) a
+refused A1 G2 design gets one revise round with the refusal reason fed back, a second refusal ending the trial (this changes
+the owner's D9 ruling, by the owner). Re-hash, owner re-sign, superseding freeze, then a re-pilot of the same four slots.
+TASK-545's Done-when text is unchanged. Re-confirm G2: owner rulings by popup this entry; the amendment gets its own builder
+check and up to two independent review rounds.
+Host facts for the brief: the path's Node is 22.22.3 while workdoo needs 24.16 or later (the authors used a Node 24 under
+`D:\Research\ab-tools`); Postgres binaries and Go are on the path.
