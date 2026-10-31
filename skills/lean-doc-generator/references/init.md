@@ -26,8 +26,9 @@ bounded by the safe-scaffold allowlist (ADR-012).
    summarised. A backlog or wish-list is not a non-goal. Docs that disagree → the topic is open, each
    source a drafted option (at most three). Quality attributes stay open while any row is uncovered.
    Hold the result for step 3's business round and step 5's write.
-1c. **Match a question set** — check every file in `${CLAUDE_SKILL_DIR}/references/profiles/` against its DETECT rule;
-   any number may match, none → scan only. Then print, before step 2 writes or any popup asks:
+1c. **Match a question set** — Read `${CLAUDE_SKILL_DIR}/references/profiles/README.md` (the index) and each set file it
+   lists, then check each set's DETECT rule; never list the folder with a shell command (a headless run is denied it).
+   Any number may match, none → scan only. Then print, before step 2 writes or any popup asks:
    `Question sets loaded: <names> (detected: <evidence>)` or `No question set matches this stack; scan
    only.` For each loaded set, run its questions' marker searches over the whole tree (not only step
    1's sample); a question with a clear answer is settled and cited, the rest stay open for step 3.
