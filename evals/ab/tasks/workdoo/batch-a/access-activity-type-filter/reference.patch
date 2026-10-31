@@ -1,8 +1,7 @@
 diff --git a/docs/api/openapi.yaml b/docs/api/openapi.yaml
-index bda6750..97ce837 100644
 --- a/docs/api/openapi.yaml
 +++ b/docs/api/openapi.yaml
-@@ -2198,6 +2198,14 @@
+@@ -2198,6 +2198,30 @@
                "type": "string",
                "format": "uuid"
              }
@@ -12,16 +11,31 @@ index bda6750..97ce837 100644
 +            "in": "query",
 +            "description": "Return only events of this type; an unsupported type is rejected with INVALID_QUERY",
 +            "schema": {
-+              "type": "string"
++              "type": "string",
++              "enum": [
++                "member.updated",
++                "member.transferred",
++                "assignment.changed",
++                "invitation.created",
++                "invitation.accepted",
++                "invitation.revoked",
++                "division.created",
++                "division.updated",
++                "team.created",
++                "team.updated",
++                "division.member_added",
++                "division.member_removed",
++                "team.member_added",
++                "team.member_removed"
++              ]
 +            }
            }
          ],
          "responses": {
 diff --git a/server/access.ts b/server/access.ts
-index bdbda3e..d1c7a33 100644
 --- a/server/access.ts
 +++ b/server/access.ts
-@@ -141,17 +141,21 @@ export function listReassignments(db: DatabaseSync, organizationId: string, user
+@@ -141,17 +141,21 @@
      total, page: paging.page, pageSize: paging.pageSize, asOf: new Date().toISOString() };
  }
  

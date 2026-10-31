@@ -17,7 +17,7 @@ export type Dimension = (typeof DIMENSIONS)[number];
 export type ContextFile = { path: string; content: string };
 export type JudgeInput = { task: Pick<Task, "prompt" | "layers" | "outOfScope">; diff: string; notes?: string | undefined; files?: ContextFile[] | undefined };
 
-export const CONTEXT_MAX_LINES = 400;
+export const CONTEXT_MAX_LINES = 600;
 export const CONTEXT_MAX_BYTES = 60_000;
 const ARMS_DIR = path.join(import.meta.dir, "..", "arms");
 
@@ -83,7 +83,7 @@ const REPLY = `Reply with one JSON line only: {"verdict":"PASS"|"FAIL"|"UNKNOWN"
 
 const RUBRIC: Record<Dimension, string> = {
   convention: `Judge ONE dimension: convention adherence. Does the diff follow the conventions visible in the code it changes and in the code around its hunks -- naming, structure, layering, error handling, reuse of existing helpers instead of duplicating them? PASS when it fits the surrounding code; FAIL when it clearly departs from it or re-implements something the touched code already provides; UNKNOWN when the diff alone does not show enough of the surrounding code to tell.`,
-  business: `Judge ONE dimension: business correctness. Does the diff make the software behave as the task asks AND as the BUSINESS FACTS below require? PASS when the behaviour it implements agrees with the task and every relevant fact; FAIL when it contradicts the task or a fact; UNKNOWN when the diff and facts do not settle it.`,
+  business: `Judge ONE dimension: business correctness. Does the diff make the software behave as the task asks AND as the BUSINESS FACTS below require? PASS when the behaviour it implements agrees with the task and every relevant fact; FAIL when it contradicts the task or a fact; where a fact names a locale, date or time format, time zone or unit, compare the exact value the code uses (a locale tag such as "en" is not "en-GB", and a neighbouring helper's different locale does not excuse it); UNKNOWN when the diff and facts do not settle it.`,
   scope: `Judge ONE dimension: scope discipline. Does the diff change only what the task asks, inside the allowed layers, and none of the OUT-OF-SCOPE behaviours? PASS when it stays inside; FAIL when it edits outside the layers, changes an out-of-scope behaviour, or adds unrequested changes; UNKNOWN when the diff does not show enough to tell.`,
 };
 

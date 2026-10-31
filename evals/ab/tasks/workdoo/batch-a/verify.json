@@ -4,9 +4,9 @@
     "ok": true,
     "red": 1,
     "apply": 0,
-    "applyOut": "",
+    "applyOut": "patching file docs/api/openapi.yaml\npatching file server/access.ts",
     "green": 0,
-    "greenOut": "",
+    "greenOut": "Access activity type filter: 22 checks passed.",
     "graders": [
       {
         "name": "typecheck",
@@ -33,16 +33,21 @@
         "code": "n/a",
         "out": ""
       }
-    ]
+    ],
+    "wrong": {
+      "apply": 0,
+      "acceptance": 1
+    },
+    "reverified": "SPRINT-152 T3 M4: reference re-ruled by the owner; fresh baseline copy, Node 24.22.2, patch -p1 -l"
   },
   {
     "id": "forecast-month-end",
     "ok": true,
     "red": 1,
     "apply": 0,
-    "applyOut": "",
+    "applyOut": "patching file src/company/model.ts",
     "green": 0,
-    "greenOut": "",
+    "greenOut": "Forecast month-end: 6 checks passed.",
     "graders": [
       {
         "name": "typecheck",
@@ -64,7 +69,12 @@
         "code": "n/a",
         "out": ""
       }
-    ]
+    ],
+    "wrong": {
+      "apply": 0,
+      "acceptance": 1
+    },
+    "reverified": "SPRINT-152 T3 M4: reference re-ruled by the owner; fresh baseline copy, Node 24.22.2, patch -p1 -l"
   },
   {
     "id": "self-onboarding-guard",

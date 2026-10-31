@@ -2,7 +2,7 @@
   "judgeModel": "claude-sonnet-5-5",
   "prompts": {
     "convention": "3b48f11be43c8771e692df71750adba0e300cab0e94865bfdaafa703109e3b7a",
-    "business": "f0bfa5ebe1b8788444284ce76f316b14c67151601e0d4c3cbed3671781f28f65",
+    "business": "71bd1effd440ef04941a2c18382b4bef48d77aa293bdb0aab97e35f8b2dd718e",
     "scope": "fa0554eca8741d0f644ec55c923ce84bbd597ec9c178c732ada18f06489f7c21"
   }
 }

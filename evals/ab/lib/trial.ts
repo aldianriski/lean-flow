@@ -63,6 +63,8 @@ export function pinsOf(arm: Arm, iso: Isolation, totals: Totals | null, streams:
   return {
     sessionModel: arm.sessionModel,
     dispatch: arm.dispatch,
+    allowedModels: arm.allowedModels ?? [],
+    allowedTools: arm.allowedTools,
     effort: arm.effort,
     permissionMode: arm.permissionMode,
     auth: arm.auth,

@@ -644,7 +644,7 @@ check("S18 workdoo: both snapshots match their manifests; A1 minus A0 == the dec
     assert(r.length === 0, `workdoo-${n} snapshot differs from its manifest: ${r.slice(0, 5)}`);
   }
   const m = (n: string) => JSON.parse(fs.readFileSync(path.join(dir, `workdoo-${n}.manifest.json`), "utf8")) as Record<string, string>;
-  const set = fs.readFileSync(path.join(dir, "workdoo-lf-docs.txt"), "utf8").split("\n").filter(Boolean);
+  const set = fs.readFileSync(path.join(dir, "workdoo-lf-docs.txt"), "utf8").split(/\r?\n/).filter(Boolean);
   const diff = diffManifest(m("a1"), m("a0")).sort();
   assert(JSON.stringify(diff) === JSON.stringify(set.map((f) => `removed ${f}`).sort()), `A0 must be A1 minus exactly the set (diff ${diff.length}, set ${set.length})`);
   assert(m("a1")["BUSINESS-NOTES.md"] === m("a0")["BUSINESS-NOTES.md"] && m("a0")["BUSINESS-NOTES.md"] !== undefined, "both arms carry the same BUSINESS-NOTES.md");
@@ -659,7 +659,71 @@ check("S19 setup: launcher command carries claude-opus-5-5, no --effort, the inv
   assert(cmd[cmd.indexOf("--model") + 1] === "claude-opus-5-5", `setup model: ${cmd.join(" ")}`);
   assert(!cmd.includes("--effort"), `setup must not pass --effort: ${cmd.join(" ")}`);
   assert(cmd[cmd.indexOf("--permission-mode") + 1] === arm.permissionMode && cmd.includes(arm.plugin!.path), "permission mode and pinned plugin must be carried");
-  assert(arm.sessionModel === "claude-haiku-5-5" && arm.effort === "low", "trial arms keep the trial inventory values");
+  assert(arm.sessionModel === "claude-opus-5-5" && arm.effort === "default" && arm.dispatch.subagent === undefined, "measured arms load the measured inventory (Opus 5.5, default effort, subagents unpinned)");
+});
+
+// S19b -- TASK-544 M2/M3: measured arms carry the model SET and one allow-list per repo; the command passes both pins.
+check("S19b inventory: measured arms allow the 3-model set, no subagent pin, default effort, one --allowedTools list per repo (A0 == A1, no blanket Bash); a model outside the set invalidates", async () => {
+  const { loadArm, modelInventory } = await import("./lib/arm.ts");
+  const { buildCommand } = await import("./lib/run.ts");
+  const { validityProblems } = await import("./lib/trial.ts");
+  const { isolationEnv } = await import("./lib/isolate.ts");
+  const dir = path.join(AB, "arms");
+  for (const repo of ["workdoo", "clinic"]) {
+    const [a0, a1] = ["a0", "a1"].map((n) => loadArm(path.join(dir, `${repo}-${n}.json`))) as [import("./lib/arm.ts").Arm, import("./lib/arm.ts").Arm];
+    assert(a0.allowedTools.length > 0 && JSON.stringify(a0.allowedTools) === JSON.stringify(a1.allowedTools), `${repo}: A0 and A1 must share one non-empty allow-list`);
+    assert(!a0.allowedTools.some((t) => /^Bash(\(\*\))?$/.test(t)), `${repo}: no blanket Bash`);
+    const cmd = buildCommand(a1, "p");
+    assert(cmd.includes("--allowedTools") && a1.allowedTools.every((t) => cmd.includes(t)), `${repo}: command carries the allow-list`);
+    assert(!cmd.includes("--effort"), `${repo}: default effort passes no --effort flag`);
+    assert(!("CLAUDE_CODE_SUBAGENT_MODEL" in isolationEnv({ home: "h", cfg: "c" } as never, a1)), `${repo}: subagents unpinned`);
+    const set = [...modelInventory(a1)].sort().join();
+    assert(set === "claude-haiku-5-5,claude-opus-5-5,claude-sonnet-5-5", `${repo}: inventory set is ${set}`);
+    const totals = (models: string[]) => ({ models }) as never;
+    assert(validityProblems([], a1, "x", totals(["claude-sonnet-5-5", "claude-haiku-5-5"])).every((p) => !p.includes("pinned inventory")), "sonnet and haiku subagents are inside the set");
+    assert(validityProblems([], a1, "x", totals(["claude-opus-4-1"])).some((p) => p.includes("claude-opus-4-1")), "a model outside the set invalidates");
+  }
+  const smoke = loadArm(path.join(dir, "smoke-a1.json"));
+  assert(smoke.sessionModel === "claude-haiku-5-5" && smoke.effort === "low" && !modelInventory(smoke).has("claude-opus-5-5"), "smoke arms keep their Haiku/low inventory");
+});
+
+// S19c -- TASK-544 M6: the pre-registration hash tooling. A corpus change changes the corpus hash; a line-ending change does not.
+check("S19c hash-prereg: one changed corpus file -> corpus sha256 changes; CRLF vs LF checkout -> same; a new file -> changes; blob id equals git's for a known string", async () => {
+  const h = await import("./hash-prereg.ts");
+  const root = tmpdir("corpus");
+  const w = (p: string, c: string) => {
+    fs.mkdirSync(path.dirname(path.join(root, p)), { recursive: true });
+    fs.writeFileSync(path.join(root, p), c);
+  };
+  w("evals/ab/tasks/r/t1/task.json", '{"id":"t1"}\n');
+  w("evals/ab/answers/r.md", "fact one\nfact two\n");
+  const dirs = ["evals/ab/tasks", "evals/ab/answers"];
+  const base = h.corpusManifest(root, dirs);
+  assert(h.corpusManifest(root, dirs).sha256 === base.sha256, "the corpus hash must be stable");
+  w("evals/ab/answers/r.md", "fact one\r\nfact two\r\n");
+  assert(h.corpusManifest(root, dirs).sha256 === base.sha256, "a CRLF checkout must hash like the LF one");
+  w("evals/ab/answers/r.md", "fact one\nfact TWO\n");
+  assert(h.corpusManifest(root, dirs).sha256 !== base.sha256, "one changed corpus file must change the corpus hash");
+  w("evals/ab/answers/r.md", "fact one\nfact two\n");
+  w("evals/ab/tasks/r/t1/extra.patch", "x\n");
+  assert(h.corpusManifest(root, dirs).sha256 !== base.sha256, "an added corpus file must change the corpus hash");
+  assert(h.blobId(Buffer.from("hello\n")) === "ce013625030ba8dba906f756967f9e9ca394464a", "blob id must equal `git hash-object` of 'hello\\n'");
+  assert(Object.keys(h.pinnedHashes()).length === h.PINNED_FILES.length, "every pinned file must exist and hash");
+});
+
+// S19d -- TASK-544: the frozen schedule is the full grid, unique, in pilot order, over real tasks.
+check("S19d schedule: 96 unique slots = 4 measured arms x their 8 tasks x trials 1..3; the first four are one per arm x repo; every task exists; runValidity accepts it", async () => {
+  const sched = JSON.parse(fs.readFileSync(path.join(AB, "schedule.json"), "utf8")) as { arm: string; repo: string; task: string; trial: number }[];
+  const { runValidity, slotId } = await import("./lib/validity.ts");
+  assert(sched.length === 96 && new Set(sched.map(slotId)).size === 96, "96 unique slots");
+  assert(new Set(sched.slice(0, 4).map((s) => s.arm)).size === 4 && sched.slice(0, 4).every((s) => s.trial === 1), "the pilot is the first four slots, one per arm x repo");
+  for (const s of sched) {
+    assert(["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1"].includes(s.arm) && s.arm.startsWith(`${s.repo}-`) && [1, 2, 3].includes(s.trial), `slot ${slotId(s)} is malformed`);
+    const dirs = ["batch-a", "batch-b"].map((b) => path.join(AB, "tasks", s.repo, b, s.task, "task.json"));
+    assert(dirs.some((d) => fs.existsSync(d)), `slot ${slotId(s)} names no task`);
+  }
+  for (const arm of ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1"]) assert(sched.filter((s) => s.arm === arm).length === 24, `${arm} has 24 slots`);
+  assert(runValidity(sched.map((s) => ({ ...s, firstLost: false, finalLost: false })), sched).state === "VALID", "a fully filled run over this schedule is VALID");
 });
 
 // ---- TASK-543: blind judges, the measured-run record, retry, validity, analysis. Free; every must-FAIL names its finding. ----
@@ -1082,9 +1146,22 @@ check("S31 incomplete tokens: phase with no usage -> known usage kept + incomple
   const clean = analyze(fixtureSlots(), SCH);
   assert(rep.arms!.A1!.tokens.incomplete === 18 && rep.arms!.A1!.tokens.trials === 6 && rep.arms!.A1!.tokens.weightedMedian === clean.arms!.A1!.tokens.weightedMedian && rep.arms!.A1!.tokens.weightedMedian > 0, `incomplete trials are left out of the cost, not zeroed: ${JSON.stringify(rep.arms!.A1!.tokens)}`);
   assert(auditAnalysis(slots, SCH, rep).length === 0, `control audit empty: ${auditAnalysis(slots, SCH, rep)}`);
-  const zeroed = slots.map((s) => ({ ...s, final: s.final && { ...s.final, tokens: { ...s.final.tokens, incomplete: undefined } } }));
+  const unflag = (r: typeof slots[number]["first"]) => r && { ...r, tokens: { ...r.tokens, incomplete: undefined } };
+  const zeroed = slots.map((s) => ({ ...s, first: unflag(s.first), final: unflag(s.final) }));
   assert(analyze(zeroed as typeof slots, SCH).arms!.A1!.tokens.weightedMedian < clean.arms!.A1!.tokens.weightedMedian, "(the old behaviour drags the median toward zero)");
   assert(auditAnalysis(slots, SCH, analyze(zeroed as typeof slots, SCH)).some((f) => f.startsWith("incomplete-tokens-as-zero")), "treating incomplete totals as zero must report incomplete-tokens-as-zero");
+
+  const g = clean.gainVsA0!.pooled!;
+  const dA0 = clean.deltaVsA1!.A0!.pooled!;
+  assert(g.n === dA0.n && Math.abs(g.point + dA0.point) < 1e-12 && g.hi >= g.lo, `gainVsA0 is A1 minus A0 over the same tasks: ${JSON.stringify(g)} vs ${JSON.stringify(dA0)}`);
+
+  // D5 comparator: per task the MEAN of its trials, then the MEDIAN over tasks (not the median of trials), on the first pass.
+  const base = clean.arms!.A1!.tokens.weightedMedian;
+  const spiked = fixtureSlots().map((s) => (s.arm === "A1" && s.repo === "clinic" && s.trial === 1 && s.final && s.first ? { ...s, first: { ...s.first, tokens: { ...s.first.tokens, input: s.first.tokens.input + 3_000_000 } } } : s));
+  const sp = analyze(spiked, SCH).arms!.A1!.tokens;
+  assert(Math.abs(sp.weightedMedian - (base + (base + 1_000_000)) / 2) < 1e-6, `one spiked trial in each of 4 tasks moves the median over task means to the midpoint (a median over trials would stay ${base}): ${sp.weightedMedian}`);
+  const postReplacement = fixtureSlots().map((s) => (s.arm === "A1" && s.final ? { ...s, final: { ...s.final, tokens: { ...s.final.tokens, input: s.final.tokens.input + 3_000_000 } } } : s));
+  assert(analyze(postReplacement, SCH).arms!.A1!.tokens.weightedMedian === base, "the cost view is the first pass, like the primary: a change only in the post-replacement rows does not move it");
 });
 
 // S32 (T4) -- only the TERMINAL infrastructure evidence classifies; task prose and recovered retries never do.
@@ -1172,7 +1249,7 @@ check("S35 clinic: both snapshots match their manifests; A0 == pre-init manifest
     assert(r.length === 0, `clinic-${n} snapshot differs from its manifest: ${r.slice(0, 5)}`);
   }
   const rd = (f: string) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")) as Record<string, string>;
-  const set = fs.readFileSync(path.join(dir, "clinic-lf-docs.txt"), "utf8").split("\n").filter(Boolean);
+  const set = fs.readFileSync(path.join(dir, "clinic-lf-docs.txt"), "utf8").split(/\r?\n/).filter(Boolean);
   assert(diffManifest(rd("clinic-a1.pre-init.manifest.json"), rd("clinic-a0.manifest.json")).length === 0, "A0 must equal the pre-init copy");
   const diff = diffManifest(rd("clinic-a0.manifest.json"), rd("clinic-a1.manifest.json")).map((d) => d.replace(/^\S+ /, "")).sort();
   assert(JSON.stringify(diff) === JSON.stringify([...set].sort()), `A1 vs A0 must be exactly the set (diff ${diff.length}, set ${set.length})`);
@@ -1198,7 +1275,7 @@ check("S36 retry regex + stderr: terminal 'Request failed: HTTP 503' -> infra (r
 });
 
 // S37 -- judge file context: post-change files, caps, lean-flow docs excluded, leak check over the context, prompts re-hashed.
-check("S37 judge context: post-change files from the trial dir / snapshot+patch, 400-line + 60 KB caps, lf-docs and binaries left out, in all three prompts; context carrying an arm id or lean-flow -> judge-context-leak, not sent; clean control -> sent", async () => {
+check("S37 judge context: post-change files from the trial dir / snapshot+patch, line + 60 KB caps, lf-docs and binaries left out, in all three prompts; context carrying an arm id or lean-flow -> judge-context-leak, not sent; clean control -> sent", async () => {
   const j = await import("./lib/judges.ts");
   const { loadArm } = await import("./lib/arm.ts");
   const root = tmpdir("ctx");
@@ -1207,13 +1284,15 @@ check("S37 judge context: post-change files from the trial dir / snapshot+patch,
     fs.writeFileSync(path.join(root, p), c);
   };
   w("src/a.ts", "export const a = 1;\n// post-change-marker\n");
-  w("src/long.ts", Array.from({ length: 500 }, (_v, i) => `line ${i + 1}`).join("\n"));
+  const cap = j.CONTEXT_MAX_LINES;
+  w("src/long.ts", Array.from({ length: cap + 100 }, (_v, i) => `line ${i + 1}`).join("\n"));
   w(".claude/CLAUDE.md", "lean-flow project instructions");
   w("img.bin", Buffer.from([1, 0, 2]));
   const ctx = j.contextFromTree(root, ["src/a.ts", "src/long.ts", ".claude/CLAUDE.md", "img.bin", "gone.ts", "../escape"], new Set([".claude/CLAUDE.md"]));
   assert(ctx.map((f) => f.path).join() === "src/a.ts,src/long.ts", `lf-docs, binaries, missing files and traversal are left out: ${ctx.map((f) => f.path)}`);
   const long = ctx[1]!.content;
-  assert(long.includes("line 400") && !long.includes("line 401") && long.includes("[cut at 400 lines]"), "a file is cut at 400 lines and marked");
+  assert(long.includes(`line ${cap}\n`) && !long.includes(`line ${cap + 1}\n`) && long.includes(`[cut at ${cap} lines]`), `a file is cut at ${cap} lines and marked`);
+  assert(cap >= 518, "the cap fits self-onboarding-guard's patched server/store.ts (518 lines)");
   const big = j.packContext(Array.from({ length: 5 }, (_v, i) => ({ path: `f${i}.ts`, content: "x".repeat(25_000) })), new Set());
   const bytes = big.reduce((n, f) => n + Buffer.byteLength(f.content), 0);
   assert(bytes <= 60_000 + 60 && big.length === 3 && big[2]!.content.includes("[context cut at 60000 bytes]"), `the whole context is capped at 60 KB: ${bytes} bytes, ${big.length} files`);
