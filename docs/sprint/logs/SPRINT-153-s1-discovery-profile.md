@@ -130,3 +130,14 @@ line to cite a repo file and exclude "a convention seen nowhere in the code", so
 `skills/lean-doc-generator/templates/development-coding-standards.md.template`, one comment, so a convention line may cite a
 repo file or the owner's answer. The template's other content is T1's and stays. The Plan's T3 Layers line gains that path.
 Re-confirm G2: the change follows T3's signed design (answers land in Conventions in use with their source); no new decision.
+
+### 2026-10-31 | scope-change | T3, T4, T5: question sets are found through an index file, not by listing the folder
+What broke: the coordinator's headless no-load check on portfolio parked correctly (nothing written, park record kept) but
+recorded "Question sets (step 1c): not evaluated": the run listed the profiles folder with a shell command, which a headless
+run is denied (the folder is outside the repo); a Read of a file inside the skill's own folder is allowed during a skill run,
+and this CLI build has no Glob tool. An adopter's headless run would never load a set, and an interactive one would prompt.
+Impact: T3 adds `skills/lean-doc-generator/references/profiles/README.md`, an index naming each set file and its detect
+rule in one line, and init's step 1c reads the index and the listed set files, never listing the folder. A new set is one
+file plus one index line. The index is coordinator-owned from here: T4 and T5 each report their one index line and the
+coordinator writes it at merge-back, so wave 3 keeps running in parallel. T3's Layers line gains the index path.
+Re-confirm G2: a defect fix inside T3's signed intent (data-driven sets); no owner decision changes.

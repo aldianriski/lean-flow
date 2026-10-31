@@ -63,7 +63,7 @@ Wave 1, after T1 because both edit the product-requirements template. Targets th
 **Acceptance:** a real `init` fills at least one business topic from the repo's own docs without asking, and every written fact cites its source.
 
 ### T3 — Ship the React/Vite question set and load sets by stack `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/profiles/react-vite.md` · `skills/lean-doc-generator/templates/development-coding-standards.md.template`
+Layers: `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/profiles/react-vite.md` · `skills/lean-doc-generator/references/profiles/README.md` · `skills/lean-doc-generator/templates/development-coding-standards.md.template`
   · `docs/work/todo/TASK-549-ship-react-vite-question-set-and-load-sets-by-stack.md`
   · `docs/work/in_progress/TASK-549-ship-react-vite-question-set-and-load-sets-by-stack.md`
   · `docs/work/done/TASK-549-ship-react-vite-question-set-and-load-sets-by-stack.md`
