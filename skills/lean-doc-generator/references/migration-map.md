@@ -47,6 +47,9 @@ don't hand-reconcile, and you're not lost in your own existing code.
    - **After each relocate/rename**: `grep` the old filename/path across the repo and fix every inbound link before moving to the next file.
    - **After each apply action** — compare the inventory (§ Preserve inventory); the first difference stops all further writes.
 4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, every sprint `## Members` id resolves to a task file — a genuinely missing one is an owner-action in the report, not a failed run (§ v1 → v2, by-reference sprint).
+   Verify by reading and grep only: never run the repo's build, test suite or generators, which can rewrite
+   files outside the plan. A check that needs a runnable tool, and any gate the repo's DoD asks for, is reported
+   unrun, for the owner to run.
 
 ## Profile pass (Plan/Apply — repo without the profile)
 
@@ -77,8 +80,8 @@ the **step-5** citation rule. Migrate's deltas only:
   untouched; propose a **consolidate** plan item, not applied in this pass.
 - **Rounds** — the business and conventions rounds run after the plan is approved (no tier popup); ask only
   what nothing settles. Headless is unchanged: park with the plan; nothing is written.
-- **Report** — each topic (Stack and Conventions lines count) as `settled (<source>)` · `asked (answered)` ·
-  `asked (not decided yet)`.
+- **Report** — every topic, all seven (Stack and Conventions included), as `settled (<source>)` ·
+  `asked (answered)` · `asked (not decided yet)`.
 
 ## Preserve inventory (backup before Apply, compared after each action)
 
@@ -92,8 +95,8 @@ per line, trailing blank lines trimmed. Population:
 
 - every file under `docs/adr/` — the whole file;
 - every `docs/DECISIONS.md` row — each table data row (not header or separator) or list item, by its text;
-- every requirements file — a doc whose path names requirements / PRD / product / acceptance (never the root
-  `README`) — the whole file; if the profile pass adds sections to it, instead the preamble before the first
+- every requirements file — a doc whose path, folder included, names requirements / PRD / product / acceptance
+  (so every file under `docs/prd/` or `docs/product/`; never the root `README`) — the whole file; if the profile pass adds sections to it, instead the preamble before the first
   heading, the section order, and each pre-existing section's heading text + body (a placeholder-only
   section is not adopter content — excluded, so filling it never trips the compare);
 - every epic (`EPIC-*.md` under `docs/epic/`, `archive/` included) — the line set under a heading matching
