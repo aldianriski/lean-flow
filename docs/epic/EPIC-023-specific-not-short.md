@@ -10,7 +10,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 # EPIC-023 — Specific, not short (lean-flow 3.0)
 
-> **Outcome:** lean-flow 3.0.0 ships only the discovery, carry-through and expertise components whose
+> **Outcome:** lean-flow ships (as 2.x MINORs, or 3.0.0 on a named contract break, D9) only the discovery, carry-through and expertise components whose
 > staged A/B on two real repos gained ≥ +10 pp on the primary endpoint, with no symptom measure
 > regressing past −5 pp and within 2× the 2.x token cost. Where a hypothesis fails, the epic records it
 > and ships the measurement harness and findings instead.
@@ -30,9 +30,11 @@ own A/B arm, and a release last. Full analysis, evidence and A/B design →
 
 **In:** the maintainer-only A/B harness and baseline (S0) · repo-profile discovery in `init`/`migrate`
 with hybrid framework question sets and business discovery (S1) · the section-pointer contract
-carrying non-derivable facts to builder, reviewer and handoff (S2) · expertise candidates: brief fields,
-fan-out budget, specialist reviewers, tier routing, expert agents (S3) · per-candidate admission, the
-STANDARD MAJOR and the 3.0.0 release (S4).
+carrying non-derivable facts to builder, reviewer and handoff (S2) · expertise in three measured steps:
+S3a brief fields and fan-out budget, S3b pilot reviewers (domain and invariants, architecture and
+integration, QA), S3c optional agent definitions or tier routing for a deferred role whose trigger fired;
+the full-loop roster → [`lean-flow-3-specialist-roster`](../research/lean-flow-3-specialist-roster.md) (S3) ·
+per-role admission, the version decision and the release (S4).
 **Out (explicitly not):** prescribing any consumer architecture (`architecture-baselines` verdict
 stands) · a framework encyclopedia beyond the four first profiles · turning the A/B harness into a gate
 or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
@@ -65,6 +67,13 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 - **D6** — Release (owner, 2026-10-30): S1 and S2 each ship as a 2.x MINOR only once their own arm passes (A2, A3); until
   then their changes stay under [Unreleased], unversioned. Fresh installs from the marketplace's `main` already carry what is
   merged there; a release, not a push, is what counts as shipping.
+- **D7** — Specialist roster (owner, 2026-10-31; research D13): named now for the whole loop. Pilots are domain and
+  invariants, architecture and integration (describes, never prescribes) and QA; existing skills get brief fields only;
+  frontend, backend, data, design system and release are deferred behind named triggers; no standing diagram agent.
+- **D8** — S3 splits into S3a, S3b and an optional S3c, each with its own arm (research D14), so each step's effect is
+  measured apart instead of one bundled A4.
+- **D9** — The version is decided at S4 on a named consumer-contract break (STANDARD §15; research D15). Without one,
+  the admitted set ships as 2.x MINORs; S3 roles ship only after S4 admits them.
 
 ## Open questions
 
@@ -81,8 +90,10 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   → next slice: S1 Discovery
 - [ ] S2: a traced run shows each required fact *read* by the builder through a resolved pointer; every
   blocking lost-detail site fixed; arm A3 measured vs A2 and A1 → next slice: S2 Carry-through
-- [ ] S3: every expertise candidate runnable in the harness; arm A4 measured vs A3
+- [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A3 and A4b vs A4a
+  measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
   → next slice: S3 Expertise candidates
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
-  and A3; STANDARD MAJOR only if H1/H2 held; 3.0.0 released with migration notes (or a recorded
-  no-ship with numbers) → next slice: S4 Admit + STANDARD + release
+  and A3; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
+  MINORs; released with migration notes (or a recorded no-ship with numbers)
+  → next slice: S4 Admit + STANDARD + release

@@ -100,6 +100,9 @@ itself** — recorded in an ADR + CLAUDE.md, never a STANDARD rule imposed on ad
 | D10 | A/B budget = full design accepted (240 + 32c runs + setup) |
 | D11 | Minimum worthwhile gain = **+10 pp** on the primary endpoint; regression limit = **−5 pp** per symptom measure |
 | D12 | First profile set = React/Vite · Vue/Vite · Go/chi · Postgres; every other stack takes the scan-only fallback |
+| D13 | (2026-10-31) S3's specialist roster is named now, for the whole loop: pilots = domain and invariants · architecture and integration · QA; existing roles get brief fields only; frontend · backend · data · design system · release deferred behind triggers; no standing diagram agent → [`lean-flow-3-specialist-roster`](lean-flow-3-specialist-roster.md) |
+| D14 | (2026-10-31) S3 splits into S3a brief + budget · S3b pilot reviewers · S3c optional definitions/tiers, each its own arm (A4a · A4b · A4c); +64 runs, +32 if S3c runs |
+| D15 | (2026-10-31) The version is decided at S4 on a named consumer-contract break (STANDARD §15); S1 and S2 may ship earlier as 2.x MINORs on a passing arm, S3 roles only after S4 admission |
 
 ## 6. Epic slicing
 
@@ -115,8 +118,8 @@ CONTEXT SSOT · README + CHANGELOG) **exercised on a real run**, not satisfied b
 | S0 | Baseline | Maintainer-only A/B harness (measurement, never a gate or `qa-check.sh` leg); Vue/Go repo built; task set; pre-registration (§7); arms A0 + A1 run | Pre-registration frozen **before** any A1 run; A0/A1 results per symptom recorded in a research log; each symptom marked *measured defect* or *not reproduced* | Not frozen (no new governance machinery). Other G: fixture + real run |
 | S1 | Discovery | `init`/`migrate` produce a **repo profile** (stack · conventions actually used · invariants · business goal · flows · quality attributes · non-goals) as section-addressable docs; hybrid question sets (React/Vite · Vue/Vite · Go/chi · Postgres); scan-only fallback; template audit removing overview sections that restate code | Real `init` on both A/B repos + an **unprofiled-stack** repo via the installed plugin; `migrate` on a real 2.x repo preserves every existing decision and leaves valid pointers; no lean-flow-internal path in output; **arm A2 measured vs A1 and recorded** (ship-eligible alone only if it meets threshold) | Skill/template work: not frozen. Tier per task at G2 (ADR-050) |
 | S2 | Carry-through | **Pointer contract**: format (`path § heading`), resolver (load that section only), missing/renamed section → explicit failure surfaced in the brief, never silent; task file, Plan, review brief and handoff use it; lost-detail audit | A traced run shows each required fact **read** by the builder (transcript evidence), not merely pointed at; every *blocking* loss from the audit fixed, only *deferrable* ones may go to TD; **arm A3 measured vs A2 and vs A1** (H1+H2 judged jointly on A3 vs A1 when A2 alone missed) | Dispatch/brief change → **frozen**: admitted on S0's *measured defect* (symptom 3) named in `## Why`; G2 review cap 2 |
-| S3 | Expertise candidates | Dispatch brief fields (objective · output format · sources · boundary · profile pointers · return cap); fan-out budget; specialist reviewers; tier-policy amendment (ADR-010); expert-agent **candidates** (not shipped) | Each candidate runnable in the harness; **arm A4 (all candidates) measured vs A3** | Dispatch · review routing · tiers → **frozen**: admitted on S0 measurement in `## Why`; G2 review cap 2 |
-| S4 | Admit + STANDARD + release | Ablation per candidate (A4 minus one) → admit only those with positive delta within cost cap (ADR-001 record each); STANDARD MAJOR carrying R1–R4 **only if H1/H2 held**; R5 in maintainer ADR; 3.0.0 release (grep-derived manifests + README footer) + migration notes | Shipped set = only components whose own ablation delta is positive; Final measured vs A1 **and** vs A3 on both repos (Final must beat A3 by the minimum gain, else no expertise component ships); if any candidate was excluded, each admitted one is re-checked as Final-minus-one; anything not admitted recorded with its numbers | New Standard requirement → frozen: admitted on S0/S1 measurement. Conformance-engine logic changes (if any) = consequential G, full ADR-050 bar |
+| S3 | Expertise candidates | Split per D14, roster per D13: **S3a** dispatch brief fields (objective · output format · sources · boundary · profile pointers · return cap) + fan-out budget; **S3b** the three pilot reviewers as role briefs through existing dispatch; **S3c** (optional) agent definitions or tier-policy amendment (ADR-010) for a deferred role whose trigger fired | Each step runnable in the harness; **arms A4a vs A3, A4b vs A4a, A4c vs A4b** measured | Dispatch · review routing · tiers → **frozen**: admitted on S0 measurement in `## Why`; G2 review cap 2 |
+| S4 | Admit + STANDARD + release | Ablation per candidate (A4 minus one) → admit only those with positive delta within cost cap (ADR-001 record each); STANDARD MAJOR carrying R1–R4 **only if H1/H2 held and a named contract breaks (D15)**; R5 in maintainer ADR; 3.0.0 release (or 2.x MINOR, D15) (grep-derived manifests + README footer) + migration notes | Shipped set = only components whose own ablation delta is positive; Final measured vs A1 **and** vs A3 on both repos (Final must beat A3 by the minimum gain, else no expertise component ships); if any candidate was excluded, each admitted one is re-checked as Final-minus-one; anything not admitted recorded with its numbers | New Standard requirement → frozen: admitted on S0/S1 measurement. Conformance-engine logic changes (if any) = consequential G, full ADR-050 bar |
 
 Order is load-bearing: S0 before everything (it is the admission evidence for every frozen change and
 the baseline for every arm); S1 → S2 → S3 because each arm stacks on the previous; STANDARD changes
@@ -133,7 +136,7 @@ answers file as `BUSINESS-NOTES.md`, so A0 means raw facts without lean-flow. **
 bound of that failure rate is > 10%; Unknown counts as failure. S0 tasks: TASK-533..545.
 
 **Arms (staged, cumulative):** A0 no lean-flow docs · A1 2.x (pinned 2.19.x) · A2 = A1 + S1 discovery ·
-A3 = A2 + S2 carry-through · A4 = A3 + S3 candidates · A4−x ablations (S4) · Final = admitted set.
+A3 = A2 + S2 carry-through · A4a/A4b/A4c = A3 + S3a, + S3b, + S3c (D14) · A4−x ablations (S4) · Final = admitted set.
 
 **Controls (identical across arms):** pinned plugin revision per arm · one fixed, version-pinned
 **model inventory** · same tool permissions · same task prompt · same business evidence (an
@@ -186,7 +189,8 @@ with "Unknown"; a sample calibrated against the owner's read.
 k = 2 → 2 repos × 8 tasks × (3 arms × 3 + 3 arms × 2) = 240 runs, plus ablations at
 2 × 8 × 2 = **32 runs per candidate** → **240 + 32c** (c = candidate count), plus 32 per admitted
 candidate for the Final-minus-one re-check when any candidate was excluded. Setup runs are extra
-(one per arm × repo, operator-attended).
+(one per arm × repo, operator-attended). D14 replaces the single A4 with A4a and A4b (+64 runs) and an
+optional A4c (+32).
 
 ## 8. Governance fit
 
@@ -201,7 +205,7 @@ candidate for the Final-minus-one re-check when any candidate was excluded. Setu
   template changes take the owner's Codex review loop.
 - **Consumer side (L-015)**: S1's unprofiled-stack and 2.x-upgrade exercises run through the installed
   plugin; no maintainer path in consumer output; README + CHANGELOG + migration notes per slice.
-- **Versioning**: 3.0.0 + STANDARD MAJOR together at S4. Only S1 and S2 outputs may ship early as 2.x
+- **Versioning** (D15 supersedes "3.0.0 + STANDARD MAJOR together at S4"): decided at S4 on a named contract break. Only S1 and S2 outputs may ship early as 2.x
   MINORs, and only on a passing arm of their own; S3 candidates never ship before S4 admission.
 
 ## 9. Risks
