@@ -1881,6 +1881,30 @@ check("S45 freeze guard: only a paragraph LEADING with `frozen <instant>` and ho
   assert(freezeProblem({ log: okLog, prereg }) === undefined, "control: a matching freeze line admits a measured start");
 });
 
+// S46 (T4 owner ruling) -- section 10's "no first action" is the TRIAL's: a phase-2 run with no action of its own is not a harness crash when phase 1 acted.
+check("S46 phase-2 classification: phase 1 acted, phase 2 killed with no action of its own -> task-failure (not retried, not replaced); no phase acted and no result -> infra:harness-crash (retried); stderr evidence still classifies as before", async () => {
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const { runWithRetry, retryAudit } = await import("./lib/retry.ts");
+  const go = async (killPhase: 1 | 2, stderr = "") => {
+    const fz = await frozenSmoke();
+    const base = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk, mutate: (events, call) => { if (call === killPhase) events.length = 2; } }); // init + commands_changed: no action, no result
+    const runner: import("./lib/run.ts").Runner = async (cmd, o) => {
+      const r = await base.runner(cmd, o);
+      return base.calls.n === killPhase ? { ...r, exitCode: 143, stderr, timedOut: true } : r;
+    };
+    const dir = tmpdir("phase2-class");
+    return runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "measured round 0", runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
+  };
+  const p2 = await go(2);
+  assert(p2.exit === "timeout" && p2.cls === "task-failure", `phase 1 acted, phase 2 killed before any action of its own: ${p2.exit} ${p2.cls}`);
+  const retried = await runWithRetry(async () => { const t = await go(2); return { cls: t.cls!, value: t }; });
+  assert(retried.attempts.length === 1 && !retried.infraLost && retryAudit(retried.attempts.map((a) => a.cls)).length === 0, "not retried, not replaced");
+  const none = await go(1);
+  assert(none.exit === "timeout" && none.cls === "infra:harness-crash", `control: no phase acted and no result event: ${none.exit} ${none.cls}`);
+  const net = await go(2, "fetch failed: ECONNRESET");
+  assert(net.cls === "infra:network", `terminal evidence still classifies exactly as frozen: ${net.cls}`);
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it

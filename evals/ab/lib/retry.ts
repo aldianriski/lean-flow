@@ -34,6 +34,8 @@ export type AttemptEvidence = {
   stream?: Stream | undefined;
   /** the finished attempt's own verdict word: "ok" or any task-level exit */
   exit?: string | undefined;
+  /** the agent acted in ANY phase of the trial (protocol path); consulted only for "no result event and no first action" */
+  trialActed?: boolean | undefined;
 };
 
 /**
@@ -72,7 +74,7 @@ export function classifyAttempt(a: AttemptEvidence): AttemptClass {
   if (API.test(evidence)) return "infra:api-error";
   if (NETWORK.test(evidence)) return "infra:network";
   if (SANDBOX.test(evidence) && !acted) return "infra:sandbox-before-action";
-  if (!res && !acted) return "infra:harness-crash";
+  if (!res && !(acted || a.trialActed)) return "infra:harness-crash";
   return "task-failure";
 }
 

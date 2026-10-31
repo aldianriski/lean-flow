@@ -12,7 +12,7 @@ import { verifyPin } from "./pin.ts";
 import { appendRow, type Row } from "./record.ts";
 import { buildCommand, spawnRunner, TRIAL_TIMEOUT_MS, type RawRun, type Runner } from "./run.ts";
 import { copyTree, diffManifest, manifest } from "./snapshot.ts";
-import { classifyAttempt, terminalText, type AttemptClass } from "./retry.ts";
+import { classifyAttempt, firstActionSeen, terminalText, type AttemptClass } from "./retry.ts";
 import { freezePreflight, PinRefused, pinsOf, validityProblems, type TrialOpts, type TrialResult } from "./trial.ts";
 
 export const DEVIATION = "D9 eval-only G2 exception -- never applies to product runs";
@@ -230,7 +230,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   };
   let cls: AttemptClass | undefined;
   if (o.measure) {
-    cls = classifyAttempt({ raw: lastRaw, stream: last, exit });
+    cls = classifyAttempt({ raw: lastRaw, stream: last, exit, trialActed: streams.some(firstActionSeen) });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
     row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens })).measure;
     if (cls.startsWith("infra:")) row.passed = false;
