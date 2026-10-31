@@ -101,3 +101,17 @@ business topics each have a requirements section with no citation slot; compass'
 non-goals, main flows and quality targets, and nothing states its invariants.
 builder-check · T2 · 4 contradictions · 7 questions · settled before the popup: headless still parks with nothing written; the quality table gains a source column with uncovered rows left as placeholders; the citation rule covers every fact init writes into requirements; an accepted drafted option cites owner and source; a topic is settled only by an explicit statement; disagreeing docs are offered as options; flow pointers only to flow docs that exist; the business round is its own popup after the tier one; the doc search recurses under docs; a filled section drops its customize marker; the build loaded by plugin-dir counts as installed; the citation format went to the owner
 Owner rulings by popup: a doc fact cites `path § heading` (the shape S2 will standardise); T2 G2 signed.
+
+### 2026-10-31 | progress | T2 done: init on compass filled the business from its docs and asked only the open topics; TASK-548 in done
+Built on an isolated worktree (`65524bac`, `0cba87d8`, `207ed142`) and merged at `6b34f1ca`. Codex would not launch, so an
+independent Claude reviewer took both rounds (as T2's design allows). Round 1: nothing blocking; four should-fixes, the main
+one a no-evidence question that could only be built by inventing a second option; one revision closed them (init never
+generates candidate answers). Round 2: nothing blocking; three wording fixes applied by owner ruling, coordinator-verified.
+Box 3, owner-run on a fresh compass copy on the VPS with the plugin built from `6b34f1ca`: goal, users, scope, five non-goals,
+both main flows, six functional requirements and availability written from the product requirements doc without asking;
+invariants and three quality rows asked with options drafted from the docs; the first milestone's undecided fields kept their
+placeholders and marker; three real conflicts between the docs and the code raised as open questions. Every fact cites
+`path § heading` or the owner; all fourteen cited headings exist (three carry an emoji prefix in the source that the citation
+omits, a normalisation S2's resolver must handle). The owner confirmed the business sections are correct for compass.
+consequence · T2 · behaviour:material · governance:low
+review · T2 · scoped-reviewer · behaviour:material · governance:low
