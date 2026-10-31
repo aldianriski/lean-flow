@@ -664,7 +664,7 @@ check("S19 setup: launcher command carries claude-opus-5-5, no --effort, the inv
 });
 
 // S19b -- TASK-544 M2/M3: measured arms carry the model SET and one allow-list per repo; the command passes both pins.
-check("S19b inventory: measured arms allow the 3-model set, no subagent pin, default effort, one --allowedTools list per repo (A0 == A1; Amendment 3: all Bash + PowerShell + Skill); a model outside the set invalidates", async () => {
+check("S19b inventory: measured arms allow the 3-model set, no subagent pin, default effort, one --allowedTools list per repo (A0 == A1; Amendments 3+4: all Bash + PowerShell + Write + Edit + Skill); a model outside the set invalidates", async () => {
   const { loadArm, modelInventory } = await import("./lib/arm.ts");
   const { buildCommand } = await import("./lib/run.ts");
   const { validityProblems } = await import("./lib/trial.ts");
@@ -673,7 +673,7 @@ check("S19b inventory: measured arms allow the 3-model set, no subagent pin, def
   for (const repo of ["workdoo", "clinic"]) {
     const [a0, a1] = ["a0", "a1"].map((n) => loadArm(path.join(dir, `${repo}-${n}.json`))) as [import("./lib/arm.ts").Arm, import("./lib/arm.ts").Arm];
     assert(a0.allowedTools.length > 0 && JSON.stringify(a0.allowedTools) === JSON.stringify(a1.allowedTools), `${repo}: A0 and A1 must share one non-empty allow-list`);
-    assert(["Bash", "PowerShell", "Skill(lean-flow:*)"].every((t) => a0.allowedTools.includes(t)) && a0.allowedTools.length === 3, `${repo}: Amendment 3 -- all shell (Bash, PowerShell) plus the protocol's Skill call, nothing curated: ${a0.allowedTools}`);
+    assert(["Bash", "PowerShell", "Write", "Edit", "Skill(lean-flow:*)"].every((t) => a0.allowedTools.includes(t)) && a0.allowedTools.length === 5, `${repo}: Amendments 3+4 -- all shell (Bash, PowerShell), the Write and Edit tools, plus the protocol's Skill call, nothing curated: ${a0.allowedTools}`);
     const cmd = buildCommand(a1, "p");
     assert(cmd.includes("--allowedTools") && a1.allowedTools.every((t) => cmd.includes(t)), `${repo}: command carries the allow-list`);
     assert(!cmd.includes("--effort"), `${repo}: default effort passes no --effort flag`);
@@ -685,7 +685,7 @@ check("S19b inventory: measured arms allow the 3-model set, no subagent pin, def
     assert(validityProblems([], a1, "x", totals(["claude-opus-4-1"])).some((p) => p.includes("claude-opus-4-1")), "a model outside the set invalidates");
   }
   const smoke = loadArm(path.join(dir, "smoke-a1.json"));
-  assert(!smoke.allowedTools.includes("Bash") && !smoke.allowedTools.includes("PowerShell"), "smoke arms keep their own curated list");
+  assert(!["Bash", "PowerShell", "Write", "Edit"].some((t) => smoke.allowedTools.includes(t)), "smoke arms keep their own curated list");
   assert(smoke.sessionModel === "claude-haiku-5-5" && smoke.effort === "low" && !modelInventory(smoke).has("claude-opus-5-5"), "smoke arms keep their Haiku/low inventory");
 });
 

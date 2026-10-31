@@ -8,8 +8,8 @@
   "setup": { "model": "claude-opus-5-5" },
   "allow": {
     "common": ["Skill(lean-flow:*)"],
-    "workdoo": ["Bash", "PowerShell"],
-    "clinic": ["Bash", "PowerShell"],
+    "workdoo": ["Bash", "PowerShell", "Write", "Edit"],
+    "clinic": ["Bash", "PowerShell", "Write", "Edit"],
     "smoke": [
       "Bash(tsc *)",
       "Bash(bunx tsc *)",
