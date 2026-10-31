@@ -14,6 +14,17 @@ bounded by the safe-scaffold allowlist (ADR-012).
    `## Conventions in use` (coding standards, written only on a repo with code, as that row is) with
    one cited file per line. Anything the sample cannot confirm goes under `Not confirmed`, never
    invented. An unknown stack gets this scan alone (curated question sets for known stacks come later).
+1b. **Read the business evidence** — code shows the stack, not the business. Before asking anything,
+   find what the repo already says. Candidates: the root `README` plus, recursively under `docs/`, any
+   doc whose path or title names requirements · PRD · product · spec · goals · roadmap · user flows ·
+   journeys · user stories. Never open secret files (`.env*`, keys, credentials). Read the **headings of
+   every candidate first**, then only the sections that bear on the five business topics — business
+   goal · main flows · invariants · quality attributes · non-goals — never a whole large doc. Record
+   each topic as **settled** (a doc states it explicitly, in its own section or an explicit statement;
+   keep the fact and `<path> § <heading>`) or **open**. A passing mention is not settled: keep it as a
+   drafted answer and the topic stays open. A backlog or "optional enhancements" list is not a
+   non-goal. Two docs that disagree → the topic is open, and each source's version becomes a drafted
+   option. Hold the result for step 3's business round and step 5's write.
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
@@ -30,6 +41,13 @@ bounded by the safe-scaffold allowlist (ADR-012).
      leaves that field `[CUSTOMIZE]`; boundary `none` writes side effects `none`. Never invent an answer.
      The section is written only from this round's answers; headless, it parks with the rest (below) and
      nothing is written.
+   - **Business round** (its own popup, after the tier + First milestone popup above) — ask ONLY the
+     topics step 1b left open, in one frontier round: a *frontier round* asks together every question
+     whose prerequisites are already settled, and only a question that depends on an earlier answer
+     waits for a later round. The five topics are independent, so none waits on another; split across
+     popups only at the 4-questions-per-popup limit. A topic settled by evidence is not asked. Each
+     question offers *not decided yet* plus, where step 1b found a partial or conflicting doc fact,
+     that fact as a drafted option (recommended when only one source). Never invent an answer.
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
      `architecture/authentication.md` (auth exists). Templates → table below.
@@ -46,7 +64,8 @@ bounded by the safe-scaffold allowlist (ADR-012).
    - **Headless (the popup cannot be answered)** — detect it, don't assume it: probe the channel
      (`ToolSearch select:AskUserQuestion` → *no matching deferred tools* means unregistered; `dontAsk`
      auto-denies any prompting call). An interactive run asks the popup normally — that stays correct.
-     Once verified headless, the tier choice can be neither asked nor assumed. Record the park before halting:
+     Once verified headless, the tier choice can be neither asked nor assumed, and nothing is written —
+     doc-evidenced business facts included. Record the park before halting:
      write the detected substrate, the tiers you would have offered, and the unblock condition
      ("owner picks the tiers") into a `/handoff` doc — there is no sprint file at this entry point.
      Base-tier scaffolding waits with it: it is additive, but it is downstream of a choice nobody made
@@ -72,6 +91,12 @@ bounded by the safe-scaffold allowlist (ADR-012).
 5. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first,
    per the generator's § Bundled + cited assets);
    enforce the line cap and the ownership header (§3) on every file touched.
+   **Citation rule** — every fact init writes into `requirements.md` ends with its source:
+   `(from <path> § <heading>)` for a doc, `(owner, init)` for an answer, `(owner, init; drafted from
+   <path> § <heading>)` for an accepted drafted option. Quality-attribute rows put it in the Source
+   column. *Not decided yet* keeps that section's placeholder and its `[CUSTOMIZE]` marker; a section
+   init fills drops the marker. Main flows: name each flow with its source, and add the
+   `→ docs/flows/<slug>.md` pointer only when that flow doc exists or init writes it.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
    file's ownership header + placement match STANDARD §2/§3; every Stack and Conventions-in-use line cites a repo file; report the full file list, including
    safe-scaffold writes and any skips.
@@ -139,4 +164,5 @@ non-doc file stay **banned** from init — no exceptions.
   exception) with `owner` a role, never a person.
 - Placement matches STANDARD §2 exactly — root vs `.claude/` vs the `docs/` tree.
 - Every Stack and Conventions-in-use line cites a repo file it was seen in.
+- Every fact in `requirements.md` cites a doc `§ heading` or the owner's answer; none is invented.
 - Report: files written · files skipped (pre-existing) · any WARN (missing template).
