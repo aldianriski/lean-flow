@@ -55,3 +55,19 @@ Owner rulings by popup: T1 G2 signed; the owner answers each S1 exercise's popup
 snapshots are copies of compass, talixa-hris (the React and Vite repo; temidev-project is Next.js), template-vue, kalasuara
 and portfolio-sveltekit, without env files, keys, dependencies, git data or build output, plus a fresh Go chi fixture for
 T5. The live repos are never touched.
+
+### 2026-10-31 | progress | T1 built, reviewed twice and merged; box 3's init exercise staged on the VPS for the owner
+Built on an isolated worktree (`98a8f15c`, `da6982d5`, `90432159`) and merged at `131b49f6`. Review round 1 was Codex
+(the owner's loop): it blocked on six prompts still asking for what the code shows, one surviving prescription about where
+permissions are enforced, and three facts with two homes, plus five should-fixes; one revision closed them. Round 2 was meant
+for Codex, but its task launch failed three times while its setup check reported ready, so by owner ruling an independent
+Claude reviewer stood in (a deviation from the Codex loop, recorded here): nothing blocking, five should-fixes and two notes,
+fixed by owner ruling without a third round and verified by the coordinator. Coordinator checks on main after the merge: no
+ADR-012 left in any template; count claims 34 core plus 2; doc caps and prose density clean; each fact's heading in exactly
+one template (the Definition of Done heading in CONTRIBUTING holds only a pointer); the three removed headings gone; init's
+two write targets present; no named-architecture menu left. README's anti-patterns line is now stale and goes to T7, which
+owns README. Pre-existing lean-flow ids in eight templates are outside TASK-552 and go to a follow-up at close.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+Box 3 staged on the VPS: the plugin built from `131b49f6` and a fresh copy of the portfolio-sveltekit snapshot; the owner
+runs init there and answers its popups.
