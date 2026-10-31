@@ -172,3 +172,5 @@ Owner rulings by popup: wave 3 G2 signed for T4, T5 and T8; the Vue set takes it
 (env and config, component test level, UI error handling); the Go/chi and Postgres sets as listed; T6's preserve inventory
 is every ADR file, every DECISIONS row, every PRD or requirements file and every epic Closed-when line. The profiles index is
 coordinator-owned (T4 and T5 report their index lines).
+builder-check · T6 · 6 contradictions · 5 questions · settled: owner ruling = the four kinds the owner ruled; hashing per item, pre-existing sections only for a requirements file the pass adds to; the profile pass never consolidates an inventory item; has-the-profile = target headings exist (deltas only); the report lists each topic settled or asked; overlapping existing sections stay untouched with a consolidation plan item; an inventory difference stops writes with no automatic rollback; the leak check is plugin paths in written files
+T6 G2 signed with the owner's inventory ruling (popup above).
