@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-29
+last_updated: 2026-10-31
 update_trigger: an A/B trial run is appended (evals/ab, run by hand)
 status: active
 id: ab-measurements-log
@@ -15,6 +15,10 @@ related: [EPIC-023]
 > `smoke` exercise the harness on a fixture and are **not measurements**. Tokens and cost come from the CLI's own
 > `result` event (`modelUsage` summed over every model); `raw` keeps its `usage`, `modelUsage` and `subagent_stats`.
 > A `usage-missing` row is invalid: the CLI reported no usage, and the trial stops for an owner ruling.
+>
+> **Pre-registration frozen 2026-10-31T03:12:56Z (owner-signed, SPRINT-152 T3):** `evals/ab/PREREGISTRATION.md` sha256
+> `e72002cf1d1be69586833ca37133c6bcb64fc47655d51270a2dba122cd64393b`, at commit `bc1ddf4a`. Every row with a `ts` before
+> that instant is tagged smoke and ran on the fixture repo (13 of 13 at the freeze); a measured trial is valid only after it.
 
 | ts | tag | arm | repo | task | trial | attempt | graders | in | out | cache-read | cache-write | cost-usd | wall-s | exit | pins | raw | passed | deviation | g2 | park | measure |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
