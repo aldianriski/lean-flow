@@ -2182,6 +2182,56 @@ check("S53 `not applicable` grader (every workdoo task freezes `lint` so): not r
   assert(m.res.row.measure!.graders.some((g) => g.name === "lint" && g.result === "not-applicable"), "a task with no lint grader records lint as not-applicable, as before");
 });
 
+check("S54 work root: unsafe roots (drive root, the repo, a parent of it) refused, AB_WORK_ROOT honoured, nothing outside the root is deleted; after the row is appended the trial copy (dependencies, cluster dir) is gone and stream*.jsonl is kept under kept/ -- on ok, timeout, provision-failed and for a protocol trial", async () => {
+  const { assertWorkRoot, defaultWorkRoot, cleanupIsolation, makeIsolation } = await import("./lib/isolate.ts");
+  const { REPO_ROOT } = await import("./lib/freeze.ts");
+  for (const bad of [path.parse(REPO_ROOT).root, REPO_ROOT, path.dirname(REPO_ROOT), path.join(REPO_ROOT, "evals", "ab", "..", "..")]) {
+    let err: unknown;
+    try { assertWorkRoot(bad); } catch (e) { err = e; }
+    assert(err instanceof Error && /drive root|repo/.test(err.message), `${bad} must be refused: ${err}`);
+  }
+  const ok = tmpdir("wr");
+  assertWorkRoot(ok);
+  assert(defaultWorkRoot({ AB_WORK_ROOT: ok }) === path.resolve(ok), "AB_WORK_ROOT is honoured");
+  let envErr: unknown;
+  try { defaultWorkRoot({ AB_WORK_ROOT: REPO_ROOT }); } catch (e) { envErr = e; }
+  assert(envErr instanceof Error, "an unsafe AB_WORK_ROOT is refused");
+  const other = tmpdir("wr-other");
+  const stray = makeIsolation(other, { auth: "api-key" });
+  cleanupIsolation(stray, ok); // an isolation dir outside the given work root
+  assert(fs.existsSync(stray.root), "nothing outside the work root is deleted");
+
+  const left = (wr: string) => ({ iso: fs.readdirSync(wr).filter((d) => d.startsWith("iso-")), kept: fs.existsSync(path.join(wr, "kept")) ? fs.readdirSync(path.join(wr, "kept")).flatMap((d) => fs.readdirSync(path.join(wr, "kept", d))) : [] });
+  const { runTrial } = await import("./lib/trial.ts");
+  const run = async (o: { fail?: boolean; timedOut?: boolean }) => {
+    const fz = await frozenSmoke();
+    const wr = tmpdir("wr-trial");
+    const fp = fakeProvision({ ...(o.fail ? { fail: true } : {}) });
+    const base = replay();
+    const runner: import("./lib/run.ts").Runner = async (cmd, opts) => {
+      fs.mkdirSync(path.join(opts.cwd, "node_modules", "x"), { recursive: true });
+      fs.writeFileSync(path.join(opts.cwd, "node_modules", "x", "i.js"), "1");
+      return o.timedOut ? { stdout: "", stderr: "", exitCode: 143, wallMs: 1, timedOut: true } : base.runner(cmd, opts);
+    };
+    const res = await runTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await task("add-fn"), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner, provision: fp.provision, measure: { judge: recJudge(PASSV) } });
+    return { res, ...left(wr) };
+  };
+  const a = await run({});
+  assert(a.res.row && a.iso.length === 0 && a.kept.join() === "stream.jsonl", `ok: trial copy gone, stream kept: ${JSON.stringify({ iso: a.iso, kept: a.kept })}`);
+  const b = await run({ timedOut: true });
+  assert(b.res.exit === "timeout" && b.iso.length === 0 && b.kept.includes("stream.jsonl"), `timeout: ${JSON.stringify(b)}`);
+  const c = await run({ fail: true });
+  assert(c.res.exit.startsWith("provision-failed") && c.iso.length === 0, `provision-failed: ${JSON.stringify(c)}`);
+
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const fz = await frozenSmoke();
+  const wr = tmpdir("wr-proto");
+  const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+  const p = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner: rep.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
+  const l = left(wr);
+  assert(p.exit === "ok" && l.iso.length === 0 && l.kept.sort().join() === "stream-phase1.jsonl,stream-phase2.jsonl", `protocol: ${p.exit} ${JSON.stringify(l)}`);
+});
+
 const paid = process.argv.includes("--paid");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it

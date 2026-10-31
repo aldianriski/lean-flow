@@ -3,7 +3,7 @@
 import path from "node:path";
 import { modelInventory, type Arm } from "./arm.ts";
 import { grade, verdictWord, type Grade, type Task } from "./grade.ts";
-import { isolationEnv, makeIsolation, type Isolation } from "./isolate.ts";
+import { cleanupIsolation, isolationEnv, makeIsolation, type Isolation } from "./isolate.ts";
 import { checkArmSnapshot } from "./freeze.ts";
 import { checkInitPlugins, verifyPin } from "./pin.ts";
 import { parseStream, totalsOf, type Stream, type Totals } from "./parse.ts";
@@ -100,7 +100,10 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
   copyTree(o.srcRepo, iso.trialDir);
   // Amendment 2: the environment is built before the clock starts, for both arms alike, and torn down after grading whatever happened
   const setup = await setupTrial(o.provision ?? provisionTrial, { trialDir: iso.trialDir, root: iso.root });
-  if (setup.failed !== undefined && !o.measure) throw new Error(`provisioning failed: ${setup.failed}`);
+  if (setup.failed !== undefined && !o.measure) {
+    cleanupIsolation(iso, o.workRoot);
+    throw new Error(`provisioning failed: ${setup.failed}`);
+  }
   let raw: RawRun;
   let thrown: string | undefined;
   let graded: Grade | undefined;
@@ -111,7 +114,11 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
       try {
         raw = await (o.runner ?? spawnRunner)(buildCommand(o.arm, o.task.prompt), { cwd: iso.trialDir, env: applyProvision(isolationEnv(iso, o.arm), setup.prov!), timeoutMs: o.timeoutMs ?? TRIAL_TIMEOUT_MS });
       } catch (e) {
-        if (!o.measure) throw e;
+        if (!o.measure) {
+          await setup.prov?.teardown();
+          cleanupIsolation(iso, o.workRoot);
+          throw e;
+        }
         thrown = (e as Error).message; // a measured run classifies a runner exception as a harness crash instead of dying
         raw = { stdout: "", stderr: thrown, exitCode: -1, wallMs: 0 };
       }
@@ -156,5 +163,6 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
+  cleanupIsolation(iso, o.workRoot); // the cluster is already down; the trial copy and its dependencies go, the stream files stay under kept/
   return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: setup.failed !== undefined ? "" : terminalText(stream, raw), ...(cls ? { cls } : {}) };
 }

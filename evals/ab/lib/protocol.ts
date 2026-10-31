@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./arm.ts";
 import { grade, verdictWord, type Grade, type Task } from "./grade.ts";
-import { isolationEnv, makeIsolation } from "./isolate.ts";
+import { cleanupIsolation, isolationEnv, makeIsolation } from "./isolate.ts";
 import { detectPopups, parseStream, totalsOf, type Popup, type Stream, type Totals } from "./parse.ts";
 import { applyProvision, graderEnv, PROVISION_CLASS, PROVISION_EXIT, provisionTrial, setupTrial } from "./provision.ts";
 import { verifyPin } from "./pin.ts";
@@ -164,7 +164,10 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
   const base = manifest(iso.trialDir);
   // Amendment 2: the environment is built before the clock starts, for both arms alike, and torn down after grading whatever happened
   const setup = await setupTrial(o.provision ?? provisionTrial, { trialDir: iso.trialDir, root: iso.root });
-  if (setup.failed !== undefined && !o.measure) throw new Error(`provisioning failed: ${setup.failed}`);
+  if (setup.failed !== undefined && !o.measure) {
+    cleanupIsolation(iso, o.workRoot);
+    throw new Error(`provisioning failed: ${setup.failed}`);
+  }
   const run = o.runner ?? spawnRunner;
   // ONE deadline for the whole trial (Amendment 1): the phases and the signer share it; each call gets what is left
   const clock = o.clock ?? Date.now;
@@ -256,6 +259,10 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
         }
       }
     }
+  } catch (e) {
+    await setup.prov?.teardown(); // an escaping error: no row is written, so nothing reads the trial copy again
+    cleanupIsolation(iso, o.workRoot);
+    throw e;
   } finally {
     await setup.prov?.teardown();
   }
@@ -296,6 +303,7 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
+  cleanupIsolation(iso, o.workRoot); // the cluster is already down; the trial copy and its dependencies go, the stream files stay under kept/
   const valid = exit === "ok" || /^(g2-refused|parked|scope-breach):/.test(exit);
   return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: setup.failed !== undefined ? "" : terminalText(last, lastRaw), ...(cls ? { cls } : {}) };
 }

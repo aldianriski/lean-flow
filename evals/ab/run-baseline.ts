@@ -24,6 +24,7 @@ import os from "node:os";
 import path from "node:path";
 import { taskFile } from "./build-slots.ts";
 import { loadArm } from "./lib/arm.ts";
+import { defaultWorkRoot } from "./lib/isolate.ts";
 import { loadTask } from "./lib/grade.ts";
 import { freezeProblem, isInfraRow, liveRows, measuredTag, parseTag, readRows, voidTag, voidIndex, type LogRow } from "./lib/log.ts";
 import { runProtocolTrial } from "./lib/protocol.ts";
@@ -186,8 +187,7 @@ export async function withLock<T>(lock: string, fn: () => Promise<T>, note: (lin
 
 /** The real attempt: the same calls run-trial.ts makes for `--measured` (A1 with `--protocol d9`), one attempt, the repo column set to the scheduled repo. */
 export function realRun(tasksDir: string, log: string): Deps["run"] {
-  const workRoot = path.join(os.tmpdir(), "ab-work");
-  fs.mkdirSync(workRoot, { recursive: true });
+  const workRoot = defaultWorkRoot();
   return async (ctx) => {
     const arm = loadArm(path.join(AB, "arms", `${ctx.slot.arm}.json`));
     if (!arm.snapshot) throw new Refused(`arm ${arm.id} has no frozen snapshot`);

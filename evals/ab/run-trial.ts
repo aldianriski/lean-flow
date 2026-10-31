@@ -7,6 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { loadArm } from "./lib/arm.ts";
+import { defaultWorkRoot } from "./lib/isolate.ts";
 import { loadTask } from "./lib/grade.ts";
 import { computePin } from "./lib/pin.ts";
 import { freezeProblem } from "./lib/log.ts";
@@ -30,8 +31,7 @@ if (pinDir) {
 const need = (name: string) => flag(name) ?? (console.error(`missing --${name}`), process.exit(2));
 if (flag("protocol") !== undefined && flag("protocol") !== "d9") (console.error(`unknown --protocol ${flag("protocol")} (only d9)`), process.exit(2));
 const repo = path.resolve(need("repo"));
-const workRoot = path.join(os.tmpdir(), "ab-work");
-fs.mkdirSync(workRoot, { recursive: true });
+const workRoot = defaultWorkRoot();
 
 try {
   const opts = {
