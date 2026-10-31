@@ -36,14 +36,16 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
    only.` For each loaded set, run its questions' marker searches over the whole tree (not only step
    1's sample); a question with a clear answer is settled and cited, the rest stay open for step 3.
 1d. **Detect existing docs** — after 1c, before step 2 writes anything. Existing docs = a `CLAUDE.md` or
-   `CONTEXT.md` at the root or under `.claude/` · an `AGENTS.md` · a `docs/` folder holding at least one
-   markdown file. If any is found, list them in a message, then ask in its OWN popup, before the tier
+   `CONTEXT.md` at the root or under `.claude/` · an `AGENTS.md` · a `docs/` tree holding at least one
+   markdown file at any depth. If any is found, list them in a message, then ask in its OWN popup, before the tier
    popup: "This repo already has docs — run `/lean-doc-generator migrate` instead (recommended), or
    continue init writing only absent files?" **migrate** → write nothing, stop, and tell the user to run
    `/lean-doc-generator migrate`. **continue** → write only absent files; never fill or append sections
-   inside an existing file (that is migrate's job); a root `CLAUDE.md` counts as the repo's AI context,
-   so `.claude/CLAUDE.md` is not written beside it. Headless: no popup; the park record (step 3) also
-   lists the existing docs found and the migrate offer.
+   inside an existing file (that is migrate's job); a root `CLAUDE.md` or `CONTEXT.md` counts as the
+   repo's AI context, so its `.claude/` twin is not written beside it. Skip a step 3 popup round whose
+   target file exists (First milestone and business round: `requirements.md`; conventions round:
+   `coding-standards.md`) and name the skipped files in the listing message. Headless: no popup
+   (probe as step 3 does); the park record also lists the existing docs and the migrate offer.
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
@@ -94,8 +96,8 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
      auto-denies any prompting call). An interactive run asks the popup normally — that stays correct.
      Once verified headless, the tier choice can be neither asked nor assumed, and nothing is written —
      doc-evidenced business facts included. Record the park before halting:
-     write the detected substrate, the question sets loaded (or none), the tiers you would have offered, and the unblock condition
-     ("owner picks the tiers") into a `/handoff` doc — there is no sprint file at this entry point.
+     write the detected substrate, the question sets loaded (or none), the tiers you would have offered, any existing docs found with the migrate offer, and the unblock condition
+     ("owner picks the tiers"; with existing docs, "owner picks migrate or continue, then the tiers") into a `/handoff` doc — there is no sprint file at this entry point.
      Base-tier scaffolding waits with it: it is additive, but it is downstream of a choice nobody made
      (TD-017 · night-run.md Part 0). Declining in prose alone leaves no artifact that init ran.
 
