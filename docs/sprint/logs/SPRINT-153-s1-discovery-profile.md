@@ -198,3 +198,16 @@ consequence · T4 · behaviour:material · governance:low
 review · T4 · scoped-reviewer · behaviour:material · governance:low
 consequence · T8 · behaviour:material · governance:low
 review · T8 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-31 | progress | T4, T5 and T8 done from five headless init runs; T6 merged, kalasuara staged for the owner
+Headless init (plugin built from `b341d47d`) on fresh VPS copies, park records read: template-vue loaded vue-vite (no existing
+docs, no offer); talixa-hris loaded react-vite only, found its root CLAUDE.md and recorded the migrate offer, and the file's
+sha256 was unchanged; compass (Nuxt) loaded no set and recorded the offer; the chi fixture loaded go-chi and postgres;
+portfolio-sveltekit loaded postgres only and listed the existing files it would skip. Nothing but the park record was written
+in any repo. TASK-550, 551 and 560 ticked and moved to done. T6 built (`20914bd6`, `4070130c`, `2b013824`) and merged at
+`7abbd42e` after two review rounds: round 1 blocked (the inventory compare ran after Apply, and the plan could still reformat
+inventory items), closed by a backup point, a compare after each action and deferring any rewrite of an inventory item; round
+2 nothing blocking; three false-stop fixes by owner ruling, coordinator-verified (CRLF preserved on all 391 lines, insertions
+only). A fresh kalasuara copy and the plugin build wait on the VPS for the owner's migrate run.
+consequence · T6 · behaviour:material · governance:low
+review · T6 · scoped-reviewer · behaviour:material · governance:low
