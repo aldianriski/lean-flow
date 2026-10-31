@@ -664,7 +664,7 @@ check("S19 setup: launcher command carries claude-opus-5-5, no --effort, the inv
 });
 
 // S19b -- TASK-544 M2/M3: measured arms carry the model SET and one allow-list per repo; the command passes both pins.
-check("S19b inventory: measured arms allow the 3-model set, no subagent pin, default effort, one --allowedTools list per repo (A0 == A1, no blanket Bash); a model outside the set invalidates", async () => {
+check("S19b inventory: measured arms allow the 3-model set, no subagent pin, default effort, one --allowedTools list per repo (A0 == A1; Amendment 3: all Bash + PowerShell + Skill); a model outside the set invalidates", async () => {
   const { loadArm, modelInventory } = await import("./lib/arm.ts");
   const { buildCommand } = await import("./lib/run.ts");
   const { validityProblems } = await import("./lib/trial.ts");
@@ -673,7 +673,7 @@ check("S19b inventory: measured arms allow the 3-model set, no subagent pin, def
   for (const repo of ["workdoo", "clinic"]) {
     const [a0, a1] = ["a0", "a1"].map((n) => loadArm(path.join(dir, `${repo}-${n}.json`))) as [import("./lib/arm.ts").Arm, import("./lib/arm.ts").Arm];
     assert(a0.allowedTools.length > 0 && JSON.stringify(a0.allowedTools) === JSON.stringify(a1.allowedTools), `${repo}: A0 and A1 must share one non-empty allow-list`);
-    assert(!a0.allowedTools.some((t) => /^Bash(\(\*\))?$/.test(t)), `${repo}: no blanket Bash`);
+    assert(["Bash", "PowerShell", "Skill(lean-flow:*)"].every((t) => a0.allowedTools.includes(t)) && a0.allowedTools.length === 3, `${repo}: Amendment 3 -- all shell (Bash, PowerShell) plus the protocol's Skill call, nothing curated: ${a0.allowedTools}`);
     const cmd = buildCommand(a1, "p");
     assert(cmd.includes("--allowedTools") && a1.allowedTools.every((t) => cmd.includes(t)), `${repo}: command carries the allow-list`);
     assert(!cmd.includes("--effort"), `${repo}: default effort passes no --effort flag`);
@@ -685,6 +685,7 @@ check("S19b inventory: measured arms allow the 3-model set, no subagent pin, def
     assert(validityProblems([], a1, "x", totals(["claude-opus-4-1"])).some((p) => p.includes("claude-opus-4-1")), "a model outside the set invalidates");
   }
   const smoke = loadArm(path.join(dir, "smoke-a1.json"));
+  assert(!smoke.allowedTools.includes("Bash") && !smoke.allowedTools.includes("PowerShell"), "smoke arms keep their own curated list");
   assert(smoke.sessionModel === "claude-haiku-5-5" && smoke.effort === "low" && !modelInventory(smoke).has("claude-opus-5-5"), "smoke arms keep their Haiku/low inventory");
 });
 
@@ -2230,6 +2231,35 @@ check("S54 work root: unsafe roots (drive root, the repo, a parent of it) refuse
   const p = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner: rep.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV) } });
   const l = left(wr);
   assert(p.exit === "ok" && l.iso.length === 0 && l.kept.sort().join() === "stream-phase1.jsonl,stream-phase2.jsonl", `protocol: ${p.exit} ${JSON.stringify(l)}`);
+});
+
+check("S56 Amendment 3 build output: dist/build/.svelte-kit/coverage at any depth are neither the agent's changed set (judges' diff) nor a scope breach; an agent-edited source file still is; an out-of-layer source file next to them is still a breach", async () => {
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const gen = (cwd: string) => {
+    for (const d of ["web/dist", "build", "web/.svelte-kit/output", "coverage"]) {
+      fs.mkdirSync(path.join(cwd, d), { recursive: true });
+      fs.writeFileSync(path.join(cwd, d, "x.js"), "generated\n");
+    }
+  };
+  const go = async (build: (cwd: string) => void, seen: string[]) => {
+    const fz = await frozenSmoke();
+    const wr = tmpdir("genout");
+    const rep = protoReplay({ design: designOf(["src/add.ts"]), build });
+    return runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: wr, logPath: path.join(wr, "l.md"), tag: "measured round 0", runner: rep.runner, judge: judgeSays(SIGN).fn, measure: { judge: recJudge(PASSV, seen) } });
+  };
+  const seen: string[] = [];
+  const ok = await go((cwd) => (buildOk(cwd), gen(cwd)), seen);
+  assert(ok.exit === "ok", `build output must not be a scope breach: ${ok.exit}`);
+  assert(seen.length > 0 && seen.some((p) => p.includes("add.ts")) && seen.every((p) => !/x\.js|generated/.test(p)), "the judges see src/add.ts (counted) and no build output");
+  const ctl = await go((cwd) => (buildOk(cwd), gen(cwd), fs.writeFileSync(path.join(cwd, "web.ts"), "x\n")), []);
+  assert(ctl.exit === "scope-breach: web.ts", `control: a source file outside the layers is still a breach, build output not named: ${ctl.exit}`);
+  const { manifest } = await import("./lib/snapshot.ts");
+  const dir = tmpdir("genman");
+  for (const f of ["src/a.ts", "web/dist/x.js", "web/build/y.js", "a/.svelte-kit/z", "coverage/c", "web/coverage/c", "distx/keep.ts"]) {
+    fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true });
+    fs.writeFileSync(path.join(dir, f), "1");
+  }
+  assert(Object.keys(manifest(dir)).join() === "distx/keep.ts,src/a.ts", `manifest keeps source, drops build output at any depth: ${Object.keys(manifest(dir))}`);
 });
 
 check("S55 review round: provisioning writes (go.sum) are neither the agent's change nor a scope breach; a dead driver's iso dir is swept at start (cluster stop attempted, streams kept); --void echoes the row it voids; both G2 signers' usage is judge overhead", async () => {

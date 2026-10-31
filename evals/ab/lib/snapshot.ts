@@ -14,14 +14,17 @@ export function blobId(file: string): string {
   return createHash("sha1").update(`blob ${body.length}\0`).update(body).digest("hex");
 }
 
-/** relative path -> blob id, for every file under `dir` (sorted, forward slashes). Installed dependencies (`node_modules`, provisioned into a trial copy) are not the agent's work and are skipped. */
+/** Installed dependencies and build output, skipped at any depth (Amendment 3): neither is the agent's edit, for the judges' changed set and the scope-breach check alike. */
+export const GENERATED_DIRS = new Set(["node_modules", "dist", "build", ".svelte-kit", "coverage"]);
+
+/** relative path -> blob id, for every file under `dir` (sorted, forward slashes), without `GENERATED_DIRS`. */
 export function manifest(dir: string): Record<string, string> {
   const out: Record<string, string> = {};
   const walk = (d: string) => {
     for (const e of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       const p = path.join(d, e.name);
       if (e.isDirectory()) {
-        if (e.name !== "node_modules") walk(p);
+        if (!GENERATED_DIRS.has(e.name)) walk(p);
       } else out[path.relative(dir, p).split(path.sep).join("/")] = blobId(p);
     }
   };

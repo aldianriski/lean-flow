@@ -7,43 +7,9 @@
   "auth": "subscription",
   "setup": { "model": "claude-opus-5-5" },
   "allow": {
-    "common": [
-      "Bash(git status *)",
-      "Bash(git diff *)",
-      "Bash(git log *)",
-      "Bash(git show *)",
-      "Bash(git rev-parse *)",
-      "Bash(git ls-files *)",
-      "Bash(git grep *)",
-      "Bash(git branch --show-current)",
-      "Bash(git add *)",
-      "Bash(git mv *)",
-      "Bash(git commit *)",
-      "Bash(mkdir *)",
-      "Bash(cat *)",
-      "Bash(echo *)",
-      "Skill(lean-flow:*)"
-    ],
-    "workdoo": [
-      "Bash(npm run typecheck)",
-      "Bash(npm run build)",
-      "Bash(npm run verify:*)",
-      "Bash(node scripts/*)",
-      "Bash(npx tsc *)"
-    ],
-    "clinic": [
-      "Bash(go test *)",
-      "Bash(go vet *)",
-      "Bash(go build *)",
-      "Bash(gofmt *)",
-      "Bash(npm run typecheck)",
-      "Bash(npm run lint)",
-      "Bash(npm run test)",
-      "Bash(npm run build)",
-      "Bash(npx vitest run *)",
-      "Bash(npx vue-tsc *)",
-      "Bash(npx eslint *)"
-    ],
+    "common": ["Skill(lean-flow:*)"],
+    "workdoo": ["Bash", "PowerShell"],
+    "clinic": ["Bash", "PowerShell"],
     "smoke": [
       "Bash(tsc *)",
       "Bash(bunx tsc *)",
