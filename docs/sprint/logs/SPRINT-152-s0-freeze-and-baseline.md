@@ -201,3 +201,10 @@ nothing new. On main: typecheck clean, selftest 60 of 60, the document hash repr
 blob (`ce811aa31e2fbf04eef0179976a30800aecd454ab56256d09236efdb124c266c`); the other hashed files are unchanged.
 Operating rule: never run a hand `run-trial.ts` while the driver runs (the driver's startup sweep treats every trial
 directory as stale).
+
+### 2026-10-31 | progress | T4 re-frozen with Amendment 2 (owner re-signed, item E included); four pilot rows voided; re-pilot launched
+Owner re-signed by popup, item E included. The superseding freeze (sha256
+`ce811aa31e2fbf04eef0179976a30800aecd454ab56256d09236efdb124c266c`, instant 2026-10-31T10:45:42Z) is in the measurement log
+header and the shared freeze guard accepts it. The four pilot rows (07:33:48, 07:35:31, 07:38:29, 07:39:51) are voided by
+appended void rows, reason "harness defect, owner ruling, Amendment 2"; each void echoed its target before the append and
+all four matched. The driver re-runs the same four pilot slots from round 0, one at a time, and stops for the owner.
