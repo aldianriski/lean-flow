@@ -122,3 +122,11 @@ Owner ruling by popup: T3 G2 signed. One file per set under the generator's prof
 announces the loaded sets before any popup; a conventions popup asks only what the scan and a targeted search left open,
 never generating answers; answers land in Conventions in use with their source. The owner reviews the drafted question list
 before merge. Box 3: the owner runs init on talixa-hris (load), the coordinator runs the portfolio no-load check headless.
+
+### 2026-10-31 | scope-change | T3: the coding-standards template joins T3's layers (a set answer is an owner-stated convention)
+What broke: review round 1 found that init's Verify rule and the coding-standards template both require every Conventions-in-use
+line to cite a repo file and exclude "a convention seen nowhere in the code", so an owner's answer to a set question, cited
+`(owner, init)`, would be dropped or given an invented file citation. Impact: T3 also edits
+`skills/lean-doc-generator/templates/development-coding-standards.md.template`, one comment, so a convention line may cite a
+repo file or the owner's answer. The template's other content is T1's and stays. The Plan's T3 Layers line gains that path.
+Re-confirm G2: the change follows T3's signed design (answers land in Conventions in use with their source); no new decision.
