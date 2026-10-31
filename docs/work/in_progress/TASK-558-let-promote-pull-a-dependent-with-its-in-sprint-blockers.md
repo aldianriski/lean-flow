@@ -27,7 +27,7 @@ governance machinery, so not frozen under ADR-053.
 - [x] The promote procedure lets a task whose every open blocker is a member of the same sprint, in an earlier wave, join that ✓ 07a75451: sprint-by-reference promote step 1 lets a blocked task join when every open blocker joins the same sprint, wave-ordered, no state change; a failed blocker removes dependents by scope-change; Codex R1 T1 CLEAR
   sprint without a state ruling, and says what happens when a blocker fails (its dependents leave by scope-change).
 - [x] The rule sits where promote reads it, chosen by §10's placement test, and is consumer-safe (no maintainer path or id). ✓ 07a75451: placed in promote's own procedure reference, the SKILL.md promote line points to it on its existing line (139 lines); no maintainer path or id in the added text; Codex R1 T2-T4 CLEAR
-- [ ] The next real promote that pulls a dependent uses it without an owner ruling, recorded in its promote entry.
+- [x] The next real promote that pulls a dependent uses it without an owner ruling, recorded in its promote entry. ✓ 421d8d82: SPRINT-152 promote entry records TASK-545 joining beside its in-sprint blocker TASK-544 under the rule, state unchanged, no owner state ruling
 
 ## Touches
 the lean-doc-generator sprint-by-reference reference · the lean-doc-generator SKILL.md promote row (139/140 lines: an existing
