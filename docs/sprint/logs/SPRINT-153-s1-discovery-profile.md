@@ -71,3 +71,26 @@ consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped-reviewer · behaviour:material · governance:low
 Box 3 staged on the VPS: the plugin built from `131b49f6` and a fresh copy of the portfolio-sveltekit snapshot; the owner
 runs init there and answers its popups.
+
+### 2026-10-31 | progress | T1 done: change list recorded, box 3 holds on the re-run, TASK-552 in done
+Change list (box 1; 34 core templates audited, the full verdict table in the builder's report, 20 KEEP unchanged apart from
+the citation fix): CONTEXT (Stack, Architecture, Patterns in Use and Anti-Patterns dropped for pointers: the profile and
+CLAUDE.md hold them) · architecture-overview (style and Dependency Rule in describe-form, WHY only; Directory Structure
+became "Why this split"; Key Integration Points a pointer; the DECISIONS link fixed) · CLAUDE (Stack and Architecture lines,
+File Structure and Naming Conventions removed for pointers; Commands a pointer to setup; Anti-Patterns the one home for
+rejected patterns; Definition of Done kept as its one home) · development-coding-standards (naming as WHY and exceptions;
+conventions, errors, logging, validation, API shape and components ask for the shape this repo uses, where seen, and why; the
+repeated logging rule removed) · development-setup (only steps the manifest does not show) · testing-guide (runner column
+dropped; running tests became the CI gate) · database-erd, database-schema, database-migration-guide (rules, exceptions and
+WHY only; cardinality, DDL and commands live in the migrations and manifest) · deployment-guide (manual steps only) ·
+architecture-authentication, architecture-integrations, architecture-data-flow (the scheme, trust assumption, hop and
+enforcement point asked as why and constraint, never as what the code shows) · CONTRIBUTING (rules only; the Definition of
+Done a pointer) · SECURITY (dependency cadence only) · AGENTS (CONTEXT described as glossary plus pointers) · README (Quick
+start asks only for first-run steps no script covers, after box 3's first run) · the ADR-012 citation dropped from 15 files.
+Each reason is R1 (do not write the derivable) or R4 (describe, never prescribe).
+Box 2: no core template carries a named-architecture menu or an always/never layer rule (grep, and two review rounds); a
+judgment tick. Box 3: the first init run on the VPS (owner-operated) had one section restating the manifest, README's Quick
+start from the then-untouched README template; by owner ruling the template was fixed (`753728d6`) and init re-run once on a
+fresh copy: 0 of 87 sections restate the manifest or file tree (independent judge). Follow-up candidates for the close:
+README Quick start now repeats setup's first-run steps (one fact, two homes); integrations points at an API contract file
+that may not exist and `docs/api` is a stub; pre-existing lean-flow ids and paths in eight consumer templates.
