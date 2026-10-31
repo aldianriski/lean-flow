@@ -94,3 +94,10 @@ start from the then-untouched README template; by owner ruling the template was 
 fresh copy: 0 of 87 sections restate the manifest or file tree (independent judge). Follow-up candidates for the close:
 README Quick start now repeats setup's first-run steps (one fact, two homes); integrations points at an API contract file
 that may not exist and `docs/api` is a stub; pre-existing lean-flow ids and paths in eight consumer templates.
+
+### 2026-10-31 | progress | T2 G2 signed (business discovery in init)
+Design from a map of init's intake (Explore): today init reads code only and asks three First milestone questions; the five
+business topics each have a requirements section with no citation slot; compass's product requirements doc settles goal,
+non-goals, main flows and quality targets, and nothing states its invariants.
+builder-check · T2 · 4 contradictions · 7 questions · settled before the popup: headless still parks with nothing written; the quality table gains a source column with uncovered rows left as placeholders; the citation rule covers every fact init writes into requirements; an accepted drafted option cites owner and source; a topic is settled only by an explicit statement; disagreeing docs are offered as options; flow pointers only to flow docs that exist; the business round is its own popup after the tier one; the doc search recurses under docs; a filled section drops its customize marker; the build loaded by plugin-dir counts as installed; the citation format went to the owner
+Owner rulings by popup: a doc fact cites `path § heading` (the shape S2 will standardise); T2 G2 signed.
