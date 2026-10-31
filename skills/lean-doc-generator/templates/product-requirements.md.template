@@ -14,6 +14,7 @@ status: current
 # [Project Name] — Requirements [CUSTOMIZE]
 
 ## Business goal [CUSTOMIZE]
+<!-- Each fact ends with its source: `(from <path> § <heading>)` · `(owner, init)` · `(owner, init; drafted from <path> § <heading>)`; not decided yet keeps the placeholder, and the marker stays until every part is filled. -->
 [The problem this product/feature solves and the outcome the business wants, in 2-4 sentences. WHY it exists, not HOW it's built. Not a feature list.]
 
 ## Users [CUSTOMIZE]
@@ -27,19 +28,22 @@ status: current
 
 ## Non-goals [CUSTOMIZE]
 <!-- Belongs: what the product deliberately does not do, and why. Does not belong: work that is
-     merely not scheduled yet (that is backlog) or anything already listed under In scope. -->
+     merely not scheduled yet (that is backlog) or anything already listed under In scope.
+     Each fact ends with its source: `(from <path> § <heading>)` · `(owner, init)` · `(owner, init; drafted from <path> § <heading>)`; not decided yet keeps the placeholder, and the marker stays until every part is filled. -->
 
 - [what it deliberately does not cover, and why]
 
 ## Main flows [CUSTOMIZE]
 <!-- Belongs: one line per flow a user or system runs end to end, pointing at `docs/flows/<slug>.md`
-     when one exists. Does not belong: the steps themselves (the flow doc holds them). -->
+     when one exists. Does not belong: the steps themselves (the flow doc holds them).
+     Each flow ends with its source: `(from <path> § <heading>)` · `(owner, init)` · `(owner, init; drafted from <path> § <heading>)`; not decided yet keeps the placeholder, and the marker stays until every part is filled. -->
 
 - [Flow name] — [what it achieves] → `docs/flows/[slug].md`
 
 ## Invariants [CUSTOMIZE]
 <!-- Belongs: rules that must always hold, each stated so a test can break it. Does not belong:
-     behaviour that happens once (a requirement below) or a rule the code cannot violate. -->
+     behaviour that happens once (a requirement below) or a rule the code cannot violate.
+     Each rule ends with its source: `(from <path> § <heading>)` · `(owner, init)` · `(owner, init; drafted from <path> § <heading>)`; not decided yet keeps the placeholder, and the marker stays until every part is filled. -->
 
 - [A rule that must always hold, stated so it can be tested]
 
@@ -61,14 +65,14 @@ status: current
 
 ## Quality attributes [CUSTOMIZE]
 <!-- Belongs: measurable targets the product must meet (speed, uptime, security, scale). Does not
-     belong: a feature, or a target nobody will measure. -->
+     belong: a feature, or a target nobody will measure. Source is one of `(from <path> § <heading>)` · `(owner, init)` · `(owner, init; drafted from <path> § <heading>)`; a row nothing covers keeps its `[e.g. …]` placeholder; not decided yet keeps the placeholder, and the marker stays until every part is filled. -->
 
-| Category | Requirement |
-|:---------|:------------|
-| Performance | [e.g. p95 response time under N ms] |
-| Availability | [e.g. uptime target] |
-| Security | [e.g. auth model constraint — see `docs/architecture/authentication.md`] |
-| Scalability | [e.g. expected load / growth assumption] |
+| Category | Requirement | Source |
+|:---------|:------------|:-------|
+| Performance | [e.g. p95 response time under N ms] | [(from <path> § <heading>)] |
+| Availability | [e.g. uptime target] | [(from <path> § <heading>)] |
+| Security | [e.g. auth model constraint — see `docs/architecture/authentication.md`] | [(from <path> § <heading>)] |
+| Scalability | [e.g. expected load / growth assumption] | [(from <path> § <heading>)] |
 
 ## Open questions [CUSTOMIZE]
 - [a requirement question not yet resolved — routes to `/prototype` or the intake grill, never left as a silent assumption]
