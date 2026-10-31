@@ -5,7 +5,7 @@ update_trigger: A convention is adopted or changed (mirror what config enforces 
 status: current
 ---
 
-<!-- Lives at docs/development/coding-standards.md (STANDARD §2, ADR-012). Base-tier — created
+<!-- Lives at docs/development/coding-standards.md (lean-flow STANDARD §2). Base-tier — created
      at init. Records only what config CANNOT express: the WHY behind a convention and the
      patterns config can't enforce. Never re-list a rule already enforced by .editorconfig /
      .eslintrc / .prettierrc / commitlint — see the closing note. -->
@@ -25,32 +25,32 @@ status: current
 - [A convention the scan could not settle — asked, not assumed]
 
 ## Naming conventions [CUSTOMIZE]
-- Files: [kebab-case / snake_case / PascalCase — per file type if it varies]
-- [Variables / functions / classes — convention + one filled example]
+<!-- Belongs: why a naming rule exists and where the code breaks it. Does not belong: a rule the
+     file names already show. -->
+- [Naming rule the code cannot show alone — why it exists]
+- [Exception — where the code departs from the rule, and why]
 
 ## Folder structure
 See [`docs/architecture/overview.md`](../architecture/overview.md) for the directory layout and
 dependency rule — not duplicated here.
 
 ## Error handling [CUSTOMIZE]
-[The project's pattern — e.g. "domain errors are typed and thrown; the outer layer maps them to
-a response shape." WHY this pattern, not a line-by-line how-to.]
+[The shape this repo uses, seen in `[path/to/file]`, and why. WHY this shape, not a line-by-line how-to.]
 
 ## Logging [CUSTOMIZE]
-- [What gets logged, at what level, and why]
+- [The shape this repo uses, seen in `[path/to/file]` — what gets logged, at what level, and why]
 - Restrictions: see [`SECURITY.md`](../../SECURITY.md) § Logging restrictions — never log
   secrets, tokens, or full PII.
 
 ## Validation [CUSTOMIZE]
-[Where input validation happens — e.g. "at the API boundary only" — and the rule for what makes
-a value invalid.]
+[Where validation happens in this repo, seen in `[path/to/file]`, and why there.]
 
 ## API response shape [CUSTOMIZE — delete this section if the project has no API]
-[The standard success/error envelope shape, and why it's consistent across endpoints.]
+[The shape this repo uses, seen in `[path/to/file]`, and why it is consistent across endpoints.]
 
 ## Frontend component & state rules [CUSTOMIZE — delete this section if the project has no frontend]
-- [Component structure convention — e.g. "one component per file, colocated styles"]
-- [State management pattern — what's local vs shared, and why]
+- [Component shape this repo uses, seen in `[path/to/file]`, and why]
+- [State: what is local vs shared in this repo, seen in `[path/to/file]`, and why]
 
 ## Testing conventions
 See [`docs/testing/testing-guide.md`](../testing/testing-guide.md) for test types, mocking, and

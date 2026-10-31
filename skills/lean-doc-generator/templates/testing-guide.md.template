@@ -5,7 +5,7 @@ update_trigger: Strategy, harness, or coverage rule changes
 status: current
 ---
 
-<!-- Lives at docs/testing/testing-guide.md (STANDARD §2, ADR-012). Base-tier — created once a
+<!-- Lives at docs/testing/testing-guide.md (lean-flow STANDARD §2). Base-tier — created once a
      test harness exists. Strategy + conventions, never a line-by-line HOW of individual tests. -->
 
 # [Project Name] — Testing Guide [CUSTOMIZE]
@@ -16,11 +16,13 @@ surface gets integration tests, critical user paths get a thin end-to-end layer.
 
 ## Test types
 
-| Type | Scope | Runner command |
-|:-----|:------|:----------------|
-| Unit | [single function/module, no external deps] | `[command placeholder]` |
-| Integration | [multiple modules, real or in-process deps] | `[command placeholder]` |
-| End-to-end | [full path through the running system] | `[command placeholder]` |
+| Type | Scope |
+|:-----|:------|
+| Unit | [single function/module, no external deps] |
+| Integration | [multiple modules, real or in-process deps] |
+| End-to-end | [full path through the running system] |
+
+Runner commands live in the manifest scripts — not repeated here.
 
 ## Test data [CUSTOMIZE]
 - Fixtures are **sanitized, synthetic data only** — never real customer/production data, even
@@ -35,6 +37,5 @@ surface gets integration tests, critical user paths get a thin end-to-end layer.
 ## Coverage expectation [CUSTOMIZE]
 [Target — e.g. "N% line coverage on core logic", or "no hard threshold, reviewed per-PR."]
 
-## Running tests
-- Locally: `[command placeholder]`
-- CI: [where it runs, what gates a merge — e.g. "required check on PR"]
+## CI gate
+- [What CI runs and what gates a merge — e.g. "required check on PR"]

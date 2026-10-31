@@ -5,14 +5,14 @@ update_trigger: Layer added, dependency rule changed, or major refactor
 status: current
 ---
 
-<!-- Lives at docs/architecture/overview.md (STANDARD §2, ADR-012). At cap-hit (150 lines), split
+<!-- Lives at docs/architecture/overview.md (lean-flow STANDARD §2). At cap-hit (150 lines), split
      into docs/architecture/{data-flow,authentication,integrations}.md siblings per the §2 growth
      rule — this file keeps the map + links, never squeeze to stay under the cap. -->
 
 # [Project Name] — Architecture
 
-> [One-line statement of the architectural style — e.g. "Layered service", "Clean Architecture +
-> DDD", "Hexagonal", "Modular monolith".] [CUSTOMIZE]
+> [One line on how this repo is shaped, in its own terms, seen in `[path/to/file]` — describe what
+> the code does; do not pick a named style.] [CUSTOMIZE]
 
 ## Stack [CUSTOMIZE]
 <!-- Belongs: the stack choices a reader needs and cannot read off the manifest — framework and
@@ -25,31 +25,22 @@ status: current
 
 ## Dependency Rule [CUSTOMIZE]
 
-[State which direction dependencies are allowed to point, in one line. Example:]
+<!-- Describe, never prescribe: record the import direction this repo actually uses, not one it should
+     use. Keep only what the imports alone do not make obvious. -->
+[Which direction imports point in this repo, seen in `[path/to/file]` — and why that direction.]
 
-`interface → application → domain ← infrastructure`
+- [Module or boundary]: [what it is responsible for + what it imports from]
+- [Module or boundary]: [what it is responsible for + what it imports from]
 
-- [Layer]: [its single responsibility + what it may depend on]
-- [Layer]: [its single responsibility + what it may depend on]
-- [Layer]: [its single responsibility + what it may depend on]
+## Why this split [CUSTOMIZE]
+<!-- Belongs: why the code is divided as it is, and what must not cross a boundary. Does not belong:
+     a directory listing — the file tree shows it. -->
+- [Boundary, e.g. a directory or module] — [why it is separate / what must not cross it]
 
-## Directory Structure [CUSTOMIZE]
+## Key Integration Points
 
-```
-/[source-root]/
-  /[layer-1]/   # [purpose — one line]
-  /[layer-2]/   # [purpose — one line]
-  /[layer-3]/   # [purpose — one line]
-/[tests-root]/
-```
-
-## Key Integration Points [CUSTOMIZE]
-
-External systems, APIs, or services this project integrates with.
-
-| System | Purpose | Location in code |
-|:-------|:--------|:-----------------|
-| [System name] | [what it does] | `[path/to/integration]` |
+External systems and their failure modes → [`integrations.md`](integrations.md) § Integrations
+(created once the first external integration exists). Not repeated here.
 
 ## Decision Records
 

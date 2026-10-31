@@ -10,8 +10,7 @@ status: current
 ## Project Overview
 - **Name**: [Project Name]
 - **Type**: [Web app / API / Library / Mobile / CLI / Starter]
-- **Stack**: [Framework + Language + Key libraries]
-- **Architecture**: [One line — e.g. "Layered service", "Clean Architecture + DDD"]
+- **Architecture and stack**: `docs/architecture/overview.md` — not repeated here.
 
 ## Session Workflow
 The lean-flow loop for any AI-driven session:
@@ -21,25 +20,19 @@ The lean-flow loop for any AI-driven session:
 4. Repeat.
 New tasks are born in `docs/work/backlog/` (written there by `/task-decomposer`; promote moves them to `todo/`).
 
-## File Structure [CUSTOMIZE]
-```
-/[source-root]/    # [layers / modules — one line each]
-/[tests-root]/
-```
-
-## Naming Conventions [CUSTOMIZE]
-- Files: [kebab-case / snake_case / PascalCase per stack]
+## Where things live
+File layout → `docs/architecture/overview.md` § Why this split. Naming and conventions →
+`docs/development/coding-standards.md`. Not repeated here.
 
 ## Anti-Patterns (Avoid) [CUSTOMIZE]
-❌ [Business logic in the wrong layer]
-❌ [Framework leaking into core logic]
+❌ [A pattern this project rejects — and the reason]
 ❌ Skipping the G1 Scope / G2 Design gates
 
 ## Commands [CUSTOMIZE]
+Install, run and test → `docs/development/setup.md`. List only commands a reader cannot find in the
+manifest (e.g. a non-obvious gate or generator):
 ```bash
-[install-command]
-[run-command]
-[test-command]
+[command the manifest does not show — and when to run it]
 ```
 
 ## Definition of Done [CUSTOMIZE]

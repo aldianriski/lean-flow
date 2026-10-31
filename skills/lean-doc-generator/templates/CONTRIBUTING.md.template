@@ -9,14 +9,11 @@ status: current
 
 ## Branching [CUSTOMIZE]
 
-- Strategy: [trunk-based / GitFlow / other]
-- Branch naming: `[type]/[short-description]` — e.g. `feat/add-login`, `fix/null-check`
-- [Any branch-protection rule worth stating]
+- [The branching rule this project follows, and any branch-protection rule worth stating]
 
 ## Commits [CUSTOMIZE]
 
-- Convention: [Conventional Commits / other] — `[type](scope): summary`
-- [One filled-in example]
+- [The commit rule this project enforces — only what the git history and commit-lint config do not show]
 
 ## Pull requests [CUSTOMIZE]
 
@@ -40,12 +37,9 @@ See [`docs/development/coding-standards.md`](docs/development/coding-standards.m
 See [`docs/testing/testing-guide.md`](docs/testing/testing-guide.md). [State the bar — e.g. "a PR
 without a passing test suite is not mergeable."] [CUSTOMIZE]
 
-## Definition of Done [CUSTOMIZE]
+## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Tests added/updated and passing
-- [ ] Docs updated where behavior changed
-- [ ] Reviewed and approved
+See `CLAUDE.md` § Definition of Done — the one home for it.
 
 ## Reporting bugs [CUSTOMIZE]
 
