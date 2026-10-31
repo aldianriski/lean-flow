@@ -184,3 +184,17 @@ D:\Research\chi-fixture (chi v5 and pgx v5, SQL migrations, a postgres compose s
 The coordinator wrote the two index lines, as the index's owner.
 consequence · T5 · behaviour:material · governance:low
 review · T5 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-10-31 | progress | T4 and T8 merged; five headless exercises launched for T4, T5 and T8
+T8 built (`d326f43e`, `f24f006c`) and merged at `d8975960`; T4 built (`5de7a2c8`, `7b77055a`) and merged at `43722942`; the
+coordinator wrote the vue-vite index line. One Claude stand-in review covered both: nothing blocking; T4's exclusions dropped
+UI-library packages, its routing marker ignored auth guards, its styling and server-state markers widened; T8's park record
+now carries the existing docs and the migrate offer, continue mode skips rounds whose target exists, and a root CONTEXT.md is
+guarded like CLAUDE.md. Both revisions matched the settlements line by line and were coordinator-verified instead of a second
+round. On main: the init strings once each, step 1d present, SKILL.md at 139 lines, checks clean. Headless init runs (plugin
+built from `b341d47d`) on fresh VPS copies of template-vue, talixa-hris, compass, the chi fixture and portfolio-sveltekit
+collect each park record; talixa's CLAUDE.md sha256 before the run is recorded.
+consequence · T4 · behaviour:material · governance:low
+review · T4 · scoped-reviewer · behaviour:material · governance:low
+consequence · T8 · behaviour:material · governance:low
+review · T8 · scoped-reviewer · behaviour:material · governance:low
