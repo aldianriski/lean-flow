@@ -37,3 +37,20 @@ no owner state ruling; its `blocked` state is unchanged. TASK-544 joins with zer
 `done/`). The installed plugin copy predates `07a75451` at the same version, so this promote ran the repo's procedure.
 Pre-dispatch preflight by inspection: no cycle; wave 0 paths disjoint (T2 in the review-depth checker and its fixtures, T3
 under `evals/ab/` and `docs/research/logs/`); T3 and T4 share those two paths in sequence only.
+
+### 2026-10-31 | progress | batch G1 signed for T1-T4; G2 signed for T1 and T2; T3 G2 in round 2, T4 G2 after T3 freezes
+Batch G1, signed by the owner by popup: T3 and T4 by fast-path (`origin: decomposer`, scope unchanged); T1 and T2 by the
+full checklist. T1: tick box 3 only, no rule or skill text changes. T2: grade only the latest `review · Tn` line per task;
+touches the checker, its fixture runner and its fixtures; no depth-token validation, no doc change. Sizes: T1 S, T2 S, T3
+re-sized S to M (calibration re-run, inventory and allow-list changes, corpus hash), T4 M; no `L`.
+Pre-dispatch preflight (the dispatch.md snippet, base `b5f1089d`): CLEAR. Waves T1=0, T2=0, T3=0, T4=1; the two shared
+paths ordered T3 then T4.
+G2 for T1 and T2 signed by popup. T2's archive-skip trap is in the design: the checker skips archived paths, so the real-
+artifact run uses non-archive copies of the archived logs, old and new checker side by side.
+builder-check · T1 · 0 contradictions · 0 questions · nothing important left
+builder-check · T2 · 0 contradictions · 1 questions · factual (an unknown depth token counts as superseding): settled as designed, depth tokens are not validated today and that is outside TASK-559
+T3 rulings taken by popup ahead of its G2: measured arms run an Opus 5.5 session with Sonnet 5.5 subagents at default
+effort (the Haiku tier cannot be enforced, recorded as a limit); permission mode stays `acceptEdits` with one shared
+allow-list for both arms; calibration fixes its data and the business prompt's locale check, then runs again in full under
+a new lock. T4's G2 waits for T3's freeze, because its spend ceiling, validity and stop rules are what T3 writes (L-111).
+`gates_signed` stays unset until every task's G2 is signed.
