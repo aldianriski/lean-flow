@@ -10,7 +10,7 @@ class: decision
 tier: P
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-547]
 ---
 
@@ -31,12 +31,14 @@ TASK-547, so it follows it. Not frozen under ADR-053. G2 review-round cap: 2.
 the core templates in lean-doc-generator
 
 ## Assumes
-- **blocked-by:** TASK-547 (it edits the same templates).
+- **was blocked-by:** TASK-547 (it edits the same templates); TASK-547 is done, triaged ready 2026-10-31.
 - A removed section's content in an adopter's existing docs is left alone: `migrate` never deletes (TASK-553).
-- **open:** the CONTEXT.md template keeps its own Stack list (manifest-style) and a Patterns in Use section, which now overlap
-  the profile's Stack and Conventions in use (SPRINT-150 T2, Codex R1 T4): rule which one holds each fact and point the other at it.
-- **open:** 15 templates carry an HTML comment citing lean-flow's own ADR-012 ("Lives at … (STANDARD §2, ADR-012)"), and
-  `init` copies it into every consumer doc, where the id resolves to nothing (SPRINT-150 T2 box-3 run): strip or generalise it.
+- **ruled (owner, 2026-10-31):** the CONTEXT.md template's own Stack list and Patterns in Use section overlap the profile's
+  Stack and Conventions in use (SPRINT-150 T2, Codex R1 T4). The repo profile holds both facts; the CONTEXT template drops the
+  two sections and points at the profile.
+- **ruled (owner, 2026-10-31):** 15 templates carry an HTML comment citing lean-flow's own ADR-012 ("Lives at … (STANDARD §2,
+  ADR-012)"), which `init` copies into every consumer doc, where the id resolves to nothing (SPRINT-150 T2 box-3 run). Drop
+  the ADR id and keep the placement citation as "(lean-flow STANDARD §2)".
 
 ## Tracker
 EPIC-023 Closed-when S1 · research §4 R1, R4, §9 · S1 intake (2026-10-30)

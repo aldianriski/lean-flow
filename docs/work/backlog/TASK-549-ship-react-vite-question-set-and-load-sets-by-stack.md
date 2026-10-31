@@ -10,7 +10,7 @@ class: execution
 tier: P
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-547]
 ---
 
@@ -32,7 +32,7 @@ review-round cap: 2.
 lean-doc-generator init reference · a new profiles folder in the lean-doc-generator references
 
 ## Assumes
-- **blocked-by:** TASK-547 (the scan and the conventions section exist).
+- **was blocked-by:** TASK-547 (the scan and the conventions section exist); TASK-547 is done, triaged ready 2026-10-31.
 - Questions stay within the seven profile topics (I-6).
 - Exercises on snapshot copies in `D:\Research`, never an A/B repo (I-2).
 

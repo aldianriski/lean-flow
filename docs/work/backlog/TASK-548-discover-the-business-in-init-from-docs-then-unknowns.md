@@ -10,7 +10,7 @@ class: decision
 tier: P
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-547]
 ---
 
@@ -33,7 +33,7 @@ open, by frontier round. Not frozen under ADR-053: skill and template work. G2 r
 lean-doc-generator init reference · the product-requirements template
 
 ## Assumes
-- **blocked-by:** TASK-547 (the profile sections exist).
+- **was blocked-by:** TASK-547 (the profile sections exist); TASK-547 is done, triaged ready 2026-10-31.
 - Questions stay within the seven profile topics, which the A/B answers file covers (I-6).
 - Exercise on a snapshot copy in `D:\Research`, never an A/B repo (I-2).
 
