@@ -41,3 +41,17 @@ Read-only check over ssh: the ubuntu user has the Claude CLI 2.1.291 with a cred
 24.22.1, bun 1.3.14, 64 GB free disk and 7.6 GB memory. Go is not installed, which T5's fresh chi fixture needs (its G2
 decides where to install it). A3 holds pending one cheap live call at T1's G2. Merge legs green across both streams after
 the plan lock (layers observed runs per sprint and skips the sibling's commits).
+
+### 2026-10-31 | progress | batch G1 signed (all seven by fast-path); T1 G2 signed; exercise and snapshot rulings
+Batch G1, signed by the owner by popup: all seven are `origin: decomposer` and their scope is unchanged since approval
+(TASK-552's two rulings of this morning included). T1 design from a 34-template inventory (Explore): 14 core templates
+change, rewording to ask only for what the code cannot show and removing only when nothing is left; one home per fact
+(stack and style in the architecture overview, conventions and naming in coding standards, commands in setup, the
+Definition of Done in CLAUDE.md, integrations in the integrations doc); prescriptive prompts reworded to describe; the
+ADR-012 citation fixed in 15 files; README untouched. No check, fixture or spec rule reads a heading T1 removes (grep of
+spec, test, evals and the conformance engine; the one fixture citing a CLAUDE.md section is standalone).
+builder-check · T1 · 3 contradictions · 5 questions · all settled before the popup: box 1 ships a verdict table over all 34 core templates (the population enumerated, L-186); box 3 fixes the template and re-runs once if the init output still restates the manifest or tree; the Dependency Rule stays in describe-form; the ADR-012 count is 14 plus the CHANGELOG variant; the count-claims check runs under sh; no other reader of the removed headings found
+Owner rulings by popup: T1 G2 signed; the owner answers each S1 exercise's popups over ssh and tmux on the VPS; the
+snapshots are copies of compass, talixa-hris (the React and Vite repo; temidev-project is Next.js), template-vue, kalasuara
+and portfolio-sveltekit, without env files, keys, dependencies, git data or build output, plus a fresh Go chi fixture for
+T5. The live repos are never touched.
