@@ -22,12 +22,12 @@ Symptom 2 (misreads the business). Owner decision D8: read PRD, README and ticke
 open, by frontier round. Not frozen under ADR-053: skill and template work. G2 review-round cap: 2.
 
 ## Done when
-- [ ] `init` reads the repo's existing business evidence before asking, and asks only about the profile's business topics
+- [x] `init` reads the repo's existing business evidence before asking, and asks only about the profile's business topics ✓ 6b34f1ca: init step 1b reads README and requirement-like docs first; the business popup asks only open topics in one frontier round, each with not decided yet; review rounds 1-2
   (goal · main flows · invariants · quality attributes · non-goals) that the evidence leaves open, in frontier rounds, each
   option offering "not decided yet".
-- [ ] Each fact written into a requirements profile section cites its source (a doc line or the owner's answer); "not decided
+- [x] Each fact written into a requirements profile section cites its source (a doc line or the owner's answer); "not decided ✓ 6b34f1ca: every requirements fact cites path § heading or the owner (all 14 compass citations resolve); not decided yet kept placeholders and the marker
   yet" leaves the prompt in place, never an invented fact.
-- [ ] A real `init` through the installed plugin on a snapshot of compass (non-A/B; a 262-line README and a product requirements
+- [x] A real `init` through the installed plugin on a snapshot of compass (non-A/B; a 262-line README and a product requirements ✓ owner-run init on a fresh compass copy on the VPS: goal, non-goals, flows, requirements filled from docs unasked; owner confirmed the business sections correct
   doc) fills at least one topic from the docs without asking, and the owner confirms the business sections are correct for that product.
 
 ## Touches
