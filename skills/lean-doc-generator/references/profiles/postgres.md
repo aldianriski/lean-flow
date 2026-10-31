@@ -1,15 +1,19 @@
 # Question set: PostgreSQL
 
-**DETECT** — any language. A Postgres driver or ORM dialect in a manifest: `github.com/jackc/pgx`,
-`github.com/lib/pq` (`go.mod`); `pg`, `postgres`, `pg-promise`, or Drizzle / Prisma / TypeORM / Sequelize /
-Knex configured for postgres (`package.json` plus its config); `psycopg`, `psycopg2`, `asyncpg`, or
-SQLAlchemy with a postgres URL (Python manifests). Or a `postgres` image in a docker-compose file.
-Never an env file: init does not open `.env*`, examples included.
+**DETECT** — any language. A Postgres driver or ORM dialect in a manifest, for example:
+`github.com/jackc/pgx`, `github.com/lib/pq` (`go.mod`); `pg`, `postgres`, `pg-promise`, or Drizzle / Prisma /
+TypeORM / Sequelize / Knex configured for postgres (`package.json` plus its config); `psycopg`, `psycopg2`,
+`asyncpg`, or SQLAlchemy with a postgres URL (Python manifests). Other ecosystems: Ruby (`pg` gem,
+`adapter: postgresql` in `config/database.yml`), JVM (`org.postgresql:postgresql`), .NET (`Npgsql`), Rust
+(`sqlx` / `tokio-postgres` / `diesel` with the postgres feature), Elixir (`postgrex`); hosted clients
+(`@neondatabase/serverless`, `@vercel/postgres`, `@supabase/supabase-js` when the project keeps SQL
+migrations). Or a Postgres-family image in a docker-compose file (`postgres`, `postgis/postgis`,
+`bitnami/postgresql`, `pgvector/pgvector`), counted only when the app connects to it, not when it only backs
+another service such as Keycloak or Metabase. Never an env file: init does not open `.env*`, examples included.
 
 Ask a question only if its **marker** search of the tree finds no clear answer. A clear answer is one
 choice found and used consistently; two or more, or none, leave the question open. Every answer is one
-line in `## Conventions in use`. A topic another loaded set already asks (for example a Go set's test
-database question) is asked once.
+line in `## Conventions in use`.
 
 1. **Migrations** — the tool, and whether migrations are SQL files or code. Marker: a `migrations/`
    folder (`*.sql` versus `*.ts` / `*.go` / `*.py`); `goose`, `golang-migrate`, `atlas`, `drizzle-kit`,
@@ -23,4 +27,5 @@ database question) is asked once.
 5. **Transactions** — which layer opens them. Marker: `BeginTx` / `Begin(` / `.transaction(` calls in
    handlers, services or the data layer. Spread over layers → ask.
 6. **Connection pooling** — the pool in use. Marker: `pgxpool`, `database/sql` pool settings, `pg.Pool`,
-   an external pooler such as PgBouncer in compose or config, or a driver default left untouched.
+   an external pooler such as PgBouncer in compose or config. A driver default left untouched is the one
+   case where finding no pool setting settles it.
