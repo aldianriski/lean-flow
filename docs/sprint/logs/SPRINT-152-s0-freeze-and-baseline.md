@@ -247,3 +247,10 @@ workdoo A0: graders pass, business PASS, scope FAIL (two files outside the layer
 Write permission prompt: the agent tried to write a scratch check script to a public folder outside its trial copy, which
 acceptEdits does not cover; scored not-passed as frozen, 264 s, 2.49 USD before parking. Judges about 0.2 to 0.4 USD per
 scored trial. A1 costs about four times A0 per trial so far.
+
+### 2026-10-31 | scope-change | T4: Amendment 4 to the pre-registration (Write and Edit tools allowed everywhere) before the full run
+Owner pilot review by popup: the setup works and lean-flow runs end to end; the last park seen is a sandbox artifact (an A1
+scratch file written outside the trial copy). Ruling: both arms also allow the Write and Edit tools wholesale, no new risk
+class beyond Amendment 3's shell; `evals/ab/arms/inventory.json` and `evals/ab/PREREGISTRATION.md` change, the owner re-signs,
+and the four second re-pilot rows are voided. Then straight to the full run: the driver re-runs the four pilot slots first and
+stops there for one last look, and the owner's continue runs the remaining 92. TASK-545's Done-when text is unchanged.
