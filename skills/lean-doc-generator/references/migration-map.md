@@ -63,7 +63,9 @@ the **step-5** citation rule. Migrate's deltas only:
 - **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. A target section whose body is only template
   placeholders is present-but-unfilled: the pass may fill it. If another section in the same file already
   covers a topic (e.g. `## Problem` for Business goal, `## Non-functional requirements` for Quality
-  attributes), add nothing and report the topic `settled (<path> § <heading>)`. Partial profile → add only
+  attributes) **and passes init step 1b's settled test** (a heading naming the topic with real content, or a
+  sentence stating it — a placeholder-only section never settles), add nothing and report the topic
+  `settled (<path> § <heading>)`. Partial profile → add only
   the missing targets; all targets present → deltas only (§ Re-run).
 - **Cite, don't copy** — a fact already in an existing doc is cited `(from <path> § <heading>)`. Answers given
   here cite `(owner, migrate)` or `(owner, migrate; drafted from <path> § <heading>)`.
@@ -80,7 +82,7 @@ the **step-5** citation rule. Migrate's deltas only:
 commit for them. Without git, copy every inventory item to a backup folder **outside** the repo and report
 its path.
 
-**Record** before the first write, item → sha256, and write that list to a file **outside** the repo
+**Record** on every run that applies anything (no Apply → no inventory), before the first write, item → sha256, and write that list to a file **outside** the repo
 (report its path) so a second party can recompute. Hash input: LF line endings, trailing whitespace stripped
 per line, trailing blank lines trimmed. Population:
 
@@ -88,14 +90,18 @@ per line, trailing blank lines trimmed. Population:
 - every `docs/DECISIONS.md` row — each table data row (not header or separator) or list item, by its text;
 - every requirements file — a doc whose path names requirements / PRD / product / acceptance (never the root
   `README`) — the whole file; if the profile pass adds sections to it, instead the preamble before the first
-  heading, the section order, and each pre-existing section's heading text + body;
+  heading, the section order, and each pre-existing section's heading text + body (a placeholder-only
+  section is not adopter content — excluded, so filling it never trips the compare);
 - every epic (`EPIC-*.md` under `docs/epic/`, `archive/` included) — the line set under a heading matching
   "Closed when" (case-insensitive).
 
 An empty population reports 0/0.
 
 **Compare after EACH apply action.** Each item is byte-identical (as hashed), or moved/archived by an approved
-plan item with content unchanged. The first difference stops all further writes: report it item by item,
+plan item with content unchanged. One exception: when an approved relocation requires updating a link
+inside an inventory item, the edit is allowed only if the item differs from its recorded text solely in that
+link target; re-hash with the old target substituted back, report it as "link updated", and continue. The
+first other difference stops all further writes: report it item by item,
 with how to restore from the backup point. No automatic rollback — the owner decides. Also check that every
 pointer migrate wrote resolves (path and `§ heading` exist) and report the inventory counts before and
 after. The profile pass never consolidates or moves an inventory item.
