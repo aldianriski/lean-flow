@@ -1,6 +1,7 @@
 ---
 sprint: 152
 slug: s0-freeze-and-baseline
+stream: s0-baseline
 epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-10-31
