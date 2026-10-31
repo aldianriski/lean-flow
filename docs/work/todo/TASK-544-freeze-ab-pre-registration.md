@@ -2,6 +2,7 @@
 id: TASK-544
 title: "Freeze the A/B pre-registration"
 epic: EPIC-023
+sprint: SPRINT-152
 priority: P2
 size: S
 risk: high

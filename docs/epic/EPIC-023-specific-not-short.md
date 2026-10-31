@@ -4,7 +4,7 @@ slug: specific-not-short
 owner: Maintainer
 last_updated: 2026-10-31
 status: active
-member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151]
+member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -45,6 +45,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-148](../sprint/archive/SPRINT-148-rules-protocol-and-a-whole-gate.md) | Rules, Protocol and a Whole Gate (S0: clinic rules + spec, trial protocol) | closed · `c8ebeea1` | The clinic repo enforces five invariants test-first (cap serialised per doctor) and its spec carries the facts not in code, signed realistic (TASK-535). The D9 two-phase protocol runs on the fixture repo with G1 pre-signed, G2 by scope check + isolated judge, popup parks recorded (TASK-542). The off-host gate is whole (TASK-531, 532, outside the epic). Closed-when 1 stays open on TASK-544/545 |
 | [SPRINT-150](../sprint/archive/SPRINT-150-scan-tracer-and-answers-scope.md) | Scan Tracer and Answers Scope (S1 tracer + S0 answers-file widening) | closed · `1b917eb6` | S1's tracer holds: on an unprofiled SvelteKit repo, through the installed plugin, `init` wrote Stack and Conventions in use with every line citing a real file, read by the owner as specific (TASK-547). TASK-536's answers file now covers the seven profile topics and is ready (TASK-556). Closed-when lines 1 and 2 stay open (S0 on TASK-544/545, S1 on TASK-548..555) |
 | [SPRINT-151](../sprint/archive/SPRINT-151-s0-answers-tasks-arms-judges.md) | S0: Answers, Tasks, Arms and Judges | closed · `a9f03af4` | S0 minus the freeze: answers files, 16 verified tasks (TASK-536..540), four frozen arms (TASK-541), judges calibrated at 85.5% (TASK-543). Line 1 open on TASK-544/545 |
+| [SPRINT-152](../sprint/SPRINT-152-s0-freeze-and-baseline.md) | S0: Freeze and Baseline (S0 freeze + paid A0/A1 baseline) | active | — |
 
 ## Decisions
 

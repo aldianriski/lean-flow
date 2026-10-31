@@ -2,6 +2,7 @@
 id: TASK-545
 title: "Run the A0 + A1 baseline, rule each symptom, and close S0"
 epic: EPIC-023
+sprint: SPRINT-152
 priority: P2
 size: M
 risk: med

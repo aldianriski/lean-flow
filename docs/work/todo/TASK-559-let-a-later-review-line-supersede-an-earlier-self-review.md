@@ -1,6 +1,7 @@
 ---
 id: TASK-559
 title: "Let a later independent review line supersede an earlier self-review record in the review-depth check"
+sprint: SPRINT-152
 priority: P2
 size: S
 risk: med
