@@ -227,3 +227,14 @@ dropped; only genuine popups park, per D9), the risk of a command outside the tr
 (dist, build, .svelte-kit, coverage) is excluded from the agent's changed set and from the scope-breach check, matching the
 freeze manifest. `evals/ab/arms/inventory.json` and `evals/ab/PREREGISTRATION.md` change, so §19 re-hashes and the owner
 re-signs before the next re-pilot. TASK-545's Done-when text is unchanged.
+
+### 2026-10-31 | progress | T4 Amendment 3 merged and re-signed; four re-pilot rows voided; second re-pilot launched
+Built on an isolated worktree and merged at `ad91c23c`: the measured arms allow `Skill(lean-flow:*)`, `Bash` and
+`PowerShell`, identical across arms (proven on the fixture: a compound command and a PowerShell call ran with no permission
+denial); build output (dist, build, .svelte-kit, coverage) is out of the agent's changed set and the breach check, with a
+must-FAIL selftest. Independent review: nothing blocking; one optional should-fix (the plugin-pin hash walk shares the new
+exclusions, harmless today since the pin holds no such folder), noted rather than fixed. On main: typecheck clean, selftest
+61 of 61, the document hash reproduces by the tool and the committed blob; only the inventory hash changed in §19. Owner
+re-signed by popup; superseding freeze sha256 `60e7e1414fde7b192951712be3ce33f4ecf0fc9158577c0624b6c1da46aae456` at
+11:34:21Z, accepted by the freeze guard; the four re-pilot rows (10:51 to 11:05) voided with echoed targets. The driver re-runs
+the four pilot slots and stops for the owner.
