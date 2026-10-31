@@ -268,40 +268,26 @@ of each run must list exactly the pinned plugin.
 
 ## 16. Permissions (R2) and the allow-list
 
-`permissionMode: acceptEdits` for every measured arm, plus **one allow-list per repo, passed as `--allowedTools` by `lib/run.ts`,
-identical for A0 and A1 of that repo** (the lists are built from `inventory.json` `allow.common` + `allow.<repo>` by the repo name
-in the arm id, so the two arms cannot differ). Drafted from each repo's grader commands (`task.json`), its package scripts, `go`
-tooling, and the read-plus-commit git and file commands the lean-flow 2.19.1 skills tell an agent to run. No blanket `Bash(*)`;
-no `git push`; no `git worktree`. Signature of the owner on this section is signature of the lists. The trial environment of Amendment 2
-(Node 24 first on the path, the database variables) is the same for both arms and adds nothing to the lists.
-
-Common to both repos:
+`permissionMode: acceptEdits` for every measured arm, plus **one `--allowedTools` list, passed by `lib/run.ts`, identical for A0 and A1
+of both repos** (Amendment 3): `Bash`, `PowerShell`, `Skill(lean-flow:*)`. `Bash` and `PowerShell` with no pattern allow every command of
+that tool; the curated per-repo command list that this section held before Amendment 3 is dropped. The lists are still built from
+`inventory.json` `allow.common` + `allow.<repo>` by the repo name in the arm id, so the two arms of a repo cannot differ. Signature of
+the owner on this section is signature of the list. The trial environment of Amendment 2 (Node 24 first on the path, the database
+variables) is the same for both arms and adds nothing to the list.
 
 ```
-Bash(git status *)          Bash(git diff *)            Bash(git log *)             Bash(git show *)
-Bash(git rev-parse *)       Bash(git ls-files *)        Bash(git grep *)            Bash(git branch --show-current)
-Bash(git add *)             Bash(git mv *)              Bash(git commit *)          Bash(mkdir *)
-Bash(cat *)                 Bash(echo *)                Skill(lean-flow:*)
+Bash        PowerShell        Skill(lean-flow:*)
 ```
 
-workdoo, in addition:
+Why `Skill(lean-flow:*)` stays: the protocol's first call is a Skill call that otherwise parks. Why the shell is open: a curated list
+measured what the agent improvises rather than lean-flow (the re-pilot parked A1 on the PowerShell tool and on a compound
+`export ... && go run ./cmd/migrate` command), while only a genuine popup should park a trial (section 12). Accepted risk: a trial agent
+may run any shell command on the host. The isolated HOME and config directory and the `D:/ab-work` trial copies limit the damage; they do
+not prevent it.
 
-```
-Bash(npm run typecheck)     Bash(npm run build)         Bash(npm run verify:*)      Bash(node scripts/*)
-Bash(npx tsc *)
-```
-
-clinic, in addition:
-
-```
-Bash(go test *)             Bash(go vet *)              Bash(go build *)            Bash(gofmt *)
-Bash(npm run typecheck)     Bash(npm run lint)          Bash(npm run test)          Bash(npm run build)
-Bash(npx vitest run *)      Bash(npx vue-tsc *)         Bash(npx eslint *)
-```
-
-Evidence this list stops the Bash-park failure (SPRINT-148): the fixture smoke arm, with its own list, went from parking on Bash
-to a clean `exit: ok` run (rows tagged `smoke -- not a measurement` in `docs/research/logs/ab-measurements.md`). `Skill(lean-flow:*)`
-is in the common list because the protocol's first call is a Skill call that otherwise parks.
+Evidence that the open shell does not park (fixture only, Amendment 3): a smoke trial on `evals/ab/fixtures/smoke-repo` under the
+measured inventory (copied), whose agent ran a compound Bash command (`export ... && echo ... && ls src`) and a PowerShell command, ended
+`exit: ok` with an empty `permission_denials` (row tagged `smoke -- not a measurement` in `docs/research/logs/ab-measurements.md`).
 
 ## 17. Judges and calibration (R3)
 
@@ -373,7 +359,7 @@ Any later edit to any hashed file voids this section.**
 | `evals/ab/arms/clinic-a0.manifest.json` | `f1cd523931691828d8a1323b4e38d2e0c8574227e812f596687c60a675133e4f` |
 | `evals/ab/arms/clinic-a1.json` | `8a0ddbcc05d85db1b38a3c9cb41addd1c91d3c66a803f4ea5567dcc65117f773` |
 | `evals/ab/arms/clinic-a1.manifest.json` | `c746aa2b180a69eca37bfda9463a35458f6df1dea298511f17127c8ff9209f5c` |
-| `evals/ab/arms/inventory.json` | `b04840fdd43326519735c8ba32c95bfd1c194cd6f93038aad58684b2b633e3e7` |
+| `evals/ab/arms/inventory.json` | `a8beacab0ccc08328316ba1091fd05a6db2d1ff41e605d8ba10bd87b900b090b` |
 | `evals/ab/judges/prompts.lock.json` | `68681da287501cdfb8ed800cf903f7c8e6418c00c3e2ce6b06a3795bffa0014b` |
 | `evals/ab/schedule.json` | `82bbd6e26af0a47d588eea346ba4ab626d14e485b46124a8c04a64a3a19d627d` |
 | plugin pin (A1) sha / content hash | `4714da50...` / `6875071c...` (full values in section 15) |
@@ -459,3 +445,29 @@ No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, p
 allow-lists, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every other exit are as frozen. Of the
 section 19 hashes, none changes (the corpus, arms, manifests, inventory, prompts lock and schedule files are untouched); this file's own
 sha256 changes and is recorded at the owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
+
+## Amendment 3 (2026-10-31, after the re-pilot, before any further trial)
+
+What changed, two owner rulings, both in the trial harness' behaviour:
+
+- **1. All shell for both arms.** The measured arms (A0 and A1, both repos) keep `permissionMode: acceptEdits` and allow the `Bash` and
+  `PowerShell` tools wholesale, with `Skill(lean-flow:*)`; the curated per-repo command list of section 16 is dropped. The list is one and
+  the same for all four arms (`inventory.json`, hashed in section 19). Only a genuine popup parks a trial, as D9 already says.
+- **2. Build output is not the agent's edit.** `dist`, `build`, `.svelte-kit` and `coverage` directories, at any depth like
+  `node_modules`, are left out of the manifest diff: they are not in the changed set the judges see and not in the post-run `scope-breach`
+  check. A source file the agent edits is still counted. This matches the freeze manifest, which already excludes build output (`dist`).
+
+Why: the re-pilot under Amendment 2 (the four pilot slots re-run; the A1 rows in `docs/research/logs/ab-measurements.md`, e.g. `2026-10-31T11:05:29.413Z`).
+Both A0 trials ran to the end, but both A1 trials parked: workdoo A1 on a call to the PowerShell tool, which the list did not cover, and
+clinic A1 on a compound command exporting the database URL and running the migrate step. A list that must anticipate every command an
+agent improvises measures the list, not lean-flow. And clinic A0's scope verdict counted `web/dist`, build output the agent's own build
+produced, as an edit, although the freeze manifest excludes it.
+
+Accepted risk (owner): a trial agent may run any shell command on the host, including one outside its trial copy. The isolated HOME and
+config directory and the `D:/ab-work` copies mitigate this and do not prevent it. Evidence that the open shell does not park is in
+section 16.
+
+No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, plugin pin, models, judges and their prompts, the
+permission mode, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. Of the
+section 19 hashes, only `evals/ab/arms/inventory.json` changes (section 19 is updated last); this file's own sha256 changes and is
+recorded at the owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
