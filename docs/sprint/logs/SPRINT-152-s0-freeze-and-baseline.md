@@ -54,3 +54,9 @@ effort (the Haiku tier cannot be enforced, recorded as a limit); permission mode
 allow-list for both arms; calibration fixes its data and the business prompt's locale check, then runs again in full under
 a new lock. T4's G2 waits for T3's freeze, because its spend ceiling, validity and stop rules are what T3 writes (L-111).
 `gates_signed` stays unset until every task's G2 is signed.
+
+### 2026-10-31 | progress | T1 done: TASK-558's third box ticked against this sprint's promote entry; TASK-558 in done
+The promote at `421d8d82` pulled TASK-545 beside its in-sprint blocker TASK-544 under the dependent-pull rule, with no owner
+state ruling. Box 3 ticked by the tick tool (sprint-by-reference 5/0, layers-completeness 12/0). All three boxes now ticked.
+consequence · T1 · behaviour:low · governance:low
+review · T1 · self-review · behaviour:low · governance:low
