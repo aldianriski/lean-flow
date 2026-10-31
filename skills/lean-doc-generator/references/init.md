@@ -14,17 +14,18 @@ bounded by the safe-scaffold allowlist (ADR-012).
    `## Conventions in use` (coding standards, written only on a repo with code, as that row is) with
    one cited file per line. Anything the sample cannot confirm goes under `Not confirmed`, never
    invented. An unknown stack gets this scan alone (curated question sets for known stacks come later).
-1b. **Read the business evidence** — code shows the stack, not the business. Before asking anything,
-   find what the repo already says. Candidates: the root `README` plus, recursively under `docs/`, any
-   doc whose path or title names requirements · PRD · product · spec · goals · roadmap · user flows ·
-   journeys · user stories. Never open secret files (`.env*`, keys, credentials). Read the **headings of
-   every candidate first**, then only the sections that bear on the five business topics — business
-   goal · main flows · invariants · quality attributes · non-goals — never a whole large doc. Record
-   each topic as **settled** (a doc states it explicitly, in its own section or an explicit statement;
-   keep the fact and `<path> § <heading>`) or **open**. A passing mention is not settled: keep it as a
-   drafted answer and the topic stays open. A backlog or "optional enhancements" list is not a
-   non-goal. Two docs that disagree → the topic is open, and each source's version becomes a drafted
-   option. Hold the result for step 3's business round and step 5's write.
+1b. **Read the business evidence** — code shows the stack, not the business. Before asking, find what
+   the repo already says. Candidates, matched by **path or filename only** (never open files to read
+   titles; code such as `*.spec.*` is excluded): the root `README` plus markdown under `docs/`
+   (recursive) naming requirements · PRD · product · spec · goals · roadmap · flows · journeys · stories.
+   Never open secret files (`.env*`, keys, credentials). Read every candidate's **headings first**, then
+   only the sections bearing on the five topics — business goal · main flows · invariants · quality
+   attributes · non-goals. A topic is **settled** only by a heading naming it or a sentence stating it
+   as a decision ("the goal is…", "non-goal: …"); a tagline or feature bullet is not — it becomes a
+   drafted option. Keep a settled fact quoted or closely paraphrased with `<path> § <heading>`, never
+   summarised. A backlog or wish-list is not a non-goal. Docs that disagree → the topic is open, each
+   source a drafted option (at most three). Quality attributes stay open while any row is uncovered.
+   Hold the result for step 3's business round and step 5's write.
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
@@ -41,13 +42,14 @@ bounded by the safe-scaffold allowlist (ADR-012).
      leaves that field `[CUSTOMIZE]`; boundary `none` writes side effects `none`. Never invent an answer.
      The section is written only from this round's answers; headless, it parks with the rest (below) and
      nothing is written.
-   - **Business round** (its own popup, after the tier + First milestone popup above) — ask ONLY the
-     topics step 1b left open, in one frontier round: a *frontier round* asks together every question
-     whose prerequisites are already settled, and only a question that depends on an earlier answer
-     waits for a later round. The five topics are independent, so none waits on another; split across
-     popups only at the 4-questions-per-popup limit. A topic settled by evidence is not asked. Each
-     question offers *not decided yet* plus, where step 1b found a partial or conflicting doc fact,
-     that fact as a drafted option (recommended when only one source). Never invent an answer.
+   - **Business round** (its own popup, after the tier + First milestone popup) — its intro lists the
+     settled facts with sources init will write, so the owner sees them unasked. Ask ONLY open topics
+     (for quality attributes, only the uncovered rows) in one frontier round: a *frontier round* asks
+     together every question whose prerequisites are settled; only a question depending on an earlier
+     answer waits. The topics are independent, so split only at the 4-questions-per-popup limit. Options
+     are *not decided yet* plus drafted options quoted from evidence (at most three; recommended when
+     one source) — init never generates candidate answers. With no evidence the second option is a
+     neutral *I'll describe it*, routing to the free-text Other answer; never a guessed fact.
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
      `architecture/authentication.md` (auth exists). Templates → table below.
@@ -93,12 +95,12 @@ bounded by the safe-scaffold allowlist (ADR-012).
    enforce the line cap and the ownership header (§3) on every file touched.
    **Citation rule** — every fact init writes into `requirements.md` ends with its source:
    `(from <path> § <heading>)` for a doc, `(owner, init)` for an answer, `(owner, init; drafted from
-   <path> § <heading>)` for an accepted drafted option. Quality-attribute rows put it in the Source
-   column. *Not decided yet* keeps that section's placeholder and its `[CUSTOMIZE]` marker; a section
-   init fills drops the marker. Main flows: name each flow with its source, and add the
+   <path> § <heading>)` for an accepted drafted option (Source column for quality rows). *Not decided
+   yet* keeps the placeholder and `[CUSTOMIZE]`; a section keeps the marker until every part is filled
+   or answered, then drops it. Main flows: name each flow with its source; add the
    `→ docs/flows/<slug>.md` pointer only when that flow doc exists or init writes it.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
-   file's ownership header + placement match STANDARD §2/§3; every Stack and Conventions-in-use line cites a repo file; report the full file list, including
+   file's ownership header + placement match STANDARD §2/§3; every Stack and Conventions-in-use line cites a repo file; every `requirements.md` fact cites a doc § heading or the owner's answer; report the full file list, including
    safe-scaffold writes and any skips.
 
 ## Base-tier mandatory minimum
