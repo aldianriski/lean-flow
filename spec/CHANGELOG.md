@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-21
+last_updated: 2026-10-31
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,17 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.18.2 — 2026-10-31
+
+**PATCH (§15): no verdict moves. On a repo whose AI-context files already carry the spec, §2's `product/requirements.md` row
+no longer says the file is skipped. It now says the file cites those files topic by topic and never copies them.** §15's test
+(could a repository that conformed now fail?) answers no. §6's Base row already owes the file on every dev repo, and the engine
+assigns tiers from §6, not from §2's create column. The old wording made `migrate` skip the file and drop the business profile
+on exactly the repos with the most decisions. The fear the old wording guarded against was a copy; a citation is not one. Owner
+ruling 2026-10-31 (SPRINT-153 T6; TASK-553).
+
+Rule ids, levels, marks and the `evals/fixtures/compat/` snapshot are untouched (ADR-034).
 
 ## 0.18.1 — 2026-10-21
 

@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-21
+last_updated: 2026-10-31
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.18.1
+version: 0.18.2
 status: current
 ---
 
@@ -127,7 +127,7 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 
 | File | Tier | Reader | Cap | Create ← | Update ← |
 |---|---|---|---|---|---|
-| `product/requirements.md` | base | Dev / PM | 150 soft | init, or first sanitized PRD lands — **skipped on an existing repo whose AI-context files already ARE the spec** (`CONTEXT.md` carries the behaviour, `CLAUDE.md` the principles + DoD): a third copy is a second SSOT. Greenfield `init` is unaffected — nothing owns the content yet | a requirement is approved / changed (via PR) |
+| `product/requirements.md` | base | Dev / PM | 150 soft | init, or first sanitized PRD lands, or `migrate` adds the profile — **on an existing repo whose AI-context files already ARE the spec** (`CONTEXT.md` carries the behaviour, `CLAUDE.md` the principles + DoD) it **cites** them topic by topic and never copies them: a third copy is a second SSOT. Greenfield `init` is unaffected — nothing owns the content yet | a requirement is approved / changed (via PR) |
 | `product/acceptance-criteria.md` | base | Dev / QA | 120 soft | with requirements | acceptance criteria change |
 | `architecture/overview.md` *(was `docs/ARCHITECTURE.md`)* | base | Tech lead | 150 | init (always) | major structural change |
 | `architecture/data-flow.md` | backend, or overview cap-split | Dev | 120 | a non-trivial data path exists | that flow changes |

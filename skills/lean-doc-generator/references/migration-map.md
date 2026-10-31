@@ -35,7 +35,8 @@ don't hand-reconcile, and you're not lost in your own existing code.
      "owner approves the per-file plan". Then halt. A prose-only "waiting on your approval" ends the
      session with **no artifact that migrate ran at all**, which is what an overnight owner wakes up
      to: the safety property held, and nothing recorded that it did (TD-017 · night-run.md Part 0).
-   - **Profile pass** and **Preserve inventory** (both below) — the plan carries the profile as items. In a run
+   - **Profile pass** and **Preserve inventory** (both below) — the plan carries the profile as **apply** items,
+     approved with the plan; it adds sections and changes no existing text, so it is never listed DEFERRED. In a run
      that has an inventory, an inventory item may only be **kept**, **relocated** or **archived**, content
      unchanged. A reformat, split, consolidate, rich-ADR conversion or retire proposed for one (including the
      `DECISIONS.md` and decision-notes rows of the mappings below) is listed **DEFERRED**, not applied — the
@@ -56,7 +57,10 @@ the **step-5** citation rule. Migrate's deltas only:
 
 - **Targets** — `## Stack` (`docs/architecture/overview.md`), `## Conventions in use`
   (`docs/development/coding-standards.md`), and Business goal · Main flows · Invariants · Quality attributes ·
-  Non-goals (`docs/product/requirements.md`). First milestone is init-only, not part of this pass.
+  Non-goals (`docs/product/requirements.md`). First milestone is init-only, not part of this pass. A repo whose
+  `CONTEXT.md` / `CLAUDE.md` already carry the spec still gets `requirements.md`: each topic they settle is
+  written as its heading plus a one-line `(from <path> § <heading>)`, never a copy and never "nothing added"; only
+  the rest is asked.
 - **Existing target file** — add the missing headings as **new** sections; never rewrite, reorder or reword
   existing text. **Absent** — create it from its template; coding-standards only when the repo has code (init's
   row).
