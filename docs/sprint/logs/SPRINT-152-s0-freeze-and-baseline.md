@@ -264,3 +264,8 @@ the inventory hash changed. Owner re-signed by popup: superseding freeze sha256
 `ac0b934e89647b7a7c48b6113adbf854cd1570026399e34825cf42eab138760e` at 12:07:44Z, accepted by the freeze guard; the four second
 re-pilot rows (11:39 to 11:56) voided. The full baseline starts: the driver re-runs the four pilot slots and stops for the
 owner's last look; the owner's continue runs the remaining 92.
+
+### 2026-10-31 | progress | T4 full baseline: the four pilot slots ran clean under Amendment 4; stopped for the owner's last look
+All four pilot slots exited ok with every grader passing and no park. Judges: both A0 trials convention and business PASS,
+scope FAIL; both A1 trials PASS on all three. Wall 123 to 265 s plus 29 to 48 s of setup; notional cost A0 0.59 and 0.81
+USD, A1 2.28 and 2.42 USD, judges 0.20 to 0.37 USD per trial. The driver stopped (exit 10) for the owner before the other 92.
