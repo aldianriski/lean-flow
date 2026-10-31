@@ -60,3 +60,21 @@ The promote at `421d8d82` pulled TASK-545 beside its in-sprint blocker TASK-544 
 state ruling. Box 3 ticked by the tick tool (sprint-by-reference 5/0, layers-completeness 12/0). All three boxes now ticked.
 consequence · T1 · behaviour:low · governance:low
 review · T1 · self-review · behaviour:low · governance:low
+
+### 2026-10-31 | progress | T3 G2 signed (round 2); T2 merged back for coordinator verification
+T3's builder check returned 2 contradictions and 5 questions. Settled before the popup: the measured inventory drops the
+smoke-grade low effort and lives apart from the smoke inventory, which the arm hashes cover; M6 hashing and M7 run last, and
+any edit after M6 voids the hash; the builder drafts the allow-list from each repo's graders, package scripts and git, and
+the owner signs it inside the document; existing measurement rows already carry the smoke tag, so the M8 check needs no
+retag; calibration agreement is reported with and without the three re-ruled rows, each re-ruling recorded with its reason
+before the re-run. One correction went to the owner: 2.x picks subagent models by role itself, so pinning every subagent to
+Sonnet would not be "2.x dispatch tiers".
+builder-check · T3 · 2 contradictions · 5 questions · four settled from the repo, the dispatch-tier contradiction and the circularity question put to the owner
+Owner rulings by popup: measured arms run an Opus 5.5 session with subagents unpinned, chosen by each arm's own routing from
+the inventory set (Opus, Sonnet, Haiku 5.5), which supersedes the round-1 Sonnet pin; R-b is applied pooled over both repos,
+per-repo figures reported only; T4's spend rule is the structural cap (at most 96 slots, 2 infra retries per slot, 2
+replacement rounds) with a pilot pause after the first four slots for an owner review, a subscription limit pausing without
+scoring, and three consecutive infra failures aborting for a ruling. T3 G2 signed as designed (M1 to M8).
+T2 built in an isolated worktree (commits `28c34056`, `1002581f`) and merged at `5e982d0b`; the review-depth fixtures
+re-run green on the main tree. Builder's archived-log comparison, 105 logs: 83 PASS to PASS, 21 FAIL to FAIL, SPRINT-151
+FAIL to PASS, none PASS to FAIL; SPRINT-119 dropped from three findings to two (a duplicate self-review line now graded once).
