@@ -2,6 +2,7 @@
 id: TASK-554
 title: "Wire S1 discovery through every job that runs init or migrate, and document it for adopters"
 epic: EPIC-023
+sprint: SPRINT-153
 priority: P2
 size: S
 risk: med

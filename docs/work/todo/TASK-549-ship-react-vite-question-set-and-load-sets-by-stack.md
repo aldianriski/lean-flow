@@ -2,6 +2,7 @@
 id: TASK-549
 title: "Ship the React/Vite question set and load sets by detected stack"
 epic: EPIC-023
+sprint: SPRINT-153
 priority: P2
 size: M
 risk: med

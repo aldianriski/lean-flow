@@ -2,6 +2,7 @@
 id: TASK-553
 title: "Make migrate add the profile to a 2.x repo and keep every decision"
 epic: EPIC-023
+sprint: SPRINT-153
 priority: P2
 size: M
 risk: high

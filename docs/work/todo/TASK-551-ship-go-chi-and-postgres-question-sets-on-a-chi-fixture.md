@@ -2,6 +2,7 @@
 id: TASK-551
 title: "Ship the Go/chi and Postgres question sets on a chi fixture"
 epic: EPIC-023
+sprint: SPRINT-153
 priority: P2
 size: M
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-552
 title: "Remove template sections that restate the code"
 epic: EPIC-023
+sprint: SPRINT-153
 priority: P2
 size: S
 risk: med
