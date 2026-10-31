@@ -106,3 +106,22 @@ Owner rulings by popup, each recorded before the full calibration re-run (with i
 - access-activity-type-filter, reference business: expectation stays PASS; the UNKNOWN is the judge declining without the
   recorder code (all 14 types confirmed by a server grep), counted as not-passed and reported as Unknown.
 Agreement will be reported with and without these three tasks, since the references were changed after reading the judge.
+
+### 2026-10-31 | progress | T3 done: the A/B pre-registration is frozen and owner-signed; TASK-544 in done
+Phase 2 on the builder's worktree applied the three re-rulings to the references (each re-verified red then green on a fresh
+baseline copy, wrong patches still failing), re-ran the full calibration under the new prompts (64 of 64 rows with an
+expectation agree, 52 of 52 without the three re-ruled tasks, no Unknown, no lost call; in-sample, as the document says),
+wrote the new prompt lock, added the hash tool and drafted the document. Review round 1 (independent, scoped): numbers and
+hashes right, eleven decision-procedure gaps; one bounded revision closed them (a per-task cost comparator in code, an exit
+scoring table, a frozen 96-slot schedule, pooled figures deciding every test, strict and inclusive bounds named, the in-sample
+note). Review round 2: all eleven closed, nothing blocking; the cap of two rounds is spent and the rest goes to notes.
+Owner signed by popup and ruled that a slot ending in usage-missing, source-mutated or an invalid run stands as not-passed
+after the operator's stop. Merged at `bc1ddf4a`; on main the corpus, eleven pinned files and the document all re-hash to the
+recorded values (document sha256 `e72002cf1d1be69586833ca37133c6bcb64fc47655d51270a2dba122cd64393b`, also equal to the
+committed blob's sha256); selftest 43 of 43; typecheck clean. The freeze is recorded in the A/B measurement log at `d029ba2b`;
+the 13 rows before it are all smoke runs on the fixture repo.
+Notes carried to T4: no code yet turns trial rows into analysis slots, so T4's builder must follow the document's slot rule
+verbatim (with the round tag the operator passes); exact equality at the +10 pp bound in floating point; the Unknown counts
+read the post-replacement view; the fixture-only guard on protocol trials is lifted by a code edit after the freeze.
+consequence · T3 · behaviour:material · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:high
