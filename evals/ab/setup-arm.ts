@@ -72,7 +72,10 @@ if (auto) {
   // owner ruling, SPRINT-154: the migrate plan is approved for the profile items only
   const PLAN_RULE = { match: /(approv|appl[iy]|proceed).*\bplan\b|\bplan\b.*(approv|appl[iy]|proceed)/is, answer: "Approve only the profile items: ## Stack, ## Conventions in use, and the five business topics in docs/product/requirements.md. Decline every other action.", source: "owner ruling, SPRINT-154" };
   let files!: ReturnType<typeof readAnswers>;
-  let rules = kind === "migrate" ? [PLAN_RULE] : [];
+  // the plan popup itself opens "Migrate plan ..." and quotes topic words (Stack, Main flows) the table would also hit, so this
+  // anchored form is exclusive; it picks the profile-only option and declines the rest (live stop on clinic-a2, 2026-11-01)
+  const PLAN_POPUP = { match: /^\s*migrate plan\b/i, exclusive: true, source: "owner ruling, SPRINT-154", answer: "Profile pass only: apply only the items that add ## Stack, ## Conventions in use and the five business topics (business goal, main flows, invariants, quality attributes, non-goals). Decline every other item, including archiving, moving, renaming or slimming any existing file." };
+  let rules = kind === "migrate" ? [PLAN_POPUP, PLAN_RULE] : [];
   try {
     files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);
     if (flag("rule-file")) rules = [...parseRules(fs.readFileSync(path.resolve(flag("rule-file")!), "utf8")), ...rules];

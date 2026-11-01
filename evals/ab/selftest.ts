@@ -2492,6 +2492,17 @@ check("S60 answerFor: Stack -> operator Stack and Main flows -> repo Main flows 
   const { answerFor } = await import("./lib/operator.ts");
   const f = clinicFiles();
   const q = (question: string, header = "Setup") => ({ question, header });
+  // exclusive run rule (live stop on clinic-a2): a "Migrate plan ..." popup quotes topic words yet takes the plan answer alone
+  const planX = { match: /^\s*migrate plan\b/i, exclusive: true, answer: "Profile pass only.", source: "owner ruling" };
+  const planQ = q("Migrate plan for clinic-ab: (1) add ## Stack (2) add ## Conventions in use (3) add ## Main flows; (a) archive BUSINESS-NOTES.md", "Migrate");
+  const px = answerFor(planQ, f, [planX]);
+  assert("answer" in px && px.answer === "Profile pass only.", `an exclusive rule on the popup's framing wins over the topic words it quotes: ${JSON.stringify(px)}`);
+  const pxx = answerFor(planQ, f, [planX, { ...planX, source: "second" }]);
+  assert("stop" in pxx && /several exclusive/.test(pxx.stop), `two exclusive matches stop: ${JSON.stringify(pxx)}`);
+  const notStart = answerFor(q("Before the migrate plan, what is the stack?"), f, [planX]);
+  assert("answer" in notStart && notStart.answer === sect(f.operator, "Stack"), `an exclusive rule matches only the question's opening: ${JSON.stringify(notStart)}`);
+  const noX = answerFor(planQ, f, [{ ...planX, exclusive: false }]);
+  assert("stop" in noX, `control: the same rule, not exclusive, still stops on the quoted topic words: ${JSON.stringify(noX)}`);
   const stack = answerFor(q("What is the stack of this project?"), f, []);
   assert("answer" in stack && stack.answer === sect(f.operator, "Stack") && /operator/.test(stack.source) && /Stack/.test(stack.source), `stack: ${JSON.stringify(stack)}`);
   const flows = answerFor(q("Describe the main flows", "Flows"), f, []);

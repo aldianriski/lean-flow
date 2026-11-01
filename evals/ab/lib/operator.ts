@@ -1,6 +1,6 @@
 // The setup operator's answer table: maps one popup question to a frozen answers-file entry, verbatim, or says STOP.
 // Pure: it reads nothing; the caller passes the two answers files' text. Never guesses: no match, or more than one, is a stop.
-export type Rule = { match: RegExp; answer: string; source: string };
+export type Rule = { match: RegExp; answer: string; source: string; exclusive?: boolean };
 export type Question = { question: string; header: string };
 export type Files = { repo: string; operator: string };
 export type Answer = { answer: string; source: string } | { stop: string };
@@ -51,7 +51,13 @@ export function answerFor(q: Question, files: Files, rules: Rule[]): Answer {
   // EVERY candidate across the three layers (run rules, topic table, setup bullets) is collected; the operator answers only when exactly one remains
   type Hit = { name: string; answer?: string; source: string; missing?: string };
   const hits: Hit[] = [];
+  // an exclusive rule matches the popup's own framing (e.g. a question that opens "Migrate plan"), whose body quotes topic words
+  // the table would also hit; it wins alone, and two exclusive matches still stop
+  const excl = rules.filter((r) => r.exclusive && ((r.match.lastIndex = 0), r.match.test(q.question)));
+  if (excl.length === 1) return { answer: excl[0]!.answer, source: excl[0]!.source };
+  if (excl.length > 1) return { stop: `${named} matches several exclusive run rules (${excl.map((r) => r.source).join("; ")}); the operator never guesses` };
   for (const r of rules) {
+    if (r.exclusive) continue;
     r.match.lastIndex = 0;
     if (r.match.test(text)) hits.push({ name: `run rule (${r.source})`, answer: r.answer, source: r.source });
   }
