@@ -2416,6 +2416,17 @@ check("S57 setup-arm: plan names the skill by pre-setup manifest (init/migrate),
   fs.writeFileSync(path.join(both.arms, `${both.id}.pre-init.manifest.json`), "{}");
   const rb = both.run();
   assert(rb.code === 2 && /REFUSED: .*both/.test(rb.err), `both manifests refused: ${rb.err}`);
+
+  for (const field of ["plugin", "snapshot"] as const) {
+    const rel = await setupFixture("migrate");
+    const rf = path.join(rel.arms, `${rel.id}.json`);
+    const j = JSON.parse(fs.readFileSync(rf, "utf8"));
+    if (field === "plugin") j.plugin.path = "./pin";
+    else j.snapshot = "snap";
+    fs.writeFileSync(rf, JSON.stringify(j));
+    const rr = rel.run();
+    assert(rr.code === 2 && new RegExp(`REFUSED: .*${field}.*absolute path`).test(rr.err), `relative ${field} path refused: ${rr.code} ${rr.err}`);
+  }
 });
 
 // S58 -- the pilot is derived from the schedule: N = distinct (arm, repo) pairs; the first N slots must hold each pair once.

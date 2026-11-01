@@ -21,11 +21,18 @@ const armsDir = path.resolve(flag("arms-dir") ?? path.join(import.meta.dir, "arm
 const run = process.argv.includes("--run");
 const resume = process.argv.includes("--resume");
 if (!fs.existsSync(path.join(armsDir, `${id}.json`))) refuse(`no arm file ${path.join(armsDir, `${id}.json`)}`);
-const arm = loadArm(path.join(armsDir, `${id}.json`));
+let arm!: ReturnType<typeof loadArm>;
+try {
+  arm = loadArm(path.join(armsDir, `${id}.json`));
+} catch (e) {
+  refuse((e as Error).message);
+}
 const repo = id!.replace(/-a\d+$/, "");
 const WORK = `D:/Research/ab-setup-${id}`; // outside the repo: holds the isolated config dir and with it the retained transcript
 
 if (!arm.snapshot || !arm.plugin) refuse(`${id}.json needs snapshot and plugin`);
+// the session starts with cwd = the snapshot, so a relative path could verify one checkout and load another
+for (const [name, p] of [["plugin.path", arm.plugin!.path], ["snapshot", arm.snapshot!]] as const) if (!path.isAbsolute(p)) refuse(`${id}.json ${name} "${p}" is not an absolute path`);
 // the pre-setup manifest names the skill: pre-init -> init, pre-migrate -> migrate; exactly one must exist
 const kinds = (["init", "migrate"] as const).filter((k) => fs.existsSync(path.join(armsDir, `${id}.pre-${k}.manifest.json`)));
 if (kinds.length === 0) refuse(`no pre-setup manifest for ${id} (expected ${id}.pre-init.manifest.json or ${id}.pre-migrate.manifest.json)`);
