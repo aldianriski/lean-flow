@@ -76,7 +76,7 @@ if (auto) {
   let files!: ReturnType<typeof readAnswers>;
   // owner ruling, SPRINT-154 (standing, after the BUSINESS-NOTES.md stop on clinic-a2): a question about changing, archiving, moving,
   // renaming or slimming an existing file is answered "leave it untouched"; a plan question is left to PLAN_RULE
-  const FILE_RULE = { match: /^(?![\s\S]*\bplan\b)[\s\S]*(\barchiv|\bmov(e|ing)\b|\brenam|\bslim|\bheader\b|what should happen to)/i, exclusive: true, source: "owner ruling, SPRINT-154 (existing files untouched)", answer: "Leave untouched: do not edit, archive, move, rename or slim this existing file." };
+  const FILE_RULE = { match: /^(?![\s\S]*\bplan\b)[\s\S]*(\barchiv|\bmov(e|ing)\b|\brenam|\bslim|\bheader\b|what should happen to|\bconsolidat|\bmerg|\bremov|\bdelet|\breplac|\btrim|\brewrit|\bdeduplicat|\bcollaps)/i, exclusive: true, source: "owner ruling, SPRINT-154 (existing files untouched)", answer: "Leave untouched: do not edit, archive, move, rename or slim this existing file." };
   let rules = kind === "migrate" ? [PLAN_RULE, FILE_RULE] : [];
   try {
     files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);

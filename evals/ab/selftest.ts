@@ -2652,9 +2652,10 @@ check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan
   // mentions archiving still takes the plan rule, not a double exclusive stop
   const notesQ = "BUSINESS-NOTES.md (root, no ownership header, not linked from README; mostly a duplicate): what should happen to it?";
   const planArchQ = "Migrate plan: (1) add ## Stack (2) add ## Main flows; (a) archive BUSINESS-NOTES.md. Which parts should I apply?";
-  const mig3 = await run("migrate", [INIT, auq("n1", { question: notesQ, header: "Notes file" }), { await: "n1" }, auq("n2", { question: planArchQ, header: "Migrate plan" }), { await: "n2" }, RESULT()]);
+  const readmeQ = "README.md repeats the Database/Migrate/Test/Run commands already in docs/development/setup.md. Consolidate them into a link to setup.md?";
+  const mig3 = await run("migrate", [INIT, auq("n1", { question: notesQ, header: "Notes file" }), { await: "n1" }, auq("n2", { question: planArchQ, header: "Migrate plan" }), { await: "n2" }, auq("n3", { question: readmeQ, header: "README" }), { await: "n3" }, RESULT()]);
   const s3 = jsonl(mig3.record);
-  assert(mig3.code === 0 && respOf(s3, "n1").updatedInput.answers[notesQ].startsWith("Leave untouched") && respOf(s3, "n2").updatedInput.answers[planArchQ].startsWith("Profile pass only"), `existing file left untouched; a plan question mentioning archiving keeps the plan answer: ${mig3.code} ${mig3.out}`);
+  assert(mig3.code === 0 && respOf(s3, "n1").updatedInput.answers[notesQ].startsWith("Leave untouched") && respOf(s3, "n2").updatedInput.answers[planArchQ].startsWith("Profile pass only") && respOf(s3, "n3").updatedInput.answers[readmeQ].startsWith("Leave untouched"), `existing file left untouched; a plan question mentioning archiving keeps the plan answer: ${mig3.code} ${mig3.out}`);
   const ini = await run("init", [INIT, plan, { await: "p" }, RESULT()]);
   assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no plan rule -> stops: ${ini.code} ${ini.out}`);
   const drift = await run("migrate", [INIT, RESULT()], (fx) => fs.appendFileSync(path.join(fx.snap, "README.md"), "drift\n"));
