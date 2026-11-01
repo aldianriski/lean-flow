@@ -26,6 +26,11 @@ export type OperatedResult =
   | { status: "failed"; resultSubtype?: string; reason: string }
   | { status: "stopped"; popup: { questions: unknown[]; reason: string } };
 
+/** At most this many chat follow-ups per session; the next one stops. */
+export const MAX_CHAT_FOLLOW_UPS = 6;
+/** Does a turn's closing text ask the user something (a question or an approval request)? */
+export const asksUser = (t: string) => /\?\s*$|\bapprov|\bconfirm|\bshould I\b|\bwhich\b/i.test(t.trim());
+
 /** The flags that make the CLI speak stream-json and route every permission prompt to the host. */
 export const STREAM_FLAGS = ["-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose", "--permission-prompt-tool", "stdio"];
 
@@ -65,13 +70,42 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
   send({ type: "user", message: { role: "user", content: o.prompt } });
 
   let result: OperatedResult | undefined;
+  let lastText = ""; // the session's last assistant text in the current turn
+  let chatFollowUps = 0;
   const dec = new TextDecoder();
   let buf = "";
   const handle = async (m: any): Promise<boolean> => {
+    if (m.type === "assistant") {
+      const texts = ((m.message?.content ?? []) as { type?: string; text?: string }[]).filter((b) => b.type === "text" && b.text?.trim()).map((b) => b.text!);
+      if (texts.length > 0) lastText = texts[texts.length - 1]!;
+      return false;
+    }
     if (m.type === "result") {
       const sub = String(m.subtype ?? "");
-      result = sub === "success" && !m.is_error ? { status: "done", resultSubtype: sub } : { status: "failed", resultSubtype: sub, reason: `result ${sub}${m.is_error ? " (is_error)" : ""}` };
-      return true;
+      if (!(sub === "success" && !m.is_error)) {
+        result = { status: "failed", resultSubtype: sub, reason: `result ${sub}${m.is_error ? " (is_error)" : ""}` };
+        return true;
+      }
+      result = { status: "done", resultSubtype: sub };
+      const text = lastText.trim();
+      lastText = "";
+      if (!asksUser(text)) return true;
+      // the turn ended asking the user something in chat: route it through the same classifier as a popup
+      const question = text.slice(-2000);
+      const popup = [{ question, header: "chat" }];
+      const stopChat = (reason: string) => {
+        log({ kind: "chat", question, header: "chat", stop: reason });
+        result = { status: "stopped", popup: { questions: popup, reason } };
+        return true;
+      };
+      if (chatFollowUps >= MAX_CHAT_FOLLOW_UPS) return stopChat(`too many chat follow-ups (more than ${MAX_CHAT_FOLLOW_UPS}); the operator never loops without end`);
+      const a = await o.answerer({ question, header: "chat" });
+      if ("stop" in a) return stopChat(a.stop);
+      chatFollowUps++;
+      log({ kind: "chat", question, header: "chat", id: a.id, reason: a.reason, answer: a.answer });
+      result = undefined;
+      send({ type: "user", message: { role: "user", content: a.answer } });
+      return false;
     }
     if (m.type !== "control_request" || m.request?.subtype !== "can_use_tool") return false;
     const id = m.request_id as string;

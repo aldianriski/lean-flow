@@ -4,10 +4,12 @@
 import fs from "node:fs";
 
 const [scenarioFile, recordFile] = process.argv.slice(2) as [string, string];
-const steps = JSON.parse(fs.readFileSync(scenarioFile, "utf8")) as ({ emit: unknown } | { await: string } | { closeStdout: true })[];
+const steps = JSON.parse(fs.readFileSync(scenarioFile, "utf8")) as ({ emit: unknown } | { await: string } | { awaitUser: number } | { closeStdout: true })[];
 const waiters = new Map<string, () => void>();
 const seen = new Set<string>();
 let started = false;
+let users = 0;
+const userWaiters: [number, () => void][] = [];
 const dec = new TextDecoder();
 let buf = "";
 
@@ -18,7 +20,9 @@ async function play() {
       setInterval(() => {}, 1000);
       return;
     }
-    if ("emit" in s) process.stdout.write(JSON.stringify(s.emit) + "\n");
+    if ("awaitUser" in s) {
+      if (users < s.awaitUser) await new Promise<void>((r) => userWaiters.push([s.awaitUser, r]));
+    } else if ("emit" in s) process.stdout.write(JSON.stringify(s.emit) + "\n");
     else if (!seen.has(s.await)) await new Promise<void>((r) => waiters.set(s.await, r));
   }
   process.exit(0);
@@ -37,6 +41,10 @@ for await (const chunk of process.stdin) {
       const id = m.response?.request_id as string;
       seen.add(id);
       waiters.get(id)?.();
+    }
+    if (m.type === "user") {
+      users++;
+      for (const w of userWaiters) if (users >= w[0]) w[1]();
     }
     if (m.type === "user" && !started) {
       started = true;

@@ -2551,7 +2551,7 @@ const fakeCall = (map: [string, string][]) => async (prompt: string) => {
   const popup = prompt.slice(prompt.indexOf("POPUP"), prompt.indexOf("CATALOG"));
   return JSON.stringify({ id: map.find(([t]) => popup.includes(t))?.[1] ?? "NONE", reason: "fake" });
 };
-const S61_MAP: [string, string][] = [["What is the stack?", "operator:stack"], ["Describe the main flows", "repo:main-flows"], ["Apply the migrate plan?", "PLAN"]];
+const S61_MAP: [string, string][] = [["What is the stack?", "operator:stack"], ["Describe the main flows", "repo:main-flows"], ["Apply the migrate plan?", "PLAN"], ["I need your approval first", "PLAN"]];
 async function fakeSession(steps: Step[], over: Record<string, unknown> = {}) {
   const { runOperatedSession } = await import("./lib/operated-session.ts");
   const { makeAnswerer, buildCatalog, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
@@ -2687,6 +2687,28 @@ check("S63 setup-arm --auto (fake classifier): same refusals as --run; a migrate
   assert(iniC.code === 3, `an init arm has no CLEANUP class either: ${iniC.code} ${iniC.out}`);
   const drift = await run("migrate", [INIT, RESULT()], (fx) => fs.appendFileSync(path.join(fx.snap, "README.md"), "drift\n"));
   assert(drift.code === 2 && /REFUSED: .*no longer the pre-migrate copy/.test(drift.err) && !fs.existsSync(drift.record), `drift refused before any session: ${drift.code} ${drift.err}`);
+});
+
+// S65 -- chat follow-ups: a turn that ends asking the user something is classified like a popup; the entry text goes back as a user message.
+const say = (text: string): Step => ({ emit: { type: "assistant", message: { role: "assistant", content: [{ type: "text", text }] } } });
+const PLAN_PROSE = "Migrate plan for clinic-ab. Nothing has been written yet; I need your approval first.\n\n| # | Item |\n|---|---|\n| 1 | add ## Stack |\n| 2 | archive BUSINESS-NOTES.md |";
+check("S65 chat follow-up (fake CLI + fake classifier): a turn ending with a request is classified and the PLAN text sent as a user message, then done; NONE stops (text printed); no question -> done with no follow-up; cap of 6 then stop; each follow-up logged as kind chat", async () => {
+  const { PLAN_RULING } = await import("./lib/classifier.ts");
+  const ok = await fakeSession([INIT, say(PLAN_PROSE), RESULT(), { awaitUser: 2 } as unknown as Step, say("Applied the profile items. Summary: Stack and Conventions added."), RESULT()]);
+  assert(ok.res.status === "done", `follow-up then done: ${JSON.stringify(ok.res)}`);
+  const users = ok.sent.filter((m) => m.type === "user");
+  assert(users.length === 2 && users[1].message.content === PLAN_RULING.text, `PLAN text sent verbatim as a second user message: ${JSON.stringify(users)}`);
+  assert(ok.log.length === 1 && ok.log[0].kind === "chat" && ok.log[0].id === "PLAN" && ok.log[0].reason === "fake" && ok.log[0].answer === PLAN_RULING.text, `chat follow-up logged: ${JSON.stringify(ok.log)}`);
+  const none = await fakeSession([INIT, say("Which file should hold the notes?"), RESULT()]);
+  assert(none.res.status === "stopped" && none.res.popup.reason.includes("Which file should hold the notes?") && JSON.stringify(none.res.popup.questions).includes("Which file should hold the notes?") && none.sent.filter((m) => m.type === "user").length === 1, `NONE stops, the text is in the popup: ${JSON.stringify(none.res)}`);
+  const plain = await fakeSession([INIT, say("All done. Added Stack and Conventions in use."), RESULT()]);
+  assert(plain.res.status === "done" && plain.sent.filter((m) => m.type === "user").length === 1 && plain.log.length === 0, `no question -> done, no follow-up: ${JSON.stringify(plain.res)}`);
+  const turns: Step[] = [INIT];
+  for (let i = 2; i <= 8; i++) turns.push(say(PLAN_PROSE), RESULT(), { awaitUser: i } as unknown as Step);
+  turns.push(say("done"), RESULT());
+  const cap = await fakeSession(turns);
+  assert(cap.res.status === "stopped" && /too many chat follow-ups/.test(cap.res.popup.reason) && cap.sent.filter((m) => m.type === "user").length === 7, `the 7th follow-up stops: ${JSON.stringify(cap.res)} users=${cap.sent.filter((m) => m.type === "user").length}`);
+  assert(cap.log.filter((l) => l.kind === "chat" && l.answer).length === 6, "six follow-ups answered and logged");
 });
 
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
