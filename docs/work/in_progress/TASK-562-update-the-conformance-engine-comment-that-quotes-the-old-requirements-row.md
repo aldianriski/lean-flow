@@ -24,7 +24,7 @@ file is consequential G (ADR-050), so the hash-restore discipline applies.
 
 ## Done when
 - [x] The comment quotes the current §2 cell; no executable line changes (`git diff` shows comment lines only). ✓ `6265614a`: `git diff -U0` four `#` lines, no executable line; quote matches §2 line 130 word for word (worktree-isolated review CLEAN)
-- [ ] The conformance fixtures and the full gate pass unchanged on the VPS.
+- [x] The conformance fixtures and the full gate pass unchanged on the VPS. ✓ VPS gate at `afba08a9`: qa-check 350 pass, 0 fail (its harness list runs the conformance-engine fixtures); bun test 589 pass, 0 fail
 
 ## Touches
 `scripts/lib/conformance-engine.sh` (comment only)

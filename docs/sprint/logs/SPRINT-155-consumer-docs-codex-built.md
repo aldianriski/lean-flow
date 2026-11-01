@@ -96,3 +96,8 @@ What changed: the full-profile ruling has `docs/product/requirements.md` and `do
 topic. T5 reads them and never edits them, so they belong on `Cites:`, not `Layers:`. Found by the VPS gate's scope-change-layers
 check at `0f78cb13`. TASK-561's Done-when text is unchanged. Same gate: TASK-564's tick evidence named a contract-file path the
 task never touches, now reworded.
+
+### 2026-11-01 | progress | VPS gate green at `afba08a9` after two gate fixes; T3 done (TASK-562 box 2 ticked)
+First run at `0f78cb13`: bun test 589/0, qa-check 348 pass, 2 fail, both in coordinator text: a contract-file path in TASK-564's
+tick evidence (layers completeness) and two AI-context files named by T5's scope-change but absent from its Cites (scope-change
+layers). Both fixed in `afba08a9`. Second run: qa-check 350 pass, 0 fail; bun test 589 pass, 0 fail.
