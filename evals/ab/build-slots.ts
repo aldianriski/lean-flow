@@ -126,13 +126,13 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
   return { slots, findings, notes, voidedUsd };
 }
 
-/** The instant every kept measured row must postdate: the latest freeze line's, or, when it carries over the rows measured since an earlier freeze line's instant, that line's boundary (Amendment 5). */
+/** The instant every kept measured row must postdate: the latest freeze line's, or, when it carries over the rows measured since an earlier freeze line's instant, exactly that instant (Amendment 5). Never transitive: the earlier line's own carry-over is not followed. */
 export function freezeBoundary(freezes: Freeze[]): string | undefined {
   const latest = latestFreeze(freezes);
   if (latest?.carriesFrom === undefined) return latest?.ts;
   const from = freezes.find((f) => Date.parse(f.ts) === Date.parse(latest.carriesFrom!) && Date.parse(f.ts) < Date.parse(latest.ts));
   if (!from) throw new BuildRefused(`the freeze line of ${latest.ts} carries over the rows measured since ${latest.carriesFrom}, the instant of no earlier freeze line`);
-  return freezeBoundary(freezes.filter((f) => Date.parse(f.ts) <= Date.parse(from.ts)));
+  return from.ts;
 }
 
 if (import.meta.main) {

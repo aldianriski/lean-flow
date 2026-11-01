@@ -1883,6 +1883,8 @@ check("S45 freeze guard: only a paragraph LEADING with `frozen <instant>` and ho
   const carried = await carry("2026-10-31T03:12:56Z");
   assert(carried[2]!.carriesFrom === "2026-10-31T03:12:56Z" && found.every((f) => f.carriesFrom === undefined), `the carry-over instant is read, and only from its phrase: ${JSON.stringify(carried)}`);
   assert(freezeBoundary(carried) === "2026-10-31T03:12:56Z" && freezeBoundary(found) === "2026-11-01T09:00:00Z", "a carry-over moves the boundary to the earlier freeze line; control: without one, the latest line's instant");
+  const chain = readFreezes(await logOf([SMOKE_SPEC], header + `\n\n> **Pre-registration re-frozen 2026-11-02T09:00:00Z (Amendment 5):** \`x\` sha256 \`${sha1}\`; carries over the rows measured since 2026-11-01T09:00:00Z.\n\n> **Pre-registration re-frozen 2026-11-03T09:00:00Z (Amendment 6):** \`x\` sha256 \`${sha2}\`; carries over the rows measured since 2026-11-02T09:00:00Z.`));
+  assert(freezeBoundary(chain) === "2026-11-02T09:00:00Z", `carry-over is never transitive: the boundary is the instant the latest line names (${freezeBoundary(chain)})`);
   const bad = await carry("2026-11-01T10:00:00Z");
   assert(((): string => { try { freezeBoundary(bad); return ""; } catch (e) { return e instanceof BuildRefused ? e.message : `other: ${e}`; } })().includes("the instant of no earlier freeze line"), "a carry-over naming no earlier freeze line's instant is refused");
 
@@ -2252,9 +2254,13 @@ check("S54 work root: unsafe roots (drive root, the repo, a parent of it) refuse
 check("S56 Amendment 3 build output: dist/build/.svelte-kit/coverage at any depth are neither the agent's changed set (judges' diff) nor a scope breach; an agent-edited source file still is; an out-of-layer source file next to them is still a breach", async () => {
   const { runProtocolTrial } = await import("./lib/protocol.ts");
   const gen = (cwd: string) => {
-    for (const d of ["web/dist", "build", "web/.svelte-kit/output", "coverage", "Microsoft/Windows/PowerShell", "web/Microsoft/Windows/PowerShell"]) {
+    for (const d of ["web/dist", "build", "web/.svelte-kit/output", "coverage"]) {
       fs.mkdirSync(path.join(cwd, d), { recursive: true });
       fs.writeFileSync(path.join(cwd, d, "x.js"), "generated\n");
+    }
+    for (const d of ["Microsoft/Windows/PowerShell", "web/Microsoft/Windows/PowerShell"]) {
+      fs.mkdirSync(path.join(cwd, d), { recursive: true });
+      fs.writeFileSync(path.join(cwd, d, "ModuleAnalysisCache"), "generated\n");
     }
   };
   const go = async (build: (cwd: string) => void, seen: string[]) => {
@@ -2269,13 +2275,16 @@ check("S56 Amendment 3 build output: dist/build/.svelte-kit/coverage at any dept
   assert(seen.length > 0 && seen.some((p) => p.includes("add.ts")) && seen.every((p) => !/x\.js|generated/.test(p)), "the judges see src/add.ts (counted) and no build output");
   const ctl = await go((cwd) => (buildOk(cwd), gen(cwd), fs.writeFileSync(path.join(cwd, "web.ts"), "x\n")), []);
   assert(ctl.exit === "scope-breach: web.ts", `control: a source file outside the layers is still a breach, build output not named: ${ctl.exit}`);
+  // Amendment 5 skips the cache FILE only: a real file beside it is still the agent's edit
+  const beside = await go((cwd) => (buildOk(cwd), gen(cwd), fs.writeFileSync(path.join(cwd, "Microsoft/Windows/PowerShell/install.ps1"), "x\n")), []);
+  assert(beside.exit === "scope-breach: Microsoft/Windows/PowerShell/install.ps1", `a file beside the PowerShell cache is still a breach, the cache not named: ${beside.exit}`);
   const { manifest } = await import("./lib/snapshot.ts");
   const dir = tmpdir("genman");
-  for (const f of ["src/a.ts", "web/dist/x.js", "web/build/y.js", "a/.svelte-kit/z", "coverage/c", "web/coverage/c", "distx/keep.ts", "Microsoft/Windows/PowerShell/ModuleAnalysisCache", "web/Microsoft/Windows/PowerShell/c", "Microsoft/Windows/keep.ts", "Microsoft/Windows/PowerShellx/keep.ts"]) {
+  for (const f of ["src/a.ts", "web/dist/x.js", "web/build/y.js", "a/.svelte-kit/z", "coverage/c", "web/coverage/c", "distx/keep.ts", "Microsoft/Windows/PowerShell/ModuleAnalysisCache", "web/Microsoft/Windows/PowerShell/ModuleAnalysisCache", "Microsoft/Windows/PowerShell/install.ps1", "Microsoft/Windows/keep.ts", "Microsoft/Windows/PowerShellx/ModuleAnalysisCache"]) {
     fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true });
     fs.writeFileSync(path.join(dir, f), "1");
   }
-  assert(Object.keys(manifest(dir)).join() === "distx/keep.ts,Microsoft/Windows/keep.ts,Microsoft/Windows/PowerShellx/keep.ts,src/a.ts", `manifest keeps source, drops build output and the PowerShell cache (Amendment 5) at any depth: ${Object.keys(manifest(dir))}`);
+  assert(Object.keys(manifest(dir)).join() === "distx/keep.ts,Microsoft/Windows/keep.ts,Microsoft/Windows/PowerShell/install.ps1,Microsoft/Windows/PowerShellx/ModuleAnalysisCache,src/a.ts", `manifest keeps source, drops build output at any depth and the PowerShell cache file only (Amendment 5): ${Object.keys(manifest(dir))}`);
 });
 
 check("S55 review round: provisioning writes (go.sum) are neither the agent's change nor a scope breach; a dead driver's iso dir is swept at start (cluster stop attempted, streams kept); --void echoes the row it voids; both G2 signers' usage is judge overhead", async () => {

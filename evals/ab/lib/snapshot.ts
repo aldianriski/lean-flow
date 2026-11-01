@@ -16,10 +16,10 @@ export function blobId(file: string): string {
 
 /** Installed dependencies and build output, skipped at any depth (Amendment 3): neither is the agent's edit, for the judges' changed set and the scope-breach check alike. */
 export const GENERATED_DIRS = new Set(["node_modules", "dist", "build", ".svelte-kit", "coverage"]);
-/** PowerShell's own cache directory (`ModuleAnalysisCache`), which a trial's PowerShell sessions wrote under the trial copy, skipped at any depth (Amendment 5). */
-export const isShellCache = (rel: string): boolean => /(^|\/)Microsoft\/Windows\/PowerShell$/.test(rel);
+/** PowerShell's own cache file, which a trial's PowerShell sessions wrote under the trial copy, skipped at any depth (Amendment 5). The file only: anything else in its directory is still counted. */
+export const isShellCache = (rel: string): boolean => /(^|\/)Microsoft\/Windows\/PowerShell\/ModuleAnalysisCache$/.test(rel);
 
-/** relative path -> blob id, for every file under `dir` (sorted, forward slashes), without `GENERATED_DIRS` and the shell cache. */
+/** relative path -> blob id, for every file under `dir` (sorted, forward slashes), without `GENERATED_DIRS` and the shell cache file. */
 export function manifest(dir: string): Record<string, string> {
   const out: Record<string, string> = {};
   const walk = (d: string) => {
@@ -27,8 +27,8 @@ export function manifest(dir: string): Record<string, string> {
       const p = path.join(d, e.name);
       const rel = path.relative(dir, p).split(path.sep).join("/");
       if (e.isDirectory()) {
-        if (!GENERATED_DIRS.has(e.name) && !isShellCache(rel)) walk(p);
-      } else out[rel] = blobId(p);
+        if (!GENERATED_DIRS.has(e.name)) walk(p);
+      } else if (!isShellCache(rel)) out[rel] = blobId(p);
     }
   };
   walk(dir);
