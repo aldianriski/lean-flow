@@ -83,3 +83,10 @@ hang); the standing route is `codex exec` with the prompt on stdin. Owner ruling
 runs as the owner's `init` in `D:\Research\clinic-ab` (unprofiled) with `--plugin-dir` at the merged commit, instead of a VPS
 snapshot with the installed plugin.
 consequence · T4 · behaviour:low · governance:low
+
+### 2026-11-01 | progress | T2 Codex-built, reviewed and merged; TASK-564 boxes 1 and 2 ticked
+Built by `codex exec -s workspace-write` in a worktree at `728901f7`; three files, all on its list; landed with equal blob
+hashes (`b27727ae`). Pilot figures (D2): build 44.8k Codex tokens (no separate builder check: T2's reader found nothing, 19.1k);
+Claude review CLEAN, 0 findings, 1 round. Box 3 waits for the owner's clinic-ab init (owner ruling above).
+consequence · T2 · behaviour:material · governance:low
+review · T2 · scoped-reviewer · behaviour:material · governance:low

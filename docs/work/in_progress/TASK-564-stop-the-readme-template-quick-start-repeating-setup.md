@@ -22,8 +22,8 @@ guide owns, so an adopter gets two copies that drift (a second SSOT). The integr
 that init never writes, so the pointer is dead on every repo without one.
 
 ## Done when
-- [ ] The README template's Quick start points to the setup guide instead of restating it.
-- [ ] The integrations template names the OpenAPI file only when the repo has one (or drops the pointer).
+- [x] The README template's Quick start points to the setup guide instead of restating it. ✓ `b27727ae`: an app keeps only the setup link, a package one install line plus the link; the first-run-steps invitation is gone (Claude review CLEAN)
+- [x] The integrations template names the OpenAPI file only when the repo has one (or drops the pointer). ✓ `b27727ae`: all three unconditional `api/openapi.yaml` mentions removed; the API-contract section is kept only when a contract file exists
 - [ ] A real `init` through the installed plugin on a fresh snapshot writes neither the duplicate nor a dead pointer.
 
 ## Touches
