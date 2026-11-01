@@ -262,3 +262,21 @@ tasks, /prime keeps `/orchestrator` as Next and names the profile on an "also" l
 comes before /task-decomposer, and the v1-layout row still wins; lean-flow's own missing profile becomes a follow-up at close
 (run migrate on lean-flow or rule it exempt); G2 signed as designed.
 consequence · T7 · behaviour:material · governance:low
+
+### 2026-11-01 | scope-change | T7: migrate's map joins T7's layers (a `Not decided yet` body is re-asked on a re-run)
+What broke: review round 1 found that init's new `Not decided yet (owner, init)` line would read as a filled section to
+migrate's Profile pass, so a re-run would never ask that topic again. Impact: T7 Layers add
+`skills/lean-doc-generator/references/migration-map.md`. Its Heading-match rule now counts such a body as present-but-unfilled,
+and init step 1b says the line never settles a topic. T6, that file's earlier owner, is done. Re-confirm G2: within the signed
+ruling (R5), no new behaviour.
+
+### 2026-11-01 | progress | T7 merged; review round 1 blocked, fixed; headless prime run on three copies
+Built in a worktree (`ccf71965`) and merged at `b4ed9b61`. Wording fix `42b2fb30`: the init row keeps docs-only, and the
+CHANGELOG states prime's order. Headless `/prime` on build `42b2fb30`: the fresh portfolio copy (no docs) gave
+`Next: /lean-doc-generator init`, and the profiled kalasuara copy gave today's routing. The unprofiled kalasuara copy gave
+promote with no mention of migrate, because the branch fired only when nothing was tracked. Review round 1 (Claude stand-in,
+Sonnet) was BLOCKING 2. First, prime never said that the v1/mixed Layout row wins. Second, a `Not decided yet` body would read
+as filled to migrate's re-run. It also raised the same missing-nudge gap the run showed, a wrong pointer, a one-Next-line
+conflict in the CHANGELOG, and an undocumented First-milestone split. All are fixed: the unprofiled bullet now applies on
+every branch (named beside the next step when work is tracked, the Next itself when nothing is), and a v1/mixed layout skips it.
+review · T7 · scoped-reviewer · behaviour:material · governance:low
