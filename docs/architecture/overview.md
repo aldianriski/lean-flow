@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-26
+last_updated: 2026-11-01
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -56,6 +56,7 @@ scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launch
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)
                   fixtures/compat/ — the frozen rule-ID snapshot (ADR-034)
+                  ab/ — EPIC-023's A/B harness: paid, by hand (`bun evals/ab/run-baseline.ts`), never a gate leg
 
   ── TypeScript tooling on Bun (scripts/ and evals/ run on it; ADR-035 · ADR-051) ────
 package.json      root manifest. Bun runs TypeScript directly: the manifest has no dependencies

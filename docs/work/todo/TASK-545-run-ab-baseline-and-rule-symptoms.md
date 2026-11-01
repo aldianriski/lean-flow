@@ -23,7 +23,7 @@ The measurement ADR-053 admission for S2, S3 and the STANDARD change rests on; a
 ## Done when
 - [ ] 2 arms × 16 tasks × k = 3 = 96 scored trials, each on a fresh copy + fresh session + isolated config, pinned to the frozen pre-registration; retries only per its classification.
 - [ ] The run-validity rule holds, reached at most through the frozen replacement policy; report per repo and per symptom with intervals, scored cost and total spend; each symptom ruled measured defect or not reproduced by R-b on non-infra-lost trials only, with a log reference later `## Why` lines can cite.
-- [ ] Wiring closure: the harness runs only through its own documented command; no skill, `/flow`, dispatch brief or CONTEXT routing calls it; `docs/architecture/overview.md` gains the `evals/ab/` line; CHANGELOG `[Unreleased]` notes the maintainer-only harness; consumer-facing effect checked to be none.
+- [x] Wiring closure: the harness runs only through its own documented command; no skill, `/flow`, dispatch brief or CONTEXT routing calls it; `docs/architecture/overview.md` gains the `evals/ab/` line; CHANGELOG `[Unreleased]` notes the maintainer-only harness; consumer-facing effect checked to be none. ✓ two greps agree on zero callers (path `evals/ab` over skills, CONTEXT, CLAUDE and README; script names over skills, scripts, the consumer entry point and .claude); overview line added at the 150-line cap; CHANGELOG SPRINT-152 entry
 - [ ] EPIC-023 Closed-when 1 ticked (or the epic records why not).
 
 ## Touches
