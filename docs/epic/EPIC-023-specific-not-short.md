@@ -48,7 +48,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-150](../sprint/archive/SPRINT-150-scan-tracer-and-answers-scope.md) | Scan Tracer and Answers Scope (S1 tracer + S0 answers-file widening) | closed · `1b917eb6` | S1's tracer holds: on an unprofiled SvelteKit repo, through the installed plugin, `init` wrote Stack and Conventions in use with every line citing a real file, read by the owner as specific (TASK-547). TASK-536's answers file now covers the seven profile topics and is ready (TASK-556). Closed-when lines 1 and 2 stay open (S0 on TASK-544/545, S1 on TASK-548..555) |
 | [SPRINT-151](../sprint/archive/SPRINT-151-s0-answers-tasks-arms-judges.md) | S0: Answers, Tasks, Arms and Judges | closed · `a9f03af4` | S0 minus the freeze: answers files, 16 verified tasks (TASK-536..540), four frozen arms (TASK-541), judges calibrated at 85.5% (TASK-543). Line 1 open on TASK-544/545 |
 | [SPRINT-152](../sprint/SPRINT-152-s0-freeze-and-baseline.md) | S0: Freeze and Baseline (S0 freeze + paid A0/A1 baseline) | active | — |
-| [SPRINT-153](../sprint/archive/SPRINT-153-s1-discovery-profile.md) | S1: Discovery Profile (stream s1-discovery; heavy runs on the VPS) | closed · `82990174` | init and migrate write a cited repo profile through the installed plugin: on an unprofiled portfolio repo the owner's /flow reached init through /prime and wrote all seven topics; on kalasuara migrate added the profile with 49 ADR, 23 PRD, 49 decision rows and 7 Closed-when sets unchanged; question sets for React/Vite, Vue/Vite, Go/chi and Postgres; init never overwrites; spec 0.18.2. Open for the S1 condition: arm A2 (TASK-555) and the profile on both A/B repos |
+| [SPRINT-153](../sprint/archive/SPRINT-153-s1-discovery-profile.md) | S1: Discovery Profile (stream s1-discovery; heavy runs on the VPS) | closed · `82990174` | init and migrate write a cited repo profile through the installed plugin, shown on an unprofiled repo (all seven topics) and on kalasuara (migrate kept every decision file and Closed-when set unchanged); question sets for React/Vite, Vue/Vite, Go/chi and Postgres; spec 0.18.2. Details in its Retro. Open for the S1 condition: arm A2 (TASK-555) and the profile on both A/B repos |
 
 ## Decisions
 
@@ -91,13 +91,13 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 - [x] S0: design frozen at S0 promote; pre-registration hash frozen before any trial on an A/B repo or a
   task-set task (harness smoke runs use a separate fixture repo only; owner ruling R-c, 2026-10-29); arms
   A0 (no lean-flow docs) and A1 (2.x) measured on both repos; each of the three symptoms recorded as
-  *measured defect* or *not reproduced* → TASK-544, TASK-545 ✓ all three not reproduced
+  *measured defect* or *not reproduced* → TASK-544, TASK-545 ✓ SPRINT-152: all three not reproduced
   (`docs/research/logs/ab-measurements.md` § Report 2026-11-01)
 - [ ] S1: `init`/`migrate` produce a repo profile on both A/B repos and on an unprofiled stack through the
   installed plugin; a real 2.x `migrate` keeps every existing decision; arm A2 measured vs A1
   → TASK-548, TASK-549, TASK-550, TASK-551, TASK-552, TASK-553, TASK-554, TASK-555
 - [x] S2: not admitted at S0 (D2, D10): symptom 3 not reproduced, and its −8.3-point regression against A0
-  rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ recorded 2026-11-01
+  rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
   → next slice: S3 Expertise candidates

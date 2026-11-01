@@ -296,3 +296,11 @@ A0 floor, convention -10.3, business -11.1 and lost detail -8.3 against A0, no s
 admitted, TASK-567..572 cancelled (`bc61a9e2`, `b5fc48cf`); EPIC-023 D10 admits S3 as a measured experiment on the convention and
 business regressions (`6a4fd1f1`). A Codex review of the whole close-out found no High: P3 to P5 OK, two report fixes (scope
 is a section 4 measure, the one A0 row bounded at 2.1 points; cost coverage stated) in `3cc3d15d`. Report label fix `2ae19058`.
+
+### 2026-11-01 | progress | close system verify: 4 FAIL on the VPS, 3 fixed, 1 owner-overridden
+First system verify at `e3381f3a`: bun test 589 pass, 0 fail; qa-check 348 pass, 4 fail. Fixed: two `epic-state` findings (the ticked
+S0 and S2 conditions named no member sprint; both now name SPRINT-152), and one `prose-density` finding (SPRINT-153's rollup cell
+ran over 400 characters, a gap that predates this sprint since that row landed after its own gate; it now points to that sprint's
+Retro for the detail). Overridden by the owner: `layers observed` on T4's `docs/work/in_progress/TASK-545-...` token. The coordinator
+moved TASK-545 straight from `todo/` to `done/` (`e3381f3a`) and skipped the declared `in_progress/` step. The task's work, ticks
+and evidence are on record, and replaying the move would add a step that never happened. The override clears at archive.
