@@ -2,6 +2,7 @@
 id: TASK-555
 title: "Run arm A2 on both A/B repos and record it against A1"
 epic: EPIC-023
+sprint: SPRINT-154
 priority: P2
 size: M
 risk: high

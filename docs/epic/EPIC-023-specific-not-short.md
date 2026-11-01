@@ -4,7 +4,7 @@ slug: specific-not-short
 owner: Maintainer
 last_updated: 2026-11-01
 status: active
-member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152, SPRINT-153]
+member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152, SPRINT-153, SPRINT-154]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -49,6 +49,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-151](../sprint/archive/SPRINT-151-s0-answers-tasks-arms-judges.md) | S0: Answers, Tasks, Arms and Judges | closed · `a9f03af4` | S0 minus the freeze: answers files, 16 verified tasks (TASK-536..540), four frozen arms (TASK-541), judges calibrated at 85.5% (TASK-543). Line 1 open on TASK-544/545 |
 | [SPRINT-152](../sprint/archive/SPRINT-152-s0-freeze-and-baseline.md) | S0: Freeze and Baseline (S0 freeze + paid A0/A1 baseline) | closed · `ba3675db` | S0 closes: the pre-registration frozen before any trial and amended five times under owner signature; 96/96 slots VALID; A1 81.2% vs A0 89.6%, regressed on convention, business and lost detail, no symptom an R-b defect. Closed-when 1 ticked, S2 recorded as not admitted, D10 admits S3 on the regressions |
 | [SPRINT-153](../sprint/archive/SPRINT-153-s1-discovery-profile.md) | S1: Discovery Profile (stream s1-discovery; heavy runs on the VPS) | closed · `82990174` | init and migrate write a cited repo profile through the installed plugin, shown on an unprofiled repo (all seven topics) and on kalasuara (migrate kept every decision file and Closed-when set unchanged); question sets for React/Vite, Vue/Vite, Go/chi and Postgres; spec 0.18.2. Details in its Retro. Open for the S1 condition: arm A2 (TASK-555) and the profile on both A/B repos |
+| [SPRINT-154](../sprint/SPRINT-154-a2-migrate-arm.md) | A2: Migrate Arm (S1's arm A2 through a real migrate; stream s1-discovery) | active | — |
 
 ## Decisions
 
