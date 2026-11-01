@@ -311,3 +311,8 @@ to the standard's meaning, reviewed by one scoped reviewer). Owner ruling by pop
 malformed one, keeping the log append-only. Archived logs are not read, so the finding clears when this close archives the
 sprint.
 consequence · T6 · behaviour:material · governance:high
+
+### 2026-11-01 | scope-change | T6: conformance-engine.sh joins T6's Cites (named by the review note under the T6 entry)
+What broke: the re-run of system verify found that the T6 review note, logged under the 2026-10-31 T6 scope-change heading,
+names `scripts/lib/conformance-engine.sh`, which T6 never touched. Impact: T6 Cites adds it (a stale comment left for
+TASK-562). No behaviour change. Re-confirm G2: not needed.
