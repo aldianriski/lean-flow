@@ -243,7 +243,8 @@ measured defect, so all three are **not reproduced**.
 | A1 | 81.2% | [66.7%, 93.8%] | 95.8% | 66.7% |
 
 Gain of A1 over A0 (pooled, decides): -8.3% [-20.8%, 2.1%], not "holds". A0 floor: A1 FAILS. Cost: A1's median execution tokens
-are about 3.9x A0's (ratio 0.26; reported only, no cost verdict for A1 against A0, section 9).
+are about 3.9x A0's (ratio 0.26; reported only, no cost verdict for A1 against A0, section 9). Coverage: 48 trials over 16
+tasks per arm, 0 incomplete.
 
 ### Symptom measures and rulings (R-b pooled over both repos, on A1 only; Unknown = failure)
 
@@ -270,7 +271,9 @@ Unknown verdicts (counted as failures above): A0 6 / 2 / 1, A1 10 / 7 / 6 (conve
   evidence shows a file the agent placed in that directory, but one created under a path the transcripts do not spell out cannot
   be ruled out.
 - **A0's scope figure:** one A0 trial (`2026-10-31T15:17:44.521Z`) had the PowerShell cache in its changed set, and its scope judge
-  named it (Amendment 5). Scope feeds no decision figure, so A0's scope column is reported as measured.
+  named it (Amendment 5). Scope is one of section 4's four regression measures, so this row could matter there: it moves A0's
+  scope rate by at most 1/48 (2.1 points), and the A1 - A0 scope difference stays at +45.8 or more, far from a regression. The
+  primary endpoint, gain, A0 floor and R-b do not read scope. A0's scope column is reported as measured.
 - **Three A1 parks are scored:** 2 workdoo A1 trials parked on a `Write` popup outside the trial copy despite Amendment 4, and 1
   re-run trial parked on a `Bash` probe script written to a temp dir. All three were owner-ruled scored (2026-11-01); see L-272.
 - **Superseded first pass:** the first-pass analysis (A1 62.5% vs A0 89.6%) counted the 13 cache breaches as failures. It is not a
