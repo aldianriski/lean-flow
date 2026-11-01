@@ -323,3 +323,7 @@ Every member is in `done/`, and the close-time members check passes 19 of 19. Sy
 overridden by the owner (entry above), which clears at archive. No handoff entry was taken in this sprint. EPIC-023's S1
 condition stays open: arm A2 (TASK-555) and the profile on both A/B repos follow S0's baseline. No release: held under
 [Unreleased] per EPIC-023 D6. Retention and the archive move wait for the owner's approval.
+
+### 2026-11-01 | progress | correction: the close entry's DoD count is 23 of 23, not 27 of 27
+Counted after writing: the eight members carry 23 `## Done when` boxes (TASK-550 has two, each other member three), all ticked,
+none open. The close entry's heading figure was written before the count.
