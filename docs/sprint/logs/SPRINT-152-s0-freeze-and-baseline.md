@@ -304,3 +304,11 @@ ran over 400 characters, a gap that predates this sprint since that row landed a
 Retro for the detail). Overridden by the owner: `layers observed` on T4's `docs/work/in_progress/TASK-545-...` token. The coordinator
 moved TASK-545 straight from `todo/` to `done/` (`e3381f3a`) and skipped the declared `in_progress/` step. The task's work, ticks
 and evidence are on record, and replaying the move would add a step that never happened. The override clears at archive.
+
+### 2026-11-01 | close | S0: Freeze and Baseline, 4 of 4 delivered (TASK-558, 559, 544, 545), 12 of 12 DoD ticked
+run · 12 of 12 DoD ticked · PLAN_EXHAUSTED. Every member is in `done/`; the close-time members check passes 10 of 10. System
+verify on the VPS at `4a381b64`: bun test 589 pass, 0 fail; qa-check 349 pass, 1 fail, the owner-overridden `layers observed`
+finding on T4 (entry above), which clears at archive. The Retro and buckets are filed: TD-283 and TD-284, L-273 and L-274, the
+CHANGELOG S0 result. No follow-up tasks are new. Doc freshness: a dated status note in `lean-flow-3-foundation.md` (owner-approved).
+No handoff entry was taken in this sprint. No release: the harness is maintainer-only. EPIC-023: S0's condition is ticked, S2
+is recorded as not admitted, and D10 admits S3; the epic stays active on S1, S3 and S4.
