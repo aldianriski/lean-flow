@@ -45,6 +45,11 @@ related: [EPIC-023]
 > `33bd6102fcbdc48e62b3eaa39d96653faedbd9fb7936adca334fbd431633aedc`, at commit `4113ae4e`; supersedes the line above, and carries over the rows measured since 2026-10-31T12:07:44Z.
 > The amendment leaves PowerShell's cache directory out of the changed set and the scope-breach check; the 13 first-pass workdoo A1
 > attempts whose only breach was `Microsoft/Windows/PowerShell/ModuleAnalysisCache` are voided by appended void rows and re-run.
+>
+> **Pre-registration re-frozen 2026-11-01T10:14:01Z (owner re-signed, SPRINT-152 T4, Amendment 5, corrected):** `evals/ab/PREREGISTRATION.md` sha256
+> `2683d3514663a0de80bb5de1366573b7492a47a6d963166d95d5707c47218966`, at commit `ec3422fe`; supersedes the line above, and carries over the rows measured since 2026-10-31T12:07:44Z.
+> The correction, after the outside review, leaves out the cache file only (any other file in that directory counts), makes a
+> carry-over name exactly one earlier freeze instant, and keeps the 13 re-run rows with the caveat the amendment states.
 
 | ts | tag | arm | repo | task | trial | attempt | graders | in | out | cache-read | cache-write | cost-usd | wall-s | exit | pins | raw | passed | deviation | g2 | park | measure |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
