@@ -284,3 +284,14 @@ Review round 2 (Claude stand-in, Sonnet): CLEAR; two wording nits taken. After t
 `/prime` gives the portfolio copy `Next: /lean-doc-generator init`, and the unprofiled kalasuara copy now names migrate
 beside promote. The owner's `/flow` run on a fresh portfolio copy is staged on the VPS with build `b8cd3cb5`.
 review · T7 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-11-01 | progress | T7 done: the owner's /flow run reached init and wrote all seven topics; TASK-554 in done; every member done
+The owner ran `/flow` on a fresh portfolio copy (build `b8cd3cb5`). The skill chain was prime, then lean-doc-generator `init`,
+then task-decomposer. The overview's `## Stack` and the coding standards' `## Conventions in use` cite files, with the open
+items under `Not confirmed`. The five business topics carry the owner's answers. No `[CUSTOMIZE]` or template placeholder is
+left in the seven sections, and no plugin path landed in the repo. TASK-554 ticked and moved to done. All eight members are
+in done.
+Follow-ups for close: lean-flow's own profile (run migrate here or rule it exempt, owner ruling); the
+`conformance-engine.sh` comment quoting the old §2 cell; pre-existing lean-flow ids in eight templates and init.md; README
+Quick start duplicates setup; the integrations openapi dead pointer; the Codex launch diagnosis; emoji heading normalisation
+for the S2 resolver.

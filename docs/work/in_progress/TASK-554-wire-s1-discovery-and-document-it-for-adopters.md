@@ -23,13 +23,18 @@ is also where the finished S1 flow is shown whole on an unprofiled stack (Codex 
 G2 review-round cap: 2.
 
 ## Done when
-- [ ] Every entry that triggers `init` or `migrate` (the generator's mode table, `/flow`'s assess stage, `/prime`'s next-step
-  routing) reaches the new discovery, shown by one real `/flow` run through the installed plugin on a fresh snapshot.
-- [ ] `.claude/CONTEXT.md`, README and CHANGELOG describe the profile, and 2.x adopters get migration notes naming what
-  `migrate` adds and that it removes nothing.
-- [ ] With every S1 task in place, a real `init` through the installed plugin on a fresh portfolio-sveltekit snapshot (unprofiled)
+- [x] Every entry that triggers `init` or `migrate` (the generator's mode table, `/flow`'s assess stage, `/prime`'s next-step
+  routing) reaches the new discovery, shown by one real `/flow` run through the installed plugin on a fresh snapshot. ✓ owner
+  `/flow` on a fresh portfolio copy (build `b8cd3cb5`): Skill chain prime → lean-doc-generator `init` → task-decomposer; headless
+  `/prime` names init on portfolio and migrate on unprofiled kalasuara; the mode rows were read through at reviews 1 and 2
+- [x] `.claude/CONTEXT.md`, README and CHANGELOG describe the profile, and 2.x adopters get migration notes naming what
+  `migrate` adds and that it removes nothing. ✓ "repo profile" in all three; README § Upgrading to 2.x "Already on 2.x?" note
+  says it "removes or rewords nothing"; CHANGELOG [Unreleased] carries one entry per S1 change plus spec 0.18.2
+- [x] With every S1 task in place, a real `init` through the installed plugin on a fresh portfolio-sveltekit snapshot (unprofiled)
   writes all seven profile topics, each as an evidence-backed fact (a file or doc it cites, or the owner's answer) or an explicit
-  "not decided yet", none left as an unfilled template prompt.
+  "not decided yet", none left as an unfilled template prompt. ✓ same run: Stack and Conventions in use cite files (open ones
+  under `Not confirmed`), the five business topics carry `(owner, init)`; no `[CUSTOMIZE]` or placeholder in the seven; no
+  plugin path in the written docs
 
 ## Touches
 flow skill · prime skill (only if routing changes) · `.claude/CONTEXT.md` · README · CHANGELOG
