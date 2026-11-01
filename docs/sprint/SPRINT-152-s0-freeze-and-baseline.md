@@ -114,8 +114,55 @@ trials, pinned to T3's frozen hash. The result is the admission evidence S2, S3 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/PREREGISTRATION.md` | T3 · T4 | the frozen A/B design, then Amendments 1-5 (the fifth corrected after two outside reviews), each owner-signed | High | freeze guard (S45); owner signatures |
+| `evals/ab/*.ts` · `evals/ab/lib/*.ts` | T3 · T4 | resumable driver, slot builder and analysis; voids before the freeze check, non-transitive carry-over, the cache file only | High | selftest 61/61; seeds S41 · S45 · S56 |
+| `evals/ab/arms/` · `evals/ab/judges/` · `evals/ab/tasks/workdoo/` | T3 · T4 | arm inventory and allow-list, judge prompt lock, task corrections before the freeze | Med | section 19 hashes |
+| `docs/research/logs/ab-measurements.md` | T4 | 162 rows, 7 freeze lines and the S0 report (A1 81.2% vs A0 89.6%) | High | rebuilds byte-identical; outside process review |
+| `scripts/lib/check-review-depth.sh` · `evals/fixtures/review-depth/` | T2 | the latest review line per task decides | Med | three must-FAIL fixtures |
+| `docs/epic/EPIC-023-specific-not-short.md` · `.out-of-scope/pointer-carry-through.md` · `docs/work/cancel/` (TASK-566..572) | T4 · triage | S0 ticked, S2 recorded as not admitted and cancelled, D10 admits S3 | Med | owner-signed |
+| `docs/LEARNINGS.md` · `TECH-DEBT.md` · `docs/knowledge-index.md` · `CHANGELOG.md` · `docs/architecture/overview.md` | T4 · close | L-270..274, TD-283 · 284, the `evals/ab/` line and the S0 entry | Low | gen-index |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 4 of 4 members delivered (TASK-558, 559, 544, 545). S0 is closed: the pre-registration was frozen and signed
+before any trial, then amended five times under owner signature, each amendment ahead of the rows it governs. The paid
+baseline filled 96 of 96 slots, run VALID. A1 (lean-flow 2.x) scored 81.2% against A0 (plain Claude Code) 89.6% on the
+primary endpoint, regressed against A0 on convention, business and lost detail, and sat below the A0 floor at about 3.9x A0's
+tokens. Yet no symptom cleared R-b, so all three are not reproduced (`docs/research/logs/ab-measurements.md` § Report
+2026-11-01). Owner rulings followed: S2 not admitted (TASK-567..572 cancelled), and EPIC-023 D10 admits S3 as a measured experiment
+on the regressions. The review-depth check now grades a task's latest review line (TASK-559), and the dependent-pull rule had
+its first real use (TASK-558).
+
+**Retrieval check** — one rule missed, one rule held. The report's first draft read only the verdicts `analyze.ts` prints. Section 4's
+regression test, which the pre-registration leaves to the reader, surfaced only on a hand pass (L-274, TD-283). Cross-check
+held: every figure in the report was recounted from the slot data by a second script before it was written.
+
+**Cost** — scored trials 129.03 USD notional, plus 43.81 USD of voided attempts (172.84 USD in total; subscription, not
+billed per call). Four outside reviews ran on Codex, 12k to 20k tokens each (63k in all): Amendment 5 rounds 1 and 2, the S2 intake, and
+the close-out process. Owner time: the
+92-slot and 13-slot driver runs in the owner's terminal, plus the popup rulings and six signatures.
+
+**Worked**
+- Amendments before rows: every rule change was signed before the rows it governs, and voids carried the owner's ruling.
+- Outside review on Codex found what the self-checks missed: the transitive carry-over, the directory-wide exclusion, the
+  overclaiming correction, and the report's scope caveat.
+- Seeding each old design back in proved each fixture fails only its own check.
+
+**Friction**
+- The harness's own side effect (PowerShell's cache under the trial copy) decided the first result. It cost a void, a re-run
+  and an amendment (L-271).
+- Trial copies are deleted after each row, so a rule changed later could not be re-checked against finished rows (L-273,
+  TD-284).
+- The low-memory reaper killed the in-session driver. Long runs moved to the owner's terminal.
+
+**Pattern candidates**
+- L-273 (count 1): a claim about finished rows under a changed rule cites what the row retains.
+- L-274 (count 1): apply every frozen decision rule before ruling admission.
+
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] maintainer-only entry with the S0 result. Tech debt: TD-283 (no section 4
+verdict printed), TD-284 (no post-run manifest kept). Follow-ups: none new; TASK-555 (A2), the Codex builder pilot
+(TASK-561..565) and S3's intake carry over to the next promote. Learnings: L-270..274. Every member is in `done/`; the
+close-time members check passes 10 of 10. System verify on the VPS: see the close entries in the log. No handoff entry was taken in this sprint. No release: the harness
+is maintainer-only. Retention and the archive move wait for the owner's approval.

@@ -391,6 +391,23 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-284** severity: med | status: open | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
+  - Summary: **A finished A/B trial keeps no record of its post-run file list, so a changed manifest rule cannot be re-applied to it.**
+    `lib/isolate.ts` deletes the trial copy once the row is appended and keeps only the `stream*.jsonl` transcripts. When Amendment 5
+    narrowed the PowerShell exclusion after 13 rows had run, nothing retained could show whether those rows held another file in
+    that directory, and the rows were kept with a caveat.
+  - Evidence: Amendment 5's correction paragraph and its owner ruling (2026-11-01); `ps-evidence-2` found no trial copy left to list.
+  - Impact: med for later arms (A2 onward). Each rule change after a run can only be argued, not checked.
+  - Mitigation (hypothesis, re-derive first): write the trial's full post-run manifest (path to blob id) under `kept/<iso>/`
+    before the copy is deleted, and let `build-slots` re-derive the changed set from it.
+- **TD-283** severity: med | status: open | created: Sprint-152 (close retro, S0 report)
+  - Summary: **`analyze.ts` prints R-b's verdicts but no section 4 verdict (holds, inconclusive or regressed) and no per-symptom
+    regression line.** The pre-registration leaves the +0.10 and -0.05 thresholds to the reader, so the report shows the rates and
+    leaves the comparison undone. In S0 the three regressions against A0 surfaced only when the coordinator applied section 4 by hand (L-274).
+  - Evidence: `docs/research/logs/ab-measurements.md` § Report 2026-11-01; the S0 analysis output.
+  - Impact: med. An admission ruling read from the printed verdicts alone would miss a regression.
+  - Mitigation (hypothesis, re-derive first): print each symptom's A-minus-A0 difference and the section 4 verdict as computed lines,
+    keeping the thresholds as frozen constants pinned by a selftest; a pre-registration amendment for later arms only.
 - **TD-282** severity: trivial | status: open | created: Sprint-148 (close-time scoped review of T3/T4, PLAUSIBLE, owner kept the rule)
   - Summary: **Reading the LAST `QA-CHECK:` line (TD-268's fix) can trust a nested line when the run's own verdict never prints.**
     A qa-check run that exits rc 0 after nested fixture output printed `QA-CHECK: 5 pass, 0 fail`, but dies before its own verdict

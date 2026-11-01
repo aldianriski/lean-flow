@@ -123,6 +123,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-274 [tags: process] [status: active]: **An absolute defect rule and a relative regression rule can disagree, and an admission ruling has to read both.** S0's R-b rule judged A1 alone (fail rate at least 20% with a 90% lower bound above 10%) and found no symptom a defect. Section 4's regression test, A1 minus A0, found three regressions (convention -10.3, business -11.1, lost detail -8.3), and A1 sat below the A0 floor. `analyze.ts` prints R-b's verdicts but leaves section 4's thresholds to the reader. The first draft of the report read "no defect, S2 and S3 admit nothing", and the regressions surfaced only when the coordinator applied section 4 by hand. Rule: before ruling admission on a measured run, apply every frozen decision rule to the figures, not just the one that prints a verdict.
+- seen: 2026-11-01 (SPRINT-152 T4, S0 report; owner ruling D10 then admitted S3 on the regressions)
+- count: 1
+- promoted: no
+- related: L-136 (a criterion its check cannot reach) · TD-283
+
+---
+
+## L-273 [tags: process] [status: active]: **A correction that says rows run under an old rule are unchanged needs evidence that survives the trial copy's deletion.** Amendment 5's correction first said the 13 re-run rows "classify the same way" under the narrower rule. The evidence was a transcript search for the path, one live listing of one trial, and the frozen snapshots. The trial copies were deleted after each row. An outside review (Codex round 2) showed that a path built from separate pieces passes the search and would have been hidden by the old rule. The owner kept the rows with a stated caveat. Rule: a claim about finished rows under a changed rule cites what the row itself retains (its manifest, its changed set), and says so when nothing retained can decide it.
+- seen: 2026-11-01 (SPRINT-152 T4, Amendment 5 correction, Codex round 2 R4)
+- count: 1
+- promoted: no
+- related: L-271 · TD-284
+
+---
+
 ## L-272 [tags: tooling] [status: active]: **An allow-list entry with no path pattern did not stop the CLI's popup for a write outside the working copy.** Amendment 4 allowed `Write` and `Edit` on any path for every A/B arm, because a pilot trial had parked writing a scratch check script outside its trial copy. In the S0 first pass, 2 workdoo A1 trials still parked the same way, and in the Amendment 5 re-run a third parked on `Bash` (allowed wholesale) writing a probe script to a fresh temp directory. No A0 trial did. Why the allowances did not apply is not established. The owner ruled all three parks scored. Two things follow: an amendment that loosens permissions needs a smoke trial of the exact case it targets before the full run, and lean-flow's runs write throwaway verification scripts outside the repo where plain Claude does not.
 - seen: 2026-11-01 (SPRINT-152 T4, S0 first pass; Amendment 4's targeted case recurred) · 2026-11-01 (Amendment 5 re-run, `Bash`, self-onboarding-guard #1)
 - count: 1
