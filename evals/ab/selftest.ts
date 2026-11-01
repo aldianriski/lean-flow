@@ -2357,6 +2357,121 @@ check("S55 review round: provisioning writes (go.sum) are neither the agent's ch
 });
 
 const paid = process.argv.includes("--paid");
+// S57 -- setup-arm.ts: the owner-run setup session for any arm. Fixtures live in temp dirs, never the real snapshots.
+async function setupFixture(kind: "init" | "migrate") {
+  const { computePin } = await import("./lib/pin.ts");
+  const { manifestOf } = await import("./lib/freeze.ts");
+  const dir = tmpdir("setup-arm");
+  const snap = path.join(dir, "snap");
+  fs.mkdirSync(snap, { recursive: true });
+  fs.writeFileSync(path.join(snap, "README.md"), "hello\n");
+  const plug = pluginRepo();
+  const arms = path.join(dir, "arms");
+  fs.mkdirSync(arms);
+  fs.copyFileSync(path.join(AB, "arms", "inventory.json"), path.join(arms, "inventory.json"));
+  const id = kind === "init" ? "fxrepo-a1" : "fxrepo-a2";
+  fs.writeFileSync(path.join(arms, `${id}.json`), JSON.stringify({ id, snapshot: snap, plugin: { path: plug, ...computePin(plug) } }));
+  fs.writeFileSync(path.join(arms, `${id}.pre-${kind}.manifest.json`), JSON.stringify(manifestOf(snap)));
+  const run = (...a: string[]) => {
+    const r = Bun.spawnSync(["bun", path.join(AB, "setup-arm.ts"), "--arm", id, "--arms-dir", arms, ...a], { cwd: AB });
+    return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString() };
+  };
+  return { id, snap, plug, arms, run };
+}
+check("S57 setup-arm: plan names the skill by pre-setup manifest (init/migrate), answers files and work dir; refuses (exit 2, named) a drifted snapshot, a wrong pin, neither/both manifests; --resume skips the drift check", async () => {
+  const mig = await setupFixture("migrate");
+  const ok = mig.run();
+  assert(ok.code === 0, `control plan must pass: ${ok.code} ${ok.err}`);
+  assert(/lean-doc-generator migrate/.test(ok.out) && !/lean-doc-generator init/.test(ok.out), `migrate arm plans migrate: ${ok.out}`);
+  assert(/answers\/fxrepo\.md/.test(ok.out) && /answers\/fxrepo-operator\.md/.test(ok.out), "plan names both answers files");
+  assert(/ab-setup-fxrepo-a2/.test(ok.out), "plan names the work dir");
+  const ini = await setupFixture("init");
+  const okI = ini.run();
+  assert(okI.code === 0 && /lean-doc-generator init/.test(okI.out), `init arm plans init: ${okI.code} ${okI.out}${okI.err}`);
+
+  fs.appendFileSync(path.join(mig.snap, "README.md"), "drift\n");
+  const drift = mig.run();
+  assert(drift.code === 2 && /REFUSED: .*no longer the pre-migrate copy/.test(drift.err), `drifted snapshot refused: ${drift.code} ${drift.err}`);
+  assert(mig.run("--resume").code === 0, "--resume skips the drift check");
+
+  const pin = await setupFixture("migrate");
+  fs.writeFileSync(path.join(pin.plug, "extra.txt"), "x");
+  git(pin.plug, "add", "-A");
+  git(pin.plug, "commit", "-q", "-m", "two");
+  const bad = pin.run();
+  assert(bad.code === 2 && /REFUSED: .*plugin is at commit/.test(bad.err), `pin mismatch refused: ${bad.code} ${bad.err}`);
+  const hashOnly = await setupFixture("migrate");
+  const af = path.join(hashOnly.arms, `${hashOnly.id}.json`);
+  const a = JSON.parse(fs.readFileSync(af, "utf8"));
+  a.plugin.hash = "0".repeat(64);
+  fs.writeFileSync(af, JSON.stringify(a));
+  const hr = hashOnly.run();
+  assert(hr.code === 2 && /REFUSED: .*content hash/.test(hr.err), `hash mismatch refused: ${hr.code} ${hr.err}`);
+
+  const none = await setupFixture("migrate");
+  fs.rmSync(path.join(none.arms, `${none.id}.pre-migrate.manifest.json`));
+  const rn = none.run();
+  assert(rn.code === 2 && /REFUSED: .*no pre-setup manifest/.test(rn.err), `no manifest refused: ${rn.err}`);
+  const both = await setupFixture("migrate");
+  fs.writeFileSync(path.join(both.arms, `${both.id}.pre-init.manifest.json`), "{}");
+  const rb = both.run();
+  assert(rb.code === 2 && /REFUSED: .*both/.test(rb.err), `both manifests refused: ${rb.err}`);
+});
+
+// S58 -- the pilot is derived from the schedule: N = distinct (arm, repo) pairs; the first N slots must hold each pair once.
+check("S58 pilot size derived: real schedule N=4; a 2-pair schedule pilots 2 and stops after 2; a schedule whose first N slots repeat a pair is refused (named)", async () => {
+  const { pilotSize, Refused, runBaseline } = await import("./run-baseline.ts");
+  const { appendRow } = await import("./lib/record.ts");
+  assert(pilotSize(REAL_SCHEDULE) === 4, `real schedule pilot is 4: ${pilotSize(REAL_SCHEDULE)}`);
+  const two: import("./lib/validity.ts").SlotKey[] = [];
+  for (const t of ["t1", "t2", "t3"]) for (const arm of ["x-a1", "y-a1"]) two.push({ arm, repo: arm[0]!, task: t, trial: 1 });
+  assert(pilotSize(two) === 2, `2-pair schedule pilots 2: ${pilotSize(two)}`);
+  const dup = [two[0]!, two[0]!, two[1]!, two[2]!];
+  let msg = "";
+  try {
+    pilotSize(dup);
+  } catch (e) {
+    assert(e instanceof Refused, "refusal is a Refused");
+    msg = (e as Error).message;
+  }
+  assert(/pilot/.test(msg) && /each \(arm, repo\) pair exactly once/.test(msg), `repeat refused with a named reason: ${msg}`);
+  const a = await dryRun();
+  const calls: string[] = [];
+  const mk = (log: string) => async (ctx: import("./run-baseline.ts").Ctx) => {
+    calls.push(ctx.slot.arm);
+    appendRow(log, specRow({ tag: ctx.tag, arm: ctx.slot.arm, task: ctx.slot.task, trial: 1, attempt: ctx.attempt, exit: "ok", cls: "ok", g: "pass", j: "PPP", tok: [1, 2, 3, 4], cost: 1 }), new Date(NOW_OK - 1000 * 60 + calls.length * 1000));
+    return { exit: "ok", cls: "ok" as import("./lib/retry.ts").AttemptClass, terminal: undefined };
+  };
+  const r = await runBaseline(0, { log: a.log, prereg: a.prereg, schedule: two, now: () => NOW_OK, run: mk(a.log) });
+  assert(r.stop === "pilot" && calls.length === 2, `2-pair driver stops after 2: ${r.stop} ${calls}`);
+  let refused = "";
+  try {
+    await runBaseline(0, { log: a.log, prereg: a.prereg, schedule: dup, now: () => NOW_OK, run: mk(a.log) });
+  } catch (e) {
+    refused = (e as Error).message;
+  }
+  assert(/each \(arm, repo\) pair exactly once/.test(refused), `driver refuses to start: ${refused}`);
+});
+
+// S59 -- schedule-a2.json is the A1 schedule slots of trial 1 and 2, renamed to A2, in order.
+const deriveA2 = (s: import("./lib/validity.ts").SlotKey[]) => s.filter((x) => x.arm.endsWith("-a1") && (x.trial === 1 || x.trial === 2)).map((x) => ({ ...x, arm: x.arm.replace(/-a1$/, "-a2") }));
+check("S59 schedule-a2.json re-derived from schedule.json (a1 slots, trial 1-2, renamed -a2, original order) matches entry for entry, 32 slots, pilot accepted; one altered entry fails", async () => {
+  const { pilotSize } = await import("./run-baseline.ts");
+  const file: import("./lib/validity.ts").SlotKey[] = JSON.parse(fs.readFileSync(path.join(AB, "schedule-a2.json"), "utf8"));
+  const want = deriveA2(REAL_SCHEDULE);
+  assert(want.length === 32, `rule yields 32 slots: ${want.length}`);
+  deepStrictEqual(file, want);
+  assert(pilotSize(file) === 2 && new Set(file.slice(0, 2).map((s) => s.repo)).size === 2, "first 2 slots are one per repo, pilot accepted");
+  const altered = file.map((s, i) => (i === 7 ? { ...s, trial: 2 } : s));
+  let failed = false;
+  try {
+    deepStrictEqual(altered, want);
+  } catch {
+    failed = true;
+  }
+  assert(failed, "an altered entry must be detected");
+});
+
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;

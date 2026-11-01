@@ -34,7 +34,6 @@ import { ArmRefused, PinRefused, runTrial } from "./lib/trial.ts";
 import type { SlotKey } from "./lib/validity.ts";
 
 const AB = import.meta.dir;
-const PILOT_SLOTS = 4;
 const ABORT_AFTER = 3;
 const OWNER_STOP = /^(?:usage-missing|source-mutated:|invalid:)/;
 /** The CLI's subscription-limit message (not an API rate limit, which is infra and retried). Matched on the attempt's terminal text only. */
@@ -42,6 +41,14 @@ const USAGE_LIMIT = /(?:usage|5-hour|weekly|monthly|session|daily) limit|hit you
 export const isUsageLimit = (terminal: string | undefined): boolean => terminal !== undefined && USAGE_LIMIT.test(terminal) && !/rate[ _-]?limit/i.test(terminal);
 
 export class Refused extends Error {}
+/** The pilot size: one slot per distinct (arm, repo) pair of the schedule. Refuses a schedule whose first N slots do not hold each pair exactly once. */
+export function pilotSize(schedule: SlotKey[]): number {
+  const key = (s: SlotKey) => `${s.arm}|${s.repo}`;
+  const n = new Set(schedule.map(key)).size;
+  const first = new Set(schedule.slice(0, n).map(key));
+  if (first.size !== n || schedule.length < n) throw new Refused(`pilot: the first ${n} slots must hold each (arm, repo) pair exactly once, they hold ${first.size} distinct`);
+  return n;
+}
 export type Ctx = { slot: SlotKey; round: number; attempt: number; tag: string };
 /** What one attempt reports back; the attempt's row is already in the log, appended by the trial. */
 export type Outcome = { exit: string; cls: AttemptClass; terminal?: string | undefined };
@@ -113,7 +120,7 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
   if (![0, 1, 2].includes(round)) throw new Refused(`--round must be 0, 1 or 2, got ${round}`);
 
   const at0 = countedRows(d.log);
-  const pilot = d.schedule.slice(0, PILOT_SLOTS);
+  const pilot = d.schedule.slice(0, pilotSize(d.schedule));
   const pilotDone = (rows: LogRow[]) => pilot.every((s) => stateIn(rows, s, 0).scored);
   const pilotPending = round === 0 && !pilotDone(at0);
   // the run-order streak of infra attempts; a streak that already aborted a run was ruled on by the owner (this start), so it restarts at 0
@@ -144,7 +151,7 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
       if (streak >= ABORT_AFTER) return stop("abort", `${ABORT_AFTER} consecutive infra attempts (last: ${slotName(slot)} attempt ${attempt}, ${out.cls}): aborted for an owner ruling`);
       if (!isInfra(out.cls)) break;
     }
-    if (pilotPending && pilotDone(countedRows(d.log))) return stop("pilot", `the ${PILOT_SLOTS} pilot slots each have a scored round-0 attempt: stopped for the owner's review of cost and behaviour`);
+    if (pilotPending && pilotDone(countedRows(d.log))) return stop("pilot", `the ${pilot.length} pilot slots each have a scored round-0 attempt: stopped for the owner's review of cost and behaviour`);
   }
   return stop("done", `round ${round} complete`);
 }

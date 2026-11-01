@@ -1,0 +1,63 @@
+// Owner-run setup of an arm: an INTERACTIVE claude session in the arm's snapshot that loads ONLY the arm's pinned plugin, so the owner can run
+// the arm's lean-doc-generator skill (init for a pre-init arm, migrate for a pre-migrate arm) and answer each popup verbatim from evals/ab/answers/.
+//   bun evals/ab/setup-arm.ts --arm <id>          prints the plan and the exact command, starts nothing
+//   bun evals/ab/setup-arm.ts --arm <id> --run    creates the isolated config dir and starts the session (inherits this terminal)
+//   --resume continues a setup in progress (skips the snapshot-equals-pre-setup check); --arms-dir <dir> reads arm files from elsewhere (selftest fixtures)
+// Maintainer-only; no trial and no gate. The session itself is a paid subscription session, started by the owner.
+import fs from "node:fs";
+import path from "node:path";
+import { loadArm } from "./lib/arm.ts";
+import { manifestOf, REPO_ROOT } from "./lib/freeze.ts";
+import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
+import { setupCommand } from "./lib/setup.ts";
+import { verifyPin } from "./lib/pin.ts";
+import { diffManifest } from "./lib/snapshot.ts";
+
+const flag = (n: string) => (process.argv.includes(`--${n}`) ? process.argv[process.argv.indexOf(`--${n}`) + 1] : undefined);
+const refuse = (why: string): never => (console.error(`REFUSED: ${why}`), process.exit(2));
+const id = flag("arm");
+if (!id || id.startsWith("--")) refuse("--arm <id> is required");
+const armsDir = path.resolve(flag("arms-dir") ?? path.join(import.meta.dir, "arms"));
+const run = process.argv.includes("--run");
+const resume = process.argv.includes("--resume");
+if (!fs.existsSync(path.join(armsDir, `${id}.json`))) refuse(`no arm file ${path.join(armsDir, `${id}.json`)}`);
+const arm = loadArm(path.join(armsDir, `${id}.json`));
+const repo = id!.replace(/-a\d+$/, "");
+const WORK = `D:/Research/ab-setup-${id}`; // outside the repo: holds the isolated config dir and with it the retained transcript
+
+if (!arm.snapshot || !arm.plugin) refuse(`${id}.json needs snapshot and plugin`);
+// the pre-setup manifest names the skill: pre-init -> init, pre-migrate -> migrate; exactly one must exist
+const kinds = (["init", "migrate"] as const).filter((k) => fs.existsSync(path.join(armsDir, `${id}.pre-${k}.manifest.json`)));
+if (kinds.length === 0) refuse(`no pre-setup manifest for ${id} (expected ${id}.pre-init.manifest.json or ${id}.pre-migrate.manifest.json)`);
+if (kinds.length > 1) refuse(`${id} has both a pre-init and a pre-migrate manifest; keep exactly one`);
+const kind = kinds[0]!;
+const problems = [...verifyPin(arm.plugin!)];
+const pre = JSON.parse(fs.readFileSync(path.join(armsDir, `${id}.pre-${kind}.manifest.json`), "utf8")) as Record<string, string>;
+if (!fs.existsSync(arm.snapshot!)) problems.push(`snapshot ${arm.snapshot} does not exist`);
+else if (!resume) {
+  const drift = diffManifest(pre, manifestOf(arm.snapshot!));
+  if (drift.length > 0) problems.push(`snapshot is no longer the pre-${kind} copy (${drift.slice(0, 5).join(", ")}${drift.length > 5 ? ", ..." : ""}); pass --resume to continue a ${kind} in progress`);
+}
+if (problems.length > 0) refuse(problems.join("; "));
+
+const claude = setupCommand(arm);
+if (!run) {
+  console.log(`plugin  ${arm.plugin!.path}  (verified: pinned hash matches, tree clean)\nsnapshot ${arm.snapshot}  (verified: ${resume ? "drift check skipped by --resume" : `still the pre-${kind} copy`})`);
+  console.log(`\nRun:\n  bun ${path.relative(REPO_ROOT, path.join(import.meta.dir, "setup-arm.ts")).split(path.sep).join("/")} --arm ${id} --run [--resume]\n`);
+  console.log(`That starts, with cwd = the snapshot and an isolated CLAUDE_CONFIG_DIR (no user plugins, settings or memory; only the credentials file is byte-copied):\n  ${claude.join(" ")}`);
+  console.log(`\nThen type: /lean-doc-generator ${kind}   -- answer every popup verbatim from evals/ab/answers/${repo}.md (setup operator reads evals/ab/answers/${repo}-operator.md too).`);
+  console.log(`Transcript: <config dir>/projects/<cwd-encoded>/*.jsonl, config dir = ${WORK}/iso-*/cfg (printed again when the session ends). Keep it.`);
+  console.log(`After the ${kind}: freeze the arm (compute the manifest, write ${id}.manifest.json, add "manifest" to ${id}.json).`);
+  process.exit(0);
+}
+
+fs.mkdirSync(WORK, { recursive: true });
+const iso = makeIsolation(WORK, arm);
+console.log(`isolated config dir (transcript lands here): ${iso.cfg}`);
+const p = Bun.spawn(claude, { cwd: arm.snapshot, env: isolationEnv(iso, arm), stdin: "inherit", stdout: "inherit", stderr: "inherit" });
+const code = await p.exited;
+const transcripts: string[] = [];
+const walk = (d: string) => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".jsonl") && transcripts.push(path.join(d, e.name))));
+walk(path.join(iso.cfg, "projects"));
+console.log(`session ended (exit ${code}). Retained transcripts:\n${transcripts.map((t) => `  ${t}`).join("\n") || "  (none found under " + iso.cfg + ")"}`);
+process.exit(code);
