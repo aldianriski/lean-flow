@@ -98,7 +98,7 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - uncovered epic conditions or roadmap rows > 0 → also name `/triage` (it lists them)
    - **unprofiled** (slots already read, never a new file: none of slots 1·2·6 exists → `/lean-doc-generator init`; else no `## Stack` heading in the slot-6 file, or no slot-6 file → `migrate`) → with work tracked, also name that command;
-     with nothing tracked, it is the `Next:` instead of `/task-decomposer`. Name it, never run it; on a v1/mixed layout skip this bullet (the `Layout:` row's migrate stands)
+     with nothing tracked, it is the `Next:` instead of `/task-decomposer`. Name it, never run it; on a v1/mixed layout skip this bullet and the next (the `Layout:` row's migrate is the `Next:`)
    - nothing tracked yet, profiled → `/task-decomposer "<intent>"`
 
 ## Output format
