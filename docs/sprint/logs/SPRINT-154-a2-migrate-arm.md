@@ -63,3 +63,13 @@ by S59. Selftest 64/64 (S57-S59 each seen failing first), re-run by the coordina
 plugin path could verify one checkout and launch another), fixed by refusing relative paths; 1 round.
 consequence · T1 · behaviour:material · governance:high
 review · T1 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-11-01 | scope-change | T1: A2's setup popups are answered by an automatic operator in `evals/ab/`, not by the owner at the keyboard (D1)
+What changed: owner ruling by popup ("too many manual steps"). `setup-arm.ts --auto` runs the setup session headless and answers
+each `AskUserQuestion` itself, verbatim from the frozen answers files by a fixed topic-to-section table. migrate's plan is
+approved for the profile items only, and any popup the files do not answer stops the run for an owner ruling. Every answer and
+permission decision is logged. Spike (coordinator, 2026-11-01): `claude -p --input-format stream-json --output-format stream-json
+--verbose --permission-prompt-tool stdio`, after an `initialize` control request, registers `AskUserQuestion` and routes it to the
+host as a `can_use_tool` control request; an `allow` reply whose `updatedInput` carries `answers` reaches the model as answered.
+Impact: TASK-555's Done-when is unchanged ("every popup answered verbatim from the frozen answers files" now holds mechanically);
+D1's owner-driven sessions become operator-driven; Amendment 6 states it. G2 re-confirmed by the same ruling.
