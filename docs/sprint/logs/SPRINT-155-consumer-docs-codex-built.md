@@ -37,3 +37,20 @@ checklist for each (no fast-path). Epic: none. Before the lock, TASK-563's first
 (`skills/lean-doc-generator/references/init.md`), since promote-check matches a partial path only exactly. promote-check:
 16 pass, 0 fail. Pre-dispatch preflight by inspection: no cycle; T2 follows T1 (README template, CHANGELOG); T3, T4 and T5
 are disjoint from T1 and T2 and from each other.
+
+### 2026-11-01 | progress | batch G1 signed for T1-T5 (full checklist, every origin close-retro); G2 signed for every task
+G1 per task: goal, size (all S), files, blast radius, out-of-scope and assumptions written in the G2 design (session scratchpad
+`s155-designs.md`); no task is `L`. G2 designs went to one fresh reader each before sign-off: five read-only Codex readers, run
+in parallel (pilot D1), 147k Codex tokens in all and no Claude reader tokens.
+builder-check · T1 · 2 contradictions · 1 questions · settled: the census grep is recursive and also catches lean-flow file paths (init.md links a lean-flow research doc), generic placements stay; real-init procedure named (owner-run on the VPS after T2, one run for T1 box 2 and T2 box 3)
+builder-check · T2 · 0 contradictions · 0 questions · nothing important left
+builder-check · T3 · 0 contradictions · 1 questions · settled: the full gate is gate-remote.ts on the merged HEAD, whose qa-check runs the conformance fixtures; the builder runs the fixtures locally
+builder-check · T4 · 2 contradictions · 2 questions · settled: cleanup works from a before/after process snapshot and covers the timed-out reproduction; the cause names the blocking call and why; the exec reviews ran on this host; intent ruled by owner: a timeout diagnostic plus the blocking call stands as the error text
+builder-check · T5 · 0 contradictions · 2 questions · settled: the product exemptions conflict with a pointer-only requirements file (spec 0.18.2); intent ruled by owner: full profile with both exemptions dropped, and an owner-approved trim of the overview, its own commit, to fit `## Stack` under the hard cap
+Owner rulings by popup: T1-T3 signed as settled; T4 signed with the error-text ruling; T5 full profile and the overview trim.
+
+### 2026-11-01 | scope-change | T5: lean-flow's own profile drops both product exemptions, so `.conformance-exempt` joins T5's Layers
+What changed: owner ruling at G2 (full profile). `migrate` writes `docs/product/requirements.md` and
+`docs/product/acceptance-criteria.md` as pointer-only files that cite `.claude/CONTEXT.md` and `.claude/CLAUDE.md` topic by topic,
+so the two reasoned exemptions in `.conformance-exempt` no longer hold and are removed. Impact: T5's Layers gain
+`.conformance-exempt`; TASK-561's Done-when text is unchanged. G2 re-confirmed in the same popup.

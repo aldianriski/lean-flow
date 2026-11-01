@@ -84,7 +84,7 @@ companion's `setup`); this task records the cause, the owner's ruling on the sta
 is left behind.
 
 ### T5 — Rule lean-flow's own repo profile, then run migrate here or record the exemption `[size: S · risk: low · class: decision · HITL · J2]`
-Layers: `docs/architecture/overview.md` · `docs/product/` · `docs/development/`
+Layers: `docs/architecture/overview.md` · `docs/product/` · `docs/development/` · `.conformance-exempt`
   · `docs/work/todo/TASK-561-rule-whether-lean-flow-itself-carries-the-repo-profile.md`
   · `docs/work/in_progress/TASK-561-rule-whether-lean-flow-itself-carries-the-repo-profile.md`
   · `docs/work/done/TASK-561-rule-whether-lean-flow-itself-carries-the-repo-profile.md`
