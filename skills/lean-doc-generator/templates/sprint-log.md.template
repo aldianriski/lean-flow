@@ -11,7 +11,7 @@ update_trigger: an Execution Log entry is appended
 
 > Append-only companion to [`../SPRINT-NNN-<slug>.md`](../SPRINT-NNN-<slug>.md). Uncapped by design:
 > this file grows with the work done, which is exactly why it is not inside the Plan's 400-line
-> budget (STANDARD §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
+> budget (STANDARD §9). **Never edit a past entry** — correct it with a new one.
 >
 > Rendered at promote, in the same commit as `plan locked`; its first entry is the `promote` entry
 > carrying the signed governance checklist.
@@ -26,13 +26,13 @@ update_trigger: an Execution Log entry is appended
      the Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`.
      A `run-complete` entry now also carries a typed `outcome · DELIVERED|PARTIAL|FAILED` line plus
      evidence fields (tasks · parks · repair-cycles · verification · warnings), each tagged
-     mechanical | model-reported | derived (SPRINT-098 T3 — EPIC-015 § Closed-when 6; full shape and
+     mechanical | model-reported | derived (full shape and
      provenance legend → night-run.md Part 4). Not a new event type — same `run-complete` header. -->
 
 ### YYYY-MM-DD | [event] | [one-line summary]
 [detail — what changed and why it matters. Name the task (Tn) it belongs to.]
 
-<!-- A `handoff` entry is the repo-side status stub STANDARD §12(b) prescribes (SPRINT-094 T2):
+<!-- A `handoff` entry is the repo-side status stub STANDARD §12(b) prescribes:
      `/handoff` writes one at `live`; a later `handoff` entry sharing the SAME handoff-path updates
      it (`consumed` when a session resumes and continues; `spent` when close reconciles it) — the
      LATEST entry per path is authoritative, never edited in place. Both fields are required; either
@@ -44,10 +44,10 @@ update_trigger: an Execution Log entry is appended
 handoff-status: live | consumed | spent
 handoff-path: [absolute temp path /handoff printed]
 
-<!-- Every task's entry carries a structured consequence classification (TD-092) — a fixed, whole-line
+<!-- Every task's entry carries a structured consequence classification — a fixed, whole-line
      record, not the classification stated in prose above it. Written at the moment review depth is
-     decided (`review-scoping.md` § Two dimensions), whatever depth follows — this is what makes
-     `check-review-depth.sh` reach a task whose review was never logged, not only one whose review was
-     logged badly. If an independent pass then fires, its own `review · Tn · <depth> · behaviour:… ·
-     governance:…` line (night-run.md Part 4) supersedes this one as the record of what happened. -->
+     decided (`review-scoping.md` § Two dimensions), whatever depth follows — a missing review must
+     be detectable, not only an incorrectly logged one. If an independent pass then fires, its own
+     `review · Tn · <depth> · behaviour:… · governance:…` line (night-run.md Part 4) supersedes this one
+     as the record of what happened. -->
 consequence · Tn · behaviour:low|material · governance:low|high

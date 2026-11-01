@@ -8,7 +8,7 @@ tags: [pick from the project's tag vocab — keep it small and consistent]
 domain: [one project domain]
 related: [other-doc-id-or-ADR-NNN]
 ---
-<!-- Frontmatter is the ADR-009 knowledge metadata SSOT — if the project maintains a generated
+<!-- Frontmatter is the knowledge metadata SSOT — if the project maintains a generated
      knowledge index, source tags/domain vocab from its single origin and lint against it;
      otherwise keep a small, consistent vocab. -->
 

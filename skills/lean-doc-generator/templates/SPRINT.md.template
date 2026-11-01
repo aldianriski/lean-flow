@@ -24,7 +24,7 @@ update_trigger: sprint execute/close events
 **Out (deferred):** [explicitly named non-goals — what looks related but is NOT in this sprint]
 
 ## Members
-<!-- REQUIRED -- the sprint BY REFERENCE (ADR-047): one member task file
+<!-- REQUIRED -- the sprint BY REFERENCE: one member task file
      (`docs/work/<status>/TASK-NNN-<slug>.md`) per line. `promote` moves each file backlog/ -> todo/ (the git case:
      `git mv` in its own commit; no git: a plain move) and stamps its `sprint:` frontmatter; the path here records where it
      sat at promote -- later folder moves do not edit this list. Each task's DoD lives ONLY in its
@@ -40,9 +40,9 @@ update_trigger: sprint execute/close events
 <!-- One block per unit of work, dependency order, holding ONLY sprint-scoped meta -- never a copy
      of a member's DoD (a second copy drifts: only one of the two ever gets ticked).
      Tasks sharing a file: fix single-owner + commit order in § Decisions (a D-row); at commit stage
-     shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037).
+     shared files per-hunk, never a plain `git add` over another task/stream's WIP.
      Mandatory per block: header meta carries `class:`
-     (decision | execution | mechanical-ingest — advisory default, dispatch may override, ADR-010)
+     (decision | execution | mechanical-ingest — advisory default, dispatch may override)
      + an autonomy tag (HITL|AFK) + an authority class (J0|J1|J2 — whose authority the task runs on,
      night-run.md Part 0 § Authority classes); plus a `Depends-on:` line, `Layers:`, and
      `**Acceptance:**`. The J-class is DECLARED at promote/G2, never inferred, and an ABSENT one
@@ -89,7 +89,7 @@ Cites: [the member TASK-NNN(s) this block delivers, then any other sources it an
 > **Lives in its own file** — `docs/sprint/logs/SPRINT-NNN-<slug>.md`, rendered from
 > `templates/sprint-log.md.template` and created at promote, its first entry the `promote` / `plan locked` record (earlier than STANDARD §9's "at the first entry" minimum, which it satisfies). Append there, never here:
 > the Log grows with the work done, so keeping it out of this file is what stops it consuming the
-> 400-line budget the Plan needs (STANDARD §9 · ADR-014). The `logs/` subdirectory is load-bearing —
+> 400-line budget the Plan needs (STANDARD §9). The `logs/` subdirectory is load-bearing —
 > the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory
 > `-log.md` sibling would be capped and schema-checked as if it were a Plan.
 

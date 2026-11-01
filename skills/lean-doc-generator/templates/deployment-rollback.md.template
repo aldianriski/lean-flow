@@ -20,5 +20,5 @@ status: current
 
 ## Rollback verification — by a real signal, not a proxy
 - [ ] Confirm the prior version is *actually* live again — check the deployed artifact's version /
-  build-id / PID, **not** an HTTP 200 or "looks fine"; a stale process can still answer healthy. [L-013]
+  build-id / PID, **not** an HTTP 200 or "looks fine"; a stale process can still answer healthy.
 - [ ] Confirm no data/state was left in a half-migrated condition by the aborted release.

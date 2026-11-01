@@ -1,8 +1,8 @@
 # Init — scaffold a fresh repo
 
 Used by `/lean-doc-generator init`. For a **greenfield** repo with no lean-flow docs yet — the twin
-of migrate (decision: `docs/research/init-vs-migrate.md`). **Scope-interactive + docs-only**,
-bounded by the safe-scaffold allowlist (ADR-012).
+of migrate. **Scope-interactive + docs-only**,
+bounded by the safe-scaffold allowlist.
 
 ## Procedure
 
@@ -46,7 +46,7 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
    target file exists (First milestone and business round: `requirements.md`; conventions round:
    `coding-standards.md`) and name the skipped files in the listing message. Headless: no popup
    (probe as step 3 does); the park record also lists the existing docs and the migrate offer.
-2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
+2. **Scaffold the base tier** — the mandatory minimum (table below), each via the
    template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
    unconditional; four carry a **substrate condition** and are skipped when that substrate is absent,
@@ -99,7 +99,7 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
      write the detected substrate, the question sets loaded (or none), the tiers you would have offered, any existing docs found with the migrate offer, and the unblock condition
      ("owner picks the tiers"; with existing docs, "owner picks migrate or continue, then the tiers") into a `/handoff` doc — there is no sprint file at this entry point.
      Base-tier scaffolding waits with it: it is additive, but it is downstream of a choice nobody made
-     (TD-017 · night-run.md Part 0). Declining in prose alone leaves no artifact that init ran.
+     (night-run.md Part 0). Declining in prose alone leaves no artifact that init ran.
 
    | Doc | Fires on | Template |
    |---|---|---|
@@ -117,7 +117,7 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
    (write-if-absent) `docs/api/README.md`, a 3-liner: *"Commit the OpenAPI source (`openapi.yaml`)
    here; generated HTML docs need not be committed."* — carrying a `<sub>` footer ownership line
    (§3 pointer-file exception, like AGENTS.md; a doc without an owner is an orphan, §7).
-4. **Safe-scaffold allowlist (ADR-012)** — the only non-doc files init writes. See below.
+4. **Safe-scaffold allowlist** — the only non-doc files init writes. See below.
 5. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first,
    per the generator's § Bundled + cited assets);
    enforce the line cap and the ownership header (§3) on every file touched.
@@ -176,7 +176,7 @@ deployment describes a release that may never happen; those are the ones that be
 Missing template for a base-tier row → WARN and fall back to STANDARD §2's inline description
 (template-load protocol step 2); never hard-stop.
 
-## Safe-scaffold allowlist (ADR-012 — the only non-doc files init writes)
+## Safe-scaffold allowlist (the only non-doc files init writes)
 
 Exactly three, **write-if-absent only** — an existing file is never overwritten, only skipped +
 reported:

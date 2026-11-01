@@ -19,7 +19,7 @@ fires inside that skill's flow alone (the placement test, STANDARD §10). Review
      Once an entry reaches promoted: yes, collapse it to a pointer line at the next promote (§11):
      "L-NNN → promoted: <where>" — the durable rule is the record from then on. -->
 
-<!-- Per-entry metadata (schema, ADR-009): the heading carries `[tags: <tag>] [status: active|promoted|superseded]`
+<!-- Per-entry metadata: the heading carries `[tags: <tag>] [status: active|promoted|superseded]`
      (tags from the project's vocabulary). If the project generates a by-tag index, this file is the SSOT
      and the index is derived — regenerate after edits. -->
 
