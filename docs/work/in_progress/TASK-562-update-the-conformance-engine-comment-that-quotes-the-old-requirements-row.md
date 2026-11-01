@@ -23,7 +23,7 @@ files already ARE the spec" to "cites them topic by topic". The comment in `scri
 file is consequential G (ADR-050), so the hash-restore discipline applies.
 
 ## Done when
-- [ ] The comment quotes the current §2 cell; no executable line changes (`git diff` shows comment lines only).
+- [x] The comment quotes the current §2 cell; no executable line changes (`git diff` shows comment lines only). ✓ `6265614a`: `git diff -U0` four `#` lines, no executable line; quote matches §2 line 130 word for word (worktree-isolated review CLEAN)
 - [ ] The conformance fixtures and the full gate pass unchanged on the VPS.
 
 ## Touches

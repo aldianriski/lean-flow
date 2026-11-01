@@ -54,3 +54,19 @@ What changed: owner ruling at G2 (full profile). `migrate` writes `docs/product/
 `docs/product/acceptance-criteria.md` as pointer-only files that cite `.claude/CONTEXT.md` and `.claude/CLAUDE.md` topic by topic,
 so the two reasoned exemptions in `.conformance-exempt` no longer hold and are removed. Impact: T5's Layers gain
 `.conformance-exempt`; TASK-561's Done-when text is unchanged. G2 re-confirmed in the same popup.
+
+### 2026-11-01 | progress | T1 and T3 Codex-built, reviewed and merged; T1 box 1 and T3 box 1 ticked
+Both built in parallel by `codex exec -s workspace-write` in worktrees at `bab5b4bb`. Neither touched a file outside its list,
+and both reported every box honestly (box 2 of each NOT-RUN, as designed). The coordinator verified scope, the census and the
+comment-only diff before review, and landed each diff with blob hashes equal to the worktree's (T1 `5588f20d`, T3 `6265614a`).
+A process snapshot taken before and after both runs shows no codex or node process left behind (T4's box 3, exec route).
+Pilot figures (D2):
+- T1: builder check 50.5k Codex tokens; build 72.6k Codex tokens; Claude review 60.8k tokens, 1 Low (CHANGELOG label,
+  coordinator-fixed), 1 round.
+- T3: builder check 26.7k Codex tokens; build 47.8k Codex tokens; worktree-isolated Claude review 52.9k tokens, 0 findings,
+  1 round.
+Coordinator tokens are not metered per task.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+consequence · T3 · behaviour:low · governance:high
+review · T3 · scoped-reviewer · behaviour:low · governance:high

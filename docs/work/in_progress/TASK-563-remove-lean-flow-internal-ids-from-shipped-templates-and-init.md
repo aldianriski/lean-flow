@@ -23,7 +23,7 @@ of them format examples and some possibly lean-flow's own rows. An adopter's gen
 nothing in their repo (L-015, consumer-side rule). T1 removed ADR-012 only where it touched the profile sections.
 
 ## Done when
-- [ ] A census of `skills/lean-doc-generator/templates/` and `skills/lean-doc-generator/references/init.md` separates format examples from
+- [x] A census of `skills/lean-doc-generator/templates/` and `skills/lean-doc-generator/references/init.md` separates format examples from ✓ `5588f20d`: the census grep over both now prints only the format examples (ADR-000/001, L-000/001/007, TD-000/001, SPRINT-000); Claude review 1 Low, fixed
   lean-flow-internal ids or names; each internal one is removed or replaced by a plain statement of the rule.
 - [ ] A real `init` through the installed plugin on a fresh snapshot writes no lean-flow-internal id into the adopter repo.
 
