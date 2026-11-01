@@ -499,14 +499,15 @@ owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
 
 What changed:
 
-- **1. PowerShell's cache is not the agent's edit.** A `Microsoft/Windows/PowerShell` directory, at any depth, is left out of the
-  manifest diff like Amendment 3's build output: it is not in the changed set the judges see and not in the post-run `scope-breach`
-  check. A source file the agent edits is still counted.
+- **1. PowerShell's cache file is not the agent's edit.** A file `Microsoft/Windows/PowerShell/ModuleAnalysisCache`, at any depth, is
+  left out of the manifest diff like Amendment 3's build output: it is not in the changed set the judges see and not in the post-run
+  `scope-breach` check. Any other file, in that directory or elsewhere, is still counted.
 - **2. Void and re-run.** The 13 first-pass attempts whose only `scope-breach` was
   `Microsoft/Windows/PowerShell/ModuleAnalysisCache` (all workdoo A1) are voided as an owner-ruled harness defect (Amendment 2 D), and
   their slots re-run from round 0 as attempt 1.
 - **3. Carry-over.** The freeze line of this amendment carries over the rows measured since the Amendment 4 freeze
-  (`2026-10-31T12:07:44Z`). Those rows stay valid, and a measured row before that instant is still refused.
+  (`2026-10-31T12:07:44Z`). Those rows stay valid, and a measured row before that instant is still refused. A carry-over names exactly
+  one earlier freeze instant and is never followed through that line's own carry-over.
 
 Why: the first pass (`docs/research/logs/ab-measurements.md`, 2026-10-31 to 2026-11-01). In 13 of the 24 workdoo A1 slots, a PowerShell
 session wrote its module-analysis cache under the trial copy. The file sits outside every layer, so each trial exited `scope-breach`
@@ -523,3 +524,9 @@ Carry-over is safe: no kept row's classification or figure depends on the cache.
 No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, allow-list, plugin pin, models, judges and their prompts,
 the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. No section 19 hash changes.
 This file's own sha256 changes and is recorded at the owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
+
+Corrected before its re-run rows were built, after an outside review found two holes in the signed text: item 1 covered the whole
+directory, which would hide a real file placed there, and the carry-over boundary was followed transitively. The 13 re-run trials ran
+under the directory rule. None of their transcripts names a path in that directory, the one trial copy listed while it ran held only
+`ModuleAnalysisCache`, and neither A/B repo's frozen snapshot has such a directory, so the corrected rule classifies every re-run row
+the same way. The log holds one carry-over only, so the boundary is unchanged (`2026-10-31T12:07:44Z`).
