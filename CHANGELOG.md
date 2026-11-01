@@ -16,6 +16,13 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — `/prime` and `/flow` route an unprofiled repo to `/lean-doc-generator init` (no CLAUDE.md, CONTEXT.md or architecture overview) or `migrate` (docs but no `## Stack`) before anything else. `init` writes an undecided business topic as `Not decided yet (owner, init)`, and its heading keeps `[CUSTOMIZE]` until it is decided (SPRINT-153, TASK-554).
+- **Changed** — standard 0.18.2 (PATCH): on a repo whose AI-context files already carry the spec, `product/requirements.md` is no longer skipped. It cites those files topic by topic and never copies them. No verdict moves.
+- **Changed** — `migrate` adds the repo profile to a 2.x repo and keeps every decision: it takes a backup point, compares the inventory after each action, applies the profile items, and verifies by reading only (TASK-553).
+- **Changed** — `init` never overwrites an existing file and offers `migrate` when the repo already has docs (TASK-560).
+- **Added** — question sets for React/Vite, Vue/Vite, Go/chi and Postgres; `init` loads the sets that match the detected stack through an index (TASK-549, TASK-550, TASK-551).
+- **Changed** — `init` reads the business from the repo's own docs first, asks only the unknowns, and cites the source of each fact (TASK-548).
+- **Changed** — templates stop asking for what the code already says (TASK-552).
 - **Added (maintainer-only)** — `evals/ab/`: an A/B measurement harness tracer for EPIC-023 (lean-flow 3.0). It runs one pinned (model ids, verified plugin hash), isolated (temp home, isolated config, outside reads denied) and measured trial on a fixture repo and appends a graded, costed row to `docs/research/logs/ab-measurements.md`. It is run by hand (`bun evals/ab/selftest.ts [--paid]`) and is never part of the gate. Nothing ships to consumers (SPRINT-147, TASK-533).
 - **Changed (maintainer-only)** — `evals/run-emitter-column-fixtures.ts` treats `evals/ab/` as out of scope for its population census (SPRINT-147 scope-change).
 - **Added (maintainer-only)** — `evals/ab/`: the unattended trial protocol with EPIC-023's eval-only D9 G2 exception. A trial runs in two phases: the loop writes its design, the harness signs G2 only if the declared files sit inside the task's `layers` and an isolated judge finds nothing out of scope, then it resumes the session to build. The files actually changed are re-checked afterwards. Any popup or permission denial parks the trial as not-passed, and every row records the D9 deviation. Fixture repo only; run by hand (`bun evals/ab/run-trial.ts --protocol d9`, `bun evals/ab/selftest.ts`), never part of the gate. Nothing ships to consumers (SPRINT-148, TASK-542).
