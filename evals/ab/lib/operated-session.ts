@@ -28,8 +28,8 @@ export type OperatedResult =
 
 /** At most this many chat follow-ups per session; the next one stops. */
 export const MAX_CHAT_FOLLOW_UPS = 6;
-/** Does a turn's closing text ask the user something (a question or an approval request)? */
-export const asksUser = (t: string) => /\?\s*$|\bapprov|\bconfirm|\bshould I\b|\bwhich\b/i.test(t.trim());
+/** Does a turn's closing text ask the user something (a question or an approval request)? Not "which": an ordinary summary uses it. */
+export const asksUser = (t: string) => /\?\s*$|\bapprov|\bconfirm|\bshould I\b/i.test(t.trim());
 
 /** The flags that make the CLI speak stream-json and route every permission prompt to the host. */
 export const STREAM_FLAGS = ["-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose", "--permission-prompt-tool", "stdio"];
