@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-31
+last_updated: 2026-11-01
 update_trigger: An epic slice (S0-S4) promotes or closes, an A/B arm reports, or an owner ruling changes D1-D12
 status: current
 id: lean-flow-3-foundation
@@ -105,6 +105,11 @@ itself** — recorded in an ADR + CLAUDE.md, never a STANDARD rule imposed on ad
 | D15 | (2026-10-31) The version is decided at S4 on a named consumer-contract break (STANDARD §15); S1 and S2 may ship earlier as 2.x MINORs on a passing arm, S3 roles only after S4 admission |
 
 ## 6. Epic slicing
+
+> **Status 2026-11-01 (after S0).** S0 reproduced no symptom under R-b, and A1 regressed against A0 under D11's regression
+> limit (`docs/research/logs/ab-measurements.md` § Report 2026-11-01). By EPIC-023 D10, S2 and arm A3 are not admitted; S3
+> runs as a measured experiment on the convention and business regressions, and its arms and S4 compare against A2. The
+> slicing below is the design as decided at S0 promote, kept as the record.
 
 Each slice ends with **its own staged A/B arm** (§7). Two permissions are kept apart: a slice whose arm
 misses its threshold still **continues as an experimental prerequisite** of the next arm (H1 may only
