@@ -316,3 +316,10 @@ consequence · T6 · behaviour:material · governance:high
 What broke: the re-run of system verify found that the T6 review note, logged under the 2026-10-31 T6 scope-change heading,
 names `scripts/lib/conformance-engine.sh`, which T6 never touched. Impact: T6 Cites adds it (a stale comment left for
 TASK-562). No behaviour change. Re-confirm G2: not needed.
+
+### 2026-11-01 | close | S1 delivered: 8 of 8 members in done, 27 of 27 DoD; system verify 354/1 (owner-ruled) + 589/0 at `a3ab2aeb`
+Every member is in `done/`, and the close-time members check passes 19 of 19. System verify on the VPS at `a3ab2aeb`: bun test
+589 pass, 0 fail; qa-check 354 pass, 1 fail, the review-depth vocabulary finding on T6's malformed consequence line,
+overridden by the owner (entry above), which clears at archive. No handoff entry was taken in this sprint. EPIC-023's S1
+condition stays open: arm A2 (TASK-555) and the profile on both A/B repos follow S0's baseline. No release: held under
+[Unreleased] per EPIC-023 D6. Retention and the archive move wait for the owner's approval.
