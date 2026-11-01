@@ -3,7 +3,7 @@
 // prompt arrive as a `control_request`/`can_use_tool` line on stdout; the host answers with a `control_response` line on stdin.
 import fs from "node:fs";
 import path from "node:path";
-import type { Answerer } from "./classifier.ts";
+import { capChat, type Answerer, type ChatAnswerer } from "./classifier.ts";
 import type { Question } from "./operator.ts";
 
 export type OperatedOpts = {
@@ -15,6 +15,8 @@ export type OperatedOpts = {
   prompt: string;
   /** chooses the frozen entry that answers each popup question (the classifier; tests substitute a fake model); a stop stops the popup */
   answerer: Answerer;
+  /** classifies a turn-ending chat request that asks the user for decisions (one reply, one line per part) */
+  chatAnswerer: ChatAnswerer;
   /** tool names (or `Name(pattern)` entries, matched on the name) the operator allows; any other tool request is denied */
   allowTools: string[];
   /** every decision is appended here as one JSON line */
@@ -70,6 +72,7 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
   send({ type: "user", message: { role: "user", content: o.prompt } });
 
   let result: OperatedResult | undefined;
+  let lastMsgId: string | undefined;
   let lastText = ""; // the session's last assistant text in the current turn
   let chatFollowUps = 0;
   const dec = new TextDecoder();
@@ -77,7 +80,12 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
   const handle = async (m: any): Promise<boolean> => {
     if (m.type === "assistant") {
       const texts = ((m.message?.content ?? []) as { type?: string; text?: string }[]).filter((b) => b.type === "text" && b.text?.trim()).map((b) => b.text!);
-      if (texts.length > 0) lastText = texts[texts.length - 1]!;
+      if (texts.length > 0) {
+        // all text blocks of the final assistant message, joined; events of one message (same id) accumulate
+        const id = m.message?.id as string | undefined;
+        lastText = id !== undefined && id === lastMsgId ? `${lastText}\n\n${texts.join("\n\n")}` : texts.join("\n\n");
+        lastMsgId = id;
+      }
       return false;
     }
     if (m.type === "result") {
@@ -89,9 +97,10 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
       result = { status: "done", resultSubtype: sub };
       const text = lastText.trim();
       lastText = "";
+      lastMsgId = undefined;
       if (!asksUser(text)) return true;
-      // the turn ended asking the user something in chat: route it through the same classifier as a popup
-      const question = text.slice(-2000);
+      // the turn ended asking the user something in chat: classify the whole request (one reply may cover several decisions)
+      const question = capChat(text);
       const popup = [{ question, header: "chat" }];
       const stopChat = (reason: string) => {
         log({ kind: "chat", question, header: "chat", stop: reason });
@@ -99,12 +108,12 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
         return true;
       };
       if (chatFollowUps >= MAX_CHAT_FOLLOW_UPS) return stopChat(`too many chat follow-ups (more than ${MAX_CHAT_FOLLOW_UPS}); the operator never loops without end`);
-      const a = await o.answerer({ question, header: "chat" });
+      const a = await o.chatAnswerer(question);
       if ("stop" in a) return stopChat(a.stop);
       chatFollowUps++;
-      log({ kind: "chat", question, header: "chat", id: a.id, reason: a.reason, answer: a.answer });
+      for (const p of a.parts) log({ kind: "chat", header: "chat", part: p.part, id: p.id, reason: p.reason, answer: p.answer });
       result = undefined;
-      send({ type: "user", message: { role: "user", content: a.answer } });
+      send({ type: "user", message: { role: "user", content: a.reply } });
       return false;
     }
     if (m.type !== "control_request" || m.request?.subtype !== "can_use_tool") return false;

@@ -2552,15 +2552,24 @@ const fakeCall = (map: [string, string][]) => async (prompt: string) => {
   return JSON.stringify({ id: map.find(([t]) => popup.includes(t))?.[1] ?? "NONE", reason: "fake" });
 };
 const S61_MAP: [string, string][] = [["What is the stack?", "operator:stack"], ["Describe the main flows", "repo:main-flows"], ["Apply the migrate plan?", "PLAN"], ["I need your approval first", "PLAN"]];
+// a fake model for CHAT messages: the first row whose trigger is in the CHAT MESSAGE part of the prompt supplies the parts, else one NONE part
+type FakeParts = [string, string][];
+const fakeChatCall = (rows: [string, FakeParts][]) => async (prompt: string) => {
+  const msg = prompt.slice(prompt.indexOf("CHAT MESSAGE"), prompt.indexOf("CATALOG"));
+  const parts = rows.find(([t]) => msg.includes(t))?.[1] ?? [["x", "NONE"]];
+  return JSON.stringify({ parts: parts.map(([part, id]) => ({ part, id, reason: "fake" })) });
+};
+let CHAT_MAP: [string, FakeParts][] = [["I need your approval first", [["plan", "PLAN"]]]];
 async function fakeSession(steps: Step[], over: Record<string, unknown> = {}) {
   const { runOperatedSession } = await import("./lib/operated-session.ts");
-  const { makeAnswerer, buildCatalog, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
+  const { makeAnswerer, makeChatAnswerer, buildCatalog, PLAN_RULING, CLEANUP_RULING, DATES_RULING } = await import("./lib/classifier.ts");
   const dir = tmpdir("op");
+  const cat = buildCatalog(clinicFiles(), [PLAN_RULING, CLEANUP_RULING, DATES_RULING]);
   const scenario = path.join(dir, "scenario.json");
   const record = path.join(dir, "record.jsonl");
   const log = path.join(dir, "operator.jsonl");
   fs.writeFileSync(scenario, JSON.stringify(steps));
-  const res = await runOperatedSession({ cmd: ["bun", FAKE_CLI, scenario, record], cwd: dir, env: { ...process.env } as Record<string, string>, prompt: "/lean-doc-generator migrate", answerer: makeAnswerer(buildCatalog(clinicFiles(), [PLAN_RULING, CLEANUP_RULING]), fakeCall(S61_MAP)), allowTools: ["Read"], operatorLog: log, timeoutMs: 20000, ...over });
+  const res = await runOperatedSession({ cmd: ["bun", FAKE_CLI, scenario, record], cwd: dir, env: { ...process.env } as Record<string, string>, prompt: "/lean-doc-generator migrate", answerer: makeAnswerer(cat, fakeCall(S61_MAP)), chatAnswerer: makeChatAnswerer(cat, fakeChatCall(CHAT_MAP)), allowTools: ["Read"], operatorLog: log, timeoutMs: 20000, ...over });
   return { res, sent: jsonl(record), log: jsonl(log) };
 }
 const respOf = (sent: any[], id: string) => sent.find((m) => m.type === "control_response" && m.response?.request_id === id)?.response?.response;
@@ -2698,7 +2707,7 @@ check("S65 chat follow-up (fake CLI + fake classifier): a turn ending with a req
   assert(ok.res.status === "done", `follow-up then done: ${JSON.stringify(ok.res)}`);
   const users = ok.sent.filter((m) => m.type === "user");
   assert(users.length === 2 && users[1].message.content === PLAN_RULING.text, `PLAN text sent verbatim as a second user message: ${JSON.stringify(users)}`);
-  assert(ok.log.length === 1 && ok.log[0].kind === "chat" && ok.log[0].id === "PLAN" && ok.log[0].reason === "fake" && ok.log[0].answer === PLAN_RULING.text, `chat follow-up logged: ${JSON.stringify(ok.log)}`);
+  assert(ok.log.length === 1 && ok.log[0].kind === "chat" && ok.log[0].part === "plan" && ok.log[0].id === "PLAN" && ok.log[0].reason === "fake" && ok.log[0].answer === PLAN_RULING.text, `chat follow-up logged: ${JSON.stringify(ok.log)}`);
   const none = await fakeSession([INIT, say("Which file should hold the notes?"), RESULT()]);
   assert(none.res.status === "stopped" && none.res.popup.reason.includes("Which file should hold the notes?") && JSON.stringify(none.res.popup.questions).includes("Which file should hold the notes?") && none.sent.filter((m) => m.type === "user").length === 1, `NONE stops, the text is in the popup: ${JSON.stringify(none.res)}`);
   const plain = await fakeSession([INIT, say("All done. Added Stack and Conventions in use."), RESULT()]);
@@ -2709,6 +2718,60 @@ check("S65 chat follow-up (fake CLI + fake classifier): a turn ending with a req
   const cap = await fakeSession(turns);
   assert(cap.res.status === "stopped" && /too many chat follow-ups/.test(cap.res.popup.reason) && cap.sent.filter((m) => m.type === "user").length === 7, `the 7th follow-up stops: ${JSON.stringify(cap.res)} users=${cap.sent.filter((m) => m.type === "user").length}`);
   assert(cap.log.filter((l) => l.kind === "chat" && l.answer).length === 6, "six follow-ups answered and logged");
+});
+
+// S66 -- multi-part chat messages: the live run-9 request (A profile pass, B drift, C cleanup, team size, date) gets one reply, one line per part.
+check("S66 chat multi-part (fake classifier): the FULL closing text (not its last 2000 chars) is classified; A/B/C/team/date -> PLAN/CLEANUP/CLEANUP/team bullet/DATES, one `part: verbatim text` line each, one log line per part; a NONE or unknown-id part, a duplicate label and an empty parts list stop; a text over 12000 chars keeps its first 4000 and last 8000", async () => {
+  const { buildCatalog, makeChatAnswerer, capChat, PLAN_RULING, CLEANUP_RULING, DATES_RULING } = await import("./lib/classifier.ts");
+  const live = fs.readFileSync(path.join(AB, "fixtures", "operator", "live-chat-run9.txt"), "utf8");
+  assert(live.length > 5000 && live.indexOf("## A. Profile pass") < live.length - 2000, "fixture is the long live text; part A lies outside its last 2000 chars");
+  const f = clinicFiles();
+  const cat = buildCatalog(f, [PLAN_RULING, CLEANUP_RULING, DATES_RULING]);
+  const team = cat.find((e) => e.id === "setup:team-size")!;
+  assert(team && team.text.startsWith("one person"), "the team-size bullet slug is setup:team-size");
+  const good: FakeParts = [["A", "PLAN"], ["B", "CLEANUP"], ["C", "CLEANUP"], ["team", "setup:team-size"], ["date", "DATES"]];
+  let prompt = "";
+  const wrap = (rows: [string, FakeParts][]) => async (p: string) => ((prompt = p), fakeChatCall(rows)(p));
+  const r = await makeChatAnswerer(cat, wrap([["## A. Profile pass", good]]))(live);
+  assert("parts" in r && r.parts.map((x) => x.part).join(",") === "A,B,C,team,date", `five parts: ${JSON.stringify(r).slice(0, 200)}`);
+  assert(prompt.includes("## A. Profile pass") && prompt.includes("Next: reply with your choices") && prompt.includes("CLEANUP") && /every decision/i.test(prompt), "prompt carries the whole request, start and end, and the multi-part rule");
+  if ("parts" in r) {
+    const lines = [`A: ${PLAN_RULING.text}`, `B: ${CLEANUP_RULING.text}`, `C: ${CLEANUP_RULING.text}`, `team: ${team.text}`, `date: ${DATES_RULING.text}`];
+    assert(r.reply === lines.join("\n"), `reply is one line per part, verbatim entry text: ${r.reply}`);
+  }
+  const none = await makeChatAnswerer(cat, wrap([["## A.", [...good.slice(0, 2), ["C", "NONE"]]]]))(live);
+  assert("stop" in none && /"C"|C\b/.test(none.stop), `a NONE part stops: ${JSON.stringify(none)}`);
+  const unk = await makeChatAnswerer(cat, wrap([["## A.", [["A", "PLAN"], ["B", "repo:nope"]]]]))(live);
+  assert("stop" in unk && /not in the catalog/.test(unk.stop), `unknown id stops: ${JSON.stringify(unk)}`);
+  const dup = await makeChatAnswerer(cat, wrap([["## A.", [["A", "PLAN"], ["A", "CLEANUP"]]]]))(live);
+  assert("stop" in dup && /twice|duplicate/i.test(dup.stop), `a repeated label stops: ${JSON.stringify(dup)}`);
+  const empty = await makeChatAnswerer(cat, async () => '{"parts": []}')(live);
+  assert("stop" in empty, "no parts stops");
+  const old = await makeChatAnswerer(cat, async () => '{"id": "PLAN", "reason": "x"}')("Approve?");
+  assert("stop" in old, "a single-entry reply to a chat message is not accepted");
+  const one = await makeChatAnswerer(cat, wrap([["Approve the plan", [["plan", "PLAN"]]]]))("Approve the plan?");
+  assert("parts" in one && one.reply === PLAN_RULING.text, `a single-decision chat replies with the bare entry text: ${JSON.stringify(one)}`);
+
+  const big = "S".repeat(4000) + "M".repeat(9000) + "E".repeat(8000);
+  const capped = capChat(big);
+  assert(capped.startsWith("S".repeat(4000)) && capped.endsWith("E".repeat(8000)) && !capped.includes("MMMM") && capped.length < 12100, `over 12000 chars: first 4000 + last 8000: ${capped.length}`);
+  assert(capChat("x".repeat(12000)).length === 12000 && capChat("short") === "short", "12000 chars or fewer is unchanged");
+
+  // wired: the live text through the fake CLI -> one user message of five lines, five log lines
+  CHAT_MAP = [["## A. Profile pass", good]];
+  try {
+    const run = await fakeSession([INIT, { emit: { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: "Looking at your docs." }, { type: "text", text: live }] } } }, RESULT(), { awaitUser: 2 } as unknown as Step, say("Applied. Summary only."), RESULT()]);
+    const users = run.sent.filter((m) => m.type === "user");
+    assert(run.res.status === "done" && users.length === 2 && users[1].message.content.split("\n").length >= 5 && users[1].message.content.startsWith("A: Profile pass only") && users[1].message.content.includes(`\ndate: ${DATES_RULING.text}`), `the reply is one message: ${JSON.stringify(run.res)} ${JSON.stringify(users[1])}`);
+    assert(run.log.filter((l) => l.kind === "chat" && l.part).map((l) => l.part).join(",") === "A,B,C,team,date" && run.log[3].id === "setup:team-size" && run.log[3].answer === team.text, `one log line per part: ${JSON.stringify(run.log).slice(0, 300)}`);
+    const stop = await (async () => {
+      CHAT_MAP = [["## A. Profile pass", [["A", "PLAN"], ["B", "NONE"]]]];
+      return fakeSession([INIT, say(live), RESULT()]);
+    })();
+    assert(stop.res.status === "stopped" && stop.sent.filter((m) => m.type === "user").length === 1 && JSON.stringify(stop.res.popup.questions).includes("## A. Profile pass"), `a NONE part stops the session with the full text: ${JSON.stringify(stop.res).slice(0, 150)}`);
+  } finally {
+    CHAT_MAP = [["I need your approval first", [["plan", "PLAN"]]]];
+  }
 });
 
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.

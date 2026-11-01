@@ -7,7 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./lib/arm.ts";
 import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
-import { buildCatalog, makeAnswerer, modelCall, parseRulingArgs, type Ruling } from "./lib/classifier.ts";
+import { buildCatalog, makeAnswerer, makeChatAnswerer, modelCall, parseRulingArgs, type Ruling } from "./lib/classifier.ts";
 import { operatedCommand, readAnswers, reportAndExit, runOperatedSession } from "./lib/operated-session.ts";
 import { setupModel } from "./lib/setup.ts";
 
@@ -39,5 +39,5 @@ const iso = makeIsolation(path.resolve(flag("work") ?? path.join(cwd, "..")), ar
 console.log(`isolated config dir (transcript lands here): ${iso.cfg}`);
 const cmd = operatedCommand(["--plugin-dir", pluginDir, "--model", setupModel(), "--permission-mode", inv.permissionMode]);
 const env = isolationEnv(iso, arm);
-const res = await runOperatedSession({ cmd, cwd, env, prompt: command, answerer: makeAnswerer(buildCatalog(files!, rulings), modelCall(env)), allowTools, operatorLog: log });
+const res = await runOperatedSession({ cmd, cwd, env, prompt: command, answerer: makeAnswerer(buildCatalog(files!, rulings), modelCall(env)), chatAnswerer: makeChatAnswerer(buildCatalog(files!, rulings), modelCall(env)), allowTools, operatorLog: log });
 process.exit(reportAndExit(res, log));

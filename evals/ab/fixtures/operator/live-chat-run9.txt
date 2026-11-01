@@ -1,0 +1,46 @@
+Your docs are already in lean-flow's layout (scaffolded by `init` on 2026-10-30), so this run is a shape sync, not a re-layout. Nothing is written yet; the plan is below and needs your approval first.
+
+**What I checked:** all 23 docs against the 19 matching templates, the 2026-10-31 standard, the three question sets that match this repo (go-chi · postgres · vue-vite), and the code those docs make claims about.
+- **Staleness:** every header is 2 days old and every owner is a role. The docs match the code.
+- **Line caps:** none exceeded. `.claude/CLAUDE.md` is exactly at its 80-line cap.
+- **Secrets / PII:** none committed. There's no `.env`, no keys and no dumps. Test fixtures are synthetic (`+62 811 0000 00x`, "Dr B").
+- **Preserved files:** 2 (`docs/product/requirements.md`, `docs/product/acceptance-criteria.md`). There are no ADRs, `DECISIONS.md` or epics yet.
+
+## A. Profile pass (adds sections only, no existing text changes)
+
+| # | File | Action |
+|---|---|---|
+| A1 | `docs/architecture/overview.md` | Add `## Stack`. Each line cites the file it comes from (`go.mod`, `internal/http/router.go`, `internal/db/db.go`, `db/migrations/`, `web/package.json`, `web/vite.config.ts`). |
+| A2 | `docs/development/coding-standards.md` | Add `## Conventions in use`. The code scan settles 19 of the 22 questions: layering, error→status map, boundary validation, `r.Context()` with no deadlines, stdlib `log`, table-driven tests on a real DB, SQL migrations with our own runner, snake_case plural tables, hard deletes, `timestamptz`, transactions opened in `booking`, default `pgxpool`, `<script setup>`, local state only, fetch inside the gateway, no router, hand-written `ref` forms, component tests with the gateway mocked, inline fault display. **Still open, asked after approval:** Vue folder layout (`pages/` + `gateway/` matches neither pattern), styling (no `<style>` anywhere), runtime config (no `import.meta.env`). |
+| A3 | `docs/product/requirements.md` | **Already covered:** Business goal (§ Problem), Non-goals (§ Solution scope → Out of scope). **Add** `## Main flows`: Book and Cancel, citing R1/R2 and pointing to `docs/flows/book-and-cancel.md`. **Add** `## Invariants`: one line pointing to R3–R7 (cited, not copied). **Ask you:** Performance, Availability and Scalability have no targets yet. If you don't decide them, they're written as `Not decided yet (owner, migrate)` and the existing table stays as it is. |
+
+## B. Template drift (only applied if you pick it)
+
+- **B1 + B2 (recommended together):** stack and patterns now sit in 2–3 places. In `CONTEXT.md`, Stack, Architecture and Patterns become a short `## Where the rest lives` pointer section, and the glossary stays. Patterns move to A2's section. CONTEXT's two anti-patterns not already in `CLAUDE.md` move into `CLAUDE.md`. In `CLAUDE.md`, File Structure, Naming and Commands become pointers. That takes it back under its cap and also removes its outdated file tree (the tree leaves out `internal/clinic`, `model` and `db`).
+- **B3:** in `overview.md`, Key Integration Points becomes a pointer to `integrations.md`, and Directory Structure becomes `## Why this split`.
+- **B4:** in the README, the Database/Migrate/Test/Run sections repeat `setup.md` almost word for word. They'd become a Quick start pointer.
+- **B5 / B6:** `## CI gate` in `testing-guide.md`, and merging Install/Run/Test in `setup.md` into one section. I'd skip both: low value.
+
+## C. Cleanup
+
+- **`BUSINESS-NOTES.md`** (root) has no ownership header, nothing links to it except a comment in `requirements.md`, and nearly all of it is already in `requirements.md` and the glossary. The only fact found nowhere else is "daily cap can be changed per doctor in the DB". Options:
+  - **archive** to `docs/archive/` with content intact and that comment link updated (recommended)
+  - keep it and add a header
+  - leave it untouched
+
+## D. Not owed / left alone
+
+- Deployment and rollback guides: nothing is published (no Dockerfile or deploy target).
+- `authentication.md`: there's no auth, by design.
+- `docs/work/`, `DECISIONS.md` and `LEARNINGS.md` are only created when their first real entry exists.
+- **`CONTRIBUTING.md` / `CODE_OF_CONDUCT.md`:** the standard requires them only when the team is 2 or more people. How big is the team?
+
+## E. For you to act on (outside this migrate run)
+
+- **Likely bug:** `web/src/pages/BookAppointment.vue` turns the `datetime-local` input into a time using `new Date(...)`, which reads it in the browser's time zone. That breaks the rule that times use the clinic zone no matter where the browser runs. Staff using a browser outside UTC+7 would book a different time than they meant. I'd suggest filing it as a TD or a task.
+- `SECURITY.md` still has 2 unfilled `[CUSTOMIZE]` fields (secret manager, scan cadence).
+- I won't run the DoD checks (`go test` / `go vet`, npm `typecheck`, `lint`, `test`, `build`); you'll need to run them.
+
+**How changes get applied:** this isn't a git repo, so before writing anything I'll copy the preserved files to `%TEMP%\clinic-ab-migrate-backup-2026-11-01\` with a hash list, and compare against it after each change. Every file I touch gets `last_updated: 2026-11-01`, two days after its current date. Please confirm that date.
+
+Next: reply with your choices, e.g. "A yes · B1+B2 · C archive · team 1 · date ok". I'll then ask the open questions from A2/A3 and apply.

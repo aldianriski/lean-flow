@@ -104,6 +104,74 @@ export async function classify(q: PopupQuestion, catalog: Entry[], call: Call): 
 
 export const makeAnswerer = (catalog: Entry[], call: Call): Answerer => (q) => classify(q, catalog, call);
 
+// ---- chat messages: a turn that ends in prose may ask several decisions at once; the model labels each part and chooses its entry ----
+export type ChatPart = { part: string; id: string; reason: string; answer: string };
+export type ChatDecision = { parts: ChatPart[]; reply: string } | { stop: string };
+export type ChatAnswerer = (text: string) => Promise<ChatDecision>;
+
+/** The closing text sent to the classifier: up to 12000 chars whole; longer keeps its first 4000 and last 8000. */
+export function capChat(text: string): string {
+  return text.length <= 12000 ? text : text.slice(0, 4000) + "\n[...]\n" + text.slice(-8000);
+}
+
+export function buildChatPrompt(text: string, catalog: Entry[]): string {
+  const cat = catalog.map((e) => `- id: ${e.id}\n  label: ${e.label}${e.text ? `\n  text: ${e.text.slice(0, 300).replace(/\n/g, " / ")}` : ""}`).join("\n");
+  return `A documentation tool ended its turn with a chat message that asks the user for decisions. Route EVERY decision it asks for to the ONE frozen answer entry that answers it. You never write an answer; you only label each decision with the request's own wording and choose an id.
+
+CHAT MESSAGE
+${text}
+
+CATALOG
+${cat}
+
+RULES
+- Cover every decision the message asks for (for example the parts a closing line like "reply with your choices, e.g. A yes, B1+B2, C archive, team 1, date ok" names). Give each one its own part, labelled exactly as the request labels it (A, B, C, team, date). A message with a single decision has a single part.
+- For each part choose the ONE entry whose text answers that decision.
+- A question asking for the content of a profile topic picks that topic's entry even if it names the file the content goes into.
+- PLAN only for a decision on which parts of a migrate plan to apply; CLEANUP for a decision on changing, slimming, consolidating, archiving, moving or renaming something that ALREADY EXISTS; DATES for updating last_updated dates, when it is in the catalog.
+- If a requested decision has no entry, or you are unsure, give it a part with id NONE. Do not leave any requested decision out.
+
+Reply with exactly one line of JSON and nothing else: {"parts": [{"part": "<the request's label>", "id": "<an id from the catalog>", "reason": "<one short sentence>"}]}`;
+}
+
+export async function classifyChat(text: string, catalog: Entry[], call: Call): Promise<ChatDecision> {
+  const shown = capChat(text.trim());
+  const named = `chat message "${shown.slice(0, 80).replace(/\s+/g, " ")}..."`;
+  let raw: string;
+  try {
+    raw = await call(buildChatPrompt(shown, catalog));
+  } catch (e) {
+    return { stop: `classifier call failed for ${named}: ${(e as Error).message}` };
+  }
+  let o: { parts?: unknown } | undefined;
+  const t = raw.trim().replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
+  try {
+    o = JSON.parse(t);
+  } catch {
+    const m = /\{[\s\S]*\}/.exec(t);
+    try {
+      o = m ? JSON.parse(m[0]) : undefined;
+    } catch {
+      o = undefined;
+    }
+  }
+  const raws = o?.parts;
+  if (!Array.isArray(raws) || raws.length === 0) return { stop: `classifier output for ${named} is not {"parts": [...]} with at least one part: ${raw.slice(0, 200)}` };
+  const parts: ChatPart[] = [];
+  for (const p of raws as { part?: unknown; id?: unknown; reason?: unknown }[]) {
+    if (typeof p?.part !== "string" || !p.part.trim() || typeof p.id !== "string") return { stop: `classifier part without a label and id for ${named}: ${JSON.stringify(p).slice(0, 120)}` };
+    const part = p.part.trim();
+    if (parts.some((x) => x.part === part)) return { stop: `classifier gave part "${part}" twice for ${named}` };
+    const entry = catalog.find((e) => e.id === p.id);
+    if (!entry) return { stop: `classifier chose "${p.id}", which is not in the catalog, for part "${part}" of ${named}` };
+    if (entry.kind === "none") return { stop: `classifier found no entry for part "${part}" of ${named}: ${typeof p.reason === "string" ? p.reason : ""}` };
+    parts.push({ part, id: entry.id, reason: typeof p.reason === "string" ? p.reason : "", answer: entry.text });
+  }
+  return { parts, reply: parts.length === 1 ? parts[0]!.answer : parts.map((p) => `${p.part}: ${p.answer}`).join("\n") };
+}
+
+export const makeChatAnswerer = (catalog: Entry[], call: Call): ChatAnswerer => (text) => classifyChat(text, catalog, call);
+
 /** `--ruling ID=text` values -> rulings; refuses a malformed or reserved id. */
 export function parseRulingArgs(args: string[]): Ruling[] {
   return args.map((a) => {

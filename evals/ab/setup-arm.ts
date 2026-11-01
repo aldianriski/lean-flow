@@ -14,7 +14,7 @@ import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
 import { setupCommand } from "./lib/setup.ts";
 import { verifyPin } from "./lib/pin.ts";
 import { diffManifest } from "./lib/snapshot.ts";
-import { buildCatalog, CLEANUP_RULING, DATES_RULING, makeAnswerer, modelCall, PLAN_RULING } from "./lib/classifier.ts";
+import { buildCatalog, CLEANUP_RULING, DATES_RULING, makeAnswerer, makeChatAnswerer, modelCall, PLAN_RULING } from "./lib/classifier.ts";
 import { operatedCommand, readAnswers, reportAndExit, runOperatedSession } from "./lib/operated-session.ts";
 
 const flag = (n: string) => (process.argv.includes(`--${n}`) ? process.argv[process.argv.indexOf(`--${n}`) + 1] : undefined);
@@ -82,7 +82,7 @@ if (auto) {
   const env = isolationEnv(iso, arm);
   const log = path.join(WORK, `operator-${id}.jsonl`);
   // the claude command minus its leading binary, behind the stream-json flags (operatedCommand puts the binary, or a test's fake CLI, first)
-  const res = await runOperatedSession({ cmd: operatedCommand(claude.slice(1)), cwd: arm.snapshot!, env, prompt: `/lean-doc-generator ${kind}`, answerer: makeAnswerer(catalog, modelCall(env)), allowTools: [...arm.allowedTools, "Read", "Glob", "Grep"], operatorLog: log });
+  const res = await runOperatedSession({ cmd: operatedCommand(claude.slice(1)), cwd: arm.snapshot!, env, prompt: `/lean-doc-generator ${kind}`, answerer: makeAnswerer(catalog, modelCall(env)), chatAnswerer: makeChatAnswerer(catalog, modelCall(env)), allowTools: [...arm.allowedTools, "Read", "Glob", "Grep"], operatorLog: log });
   process.exit(reportAndExit(res, log));
 }
 const p = Bun.spawn(claude, { cwd: arm.snapshot, env: isolationEnv(iso, arm), stdin: "inherit", stdout: "inherit", stderr: "inherit" });
