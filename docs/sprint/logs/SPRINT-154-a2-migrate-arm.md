@@ -41,3 +41,14 @@ What changed: owner ruling 2026-11-01 (D1). The A1 snapshots carry 2.x docs, so 
 `migrate`; `init` would scaffold beside existing docs. Impact: box 1's verb and its subject change ("a real `migrate` on the
 frozen A1 snapshots"); boxes 2 and 3, the trial count and the ruling are unchanged. G2 is re-confirmed with the design, which has
 not been signed yet.
+
+### 2026-11-01 | progress | G1 and G2 signed for T1 after a Codex builder check; three owner rulings for Amendment 6
+G1: goal, size M, risk high, blast radius (`evals/ab/`, the new A2 log, and outside the repo `D:/Research/ab-pins/` and the A2
+snapshot copies), out of scope (S0's log and freeze, the A0/A1 arms, tasks, judges and rules, S3). G2: the runbook's nine steps
+(pin, snapshot copies, arm files, a generalised `setup-arm.ts`, the owner's migrate sessions, freeze, Amendment 6, run, analysis).
+builder-check · T1 · 3 contradictions · 2 questions · settled: A2 passes the run-validity rule on its own 32 slots before any combined analysis (a loss share must not be diluted by S0's 96); deltaVsA1 already carries the pooled bootstrap interval section 4 needs; intent ruled by owner (below)
+Owner rulings by popup: (1) the S1 pin loaded by `--plugin-dir` in an isolated config with no user plugins counts as "the
+installed plugin at the pinned S1 revision", as at A1; (2) setup popups the frozen answers files do not cover: migrate's plan is
+approved for the profile items only and anything else declined; any other unanswered popup stops the session for an owner ruling,
+logged in the A2 log as a setup deviation; (3) the pilot is one slot per arm-repo pair, derived from the schedule (S0 stays 4, A2
+becomes 2), a driver change with a selftest fixture. All three are stated in Amendment 6. G2 signed.
