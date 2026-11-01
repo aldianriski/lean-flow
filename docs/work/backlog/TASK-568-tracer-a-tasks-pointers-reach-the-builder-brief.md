@@ -41,3 +41,6 @@ the task-decomposer skill and its task-file reference · the TASK template · th
 
 ## Tracker
 EPIC-023 Closed-when S2 · research §6 row S2 (pointer contract) · owner rulings 2026-11-01 (resolver, contract placement)
+
+## Amended 2026-11-01
+Not admitted (owner, /triage): S0 recorded symptom 3, lost detail, as not reproduced under R-b (`docs/research/logs/ab-measurements.md` § Report 2026-11-01), so S2 admits nothing. Revisit only per `.out-of-scope/pointer-carry-through.md`.

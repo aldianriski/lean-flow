@@ -37,3 +37,6 @@ Frozen surface: admitted on S0's measured defect for symptom 3, log reference fi
 
 ## Tracker
 EPIC-023 Closed-when S2 · research §6 row S2 · research §7 (arms)
+
+## Amended 2026-11-01
+Not admitted (owner, /triage): S0 recorded symptom 3, lost detail, as not reproduced under R-b (`docs/research/logs/ab-measurements.md` § Report 2026-11-01), so S2 admits nothing. Revisit only per `.out-of-scope/pointer-carry-through.md`.
