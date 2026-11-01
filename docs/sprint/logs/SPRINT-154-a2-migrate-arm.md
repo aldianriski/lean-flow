@@ -102,3 +102,11 @@ lines ... one-line pointers instead" mentions "stack", so the topic table return
 migrate, a non-plan question that names an existing file or speaks of repeating, duplicating, "already in" or pointers is a cleanup
 question, answered "leave untouched", unless the popup's header names a profile topic (the business and conventions rounds keep the
 table). The live CLAUDE.md and overview.md questions are fixtures, with a Stack-headed control; seeding the previous rule fails S63.
+
+### 2026-11-01 | progress | T1: run 6 gave three more wrong answers (no write); owner ruling: a model classifier replaces the keyword table
+Run 6 answered three quality-attribute questions ("what is the Performance target for docs/product/requirements.md?") with "Leave
+untouched", because the file rule matched the named file; it stopped at a Vue folder-layout question; the snapshot is still the
+pre-migrate copy. Owner ruling by popup: a model only CLASSIFIES each popup (an answers-file section, a Setup bullet, PLAN, CLEANUP
+or NONE); the text sent is the entry's own words or the fixed ruling text, never model-written; an unknown id, unparsable output or
+NONE stops. Built test-first by a Sonnet builder (`8a81c8db`, S61-S64, selftest 69/69 re-run by the coordinator). One paid smoke
+run of `claude-sonnet-5-5` classified the four live questions as the owner expected (CLEANUP, quality attributes, PLAN, CLEANUP).
