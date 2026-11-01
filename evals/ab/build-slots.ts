@@ -58,13 +58,14 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
   const smoke = rows.filter((r) => parseTag(r.tag).kind === "smoke").length;
   if (measured.length === 0) throw new BuildRefused(`no measured rows: ${smoke} smoke row(s) are not measurements`);
   if (smoke > 0) notes.push(`${smoke} smoke row(s) skipped`);
-  if (freezeTs !== undefined) {
-    const early = measured.filter((r) => Date.parse(r.ts) < Date.parse(freezeTs));
-    if (early.length > 0) throw new BuildRefused(`${early.length} measured row(s) predate the freeze ${freezeTs}, first at ${early[0]!.ts}`);
-  }
 
   // an attempt a usage limit cut short is voided by an appended void row: it leaves the retry budget, the consecutive-infra counter and the infra share
   const { voided, orphans } = voidIndex(rows);
+  // a voided attempt counts nowhere, so only an unvoided one can predate the freeze (the voided pre-freeze pilot rows of Amendments 2 to 4)
+  if (freezeTs !== undefined) {
+    const early = measured.filter((r) => !voided.has(r) && Date.parse(r.ts) < Date.parse(freezeTs));
+    if (early.length > 0) throw new BuildRefused(`${early.length} measured row(s) predate the freeze ${freezeTs}, first at ${early[0]!.ts}`);
+  }
   for (const v of orphans) findings.push(`void row at ${v.ts} (${v.arm} ${v.task} #${v.trial} attempt ${v.attempt}) names ${JSON.stringify((parseTag(v.tag) as { ts: string }).ts)}, which is no measured row of that attempt`);
   const kept = measured.filter((r) => !voided.has(r));
   const voidedUsd = [...voided].reduce((n, r) => n + (r.measure?.exec.costUsd ?? r.costUsd ?? 0), 0);

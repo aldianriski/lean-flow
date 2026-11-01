@@ -1547,6 +1547,14 @@ check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / r
   assert(/neither "measured round <r>" nor smoke/.test(await refusal([...rows, { ...rows[1]!, tag: "measured rnd 0" }])), "a tag that is neither measured nor smoke is refused");
   assert(/predate the freeze/.test(await refusal(rows, "2026-11-02T00:00:00Z")), "measured rows older than the freeze are refused");
   assert((await run(rows, "2026-11-01T00:00:00Z")).findings.length === 0, "control: rows at or after the freeze are accepted");
+  // a pre-freeze attempt that its void row covers counts nowhere, so it passes the freeze check; the same attempt unvoided is refused
+  const rest = rows.filter((_, i) => i !== 13 && i !== 14);
+  const lead = (head: Spec[]): Spec[] => [...head, ...rest.map((s) => (s.voids === undefined ? s : { ...s, voids: s.voids + head.length }))];
+  const atFreeze = new Date(T0 + 1500).toISOString();
+  const earlyVoided = await run(lead([rows[13]!, { ...rows[14]!, voids: 0 }]), atFreeze);
+  assertEq(earlyVoided.findings, []);
+  assertEq(JSON.parse(JSON.stringify(earlyVoided.slots)), JSON.parse(fs.readFileSync(path.join(FX_SLOTS, "expected.json"), "utf8")));
+  assert(/^1 measured row\(s\) predate the freeze/.test(await refusal(lead([rows[13]!]), atFreeze)), "a pre-freeze attempt without its void row is refused");
   const finding = async (extra: Spec[]) => (await run([...rows, ...extra])).findings.join(" | ");
   assert(/already scored in an earlier round/.test(await finding([{ ...rows[1]!, tag: "measured round 1" }])), "a replacement round that re-runs a scored slot is a finding");
   assert(/duplicate attempt numbers/.test(await finding([{ ...rows[1]! }])), "two unmarked attempts with one number are a finding");
