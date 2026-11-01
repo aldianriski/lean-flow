@@ -83,3 +83,13 @@ and `operated-session.ts` are the entry points, both in an isolated config. Self
 CLEAR (1 High: competing matches answered instead of stopping; 3 Med: repeated question texts, unpatterned Skill allow, a hang on
 a stalled CLI; 1 Low: an allow-list probe). All fixed in one builder retry. The coordinator seeded each pre-fix file back in:
 old `operator.ts` fails S60 only; old `operated-session.ts` fails S61 and S63; both restored by hash.
+
+### 2026-11-01 | progress | T1: three live clinic-a2 runs stopped safely before writing; setup deviation 1 ruled; operator rules widened
+Run 1 stopped at migrate's plan popup: its text quotes Stack and Main flows, so the plan rule and three topics all matched. Fixed by
+an exclusive plan rule (`8fa6e1a4`). Run 2 stopped at a reworded plan popup ("which part of the plan should I apply?"); the rule now
+matches the plan in either wording (`5b5e1b38`). Run 3 answered the plan with "profile pass only" and stopped at a new popup
+asking what should happen to `BUSINESS-NOTES.md` (options: add a header, archive, leave untouched). Every arm's trial copy carries
+that file, so changing it in A2 alone would confound the measurement. **Setup deviation 1 (owner ruling):** leave it untouched.
+Owner standing rule: for A2's setup, a question about changing, archiving, moving, renaming or slimming an existing file is
+answered "leave untouched", an exclusive operator rule that defers to the plan rule on plan questions. Each fix carries a fixture, and
+seeding the previous version fails S60 or S63 alone. No run wrote anything: the snapshot is still the pre-migrate copy after each.

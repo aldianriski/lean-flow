@@ -2648,6 +2648,13 @@ check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan
   const liveQ = "lean-doc-generator migrate on clinic-ab: which part of the plan should I apply? The profile pass only adds new `## Stack`, `## Conventions in use` and `## Main flows` sections";
   const mig2 = await run("migrate", [INIT, auq("p2", { question: liveQ, header: "Scope" }), { await: "p2" }, RESULT()]);
   assert(mig2.code === 0 && respOf(jsonl(mig2.record), "p2").updatedInput.answers[liveQ].startsWith("Profile pass only"), `the live plan wording is answered by the exclusive plan rule: ${mig2.code} ${mig2.out}`);
+  // standing rule (owner, after the live BUSINESS-NOTES.md stop): an existing file is left untouched; a plan question that
+  // mentions archiving still takes the plan rule, not a double exclusive stop
+  const notesQ = "BUSINESS-NOTES.md (root, no ownership header, not linked from README; mostly a duplicate): what should happen to it?";
+  const planArchQ = "Migrate plan: (1) add ## Stack (2) add ## Main flows; (a) archive BUSINESS-NOTES.md. Which parts should I apply?";
+  const mig3 = await run("migrate", [INIT, auq("n1", { question: notesQ, header: "Notes file" }), { await: "n1" }, auq("n2", { question: planArchQ, header: "Migrate plan" }), { await: "n2" }, RESULT()]);
+  const s3 = jsonl(mig3.record);
+  assert(mig3.code === 0 && respOf(s3, "n1").updatedInput.answers[notesQ].startsWith("Leave untouched") && respOf(s3, "n2").updatedInput.answers[planArchQ].startsWith("Profile pass only"), `existing file left untouched; a plan question mentioning archiving keeps the plan answer: ${mig3.code} ${mig3.out}`);
   const ini = await run("init", [INIT, plan, { await: "p" }, RESULT()]);
   assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no plan rule -> stops: ${ini.code} ${ini.out}`);
   const drift = await run("migrate", [INIT, RESULT()], (fx) => fs.appendFileSync(path.join(fx.snap, "README.md"), "drift\n"));

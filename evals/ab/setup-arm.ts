@@ -74,7 +74,10 @@ if (auto) {
   // apply?"), so the rule matches the plan in either order and is exclusive (live stops on clinic-a2, 2026-11-01)
   const PLAN_RULE = { match: /(approv|appl[iy]|proceed)[\s\S]*\bplan\b|\bplan\b[\s\S]*(approv|appl[iy]|proceed)/i, exclusive: true, source: "owner ruling, SPRINT-154", answer: "Profile pass only: apply only the items that add ## Stack, ## Conventions in use and the five business topics (business goal, main flows, invariants, quality attributes, non-goals). Decline every other item, including archiving, moving, renaming or slimming any existing file." };
   let files!: ReturnType<typeof readAnswers>;
-  let rules = kind === "migrate" ? [PLAN_RULE] : [];
+  // owner ruling, SPRINT-154 (standing, after the BUSINESS-NOTES.md stop on clinic-a2): a question about changing, archiving, moving,
+  // renaming or slimming an existing file is answered "leave it untouched"; a plan question is left to PLAN_RULE
+  const FILE_RULE = { match: /^(?![\s\S]*\bplan\b)[\s\S]*(\barchiv|\bmov(e|ing)\b|\brenam|\bslim|\bheader\b|what should happen to)/i, exclusive: true, source: "owner ruling, SPRINT-154 (existing files untouched)", answer: "Leave untouched: do not edit, archive, move, rename or slim this existing file." };
+  let rules = kind === "migrate" ? [PLAN_RULE, FILE_RULE] : [];
   try {
     files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);
     if (flag("rule-file")) rules = [...parseRules(fs.readFileSync(path.resolve(flag("rule-file")!), "utf8")), ...rules];
