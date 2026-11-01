@@ -90,3 +90,9 @@ hashes (`b27727ae`). Pilot figures (D2): build 44.8k Codex tokens (no separate b
 Claude review CLEAN, 0 findings, 1 round. Box 3 waits for the owner's clinic-ab init (owner ruling above).
 consequence · T2 · behaviour:material · governance:low
 review · T2 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-11-01 | scope-change | T5: Cites gains `.claude/CONTEXT.md` and `.claude/CLAUDE.md`, the files the pointer-only requirements cite
+What changed: the full-profile ruling has `docs/product/requirements.md` and `docs/product/acceptance-criteria.md` cite these two files topic by
+topic. T5 reads them and never edits them, so they belong on `Cites:`, not `Layers:`. Found by the VPS gate's scope-change-layers
+check at `0f78cb13`. TASK-561's Done-when text is unchanged. Same gate: TASK-564's tick evidence named a contract-file path the
+task never touches, now reworded.

@@ -90,7 +90,7 @@ Layers: `docs/architecture/overview.md` · `docs/product/` · `docs/development/
   · `docs/work/in_progress/TASK-561-rule-whether-lean-flow-itself-carries-the-repo-profile.md`
   · `docs/work/done/TASK-561-rule-whether-lean-flow-itself-carries-the-repo-profile.md`
 Depends-on: none
-Cites: TASK-561 · `skills/lean-doc-generator/references/migration-map.md`
+Cites: TASK-561 · `skills/lean-doc-generator/references/migration-map.md` · `.claude/CONTEXT.md` · `.claude/CLAUDE.md`
 Claude-run: `migrate` is an installed Claude Code skill, which Codex cannot run. The owner already ruled dogfood (2026-11-01),
 so `/prime` on lean-flow stops naming migrate once the profile exists.
 
