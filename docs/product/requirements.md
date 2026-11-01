@@ -19,13 +19,10 @@ status: current
 - A tool that improves the coding process and evolves with the standard as it is used on real projects such as workdoo, with a plan to handle agent work through agents with a specific speciality each (owner, migrate)
 
 ## Users [CUSTOMIZE]
-- **[Primary user role]** — [what they need from this]
-- **[Secondary user role]** — [what they need from this]
+Not decided yet (owner, migrate)
 
 ## Solution scope [CUSTOMIZE]
-
-**In scope:**
-- [what this solution covers]
+Not decided yet (owner, migrate)
 
 ## Non-goals
 - No app-code generation, CI/CD pipeline, automated coverage tooling or telemetry (from README.md § What lean-flow does NOT do)
@@ -45,15 +42,13 @@ status: current
 ## First milestone [CUSTOMIZE]
 <!-- Init-only: migrate's profile pass does not ask it. -->
 
-- **Proof goal:** [the uncertainty this first slice removes]
-- **Stopping condition:** [what "done" means for this milestone; further ideas go to the backlog, not into it]
-- **Integration boundary:** [none | simulated | live] · **allowed side effects:** [named, or `none`; a simulated action is labelled as simulated]
+Not decided yet (owner, migrate)
 
 ## Functional requirements [CUSTOMIZE]
 <!-- No R-numbers yet: the skill roster in .claude/CONTEXT.md § Skill roster is the behaviour spec.
      Numbers are assigned when a sanitized feature PRD lands; never renumber, only append or deprecate. -->
 
-- **R1**: [the system does X, observable and testable]
+None numbered yet; the skill roster is the behaviour spec (from .claude/CONTEXT.md § Skill roster)
 
 ## Quality attributes [CUSTOMIZE]
 
@@ -65,4 +60,4 @@ status: current
 | Scalability | Not decided yet | (owner, migrate) |
 
 ## Open questions [CUSTOMIZE]
-- [a requirement question not yet resolved — routes to `/prototype` or the intake grill, never left as a silent assumption]
+None open (owner, migrate)

@@ -114,3 +114,13 @@ Two empty files committed by accident at SPRINT-077 are removed (`b1f7e991`, the
 `docs/spec.md`; it is discarded by owner ruling and `init` is re-run with the checkout for T1 box 2 and T2 box 3.
 consequence · T5 · behaviour:low · governance:high
 review · T5 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-11-01 | progress | correction: T5's review line above was written before any review ran; the scoped review has now run
+The `review · T5 · scoped-reviewer` line in the T5-done entry was recorded before a reviewer looked at `d1d68b9c`; that was a
+coordinator error. The review has now run (Sonnet, scoped to the commit, 80.5k tokens). Cite-not-copy holds, every cited heading
+exists, about ten Stack and convention citations check out, the testing-guide exemption is reasoned with a revisit condition, and
+the overview's table matches `.conformance-exempt`. Two Lows, both fixed by the coordinator: an overclaim in
+`docs/development/coding-standards.md` (only a new Tier G gate must keep a retained must-FAIL fixture), and bare template
+placeholders in `docs/product/requirements.md` (Users, Solution scope, First milestone and Open questions now read `Not decided yet`
+or `None open (owner, migrate)`; Functional requirements cites the skill roster as the behaviour spec).
+review · T5 · scoped-reviewer · behaviour:low · governance:high

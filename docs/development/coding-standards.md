@@ -20,7 +20,7 @@ status: current
 **Checks and gates**
 - A check prints one PASS / FAIL / note line per finding and exits 1 when any FAIL printed — seen in `scripts/lib/check-doc-caps.ts`
 - A check derives its figures from `spec/STANDARD.md` at run time and never hardcodes them, so the two cannot drift — seen in `scripts/lib/check-doc-caps.ts`
-- Every gate keeps a must-FAIL fixture under `evals/fixtures/`, run by its own fixture harness — seen in `evals/run-conformance-engine-fixtures.sh`
+- Every new Tier G gate keeps a retained must-FAIL fixture under `evals/fixtures/`, run by its own fixture harness — seen in `evals/run-conformance-engine-fixtures.sh`
 
 **Tests**
 - `bun:test` with `*.test.ts` files; a CONTROL case reports which rungs it examined, so a vacuous pass shows — seen in `test/gate-discovery/discovery-order.test.ts`
