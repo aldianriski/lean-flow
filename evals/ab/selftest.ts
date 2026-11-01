@@ -1595,7 +1595,7 @@ check("S41 build-slots: fixture rows (ok / every non-ok exit / infra retried / r
   assert(cli.exitCode === 0 && /build-slots: 13 slots of 15 scheduled \(2 infra-lost on the first pass\)/.test(cli.stderr.toString()), `build-slots CLI: ${cli.stderr.toString()}`);
   const an = Bun.spawnSync(["bun", path.join(AB, "analyze.ts"), "--data", path.join(dir, "slots.json"), "--schedule", sched], { stdout: "pipe", stderr: "pipe" });
   assert(/analysis: (VALID|INVALID|FAILED)/.test(an.stdout.toString()) && !/audit finding/.test(an.stdout.toString()), `analyze.ts reads the built slots: ${an.stdout.toString().slice(-300)}`);
-  assert(/Usage-limit attempts voided[^\n]*1\.0000 USD/.test(an.stdout.toString()), `the voided attempts' spend is its own reported line: ${an.stdout.toString().slice(-400)}`);
+  assert(/Attempts voided, usage-limit or owner-ruled harness defect[^\n]*1\.0000 USD/.test(an.stdout.toString()), `the voided attempts' spend is its own reported line: ${an.stdout.toString().slice(-400)}`);
   const smokeOnly = await logOf(rows.slice(0, 1));
   const refused = Bun.spawnSync(["bun", path.join(AB, "build-slots.ts"), "--log", smokeOnly, "--schedule", sched], { stdout: "pipe", stderr: "pipe" });
   assert(refused.exitCode === 2 && /REFUSED: no measured rows/.test(refused.stderr.toString()), "the CLI refuses a smoke-only log");

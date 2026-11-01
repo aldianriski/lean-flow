@@ -42,7 +42,7 @@ export function resultOf(r: LogRow): Result {
   };
 }
 
-/** `voidedUsd`: notional spend of the voided (usage-limit) attempts, reported as its own line of the total spend and in no D5 or scored figure. */
+/** `voidedUsd`: notional spend of the voided (usage-limit or owner-ruled harness defect) attempts, reported as its own line of the total spend and in no D5 or scored figure. */
 export type Built = { slots: Slot[]; findings: string[]; notes: string[]; voidedUsd: number };
 
 /**

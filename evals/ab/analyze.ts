@@ -23,7 +23,7 @@ const findings = auditAnalysis(slots, scheduled, report);
 const voidedLine = voidedUsd > 0 ? `
 ## Voided attempts
 
-Usage-limit attempts voided (notional, outside every figure above): ${voidedUsd.toFixed(4)} USD; total spend including them: ${((report.spend?.totalUsd ?? 0) + voidedUsd).toFixed(4)} USD.
+Attempts voided, usage-limit or owner-ruled harness defect (notional, outside every figure above): ${voidedUsd.toFixed(4)} USD; total spend including them: ${((report.spend?.totalUsd ?? 0) + voidedUsd).toFixed(4)} USD.
 ` : "";
 const text = renderReport(report) + voidedLine + (findings.length > 0 ? `\n## Audit findings\n\n${findings.map((f) => `- ${f}`).join("\n")}\n` : "");
 if (flag("out")) fs.writeFileSync(path.resolve(flag("out")!), text);
