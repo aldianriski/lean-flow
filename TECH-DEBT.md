@@ -391,7 +391,7 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-284** severity: med | status: open | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
+- **TD-284** severity: medium | status: open | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
   - Summary: **A finished A/B trial keeps no record of its post-run file list, so a changed manifest rule cannot be re-applied to it.**
     `lib/isolate.ts` deletes the trial copy once the row is appended and keeps only the `stream*.jsonl` transcripts. When Amendment 5
     narrowed the PowerShell exclusion after 13 rows had run, nothing retained could show whether those rows held another file in
@@ -400,7 +400,7 @@ status: current
   - Impact: med for later arms (A2 onward). Each rule change after a run can only be argued, not checked.
   - Mitigation (hypothesis, re-derive first): write the trial's full post-run manifest (path to blob id) under `kept/<iso>/`
     before the copy is deleted, and let `build-slots` re-derive the changed set from it.
-- **TD-283** severity: med | status: open | created: Sprint-152 (close retro, S0 report)
+- **TD-283** severity: medium | status: open | created: Sprint-152 (close retro, S0 report)
   - Summary: **`analyze.ts` prints R-b's verdicts but no section 4 verdict (holds, inconclusive or regressed) and no per-symptom
     regression line.** The pre-registration leaves the +0.10 and -0.05 thresholds to the reader, so the report shows the rates and
     leaves the comparison undone. In S0 the three regressions against A0 surfaced only when the coordinator applied section 4 by hand (L-274).
