@@ -521,9 +521,12 @@ _tier_rows_at() {
 # rows that are "skipped, not owed" without code. §6's tier table is the statement OF the tier doc
 # sets -- §2's Tier column only assigns rows to them -- so where the two differ about what a tier owes,
 # §6 is the one being asked. Reading §2's Create prose for condition words instead was tried and
-# rejected: it makes `product/requirements.md` conditional (its cell says "or first sanitized PRD
+# rejected: the 0.18.1 wording made `product/requirements.md` conditional ("or first sanitized PRD
 # lands ... skipped on an existing repo whose AI-context files already ARE the spec") when §6 lists it
 # in the Base minimum unconditionally, which would empty the one tier set that has teeth.
+# The current (0.18.2) cell reads "init, or first sanitized PRD lands, or `migrate` adds the profile — on
+# an existing repo whose AI-context files already ARE the spec ... it cites them topic by topic and
+# never copies them"; it no longer carries a skip condition.
 #
 # `{a,b}` in a stem is expanded -- §6 writes `deployment/{deployment,rollback}-guide` for two files.
 _TIER_STEMS_CACHE=""
