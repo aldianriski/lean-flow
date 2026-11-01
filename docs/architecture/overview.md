@@ -10,6 +10,11 @@ status: current
 > **Style:** a Claude Code **plugin** — a skill library + one conductor. Not a layered application;
 > the "architecture" is how the skills *compose* into a loop. Curated, not copied (ADR-001).
 
+## Stack
+- A Claude Code plugin: `skills/*/SKILL.md` auto-discovered at root, one manifest per host (`.claude-plugin/` · `.codex-plugin/` · `.kimi-plugin/`) — seen in `.claude-plugin/plugin.json`
+- Maintainer tooling is TypeScript on Bun with no build step; the conformance engine stays shell (ADR-051) — seen in `bunfig.toml`, `scripts/lib/conformance-engine.sh`
+- Checks read their figures from the versioned standard at run time — seen in `spec/STANDARD.md`, `scripts/lib/check-doc-caps.ts`
+
 ## Composition rule
 
 - **Stage-skills are standalone** — each completes its own job when invoked cold. Cross-references between them are routing/handoff *suggestions* (`→ /X`), never requirements (ADR-005).
@@ -127,21 +132,14 @@ Ruled at SPRINT-054 T1. Each row below is an **exemption with a reason**, not an
 of writing them down is that a future reader (or `init` run) can tell the two apart. Substrate-gated
 rows are excluded: they are skipped, not owed (STANDARD §6), and are not listed here.
 
-> **The two `docs/product/` rulings live in [`.conformance-exempt`](../../.conformance-exempt), which
-> is where the engine reads them** (§6's reasoned exemption · [ADR-031](../adr/ADR-031-reasoned-doc-exemptions-are-declared.md)).
-> Until SPRINT-081 T2 they lived *only* in this table, and a conformance run cannot read a prose table
-> in an architecture doc — so the ruling behaved exactly as if it had never been taken, and capped this
-> repository at `level: none` for a decision it had already made (TD-077 · L-151). The rows below are
-> kept as the **narrative** of why; the declaration file is the SSOT the tool parses, and a change of
-> mind belongs there first. The two `§2`-gated rows are different in kind — they need no declaration,
-> because the *standard's own* condition never fires for a single-maintainer repo.
+> **Declared rulings live in [`.conformance-exempt`](../../.conformance-exempt)**, the file the engine reads
+> ([ADR-031](../adr/ADR-031-reasoned-doc-exemptions-are-declared.md) · TD-077); this table is the narrative of why.
 
 | Absent | Why | Revisit when |
 |---|---|---|
 | `CONTRIBUTING.md` | §2 gates it on *team ≥ 2, or on request*. Single maintainer, no request received — the standard's own condition never fired, so this is not a deviation. | a second maintainer joins, or an external contributor asks |
 | `CODE_OF_CONDUCT.md` | Same gate as CONTRIBUTING (§2, added SPRINT-055 T7), and the same unmet condition: one maintainer, no request. The template ships so `init` can scaffold it for a consumer who *has* met the condition — lean-flow shipping the template is not lean-flow owing the file. Its enforcement contact is load-bearing, and a solo repo has no one to route a report to. | a second maintainer joins, an external contributor asks, or the project accepts public contributions |
-| `docs/product/requirements.md` | What it would hold already exists and is owned elsewhere: `.claude/CONTEXT.md` carries the roster · loop · gates · modes (what the product **is**), `.claude/CLAUDE.md` the design principles + DoD (what it must **satisfy**). A third copy would be a second SSOT, which LAW 4 and the anti-SSOT rule both forbid. The alternate trigger — a sanitized feature PRD landing — has never fired. | a feature PRD is sanitized into a durable requirement, or the AI-context files stop being the spec |
-| `docs/product/acceptance-criteria.md` | §2 trigger is *with requirements*. Dependent row; its condition is unmet while the row above is exempt. | with `requirements.md` |
+| `docs/testing/testing-guide.md` | Declared (migrate, 2026-11-01). Code exists, so §2 owes it, but [`docs/QA.md`](../QA.md) already owns the gate, the judgment pass and when to run each; a second guide would split that. (`docs/product/` was exempt until the same run, which wrote it cite-only.) | QA.md stops covering test strategy |
 
 ## Decision records
 
