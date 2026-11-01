@@ -93,3 +93,12 @@ that file, so changing it in A2 alone would confound the measurement. **Setup de
 Owner standing rule: for A2's setup, a question about changing, archiving, moving, renaming or slimming an existing file is
 answered "leave untouched", an exclusive operator rule that defers to the plan rule on plan questions. Each fix carries a fixture, and
 seeding the previous version fails S60 or S63 alone. No run wrote anything: the snapshot is still the pre-migrate copy after each.
+
+### 2026-11-01 | progress | T1: clinic-a2 runs 4-5 -- one wrong operator answer caught, no file written; the file rule rebuilt on a principle
+Run 4 stopped at "README.md repeats ... Consolidate them into a link?", a change the standing rule covers but the verb list missed
+(`78382149`). Run 5 answered the plan, then gave one WRONG answer: ".claude/CLAUDE.md repeats File Structure, Commands and stack
+lines ... one-line pointers instead" mentions "stack", so the topic table returned operator § Stack. It stopped at the next popup
+(overview.md duplicates integrations.md) before any write; the snapshot is still the pre-migrate copy. Fix: in a profile-only
+migrate, a non-plan question that names an existing file or speaks of repeating, duplicating, "already in" or pointers is a cleanup
+question, answered "leave untouched", unless the popup's header names a profile topic (the business and conventions rounds keep the
+table). The live CLAUDE.md and overview.md questions are fixtures, with a Stack-headed control; seeding the previous rule fails S63.
