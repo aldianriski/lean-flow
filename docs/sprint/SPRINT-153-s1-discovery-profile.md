@@ -112,7 +112,7 @@ Wave 3. The riskiest task for adopters: a 2.x repo must keep every decision it h
 **Acceptance:** a real `migrate` adds the profile, every earlier ADR, ruling and settled requirement survives unreworded, and every pointer it writes resolves.
 
 ### T7 — Wire S1 discovery and document it for adopters `[size: S · risk: med · class: execution · HITL · J2]`
-Layers: `skills/flow/SKILL.md` · `skills/prime/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md`
+Layers: `skills/flow/SKILL.md` · `skills/prime/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md` · `skills/lean-doc-generator/references/init.md`
   · `docs/work/todo/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md`
   · `docs/work/in_progress/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md`
   · `docs/work/done/TASK-554-wire-s1-discovery-and-document-it-for-adopters.md`

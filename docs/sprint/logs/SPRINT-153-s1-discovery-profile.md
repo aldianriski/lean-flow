@@ -247,3 +247,18 @@ while its report said nothing old changed (Verify now reads and greps only, and 
 own inventory left out docs/prd/ (the population now names folders); its report gave no status for Conventions (now all seven
 topics). Review round 2 (Claude stand-in, Sonnet): CLEAR, one wording fix taken.
 review · T6 · scoped-reviewer · behaviour:material · governance:material
+
+### 2026-11-01 | scope-change | T7: init's reference joins T7's layers (an undecided topic is written, not left as a prompt)
+What broke: T7's box 3 asks for each of the seven topics as a fact or an explicit "not decided yet", none left as an unfilled
+template prompt, but init step 5 keeps an undecided requirements topic as the template placeholder plus `[CUSTOMIZE]`. Impact:
+T7 Layers add `skills/lean-doc-generator/references/init.md`; one step-5 sentence changes, so an undecided topic is written as
+`Not decided yet (owner, init)` in place of the placeholder and the heading keeps `[CUSTOMIZE]` as the open flag. T2, T3 and
+T8, the earlier owners of that file, are done. Re-confirm G2: signed by the owner (popup below).
+
+### 2026-11-01 | progress | T7 G2 signed (wiring and adopter docs)
+builder-check · T7 · 4 contradictions · 5 questions · settled: the no-docs case reuses init step 1d's existing-docs definition (AGENTS.md counts; a README alone does not); prime decides from its own read slots only (no CLAUDE, CONTEXT or slot-6 overview → init; otherwise no `## Stack` in the slot-6 file, or no slot-6 file → migrate), so it reads no new file; verification adds a read-through of the generator's two mode rows and flow's Orient line, and a grep for the 2.x "removes nothing" note
+Owner rulings by popup: init changes (an undecided topic is written as `Not decided yet (owner, init)`), not box 3; with open
+tasks, /prime keeps `/orchestrator` as Next and names the profile on an "also" line, and with no open work, init or migrate
+comes before /task-decomposer, and the v1-layout row still wins; lean-flow's own missing profile becomes a follow-up at close
+(run migrate on lean-flow or rule it exempt); G2 signed as designed.
+consequence · T7 · behaviour:material · governance:low
