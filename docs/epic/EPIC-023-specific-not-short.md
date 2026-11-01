@@ -75,6 +75,12 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   measured apart instead of one bundled A4.
 - **D9** — The version is decided at S4 on a named consumer-contract break (STANDARD §15; research D15). Without one,
   the admitted set ships as 2.x MINORs; S3 roles ship only after S4 admits them.
+- **D10** — After S0 (owner, 2026-11-01; `docs/research/logs/ab-measurements.md` § Report 2026-11-01): no symptom is an R-b
+  defect, but A1 regressed against A0 under section 4 (primary −8.3 points, below the A0 floor, at about 3.9× A0's tokens).
+  Amends D2 for S3 only: S3 is admitted as a measured experiment on the convention (−10.3, 13 tasks) and business (−11.1,
+  9 tasks) regressions, and its `## Why` cites them; D5 still ships a role only on its own positive delta. S2 is not admitted:
+  its lost-detail regression (−8.3) rests on 4 tasks. The STANDARD change stays under D2. With no A3, S3 and S4 compare
+  against A2.
 
 ## Open questions
 
@@ -82,19 +88,20 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 
 ## Closed when
 
-- [ ] S0: design frozen at S0 promote; pre-registration hash frozen before any trial on an A/B repo or a
+- [x] S0: design frozen at S0 promote; pre-registration hash frozen before any trial on an A/B repo or a
   task-set task (harness smoke runs use a separate fixture repo only; owner ruling R-c, 2026-10-29); arms
   A0 (no lean-flow docs) and A1 (2.x) measured on both repos; each of the three symptoms recorded as
-  *measured defect* or *not reproduced* → TASK-544, TASK-545
+  *measured defect* or *not reproduced* → TASK-544, TASK-545 ✓ all three not reproduced
+  (`docs/research/logs/ab-measurements.md` § Report 2026-11-01)
 - [ ] S1: `init`/`migrate` produce a repo profile on both A/B repos and on an unprofiled stack through the
   installed plugin; a real 2.x `migrate` keeps every existing decision; arm A2 measured vs A1
   → TASK-548, TASK-549, TASK-550, TASK-551, TASK-552, TASK-553, TASK-554, TASK-555
-- [ ] S2: a traced run shows each required fact *read* by the builder through a resolved pointer; every
-  blocking lost-detail site fixed; arm A3 measured vs A2 and A1 → next slice: S2 Carry-through
-- [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A3 and A4b vs A4a
+- [x] S2: not admitted at S0 (D2, D10): symptom 3 not reproduced, and its −8.3-point regression against A0
+  rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ recorded 2026-11-01
+- [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
   → next slice: S3 Expertise candidates
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
-  and A3; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
+  and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)
   → next slice: S4 Admit + STANDARD + release
