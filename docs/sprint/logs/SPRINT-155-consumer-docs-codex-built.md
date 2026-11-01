@@ -70,3 +70,16 @@ consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped-reviewer · behaviour:material · governance:low
 consequence · T3 · behaviour:low · governance:high
 review · T3 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-11-01 | progress | T4 done: Codex launches work on this host; the companion's broker is the leftover; owner rulings recorded
+Reproduction: `codex-companion.mjs setup --json` now answers in 3 s (ready, ChatGPT login active), and a companion `task` ran
+end to end in 8 s. The earlier hang, more than 2 minutes with no output, no longer reproduces. Cause from the code
+(`lib/app-server.mjs`, `lib/codex.mjs`): `getCodexAuthStatus` awaits the app server's `initialize` and auth requests with no
+timeout, so an account that could not answer (the owner's lapsed subscription, since renewed) blocked silently. Leftovers: the
+companion keeps `app-server-broker.mjs` (with its `codex app-server` tree) alive after a launch, and seven brokers from 10-19 to
+today were running; all were stopped with their descendants, and the Codex app daemon and the owner's interactive `codex` were left
+alone. `codex exec` leaves nothing behind. Owner rulings by popup: box 1 ticked by ruling (not reproducible, cause named, silent
+hang); the standing route is `codex exec` with the prompt on stdin. Owner ruling for T1 box 2 and T2 box 3: the real-init check
+runs as the owner's `init` in `D:\Research\clinic-ab` (unprofiled) with `--plugin-dir` at the merged commit, instead of a VPS
+snapshot with the installed plugin.
+consequence · T4 · behaviour:low · governance:low
