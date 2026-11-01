@@ -10,7 +10,7 @@ class: execution
 tier: X
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-554, TASK-545]
 ---
 
@@ -32,8 +32,6 @@ maintainer-only measurement (`evals/ab/`, paid, run by hand), never a gate or `q
 `evals/ab/` (arm definition only) · `docs/research/logs/ab-measurements.md`
 
 ## Assumes
-- **blocked-by:** TASK-554 (S1 complete) and TASK-545 (A0/A1 baseline, which needs the frozen pre-registration TASK-544 and the
-  pipeline TASK-543).
 - This is the first time S1 touches an A/B repo (I-2). The answers files cover the seven profile topics before they freeze (I-6).
 - Paid runs, maintainer-only.
 
