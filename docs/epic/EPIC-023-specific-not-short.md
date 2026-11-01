@@ -2,7 +2,7 @@
 epic: 023
 slug: specific-not-short
 owner: Maintainer
-last_updated: 2026-10-31
+last_updated: 2026-11-01
 status: active
 member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152, SPRINT-153]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -48,7 +48,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-150](../sprint/archive/SPRINT-150-scan-tracer-and-answers-scope.md) | Scan Tracer and Answers Scope (S1 tracer + S0 answers-file widening) | closed · `1b917eb6` | S1's tracer holds: on an unprofiled SvelteKit repo, through the installed plugin, `init` wrote Stack and Conventions in use with every line citing a real file, read by the owner as specific (TASK-547). TASK-536's answers file now covers the seven profile topics and is ready (TASK-556). Closed-when lines 1 and 2 stay open (S0 on TASK-544/545, S1 on TASK-548..555) |
 | [SPRINT-151](../sprint/archive/SPRINT-151-s0-answers-tasks-arms-judges.md) | S0: Answers, Tasks, Arms and Judges | closed · `a9f03af4` | S0 minus the freeze: answers files, 16 verified tasks (TASK-536..540), four frozen arms (TASK-541), judges calibrated at 85.5% (TASK-543). Line 1 open on TASK-544/545 |
 | [SPRINT-152](../sprint/SPRINT-152-s0-freeze-and-baseline.md) | S0: Freeze and Baseline (S0 freeze + paid A0/A1 baseline) | active | — |
-| [SPRINT-153](../sprint/SPRINT-153-s1-discovery-profile.md) | S1: Discovery Profile (stream s1-discovery; heavy runs on the VPS) | active | — |
+| [SPRINT-153](../sprint/archive/SPRINT-153-s1-discovery-profile.md) | S1: Discovery Profile (stream s1-discovery; heavy runs on the VPS) | closed · `82990174` | init and migrate write a cited repo profile through the installed plugin: on an unprofiled portfolio repo the owner's /flow reached init through /prime and wrote all seven topics; on kalasuara migrate added the profile with 49 ADR, 23 PRD, 49 decision rows and 7 Closed-when sets unchanged; question sets for React/Vite, Vue/Vite, Go/chi and Postgres; init never overwrites; spec 0.18.2. Open for the S1 condition: arm A2 (TASK-555) and the profile on both A/B repos |
 
 ## Decisions
 
