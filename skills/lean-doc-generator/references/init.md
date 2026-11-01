@@ -24,7 +24,7 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
    Never open secret files (`.env*`, keys, credentials). Read every candidate's **headings first**, then
    only the sections bearing on the five topics — business goal · main flows · invariants · quality
    attributes · non-goals. A topic is **settled** only by a heading naming it or a sentence stating it
-   as a decision ("the goal is…", "non-goal: …"); a tagline or feature bullet is not — it becomes a
+   as a decision ("the goal is…", "non-goal: …"); a tagline, feature bullet or `Not decided yet` line is not — the first two become a
    drafted option. Keep a settled fact quoted or closely paraphrased with `<path> § <heading>`, never
    summarised. A backlog or wish-list is not a non-goal. Docs that disagree → the topic is open, each
    source a drafted option (at most three). Quality attributes stay open while any row is uncovered.
@@ -125,8 +125,8 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
    `(from <path> § <heading>)` for a doc, `(owner, init)` for an answer, `(owner, init; drafted from
    <path> § <heading>)` for an accepted drafted option (Source column for quality rows). An undecided
    business topic is written as the line `Not decided yet (owner, init)` in place of the template
-   placeholder; its heading keeps `[CUSTOMIZE]` as the open flag until the topic is decided. A set
-   answer is one line in `## Conventions in use` ending `(owner, init)` or
+   placeholder; its heading keeps `[CUSTOMIZE]` as the open flag until the topic is decided (a First milestone
+   field keeps its placeholder, as above). A set answer is one line in `## Conventions in use` ending `(owner, init)` or
    `(owner, init; drafted from <file>)`;
    *not decided yet* goes under `Not confirmed`. Main flows: name each flow with its source; add the
    `→ docs/flows/<slug>.md` pointer only when that flow doc exists or init writes it.

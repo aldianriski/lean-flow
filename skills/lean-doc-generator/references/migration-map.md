@@ -68,7 +68,8 @@ the **step-5** citation rule. Migrate's deltas only:
   existing text. **Absent** — create it from its template; coding-standards only when the repo has code (init's
   row).
 - **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. A target section whose body is only template
-  placeholders is present-but-unfilled: the pass may fill it. If another section in the same file already
+  placeholders or a `Not decided yet (owner, …)` line is present-but-unfilled: the pass may fill it, asking that
+  topic again. If another section in the same file already
   covers a topic (e.g. `## Problem` for Business goal, `## Non-functional requirements` for Quality
   attributes) **and passes init step 1b's settled test** (a heading naming the topic with real content, or a
   sentence stating it — a placeholder-only section never settles), add nothing and report the topic

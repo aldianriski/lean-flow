@@ -16,7 +16,7 @@ status: current
 
 ## [Unreleased]
 
-- **Changed** — `/prime` and `/flow` route an unprofiled repo to `/lean-doc-generator init` (no CLAUDE.md, CONTEXT.md or architecture overview) or `migrate` (docs but no `## Stack`): first when no work is open, on an extra line beside `/orchestrator` when it is. `init` writes an undecided business topic as `Not decided yet (owner, init)`, and its heading keeps `[CUSTOMIZE]` until it is decided (SPRINT-153, TASK-554).
+- **Changed** — `/prime` and `/flow` route an unprofiled repo to `/lean-doc-generator init` (no CLAUDE.md, CONTEXT.md or architecture overview) or `migrate` (docs but no `## Stack`): as the next step when nothing is tracked yet, otherwise named beside it. `init` writes an undecided business topic as `Not decided yet (owner, init)`, and its heading keeps `[CUSTOMIZE]` until it is decided (SPRINT-153, TASK-554).
 - **Changed** — standard 0.18.2 (PATCH): on a repo whose AI-context files already carry the spec, `product/requirements.md` is no longer skipped. It cites those files topic by topic and never copies them. No verdict moves.
 - **Changed** — `migrate` adds the repo profile to a 2.x repo and keeps every decision: it takes a backup point, compares the inventory after each action, applies the profile items, and verifies by reading only (TASK-553).
 - **Changed** — `init` never overwrites an existing file and offers `migrate` when the repo already has docs (TASK-560).
