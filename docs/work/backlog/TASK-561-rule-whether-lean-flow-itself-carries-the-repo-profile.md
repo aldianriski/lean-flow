@@ -9,7 +9,7 @@ class: decision
 tier: P
 authority: J2
 origin: close-retro
-state: needs-info
+state: ready
 depends-on: []
 ---
 
@@ -29,7 +29,6 @@ Owner ruling at T7's G2: accept the nudge for now and decide in a later sprint (
 `docs/architecture/overview.md` (if migrate runs) · or the exemption record
 
 ## Assumes
-- **needs-info:** the owner's dogfood-or-exempt ruling.
 
 ## Tracker
 SPRINT-153 close Retro · T7 G2 ruling

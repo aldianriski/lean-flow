@@ -29,3 +29,6 @@ the form `<path> § <heading>` resolves only on an exact match, so S2's resolver
 
 ## Tracker
 SPRINT-153 close Retro · EPIC-023 S2
+
+## Amended 2026-11-01
+Merged into TASK-568 (owner, /triage): its pointer rule ignores leading emoji and decoration, and treats two matches as a failure. TASK-568's real run should include a decorated heading.
