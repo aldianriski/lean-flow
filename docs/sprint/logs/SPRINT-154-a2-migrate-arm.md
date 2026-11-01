@@ -73,3 +73,13 @@ permission decision is logged. Spike (coordinator, 2026-11-01): `claude -p --inp
 host as a `can_use_tool` control request; an `allow` reply whose `updatedInput` carries `answers` reaches the model as answered.
 Impact: TASK-555's Done-when is unchanged ("every popup answered verbatim from the frozen answers files" now holds mechanically);
 D1's owner-driven sessions become operator-driven; Amendment 6 states it. G2 re-confirmed by the same ruling.
+
+### 2026-11-01 | progress | T1: the setup operator is built, reviewed and merged (`deb763c6`, `f8220641`)
+A Sonnet builder in a worktree, test-first against a fake CLI (no paid run): `lib/operator.ts` answers a popup only when exactly
+one candidate matches across the run's rules, a fixed topic table and the Setup-answers bullets, and otherwise stops naming them
+all; `lib/operated-session.ts` drives the headless session over the spiked protocol, allows a tool only by the arm's allow-list
+(patterns honoured), stops on a repeated question text, logs every decision, and times out a stalled CLI; `setup-arm.ts --auto`
+and `operated-session.ts` are the entry points, both in an isolated config. Selftest 68/68 (S60-S63). Codex review round 1: NOT
+CLEAR (1 High: competing matches answered instead of stopping; 3 Med: repeated question texts, unpatterned Skill allow, a hang on
+a stalled CLI; 1 Low: an allow-list probe). All fixed in one builder retry. The coordinator seeded each pre-fix file back in:
+old `operator.ts` fails S60 only; old `operated-session.ts` fails S61 and S63; both restored by hash.
