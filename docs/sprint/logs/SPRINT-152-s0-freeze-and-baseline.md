@@ -269,3 +269,30 @@ owner's last look; the owner's continue runs the remaining 92.
 All four pilot slots exited ok with every grader passing and no park. Judges: both A0 trials convention and business PASS,
 scope FAIL; both A1 trials PASS on all three. Wall 123 to 265 s plus 29 to 48 s of setup; notional cost A0 0.59 and 0.81
 USD, A1 2.28 and 2.42 USD, judges 0.20 to 0.37 USD per trial. The driver stopped (exit 10) for the owner before the other 92.
+
+### 2026-11-01 | progress | T4 first pass complete: 96 of 96 slots; the analysis rests on 13 workdoo-A1 breaches of one file
+The owner's terminal ran the remaining 92 slots through the resumable driver, after the memory reaper killed the in-session run.
+The first build refused: 12 voided pilot rows predated the freeze, because the check ran before voids were applied (fixed,
+`24207a47`). The first analysis (A1 62.5% vs A0 89.6%) rested on 13 workdoo-A1 trials that exited `scope-breach:
+Microsoft/Windows/PowerShell/ModuleAnalysisCache`, PowerShell's own cache written under the trial copy, each UNKNOWN on every judge.
+
+### 2026-11-01 | scope-change | T4: Amendment 5 (cache excluded, 13 attempts voided and re-run, earlier rows carried over)
+Owner rulings by popup: fix the harness, void the 13 as an owner-ruled harness defect and re-run their slots, keep the two Write
+parks scored. Amendment 5 owner-signed (freeze 2026-11-01T06:57:00Z). TASK-545's Done-when text is unchanged.
+
+### 2026-11-01 | progress | T4 re-run: 13 rows, 11 ok, 1 refused at G2, 1 Bash park scored by owner ruling (L-272); `7803ce04`
+
+### 2026-11-01 | progress | T4 outside review: round 1 NOT CLEAR (2 High), fixed; round 2 one High, owner-ruled; re-frozen
+Round 1 (Codex) found a transitive carry-over and a directory-wide exclusion. Both were fixed in `4965f9c0`. Seeding each old design
+back in fails only its own check (S45, S56) while the other 60 stay green, and both files were restored by hash. The text was corrected
+in `15ca5ced`. Round 2 found that the correction overclaimed for the re-run rows. Owner ruling: keep the rows, reword with a
+caveat (`ec3422fe`). Owner re-signed: sha256 `2683d351...`, freeze line 10:14:01Z (`d78c1e34`), slots rebuilt byte-identical.
+consequence · T4 · behaviour:material · governance:high
+review · T4 · outside-reviewer · behaviour:material · governance:high
+
+### 2026-11-01 | progress | T4 S0 report: VALID, A1 81.2% vs A0 89.6%, regressed on three symptoms, no R-b defect
+Report in `docs/research/logs/ab-measurements.md` § Report 2026-11-01 (`600046c4`): gain -8.3 points [-20.8, 2.1], A1 below the
+A0 floor, convention -10.3, business -11.1 and lost detail -8.3 against A0, no symptom an R-b defect. Owner rulings: S2 not
+admitted, TASK-567..572 cancelled (`bc61a9e2`, `b5fc48cf`); EPIC-023 D10 admits S3 as a measured experiment on the convention and
+business regressions (`6a4fd1f1`). A Codex review of the whole close-out found no High: P3 to P5 OK, two report fixes (scope
+is a section 4 measure, the one A0 row bounded at 2.1 points; cost coverage stated) in `3cc3d15d`. Report label fix `2ae19058`.
