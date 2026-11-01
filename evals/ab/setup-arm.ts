@@ -2,6 +2,8 @@
 // the arm's lean-doc-generator skill (init for a pre-init arm, migrate for a pre-migrate arm) and answer each popup verbatim from evals/ab/answers/.
 //   bun evals/ab/setup-arm.ts --arm <id>          prints the plan and the exact command, starts nothing
 //   bun evals/ab/setup-arm.ts --arm <id> --run    creates the isolated config dir and starts the session (inherits this terminal)
+//   bun evals/ab/setup-arm.ts --arm <id> --auto   same refusals and isolated config, but HEADLESS: the setup operator answers every popup from the frozen
+//                                                  answers files (exit 0 done, 3 stopped on a popup it cannot answer -- printed in full, 1 failed)
 //   --resume continues a setup in progress (skips the snapshot-equals-pre-setup check); --arms-dir <dir> reads arm files from elsewhere (selftest fixtures)
 // Maintainer-only; no trial and no gate. The session itself is a paid subscription session, started by the owner.
 import fs from "node:fs";
@@ -12,6 +14,8 @@ import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
 import { setupCommand } from "./lib/setup.ts";
 import { verifyPin } from "./lib/pin.ts";
 import { diffManifest } from "./lib/snapshot.ts";
+import { parseRules } from "./lib/operator.ts";
+import { operatedCommand, readAnswers, reportAndExit, runOperatedSession } from "./lib/operated-session.ts";
 
 const flag = (n: string) => (process.argv.includes(`--${n}`) ? process.argv[process.argv.indexOf(`--${n}`) + 1] : undefined);
 const refuse = (why: string): never => (console.error(`REFUSED: ${why}`), process.exit(2));
@@ -19,6 +23,8 @@ const id = flag("arm");
 if (!id || id.startsWith("--")) refuse("--arm <id> is required");
 const armsDir = path.resolve(flag("arms-dir") ?? path.join(import.meta.dir, "arms"));
 const run = process.argv.includes("--run");
+const auto = process.argv.includes("--auto");
+if (run && auto) refuse("--run and --auto are exclusive");
 const resume = process.argv.includes("--resume");
 if (!fs.existsSync(path.join(armsDir, `${id}.json`))) refuse(`no arm file ${path.join(armsDir, `${id}.json`)}`);
 let arm!: ReturnType<typeof loadArm>;
@@ -28,7 +34,7 @@ try {
   refuse((e as Error).message);
 }
 const repo = id!.replace(/-a\d+$/, "");
-const WORK = `D:/Research/ab-setup-${id}`; // outside the repo: holds the isolated config dir and with it the retained transcript
+const WORK = flag("work") ?? `D:/Research/ab-setup-${id}`; // outside the repo: holds the isolated config dir and with it the retained transcript
 
 if (!arm.snapshot || !arm.plugin) refuse(`${id}.json needs snapshot and plugin`);
 // the session starts with cwd = the snapshot, so a relative path could verify one checkout and load another
@@ -48,7 +54,7 @@ else if (!resume) {
 if (problems.length > 0) refuse(problems.join("; "));
 
 const claude = setupCommand(arm);
-if (!run) {
+if (!run && !auto) {
   console.log(`plugin  ${arm.plugin!.path}  (verified: pinned hash matches, tree clean)\nsnapshot ${arm.snapshot}  (verified: ${resume ? "drift check skipped by --resume" : `still the pre-${kind} copy`})`);
   console.log(`\nRun:\n  bun ${path.relative(REPO_ROOT, path.join(import.meta.dir, "setup-arm.ts")).split(path.sep).join("/")} --arm ${id} --run [--resume]\n`);
   console.log(`That starts, with cwd = the snapshot and an isolated CLAUDE_CONFIG_DIR (no user plugins, settings or memory; only the credentials file is byte-copied):\n  ${claude.join(" ")}`);
@@ -59,8 +65,25 @@ if (!run) {
 }
 
 fs.mkdirSync(WORK, { recursive: true });
+if (flag("auth")) arm.auth = flag("auth") as typeof arm.auth; // test hook: the selftest runs without credentials
 const iso = makeIsolation(WORK, arm);
 console.log(`isolated config dir (transcript lands here): ${iso.cfg}`);
+if (auto) {
+  // owner ruling, SPRINT-154: the migrate plan is approved for the profile items only
+  const PLAN_RULE = { match: /(approv|appl[iy]|proceed).*\bplan\b|\bplan\b.*(approv|appl[iy]|proceed)/is, answer: "Approve only the profile items: ## Stack, ## Conventions in use, and the five business topics in docs/product/requirements.md. Decline every other action.", source: "owner ruling, SPRINT-154" };
+  let files!: ReturnType<typeof readAnswers>;
+  let rules = kind === "migrate" ? [PLAN_RULE] : [];
+  try {
+    files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);
+    if (flag("rule-file")) rules = [...parseRules(fs.readFileSync(path.resolve(flag("rule-file")!), "utf8")), ...rules];
+  } catch (e) {
+    refuse((e as Error).message);
+  }
+  const log = path.join(WORK, `operator-${id}.jsonl`);
+  // the claude command minus its leading binary, behind the stream-json flags (operatedCommand puts the binary, or a test's fake CLI, first)
+  const res = await runOperatedSession({ cmd: operatedCommand(claude.slice(1)), cwd: arm.snapshot!, env: isolationEnv(iso, arm), prompt: `/lean-doc-generator ${kind}`, files, rules, allowTools: [...arm.allowedTools, "Read", "Glob", "Grep"], operatorLog: log });
+  process.exit(reportAndExit(res, log));
+}
 const p = Bun.spawn(claude, { cwd: arm.snapshot, env: isolationEnv(iso, arm), stdin: "inherit", stdout: "inherit", stderr: "inherit" });
 const code = await p.exited;
 const transcripts: string[] = [];

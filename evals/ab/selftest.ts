@@ -2483,6 +2483,150 @@ check("S59 schedule-a2.json re-derived from schedule.json (a1 slots, trial 1-2, 
   assert(failed, "an altered entry must be detected");
 });
 
+// S60-S63 -- the setup operator: answers a docs-tool setup session's popups verbatim from the frozen answers files.
+const ANS = path.join(AB, "answers");
+const sect = (md: string, h: string) => md.replace(/\r\n/g, "\n").split(/^## /m).find((s) => s.startsWith(h + "\n"))!.slice(h.length + 1).trim(); // independent of lib/operator.ts
+const clinicFiles = () => ({ repo: fs.readFileSync(path.join(ANS, "clinic.md"), "utf8"), operator: fs.readFileSync(path.join(ANS, "clinic-operator.md"), "utf8") });
+const PLAN_RULE = { match: /approve|apply/i, answer: "Approve only the profile items.", source: "owner ruling, SPRINT-154" };
+check("S60 answerFor: Stack -> operator Stack and Main flows -> repo Main flows verbatim; setup bullets by label; a run rule wins over the table; unmatched, two-topic and missing-section questions STOP naming the question", async () => {
+  const { answerFor } = await import("./lib/operator.ts");
+  const f = clinicFiles();
+  const q = (question: string, header = "Setup") => ({ question, header });
+  const stack = answerFor(q("What is the stack of this project?"), f, []);
+  assert("answer" in stack && stack.answer === sect(f.operator, "Stack") && /operator/.test(stack.source) && /Stack/.test(stack.source), `stack: ${JSON.stringify(stack)}`);
+  const flows = answerFor(q("Describe the main flows", "Flows"), f, []);
+  assert("answer" in flows && flows.answer === sect(f.repo, "Main flows"), `flows: ${JSON.stringify(flows)}`);
+  for (const [qq, h] of [["What conventions are in use?", "Conventions in use"], ["What is the business goal?", "Goal"], ["List the invariants", ""], ["Which quality attributes matter?", ""], ["What are the non-goals?", ""]] as const) {
+    const r = answerFor(q(qq, h), f, []);
+    assert("answer" in r && r.answer.length > 20, `${qq}: ${JSON.stringify(r)}`);
+  }
+  const lic = answerFor(q("Which license should the repo carry?"), f, []);
+  assert("answer" in lic && lic.answer === "a proprietary notice.", `license: ${JSON.stringify(lic)}`);
+  const tiers = answerFor(q("Which documentation tier fits this repo?"), f, []);
+  assert("answer" in tiers && tiers.answer.startsWith("backend/integration (an HTTP API") && tiers.answer.includes("the medium/complex tier with the booking flow doc."), `multi-line bullet kept whole: ${JSON.stringify(tiers)}`);
+  const proof = answerFor(q("What is the first milestone proof goal?"), f, []);
+  assert("answer" in proof && proof.answer === "book and cancel work end to end.", `milestone proof goal picks its own bullet, not the business goal: ${JSON.stringify(proof)}`);
+  const flowDoc = answerFor(q("Which main business-flow doc should be created?"), f, []);
+  assert("answer" in flowDoc && flowDoc.answer.startsWith("the booking flow"), `flow doc bullet, not Main flows: ${JSON.stringify(flowDoc)}`);
+
+  const plan = q("Apply the migrate plan?", "Plan");
+  const stopped = answerFor(plan, f, []);
+  assert("stop" in stopped && stopped.stop.includes("Apply the migrate plan?"), `no rule -> stop naming the question: ${JSON.stringify(stopped)}`);
+  const ruled = answerFor(plan, f, [PLAN_RULE]);
+  assert("answer" in ruled && ruled.answer === PLAN_RULE.answer && ruled.source === PLAN_RULE.source, `rule answers: ${JSON.stringify(ruled)}`);
+  const over = answerFor(q("Approve the stack?", "Stack"), f, [PLAN_RULE]);
+  assert("answer" in over && over.source === PLAN_RULE.source, `a run rule wins over the topic table: ${JSON.stringify(over)}`);
+  const odd = answerFor(q("What colour should the logo be?"), f, []);
+  assert("stop" in odd && odd.stop.includes("What colour should the logo be?"), `unmatched stops: ${JSON.stringify(odd)}`);
+  const two = answerFor(q("Describe the stack and the main flows"), f, []);
+  assert("stop" in two && /stack/i.test(two.stop) && /main flows/i.test(two.stop) && two.stop.includes("Describe the stack"), `two topics stop, naming both: ${JSON.stringify(two)}`);
+  const noSec = answerFor(q("What are the non-goals?"), { ...f, repo: "# x\n\n## Business goal\nA.\n" }, []);
+  assert("stop" in noSec && /Non-goals/.test(noSec.stop), `a topic with no section in the file stops: ${JSON.stringify(noSec)}`);
+});
+
+type Step = { emit: unknown } | { await: string };
+const INIT: Step = { emit: { type: "system", subtype: "init", tools: [] } };
+const auq = (id: string, ...qs: { question: string; header: string }[]): Step => ({ emit: { type: "control_request", request_id: id, request: { subtype: "can_use_tool", tool_name: "AskUserQuestion", input: { questions: qs.map((x) => ({ ...x, options: [], multiSelect: false })) } } } });
+const toolReq = (id: string, tool_name: string): Step => ({ emit: { type: "control_request", request_id: id, request: { subtype: "can_use_tool", tool_name, input: { command: "ls" } } } });
+const RESULT = (subtype = "success"): Step => ({ emit: { type: "result", subtype, is_error: subtype !== "success" } });
+const jsonl = (f: string): any[] => (fs.existsSync(f) ? fs.readFileSync(f, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
+const FAKE_CLI = path.join(AB, "fixtures", "operator", "fake-cli.ts");
+async function fakeSession(steps: Step[], over: Record<string, unknown> = {}) {
+  const { runOperatedSession } = await import("./lib/operated-session.ts");
+  const dir = tmpdir("op");
+  const scenario = path.join(dir, "scenario.json");
+  const record = path.join(dir, "record.jsonl");
+  const log = path.join(dir, "operator.jsonl");
+  fs.writeFileSync(scenario, JSON.stringify(steps));
+  const res = await runOperatedSession({ cmd: ["bun", FAKE_CLI, scenario, record], cwd: dir, env: { ...process.env } as Record<string, string>, prompt: "/lean-doc-generator migrate", files: clinicFiles(), rules: [], allowTools: ["Read"], operatorLog: log, timeoutMs: 20000, ...over });
+  return { res, sent: jsonl(record), log: jsonl(log) };
+}
+const respOf = (sent: any[], id: string) => sent.find((m) => m.type === "control_response" && m.response?.request_id === id)?.response?.response;
+check("S61 runOperatedSession (fake CLI): protocol start; Stack/Main flows answered verbatim; a run rule beats the table; allowed tool allowed, other denied; one log line per decision; unmatched popup STOPS (nothing further answered), a two-topic popup stops", async () => {
+  const f = clinicFiles();
+  const ok = await fakeSession([INIT, auq("a1", { question: "What is the stack?", header: "Stack" }), { await: "a1" }, auq("a2", { question: "Describe the main flows", header: "Flows" }), { await: "a2" }, auq("a3", { question: "Apply the migrate plan?", header: "Plan" }), { await: "a3" }, toolReq("t1", "Read"), { await: "t1" }, toolReq("t2", "Bash"), { await: "t2" }, RESULT()], { rules: [PLAN_RULE] });
+  assert(ok.res.status === "done" && ok.res.resultSubtype === "success", `done: ${JSON.stringify(ok.res)}`);
+  assert(ok.sent[0].request.subtype === "initialize" && ok.sent[1].type === "user" && ok.sent[1].message.content === "/lean-doc-generator migrate", `protocol start: ${JSON.stringify(ok.sent.slice(0, 2))}`);
+  const a1 = respOf(ok.sent, "a1");
+  assert(a1.behavior === "allow" && a1.updatedInput.answers["What is the stack?"] === sect(f.operator, "Stack"), `Stack verbatim: ${JSON.stringify(a1)}`);
+  assert(respOf(ok.sent, "a2").updatedInput.answers["Describe the main flows"] === sect(f.repo, "Main flows"), "Main flows verbatim");
+  assert(respOf(ok.sent, "a3").updatedInput.answers["Apply the migrate plan?"] === PLAN_RULE.answer, "run rule answered");
+  assert(respOf(ok.sent, "t1").behavior === "allow" && respOf(ok.sent, "t2").behavior === "deny", "Read allowed, Bash denied");
+  assert(ok.log.length === 5, `one log line per decision: ${ok.log.length}`);
+  assert(ok.log[0].question === "What is the stack?" && ok.log[0].header === "Stack" && ok.log[0].answer === sect(f.operator, "Stack") && /Stack/.test(ok.log[0].source), `question log: ${JSON.stringify(ok.log[0])}`);
+  assert(ok.log[2].source === PLAN_RULE.source, "rule source logged");
+  assert(ok.log[3].tool === "Read" && ok.log[3].decision === "allow" && ok.log[4].tool === "Bash" && ok.log[4].decision === "deny", `tool log: ${JSON.stringify(ok.log.slice(3))}`);
+
+  const st = await fakeSession([INIT, auq("b1", { question: "What is the stack?", header: "Stack" }, { question: "What colour is the logo?", header: "Logo" }), { await: "b1" }, auq("b2", { question: "What is the stack?", header: "Stack" }), { await: "b2" }, RESULT()]);
+  assert(st.res.status === "stopped" && JSON.stringify(st.res.popup).includes("What colour is the logo?"), `stopped, popup named: ${JSON.stringify(st.res)}`);
+  const d = respOf(st.sent, "b1");
+  assert(d.behavior === "deny" && /^operator stopped: .*What colour is the logo\?/.test(d.message), `deny with reason: ${JSON.stringify(d)}`);
+  assert(st.sent.filter((m) => m.type === "control_response").length === 1, "nothing further answered; the stack question of the same popup was not answered either");
+  const two = await fakeSession([INIT, auq("c1", { question: "Describe the stack and the main flows", header: "x" }), { await: "c1" }, RESULT()]);
+  assert(two.res.status === "stopped" && respOf(two.sent, "c1").behavior === "deny", `two-topic popup stops: ${JSON.stringify(two.res)}`);
+  const bad = await fakeSession([INIT, RESULT("error_max_turns")]);
+  assert(bad.res.status === "failed" && bad.res.resultSubtype === "error_max_turns", `failed result: ${JSON.stringify(bad.res)}`);
+});
+
+/** A temp answers dir holding the clinic files under the given repo name. */
+function answersDir(dir: string, repo: string): string {
+  const d = path.join(dir, "answers");
+  fs.mkdirSync(d, { recursive: true });
+  fs.copyFileSync(path.join(ANS, "clinic.md"), path.join(d, `${repo}.md`));
+  fs.copyFileSync(path.join(ANS, "clinic-operator.md"), path.join(d, `${repo}-operator.md`));
+  return d;
+}
+const fakeCliEnv = (scenario: string, record: string) => ({ ...process.env, AB_OPERATOR_CLI: JSON.stringify(["bun", FAKE_CLI, scenario, record]) });
+async function cliRun(steps: Step[], extra: string[] = []) {
+  const dir = tmpdir("opcli");
+  const cwd = path.join(dir, "repo");
+  fs.mkdirSync(cwd);
+  const scenario = path.join(dir, "scenario.json");
+  const record = path.join(dir, "record.jsonl");
+  fs.writeFileSync(scenario, JSON.stringify(steps));
+  const log = path.join(dir, "log.jsonl");
+  const r = Bun.spawnSync(["bun", path.join(AB, "operated-session.ts"), "--cwd", cwd, "--plugin-dir", dir, "--command", "/lean-doc-generator init", "--answers", "clinic", "--answers-dir", answersDir(dir, "clinic"), "--log", log, "--auth", "api-key", ...extra], { cwd: AB, env: fakeCliEnv(scenario, record) });
+  return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString(), log, record, dir };
+}
+check("S62 operated-session.ts: exit 0 done, 3 stopped (popup printed in full, deny sent), 1 failed; --rule-file rules apply; the isolated config dir is created beside the cwd", async () => {
+  const done = await cliRun([INIT, auq("a", { question: "Which license should the repo carry?", header: "License" }), { await: "a" }, RESULT()]);
+  assert(done.code === 0 && fs.existsSync(done.log), `done exit 0: ${done.code} ${done.err}`);
+  assert(fs.readdirSync(done.dir).some((x) => x.startsWith("iso-")), "isolation dir made beside the cwd");
+  const stop = await cliRun([INIT, auq("a", { question: "What colour is the logo?", header: "Logo" }), { await: "a" }, RESULT()]);
+  assert(stop.code === 3 && stop.out.includes("What colour is the logo?") && stop.out.includes('"header"'), `stopped exit 3, popup printed: ${stop.code} ${stop.out}`);
+  const fail = await cliRun([INIT, RESULT("error_during_execution")]);
+  assert(fail.code === 1, `failed exit 1: ${fail.code} ${fail.err}`);
+  const rf = path.join(tmpdir("rule"), "rules.json");
+  fs.writeFileSync(rf, JSON.stringify([{ match: "colou?r", answer: "blue", source: "test" }]));
+  const ruled = await cliRun([INIT, auq("a", { question: "What colour is the logo?", header: "Logo" }), { await: "a" }, RESULT()], ["--rule-file", rf]);
+  assert(ruled.code === 0, `rule-file rule answers: ${ruled.code} ${ruled.out}${ruled.err}`);
+});
+
+check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan-approval rule and a pre-init arm does not; allowTools come from the arm; exit 3 on a stop, 0 on done", async () => {
+  const run = async (kind: "init" | "migrate", steps: Step[], mutate?: (fx: Awaited<ReturnType<typeof setupFixture>>) => void) => {
+    const fx = await setupFixture(kind);
+    mutate?.(fx);
+    const dir = tmpdir("auto");
+    const scenario = path.join(dir, "scenario.json");
+    const record = path.join(dir, "record.jsonl");
+    fs.writeFileSync(scenario, JSON.stringify(steps));
+    const r = Bun.spawnSync(["bun", path.join(AB, "setup-arm.ts"), "--arm", fx.id, "--arms-dir", fx.arms, "--auto", "--work", dir, "--answers-dir", answersDir(dir, "fxrepo"), "--auth", "api-key"], { cwd: AB, env: fakeCliEnv(scenario, record) });
+    return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString(), record, log: path.join(dir, `operator-${fx.id}.jsonl`) };
+  };
+  const plan = auq("p", { question: "Apply the migrate plan?", header: "Plan" });
+  const mig = await run("migrate", [INIT, plan, { await: "p" }, toolReq("t", "Glob"), { await: "t" }, toolReq("t2", "WebFetch"), { await: "t2" }, RESULT()]);
+  assert(mig.code === 0, `migrate arm done: ${mig.code} ${mig.err}${mig.out}`);
+  const sent = jsonl(mig.record);
+  assert(respOf(sent, "p").updatedInput.answers["Apply the migrate plan?"].startsWith("Approve only the profile items: ## Stack, ## Conventions in use,"), "migrate plan rule answered");
+  assert(sent[1].message.content === "/lean-doc-generator migrate", `skill from the pre-setup manifest: ${JSON.stringify(sent[1])}`);
+  assert(respOf(sent, "t").behavior === "allow" && respOf(sent, "t2").behavior === "deny", "x");
+  assert(jsonl(mig.log)[0].source === "owner ruling, SPRINT-154", "operator log in the work dir with the rule source");
+  const ini = await run("init", [INIT, plan, { await: "p" }, RESULT()]);
+  assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no plan rule -> stops: ${ini.code} ${ini.out}`);
+  const drift = await run("migrate", [INIT, RESULT()], (fx) => fs.appendFileSync(path.join(fx.snap, "README.md"), "drift\n"));
+  assert(drift.code === 2 && /REFUSED: .*no longer the pre-migrate copy/.test(drift.err) && !fs.existsSync(drift.record), `drift refused before any session: ${drift.code} ${drift.err}`);
+});
+
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;
