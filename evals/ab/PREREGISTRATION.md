@@ -494,3 +494,32 @@ No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, p
 mode, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. Of the section 19
 hashes, only `evals/ab/arms/inventory.json` changes (section 19 is updated last); this file's own sha256 changes and is recorded at the
 owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).
+
+## Amendment 5 (2026-11-01, after the first pass, before re-running its voided slots)
+
+What changed:
+
+- **1. PowerShell's cache is not the agent's edit.** A `Microsoft/Windows/PowerShell` directory, at any depth, is left out of the
+  manifest diff like Amendment 3's build output: it is not in the changed set the judges see and not in the post-run `scope-breach`
+  check. A source file the agent edits is still counted.
+- **2. Void and re-run.** The 13 first-pass attempts whose only `scope-breach` was
+  `Microsoft/Windows/PowerShell/ModuleAnalysisCache` (all workdoo A1) are voided as an owner-ruled harness defect (Amendment 2 D), and
+  their slots re-run from round 0 as attempt 1.
+- **3. Carry-over.** The freeze line of this amendment carries over the rows measured since the Amendment 4 freeze
+  (`2026-10-31T12:07:44Z`). Those rows stay valid, and a measured row before that instant is still refused.
+
+Why: the first pass (`docs/research/logs/ab-measurements.md`, 2026-10-31 to 2026-11-01). In 13 of the 24 workdoo A1 slots, a PowerShell
+session wrote its module-analysis cache under the trial copy. The file sits outside every layer, so each trial exited `scope-breach`
+before any judge ran. Each one scored UNKNOWN on all three judges and failed the primary endpoint. No other cell had one. Removing the
+cache changes nothing the agent did.
+
+Carry-over is safe: no kept row's classification or figure depends on the cache.
+
+- **A1:** a cache file always ended in `scope-breach`, so every A1 row that held one is among the 13 voided.
+- **A0:** A0 rows get no breach check. One A0 row held the file in its changed set (`2026-10-31T15:17:44.521Z`), and its scope judge
+  named it. The primary endpoint (graders and business), the A0 floor, the gain and R-b (on A1 only) do not read the scope verdict.
+  No A0 business or convention verdict cites the cache, so A0's scope figure is reported as frozen, with this caveat.
+
+No other rule changed: the endpoints, thresholds, schedule, task corpus, arms, allow-list, plugin pin, models, judges and their prompts,
+the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. No section 19 hash changes.
+This file's own sha256 changes and is recorded at the owner's re-signature. Harness code (`lib/*.ts`) is not hashed (section 20).

@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Result, Slot } from "./lib/analyze.ts";
-import { analysisArm, isInfraRow, latestFreeze, parseTag, readFreezes, readRows, voidIndex, type LogRow } from "./lib/log.ts";
+import { analysisArm, isInfraRow, latestFreeze, parseTag, readFreezes, readRows, voidIndex, type Freeze, type LogRow } from "./lib/log.ts";
 import { MAX_RETRIES } from "./lib/retry.ts";
 import type { SlotKey } from "./lib/validity.ts";
 import { DEFAULT_LOG } from "./lib/record.ts";
@@ -126,14 +126,22 @@ export function buildSlots(rows: LogRow[], schedule: SlotKey[], tasksDir: string
   return { slots, findings, notes, voidedUsd };
 }
 
+/** The instant every kept measured row must postdate: the latest freeze line's, or, when it carries over the rows measured since an earlier freeze line's instant, that line's boundary (Amendment 5). */
+export function freezeBoundary(freezes: Freeze[]): string | undefined {
+  const latest = latestFreeze(freezes);
+  if (latest?.carriesFrom === undefined) return latest?.ts;
+  const from = freezes.find((f) => Date.parse(f.ts) === Date.parse(latest.carriesFrom!) && Date.parse(f.ts) < Date.parse(latest.ts));
+  if (!from) throw new BuildRefused(`the freeze line of ${latest.ts} carries over the rows measured since ${latest.carriesFrom}, the instant of no earlier freeze line`);
+  return freezeBoundary(freezes.filter((f) => Date.parse(f.ts) <= Date.parse(from.ts)));
+}
+
 if (import.meta.main) {
   const argv = process.argv.slice(2);
   const flag = (n: string) => (argv.indexOf(`--${n}`) >= 0 ? argv[argv.indexOf(`--${n}`) + 1] : undefined);
   try {
     const log = path.resolve(flag("log") ?? DEFAULT_LOG);
     const schedule = JSON.parse(fs.readFileSync(path.resolve(flag("schedule") ?? path.join(AB, "schedule.json")), "utf8")) as SlotKey[];
-    const freeze = latestFreeze(readFreezes(log));
-    const built = buildSlots(readRows(log), schedule, path.resolve(flag("tasks") ?? path.join(AB, "tasks")), freeze?.ts);
+    const built = buildSlots(readRows(log), schedule, path.resolve(flag("tasks") ?? path.join(AB, "tasks")), freezeBoundary(readFreezes(log)));
     for (const n of built.notes) console.error(`note: ${n}`);
     if (built.findings.length > 0) {
       for (const f of built.findings) console.error(`FINDING: ${f}`);

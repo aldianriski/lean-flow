@@ -1877,6 +1877,14 @@ check("S45 freeze guard: only a paragraph LEADING with `frozen <instant>` and ho
   const found = readFreezes(log);
   assert(JSON.stringify(found) === JSON.stringify([{ ts: "2026-10-31T03:12:56Z", sha256: sha1 }, { ts: "2026-11-01T09:00:00Z", sha256: sha2 }]), `leading instants only, paragraphs apart: ${JSON.stringify(found)}`);
   assert(latestFreeze(found)!.sha256 === sha2 && readFreezes(path.join(tmpdir("nolog"), "missing.md")).length === 0, "the latest instant wins; a missing log has no freeze line");
+  // Amendment 5: a freeze line may carry over the rows measured since an earlier freeze line's instant; the boundary is then that line's
+  const { freezeBoundary, BuildRefused } = await import("./build-slots.ts");
+  const carry = async (since: string) => readFreezes(await logOf([SMOKE_SPEC], header + `\n\n> **Pre-registration re-frozen 2026-11-02T09:00:00Z (Amendment 5):** \`x\` sha256 \`${sha1}\`; carries over the rows measured since ${since}.`));
+  const carried = await carry("2026-10-31T03:12:56Z");
+  assert(carried[2]!.carriesFrom === "2026-10-31T03:12:56Z" && found.every((f) => f.carriesFrom === undefined), `the carry-over instant is read, and only from its phrase: ${JSON.stringify(carried)}`);
+  assert(freezeBoundary(carried) === "2026-10-31T03:12:56Z" && freezeBoundary(found) === "2026-11-01T09:00:00Z", "a carry-over moves the boundary to the earlier freeze line; control: without one, the latest line's instant");
+  const bad = await carry("2026-11-01T10:00:00Z");
+  assert(((): string => { try { freezeBoundary(bad); return ""; } catch (e) { return e instanceof BuildRefused ? e.message : `other: ${e}`; } })().includes("the instant of no earlier freeze line"), "a carry-over naming no earlier freeze line's instant is refused");
 
   const prereg = path.join(tmpdir("prereg-cli"), "P.md");
   fs.writeFileSync(prereg, "doc\n");
@@ -2244,7 +2252,7 @@ check("S54 work root: unsafe roots (drive root, the repo, a parent of it) refuse
 check("S56 Amendment 3 build output: dist/build/.svelte-kit/coverage at any depth are neither the agent's changed set (judges' diff) nor a scope breach; an agent-edited source file still is; an out-of-layer source file next to them is still a breach", async () => {
   const { runProtocolTrial } = await import("./lib/protocol.ts");
   const gen = (cwd: string) => {
-    for (const d of ["web/dist", "build", "web/.svelte-kit/output", "coverage"]) {
+    for (const d of ["web/dist", "build", "web/.svelte-kit/output", "coverage", "Microsoft/Windows/PowerShell", "web/Microsoft/Windows/PowerShell"]) {
       fs.mkdirSync(path.join(cwd, d), { recursive: true });
       fs.writeFileSync(path.join(cwd, d, "x.js"), "generated\n");
     }
@@ -2263,11 +2271,11 @@ check("S56 Amendment 3 build output: dist/build/.svelte-kit/coverage at any dept
   assert(ctl.exit === "scope-breach: web.ts", `control: a source file outside the layers is still a breach, build output not named: ${ctl.exit}`);
   const { manifest } = await import("./lib/snapshot.ts");
   const dir = tmpdir("genman");
-  for (const f of ["src/a.ts", "web/dist/x.js", "web/build/y.js", "a/.svelte-kit/z", "coverage/c", "web/coverage/c", "distx/keep.ts"]) {
+  for (const f of ["src/a.ts", "web/dist/x.js", "web/build/y.js", "a/.svelte-kit/z", "coverage/c", "web/coverage/c", "distx/keep.ts", "Microsoft/Windows/PowerShell/ModuleAnalysisCache", "web/Microsoft/Windows/PowerShell/c", "Microsoft/Windows/keep.ts", "Microsoft/Windows/PowerShellx/keep.ts"]) {
     fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true });
     fs.writeFileSync(path.join(dir, f), "1");
   }
-  assert(Object.keys(manifest(dir)).join() === "distx/keep.ts,src/a.ts", `manifest keeps source, drops build output at any depth: ${Object.keys(manifest(dir))}`);
+  assert(Object.keys(manifest(dir)).join() === "distx/keep.ts,Microsoft/Windows/keep.ts,Microsoft/Windows/PowerShellx/keep.ts,src/a.ts", `manifest keeps source, drops build output and the PowerShell cache (Amendment 5) at any depth: ${Object.keys(manifest(dir))}`);
 });
 
 check("S55 review round: provisioning writes (go.sum) are neither the agent's change nor a scope breach; a dead driver's iso dir is swept at start (cluster stop attempted, streams kept); --void echoes the row it voids; both G2 signers' usage is judge overhead", async () => {

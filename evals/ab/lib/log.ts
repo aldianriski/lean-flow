@@ -110,7 +110,7 @@ export const liveRows = (rows: LogRow[]): LogRow[] => {
   return rows.filter((r) => parseTag(r.tag).kind === "measured" && !voided.has(r));
 };
 
-export type Freeze = { ts: string; sha256: string };
+export type Freeze = { ts: string; sha256: string; carriesFrom?: string };
 /**
  * The freeze lines of the log header. A blockquote paragraph (consecutive `>` lines before the table; an empty `>` line or a line without
  * `>` ends it) is a freeze line when it LEADS with the freeze and its instant, and holds the document hash:
@@ -118,8 +118,9 @@ export type Freeze = { ts: string; sha256: string };
  *   > **Pre-registration frozen 2026-11-01T09:00:00Z (any words):** `evals/ab/PREREGISTRATION.md` sha256 `<64 hex>`, any words.
  *
  * i.e. after optional `**` and at most three words, `frozen` or `freeze`, then the ISO-8601 UTC instant; the first `sha256 \`<64 hex>\``
- * of the paragraph is the hash. A later instant elsewhere in the paragraph is never read. Returned in file order; `latestFreeze` is the
- * one with the latest instant. A missing log has no freeze line.
+ * of the paragraph is the hash. A later instant elsewhere in the paragraph is never read, except the one after `carries over the rows
+ * measured since` (`carriesFrom`, Amendment 5): rows measured under that earlier freeze stay valid under this one. Returned in file order;
+ * `latestFreeze` is the one with the latest instant. A missing log has no freeze line.
  */
 export function readFreezes(logPath: string): Freeze[] {
   if (!fs.existsSync(logPath)) return [];
@@ -141,7 +142,8 @@ export function readFreezes(logPath: string): Freeze[] {
   for (const p of paragraphs) {
     const ts = /^\**(?:[A-Za-z-]+ ){0,3}(?:re-)?(?:frozen|freeze)\s+(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z)\b/i.exec(p)?.[1];
     const sha = /sha256\s+`([0-9a-f]{64})`/.exec(p)?.[1];
-    if (ts && sha) out.push({ ts, sha256: sha });
+    const carriesFrom = /\bcarries over the rows measured since\s+(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z)\b/i.exec(p)?.[1];
+    if (ts && sha) out.push(carriesFrom ? { ts, sha256: sha, carriesFrom } : { ts, sha256: sha });
   }
   return out;
 }
