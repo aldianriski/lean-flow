@@ -124,3 +124,12 @@ the overview's table matches `.conformance-exempt`. Two Lows, both fixed by the 
 placeholders in `docs/product/requirements.md` (Users, Solution scope, First milestone and Open questions now read `Not decided yet`
 or `None open (owner, migrate)`; Functional requirements cites the skill roster as the behaviour spec).
 review · T5 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-11-01 | park | T1 box 2 and T2 box 3 wait for the owner's clinic init in the A2 setup sitting
+The second clinic run also loaded the installed 2.19.1, although the owner started it with `--plugin-dir`: an interactive
+session let the installed copy of the same plugin win, while headless runs load the checkout. Its output was discarded the same
+way. The third run, with the installed plugin disabled, loaded the checkout (`D:\Project\lean-flow\skills\lean-doc-generator`).
+Its existing-docs guard found `docs/spec.md` and offered migrate or continue, which 2.19.1 lacks; that is why both 2.19.1 runs
+deleted the spec and rewrote the README. The owner closed that popup, so nothing was written. Owner ruling: both boxes stay open,
+and the owner runs the clinic init (choosing continue, with the installed plugin disabled) in the same sitting as SPRINT-154's A2
+migrate sessions. Unblock condition: that run's output passes the census grep, the Quick start check and the OpenAPI check.
