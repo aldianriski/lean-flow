@@ -52,12 +52,10 @@
 
 ## Quick start
 
-<!-- Only what the manifest's scripts do not already say. A published package: the line a user runs to
-     install and use it. An app: the first-run steps no script covers (a service to start, an env file
-     to copy, a seed), or nothing — never the install/dev/test scripts restated. Setup lives in
-     docs/development/setup.md; this section is never a second home for it. -->
+<!-- An app: keep only the setup link below. A published package: keep the one line a user runs
+     to install and use it, then the setup link. Never restate setup steps or manifest scripts. -->
 ```bash
-[a step the manifest's scripts do not show — or delete this block]
+[one line to install and use the published package — delete this block for an app]
 ```
 
 Full setup: [`docs/development/setup.md`](docs/development/setup.md)

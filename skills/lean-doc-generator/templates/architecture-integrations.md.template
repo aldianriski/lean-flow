@@ -6,13 +6,12 @@ status: current
 ---
 
 <!-- Lives at docs/architecture/integrations.md (lean-flow STANDARD §2). Backend/integration
-     tier row — fires on the first external integration. Companion to architecture-overview.md;
-     API contract itself lives at api/openapi.yaml (placement rule, no template). -->
+     tier row — fires on the first external integration. Companion to architecture-overview.md. -->
 
 # [Project Name] — Integrations [CUSTOMIZE]
 
 > Every external system this service talks to, and how — orientation for "what breaks if X is
-> down," not the request/response schema (that's `api/openapi.yaml`).
+> down," not the request/response schema.
 
 ## Integrations [CUSTOMIZE]
 
@@ -26,5 +25,7 @@ status: current
 - Retry/backoff policy: [summary, e.g. exponential, capped at N attempts].
 
 ## API contract
-This service's own API surface is defined at `api/openapi.yaml` — this file covers *outbound*
+<!-- Name the repo's API contract file (for example an OpenAPI file) only if it exists;
+     otherwise delete this section. -->
+This service's own API surface is defined at `[path to existing API contract]` — this file covers *outbound*
 dependencies and inbound webhook conventions, not the contract this service exposes.
