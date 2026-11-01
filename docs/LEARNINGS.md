@@ -123,8 +123,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-272 [tags: tooling] [status: active]: **An allow-list entry with no path pattern did not stop the CLI's popup for a write outside the working copy.** Amendment 4 allowed `Write` and `Edit` on any path for every A/B arm, because a pilot trial had parked writing a scratch check script outside its trial copy. In the S0 first pass, 2 workdoo A1 trials still parked the same way. No A0 trial did. Why the allowance did not apply is not established. The owner ruled both parks scored. Two things follow: an amendment that loosens permissions needs a smoke trial of the exact case it targets before the full run, and lean-flow's runs write throwaway verification scripts outside the repo where plain Claude does not.
-- seen: 2026-11-01 (SPRINT-152 T4, S0 first pass; Amendment 4's targeted case recurred)
+## L-272 [tags: tooling] [status: active]: **An allow-list entry with no path pattern did not stop the CLI's popup for a write outside the working copy.** Amendment 4 allowed `Write` and `Edit` on any path for every A/B arm, because a pilot trial had parked writing a scratch check script outside its trial copy. In the S0 first pass, 2 workdoo A1 trials still parked the same way, and in the Amendment 5 re-run a third parked on `Bash` (allowed wholesale) writing a probe script to a fresh temp directory. No A0 trial did. Why the allowances did not apply is not established. The owner ruled all three parks scored. Two things follow: an amendment that loosens permissions needs a smoke trial of the exact case it targets before the full run, and lean-flow's runs write throwaway verification scripts outside the repo where plain Claude does not.
+- seen: 2026-11-01 (SPRINT-152 T4, S0 first pass; Amendment 4's targeted case recurred) · 2026-11-01 (Amendment 5 re-run, `Bash`, self-onboarding-guard #1)
 - count: 1
 - promoted: no
 - related: L-007 (exercised on real input)
