@@ -2546,30 +2546,38 @@ const toolReq = (id: string, tool_name: string, input: unknown = { command: "ls"
 const RESULT = (subtype = "success"): Step => ({ emit: { type: "result", subtype, is_error: subtype !== "success" } });
 const jsonl = (f: string): any[] => (fs.existsSync(f) ? fs.readFileSync(f, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
 const FAKE_CLI = path.join(AB, "fixtures", "operator", "fake-cli.ts");
+// a fake model: picks the id of the first map entry whose text is in the POPUP part of the prompt, else NONE
+const fakeCall = (map: [string, string][]) => async (prompt: string) => {
+  const popup = prompt.slice(prompt.indexOf("POPUP"), prompt.indexOf("CATALOG"));
+  return JSON.stringify({ id: map.find(([t]) => popup.includes(t))?.[1] ?? "NONE", reason: "fake" });
+};
+const S61_MAP: [string, string][] = [["What is the stack?", "operator:stack"], ["Describe the main flows", "repo:main-flows"], ["Apply the migrate plan?", "PLAN"]];
 async function fakeSession(steps: Step[], over: Record<string, unknown> = {}) {
   const { runOperatedSession } = await import("./lib/operated-session.ts");
+  const { makeAnswerer, buildCatalog, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
   const dir = tmpdir("op");
   const scenario = path.join(dir, "scenario.json");
   const record = path.join(dir, "record.jsonl");
   const log = path.join(dir, "operator.jsonl");
   fs.writeFileSync(scenario, JSON.stringify(steps));
-  const res = await runOperatedSession({ cmd: ["bun", FAKE_CLI, scenario, record], cwd: dir, env: { ...process.env } as Record<string, string>, prompt: "/lean-doc-generator migrate", files: clinicFiles(), rules: [], allowTools: ["Read"], operatorLog: log, timeoutMs: 20000, ...over });
+  const res = await runOperatedSession({ cmd: ["bun", FAKE_CLI, scenario, record], cwd: dir, env: { ...process.env } as Record<string, string>, prompt: "/lean-doc-generator migrate", answerer: makeAnswerer(buildCatalog(clinicFiles(), [PLAN_RULING, CLEANUP_RULING]), fakeCall(S61_MAP)), allowTools: ["Read"], operatorLog: log, timeoutMs: 20000, ...over });
   return { res, sent: jsonl(record), log: jsonl(log) };
 }
 const respOf = (sent: any[], id: string) => sent.find((m) => m.type === "control_response" && m.response?.request_id === id)?.response?.response;
-check("S61 runOperatedSession (fake CLI): protocol start; Stack/Main flows answered verbatim; a run rule beats the table; allowed tool allowed, other denied; one log line per decision; unmatched popup STOPS (nothing further answered), a two-topic popup stops", async () => {
+check("S61 runOperatedSession (fake CLI + fake classifier): protocol start; Stack/Main flows answered verbatim by the chosen entry; a ruling id answers with its fixed text; allowed tool allowed, other denied; one log line per decision; unmatched popup STOPS (nothing further answered), a two-topic popup stops", async () => {
   const f = clinicFiles();
-  const ok = await fakeSession([INIT, auq("a1", { question: "What is the stack?", header: "Stack" }), { await: "a1" }, auq("a2", { question: "Describe the main flows", header: "Flows" }), { await: "a2" }, auq("a3", { question: "Apply the migrate plan?", header: "Plan" }), { await: "a3" }, toolReq("t1", "Read"), { await: "t1" }, toolReq("t2", "Bash"), { await: "t2" }, RESULT()], { rules: [PLAN_RULE] });
+  const { PLAN_RULING } = await import("./lib/classifier.ts");
+  const ok = await fakeSession([INIT, auq("a1", { question: "What is the stack?", header: "Stack" }), { await: "a1" }, auq("a2", { question: "Describe the main flows", header: "Flows" }), { await: "a2" }, auq("a3", { question: "Apply the migrate plan?", header: "Plan" }), { await: "a3" }, toolReq("t1", "Read"), { await: "t1" }, toolReq("t2", "Bash"), { await: "t2" }, RESULT()]);
   assert(ok.res.status === "done" && ok.res.resultSubtype === "success", `done: ${JSON.stringify(ok.res)}`);
   assert(ok.sent[0].request.subtype === "initialize" && ok.sent[1].type === "user" && ok.sent[1].message.content === "/lean-doc-generator migrate", `protocol start: ${JSON.stringify(ok.sent.slice(0, 2))}`);
   const a1 = respOf(ok.sent, "a1");
   assert(a1.behavior === "allow" && a1.updatedInput.answers["What is the stack?"] === sect(f.operator, "Stack"), `Stack verbatim: ${JSON.stringify(a1)}`);
   assert(respOf(ok.sent, "a2").updatedInput.answers["Describe the main flows"] === sect(f.repo, "Main flows"), "Main flows verbatim");
-  assert(respOf(ok.sent, "a3").updatedInput.answers["Apply the migrate plan?"] === PLAN_RULE.answer, "run rule answered");
+  assert(respOf(ok.sent, "a3").updatedInput.answers["Apply the migrate plan?"] === PLAN_RULING.text, "ruling answered verbatim");
   assert(respOf(ok.sent, "t1").behavior === "allow" && respOf(ok.sent, "t2").behavior === "deny", "Read allowed, Bash denied");
   assert(ok.log.length === 5, `one log line per decision: ${ok.log.length}`);
-  assert(ok.log[0].question === "What is the stack?" && ok.log[0].header === "Stack" && ok.log[0].answer === sect(f.operator, "Stack") && /Stack/.test(ok.log[0].source), `question log: ${JSON.stringify(ok.log[0])}`);
-  assert(ok.log[2].source === PLAN_RULE.source, "rule source logged");
+  assert(ok.log[0].question === "What is the stack?" && ok.log[0].header === "Stack" && ok.log[0].answer === sect(f.operator, "Stack") && ok.log[0].id === "operator:stack" && ok.log[0].reason === "fake", `question log records id, reason and the verbatim answer: ${JSON.stringify(ok.log[0])}`);
+  assert(ok.log[2].id === "PLAN", "ruling id logged");
   assert(ok.log[3].tool === "Read" && ok.log[3].decision === "allow" && ok.log[4].tool === "Bash" && ok.log[4].decision === "deny", `tool log: ${JSON.stringify(ok.log.slice(3))}`);
 
   const st = await fakeSession([INIT, auq("b1", { question: "What is the stack?", header: "Stack" }, { question: "What colour is the logo?", header: "Logo" }), { await: "b1" }, auq("b2", { question: "What is the stack?", header: "Stack" }), { await: "b2" }, RESULT()]);
@@ -2577,6 +2585,10 @@ check("S61 runOperatedSession (fake CLI): protocol start; Stack/Main flows answe
   const d = respOf(st.sent, "b1");
   assert(d.behavior === "deny" && /^operator stopped: .*What colour is the logo\?/.test(d.message), `deny with reason: ${JSON.stringify(d)}`);
   assert(st.sent.filter((m) => m.type === "control_response").length === 1, "nothing further answered; the stack question of the same popup was not answered either");
+  assert(st.log.length === 2 && st.log[0].id === "operator:stack" && /NONE|no entry/.test(st.log[1].stop) && st.log[1].question === "What colour is the logo?", `multi-question popup: each question classified, the stop logged: ${JSON.stringify(st.log)}`);
+  const multi = await fakeSession([INIT, auq("m1", { question: "What is the stack?", header: "Stack" }, { question: "Describe the main flows", header: "Flows" }), { await: "m1" }, RESULT()]);
+  const ma = respOf(multi.sent, "m1").updatedInput.answers;
+  assert(ma["What is the stack?"] === sect(f.operator, "Stack") && ma["Describe the main flows"] === sect(f.repo, "Main flows") && multi.log.length === 2, `both questions of one popup classified and answered: ${JSON.stringify(multi.log)}`);
   const two = await fakeSession([INIT, auq("c1", { question: "Describe the stack and the main flows", header: "x" }), { await: "c1" }, RESULT()]);
   assert(two.res.status === "stopped" && respOf(two.sent, "c1").behavior === "deny", `two-topic popup stops: ${JSON.stringify(two.res)}`);
   const dup = await fakeSession([INIT, auq("d1", { question: "What is the stack?", header: "A" }, { question: "What is the stack?", header: "B" }), { await: "d1" }, RESULT()]);
@@ -2599,7 +2611,8 @@ function answersDir(dir: string, repo: string): string {
   return d;
 }
 const fakeCliEnv = (scenario: string, record: string) => ({ ...process.env, AB_OPERATOR_CLI: JSON.stringify(["bun", FAKE_CLI, scenario, record]) });
-async function cliRun(steps: Step[], extra: string[] = []) {
+const FAKE_CLASSIFIER = path.join(AB, "fixtures", "operator", "fake-classifier.ts");
+async function cliRun(steps: Step[], extra: string[] = [], classify: [string, string][] = [["license", "setup:license"]]) {
   const dir = tmpdir("opcli");
   const cwd = path.join(dir, "repo");
   fs.mkdirSync(cwd);
@@ -2607,10 +2620,11 @@ async function cliRun(steps: Step[], extra: string[] = []) {
   const record = path.join(dir, "record.jsonl");
   fs.writeFileSync(scenario, JSON.stringify(steps));
   const log = path.join(dir, "log.jsonl");
-  const r = Bun.spawnSync(["bun", path.join(AB, "operated-session.ts"), "--cwd", cwd, "--plugin-dir", dir, "--command", "/lean-doc-generator init", "--answers", "clinic", "--answers-dir", answersDir(dir, "clinic"), "--log", log, "--auth", "api-key", ...extra], { cwd: AB, env: fakeCliEnv(scenario, record) });
-  return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString(), log, record, dir };
+  const classifierRecord = path.join(dir, "classifier.jsonl");
+  const r = Bun.spawnSync(["bun", path.join(AB, "operated-session.ts"), "--cwd", cwd, "--plugin-dir", dir, "--command", "/lean-doc-generator init", "--answers", "clinic", "--answers-dir", answersDir(dir, "clinic"), "--log", log, "--auth", "api-key", ...extra], { cwd: AB, env: { ...fakeCliEnv(scenario, record), AB_CLASSIFIER_CLI: JSON.stringify(["bun", FAKE_CLASSIFIER]), AB_FAKE_CLASSIFY: JSON.stringify(classify), AB_FAKE_CLASSIFY_RECORD: classifierRecord } });
+  return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString(), log, record, dir, classifierRecord };
 }
-check("S62 operated-session.ts: exit 0 done, 3 stopped (popup printed in full, deny sent), 1 failed; --rule-file rules apply; the isolated config dir is created beside the cwd", async () => {
+check("S62 operated-session.ts: exit 0 done, 3 stopped (popup printed in full, deny sent), 1 failed; --ruling adds a class; modelCall flags and env; the isolated config dir is created beside the cwd", async () => {
   const done = await cliRun([INIT, auq("a", { question: "Which license should the repo carry?", header: "License" }), { await: "a" }, RESULT()]);
   assert(done.code === 0 && fs.existsSync(done.log), `done exit 0: ${done.code} ${done.err}`);
   assert(fs.readdirSync(done.dir).some((x) => x.startsWith("iso-")), "isolation dir made beside the cwd");
@@ -2618,21 +2632,25 @@ check("S62 operated-session.ts: exit 0 done, 3 stopped (popup printed in full, d
   assert(stop.code === 3 && stop.out.includes("What colour is the logo?") && stop.out.includes('"header"'), `stopped exit 3, popup printed: ${stop.code} ${stop.out}`);
   const fail = await cliRun([INIT, RESULT("error_during_execution")]);
   assert(fail.code === 1, `failed exit 1: ${fail.code} ${fail.err}`);
-  const rf = path.join(tmpdir("rule"), "rules.json");
-  fs.writeFileSync(rf, JSON.stringify([{ match: "colou?r", answer: "blue", source: "test" }]));
-  const ruled = await cliRun([INIT, auq("a", { question: "What colour is the logo?", header: "Logo" }), { await: "a" }, RESULT()], ["--rule-file", rf]);
-  assert(ruled.code === 0, `rule-file rule answers: ${ruled.code} ${ruled.out}${ruled.err}`);
+  const ruled = await cliRun([INIT, auq("a", { question: "Docs already exist here: continue?", header: "Existing" }), { await: "a" }, RESULT()], ["--ruling", "CONTINUE=continue: write only absent files"], [["Docs already exist", "CONTINUE"]]);
+  assert(ruled.code === 0 && respOf(jsonl(ruled.record), "a").updatedInput.answers["Docs already exist here: continue?"] === "continue: write only absent files", `--ruling adds a class answered verbatim: ${ruled.code} ${ruled.out}${ruled.err}`);
+  const noRuling = await cliRun([INIT, auq("a", { question: "Docs already exist here: continue?", header: "Existing" }), { await: "a" }, RESULT()], [], [["Docs already exist", "CONTINUE"]]);
+  assert(noRuling.code === 3, `control: without --ruling the id is not in the catalog -> stop: ${noRuling.code}`);
+  const call = jsonl(done.classifierRecord)[0];
+  assert(["-p", "--model", "claude-sonnet-5-5", "--output-format", "json", "--max-turns", "1", "--tools", ""].every((x, i) => call.argv[i] === x) && call.cfg.includes("iso-") && call.prompt.includes("POPUP"), `modelCall: claude -p, the classifier model, json output, one turn, no tools, prompt on stdin, the session's isolated config dir: ${JSON.stringify({ ...call, prompt: call.prompt.slice(0, 30) })}`);
 });
 
-check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan-approval rule and a pre-init arm does not; allowTools come from the arm; exit 3 on a stop, 0 on done", async () => {
-  const run = async (kind: "init" | "migrate", steps: Step[], mutate?: (fx: Awaited<ReturnType<typeof setupFixture>>) => void) => {
+check("S63 setup-arm --auto (fake classifier): same refusals as --run; a migrate arm gets the PLAN and CLEANUP classes and a pre-init arm neither; live questions are answered by the chosen entry verbatim; allowTools come from the arm; exit 3 on a stop, 0 on done", async () => {
+  // the fake model's choices: the expected id for each live wording (substring of the popup), as the real classifier must choose
+  const S63_MAP: [string, string][] = [["Apply the migrate plan?", "PLAN"], ["which part of the plan should I apply", "PLAN"], ["BUSINESS-NOTES.md (root", "CLEANUP"], ["Migrate plan: (1)", "PLAN"], ["README.md repeats", "CLEANUP"], [".claude/CLAUDE.md repeats", "CLEANUP"], ["overview.md has a Directory", "CLEANUP"], ["Which stack does go.mod", "operator:stack"], ["what is the Performance target", "repo:quality-attributes"]];
+  const run = async (kind: "init" | "migrate", steps: Step[], mutate?: (fx: Awaited<ReturnType<typeof setupFixture>>) => void, classify: [string, string][] = S63_MAP) => {
     const fx = await setupFixture(kind);
     mutate?.(fx);
     const dir = tmpdir("auto");
     const scenario = path.join(dir, "scenario.json");
     const record = path.join(dir, "record.jsonl");
     fs.writeFileSync(scenario, JSON.stringify(steps));
-    const r = Bun.spawnSync(["bun", path.join(AB, "setup-arm.ts"), "--arm", fx.id, "--arms-dir", fx.arms, "--auto", "--work", dir, "--answers-dir", answersDir(dir, "fxrepo"), "--auth", "api-key"], { cwd: AB, env: fakeCliEnv(scenario, record) });
+    const r = Bun.spawnSync(["bun", path.join(AB, "setup-arm.ts"), "--arm", fx.id, "--arms-dir", fx.arms, "--auto", "--work", dir, "--answers-dir", answersDir(dir, "fxrepo"), "--auth", "api-key"], { cwd: AB, env: { ...fakeCliEnv(scenario, record), AB_CLASSIFIER_CLI: JSON.stringify(["bun", FAKE_CLASSIFIER]), AB_FAKE_CLASSIFY: JSON.stringify(classify) } });
     return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString(), record, log: path.join(dir, `operator-${fx.id}.jsonl`) };
   };
   const plan = auq("p", { question: "Apply the migrate plan?", header: "Plan" });
@@ -2643,7 +2661,7 @@ check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan
   assert(sent[1].message.content === "/lean-doc-generator migrate", `skill from the pre-setup manifest: ${JSON.stringify(sent[1])}`);
   assert(respOf(sent, "t").behavior === "allow" && respOf(sent, "t2").behavior === "deny", "x");
   assert(respOf(sent, "k1").behavior === "allow" && respOf(sent, "k2").behavior === "deny", "a tool allowed ONLY by the arm's own allow-list (Skill(lean-flow:*)) is allowed for lean-flow skills and denied for another plugin's");
-  assert(jsonl(mig.log)[0].source === "owner ruling, SPRINT-154", "operator log in the work dir with the rule source");
+  assert(jsonl(mig.log)[0].id === "PLAN" && jsonl(mig.log)[0].answer.startsWith("Profile pass only"), "operator log in the work dir with the chosen id and the verbatim answer");
   // the live wording that stopped the second clinic-a2 run (header "Scope", the plan named mid-sentence, topic words quoted)
   const liveQ = "lean-doc-generator migrate on clinic-ab: which part of the plan should I apply? The profile pass only adds new `## Stack`, `## Conventions in use` and `## Main flows` sections";
   const mig2 = await run("migrate", [INIT, auq("p2", { question: liveQ, header: "Scope" }), { await: "p2" }, RESULT()]);
@@ -2660,10 +2678,60 @@ check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan
   const mig3 = await run("migrate", [INIT, auq("n1", { question: notesQ, header: "Notes file" }), { await: "n1" }, auq("n2", { question: planArchQ, header: "Migrate plan" }), { await: "n2" }, auq("n3", { question: readmeQ, header: "README" }), { await: "n3" }, auq("n4", { question: claudeQ, header: "CLAUDE.md" }), { await: "n4" }, auq("n5", { question: overviewQ, header: "overview.md" }), { await: "n5" }, auq("n6", { question: stackQ, header: "Stack" }), { await: "n6" }, RESULT()]);
   const s3 = jsonl(mig3.record);
   assert(mig3.code === 0 && respOf(s3, "n1").updatedInput.answers[notesQ].startsWith("Leave untouched") && respOf(s3, "n2").updatedInput.answers[planArchQ].startsWith("Profile pass only") && respOf(s3, "n3").updatedInput.answers[readmeQ].startsWith("Leave untouched") && respOf(s3, "n4").updatedInput.answers[claudeQ].startsWith("Leave untouched") && respOf(s3, "n5").updatedInput.answers[overviewQ].startsWith("Leave untouched") && !respOf(s3, "n6").updatedInput.answers[stackQ].startsWith("Leave untouched"), `existing file left untouched; a plan question mentioning archiving keeps the plan answer: ${mig3.code} ${mig3.out}`);
+  const perfQ = "Quality attribute for docs/product/requirements.md: what is the Performance target (e.g. p95 response time)? Nothing in the repo settles it";
+  const mig4 = await run("migrate", [INIT, auq("q1", { question: perfQ, header: "Quality" }), { await: "q1" }, RESULT()]);
+  assert(mig4.code === 0 && respOf(jsonl(mig4.record), "q1").updatedInput.answers[perfQ] === sect(clinicFiles().repo, "Quality attributes"), `a question about a profile topic that names a file gets the topic's entry, not Leave untouched: ${mig4.code} ${mig4.out}`);
   const ini = await run("init", [INIT, plan, { await: "p" }, RESULT()]);
-  assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no plan rule -> stops: ${ini.code} ${ini.out}`);
+  assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no PLAN class (the model's PLAN is not in the catalog) -> stops: ${ini.code} ${ini.out}`);
+  const iniC = await run("init", [INIT, auq("c", { question: notesQ, header: "Notes file" }), { await: "c" }, RESULT()]);
+  assert(iniC.code === 3, `an init arm has no CLEANUP class either: ${iniC.code} ${iniC.out}`);
   const drift = await run("migrate", [INIT, RESULT()], (fx) => fs.appendFileSync(path.join(fx.snap, "README.md"), "drift\n"));
   assert(drift.code === 2 && /REFUSED: .*no longer the pre-migrate copy/.test(drift.err) && !fs.existsSync(drift.record), `drift refused before any session: ${drift.code} ${drift.err}`);
+});
+
+// S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
+check("S64 classifier: buildCatalog has every section, setup bullet, ruling and NONE; the chosen id sends the entry text verbatim; unknown id, unparsable output, NONE and a failed call each STOP; the prompt carries the popup and every id; the four live questions route as the owner ruled", async () => {
+  const { buildCatalog, classify, buildPrompt, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
+  const f = clinicFiles();
+  const cat = buildCatalog(f, [PLAN_RULING, CLEANUP_RULING]);
+  const ids = cat.map((e) => e.id);
+  for (const id of ["repo:business-goal", "repo:main-flows", "repo:invariants", "repo:quality-attributes", "repo:non-goals", "operator:stack", "operator:conventions", "setup:license", "setup:documentation-tiers", "setup:first-milestone-proof-goal", "PLAN", "CLEANUP", "NONE"]) assert(ids.includes(id), `catalog has ${id}: ${ids.join(",")}`);
+  assert(new Set(ids).size === ids.length, "catalog ids are unique");
+  const byId = (id: string) => cat.find((e) => e.id === id)!;
+  assert(byId("repo:quality-attributes").text === sect(f.repo, "Quality attributes") && byId("operator:conventions").text === sect(f.operator, "Conventions in use"), "section entries carry the section body verbatim");
+  assert(byId("setup:license").text === "a proprietary notice." && byId("PLAN").text === PLAN_RULING.text, "bullet text is the part after the colon; ruling text is the ruling");
+  assert(!buildCatalog(f).some((e) => e.id === "PLAN" || e.id === "CLEANUP") && buildCatalog(f).some((e) => e.id === "NONE"), "no rulings passed -> no PLAN/CLEANUP, NONE always");
+
+  const q = (question: string, header = "H") => ({ question, header, options: [{ label: "Yes" }, { label: "No" }] });
+  const pick = (id: string, reason = "because") => async () => JSON.stringify({ id, reason });
+  const ok = await classify(q("What is the stack?"), cat, pick("operator:stack"));
+  assert("answer" in ok && ok.answer === sect(f.operator, "Stack") && ok.id === "operator:stack" && ok.reason === "because", `verbatim entry text: ${JSON.stringify(ok)}`);
+  const fenced = await classify(q("x"), cat, async () => '```json\n{"id": "PLAN", "reason": "r"}\n```');
+  assert("answer" in fenced && fenced.answer === PLAN_RULING.text, `a fenced reply still parses: ${JSON.stringify(fenced)}`);
+  for (const [name, call, re] of [["unknown id", pick("repo:nonsense"), /not in the catalog/], ["unparsable", async () => "I think the stack", /not one JSON/], ["NONE", pick("NONE", "unsure"), /no entry/], ["call failure", async () => { throw new Error("boom"); }, /boom/], ["id absent", async () => '{"reason":"x"}', /not one JSON/]] as const) {
+    const r = await classify(q("What colour is the logo?"), cat, call);
+    assert("stop" in r && r.stop.includes("What colour is the logo?") && re.test(r.stop), `${name} stops naming the question: ${JSON.stringify(r)}`);
+  }
+  let seen = "";
+  await classify(q("Describe the main flows", "Flows"), cat, async (p) => ((seen = p), pick("repo:main-flows")()));
+  assert(ids.every((id) => seen.includes(id)) && seen.includes("Describe the main flows") && seen.includes("Flows") && seen.includes("Yes | No"), "prompt has every catalog id and the popup's header, question and options");
+  const prev = (t: string, n: number) => t.slice(0, n).replace(/\n/g, " / ");
+  assert(byId("repo:invariants").text.length > 301 && seen.includes(prev(byId("repo:invariants").text, 300)) && !seen.includes(prev(byId("repo:invariants").text, 301)), "entries are previewed from their text, cut at 300 chars");
+  assert(/Performance, Availability or Scalability/.test(seen) && /ALREADY EXISTS/.test(seen) && /exactly one line of JSON/.test(seen), "prompt carries the routing rules");
+
+  // the live questions that defeated the keyword table, routed by the (fake) model to the ids the owner ruled
+  const live: [string, string, string][] = [
+    [".claude/CLAUDE.md repeats File Structure, Commands and stack lines already in overview.md / setup.md. The current template uses one-line pointers instead", "CLAUDE.md", "CLEANUP"],
+    ["Quality attribute for docs/product/requirements.md: what is the Performance target (e.g. p95 response time)? Nothing in the repo settles it", "Quality", "repo:quality-attributes"],
+    ["lean-doc-generator migrate on clinic-ab: which part of the plan should I apply?", "Scope", "PLAN"],
+    ["BUSINESS-NOTES.md (root, no ownership header, not linked from README; mostly a duplicate): what should happen to it?", "Notes file", "CLEANUP"],
+  ];
+  for (const [question, header, id] of live) {
+    let p = "";
+    const r = await classify({ question, header }, cat, async (pp) => ((p = pp), pick(id)()));
+    assert("answer" in r && r.id === id && r.answer === byId(id).text && buildPrompt({ question, header }, cat) === p, `${id} for "${question.slice(0, 50)}": ${JSON.stringify(r).slice(0, 120)}`);
+    assert(p.includes(question) && p.includes(`header: ${header}`), "the live popup text is in the prompt");
+  }
 });
 
 const onlyIdx = process.argv.indexOf("--only");

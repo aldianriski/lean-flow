@@ -14,7 +14,7 @@ import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
 import { setupCommand } from "./lib/setup.ts";
 import { verifyPin } from "./lib/pin.ts";
 import { diffManifest } from "./lib/snapshot.ts";
-import { parseRules } from "./lib/operator.ts";
+import { buildCatalog, CLEANUP_RULING, makeAnswerer, modelCall, PLAN_RULING } from "./lib/classifier.ts";
 import { operatedCommand, readAnswers, reportAndExit, runOperatedSession } from "./lib/operated-session.ts";
 
 const flag = (n: string) => (process.argv.includes(`--${n}`) ? process.argv[process.argv.indexOf(`--${n}`) + 1] : undefined);
@@ -69,24 +69,19 @@ if (flag("auth")) arm.auth = flag("auth") as typeof arm.auth; // test hook: the 
 const iso = makeIsolation(WORK, arm);
 console.log(`isolated config dir (transcript lands here): ${iso.cfg}`);
 if (auto) {
-  // owner ruling, SPRINT-154: the migrate plan is approved for the profile items only. The plan popup quotes topic words (Stack,
-  // Main flows) the table would also hit, and its wording varies run to run ("Migrate plan ...", "which part of the plan should I
-  // apply?"), so the rule matches the plan in either order and is exclusive (live stops on clinic-a2, 2026-11-01)
-  const PLAN_RULE = { match: /(approv|appl[iy]|proceed)[\s\S]*\bplan\b|\bplan\b[\s\S]*(approv|appl[iy]|proceed)/i, exclusive: true, source: "owner ruling, SPRINT-154", answer: "Profile pass only: apply only the items that add ## Stack, ## Conventions in use and the five business topics (business goal, main flows, invariants, quality attributes, non-goals). Decline every other item, including archiving, moving, renaming or slimming any existing file." };
+  // the model classifier only CHOOSES an entry; a migrate arm also gets the two owner rulings (SPRINT-154): the plan is approved for the
+  // profile items only, and an existing file is left untouched. An init arm gets neither class.
   let files!: ReturnType<typeof readAnswers>;
-  // owner ruling, SPRINT-154 (standing, after the BUSINESS-NOTES.md stop on clinic-a2): a question about changing, archiving, moving,
-  // renaming or slimming an existing file is answered "leave it untouched"; a plan question is left to PLAN_RULE
-  const FILE_RULE = { match: /^(?![\s\S]*\bplan\b)(?=[\s\S]*(\b[\w./-]+\.md\b|\bREADME\b|\brepeats?\b|\bduplicat|\balready in\b|\bpointers?\b|\barchiv|\bmov(e|ing)\b|\brenam|\bslim|\bheader\b|what should happen to|\bconsolidat|\bmerg|\bremov|\bdelet|\breplac|\btrim|\brewrit|\bcollaps))/i, exclusive: true, topicHeaderExempt: true, source: "owner ruling, SPRINT-154 (existing files untouched)", answer: "Leave untouched: do not edit, archive, move, rename or slim this existing file." };
-  let rules = kind === "migrate" ? [PLAN_RULE, FILE_RULE] : [];
   try {
     files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);
-    if (flag("rule-file")) rules = [...parseRules(fs.readFileSync(path.resolve(flag("rule-file")!), "utf8")), ...rules];
   } catch (e) {
     refuse((e as Error).message);
   }
+  const catalog = buildCatalog(files, kind === "migrate" ? [PLAN_RULING, CLEANUP_RULING] : []);
+  const env = isolationEnv(iso, arm);
   const log = path.join(WORK, `operator-${id}.jsonl`);
   // the claude command minus its leading binary, behind the stream-json flags (operatedCommand puts the binary, or a test's fake CLI, first)
-  const res = await runOperatedSession({ cmd: operatedCommand(claude.slice(1)), cwd: arm.snapshot!, env: isolationEnv(iso, arm), prompt: `/lean-doc-generator ${kind}`, files, rules, allowTools: [...arm.allowedTools, "Read", "Glob", "Grep"], operatorLog: log });
+  const res = await runOperatedSession({ cmd: operatedCommand(claude.slice(1)), cwd: arm.snapshot!, env, prompt: `/lean-doc-generator ${kind}`, answerer: makeAnswerer(catalog, modelCall(env)), allowTools: [...arm.allowedTools, "Read", "Glob", "Grep"], operatorLog: log });
   process.exit(reportAndExit(res, log));
 }
 const p = Bun.spawn(claude, { cwd: arm.snapshot, env: isolationEnv(iso, arm), stdin: "inherit", stdout: "inherit", stderr: "inherit" });

@@ -3,7 +3,8 @@
 // prompt arrive as a `control_request`/`can_use_tool` line on stdout; the host answers with a `control_response` line on stdin.
 import fs from "node:fs";
 import path from "node:path";
-import { answerFor, type Files, type Question, type Rule } from "./operator.ts";
+import type { Answerer } from "./classifier.ts";
+import type { Question } from "./operator.ts";
 
 export type OperatedOpts = {
   /** the full command line, built with `operatedCommand` (tests substitute a fake CLI) */
@@ -12,8 +13,8 @@ export type OperatedOpts = {
   env: Record<string, string>;
   /** the first user message, e.g. `/lean-doc-generator migrate` */
   prompt: string;
-  files: Files;
-  rules: Rule[];
+  /** chooses the frozen entry that answers each popup question (the classifier; tests substitute a fake model); a stop stops the popup */
+  answerer: Answerer;
   /** tool names (or `Name(pattern)` entries, matched on the name) the operator allows; any other tool request is denied */
   allowTools: string[];
   /** every decision is appended here as one JSON line */
@@ -66,7 +67,7 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
   let result: OperatedResult | undefined;
   const dec = new TextDecoder();
   let buf = "";
-  const handle = (m: any): boolean => {
+  const handle = async (m: any): Promise<boolean> => {
     if (m.type === "result") {
       const sub = String(m.subtype ?? "");
       result = sub === "success" && !m.is_error ? { status: "done", resultSubtype: sub } : { status: "failed", resultSubtype: sub, reason: `result ${sub}${m.is_error ? " (is_error)" : ""}` };
@@ -77,7 +78,7 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
     const tool = m.request.tool_name as string;
     const input = m.request.input ?? {};
     if (tool === "AskUserQuestion") {
-      const questions = (input.questions ?? []) as (Question & { question: string })[];
+      const questions = (input.questions ?? []) as (Question & { question: string; options?: unknown[] })[];
       const answers: Record<string, string> = {};
       const decided: Record<string, unknown>[] = [];
       let stop: string | undefined;
@@ -89,14 +90,14 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
         decided.push({ question: repeated, header: questions[texts.indexOf(repeated)]?.header, stop });
       }
       for (const q of stop === undefined ? questions : []) {
-        const a = answerFor({ question: q.question, header: q.header ?? "" }, o.files, o.rules);
+        const a = await o.answerer({ question: q.question, header: q.header ?? "", options: q.options });
         if ("stop" in a) {
           stop = a.stop;
           decided.push({ question: q.question, header: q.header, stop: a.stop });
           break;
         }
         answers[q.question] = a.answer;
-        decided.push({ question: q.question, header: q.header, answer: a.answer, source: a.source });
+        decided.push({ question: q.question, header: q.header, id: a.id, reason: a.reason, answer: a.answer });
       }
       if (stop !== undefined) {
         for (const d of decided) log(d);
@@ -126,7 +127,7 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
       } catch {
         continue;
       }
-      if (handle(m)) break outer;
+      if (await handle(m)) break outer;
     }
   }
   try {

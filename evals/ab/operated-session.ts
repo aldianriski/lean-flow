@@ -1,13 +1,13 @@
 // A headless, operator-answered docs-tool session for a repo that is not an arm (arms use `setup-arm.ts --auto`).
 //   bun evals/ab/operated-session.ts --cwd <dir> --plugin-dir <dir> --command "/lean-doc-generator init" --answers <repo>
-//        [--rule-file <json>] [--log <file>] [--allow-tools Read,Glob,...] [--answers-dir <dir>] [--work <dir>] [--auth subscription|api-key]
+//        [--ruling <ID>=<text>]... [--log <file>] [--allow-tools Read,Glob,...] [--answers-dir <dir>] [--work <dir>] [--auth subscription|api-key]
 // Runs with an isolated config dir (made beside the cwd, or in --work) so no installed user plugin loads. Exit 0 done, 3 stopped, 1 failed, 2 refused.
 // Maintainer-only; the session is a paid subscription session.
 import fs from "node:fs";
 import path from "node:path";
 import type { Arm } from "./lib/arm.ts";
 import { makeIsolation, isolationEnv } from "./lib/isolate.ts";
-import { parseRules } from "./lib/operator.ts";
+import { buildCatalog, makeAnswerer, modelCall, parseRulingArgs, type Ruling } from "./lib/classifier.ts";
 import { operatedCommand, readAnswers, reportAndExit, runOperatedSession } from "./lib/operated-session.ts";
 import { setupModel } from "./lib/setup.ts";
 
@@ -23,10 +23,10 @@ if (auth !== "subscription" && auth !== "api-key") refuse("--auth must be subscr
 for (const [n, d] of [["--cwd", cwd], ["--plugin-dir", pluginDir]] as const) if (!fs.existsSync(d)) refuse(`${n} ${d} does not exist`);
 
 let files!: ReturnType<typeof readAnswers>;
-let rules: ReturnType<typeof parseRules> = [];
+let rulings: Ruling[] = [];
 try {
   files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);
-  if (flag("rule-file")) rules = parseRules(fs.readFileSync(path.resolve(flag("rule-file")!), "utf8"));
+  rulings = parseRulingArgs(process.argv.flatMap((a, i, all) => (a === "--ruling" && all[i + 1] !== undefined ? [all[i + 1]!] : [])));
 } catch (e) {
   refuse((e as Error).message);
 }
@@ -38,5 +38,6 @@ const arm = { auth, dispatch: {} } as Arm;
 const iso = makeIsolation(path.resolve(flag("work") ?? path.join(cwd, "..")), arm);
 console.log(`isolated config dir (transcript lands here): ${iso.cfg}`);
 const cmd = operatedCommand(["--plugin-dir", pluginDir, "--model", setupModel(), "--permission-mode", inv.permissionMode]);
-const res = await runOperatedSession({ cmd, cwd, env: isolationEnv(iso, arm), prompt: command, files: files!, rules, allowTools, operatorLog: log });
+const env = isolationEnv(iso, arm);
+const res = await runOperatedSession({ cmd, cwd, env, prompt: command, answerer: makeAnswerer(buildCatalog(files!, rulings), modelCall(env)), allowTools, operatorLog: log });
 process.exit(reportAndExit(res, log));

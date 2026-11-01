@@ -30,7 +30,7 @@ export function section(md: string, heading: string): string | undefined {
 }
 
 type Bullet = { label: string; text: string };
-function setupBullets(operator: string): Bullet[] {
+export function setupBullets(operator: string): Bullet[] {
   const body = section(operator, "Setup answers");
   if (!body) return [];
   const out: { label: string; lines: string[] }[] = [];
