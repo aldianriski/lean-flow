@@ -123,6 +123,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-269 [tags: process] [status: active]: **A design that writes a file the standard rules on must read that file's STANDARD §2 row at G2, or the real run follows the row instead of the design.** SPRINT-153 T6 designed migrate to write `docs/product/requirements.md` on every 2.x repo. Its builder check, two review rounds and the merge never opened §2, whose row for that file said "skipped on an existing repo whose AI-context files already ARE the spec". The owner's real migrate run on kalasuara read the row, skipped the file and dropped the business profile; the owner then had to rule spec against design, and the result was a spec PATCH and a second owner run. At G2, list each file the design creates or extends and read its §2 row (create and update triggers) beside the design.
+- seen: 2026-10-31 (SPRINT-153 T6, kalasuara migrate run; spec 0.18.2 at `a991c393`)
+- count: 1
+- promoted: no
+- related: L-220 (read the entry point's own ADR before offering a ruling)
+
+---
+
 ## L-268 [tags: process] [status: active]: **A review record written before the review depth is decided becomes a permanent finding in an append-only log.** SPRINT-151 logged `review · T8 · self-review` against a behaviour:material change, meaning to run one review per wave. Two independent Codex rounds followed, each recorded as `scoped-reviewer`, but the review-depth check examines every self-review line on its own and the log cannot drop one. System verify FAILed at close on a review that had in fact happened, and the owner had to rule it. Write the `review · Tn` line only after the depth is decided; until then the `consequence` line is the record.
 - seen: 2026-10-30 (SPRINT-151 close, system verify at `a27eeaed`; owner override, checker fix filed as TASK-559)
 - count: 1
