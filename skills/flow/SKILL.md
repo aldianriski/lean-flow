@@ -29,7 +29,7 @@ Assess the current state first, then run only the stages whose precondition is u
 *active sprint* = a top-level `docs/sprint/SPRINT-*.md` (not `logs/` or `archive/`) with `status: active`; its
 members are its `## Members` paths ∪ every task file stamped `sprint: SPRINT-NNN`, whatever folder it sits in.
 
-1. **Orient** — context missing/stale → `/prime`. Resuming from a handoff? read it first.
+1. **Orient** — context missing/stale → `/prime`. Resuming from a handoff? read it first. After `/prime`, an **unprofiled** repo (prime's test: no CLAUDE/CONTEXT/overview → `/lean-doc-generator init`; docs but no overview `## Stack` → `migrate`) runs that skill before Feed; unattended it parks (both are HITL).
 2. **Feed** — no active sprint and no open work → `/task-decomposer "<intent>"` — **the detailed grill fires here, at intake** (the build gates re-grill only residuals); intent too **foggy to plan** (decisions unknown) → its **fog-mode** (`--fog`) maps decisions before tasks; open work but none `state: ready`, or backlog drifted / noisy → `/triage`.
    Work is a `docs/product/roadmap.md` row → `/task-decomposer --roadmap <row>` (one row, beside `--epic`; never edits the roadmap).
 3. **Plan** — no active sprint but a ready backlog exists → `/lean-doc-generator promote` (the governance review fires here).

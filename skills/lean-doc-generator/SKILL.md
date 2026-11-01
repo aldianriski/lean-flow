@@ -44,8 +44,8 @@ SSOT for every standard-owned rule (ADR-023).
 | `/lean-doc-generator close` | Sprint Close (below) |
 | `/lean-doc-generator epic "<outcome>"` | **Open an epic** — a *multi-sprint* outcome (below). One sprint's worth of work is a sprint; an unnameable destination is fog (`/task-decomposer --fog`) until it isn't |
 | `/lean-doc-generator prd` | **Create/update `docs/product/requirements.md`** (+ `acceptance-criteria.md`) from `templates/product-requirements.md.template`. The durable, project-scoped requirements doc — distinct from the per-feature PRD `/task-decomposer` synthesizes at intake, whose approved residue is sanitized *into* this file |
-| `/lean-doc-generator migrate` | **Adopt + clean** existing docs (dev-flow · adlc-flow · any layout) — align placement/format/wiring, **consolidate dupes, retire dead docs**. Plan → approve → apply. **Re-runnable as an update sync** (report standard/template deltas, never clobber). |
-| `/lean-doc-generator init` | **Scaffold a fresh repo** (greenfield) — scope-interactive: base tier always + higher tiers by repo type; docs + the 3-file safe-scaffold allowlist only (never `settings.json`). The twin of migrate. |
+| `/lean-doc-generator migrate` | **Adopt + clean** existing docs (dev-flow · adlc-flow · any layout) — align placement/format/wiring, **consolidate dupes, retire dead docs**, and **add the repo profile** (same as init) while keeping every decision. Plan → approve → apply. **Re-runnable as an update sync** (never clobber). |
+| `/lean-doc-generator init` | **Scaffold a fresh repo** — writes the **repo profile** (Stack, Conventions in use, five business topics: Business goal · Main flows · Invariants · Quality attributes · Non-goals) from the scan, the repo's docs and any matched question set; asks only what none settles; never overwrites; offers migrate when docs exist. |
 
 `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
 `promote` / `close` / epic rollup refuse v1 or mixed by name and point to `/lean-doc-generator migrate` — the only 2.x path accepting one; doc/ADR generation and `migrate` itself are unaffected.

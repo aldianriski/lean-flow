@@ -93,11 +93,12 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
      sprint-bulk unattended` too (a night run executing the promoted Plan). An all-HITL/J2 sprint gets
      `/orchestrator` alone: an unattended run would park every J2 task and end at AUTHORITY_BOUNDARY
      having done nothing. **Naming it is the whole job:** priming never launches anything; the mode is
-     declared at the trigger, and the run is gated by its own pre-flight (`orchestrator/references/night-run.md`)
+     declared at the trigger, and the run is gated by its own pre-flight (`orchestrator/references/night-run.md`) — an **unprofiled** repo (last bullet's test) is also named
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - uncovered epic conditions or roadmap rows > 0 → also name `/triage` (it lists them)
-   - nothing tracked yet → `/task-decomposer "<intent>"`
+   - nothing tracked yet, **unprofiled** → name the command, never run it: none of slots 1·2·6 exists → `/lean-doc-generator init`; else slot 6 has no `## Stack` heading (or no slot-6 file) → `/lean-doc-generator migrate`. Slots already read; no new file
+   - nothing tracked yet, profiled → `/task-decomposer "<intent>"`
 
 ## Output format
 

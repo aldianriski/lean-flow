@@ -403,6 +403,11 @@ unfamiliar repo or doing a pre-refactor audit (usage + maintenance recipe: `docs
 lean-flow's placement · format · wiring — plan → approve → apply, surgically (never deletes your
 content), so you're not hand-reconciling or lost in existing code.
 
+**The repo profile.** `init` and `migrate` both write it: Stack, Conventions in use and five business
+topics (Business goal, Main flows, Invariants, Quality attributes, Non-goals). Each line cites its source
+(a file, one of your docs, or your answer) or says *not decided yet*. They ask only what the scan and your
+docs don't settle. Question sets load by detected stack (React/Vite, Vue/Vite, Go/chi and Postgres today).
+
 **Requirements:** Claude Code CLI. (Node / language toolchains matter only for whatever your own
 project needs — lean-flow itself is Markdown.)
 
@@ -428,6 +433,11 @@ graceful window — every `2.x` queue skill carries exactly one read path.
    `/orchestrator` and promote/close all read the store from here on. A sprint now **references**
    its member task files instead of copying their DoD into its Plan. Each task's DoD lives only in
    its own `## Done when`, and `plan_commit` is the freeze (ADR-047); with no git, a verbatim snapshot in the promote entry is (ADR-054).
+
+**Already on 2.x?** Re-run `/lean-doc-generator migrate`. It adds the profile sections and
+`docs/product/requirements.md`, citing what your CLAUDE.md and CONTEXT.md already say and never copying
+it, and it removes or rewords nothing. It backs up first and checks every ADR, decision row,
+requirements file and epic Closed-when line before and after.
 
 **New requirement: `bun` for checking a 2.x tree.** `conformance.sh` (and the gate and night-run) read a
 sprint's members through one TypeScript lookup, so checking a migrated repo needs [`bun`](https://bun.sh)

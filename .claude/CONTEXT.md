@@ -20,7 +20,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 |---|---|---|
 | `/flow` | **conductor** | opt-in — drives the whole loop, calling stage-skills in sequence; enforces gates + governance, never auto-approves |
 | `/prime` | entry | ordered context load + health check (read-only) — incl. a `Skills:` freshness row: installed base-dir version vs repo manifest (report, never a block) |
-| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (open a multi-sprint outcome) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — bundles templates + standard; **creates** every core doc, `/task-decomposer` consumes them |
+| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (open a multi-sprint outcome) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — both write the repo profile (Stack · Conventions in use · five business topics) — bundles templates + standard; **creates** every core doc, `/task-decomposer` consumes them |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
 | `/task-decomposer` | feed | intent / ticket / PRD / epic-slice → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake). **Consumes docs, never creates them** |
 | `/triage` | groom | re-prioritise + state the backlog (`docs/work/backlog/`); flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
