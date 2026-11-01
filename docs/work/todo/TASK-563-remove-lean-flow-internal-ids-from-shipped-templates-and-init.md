@@ -1,6 +1,7 @@
 ---
 id: TASK-563
 title: "Remove lean-flow-internal ids from the shipped templates and init's reference"
+sprint: SPRINT-155
 priority: P2
 size: S
 risk: med
@@ -22,7 +23,7 @@ of them format examples and some possibly lean-flow's own rows. An adopter's gen
 nothing in their repo (L-015, consumer-side rule). T1 removed ADR-012 only where it touched the profile sections.
 
 ## Done when
-- [ ] A census of `skills/lean-doc-generator/templates/` and `references/init.md` separates format examples from
+- [ ] A census of `skills/lean-doc-generator/templates/` and `skills/lean-doc-generator/references/init.md` separates format examples from
   lean-flow-internal ids or names; each internal one is removed or replaced by a plain statement of the rule.
 - [ ] A real `init` through the installed plugin on a fresh snapshot writes no lean-flow-internal id into the adopter repo.
 

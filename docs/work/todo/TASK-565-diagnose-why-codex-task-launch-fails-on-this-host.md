@@ -1,6 +1,7 @@
 ---
 id: TASK-565
 title: "Diagnose why a Codex review task fails to launch on this host while setup reports it ready"
+sprint: SPRINT-155
 priority: P2
 size: S
 risk: low

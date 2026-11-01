@@ -1,6 +1,7 @@
 ---
 id: TASK-561
 title: "Rule whether lean-flow itself carries the repo profile, then run migrate here or record the exemption"
+sprint: SPRINT-155
 priority: P2
 size: S
 risk: low

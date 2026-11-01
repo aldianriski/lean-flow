@@ -1,6 +1,7 @@
 ---
 id: TASK-564
 title: "Stop the README template's Quick start repeating the setup guide, and fix the integrations OpenAPI pointer"
+sprint: SPRINT-155
 priority: P3
 size: S
 risk: low
