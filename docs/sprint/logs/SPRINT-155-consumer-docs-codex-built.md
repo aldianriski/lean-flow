@@ -101,3 +101,16 @@ task never touches, now reworded.
 First run at `0f78cb13`: bun test 589/0, qa-check 348 pass, 2 fail, both in coordinator text: a contract-file path in TASK-564's
 tick evidence (layers completeness) and two AI-context files named by T5's scope-change but absent from its Cites (scope-change
 layers). Both fixed in `afba08a9`. Second run: qa-check 350 pass, 0 fail; bun test 589 pass, 0 fail.
+
+### 2026-11-01 | progress | T5 done: lean-flow carries its repo profile; the clinic init check is re-run (both owner sessions loaded 2.19.1)
+The owner's two sessions, `init` in clinic-ab and `migrate` in lean-flow, both loaded the installed 2.19.1 (skill base directory
+under the plugin cache). The likely cause is launching without `--plugin-dir`: headless, both a Skill call and a typed
+`/lean-flow:prime` with `--plugin-dir` load the checkout. lean-flow's migrate output stands for T5, since the box does not name a
+version: the profile (`d1d68b9c`), both product exemptions withdrawn, a testing-guide exemption added, the overview at 148 lines.
+Owner ruling: keep those, undo the roadmap move to `docs/archive/` and a date-only bump of `docs/deployment/rollback-guide.md`.
+Two empty files committed by accident at SPRINT-077 are removed (`b1f7e991`, then `4235be8e` for the one the first commit missed).
+`/prime` from the checkout then reports `## Stack present → profiled` with no migrate in Next. The clinic output (2.19.1) leaked
+`ADR-012` into seven docs, repeated setup.md's run commands in the README Quick start, rewrote the README and deleted
+`docs/spec.md`; it is discarded by owner ruling and `init` is re-run with the checkout for T1 box 2 and T2 box 3.
+consequence · T5 · behaviour:low · governance:high
+review · T5 · scoped-reviewer · behaviour:low · governance:high

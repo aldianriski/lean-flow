@@ -22,9 +22,9 @@ SPRINT-153 T7 wired `/prime` to name `migrate` on a repo whose architecture over
 Owner ruling at T7's G2: accept the nudge for now and decide in a later sprint (dogfood vs exempt).
 
 ## Done when
-- [ ] The owner rules: run `migrate` on lean-flow (profile written, inventory holds) or record lean-flow as exempt where
+- [x] The owner rules: run `migrate` on lean-flow (profile written, inventory holds) or record lean-flow as exempt where ✓ owner ruled dogfood; the owner's migrate run wrote the profile (`d1d68b9c`: Stack, Conventions in use, cite-only requirements and acceptance criteria); inventory holds, no ADR, DECISIONS, epic or LEARNINGS file changed
   `/prime` and the conformance check read it.
-- [ ] After the ruling, `/prime` on lean-flow names migrate only if the ruling says it should.
+- [x] After the ruling, `/prime` on lean-flow names migrate only if the ruling says it should. ✓ the checkout's `/prime` on lean-flow reports `overview.md (## Stack present → profiled)` and its Next line names no migrate
 
 ## Touches
 `docs/architecture/overview.md` (if migrate runs) · or the exemption record
