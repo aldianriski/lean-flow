@@ -125,7 +125,8 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
    `(from <path> § <heading>)` for a doc, `(owner, init)` for an answer, `(owner, init; drafted from
    <path> § <heading>)` for an accepted drafted option (Source column for quality rows). An undecided
    business topic is written as the line `Not decided yet (owner, init)` in place of the template
-   placeholder; its heading keeps `[CUSTOMIZE]` as the open flag until the topic is decided. A set answer is one line in `## Conventions in use` ending `(owner, init)` or
+   placeholder; its heading keeps `[CUSTOMIZE]` as the open flag until the topic is decided. A set
+   answer is one line in `## Conventions in use` ending `(owner, init)` or
    `(owner, init; drafted from <file>)`;
    *not decided yet* goes under `Not confirmed`. Main flows: name each flow with its source; add the
    `→ docs/flows/<slug>.md` pointer only when that flow doc exists or init writes it.
