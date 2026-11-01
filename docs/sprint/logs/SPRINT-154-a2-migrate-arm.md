@@ -110,3 +110,11 @@ pre-migrate copy. Owner ruling by popup: a model only CLASSIFIES each popup (an 
 or NONE); the text sent is the entry's own words or the fixed ruling text, never model-written; an unknown id, unparsable output or
 NONE stops. Built test-first by a Sonnet builder (`8a81c8db`, S61-S64, selftest 69/69 re-run by the coordinator). One paid smoke
 run of `claude-sonnet-5-5` classified the four live questions as the owner expected (CLEANUP, quality attributes, PLAN, CLEANUP).
+
+### 2026-11-01 | progress | T1: clinic-a2 runs 7-8 with the classifier; setup deviation 2 ruled (dates on touched files)
+Run 7 ended at a plan that migrate asked for in prose, not a popup; the operator now classifies a turn that ends asking the user and
+replies with the chosen entry (`14dc9a85`, S65; the trigger no longer fires on "which", `251c5a93`). Run 8: the chat request was
+classified CLEANUP (BUSINESS-NOTES.md untouched), the plan popup PLAN, then a popup asking whether to update `last_updated` on the
+files that get a new section was classified NONE and stopped; nothing written. **Setup deviation 2 (owner ruling):** yes, on the
+files that get a new section only. Added as the DATES ruling class for migrate arms, with CLEANUP's label excluding dates; a real
+classification of the live question picked DATES.
