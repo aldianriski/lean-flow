@@ -280,3 +280,7 @@ as filled to migrate's re-run. It also raised the same missing-nudge gap the run
 conflict in the CHANGELOG, and an undocumented First-milestone split. All are fixed: the unprofiled bullet now applies on
 every branch (named beside the next step when work is tracked, the Next itself when nothing is), and a v1/mixed layout skips it.
 review · T7 · scoped-reviewer · behaviour:material · governance:low
+Review round 2 (Claude stand-in, Sonnet): CLEAR; two wording nits taken. After the round-1 fixes on build `b8cd3cb5`, headless
+`/prime` gives the portfolio copy `Next: /lean-doc-generator init`, and the unprofiled kalasuara copy now names migrate
+beside promote. The owner's `/flow` run on a fresh portfolio copy is staged on the VPS with build `b8cd3cb5`.
+review · T7 · scoped-reviewer · behaviour:material · governance:low
