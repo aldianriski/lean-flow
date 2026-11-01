@@ -35,3 +35,9 @@ Composition by owner popup: TASK-555 alone, stream s1-discovery, beside stream c
 `ready` by triage (`84fd3c1c`), both blockers in `done/`. Size M, no `L`. Origin: decomposer. Epic: EPIC-023 (S1).
 Box 1 still reads `init`; the owner's ruling (migrate) is applied by a `scope-change` entry right after this lock.
 promote-check: 4 pass, 0 fail.
+
+### 2026-11-01 | scope-change | T1: TASK-555 box 1 sets A2 up through a real `migrate`, not `init`
+What changed: owner ruling 2026-11-01 (D1). The A1 snapshots carry 2.x docs, so the upgrade an adopter would really run is
+`migrate`; `init` would scaffold beside existing docs. Impact: box 1's verb and its subject change ("a real `migrate` on the
+frozen A1 snapshots"); boxes 2 and 3, the trial count and the ruling are unchanged. G2 is re-confirmed with the design, which has
+not been signed yet.

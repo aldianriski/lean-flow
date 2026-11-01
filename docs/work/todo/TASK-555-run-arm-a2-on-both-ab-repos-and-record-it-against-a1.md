@@ -22,7 +22,7 @@ The epic's S1 Closed-when line ends on "arm A2 measured vs A1"; research §7 sta
 maintainer-only measurement (`evals/ab/`, paid, run by hand), never a gate or `qa-check.sh` leg. G2 review-round cap: 2.
 
 ## Done when
-- [ ] A2 setup: a real `init` on the workdoo and clinic-ab snapshots through the installed plugin at the pinned S1 revision,
+- [ ] A2 setup: a real `migrate` on the frozen A1 snapshots of workdoo and clinic-ab through the installed plugin at the pinned S1 revision,
   every popup answered verbatim from the frozen answers files, transcripts kept; the produced docs hashed as the frozen A2
   discovery set.
 - [ ] A2 trials run as pre-registered (k = 2, 2 repos × 8 tasks) and graded by the S0 pipeline; A2 vs A1 recorded in the A/B
