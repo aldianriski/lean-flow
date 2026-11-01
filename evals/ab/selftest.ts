@@ -2639,11 +2639,15 @@ check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan
   const mig = await run("migrate", [INIT, plan, { await: "p" }, toolReq("t", "Glob"), { await: "t" }, toolReq("t2", "WebFetch"), { await: "t2" }, toolReq("k1", "Skill", { skill: "lean-flow:prime" }), { await: "k1" }, toolReq("k2", "Skill", { skill: "other-plugin:run" }), { await: "k2" }, RESULT()]);
   assert(mig.code === 0, `migrate arm done: ${mig.code} ${mig.err}${mig.out}`);
   const sent = jsonl(mig.record);
-  assert(respOf(sent, "p").updatedInput.answers["Apply the migrate plan?"].startsWith("Approve only the profile items: ## Stack, ## Conventions in use,"), "migrate plan rule answered");
+  assert(respOf(sent, "p").updatedInput.answers["Apply the migrate plan?"].startsWith("Profile pass only: apply only the items that add ## Stack"), "migrate plan rule answered");
   assert(sent[1].message.content === "/lean-doc-generator migrate", `skill from the pre-setup manifest: ${JSON.stringify(sent[1])}`);
   assert(respOf(sent, "t").behavior === "allow" && respOf(sent, "t2").behavior === "deny", "x");
   assert(respOf(sent, "k1").behavior === "allow" && respOf(sent, "k2").behavior === "deny", "a tool allowed ONLY by the arm's own allow-list (Skill(lean-flow:*)) is allowed for lean-flow skills and denied for another plugin's");
   assert(jsonl(mig.log)[0].source === "owner ruling, SPRINT-154", "operator log in the work dir with the rule source");
+  // the live wording that stopped the second clinic-a2 run (header "Scope", the plan named mid-sentence, topic words quoted)
+  const liveQ = "lean-doc-generator migrate on clinic-ab: which part of the plan should I apply? The profile pass only adds new `## Stack`, `## Conventions in use` and `## Main flows` sections";
+  const mig2 = await run("migrate", [INIT, auq("p2", { question: liveQ, header: "Scope" }), { await: "p2" }, RESULT()]);
+  assert(mig2.code === 0 && respOf(jsonl(mig2.record), "p2").updatedInput.answers[liveQ].startsWith("Profile pass only"), `the live plan wording is answered by the exclusive plan rule: ${mig2.code} ${mig2.out}`);
   const ini = await run("init", [INIT, plan, { await: "p" }, RESULT()]);
   assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no plan rule -> stops: ${ini.code} ${ini.out}`);
   const drift = await run("migrate", [INIT, RESULT()], (fx) => fs.appendFileSync(path.join(fx.snap, "README.md"), "drift\n"));
