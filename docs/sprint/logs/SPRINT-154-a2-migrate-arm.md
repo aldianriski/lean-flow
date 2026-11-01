@@ -52,3 +52,14 @@ installed plugin at the pinned S1 revision", as at A1; (2) setup popups the froz
 approved for the profile items only and anything else declined; any other unanswered popup stops the session for an owner ruling,
 logged in the A2 log as a setup deviation; (3) the pilot is one slot per arm-repo pair, derived from the schedule (S0 stays 4, A2
 becomes 2), a driver change with a selftest fixture. All three are stated in Amendment 6. G2 signed.
+
+### 2026-11-01 | progress | T1 steps 1-4 built: pin, A2 snapshot copies and arm files, setup-arm.ts, derived pilot, schedule-a2.json
+Steps 1-3 inline (`798a4f1c`): the S1 pin at `82990174` (hashDir `b8c3b484...`); the A2 copies of the frozen A1 snapshots with 0 drift
+(workdoo 1244 files, clinic 66; pre-migrate manifests equal the A1 manifests key for key); arm files whose pin verifies. Step 4 by a
+Sonnet builder in a worktree, test-first (`acfec0b9`, `0826d8b9`): `setup-arm.ts --arm <id>` replaces `setup-a1.ts` and runs init
+or migrate according to the arm's pre-setup manifest, in the isolated config that keeps the installed plugin out; the pilot is
+one slot per (arm, repo) pair (S0 4, A2 2); `schedule-a2.json` is the A1 slots with trial 1-2 renamed -a2 (32 slots), re-derived
+by S59. Selftest 64/64 (S57-S59 each seen failing first), re-run by the coordinator. Codex review: R2-R5 OK, one Medium (a relative
+plugin path could verify one checkout and launch another), fixed by refusing relative paths; 1 round.
+consequence · T1 · behaviour:material · governance:high
+review · T1 · scoped-reviewer · behaviour:material · governance:high
