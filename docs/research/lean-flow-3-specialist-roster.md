@@ -6,7 +6,7 @@ status: current
 id: lean-flow-3-specialist-roster
 tags: [process, docs]
 domain: skills
-related: [lean-flow-3-foundation, EPIC-023, ADR-001, ADR-002, ADR-010, ADR-044, ADR-053]
+related: [lean-flow-3-foundation, ADR-001, ADR-002, ADR-010, ADR-044, ADR-053]
 ---
 
 # Research — Which specialist roles does lean-flow 3.0 test, across the whole loop?

@@ -295,3 +295,19 @@ Follow-ups for close: lean-flow's own profile (run migrate here or rule it exemp
 `conformance-engine.sh` comment quoting the old §2 cell; pre-existing lean-flow ids in eight templates and init.md; README
 Quick start duplicates setup; the integrations openapi dead pointer; the Codex launch diagnosis; emoji heading normalisation
 for the S2 resolver.
+
+### 2026-11-01 | scope-change | T6: requirements.md joins T6's Cites (the adopter file its earlier entry names)
+What broke: system verify at close found that the T6 scope-change entry of 2026-10-31 names `requirements.md`, the adopter
+file migrate writes, which sits in neither T6's Layers nor its Cites. Impact: T6 Cites adds `requirements.md` (an adopter
+file, never touched in this repo). No behaviour change. Re-confirm G2: not needed.
+
+### 2026-11-01 | progress | close: system verify red on four of 349, three fixed, one ruled by the owner
+System verify on the VPS at `18612316`: bun test 589 of 589; qa-check 345 pass, 4 fail. Three are fixed forward. First, doc-caps
+token budget: T7's CONTEXT row went over by 25 tokens, and the row is now trimmed (it also drops "+ standard", since the
+standard is cited, not bundled). Second, a dangling `EPIC-023` in the specialist-roster research doc's `related:`. Third, the
+T6 scope-change naming `requirements.md` outside T6's Cites (entry above). The fourth is the review-depth vocabulary check:
+T6's consequence line reads `governance:material`, a token outside `low|high`, and the intended class was `high` (a change
+to the standard's meaning, reviewed by one scoped reviewer). Owner ruling by popup: append the correct line and override the
+malformed one, keeping the log append-only. Archived logs are not read, so the finding clears when this close archives the
+sprint.
+consequence · T6 · behaviour:material · governance:high

@@ -105,7 +105,7 @@ Layers: `skills/lean-doc-generator/references/migration-map.md` · `spec/STANDAR
   · `docs/work/in_progress/TASK-553-make-migrate-add-the-profile-and-keep-every-decision.md`
   · `docs/work/done/TASK-553-make-migrate-add-the-profile-and-keep-every-decision.md`
 Depends-on: T1 T2 T3
-Cites: `TASK-553` · `lean-flow-3-foundation.md` (in `docs/research/`; D6)
+Cites: `TASK-553` · `lean-flow-3-foundation.md` (in `docs/research/`; D6) · `requirements.md` (the adopter file migrate writes, never touched here)
 
 Wave 3. The riskiest task for adopters: a 2.x repo must keep every decision it had.
 
