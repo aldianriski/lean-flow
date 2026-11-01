@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-31
+last_updated: 2026-11-01
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -120,6 +120,30 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **cross-check → moved: docs/LEARNINGS.md` § Durable rules › cross-check** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Behavioral Guidelines · learnings: L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198
 
 - **Cross-check a query before acting on it** — a search/count/grep whose result you will act on *immediately* gets a **second query that must agree**: an inverse whose sum is the known total, a count reconciled against a census, or a seeded gap the query must detect. Run it before the conclusion, not after it surprises you. **Why an action and not a caution:** the "match by shape, not substring" rule was promoted, correctly placed and *loaded in context* for all eleven sightings, and reached none — 8 of them ad-hoc queries inside a governance pass, where a wrong answer is acted on with no review between query and conclusion. Every one that was caught was caught by a *disagreeing second number*, never by recalling the rule. A negative control alone is not enough: it proves the query fires on rows it reaches, never that it reached them all (SPRINT-064 T1 — a nested `getline` silently examined 20 of 31 and returned "clean"). **A value entering a *frozen artifact* — an assumption, a DoD, an acceptance threshold — is a query result and gets the same treatment at the moment it is written, then again at execution.** Both grains count: a **figure** (SPRINT-071 wrote `~121` sites into A1; the real number was 39, so the DoD built on it was unsatisfiable the moment it froze) and a **structural claim about another document** (SPRINT-074 froze "the checker reads §14's tables" into three artifacts; §14 has no per-rule table). The guard does not fire on its own because *authoring* feels like planning, not querying — but the number is acted on later, by someone who cannot re-derive it, against a Plan nobody can amend cheaply. A **third grain: an identifier for a new row** — a `TD-NNN`, `TASK-NNN` or `L-NNN` — is a query result too, so **derive the maximum in use; never increment the one you remember**. Twice in one sprint the assumed id was wrong: a register cited `TASK-241`, which was that task's own twin, and a debt row filed as `TD-066` collided with an existing row whose subject was the very bug another task was fixing. Nothing rejects a duplicate id, and a second row with the same number reads as an edit to the first (L-143 ×2). **And derive it with the worktrees excluded** — `.claude/worktrees/` holds complete repo copies during isolated dispatch, so a bare `grep -r` over this repo counts them as content and returns a maximum that is not a row. It has now returned `L-999` (SPRINT-013's deliberate dangling-reference *negative-test token*) twice: once against a real max of `L-168`, once against `L-180` — the second time inside a close Retro, in a session that had already derived two `TD-NNN` correctly minutes earlier, because id-derivation feels like bookkeeping rather than querying. Treat a suspiciously high maximum as contamination before treating it as a row (L-170 ×2). **And the second query must vary the SELECTION rule, not the direction of the count.** An inverse whose two halves sum to the known total proves only that the rows were *partitioned* — both halves run the same selector, so they agree perfectly on the wrong population. SPRINT-098 got `37 open + 60 closed = 97` against a real figure of **5**; SPRINT-099 derived ten archive-exclusion call sites by grepping one predicate SHAPE and cross-checked by grepping the same shape, while an eleventh site written as `grep -v` sat outside what either query could reach — on a live gate leg, failing silently. Both were caught only by a number derived through a *different route*. The cheap tell: would both halves of your check break identically if the selector were wrong? (L-198 ×2). Full family → CONTEXT.md § Gates (L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198).
+
+---
+
+## L-272 [tags: tooling] [status: active]: **An allow-list entry with no path pattern did not stop the CLI's popup for a write outside the working copy.** Amendment 4 allowed `Write` and `Edit` on any path for every A/B arm, because a pilot trial had parked writing a scratch check script outside its trial copy. In the S0 first pass, 2 workdoo A1 trials still parked the same way. No A0 trial did. Why the allowance did not apply is not established. The owner ruled both parks scored. Two things follow: an amendment that loosens permissions needs a smoke trial of the exact case it targets before the full run, and lean-flow's runs write throwaway verification scripts outside the repo where plain Claude does not.
+- seen: 2026-11-01 (SPRINT-152 T4, S0 first pass; Amendment 4's targeted case recurred)
+- count: 1
+- promoted: no
+- related: L-007 (exercised on real input)
+
+---
+
+## L-271 [tags: tooling] [status: active]: **A side effect of the isolated environment that lands in the working copy reads as the agent's edit, and it can decide an A/B result.** The trial environment redirects HOME and USERPROFILE. In 13 of 24 workdoo A1 first-pass trials, a PowerShell session wrote its module-analysis cache under the trial copy, so each trial exited `scope-breach` before any judge ran and failed the primary endpoint. That one cell carried the headline result: A1 below the A0 floor. The analysis reported VALID; what exposed it was a tally of exit labels per cell, with 13 identical breaches in one cell and none elsewhere. Before reading an A/B result, tally exit labels per arm and repo. Treat a cell with many identical non-ok exits as a harness defect until a transcript shows otherwise (fixed by Amendment 5).
+- seen: 2026-11-01 (SPRINT-152 T4, S0 first pass; Amendment 5 at `4113ae4e`)
+- count: 1
+- promoted: no
+- related: L-007 · edit-safety (c) (inspect what a command was meant to produce, never its status)
+
+---
+
+## L-270 [tags: tooling] [status: active]: **A check over rows must apply the exclusions its consumer applies, and apply them first.** After the S0 first pass, `build-slots.ts` refused the whole build: it checked the freeze over every measured row before it applied the void rows, so 12 pilot attempts that Amendments 2 to 4 had already voided counted as pre-freeze measurements. Its selftest had a pre-freeze case and a void case, but never a voided pre-freeze row, so the ordering went untested until real data reached it. When a rule removes rows from every count, apply it before any check over those rows, and give the fixture the removed-row case beside the kept one (fixed at `24207a47`).
+- seen: 2026-11-01 (SPRINT-152 T4, first build-slots run on real data)
+- count: 1
+- promoted: no
+- related: L-198 (vary the selection, not the direction)
 
 ---
 
