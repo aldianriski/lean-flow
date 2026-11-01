@@ -2515,7 +2515,11 @@ check("S60 answerFor: Stack -> operator Stack and Main flows -> repo Main flows 
   const ruled = answerFor(plan, f, [PLAN_RULE]);
   assert("answer" in ruled && ruled.answer === PLAN_RULE.answer && ruled.source === PLAN_RULE.source, `rule answers: ${JSON.stringify(ruled)}`);
   const over = answerFor(q("Approve the stack?", "Stack"), f, [PLAN_RULE]);
-  assert("answer" in over && over.source === PLAN_RULE.source, `a run rule wins over the topic table: ${JSON.stringify(over)}`);
+  assert("stop" in over && /stack/i.test(over.stop) && /rule/i.test(over.stop), `a run rule AND a table topic both matching stops, naming both: ${JSON.stringify(over)}`);
+  for (const [qq, names] of [["What is the business goal and first milestone?", [/business goal/i, /milestone/i]], ["What are the license and documentation tiers?", [/licen/i, /tier/i]], ["Describe the main flows and the flow doc", [/main flows/i, /flow doc/i]]] as const) {
+    const r = answerFor(q(qq), f, []);
+    assert("stop" in r && names.every((n) => n.test(r.stop)), `${qq} -> competing candidates stop, all named: ${JSON.stringify(r)}`);
+  }
   const odd = answerFor(q("What colour should the logo be?"), f, []);
   assert("stop" in odd && odd.stop.includes("What colour should the logo be?"), `unmatched stops: ${JSON.stringify(odd)}`);
   const two = answerFor(q("Describe the stack and the main flows"), f, []);
@@ -2527,7 +2531,7 @@ check("S60 answerFor: Stack -> operator Stack and Main flows -> repo Main flows 
 type Step = { emit: unknown } | { await: string };
 const INIT: Step = { emit: { type: "system", subtype: "init", tools: [] } };
 const auq = (id: string, ...qs: { question: string; header: string }[]): Step => ({ emit: { type: "control_request", request_id: id, request: { subtype: "can_use_tool", tool_name: "AskUserQuestion", input: { questions: qs.map((x) => ({ ...x, options: [], multiSelect: false })) } } } });
-const toolReq = (id: string, tool_name: string): Step => ({ emit: { type: "control_request", request_id: id, request: { subtype: "can_use_tool", tool_name, input: { command: "ls" } } } });
+const toolReq = (id: string, tool_name: string, input: unknown = { command: "ls" }): Step => ({ emit: { type: "control_request", request_id: id, request: { subtype: "can_use_tool", tool_name, input } } });
 const RESULT = (subtype = "success"): Step => ({ emit: { type: "result", subtype, is_error: subtype !== "success" } });
 const jsonl = (f: string): any[] => (fs.existsSync(f) ? fs.readFileSync(f, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
 const FAKE_CLI = path.join(AB, "fixtures", "operator", "fake-cli.ts");
@@ -2564,6 +2568,13 @@ check("S61 runOperatedSession (fake CLI): protocol start; Stack/Main flows answe
   assert(st.sent.filter((m) => m.type === "control_response").length === 1, "nothing further answered; the stack question of the same popup was not answered either");
   const two = await fakeSession([INIT, auq("c1", { question: "Describe the stack and the main flows", header: "x" }), { await: "c1" }, RESULT()]);
   assert(two.res.status === "stopped" && respOf(two.sent, "c1").behavior === "deny", `two-topic popup stops: ${JSON.stringify(two.res)}`);
+  const dup = await fakeSession([INIT, auq("d1", { question: "What is the stack?", header: "A" }, { question: "What is the stack?", header: "B" }), { await: "d1" }, RESULT()]);
+  assert(dup.res.status === "stopped" && /repeat|duplicate/i.test(dup.res.popup.reason) && respOf(dup.sent, "d1").behavior === "deny", `repeated question text in one popup stops: ${JSON.stringify(dup.res)}`);
+  const pat = await fakeSession([INIT, toolReq("s1", "Skill", { skill: "lean-flow:prime" }), { await: "s1" }, toolReq("s2", "Skill", { skill: "other-plugin:run" }), { await: "s2" }, toolReq("s3", "Read", { file_path: "x" }), { await: "s3" }, RESULT()], { allowTools: ["Skill(lean-flow:*)", "Read"] });
+  assert(respOf(pat.sent, "s1").behavior === "allow" && respOf(pat.sent, "s2").behavior === "deny" && respOf(pat.sent, "s3").behavior === "allow", `Tool(pattern) honours the pattern, bare Tool allows: ${JSON.stringify(pat.log)}`);
+  const t0 = Date.now();
+  const hang = await fakeSession([INIT, { emit: { type: "assistant" } }, { closeStdout: true } as unknown as Step], { timeoutMs: 1500 });
+  assert(hang.res.status === "failed" && /timed out/i.test(hang.res.reason) && Date.now() - t0 < 15000, `a CLI that closes stdout without a result and stays alive is killed at the timeout: ${JSON.stringify(hang.res)} after ${Date.now() - t0} ms`);
   const bad = await fakeSession([INIT, RESULT("error_max_turns")]);
   assert(bad.res.status === "failed" && bad.res.resultSubtype === "error_max_turns", `failed result: ${JSON.stringify(bad.res)}`);
 });
@@ -2614,12 +2625,13 @@ check("S63 setup-arm --auto: same refusals as --run; a migrate arm gets the plan
     return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString(), record, log: path.join(dir, `operator-${fx.id}.jsonl`) };
   };
   const plan = auq("p", { question: "Apply the migrate plan?", header: "Plan" });
-  const mig = await run("migrate", [INIT, plan, { await: "p" }, toolReq("t", "Glob"), { await: "t" }, toolReq("t2", "WebFetch"), { await: "t2" }, RESULT()]);
+  const mig = await run("migrate", [INIT, plan, { await: "p" }, toolReq("t", "Glob"), { await: "t" }, toolReq("t2", "WebFetch"), { await: "t2" }, toolReq("k1", "Skill", { skill: "lean-flow:prime" }), { await: "k1" }, toolReq("k2", "Skill", { skill: "other-plugin:run" }), { await: "k2" }, RESULT()]);
   assert(mig.code === 0, `migrate arm done: ${mig.code} ${mig.err}${mig.out}`);
   const sent = jsonl(mig.record);
   assert(respOf(sent, "p").updatedInput.answers["Apply the migrate plan?"].startsWith("Approve only the profile items: ## Stack, ## Conventions in use,"), "migrate plan rule answered");
   assert(sent[1].message.content === "/lean-doc-generator migrate", `skill from the pre-setup manifest: ${JSON.stringify(sent[1])}`);
   assert(respOf(sent, "t").behavior === "allow" && respOf(sent, "t2").behavior === "deny", "x");
+  assert(respOf(sent, "k1").behavior === "allow" && respOf(sent, "k2").behavior === "deny", "a tool allowed ONLY by the arm's own allow-list (Skill(lean-flow:*)) is allowed for lean-flow skills and denied for another plugin's");
   assert(jsonl(mig.log)[0].source === "owner ruling, SPRINT-154", "operator log in the work dir with the rule source");
   const ini = await run("init", [INIT, plan, { await: "p" }, RESULT()]);
   assert(ini.code === 3 && ini.out.includes("Apply the migrate plan?"), `an init arm has no plan rule -> stops: ${ini.code} ${ini.out}`);

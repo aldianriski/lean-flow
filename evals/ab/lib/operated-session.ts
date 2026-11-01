@@ -34,6 +34,17 @@ export function operatedCommand(sessionFlags: string[], env: Record<string, stri
   return [...prefix, ...STREAM_FLAGS, ...sessionFlags];
 }
 
+/** An allow-list entry is `Tool` (any input) or `Tool(pattern)`: the pattern (`*` = wildcard) must match the request's relevant input (skill name, command, path). */
+export function toolEntryAllows(entry: string, tool: string, input: Record<string, unknown>): boolean {
+  const m = /^([^(]+)(?:\((.*)\))?$/.exec(entry);
+  if (!m || m[1] !== tool) return false;
+  if (m[2] === undefined) return true;
+  const subject = [input.skill, input.command, input.file_path, input.path, input.pattern].find((v) => typeof v === "string") as string | undefined;
+  if (subject === undefined) return false;
+  const re = new RegExp("^" + m[2].split("*").map((x) => x.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*") + "$", "s");
+  return re.test(subject);
+}
+
 export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResult> {
   const proc = Bun.spawn(o.cmd, { cwd: o.cwd, env: o.env, stdin: "pipe", stdout: "pipe", stderr: "pipe" });
   const send = (m: unknown) => {
@@ -45,9 +56,10 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
     }
   };
   const log = (rec: unknown) => fs.appendFileSync(o.operatorLog, JSON.stringify(rec) + "\n");
-  const allowed = new Set(o.allowTools.map((t) => t.replace(/\(.*$/, "")));
+  const isAllowed = (tool: string, input: Record<string, unknown>) => o.allowTools.some((entry) => toolEntryAllows(entry, tool, input));
   const stderr = new Response(proc.stderr).text();
-  const timer = setTimeout(() => proc.kill(), o.timeoutMs ?? 60 * 60 * 1000);
+  let timedOut = false;
+  const timer = setTimeout(() => ((timedOut = true), proc.kill()), o.timeoutMs ?? 60 * 60 * 1000); // armed until the process has exited
   send({ type: "control_request", request_id: "init-1", request: { subtype: "initialize", hooks: null } });
   send({ type: "user", message: { role: "user", content: o.prompt } });
 
@@ -69,7 +81,14 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
       const answers: Record<string, string> = {};
       const decided: Record<string, unknown>[] = [];
       let stop: string | undefined;
-      for (const q of questions) {
+      const texts = questions.map((q) => q.question);
+      const repeated = texts.find((t, i) => texts.indexOf(t) !== i);
+      if (repeated !== undefined) {
+        // answers are keyed by question text, so a repeat would overwrite an earlier answer
+        stop = `question text repeats within one popup ("${repeated}"); answers are keyed by question text`;
+        decided.push({ question: repeated, header: questions[texts.indexOf(repeated)]?.header, stop });
+      }
+      for (const q of stop === undefined ? questions : []) {
         const a = answerFor({ question: q.question, header: q.header ?? "" }, o.files, o.rules);
         if ("stop" in a) {
           stop = a.stop;
@@ -88,7 +107,7 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
       for (const d of decided) log(d);
       send({ type: "control_response", response: { subtype: "success", request_id: id, response: { behavior: "allow", updatedInput: { ...input, answers } } } });
     } else {
-      const ok = allowed.has(tool);
+      const ok = isAllowed(tool, input);
       log({ tool, decision: ok ? "allow" : "deny" });
       send({ type: "control_response", response: { subtype: "success", request_id: id, response: ok ? { behavior: "allow", updatedInput: input } : { behavior: "deny", message: `operator: tool ${tool} is not in the allow-list` } } });
     }
@@ -110,7 +129,6 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
       if (handle(m)) break outer;
     }
   }
-  clearTimeout(timer);
   try {
     proc.stdin.end();
   } catch {
@@ -119,6 +137,8 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
   if (result?.status === "stopped") proc.kill();
   else if (result) setTimeout(() => proc.kill(), 5000).unref(); // a finished session should exit on its own once stdin closes
   const code = await proc.exited;
+  clearTimeout(timer);
+  if (!result && timedOut) return { status: "failed", reason: `timed out after ${o.timeoutMs ?? 60 * 60 * 1000} ms without a result event; the CLI was killed` };
   return result ?? { status: "failed", reason: `the CLI exited (code ${code}) without a result event: ${(await stderr).slice(0, 300)}` };
 }
 

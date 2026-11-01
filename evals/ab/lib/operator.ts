@@ -5,12 +5,12 @@ export type Question = { question: string; header: string };
 export type Files = { repo: string; operator: string };
 export type Answer = { answer: string; source: string } | { stop: string };
 
-type Topic = { name: string; re: RegExp; not?: RegExp; file: keyof Files; heading: string };
+type Topic = { name: string; re: RegExp; file: keyof Files; heading: string };
 const TOPICS: Topic[] = [
   { name: "stack", re: /\bstack\b/i, file: "operator", heading: "Stack" },
   { name: "conventions", re: /convention/i, file: "operator", heading: "Conventions in use" },
-  { name: "business goal", re: /business goal|(?<![\w-])goal\b/i, not: /milestone|proof/i, file: "repo", heading: "Business goal" },
-  { name: "main flows", re: /main flows?|\bflows\b/i, not: /flow doc/i, file: "repo", heading: "Main flows" },
+  { name: "business goal", re: /business goal|(?<![\w-])(?<!proof )goal\b/i, file: "repo", heading: "Business goal" },
+  { name: "main flows", re: /main flows?(?! doc)|\bflows\b/i, file: "repo", heading: "Main flows" },
   { name: "invariants", re: /invariant/i, file: "repo", heading: "Invariants" },
   { name: "quality attributes", re: /quality attribute/i, file: "repo", heading: "Quality attributes" },
   { name: "non-goals", re: /non-?goals?/i, file: "repo", heading: "Non-goals" },
@@ -47,25 +47,32 @@ const words = (s: string) => s.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w
 
 export function answerFor(q: Question, files: Files, rules: Rule[]): Answer {
   const text = `${q.header} ${q.question}`;
-  for (const r of rules) {
-    r.match.lastIndex = 0;
-    if (r.match.test(text)) return { answer: r.answer, source: r.source };
-  }
   const named = `question "${q.question}" (header "${q.header}")`;
+  // EVERY candidate across the three layers (run rules, topic table, setup bullets) is collected; the operator answers only when exactly one remains
   type Hit = { name: string; answer?: string; source: string; missing?: string };
   const hits: Hit[] = [];
+  for (const r of rules) {
+    r.match.lastIndex = 0;
+    if (r.match.test(text)) hits.push({ name: `run rule (${r.source})`, answer: r.answer, source: r.source });
+  }
   for (const t of TOPICS) {
-    if (!t.re.test(text) || t.not?.test(text)) continue;
+    if (!t.re.test(text)) continue;
     const body = section(files[t.file], t.heading);
     hits.push(body === undefined ? { name: t.name, source: "", missing: `## ${t.heading} in the ${t.file} answers file` } : { name: t.name, answer: body, source: `${t.file} § ${t.heading}` });
   }
-  const keys = SETUP_KEYS.filter((k) => k.test(text));
-  if (keys.length > 0) {
-    const cands = setupBullets(files.operator).filter((b) => keys.some((k) => k.test(b.label)));
-    const qw = new Set(words(text));
-    const score = (b: Bullet) => words(b.label).filter((w) => qw.has(w) || [...qw].some((x) => x.startsWith(w.slice(0, 5)))).length;
+  const bullets = setupBullets(files.operator);
+  const qw = new Set(words(text));
+  const score = (b: Bullet) => words(b.label).filter((w) => qw.has(w) || [...qw].some((x) => x.startsWith(w.slice(0, 5)))).length;
+  const seen = new Set<string>();
+  for (const key of SETUP_KEYS.filter((k) => k.test(text))) {
+    // per key: of the bullets sharing it, the one whose label shares the most words with the question (milestone proof goal vs stopping condition)
+    const cands = bullets.filter((b) => key.test(b.label));
     const best = Math.max(0, ...cands.map(score));
-    for (const b of cands.filter((c) => score(c) === best)) hits.push({ name: `setup answer "${b.label}"`, answer: b.text, source: `operator § Setup answers / ${b.label}` });
+    for (const b of cands.filter((c) => score(c) === best)) {
+      if (seen.has(b.label)) continue;
+      seen.add(b.label);
+      hits.push({ name: `setup answer "${b.label}"`, answer: b.text, source: `operator § Setup answers / ${b.label}` });
+    }
   }
   if (hits.length === 0) return { stop: `no answers-file entry matches ${named}` };
   if (hits.length > 1) return { stop: `${named} matches several entries (${hits.map((h) => h.name).join("; ")}); the operator never guesses` };
