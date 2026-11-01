@@ -40,6 +40,11 @@ related: [EPIC-023]
 > `ac0b934e89647b7a7c48b6113adbf854cd1570026399e34825cf42eab138760e`, at commit `e1a101cb`; supersedes the line above. The
 > amendment also allows the Write and Edit tools everywhere for both arms; the four second re-pilot rows of 11:39 to 11:56 ran
 > before it and are voided by appended void rows. The full baseline runs after this line.
+>
+> **Pre-registration re-frozen 2026-11-01T06:57:00Z (owner re-signed, SPRINT-152 T4, Amendment 5):** `evals/ab/PREREGISTRATION.md` sha256
+> `33bd6102fcbdc48e62b3eaa39d96653faedbd9fb7936adca334fbd431633aedc`, at commit `4113ae4e`; supersedes the line above, and carries over the rows measured since 2026-10-31T12:07:44Z.
+> The amendment leaves PowerShell's cache directory out of the changed set and the scope-breach check; the 13 first-pass workdoo A1
+> attempts whose only breach was `Microsoft/Windows/PowerShell/ModuleAnalysisCache` are voided by appended void rows and re-run.
 
 | ts | tag | arm | repo | task | trial | attempt | graders | in | out | cache-read | cache-write | cost-usd | wall-s | exit | pins | raw | passed | deviation | g2 | park | measure |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
