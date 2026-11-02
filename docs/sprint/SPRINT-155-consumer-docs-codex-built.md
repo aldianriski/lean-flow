@@ -3,8 +3,8 @@ sprint: 155
 slug: consumer-docs-codex-built
 stream: codex-pilot
 owner: Maintainer
-last_updated: 2026-11-01
-status: active
+last_updated: 2026-11-02
+status: closed
 plan_commit: 2ea2af75
 gates_signed: G1,G2 @ 1314a5da
 update_trigger: sprint execute/close events

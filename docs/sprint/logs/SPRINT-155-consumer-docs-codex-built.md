@@ -146,3 +146,16 @@ README). README-less copy (`-155b`): run 1 stopped on a classifier reply the str
 the README's Quick start is one link to `docs/development/setup.md`, no internal id, the only OpenAPI line is init's
 `docs/api/README.md` placement 3-liner. The integrations template was not exercised (clinic has no integrations), recorded on
 the box. TASK-563 box 2 and TASK-564 box 3 ticked.
+
+### 2026-11-02 | progress | close system verify: 2 FAIL on the VPS, both fixed; TD-285 filed
+First system verify at `16f28eaa`: qa-check 352 pass, 2 fail. `layers completeness`: TASK-564's tick evidence named two
+adopter-repo paths, read as T2 files; reworded. `scope-change layers`: both new ticks ran their evidence onto continuation lines,
+which read as Done-when edits (FREEZE-EDIT), and that baseline read surfaced a checker defect: the members check took SPRINT-154's
+log as SPRINT-155's baseline through `git log --follow` and reported LOG-REWRITTEN over a pure append (TD-285). Evidence now
+sits on each box's own line. Second run at `09e1a11b`: qa-check 354 pass, 0 fail.
+
+### 2026-11-02 | close | Consumer Docs, Codex-Built: 5 of 5 delivered (TASK-561..565)
+run · every member's Done-when ticked · PLAN_EXHAUSTED. Every member is in `done/`; the close-time members check passes. System
+verify on the VPS at `09e1a11b`: qa-check 354 pass, 0 fail. The Retro and buckets are filed: L-277, TD-285; the CHANGELOG already
+carries T1 and T2. No follow-up tasks are new. No handoff entry was taken in this sprint. No release: the changes stay under
+[Unreleased] (EPIC-023 D6). The Codex builder pilot figures are in the Retro for the owner's ruling.
