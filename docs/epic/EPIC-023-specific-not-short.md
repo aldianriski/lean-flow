@@ -97,6 +97,11 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 - **D13** — A4a's scope at SPRINT-156 G2 (owner, 2026-11-02): TASK-576 is cancelled. A2's kept streams show the design phase
   already lean; the cost above A0 is the trial protocol's separate design, revise and build sessions, which a light path cannot
   remove, and TASK-575 removes the revise round. A4a bundles TASK-573 and TASK-575 (`.out-of-scope/light-path-small-tasks.md`).
+- **D14** — How changes are tested (owner, 2026-11-02, after a Codex process review): fixes iterate on 5-task development runs on
+  research copies (about 20 minutes, excluded from measurement and disclosed in the next amendment, with an untouched-task check);
+  related fixes are bundled and frozen; a full arm runs unattended after the owner approves its pilot, with a notification when it
+  ends or needs a ruling. Parallel trials are being added (TASK-577). Measured arms stay on this PC and at 16 tasks x k = 2:
+  the VPS would break comparability and fewer slots would cost power.
 
 ## Open questions
 

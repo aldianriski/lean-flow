@@ -146,3 +146,12 @@ The owner signed Amendment 7 by popup. `docs/research/logs/ab-measurements-a4a.m
 workdoo-a4a access-activity-type-filter: G2 passed on the first round, every grader pass, convention/business/scope PASS, $1.46,
 156 s. clinic-a4a appointment-lookup: same, $1.49, 151 s. Both rows pin `56964ce2`. A2's pilot on the same two slots cost
 $2.26 and $1.98, and its workdoo slot needed a revise round. The owner approved the full run by popup before the pilot ended.
+
+### 2026-11-02 | progress | process review (Codex) and owner rulings; A4a full run launched detached; TASK-577 filed
+The owner asked how to end the two-hour waits without losing quality. Codex (98.1k tokens) ranked: unattended full arms after the
+pilot with a notification; development runs as the iteration loop; bundled fixes; parallel trials after isolation and capacity
+work (the driver's lock is per log while its stale sweep takes every `iso-*` directory); not the VPS for measured arms
+(comparability); not fewer slots (power). Owner ruling by popup: adopt the first three and start parallel trials now (EPIC-023
+D14, TASK-577 in the backlog, blocked until this run exits). The A4a 30-slot run was launched by the coordinator as a detached
+process (owner ruling), with Git's `usr\bin` on PATH, output and exit code to the scratchpad and a watcher on its exit; no second
+driver, selftest or build runs on this machine until it exits.
