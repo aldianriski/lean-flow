@@ -31,9 +31,9 @@ session's own design (D11).
 - [x] The orchestrator's G2 rule: the design names each stated business fact (requirements, business notes, the profile's business ✓ 2026-11-02: SKILL.md G2 box "Business facts", `d09db7f5`
       topics) that the change touches and says how it honours it; where a fact and the neighbouring code disagree, the fact wins
       and the design says so.
-- [ ] Shown on real input: development runs on invitation-issued-by and self-onboarding-guard produce designs that name the
+- [x] Shown on real input: development runs on invitation-issued-by and self-onboarding-guard produce designs that name the ✓ 2026-11-02: owner ruling, half met: invitation-issued-by `iso-RyvHro` names the en-GB fact and says it wins, business PASS; self-onboarding-guard `iso-9NayTL` and `iso-PtJHOH` miss fact 6 (business PASS, then parked); the arm measures the rule
       locale fact and fact 6, and their business judge verdicts are read (one run each).
-- [ ] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap.
+- [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ 2026-11-02: CHANGELOG [Unreleased] Changed line (`d09db7f5`); SKILL.md 140 lines, 13 dense lines
 
 ## Touches
 `skills/orchestrator/SKILL.md` · CHANGELOG.md

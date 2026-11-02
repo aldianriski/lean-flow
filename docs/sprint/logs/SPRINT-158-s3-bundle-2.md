@@ -86,3 +86,31 @@ serial loop would); S76 proves it and fails on round 1. Selftest 81/81 outside C
 known sandbox limit), tsc clean. Codex 136.9k tokens over two rounds. Landed as `15012173`; boxes 1 and 2 ticked.
 consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped outside review (Claude reviewing the Codex build, 2 rounds, 1 finding fixed) · behaviour:material · governance:low
+
+### 2026-11-02 | progress | T1 capacity check at N = 2; T3/T4 development runs; T4's one wording revision; T2's evidence path fails
+Capacity check (TASK-582 box 3), N = 2, A4a's arms and pin, 4 slots into a scratch log: workdoo access-activity-type-filter and
+clinic patient-cancel-all, trials 1 and 2. The pilot stopped after its 2 slots, which ran at once (exit 10); the restart ran the
+other 2 at once (exit 0). All 4 ok, graders and business judge PASS, as in A4a's serial trials of the same slots; no timeout, no
+infra attempt, no low-memory kill. Wall 169/217 s and 258/134 s (A4a serial 156/152 and 119/121); cost 1.55/1.49 and 1.61/1.36
+USD (A4a 1.46/1.54 and 1.38/1.45). Elapsed 13.3 minutes for 4 slots including the pilot stop. Awaits the owner's reading.
+Development runs (pin `11c768c3`, research copies `D:\Research\dev156\`, scratch log): invitation-issued-by, self-onboarding-guard,
+clinic appointment-lookup and workdoo reissue-invitation all ok and passed, no popup, no park, scope PASS; business PASS on all
+four; reissue-invitation's convention judge UNKNOWN. T4: the invitation-issued-by design names the en-GB fact and says it wins over
+the neighbouring `formatDate` (`iso-RyvHro`); the self-onboarding-guard design takes duty holders "from the current configuration"
+and names no fact 6 (`iso-9NayTL`), and neither design opened `BUSINESS-NOTES.md`. One wording revision, as G2 allows (`a9b7097f`):
+the box now says the design reads the stated facts first. Re-run of self-onboarding-guard on pin `a9b7097f` in progress.
+T2: the evidence G2 chose does not work. The trial tasks are not members of workdoo's sprint, so a report cannot carry its sprint
+or epic figures; one of the four final reports printed a `Progress:` line, counting checks. A different real input needs the owner.
+
+### 2026-11-02 | gate | owner rulings on T1's capacity check, T3, T4 and T2's real input (popup)
+T4's re-run on pin `a9b7097f` (`iso-PtJHOH`) parked: its design named no business fact and never opened `BUSINESS-NOTES.md`
+though the box's text was in its context, and its build tried `rm -rf` on a system-temp directory the repo's own test made, in
+the same command that removed its own in-tree probe (the outside-tree clause was in context through `--resume`). Rulings:
+- T1: the capacity check is accepted (TASK-582 box 3); Amendment 8 adopts N = 2 for later arms.
+- T4: TASK-585 box 3 is half met by owner ruling: the locale fact named (`iso-RyvHro`), fact 6 missed in both self-onboarding-guard
+  runs (`iso-9NayTL`, `iso-PtJHOH`). The rule stays; bundle 2's arm measures it. No more development spend.
+- T3: TASK-584 box 2 is ticked as written (clinic appointment-lookup clean, reissue-invitation no popup); the counter-run above is
+  recorded, and the arm's park rate measures the outside-tree clause against A4a's 1 of 32.
+- T2: the evidence G2 chose (workdoo runs) cannot carry sprint figures; replaced by a headless run of the pinned changed skill in a
+  lean-flow worktree completing one real step of this sprint (TASK-584's last box), its Progress line read against SPRINT-158
+  and EPIC-023.

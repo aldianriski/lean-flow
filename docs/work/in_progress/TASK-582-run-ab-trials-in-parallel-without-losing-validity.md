@@ -32,7 +32,7 @@ harness only, never a gate.
       owner stops (usage limit, owner-ruling exits) stopping every worker (none starts another slot; a running trial finishes and
       records its row, scope-change 2026-11-02), and resume unchanged; default 1 is byte-identical in
       behaviour to today.
-- [ ] A capacity check on this PC: N = 2 on a pilot-sized run completes with no timeout, no low-memory kill and no infra-lost
+- [x] A capacity check on this PC: N = 2 on a pilot-sized run completes with no timeout, no low-memory kill and no infra-lost ✓ 2026-11-02: N = 2 on 4 slots of the A4a task set, all ok and passing as in the serial trials, no timeout, no infra, no low-memory kill, pilot stop held; owner accepted (popup); SPRINT-158 log
       slot, and its per-slot results stay inside the run-to-run spread of the serial runs on the same slots (owner reads it).
 - [ ] An owner-signed amendment adopts the worker count for later arms before any arm runs with N > 1; earlier arms stay as
       measured.
