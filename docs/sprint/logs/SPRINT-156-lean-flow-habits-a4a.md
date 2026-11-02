@@ -155,3 +155,14 @@ work (the driver's lock is per log while its stale sweep takes every `iso-*` dir
 D14, TASK-577 in the backlog, blocked until this run exits). The A4a 30-slot run was launched by the coordinator as a detached
 process (owner ruling), with Git's `usr\bin` on PATH, output and exit code to the scratchpad and a watcher on its exit; no second
 driver, selftest or build runs on this machine until it exits.
+
+### 2026-11-02 | progress | quick one-off (owner ruling, outside the Plan): TASK-578 -- reports carry a Progress line
+The owner chose to write TASK-578 while A4a runs (a backlog task; G1 by the owner's popup choice, recorded as quick). The
+orchestrator's Report shape now puts a `Progress:` line after the verdict (sprint members done and epic conditions ticked, each N
+of M with 
+### 2026-11-02 | progress | quick one-off (owner ruling, outside the Plan): TASK-578 -- reports carry a Progress line
+The owner chose to write TASK-578 while A4a runs (a backlog task; G1 by the owner's popup choice, recorded as quick). The
+orchestrator's Report shape now puts a `Progress:` line after the verdict (sprint members done and epic conditions ticked, each N
+of M with %; a running job adds done/total, % and an ETA). SKILL.md stays at 140 lines; density baseline 13 (the first wording
+made a 14th dense line and was split). The running A4a arm uses a pinned clone, so it is unaffected. Box 2 (real input) waits for
+the next development run.
