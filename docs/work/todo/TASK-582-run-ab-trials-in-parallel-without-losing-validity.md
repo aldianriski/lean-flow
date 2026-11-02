@@ -29,7 +29,8 @@ harness only, never a gate.
       one leaves the running trial's workspace in place (today the lock is per log while the sweep takes every `iso-*` directory).
       Shown by a selftest with two drivers, failing on the current sweep.
 - [ ] A bounded worker count (`--workers N`, default 1) runs N slots at once under one lock and one log, with appends serialised,
-      owner stops (usage limit, owner-ruling exits) stopping every worker, and resume unchanged; default 1 is byte-identical in
+      owner stops (usage limit, owner-ruling exits) stopping every worker (none starts another slot; a running trial finishes and
+      records its row, scope-change 2026-11-02), and resume unchanged; default 1 is byte-identical in
       behaviour to today.
 - [ ] A capacity check on this PC: N = 2 on a pilot-sized run completes with no timeout, no low-memory kill and no infra-lost
       slot, and its per-slot results stay inside the run-to-run spread of the serial runs on the same slots (owner reads it).

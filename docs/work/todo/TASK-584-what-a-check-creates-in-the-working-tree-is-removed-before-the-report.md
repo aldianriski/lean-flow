@@ -24,9 +24,11 @@ now sends throwaway probes into the working tree, so leftover check artifacts ar
 
 ## Done when
 - [ ] The orchestrator's rule names it: anything a check creates inside the working tree (a scratch script, a database directory, a
-      cache, a log), gitignored or not, is removed before the report, unless the task's declared files include it.
+      cache, a log), gitignored or not, is removed before the report, unless the task's declared files include it; what the
+      repo's own tests leave outside the working tree is named in the report, never deleted (scope-change 2026-11-02).
 - [ ] Shown on real input: a development run on clinic appointment-lookup (and any A4a slot that breached on a check artifact)
-      ends with no such file left (stream and post-run file list read).
+      ends with no such file left (stream and post-run file list read), and one on workdoo reissue-invitation ends with no popup
+      (scope-change 2026-11-02).
 - [ ] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap.
 
 ## Touches
