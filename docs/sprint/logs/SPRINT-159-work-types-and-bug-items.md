@@ -48,3 +48,11 @@ Impact, by owner ruling (popup, 2026-11-02): TASK-591's evidence folder serves e
 gives business facts a placed row; TASK-594's migrate also proposes mapping existing capture folders onto their items; TASK-589's
 §2 amendment also places the five kinds above. Each task cites the audit doc. `storm/` goes to a new backlog task (TASK-595).
 Re-confirm G2: T2, T5 and T6 are designed after this entry, at their G2.
+
+### 2026-11-02 | progress | T1: adopter folder audit done; owner ruled every finding; TASK-590 done
+A Sonnet census read the frozen population read-only and a plain listing cross-checked it (workdoo 586 of 709 files unplaced,
+clinic 0 of 13, lean-flow 27 of 622, each fully covered by the findings). Twelve findings, owner rulings by popup: evidence for
+every work item and a business-facts row (TASK-591), capture folders proposed by migrate (TASK-594), five legitimate extras placed
+by TASK-589's §2 amendment, `storm/` to TASK-595, mockups and the exploratory pack kept. Doc: `docs/research/adopter-folder-audit.md`.
+consequence · T1 · behaviour:low · governance:low
+review · T1 · self-review (research doc; census cross-checked by a second listing; rulings by the owner) · behaviour:low · governance:low
