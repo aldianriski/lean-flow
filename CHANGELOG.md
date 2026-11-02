@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — `/orchestrator`: evidence for a criterion ticked on judgment comes from the repo's existing runners first; a throwaway probe script lives inside the working tree and is deleted before the report, never in a system temp dir, because an unattended run cannot answer the permission prompt that write raises (TASK-573).
 - **Measured (maintainer-only)** — arm A2 (S1's `migrate` on the 2.x A/B snapshots) scored 78.1% against A1's 81.2% and A0's 89.6%, at 0.93x A1's tokens. It is ruled failed under the pre-registration (below the A0 floor; no gain over A1, no symptom regression), so the S1 entries below stay unreleased (EPIC-023 D6). `evals/ab/`: the setup operator answers `migrate`'s questions from frozen entries, and `analyze.ts` reads several slot files and prints symptom differences against A1.
 - **Fixed** — README Quick start links to the setup guide without repeating its steps; the integrations template names an API contract file only when it exists.
 - **Fixed** — `/lean-doc-generator` templates and `init` guidance state their rules without maintainer-specific ids, names or file references; format examples remain.
