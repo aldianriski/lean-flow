@@ -133,6 +133,27 @@ as a per-item plan, exactly like first adoption. Guarantees:
   *shape/convention* (a doc missing a new template section, an outdated wiring pointer), **not** the
   user's prose. Structure drift is flagged; wording is left alone.
 
+### Typed work items, bug items and evidence (spec 0.19.0, ADR-056)
+
+A repo adopted before work items were typed has untyped tasks and may keep bug material and verification captures in folders
+the standard did not place. The sync brings it across without rewriting it:
+
+- **Untyped tasks read as `feature`.** The sync never adds `type: feature` to a task; it reports the optional `type:` field, the
+  evidence row (`docs/work/evidence/TASK-NNN/`) and the business-facts row (`docs/product/business-notes.md`) as standard deltas.
+- **Bug material is proposed as bug items, one proposal per item**, each applied only on approval:
+  - an existing task that describes a defect (its title or body names a bug, a regression or a wrong result) → `type: bug` added;
+    its text stays as written, and the bug sections it lacks are listed for the owner, never invented;
+  - an ad-hoc bugs folder (`docs/bugs/`, `bugs/`) or a committed `BUG-*.md` → evidence of the task that cites it, or, when no task
+    does, a new `type: bug` item (id derived as `/task-decomposer` derives it) holding what the file says;
+  - a verification-capture folder (screenshots, captured JSON, a review README) whose README or tasks cite task ids → evidence of
+    those tasks; a folder no task cites stays where it is and is listed, never guessed onto a task.
+- **Moves keep history and links**: `git mv` (a plain move without git) into `docs/work/evidence/TASK-NNN/`, every live link to the
+  old path updated in the same apply; a `.log` file moves as `.txt` (S12).
+- **Redaction before any move**: a file carrying a token, an auth header, a key or a password is flagged and left in place, never
+  moved into evidence unredacted.
+- **Kept, not moved**: a root `BUSINESS-NOTES.md` is the business-facts row's accepted legacy location; it is reported, not moved.
+- **Nothing is deleted.** An approved run changes only what was approved; every other file is left byte-identical.
+
 ## Surgical rules
 
 - **Never delete pre-existing content silently** — reformat/relocate/archive it, or surface it and ask. Content is the user's; format is ours. The **only** sanctioned deletion is `retire`-by-hard-delete, and only on **explicit per-item approval** (below) — never a batch "delete all".
@@ -205,6 +226,7 @@ itself.
 | research · spike · decision write-ups · `notes/` | reformat | `docs/research/<slug>.md` via `RESEARCH.md.template` (desk synthesis → feeds an ADR) |
 | `graphify-out/` + graphify mentions | **flag, don't delete** | lean-flow no longer integrates graphify (on-demand only) — note it's inert under the loop; leave the artifact, offer to clean the mentions, **never auto-delete** |
 | existing `LEARNINGS.md` lacking `related:` | keep as-is | the `related:` field is **optional + additive** — never backfill; entries without it stay conforming |
+| `docs/bugs/` · `bugs/` · committed `BUG-*.md` · bug-flavoured tasks · verification-capture folders | **propose** | `type: bug` items and `docs/work/evidence/TASK-NNN/` — § Typed work items, bug items and evidence |
 | `agents/`, `hooks/` | **flag, don't delete** | lean-flow ships none — the loop dispatches built-ins; tell the user these are now inert under lean-flow |
 | adlc-flow `HYPOTHESIS.md` · `EVAL-SUITE/` · `GOLDEN-DATASET/` · `OBSERVABILITY.md` … | **leave untouched + note** | out of lean-flow scope (those are adlc-flow's domain) |
 
@@ -218,6 +240,7 @@ itself.
 - Existing changelog → keep; align to Keep-a-Changelog if it diverges.
 - Existing backlog / issues file → one task file per item in `docs/work/backlog/` (§ v1 → v2 work-item store for the field mapping).
 - Existing `CONTEXT`/`CLAUDE`/agent-instruction file → lean-flow `CONTEXT.md` / `CLAUDE.md` format.
+- Existing bug notes, bug screenshots or verification captures → proposed as bug items and evidence (§ Typed work items, bug items and evidence).
 - **Unrecognized docs** → leave untouched, list them, ask where they belong (don't force a mapping).
 
 ## v1 → v2 work-item store (2.0)

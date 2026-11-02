@@ -401,7 +401,8 @@ unfamiliar repo or doing a pre-refactor audit (usage + maintenance recipe: `docs
 
 **Already have docs (or ran dev-flow / adlc-flow)?** `/lean-doc-generator migrate` aligns them to
 lean-flow's placement · format · wiring — plan → approve → apply, surgically (never deletes your
-content), so you're not hand-reconciling or lost in existing code.
+content), so you're not hand-reconciling or lost in existing code. Already on lean-flow? Re-running it proposes your existing bug notes and
+verification captures as bug items and evidence; your untyped tasks stay as they are.
 
 **The repo profile.** `init` and `migrate` both write it: Stack, Conventions in use and five business
 topics (Business goal, Main flows, Invariants, Quality attributes, Non-goals). Each line cites its source
