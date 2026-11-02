@@ -26,7 +26,9 @@ drops entries from CRLF files. Elsewhere: `docs/development/Lean-Flow-Governance
 
 ## Done when
 - [ ] An ADR and a STANDARD §2 amendment define research topic folders (a series of three or more docs sharing a prefix), with
-      `logs/` and `archive/` unchanged.
+      `logs/` and `archive/` unchanged, and also place per-feature sibling docs beside a core file, `docs/archive/` (migrate's
+      history), `docs/qa/` with `QA.md`, the generated knowledge index and data files under `research/logs/` (scope-change
+      2026-11-02).
 - [ ] `scripts/gen-index.sh` and the cap check read topic folders, and the generator strips CR; each change has a must-FAIL fixture
       (a doc in a subfolder, a CRLF doc) that fails on the current code.
 - [ ] `conformance/`, `guard-audit/` and `mattpocock/` hold their series, every live link updated (citation counts re-derived
@@ -41,4 +43,4 @@ drops entries from CRLF files. Elsewhere: `docs/development/Lean-Flow-Governance
 - `docs/research/storm/` (a skill-shaped file) is out of scope; an owner decision under ADR-001's curation bar.
 
 ## Tracker
-SPRINT-158 research audit (owner request, 2026-11-02)
+SPRINT-158 research audit (owner request, 2026-11-02) · `docs/research/adopter-folder-audit.md` (F4, F5, F7-F9, F12)
