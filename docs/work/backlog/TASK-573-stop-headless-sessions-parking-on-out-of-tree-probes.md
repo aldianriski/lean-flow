@@ -17,12 +17,12 @@ depends-on: [TASK-555]
 # TASK-573 — Stop lean-flow sessions parking a headless run by writing verification probes outside the working tree
 
 ## Why
-S0's convention (-10.3) and business (-11.1) regressions, which admitted S3 (EPIC-023 D10), are not more judge FAILs: A1 has
-1 and 2 against A0's 2 and 3. They are UNKNOWN verdicts. Part of them comes from lean-flow sessions that stopped at a permission popup and were
-parked, so no judge ran. That happened in 6 of A1's 48 round-0 trials and in 3 of A2's first 17, and in none of A0's. Each one was a throwaway
-`check.mjs`/`probe.mjs` written to the OS temp dir or `C:\Users\Public`, or a Bash/PowerShell command needing a prompt
-(an env export + `go run ./cmd/migrate`, a `mktemp` heredoc, a piped `npm run typecheck`). An adopter's unattended run
-loses the task the same way. The parked sessions' streams were swept, so the cause is not yet known.
+S0's convention (-10.3) and business (-11.1) regressions, which admitted S3 (EPIC-023 D10), are not more judge FAILs. On each
+measure's own tasks, first pass: convention FAIL A1 1 vs A0 2, business FAIL 0 vs 0. They are UNKNOWN verdicts (convention 8 vs
+3, business 4 vs 1). Part of them comes from lean-flow sessions that stopped at a permission popup and were parked, so no judge
+ran (L-272). Scored parks: A1 3 of 48, A2 3 of 32, A0 none. Five were a throwaway `check.mjs`/`probe.mjs`/`check.ts` written to
+the OS temp dir, and one a Bash `mktemp` heredoc writing a probe there. An adopter's unattended run loses the task the same
+way. The parked sessions' streams were swept, so the cause is not yet known.
 Owner ruling 2026-11-02: S3's first slice targets these popup stops; S3a's brief fields wait.
 
 ## Done when

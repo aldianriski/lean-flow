@@ -83,11 +83,12 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   its lost-detail regression (−8.3) rests on 4 tasks. The STANDARD change stays under D2. With no A3, S3 and S4 compare
   against A2.
 - **D11** — S3's first slice (owner, 2026-11-02): the convention and business regressions D10 admits S3 on are judge UNKNOWN
-  verdicts, not more FAILs (A1 1 and 2 against A0's 2 and 3, round-0 rows). Some of those UNKNOWNs are lean-flow sessions parked at a permission
-  popup after writing a probe outside the working tree (A1 6 of 48, A2 3 of its first 17, A0 none). S3's first slice
-  therefore fixes those popup stops (TASK-573) and measures the fix as its own arm A4a against A2 (TASK-574). S3a's brief
-  fields wait; when they come, they apply to the session's own G1/G2 brief, since trial sessions dispatched a subagent in
-  4 of 98 A1/A2 rows. A4a stacks on A2 whatever A2's ruling is.
+  verdicts, not more FAILs (first pass, on each measure's own tasks: convention FAIL A1 1 vs A0 2, UNKNOWN 8 vs 3; business FAIL
+  0 vs 0, UNKNOWN 4 vs 1). Some of those UNKNOWNs are lean-flow sessions parked at a permission popup after writing a probe
+  outside the working tree (L-272; scored parks A1 3 of 48, A2 3 of 32, A0 none). S3's first slice therefore fixes those popup
+  stops (TASK-573) and measures the fix as its own arm A4a against A2 (TASK-574). S3a's brief fields wait; when they come, they
+  apply to the session's own G1/G2 brief, since only 3 of 93 measured A1/A2 sessions dispatched a subagent. A4a stacks on A2
+  whatever A2's ruling is.
 
 ## Open questions
 
