@@ -109,6 +109,12 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   the base and comparator for S3 bundle 2 (TASK-583, 584, 585, measured as TASK-581).
   Renumbered 2026-11-02 (owner): bundle 2 was filed as TASK-577..580, ids the parallel stream SPRINT-157 had already
   taken; they are now TASK-582 (parallel trials), 583, 584 and 585. Archived logs keep the old ids.
+- **D16** — How changes are tested, revised (owner, 2026-11-02, after a Codex process review; supersedes D14's one arm per
+  bundle): each improvement is checked by 1-5 development runs run in parallel (about 8-12 minutes for a batch, never a full
+  arm); a full measured arm runs only before a release, on the stacked bundles, unattended (overnight is fine), and nothing
+  ships without a passing arm (D6); development runs may continue during an arm, one worker's worth, so nothing waits on it
+  (SPRINT-158 T1 made the sweep safe for that). A capacity check at 3 and 4 workers sets the release arm's worker count by
+  amendment (target 40-50 minutes; RAM, not CPU, is the limit on this PC). Arm A4b (bundle 2) is the last per-bundle arm.
 
 ## Open questions
 
