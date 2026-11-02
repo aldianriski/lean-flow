@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Added (maintainer-only)** — `evals/ab/run-dev.ts` runs a batch of development trials in parallel (`--workers N`, default 3), each slot with its own scratch log, and prints one result line per slot (EPIC-023 D16).
 - **Changed (maintainer-only)** — `evals/ab/run-baseline.ts --workers N` runs up to N A/B trials at once under one driver, lock and log (default 1, unchanged); a stop lets running trials finish, and the pilot still stops before any other slot. The stale-workspace sweep now keeps a directory whose owning driver is alive, so a second driver no longer deletes a running trial.
 - **Changed** — `/orchestrator` G2: a design names each stated business fact its change touches (requirements, business notes, the repo profile's business topics) and how it honours it; where a fact and the neighbouring code disagree, the fact wins.
 - **Changed** — `/orchestrator`: anything a check creates inside the working tree (a database directory, a cache, a log) is removed before the report unless the task declares it; what the repo's own tests leave outside the working tree is named in the report, never deleted, since deleting it needs a permission an unattended run does not have.

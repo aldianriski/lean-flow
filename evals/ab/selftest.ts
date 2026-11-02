@@ -3132,6 +3132,55 @@ check("S64 classifier: buildCatalog has every section, setup bullet, ruling and 
   }
 });
 
+check("S77 run-dev: bounded workers, ordered starts, isolated logs, failure and CLI refusal", async () => {
+  const { runDev } = await import("./run-dev.ts");
+  const dir = tmpdir("s77"), header = path.join(dir, "header.md");
+  fs.writeFileSync(header, "# Development\nfreeze: fixture\n");
+  const tasks = ["batch-b/invitation-issued-by", "batch-b/reissue-invitation", "batch-b/pilot-seat-limit", "batch-b/shared-auth-failure", "batch-a/shared-timestamp-format"];
+  const args = ["--arms", path.join(AB, "arms"), "--suffix", "a0", "--research", dir, "--out", path.join(dir, "out"), "--log-header", header, "--workers", "2", ...tasks.map((t) => `workdoo:workdoo/${t}`)];
+  const calls: string[] = [], releases: (() => void)[] = [], lines: string[] = [];
+  let active = 0, peak = 0;
+  const running = runDev(args, async (cmd, fd) => {
+    const log = cmd[cmd.indexOf("--log") + 1]!;
+    calls.push(path.basename(log, ".md"));
+    assert(fs.readFileSync(log, "utf8") === fs.readFileSync(header, "utf8"), "each log starts with the exact header");
+    peak = Math.max(peak, ++active);
+    const index = calls.length;
+    await new Promise<void>((resolve) => releases.push(resolve));
+    fs.writeSync(fd, `exit: ${index === 3 ? "failed" : "ok"}\npassed: ${index !== 3}\n`);
+    active--;
+    return index === 3 ? 1 : 0;
+  }, (line) => lines.push(line));
+  for (let i = 0; i < 5; i++) {
+    assert(releases[i], `slot ${i + 1} starts`);
+    releases[i]!();
+    await Bun.sleep(0);
+  }
+  assert(await running === 1, "a failing child fails the batch");
+  assert(peak === 2, `workers cap: expected 2 concurrent, saw ${peak}`);
+  deepStrictEqual(calls, tasks.map((t) => path.basename(t)), "starts in input order");
+  assert(new Set(calls).size === 5 && fs.readdirSync(path.join(dir, "out")).length === 10, "five separate logs and outputs");
+  assert(lines.some((l) => /pilot-seat-limit.*code: 1.*passed: false.*exit: failed/.test(l)), "summary includes child code and verdicts");
+  const refused = await Bun.spawn([process.execPath, "--no-env-file", path.join(AB, "run-dev.ts"), "--workers", "0"], { stdout: "pipe", stderr: "pipe" });
+  assert(await refused.exited === 2 && /REFUSED: --workers/.test(await new Response(refused.stderr).text()), "--workers 0 refuses with exit 2");
+  const fresh = [...args];
+  fresh[fresh.indexOf("--out") + 1] = path.join(dir, "dry");
+  const commands: string[] = [];
+  const never: import("./run-dev.ts").Spawn = async () => { throw new Error("must not spawn"); };
+  assert(await runDev([...fresh, "--dry-run"], never, (l) => commands.push(l)) === 0, "dry run succeeds");
+  assert(commands.length === 5 && commands.every((l) => l.includes("--measured") && l.includes("d9")) && !fs.existsSync(path.join(dir, "dry")), "dry run prints commands without writing output");
+  for (const bad of [
+    [...fresh.slice(0, -5), "workdoo:workdoo/batch-b/absent-s77"],
+    fresh.map((arg) => arg === "a0" ? "absent-s77" : arg),
+  ]) {
+    const messages: string[] = [];
+    assert(await runDev(bad, never, (l) => messages.push(l)) === 2 && messages.length === 1 && messages[0]!.startsWith("REFUSED: missing file:"), "missing task or arm refuses before spawning");
+  }
+  const success = [...fresh];
+  success[success.indexOf("--out") + 1] = path.join(dir, "success");
+  assert(await runDev(success, async () => 0, () => {}) === 0, "all successful children pass the batch");
+});
+
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;
