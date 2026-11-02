@@ -81,7 +81,7 @@ Untyped tasks read as features with no rewrite; an existing bugs folder is propo
 **Acceptance:** migrate on the workdoo research copy proposes its bugs folder as a bug item and changes nothing else.
 
 ### T6 — Research topic folders, with the standard and the index generator first `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `spec/` · `docs/adr/` · `docs/DECISIONS.md` · `scripts/` · `evals/` · `docs/research/` · `docs/product/` · `docs/deployment/` · `docs/qa/` · `docs/knowledge-index.md` · `CHANGELOG.md`
+Layers: `spec/` · `docs/adr/` · `docs/DECISIONS.md` · `scripts/` · `evals/` · `docs/research/` · `docs/product/` · `docs/deployment/` · `docs/qa/` · `docs/knowledge-index.md` · `CHANGELOG.md` · `TECH-DEBT.md` · `docs/LEARNINGS.md` · `.out-of-scope/` · `docs/development/`
 Depends-on: T1, T2
 Cites: TASK-589 · SPRINT-158 research audit · `QA.md` (placed by the §2 amendment, not edited)
 Topic folders are defined in the standard before anything moves; the generator and the cap check read them; low-citation series
