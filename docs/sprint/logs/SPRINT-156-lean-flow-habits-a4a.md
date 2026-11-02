@@ -166,3 +166,12 @@ orchestrator's Report shape now puts a `Progress:` line after the verdict (sprin
 of M with %; a running job adds done/total, % and an ETA). SKILL.md stays at 140 lines; density baseline 13 (the first wording
 made a 14th dense line and was split). The running A4a arm uses a pinned clone, so it is unaffected. Box 2 (real input) waits for
 the next development run.
+
+### 2026-11-02 | progress | T4: A4a full run done, ruled ship-eligible (tuning-sensitive); owner rules it ships
+The detached run exited 0: 32/32 slots, VALID on its own slots. Against A2 (combined slots, `--comparator A2`): 90.6% vs 78.1%,
+gain +12.5 [3.1, 21.9], no symptom regression (convention +3.8, business +11.1, lost detail 0.0, scope +9.4), above A0 (89.6%),
+cost 0.55x A1. On the eleven untouched tasks A4a ties A2 at 90.9% (gain 0.0, below +0.10), so Amendment 7 item 8 reports it
+ship-eligible, tuning-sensitive. Owner ruling: A4a ships (EPIC-023 D15); bundle 2 stacks on it and TASK-581 compares with it.
+Exposure 0 slots; 1 park of 32 (reissue-invitation: an `rm -rf` of a system-temp dir the repo's own test created, TASK-579's
+ground). Report: `docs/research/logs/ab-measurements-a4a.md` § Report 2026-11-02 (`881a79a2`). TASK-574 ticked and done.
+The truncated copy of the TASK-578 entry above, ending mid-sentence, is a write defect of `d52bf3a0`; the full entry follows it.

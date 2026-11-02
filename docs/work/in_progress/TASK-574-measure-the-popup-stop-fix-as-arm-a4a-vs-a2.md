@@ -23,12 +23,12 @@ plugin text, so A4a is A2's frozen snapshots with the plugin pinned at the fix c
 arm, not targeted runs only.
 
 ## Done when
-- [ ] PREREGISTRATION Amendment 7 owner-signed before any A4a trial: arm A4a (both repos, A2's snapshots and manifests unchanged,
+- [x] PREREGISTRATION Amendment 7 owner-signed before any A4a trial: arm A4a (both repos, A2's snapshots and manifests unchanged, ✓ 2026-11-02: Amendment 7 owner-signed at 5339c67c, before the pilot (6f190c59)
       plugin pinned at the commit that carries the fixes of TASK-573 and TASK-575), a 32-slot schedule built like A2's, a derived pilot, its own log with a
       freeze line, and section 11 validity first. The ruling against A2 follows Amendment 6 §7's rules with A2 as the comparator, and the park
       rate is reported as the mechanism measure.
-- [ ] All 32 slots measured; A4a passes section 11's run-validity rule on its own slots.
-- [ ] The ruling (ship-eligible / failed / inconclusive) is owner-signed and recorded in the A4a log and EPIC-023.
+- [x] All 32 slots measured; A4a passes section 11's run-validity rule on its own slots. ✓ 2026-11-02: 32/32 slots, 0 infra-lost, VALID (881a79a2)
+- [x] The ruling (ship-eligible / failed / inconclusive) is owner-signed and recorded in the A4a log and EPIC-023. ✓ 2026-11-02: ship-eligible, tuning-sensitive; owner rules it ships (A4a log § Report 2026-11-02, EPIC-023 D15)
 
 ## Touches
 evals/ab/PREREGISTRATION.md (Amendment 7) · evals/ab/arms/<repo>-a4a.json · evals/ab/schedule-a4a.json ·

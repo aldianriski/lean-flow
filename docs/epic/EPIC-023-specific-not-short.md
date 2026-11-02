@@ -102,6 +102,10 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   related fixes are bundled and frozen; a full arm runs unattended after the owner approves its pilot, with a notification when it
   ends or needs a ruling. Parallel trials are being added (TASK-577). Measured arms stay on this PC and at 16 tasks x k = 2:
   the VPS would break comparability and fewer slots would cost power.
+- **D15** — A4a ships (owner, 2026-11-02): arm A4a (TASK-573 + TASK-575) measured 32/32 VALID, 90.6% vs A2 78.1%, gain
+  +12.5 [3.1, 21.9], no regression, above A0, cost 0.55x A1 (`ab-measurements-a4a.md` § Report 2026-11-02). Ship-eligible,
+  tuning-sensitive: on the eleven tasks no development run touched A4a ties A2 at 90.9%, where +0.10 was out of reach. A4a is
+  the base and comparator for S3 bundle 2 (TASK-578, 579, 580, measured as TASK-581).
 
 ## Open questions
 
@@ -123,7 +127,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
-  → TASK-573, TASK-574, TASK-575
+  → TASK-578, TASK-579, TASK-580, TASK-581
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)
