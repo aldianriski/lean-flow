@@ -164,3 +164,13 @@ Codex R2 over the R1 fix: T1 CLEAR, VERDICT CLEAR (11.5k tokens); the gauntlet c
 pre-registration (`e6b621bd`, sha256 `f6b770f1…b470f`) and **signed by the owner** by popup. `docs/research/logs/ab-measurements-a2.md`
 created with the freeze line at 2026-11-02T00:40:46Z; the harness reads it and reports no freeze problem. Next: the owner runs the
 A2 pilot (2 slots) in their own terminal.
+
+### 2026-11-02 | progress | T1: A2 pilot done (2 of 2 scored, both pass); one earlier start lost to a missing `sh`
+First start (07:45 local, owner's PowerShell): the workdoo-a2 pilot slot ran plan, G2, revise and build, then grading failed with
+`ENOENT ... uv_spawn 'sh'` (`lib/grade.ts` runs graders through `sh`; Git's `usr\bin` was not on that terminal's PATH). No row was
+written, nothing was scored or judged, so the slot never counted; the next start swept its iso dir and ran it as attempt 1. Cost of
+the lost session only. Fix: Git's `usr\bin` prepended to PATH in that terminal; no harness change. Second start: both pilot slots
+scored, exit 10. workdoo-a2 access-activity-type-filter: G2 signed, every grader pass, convention/business/scope PASS, $2.26, 198 s.
+clinic-a2 appointment-lookup: G2 signed, every grader pass, all three judges PASS, $1.98, 148 s. Both rows pin the S1 plugin
+(`82990174`, `b8c3b484`). Cost per attempt sits beside A1's S0 mean ($2.08, 67 rows), far inside the 2.0x ceiling; A0's is $0.62.
+Owner review of cost and behaviour next; then the remaining 30 slots.
