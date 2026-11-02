@@ -137,3 +137,7 @@ A4a plugin against the A2 plugin. R2 (42.9k): item 2 closed; one Med left on ite
 decisive ruling). Stop rule reached; owner ruling by popup: the sixteen-task ruling decides, and a ship-eligible A4a whose gain on
 the eleven untouched tasks is below +0.10 is reported "ship-eligible, tuning-sensitive" and does not ship under D6 without the
 owner's ruling. Amendment 7 appended (CRLF); the document's sha256 is recorded at signature.
+
+### 2026-11-02 | progress | T4: Amendment 7 owner-signed; A4a log created with its freeze line
+The owner signed Amendment 7 by popup. `docs/research/logs/ab-measurements-a4a.md` created, frozen 2026-11-02T06:10:41Z, sha256 `937e9855...3e03` at
+`5339c67c`; the harness reports no freeze problem. Next: the owner runs the A4a pilot (2 slots) in their own terminal.
