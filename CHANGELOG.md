@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — `/prime` reports open bug items (count and oldest) beside the task count; `/flow` sends a reported bug to `/triage` and builds a bug item through `/diagnose`; the close retro lists each fixed bug item with its one-line root cause.
 - **Changed** — `/triage` files a reported bug as a `type: bug` work item with its repro and redacted evidence; `/diagnose` reads that item first and, at its post-mortem, writes the root cause, fix, regression test and prevention into it.
 - **Changed** — work items carry an optional `type:` (feature, bug or debt), and a reported bug becomes a `type: bug` work item that carries its repro, evidence and root cause instead of a temp-only report; evidence for any item lives in `docs/work/evidence/TASK-NNN/`, and business facts get a placed `docs/product/business-notes.md` (spec 0.19.0, ADR-056).
 - **Added (maintainer-only)** — `evals/ab/run-dev.ts` runs a batch of development trials in parallel (`--workers N`, default 3), each slot with its own scratch log, and prints one result line per slot (EPIC-023 D16).

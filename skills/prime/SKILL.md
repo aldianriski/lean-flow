@@ -29,7 +29,7 @@ locations second. Adapt the globs to the host project's layout.
 | 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Vocabulary · gates · modes (if the project uses one) |
 | 3 | `README.md` — *presence-check by default* | Front-door (humans); overlaps 1·2·6 → **full read deferred** (note below) |
 | 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
-| 5 | `docs/work/`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Work-item store + debt ledger — frontmatter + open `- [ ]` items only |
+| 5 | `docs/work/`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Work-item store (incl. `type:`) + debt ledger — frontmatter + open `- [ ]` items only |
 | 6 | `docs/architecture/overview.md`, `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
 | 7 | active `docs/epic/EPIC-*.md` (not `archive/`) § Closed when · `docs/product/roadmap.md` (or `docs/roadmap.md`) Delivery-sequence rows | Coverage count (below) |
 
@@ -40,7 +40,7 @@ Why: the README duplicates CLAUDE.md/CONTEXT.md/ARCHITECTURE.md content, so read
 the priming token cost for near-zero new signal.
 
 **Resolution** (v2 store): backlog = `docs/work/backlog/`. Active sprint = each `docs/sprint/SPRINT-NNN-<slug>.md`
-with `status: active` (a multi-stream repo has one per stream) — read only its frontmatter + `## Members`.
+with `status: active` (a multi-stream repo has one per stream) — read only its frontmatter + `## Members`. Open bugs = `type: bug` items outside `done/`·`cancel/`, oldest = lowest id.
 Open DoD = count of `- [ ]` lines under `## Done when` in each member's task file — found **by id**
 (`docs/work/**/TASK-NNN-*.md`), never by the listed path, which goes stale once a member moves folder — summed per active
 sprint (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); no active
@@ -112,7 +112,7 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
 [OK]      docs/work/
 [OK]      ARCHITECTURE.md
 Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
-Tasks:    3 open
+Tasks:    3 open · bugs: 1 open (oldest TASK-NNN)
 Coverage: 2 uncovered (EPIC-015 ×1 · roadmap P2a) → /triage
 Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
 Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run — only if an open AFK J0/J1 member exists)

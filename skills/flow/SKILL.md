@@ -32,8 +32,10 @@ members are its `## Members` paths ∪ every task file stamped `sprint: SPRINT-N
 1. **Orient** — context missing/stale → `/prime`. Resuming from a handoff? read it first. After `/prime`, an **unprofiled** repo (prime's test: no CLAUDE/CONTEXT/overview → `/lean-doc-generator init`; docs but no overview `## Stack` → `migrate`) runs that skill before Feed; unattended it parks (both are HITL).
 2. **Feed** — no active sprint and no open work → `/task-decomposer "<intent>"` — **the detailed grill fires here, at intake** (the build gates re-grill only residuals); intent too **foggy to plan** (decisions unknown) → its **fog-mode** (`--fog`) maps decisions before tasks; open work but none `state: ready`, or backlog drifted / noisy → `/triage`.
    Work is a `docs/product/roadmap.md` row → `/task-decomposer --roadmap <row>` (one row, beside `--epic`; never edits the roadmap).
+   A reported bug → `/triage`, which files it as a `type: bug` work item (ADR-056).
 3. **Plan** — no active sprint but a ready backlog exists → `/lean-doc-generator promote` (the governance review fires here).
 4. **Build** — an active sprint with a member outside `done/`/`cancel/` → `/orchestrator sprint-bulk` through G1 / G2 (never an unpromoted Backlog task — step 3 promotes first). Route each task by type: new behaviour → `/tdd` (test-first, default) · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
+   A `type: bug` item builds through `/diagnose`, which writes its root cause, fix and regression test into it.
 5. **Close** — every member of the active sprint in `docs/work/done/` or `cancel/` → `/lean-doc-generator close` (Retro → §10 buckets), then **`/release-patch` (PATCH) for a fixes-only sprint · MINOR by hand for a feature sprint**.
 6. **Continuity** — stopping mid-loop or context budget low → `/handoff`, so the next `/flow` resumes cleanly.
 
