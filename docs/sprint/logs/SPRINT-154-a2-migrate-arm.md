@@ -158,3 +158,9 @@ mined an object out of surrounding prose. Fixed: a label must be one line of at 
 else stop; the reply must be exactly one JSON value (fences allowed). S68 (fails on the old classifier); selftest 73/73. Effect on
 the frozen arms: none. Every label the operator sent in either setup appears verbatim in its session's text (10 of 10, checked
 against the transcripts), so no model-written words reached a session.
+
+### 2026-11-02 | review | T1: Codex R2 CLEAR; Amendment 6 owner-signed; A2 log frozen
+Codex R2 over the R1 fix: T1 CLEAR, VERDICT CLEAR (11.5k tokens); the gauntlet closed in two rounds. Amendment 6 appended to the
+pre-registration (`e6b621bd`, sha256 `f6b770f1…b470f`) and **signed by the owner** by popup. `docs/research/logs/ab-measurements-a2.md`
+created with the freeze line at 2026-11-02T00:40:46Z; the harness reads it and reports no freeze problem. Next: the owner runs the
+A2 pilot (2 slots) in their own terminal.
