@@ -5,6 +5,7 @@ stream: codex-pilot
 owner: Maintainer
 last_updated: 2026-11-02
 status: closed
+close_commit: b6422945
 plan_commit: 2ea2af75
 gates_signed: G1,G2 @ 1314a5da
 update_trigger: sprint execute/close events
@@ -179,5 +180,5 @@ SPRINT-154's sitting and the popup rulings.
 
 **Buckets routed** — Shipped: CHANGELOG [Unreleased] already carries T1 and T2 (Fixed). Tech debt: TD-285 (the members check can read another sprint's log as its baseline, found at this close's system verify). Follow-ups: none
 new. Learnings: L-277. Every member is in `done/`. No handoff entry was taken in this sprint. No release: the changes stay under
-[Unreleased] with S1's (EPIC-023 D6). The owner rules on Codex as the default builder from the table above. Retention and the
+[Unreleased] with S1's (EPIC-023 D6). Owner ruling at close (2026-11-02): Codex becomes the default builder for execution-class tasks, reviewed by Claude. Retention and the
 archive move wait for the owner's approval.
