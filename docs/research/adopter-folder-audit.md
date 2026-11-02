@@ -6,7 +6,7 @@ status: current
 id: adopter-folder-audit
 tags: [process]
 domain: governance
-related: [TASK-590, TASK-591, TASK-594, TASK-589, ADR-053]
+related: [ADR-053, ADR-056]
 ---
 
 # Research — What do adopters keep outside the standard, and where should it go?
