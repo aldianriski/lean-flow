@@ -27,3 +27,14 @@ archive, `TECH-DEBT.md` kept as the ledger, and a proper migration for repos alr
 Cross-stream: SPRINT-157 (branch `sprint-157-reusable-verification`) owns the generator's CRLF fix, an edit to
 `skills/diagnose/SKILL.md` and `docs/development/setup.md`; recorded as D3.
 promote-check: 19 pass, 0 fail.
+
+### 2026-11-02 | gate | G1 signed for all six tasks; G2 signed for T1 only (T2-T6 wait for T1's findings)
+G1 (owner popup): TASK-590 to TASK-594 fast-path (origin decomposer, scope unchanged since approve); TASK-589 (origin manual) full
+checklist: done when the three series sit in topic folders with the ADR, the §2 amendment and the generator reading folders first;
+size M; out of scope the CRLF fix and `docs/development/setup.md` (SPRINT-157), `docs/research/storm/`, `plugin-reference-delta.md`,
+`loop-hygiene-*` and high-citation docs; assumption A1 (spec version bump) confirmed at T2's G2.
+G2 for T1: a read-only census of the frozen population (`D:\Research\dev156\workdoo`, `\clinic`, lean-flow's `docs/`, freshly read)
+against STANDARD §2, cross-checked by a second listing with a different selection rule; `docs/research/adopter-folder-audit.md`
+with a proposed ruling per finding; owner rulings by popup; approved new tasks filed by the coordinator; changes to TASK-591, 594
+or 589 by a logged scope-change that cites the doc. T2-T6 are designed after T1's findings (they depend on them).
+builder-check · T1 · 5 contradictions · 3 questions · settled by fact (population kept to the frozen text; lean-flow docs read fresh; filing and citing steps added)
