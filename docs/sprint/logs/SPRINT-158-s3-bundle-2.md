@@ -75,3 +75,14 @@ self-onboarding-guard searched the code for intake and responsibility and never 
 available for all three preparation responsibilities"). No lean-flow sentence sent the design to the business facts.
 Development runs (T3 clinic appointment-lookup and workdoo reissue-invitation; T4 the two tasks above, which also give T2 its
 real input) start after T1's ownership-safe sweep lands.
+
+### 2026-11-02 | progress | T1: safe sweep and --workers N landed (Codex-built, Claude-reviewed in two rounds)
+Codex built TASK-582 boxes 1 and 2 in a worktree (`sprint158-t1`). Round 1: `makeIsolation` writes `owner.json` before the dir
+is published; `sweepStale` sweeps only dead owners and legacy dirs, keeping live or uncertain pids; `runBaseline` takes
+`--workers N` (default 1), a stop drains running trials and the first stop wins. Claude's review found one defect: at N = 2 the
+worker that finished the first pilot slot started slot 3 while slot 2 was still running, spending a non-pilot slot before the
+owner's pilot review. Round 2 holds non-pilot dispatch while any pilot slot runs (an unscored pilot still continues as the
+serial loop would); S76 proves it and fails on round 1. Selftest 81/81 outside Codex's sandbox (S43 fails only inside it, a
+known sandbox limit), tsc clean. Codex 136.9k tokens over two rounds. Landed as `15012173`; boxes 1 and 2 ticked.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped outside review (Claude reviewing the Codex build, 2 rounds, 1 finding fixed) · behaviour:material · governance:low

@@ -25,10 +25,10 @@ development runs as the iteration loop, bundled fixes, unattended full arms with
 harness only, never a gate.
 
 ## Done when
-- [ ] The stale-workspace sweep removes only directories that belong to no live driver: a second driver started beside a running
+- [x] The stale-workspace sweep removes only directories that belong to no live driver: a second driver started beside a running ✓ 2026-11-02: `15012173`; S71 spawns a real second process as the live owner, its dir survives the sweep, a dead owner's is swept; with the old sweep S71 FAILS
       one leaves the running trial's workspace in place (today the lock is per log while the sweep takes every `iso-*` directory).
       Shown by a selftest with two drivers, failing on the current sweep.
-- [ ] A bounded worker count (`--workers N`, default 1) runs N slots at once under one lock and one log, with appends serialised,
+- [x] A bounded worker count (`--workers N`, default 1) runs N slots at once under one lock and one log, with appends serialised, ✓ 2026-11-02: `15012173`; S72 N = 1 equals the old loop (calls, rows, stop, say lines), S73 a stop drains running trials, S74 bad --workers exits 2, S75 refill and streak, S76 pilot barrier at N = 2 (FAILS on round 1); selftest 81/81, tsc clean
       owner stops (usage limit, owner-ruling exits) stopping every worker (none starts another slot; a running trial finishes and
       records its row, scope-change 2026-11-02), and resume unchanged; default 1 is byte-identical in
       behaviour to today.
