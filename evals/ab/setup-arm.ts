@@ -70,7 +70,7 @@ const iso = makeIsolation(WORK, arm);
 console.log(`isolated config dir (transcript lands here): ${iso.cfg}`);
 if (auto) {
   // the model classifier only CHOOSES an entry; a migrate arm also gets the two owner rulings (SPRINT-154): the plan is approved for the
-  // profile items only, and an existing file is left untouched. An init arm gets neither class.
+  // profile items only, and an existing file is left untouched. An init arm gets neither class (but does get UNDECIDED, below).
   let files!: ReturnType<typeof readAnswers>;
   try {
     files = readAnswers(path.resolve(flag("answers-dir") ?? path.join(import.meta.dir, "answers")), repo);
@@ -79,7 +79,8 @@ if (auto) {
   }
   // DATES: owner ruling (setup deviation 2, run 8): a file that gains a section gets today's last_updated; no other file
   // UNDECIDED: owner ruling (setup deviation 3, run 10): a convention question the frozen Conventions file does not settle is 'Not decided yet'
-  const catalog = buildCatalog(files, kind === "migrate" ? [PLAN_RULING, CLEANUP_RULING, DATES_RULING, UNDECIDED_RULING] : []);
+  // init gets UNDECIDED too (SPRINT-155 init proof: its stack question sets ask conventions the Conventions file does not settle)
+  const catalog = buildCatalog(files, kind === "migrate" ? [PLAN_RULING, CLEANUP_RULING, DATES_RULING, UNDECIDED_RULING] : [UNDECIDED_RULING]);
   const env = isolationEnv(iso, arm);
   const log = path.join(WORK, `operator-${id}.jsonl`);
   // the claude command minus its leading binary, behind the stream-json flags (operatedCommand puts the binary, or a test's fake CLI, first)
