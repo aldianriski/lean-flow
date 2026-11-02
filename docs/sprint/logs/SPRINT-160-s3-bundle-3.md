@@ -85,3 +85,17 @@ escape, then the missing inventory file): no spend. Batch A (self-onboarding-gua
 and batch B (self-onboarding-guard, reissue-invitation) run at two workers on research copies `D:\Research\dev156\`.
 consequence · T1 · behaviour:material · governance:low
 consequence · T2 · behaviour:material · governance:low
+
+### 2026-11-02 | progress | T2 done on real input; T1's first batch misses the target facts, one wording revision, re-run
+Development batch on pin `4c840af5` (5 runs, two workers, 16:34-16:54 UTC, 8.08 USD): all `ok` and passed, 0 parks, 0 permission
+denials. Streams read with a scratch extractor (design text, every delete command, denials).
+- T2 (TASK-588) box 2 met: reissue-invitation `iso-2Yd7Wk`, `iso-4xA0A8` and self-onboarding-guard `iso-sISj5b`, `iso-wHKhSk`; the
+  only delete was `Remove-Item scripts/probe-reissue.tmp.mjs`, inside the tree. Ticked; `done/`.
+- T1 (TASK-587) box 2 not met: every design quoted fact lines verbatim and named its sources (SPRINT-158's opened none), but 0 of 3
+  quoted the target fact. Self-onboarding-guard `iso-sISj5b` opened `BUSINESS-NOTES.md` and quoted four other facts, not fact 6;
+  `iso-wHKhSk` opened only `docs/product/requirements.md` and `.claude/CONTEXT.md`; invitation-issued-by `iso-oVe5ky` quoted facts
+  2, 3, 7 and R12, not the en-GB fact 14.
+- The one wording revision G2 allows (`2249c701`): the design opens each facts source, reads every fact in them, and quotes every
+  fact the change touches; still 140 lines, cap PASS. Box 1's words stay verbatim. Pin `D:\Research\ab-pins\lean-flow-160-2249c701`
+  (hash `83f75809…`); only the three missing runs re-run.
+review · T2 · scoped outside review (Codex, read-only, 1 round, CLEAR) · behaviour:material · governance:low
