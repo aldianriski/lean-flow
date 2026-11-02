@@ -123,6 +123,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-279 [tags: process] [status: active]: **A predeclared threshold on a subset is checked against what the comparator already scores there before it is frozen.** Amendment 7 item 8 asked A4a to gain +0.10 over A2 on the eleven tasks no development run touched; A2 already scored 90.9% on them, so the most any arm could gain was +9.1 and the bar could not be met. The ruling had to go to the owner on a check that could not discriminate. Compute the ceiling (1 minus the comparator's rate on the subset) when the amendment is drafted, and set the bar below it or name a different check.
+- seen: 2026-11-02 (SPRINT-156 T4, A4a ruling; EPIC-023 D15)
+- count: 1
+- promoted: no
+- related: L-130 (a value entering a frozen artifact is a query result) · `docs/research/logs/ab-measurements-a4a.md` § Report 2026-11-02
+
+---
+
+## L-278 [tags: process] [status: active]: **Measure a habit across every kept stream, not only the sessions where it failed visibly.** Six parked sessions pointed at probes written outside the repo; a scan of all kept streams found the habit in 33 of 61 A1 and 18 of 32 A2 sessions against 3 of 49 A0, most of which never parked. The visible failures were the tip of a habit that cost tokens and permissions on every run. After the fix (TASK-573) arm A4a had 0 of 32.
+- seen: 2026-11-02 (SPRINT-156 T1 diagnosis; A4a exposure check)
+- count: 1
+- promoted: no
+- related: L-272 · L-276 (split a regression by cause before admitting work on it)
+
+---
+
 ## L-277 [tags: tooling] [status: active]: **An interactive session started with `--plugin-dir` can still load the installed copy of the same plugin, while a headless run loads the checkout.** SPRINT-155's first two clinic `init` runs were started interactively with `--plugin-dir` pointing at the lean-flow checkout. Both loaded the installed 2.19.1 instead: they lacked the checkout's existing-docs guard, deleted the repo's spec and rewrote its README, and were discarded. Headless runs with the same flag loaded the checkout, and a third interactive run loaded it only with the installed plugin disabled. Nothing in the session said which copy won; the base directory a skill prints is the only tell. Durable form: prove a checkout's behaviour headless, or with the installed copy disabled, and read the skill's printed base directory before trusting the output.
 - seen: 2026-11-01 (SPRINT-155 T1/T2 clinic init attempts)
 - count: 1

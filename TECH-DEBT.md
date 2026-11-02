@@ -391,6 +391,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-286** severity: low | status: open | created: Sprint-156 (close retro)
+  - Summary: **The A/B harness's design scope check (G2) refuses a design that lists the task file, while its post-run breach check
+    exempts `docs/work/`.** The two checks disagree on the same path, so a design that names the task it ticks pays a revise round
+    for a file the run is allowed to touch.
+  - Evidence: A2's kept streams, 14 of 82 first-round G2 refusals were the task file alone (SPRINT-156 T2 diagnosis); TASK-575
+    worked around it in the skill text rather than the harness.
+  - Impact: low now (A4a's designs no longer list the task file); it biases any later arm whose skill text lists it.
+  - Mitigation (hypothesis, re-derive first): exempt `docs/work/` in the G2 scope check as the breach check does, in a later
+    owner-signed amendment (the rule is frozen), with a must-FAIL fixture for a design listing only the task file.
 - **TD-285** severity: medium | status: open | created: Sprint-155 (close system verify)
   - Summary: **`check-sprint-by-reference.ts` can read another sprint's log as a baseline, so an append-only log reports
     `LOG-REWRITTEN`.** `logPaths` takes every path `git log --follow` gives for the log, and `--follow`'s rename guess can

@@ -104,8 +104,58 @@ signed before any trial; validity on its own 32 slots first, then the ruling aga
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/SKILL.md` | T1, T2, TASK-578 | probes stay in the working tree; a design lists only what the change needs inside its layers; reports carry a Progress line | med | dev re-runs 5/5, arm A4a |
+| `CHANGELOG.md` | T1, T2, T4, TASK-578 | `[Unreleased]` Changed lines and the A4a measurement | low | read-through |
+| `evals/ab/analyze.ts` · `lib/analyze.ts` · `selftest.ts` | T4 | `--comparator <arm>` for a ruling against A2 | med | selftest 75/75, S70 must-FAIL seed |
+| `evals/ab/arms/*-a4a*` · `schedule-a4a.json` · `hash-prereg.ts` | T4 | arm A4a on A2's snapshots, plugin pinned at `56964ce2` | med | build-slots 32/32 |
+| `evals/ab/PREREGISTRATION.md` | T4 | Amendment 7, owner-signed | high | hash recorded, Codex 2 rounds |
+| `docs/research/logs/ab-measurements-a4a.md` | T4 | freeze line, 33 rows, report and ruling | med | analyze VALID |
+| `docs/epic/EPIC-023-specific-not-short.md` | coordinator | D11-D15, S3 mark | low | triage coverage |
+| `.out-of-scope/light-path-small-tasks.md` | T3 | the light path rejected at G2 | low | read-through |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 3 of 4 members delivered (TASK-573, 575, 574); TASK-576 cancelled at G2 (its cost premise was the trial protocol,
+not lean-flow). Two lean-flow habits fixed in `skills/orchestrator/SKILL.md`: probes stay inside the working tree (TASK-573), and
+a design declares only what the change needs inside the declared layers (TASK-575). On five development re-runs the first G2
+scope check passed 5 of 5 (82 of 93 failed before), with no park and about a third lower cost. Arm A4a: 32/32 VALID, 90.6%
+against A2's 78.1%, gain +12.5 [3.1, 21.9], no symptom regression (business +11.1, scope +9.4), above A0 (89.6%), cost 0.55x
+A1; 1 park of 32 (A2 3), 0 slots with an out-of-tree probe. Ruled ship-eligible, tuning-sensitive (the eleven untouched tasks
+tie A2 at 90.9%, a ceiling); owner rules it ships (EPIC-023 D15). Quick one-off TASK-578 (reports carry a Progress line)
+landed beside the Plan.
+
+**Retrieval check** — one miss, one hold. Missed: TASK-573 said the parked sessions' streams were swept; the coordinator had looked
+in the wrong directory, and every stream was kept (`D:\ab-work\kept\`). Held: the design-phase recon used those streams to name
+the causes before any paid reproduction, saving about ten runs, and the verifier was proven on A2's log before reading the re-runs.
+
+**Cost** — development re-runs $7.62 (five slots); A4a scored $45.55 + $1.20 infra (A2 $64.81). Codex: three builder checks
+169.8k, the `--comparator` build 82.8k, Amendment 7 review 121.1k (two rounds), the process review 98.1k (471.8k in all). Owner
+time: the pilot start, popup rulings and two signatures; the full arm ran unattended (detached driver, exit watcher, push
+notification), finishing about 45 minutes before its estimate.
+
+**Worked**
+- Kept streams as the diagnosis source: causes quoted, not guessed, and cheap.
+- Development runs as the iteration loop, then one bundled arm (now EPIC-023 D14).
+- Codex as builder for the execution piece, with a must-FAIL seed before landing.
+
+**Friction**
+- Two waits of about two hours (A2, A4a); the process ruling (D14) and TASK-577 (parallel trials) answer it.
+- Commits under a `Tn` subject that moved or ticked a member file failed `layers observed`; bookkeeping commits carry the
+  coordinator subject `sprint(N):`.
+- The harness's design scope check does not exempt `docs/work/` while its post-run breach check does (14 of 82 first-round
+  refusals were the task file alone).
+- The untouched-task secondary was set at +0.10 on tasks where A2 already scored 90.9%, so it could not be met; a secondary's
+  bar is checked against the comparator's ceiling before it is frozen (L-279).
+- A log append in `d52bf3a0` left a truncated copy of its entry; the log is append-only, so it stays, with a note.
+
+**Pattern candidates**
+- L-278 (count 1): lean-flow sessions wrote throwaway probes outside the repo in 54% of A1 and 56% of A2 sessions against 6% of A0;
+  measure a habit across all kept streams, not only the sessions where it failed visibly. A4a: 0 of 32.
+- L-279 (count 1): a predeclared threshold on a subset is checked against the comparator's ceiling there before freezing.
+
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] (TASK-573, 575, 578; A4a measured). Tech debt: TD-286, the design scope check
+vs the post-run breach check on `docs/work/` (frozen rule; fix in a later amendment). Follow-ups: TASK-577 (parallel trials), TASK-579
+and TASK-580 (bundle 2), TASK-581 (bundle 2's arm). Learnings: L-278, L-279.
