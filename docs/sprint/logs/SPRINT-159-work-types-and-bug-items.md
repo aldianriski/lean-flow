@@ -165,3 +165,20 @@ T2 Layers name `skills/task-decomposer/references/task-file.md` and `scripts/lib
 ### 2026-11-02 | progress | T6 Cites name two T2 files a log note mentions
 The note on T2's Layers above sits under T6's scope-change heading, so T6 cites the two files it names. Notes of this kind get their
 own entry heading from here on.
+
+### 2026-11-02 | progress | T5 and T6 done: migrate brings adopted repos across; research topic folders; VPS gate 479/0
+T5: migrate's update sync (migration-map § Typed work items) shown on a scratch copy of the workdoo research copy, headless from a
+pinned clone: the plan ($1.80) left all untyped tasks unwritten and proposed two bug items and five evidence moves; the owner
+approved all its recommendations; the apply ($1.44) moved 63 files and changed 9, every change an approved item (hash diff read).
+It also edited one link in a frozen changelog, which led to the rule that history keeps its links. T6: Codex built the topic-folder
+reading for the generator, the research corpus and the archive check (fixtures fail on the old code); the coordinator moved the
+three series (15 docs), updated 13 live links, wrote ADR-057 and the §2 rows, moved the governance roadmap and verified or
+corrected the six stale docs (a Sonnet check found three accurate, three needing fixes). Outside review of T5 and T6: round 1 FIX
+(one high, migrate could copy secret-bearing text into a new item; two medium, QA.md's shared row and a root knowledge-index.md's
+placement), all fixed; round 2 PASS. The gate then caught a missing density baseline for the newly placed QA.md, two layer tokens,
+a `chore(work):` subject (reworded on the unpushed range with the owner's approval, tree byte-identical, backup
+`backup/pre-reword-159`) and a log note under the wrong heading; all fixed.
+consequence · T5 · behaviour:material · governance:low
+review · T5 · scoped outside review (Codex, read-only, 2 rounds, 1 high fixed, PASS) · behaviour:material · governance:low
+consequence · T6 · behaviour:low · governance:high
+review · T6 · scoped outside review (Codex, read-only, 2 rounds, 2 medium fixed, PASS) · behaviour:low · governance:high

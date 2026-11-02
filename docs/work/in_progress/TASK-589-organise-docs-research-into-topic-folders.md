@@ -25,15 +25,15 @@ drops entries from CRLF files. Elsewhere: `docs/development/Lean-Flow-Governance
 `product/` (0 citations), and six docs carry headers over 60 days old.
 
 ## Done when
-- [ ] An ADR and a STANDARD §2 amendment define research topic folders (a series of three or more docs sharing a prefix), with
+- [x] An ADR and a STANDARD §2 amendment define research topic folders (a series of three or more docs sharing a prefix), with ✓ 2026-11-02: ADR-057 and spec 0.19.0 rows for the three topic folders plus archive/, qa/, QA.md, the knowledge index, log data files and the sibling-doc rule (`6f81890c`); outside review 2 rounds, PASS
       `logs/` and `archive/` unchanged, and also place per-feature sibling docs beside a core file, `docs/archive/` (migrate's
       history), `docs/qa/` with `QA.md`, the generated knowledge index and data files under `research/logs/` (scope-change
       2026-11-02).
-- [ ] `scripts/gen-index.sh` and the cap check read topic folders (the CR fix is SPRINT-157 T1's; scope-change 2026-11-02); each
+- [x] `scripts/gen-index.sh` and the cap check read topic folders (the CR fix is SPRINT-157 T1's; scope-change 2026-11-02); each ✓ 2026-11-02: gen-index, the qa-check research corpus and the archive check read topic folders; fixtures fail on the old code (gen-index 11/11, archive 12/12); the cap check derives exact per-folder globs unchanged
       change has a must-FAIL fixture (a doc in a topic folder) that fails on the current code.
-- [ ] `conformance/`, `guard-audit/` and `mattpocock/` hold their series, every live link updated (citation counts re-derived
+- [x] `conformance/`, `guard-audit/` and `mattpocock/` hold their series, every live link updated (citation counts re-derived ✓ 2026-11-02: 15 docs moved by git mv, 13 live links updated (scripts, harnesses, ledger, learnings), history kept; the regenerated index lists every moved doc; VPS gate 479/0
       before the move); `loop-hygiene-*` and high-citation docs stay flat; the knowledge index lists every moved doc.
-- [ ] The governance roadmap moves under `docs/product/` per §2; the six stale headers are refreshed or re-dated with a reason.
+- [x] The governance roadmap moves under `docs/product/` per §2; the six stale headers are refreshed or re-dated with a reason. ✓ 2026-11-02: moved to docs/product/governance-roadmap-2026-2027.md; the deployment guide, rollback guide and QA-001 corrected against the repo; qa/README, QA-002 and QA-003 verified and re-dated
 
 ## Touches
 `spec/STANDARD.md` · `docs/adr/` · `scripts/gen-index.sh` · cap check · `docs/research/` · `docs/product/` · `docs/knowledge-index.md`
