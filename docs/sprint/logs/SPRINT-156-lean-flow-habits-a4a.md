@@ -116,3 +116,14 @@ A1 33 of 61, A2 18 of 32 (most by Bash, which raises no prompt). On the re-runs 
 invitation piped its probe to `node` over stdin ("so no extra file gets written into the repo"), and only the probe's runtime
 database sat in `os.tmpdir()`, as the repo's own verify scripts do; no file was written outside the tree and nothing prompted.
 Cost, these five tasks: $7.62 against A2's per-task means summing to $11.52. Development evidence only; A4a measures it.
+
+### 2026-11-02 | progress | T4: A4a arm files and `analyze.ts --comparator` (Codex-built) landed; Amendment 7 drafted
+Arm files (`a7867e8a`): `workdoo-a4a`/`clinic-a4a` on A2's snapshots, manifests byte copies of A2's (same sha256), plugin pinned at
+`56964ce2` (drift 0, pin verified), `schedule-a4a.json` (A2's 32 slots renamed), `hash-prereg.ts` pins them. Against A2's pin the
+plugin differs in 11 skill files: the two orchestrator edits under test and ten lean-doc-generator template/init files from
+SPRINT-155; in all 32 A2 sessions the only skill invoked was the orchestrator and no plugin file was read, so the ten are not
+expected to reach a trial (stated in Amendment 7). `--comparator` was built by Codex in a worktree (82.8k Codex tokens), reviewed
+by the coordinator (a small diff, the same recipe as `deltaVsA1`, nothing above line 134 touched), landed with equal blobs.
+Selftest 75/75 here (Codex's sandbox showed S43 failing on process-tree cleanup, a sandbox limit); tsc clean. Must-FAIL: a
+baseline computed from A1 instead of the comparator reddens S70 alone. Next: Codex review of Amendment 7, then the owner signs.
+review · T4 · self-review (coordinator; diff +103 lines, execution piece, Codex-built) · behaviour:low · governance:low
