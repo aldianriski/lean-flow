@@ -153,3 +153,9 @@ plan run found the screenshot is a prototype reference, not a defect capture, ci
 deferring it; it proposed the two real defect tasks (TASK-053, TASK-070) as bug items instead.
 Impact, by owner ruling (popup, 2026-11-02): box 4 is met by that judgment; it reads that migrate classifies the bugs folder and
 proposes real defects as bug items. The apply run carries every recommended item (owner: all its recommendations).
+
+### 2026-11-02 | scope-change | T6: Layers add `TECH-DEBT.md`, `docs/LEARNINGS.md`, `.out-of-scope/` and `docs/development/`
+What broke: moving the three research series updates live links in `TECH-DEBT.md`, `docs/LEARNINGS.md` and
+`.out-of-scope/skill-self-fork.md`, and the governance roadmap moves out of `docs/development/` (the Done-when names the move).
+Impact: T6 Layers add the four paths; no Done-when changes. Re-confirm G2: not needed (the signed design names the link updates and
+the roadmap move).
