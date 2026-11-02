@@ -532,3 +532,67 @@ evidence shows one: none of their transcripts names a path in that directory, th
 `ModuleAnalysisCache`, and neither A/B repo's frozen snapshot has such a directory. A file created there under a path the transcripts
 do not spell out cannot be ruled out, and the rows are kept with this caveat (owner ruling, after the second outside review). The log
 holds one carry-over only, so the boundary is unchanged (`2026-10-31T12:07:44Z`).
+
+## Amendment 6 (2026-11-02, arm A2 before any A2 trial)
+
+What changed:
+
+- **1. Arm A2.** Two new measured arms, `workdoo-a2` and `clinic-a2` (`evals/ab/arms/<repo>-a2.json`). Each snapshot
+  (`D:\Research\ab-arm-<repo>-a2`) is a copy of the frozen A1 snapshot (0 drift against the A1 manifest, checked before setup),
+  then `/lean-doc-generator migrate` run from the S1 pin: lean-flow at `8299017428b02ef6db7f0374f498b4c92350bf77`, content hash
+  `b8c3b484cc8567ae52b3b2392d775cc21ff0e1bf4e0802946123a3555b0e1752`, in `D:\Research\ab-pins\lean-flow-s1-82990174`. The pin is
+  loaded by `--plugin-dir` in an isolated config with no user plugins; by owner ruling that is "the installed plugin at the pinned
+  S1 revision" (TASK-555), as at A1. Each migrated snapshot is then frozen by its manifest (`<repo>-a2.manifest.json`).
+- **2. Setup answered by the operator.** A2's setup runs headless (`evals/ab/setup-arm.ts --auto`). Every popup, and every turn
+  that ends asking the user in chat, is answered by the setup operator (`evals/ab/lib/classifier.ts`,
+  `evals/ab/lib/operated-session.ts`): a model (`claude-sonnet-5-5`, no tools) only CHOOSES one entry of a fixed catalog (each
+  section of `evals/ab/answers/<repo>.md` and `<repo>-operator.md`, each Setup bullet, the four ruling classes below, or NONE),
+  and the text sent is that entry's own words, never model-written. NONE, an unknown id or unparsable output stops the session
+  with that question unanswered; the owner rules it, and the ruling becomes a ruling class. The ruling classes (owner rulings,
+  SPRINT-154):
+  - PLAN: `migrate`'s plan is approved for the profile items only (Stack, Conventions in use, the five business topics); every
+    other item, including archiving, moving, renaming or slimming an existing file, is declined.
+  - CLEANUP (setup deviation 1): an existing file a question offers to edit, archive, move, rename or slim is left untouched.
+  - DATES (setup deviation 2): a file that gains a section gets today's `last_updated`; no other file does.
+  - UNDECIDED (setup deviation 3): a coding convention the Conventions file does not settle is answered "Not decided yet (owner,
+    migrate)".
+  Every decision is logged to `operator-<arm>.jsonl`, kept with the session transcript. Ten clinic-a2 sessions stopped before
+  writing anything while the operator was built; run 11 completed. workdoo-a2 completed in one session; its closing turn offered to write
+  `.cap-dispositions`, which no entry covered; the owner ruled it declined under PLAN (no file written). Both migrates changed exactly `docs/architecture/overview.md`,
+  `docs/development/coding-standards.md` and `docs/product/requirements.md` and removed no existing line except `last_updated`
+  dates; the migrated snapshots are frozen as migrate left them (workdoo-a2's `requirements.md` keeps its old date, and its
+  `overview.md` and `requirements.md` end over their caps, 158/150 and 211/150: recorded as arm output, not corrected).
+- **3. Schedule.** `evals/ab/schedule-a2.json`: the A1 entries of `schedule.json` with trial 1 or 2, in their order, renamed to A2:
+  2 repos x 8 tasks x k = 2 = 32 slots. Every other rule of section 2 holds.
+- **4. Pilot.** Section 18's pilot becomes "the first N schedule entries, N = the number of distinct (arm, repo) pairs, one entry
+  each" (the driver refuses a schedule that does not satisfy it). For S0's schedule N = 4, unchanged; for A2's, N = 2.
+- **5. Log.** A2 rows go to `docs/research/logs/ab-measurements-a2.md`, whose header carries A2's own freeze line (it carries
+  over nothing). S0's log stays closed.
+- **6. Validity first.** A2 must pass section 11's run-validity rule on its own 32 slots (its own infra-lost share and cells)
+  before any comparison is made. A run that is INVALID or FAILED there gets no ruling.
+- **7. Comparison and ruling.** A2 is compared with A1 on the combined slot data (S0's A0 and A1 first pass, frozen, plus A2's) by
+  section 4's rules with A1 in place of A0 as the comparator: gain = pooled primary of A2 minus A1 (90% task-bootstrap interval,
+  `deltaVsA1`); a symptom regresses when A2 minus A1 is below -0.05. The never-worse-than-A0 floor (section 8) and the 2.0x A1
+  cost ceiling (section 9) apply. The ruling is:
+  - **ship-eligible**: the gain holds (>= +0.10 and lower end > 0), no symptom regresses, A2 is not below A0, and its cost is within 2.0x A1;
+  - **failed**: a symptom regresses, or A2 is below A0, or its cost exceeds 2.0x A1;
+  - **inconclusive**: otherwise.
+  (These three words are TASK-555's; section 4 and 8's terms map onto them as above.)
+
+Why: EPIC-023 D6 ships S1 only once its own arm passes, and D10 has S3 compare against A2. The A1 snapshots carry 2.x docs, so the
+upgrade an adopter would run is `migrate` (owner ruling, 2026-11-01). The operator answers setup from the same frozen files an owner
+would read, choosing an entry and never writing one, so the setup is reproducible.
+
+No other rule changed: the endpoints, thresholds, task corpus, the A0 and A1 arms, the allow-list, models, judges and their
+prompts, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. Section 19
+gains the rows below; no existing row changes. This file's own sha256 changes and is recorded at the owner's re-signature in the
+A2 log's header. Harness code (`lib/*.ts`) is not hashed (section 20); `hash-prereg.ts` now also pins the A2 files.
+
+| What | Value |
+|---|---|
+| `evals/ab/arms/workdoo-a2.json` | `d144edfe15a3d1ae0e840fede4448b926c1c562f903e4b927904c2751642057d` |
+| `evals/ab/arms/workdoo-a2.manifest.json` | `f71a220af1bea50708f131aaed837a6196c6580fba1966053869f46d4eaacbff` |
+| `evals/ab/arms/clinic-a2.json` | `60fd3aa6e9ea30184f5d5ae1ce219df311767f09c477cea43bf276cd53db0459` |
+| `evals/ab/arms/clinic-a2.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
+| `evals/ab/schedule-a2.json` | `d87e435b094291579df9a2a9213a2af7caa05da12d973dc61357b8b5e73b2eba` |
+| plugin pin (A2, S1) sha / content hash | `8299017428b02ef6db7f0374f498b4c92350bf77` / `b8c3b484cc8567ae52b3b2392d775cc21ff0e1bf4e0802946123a3555b0e1752` |
