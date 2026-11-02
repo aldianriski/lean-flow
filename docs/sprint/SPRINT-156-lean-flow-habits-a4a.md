@@ -55,7 +55,7 @@ cause is quoted from a kept stream; the fix keeps ticking as coordinator bookkee
 ### T3 — Give small coding tasks a light path through the loop `[size: M · risk: med · class: decision · HITL · J2]` — cancelled at G2 (scope-change 2026-11-02, TASK-576 in `cancel/`)
 Layers: `skills/` · `CHANGELOG.md` · `README.md`
 Depends-on: T2
-Cites: TASK-576 · `.claude/CLAUDE.md` § Design Principles (human-gated)
+Cites: TASK-576 · `.claude/CLAUDE.md` § Design Principles (human-gated) · `cancel/` · `.out-of-scope/` (its cancellation, scope-change 2026-11-02)
 A2's plan phase alone costs about what A0 spends on a whole task. A small, low-risk task keeps G1 as a short confirm and gets a
 design note only where risk or size calls for one; no gate is self-approved. Whether this fits the D9 trial protocol is settled
 at this task's G2.
