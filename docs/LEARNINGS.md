@@ -123,6 +123,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-277 [tags: tooling] [status: active]: **An interactive session started with `--plugin-dir` can still load the installed copy of the same plugin, while a headless run loads the checkout.** SPRINT-155's first two clinic `init` runs were started interactively with `--plugin-dir` pointing at the lean-flow checkout. Both loaded the installed 2.19.1 instead: they lacked the checkout's existing-docs guard, deleted the repo's spec and rewrote its README, and were discarded. Headless runs with the same flag loaded the checkout, and a third interactive run loaded it only with the installed plugin disabled. Nothing in the session said which copy won; the base directory a skill prints is the only tell. Durable form: prove a checkout's behaviour headless, or with the installed copy disabled, and read the skill's printed base directory before trusting the output.
+- seen: 2026-11-01 (SPRINT-155 T1/T2 clinic init attempts)
+- count: 1
+- promoted: no
+- related: CLAUDE.md § plugin-cache traps · L-275 (another run lost before it could count)
+
+---
+
 ## L-276 [tags: process] [status: active]: **A regression made of UNKNOWN verdicts is not a regression of what the judge measures, so split it by verdict and cause before admitting work on it.** S0's convention (-10.3) and business (-11.1) regressions admitted S3 as an expertise experiment (EPIC-023 D10). At S3's intake the verdicts behind them showed no more FAILs in A1 than in A0 (convention 1 vs 2, business 0 vs 0, first pass, each measure's own tasks). The deficit was UNKNOWN verdicts (8 vs 3, 4 vs 1): sessions parked at a permission popup (L-272), and judges that could not see enough of the diff. Better briefs cannot fix a park, so the first slice was redirected to the parks (D11, TASK-573). The intake's own first figures were wrong the same way one level down: counted from raw log rows, they included voided pilot rows and tasks outside each measure (A1 parks "6 of 48" against the true 3). The built slots, a second population, caught it before the ruling. Durable form: before a regression admits work, tabulate it as FAIL vs UNKNOWN-by-cause on the analysis population, never on the raw log.
 - seen: 2026-11-02 (SPRINT-154 close; S3 intake, EPIC-023 D11)
 - count: 1

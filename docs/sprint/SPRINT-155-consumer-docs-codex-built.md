@@ -127,8 +127,57 @@ so `/prime` on lean-flow stops naming migrate once the profile exists.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/lean-doc-generator/templates/*` · `references/init.md` · `CHANGELOG.md` | T1 | internal ids and maintainer paths out of what adopters get; format examples kept | med | census grep + real init on two clinic copies |
+| `skills/lean-doc-generator/templates/README.md.template` · integrations template | T2 | Quick start is a link to setup; the API-contract pointer only when a contract file exists | low | real init on a README-less copy |
+| `scripts/lib/conformance-engine.sh` | T3 | comment quotes the current requirements row | low | comment-only diff, review |
+| `docs/work/done/TASK-565-...` | T4 | Codex launch diagnosis and the standing review route | low | owner ruling |
+| `docs/architecture/overview.md` · `docs/product/` · `docs/development/` · `.conformance-exempt` | T5 | lean-flow's own repo profile via migrate | low | scoped review, `/prime` reports profiled |
+| `evals/ab/setup-arm.ts` | coordinator | init's operator catalog carries UNDECIDED, for the init proofs | low | selftest 74/74 |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 5 of 5 members delivered (TASK-561..565). Shipped templates and init's reference no longer carry lean-flow-internal
+ids, the README template's Quick start links to setup instead of repeating it, and the API-contract pointer appears only with a
+contract file; a real `init` on fresh clinic copies through the pinned checkout proved both (no internal id in 20 and 21 added
+files; a one-link Quick start). The conformance-engine comment is current, the Codex launch hang is diagnosed with a standing
+review route, and lean-flow carries its own repo profile. The Codex builder pilot (D1) built T1, T2 and T3.
+
+**Codex builder pilot (D2 figures, for the owner's ruling)**
+
+| task | Codex tokens | Claude tokens | findings | rounds |
+|---|---|---|---|---|
+| T1 | 123.1k (check 50.5k + build 72.6k) | review 60.8k | 1 Low (coordinator-fixed) | 1 |
+| T2 | 63.9k (reader 19.1k + build 44.8k) | review (not metered) | 0 | 1 |
+| T3 | 74.5k (check 26.7k + build 47.8k) | review 52.9k | 0 | 1 |
+
+Baseline (SPRINT-153's Claude-built tasks): builder about 90k, builder check about 73k, each Sonnet review about 65k Claude tokens.
+With Codex building, a task's Claude cost fell to the review alone; findings stayed at Low or none and every task cleared in one
+round. Coordinator tokens are not metered per task in either sprint, so the comparison covers builder and reviewer only.
+
+**Retrieval check** — one rule missed, one held. Missed: the first two clinic inits ran from an interactive session started
+with `--plugin-dir`, and the installed 2.19.1 won (L-277); both outputs were discarded. Held: TASK-564 box 3 was not ticked
+on a run where its templates never ran (the README existed); a README-less run proved it.
+
+**Cost** — Codex 261.5k tokens across T1-T3; Claude reviews about 114k metered. Six headless init proof sessions (four on the
+first copy, two on the README-less copy; four stopped before writing anything). Owner time: the clinic init attempts in
+SPRINT-154's sitting and the popup rulings.
+
+**Worked**
+- Codex builds in a worktree with a Claude reviewer: every diff landed with blob hashes equal to the worktree's, in one round.
+- The setup operator, built for A2, ran the init proofs headless with the plugin pinned, so no interactive plugin precedence.
+
+**Friction**
+- Interactive `--plugin-dir` lost to the installed copy of the same plugin (L-277).
+- The init proofs stopped four times on questions the frozen answers did not cover or on a reply the parser refused; each stop
+  wrote nothing, so the cost was sessions, not bad output.
+
+**Pattern candidates**
+- L-277 (count 1): an interactive session can prefer the installed copy of a plugin over `--plugin-dir`; prove a checkout's
+  behaviour headless, or with the installed copy disabled.
+
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] already carries T1 and T2 (Fixed). Tech debt: none new. Follow-ups: none
+new. Learnings: L-277. Every member is in `done/`. No handoff entry was taken in this sprint. No release: the changes stay under
+[Unreleased] with S1's (EPIC-023 D6). The owner rules on Codex as the default builder from the table above. Retention and the
+archive move wait for the owner's approval.
