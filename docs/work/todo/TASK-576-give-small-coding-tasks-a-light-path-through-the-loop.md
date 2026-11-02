@@ -2,6 +2,7 @@
 id: TASK-576
 title: "Give small coding tasks a light path through the loop"
 epic: EPIC-023
+sprint: SPRINT-156
 priority: P2
 size: M
 risk: med

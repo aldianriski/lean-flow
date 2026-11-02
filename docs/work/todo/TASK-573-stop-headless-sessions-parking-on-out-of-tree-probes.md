@@ -2,6 +2,7 @@
 id: TASK-573
 title: "Stop lean-flow sessions parking a headless run by writing verification probes outside the working tree"
 epic: EPIC-023
+sprint: SPRINT-156
 priority: P2
 size: M
 risk: med

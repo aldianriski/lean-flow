@@ -2,6 +2,7 @@
 id: TASK-575
 title: "A coding task's design declares only the files its change needs"
 epic: EPIC-023
+sprint: SPRINT-156
 priority: P2
 size: M
 risk: med
