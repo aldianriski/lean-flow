@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — `/orchestrator`: when the build cleans up, no delete command names a path outside the working tree, not even in the command that removes its own in-tree files; such a path is reported, not removed.
 - **Changed** — `/orchestrator` G2: the design opens the repo's business-facts source (the profile's pointer, the requirements and business-notes files) and quotes the line of each fact it honours; a design that names no fact says which sources it opened.
 - **Changed** — research docs that form a series live in topic folders (`docs/research/<topic>/`, one §2 row each), and the knowledge index, research checks and caps read them; §2 also places `docs/archive/`, `docs/qa/` with `QA.md`, the generated knowledge index, data files beside research logs, and per-feature sibling docs (spec 0.19.0, ADR-057).
 - **Changed** — `/lean-doc-generator migrate`, re-run on a repo already on lean-flow, reads untyped tasks as features without rewriting them and proposes existing bug notes, `BUG-*.md` files, bug-flavoured tasks and verification-capture folders as bug items and evidence, moving only what you approve.
