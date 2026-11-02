@@ -92,3 +92,5 @@ builder-check · T3 · 4 contradictions · 5 questions · settled by fact and on
 builder-check · T4 · 3 contradictions · 5 questions · settled by fact
 builder-check · T5 · 7 contradictions · 4 questions · settled by fact and one owner ruling (scratch copy)
 builder-check · T6 · 5 contradictions · 5 questions · settled by fact and one owner ruling (CR fix to SPRINT-157)
+
+Cites, per the scope-changes above: T2 cites `BUSINESS-NOTES.md` and T6 cites `QA.md` (named by their Done-whens, not touched).
