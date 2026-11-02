@@ -129,3 +129,8 @@ consequence · T3 · behaviour:material · governance:low
 review · T3 · scoped outside review (Codex, read-only, 2 rounds, 1 med fixed, PASS) · behaviour:material · governance:low
 consequence · T4 · behaviour:material · governance:low
 review · T4 · scoped outside review (Codex, read-only, 2 rounds, PASS) · behaviour:material · governance:low
+
+### 2026-11-02 | progress | T2: the owner read the Progress line; TASK-583 done
+The owner read the headless run's line and ruled it meets TASK-583 box 2 (popup). No skill text changed under T2.
+consequence · T2 · behaviour:low · governance:low
+review · T2 · self-review (no skill text changed in this sprint; the line's figures checked against the files) · behaviour:low · governance:low
