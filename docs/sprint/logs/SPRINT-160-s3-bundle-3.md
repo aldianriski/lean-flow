@@ -67,3 +67,21 @@ Order: T4, then T1, T2 and their batch, then T3.
 What broke: the move-out ruling changes nothing under `evals/`; the research fixtures build their own `storm` folder in a temp
 directory. Impact: an unused token would fail `layers observed` at close (L-240). T4's Plan line now reads `docs/research/`. No
 Done-when changes. Re-confirm G2: covered by the signature above.
+
+### 2026-11-02 | progress | T4 done: the storm copy left the repo; T1 and T2 skill text landed; their development batch running
+T4 (TASK-595): `03289603` removes `docs/research/storm/` (git keeps it at `94248e54`) and points `council-improvements.md`,
+`loop-hygiene-prd.md` (inline, still 140 lines) and `adopter-folder-audit.md` (F10 resolved) there. The knowledge index,
+regenerated in a clean worktree, came out unchanged (its two "storm" hits are "brainstorming"). Gate: a local run in the main tree
+read the untracked `docs/research/plugin-reference-delta.md` (not this sprint's; prose-density and a stale index) and ran past
+the 520 s budget, so the verdict is the off-host one: `gate-remote.ts` on `03289603`, QA-CHECK 476 pass, 0 fail. Both boxes
+ticked; moved to `done/`.
+consequence · T4 · behaviour:low · governance:low
+review · T4 · self-review (citation edits and a deletion; no shipped text) · behaviour:low · governance:low
+T1 (`00cfff0b`) and T2 (`4c840af5`): lines 48 and 126 of `skills/orchestrator/SKILL.md` rewritten in place, 140 lines,
+`check-doc-caps` PASS; one CHANGELOG `[Unreleased]` bullet each. Pin: clone at `4c840af5` in
+`D:\Research\ab-pins\lean-flow-160-4c840af5`, content hash `83910f77…`; a scratch arm (A2's snapshot, A4b's manifest, this pin,
+the measured inventory) and a scratch log under A4b's freeze line. Two launches failed before any trial started (an arm JSON
+escape, then the missing inventory file): no spend. Batch A (self-onboarding-guard, invitation-issued-by, reissue-invitation)
+and batch B (self-onboarding-guard, reissue-invitation) run at two workers on research copies `D:\Research\dev156\`.
+consequence · T1 · behaviour:material · governance:low
+consequence · T2 · behaviour:material · governance:low
