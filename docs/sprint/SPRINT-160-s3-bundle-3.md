@@ -66,7 +66,7 @@ A4a passed. The highest clean N is adopted by an owner-signed amendment before t
 **Acceptance:** the owner reads the per-N report, and the adopted N is in a signed amendment.
 
 ### T4 — Decide the storm skill copy under the curation bar `[size: S · risk: low · class: decision · HITL · J2]`
-Layers: `docs/research/` · `evals/`
+Layers: `docs/research/`
 Depends-on: none
 Cites: TASK-595 · ADR-001 · `docs/research/adopter-folder-audit.md` (F10) · `docs/research/storm/SKILL.md`
 A skill file and an HTML template sit in `docs/research/storm/`, outside `skills/` and the curation bar. The owner rules adopt or
