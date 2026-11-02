@@ -175,3 +175,11 @@ ship-eligible, tuning-sensitive. Owner ruling: A4a ships (EPIC-023 D15); bundle 
 Exposure 0 slots; 1 park of 32 (reissue-invitation: an `rm -rf` of a system-temp dir the repo's own test created, TASK-579's
 ground). Report: `docs/research/logs/ab-measurements-a4a.md` § Report 2026-11-02 (`881a79a2`). TASK-574 ticked and done.
 The truncated copy of the TASK-578 entry above, ending mid-sentence, is a write defect of `d52bf3a0`; the full entry follows it.
+
+### 2026-11-02 | review | T1, T2: owed scoped reviews, run at close after the system verify named them absent
+The close's VPS gate (`61183ff7`) failed `review-depth-material-absent` for T1 and T2: both logged `behaviour:material` and no
+review line was ever written. A scoped outside review ran now, read-only, on both skill diffs (`ca13d54e`, `56964ce2`) against
+their acceptance, contradiction with the rest of SKILL.md, and consumer leaks: Codex round 1 of 2, `VERDICT: PASS`, no finding
+(36.4k tokens). The miss was the coordinator's: the development re-runs were taken as the check and the review step was skipped.
+review · T1 · scoped outside review (Codex, read-only, round 1 of 2, PASS, 0 findings) · behaviour:material · governance:low
+review · T2 · scoped outside review (Codex, read-only, round 1 of 2, PASS, 0 findings) · behaviour:material · governance:low
