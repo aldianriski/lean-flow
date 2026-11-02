@@ -2,7 +2,7 @@
 //   bun evals/ab/hash-prereg.ts [--doc <path>]
 // (a) task-corpus manifest: every file under evals/ab/tasks/ and evals/ab/answers/, sorted by repo-relative path, as
 //     "<path> <blob id>" lines, plus the sha256 of that listing;
-// (b) sha256 of each measured arm json + manifest (A0, A1, A2, A4a), the measured inventory, judges/prompts.lock.json, schedule.json, schedule-a2.json and schedule-a4a.json;
+// (b) sha256 of each measured arm json + manifest (A0, A1, A2, A4a, A4b), the measured inventory, judges/prompts.lock.json, schedule.json, schedule-a2.json, schedule-a4a.json and schedule-a4b.json;
 // (c) with --doc, the sha256 of that document.
 // Line-ending convention: a text file is hashed as if every CRLF were LF, so a CRLF checkout (Windows autocrlf) and an LF
 // checkout give the same value; a file holding a NUL byte is binary and hashed as it is. A blob id is git's:
@@ -41,9 +41,9 @@ export function corpusManifest(base: string, dirs: string[]): { listing: string;
   return { listing, sha256: sha256(listing), files: files.length };
 }
 
-export const MEASURED_ARMS = ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1", "workdoo-a2", "clinic-a2", "workdoo-a4a", "clinic-a4a"];
+export const MEASURED_ARMS = ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1", "workdoo-a2", "clinic-a2", "workdoo-a4a", "clinic-a4a", "workdoo-a4b", "clinic-a4b"];
 /** Repo-relative (to evals/ab) files whose sha256 is pinned besides the corpus. */
-export const PINNED_FILES = [...MEASURED_ARMS.flatMap((a) => [`arms/${a}.json`, `arms/${a}.manifest.json`]), "arms/inventory.json", "judges/prompts.lock.json", "schedule.json", "schedule-a2.json", "schedule-a4a.json"];
+export const PINNED_FILES = [...MEASURED_ARMS.flatMap((a) => [`arms/${a}.json`, `arms/${a}.manifest.json`]), "arms/inventory.json", "judges/prompts.lock.json", "schedule.json", "schedule-a2.json", "schedule-a4a.json", "schedule-a4b.json"];
 
 export function pinnedHashes(ab: string = AB): Record<string, string> {
   return Object.fromEntries(PINNED_FILES.map((f) => [`evals/ab/${f}`, sha256(canonicalBytes(path.join(ab, f)))]));

@@ -1,0 +1,194 @@
+[
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "access-activity-type-filter",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "appointment-lookup",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "forecast-month-end",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "invitation-issued-by",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "pilot-seat-limit",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "reissue-invitation",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "self-onboarding-guard",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "shared-auth-failure",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "shared-timestamp-format",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "booking-lead-time",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "closed-independence-day",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "confirmation-time",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "doctor-day-sheet",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "one-offset-helper",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "patient-cancel-all",
+    "trial": 1
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "series-booking",
+    "trial": 1
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "access-activity-type-filter",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "forecast-month-end",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "invitation-issued-by",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "pilot-seat-limit",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "reissue-invitation",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "self-onboarding-guard",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "shared-auth-failure",
+    "trial": 2
+  },
+  {
+    "arm": "workdoo-a4b",
+    "repo": "workdoo",
+    "task": "shared-timestamp-format",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "appointment-lookup",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "booking-lead-time",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "closed-independence-day",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "confirmation-time",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "doctor-day-sheet",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "one-offset-helper",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "patient-cancel-all",
+    "trial": 2
+  },
+  {
+    "arm": "clinic-a4b",
+    "repo": "clinic",
+    "task": "series-booking",
+    "trial": 2
+  }
+]
