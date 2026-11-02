@@ -161,3 +161,7 @@ Impact: T6 Layers add the four paths; no Done-when changes. Re-confirm G2: not n
 the roadmap move).
 
 T2 Layers name `skills/task-decomposer/references/task-file.md` and `scripts/lib/check-work-type.ts` explicitly (its tick evidence names them; layers completeness).
+
+### 2026-11-02 | progress | T6 Cites name two T2 files a log note mentions
+The note on T2's Layers above sits under T6's scope-change heading, so T6 cites the two files it names. Notes of this kind get their
+own entry heading from here on.
