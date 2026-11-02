@@ -34,7 +34,7 @@ harness only, never a gate.
       behaviour to today.
 - [x] A capacity check on this PC: N = 2 on a pilot-sized run completes with no timeout, no low-memory kill and no infra-lost ✓ 2026-11-02: N = 2 on 4 slots of the A4a task set, all ok and passing as in the serial trials, no timeout, no infra, no low-memory kill, pilot stop held; owner accepted (popup); SPRINT-158 log
       slot, and its per-slot results stay inside the run-to-run spread of the serial runs on the same slots (owner reads it).
-- [ ] An owner-signed amendment adopts the worker count for later arms before any arm runs with N > 1; earlier arms stay as
+- [x] An owner-signed amendment adopts the worker count for later arms before any arm runs with N > 1; earlier arms stay as ✓ 2026-11-02: PREREGISTRATION Amendment 8 item 1, owner-signed (`4c61911d`), before A4b, the first arm at N = 2; A0, A1, A2 and A4a stay as measured
       measured.
 
 ## Touches
