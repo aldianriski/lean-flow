@@ -56,3 +56,15 @@ every work item and a business-facts row (TASK-591), capture folders proposed by
 by TASK-589's §2 amendment, `storm/` to TASK-595, mockups and the exploratory pack kept. Doc: `docs/research/adopter-folder-audit.md`.
 consequence · T1 · behaviour:low · governance:low
 review · T1 · self-review (research doc; census cross-checked by a second listing; rulings by the owner) · behaviour:low · governance:low
+
+### 2026-11-02 | scope-change | T2, T3, T5, T6: owner rulings at G2 (builder check)
+What broke: G2's builder check found four places where the frozen text and a sound design disagree. (1) TASK-591 box 1 says the
+temp-only bug-report rule is "retired"; removing `S2.R-TEMPDIR` is a MAJOR spec change against the frozen rule ids (ADR-034).
+(2) TASK-592's real bug needs a fix outside T3's Layers. (3) TASK-594 box 4 runs migrate on the workdoo research copy that the A/B
+development runs read unchanged. (4) TASK-589 box 2 asks the generator to strip CR, which SPRINT-157's T1 already does (D3).
+Impact, by owner ruling (popup, 2026-11-02): (1) box 1 reads that the temp-only intake is replaced by a bug item and `S2.R-TEMPDIR`
+stays (a committed bug-report file remains wrong); spec 0.19.0, MINOR. (2) T3's real bug is TD-285 (`check-sprint-by-reference.ts`
+reads another sprint's log as a baseline): T3's Layers add `scripts/lib/check-sprint-by-reference.ts`, its `evals/` fixtures and
+`TECH-DEBT.md` (the TD row marked converted). (3) box 4 runs migrate on a scratch copy of that research copy. (4) box 2 drops the
+CR fix (SPRINT-157 T1 owns it); T6 builds the topic-folder reading with its own must-FAIL fixture. T2's Cites corrects ADR-023 to
+ADR-018 (the spec's extraction ADR). Re-confirm G2: signed in the same popup.
