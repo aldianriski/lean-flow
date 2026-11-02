@@ -133,3 +133,16 @@ Its existing-docs guard found `docs/spec.md` and offered migrate or continue, wh
 deleted the spec and rewrote the README. The owner closed that popup, so nothing was written. Owner ruling: both boxes stay open,
 and the owner runs the clinic init (choosing continue, with the installed plugin disabled) in the same sitting as SPRINT-154's A2
 migrate sessions. Unblock condition: that run's output passes the census grep, the Quick start check and the OpenAPI check.
+
+### 2026-11-02 | progress | T1 box 2 and T2 box 3: real `init` proofs pass; both parks spent
+Unblock condition of the 2026-11-01 park met. The init ran headless through the setup operator (`setup-arm.ts --auto`) with the
+plugin pinned at `5a53c65d` (a clone, isolated config, no other plugins), on fresh copies of the clinic A0 snapshot, answers from
+a scratch copy of the frozen clinic answers plus three bullets: continue beside existing docs (owner ruling), BUSINESS-NOTES.md as
+the business source (the recommended option, coordinator choice for a proof), and convention questions not settled by the
+Conventions file answered "Not decided yet". Runs 1-3 stopped on unanswered questions before writing anything; for run 4,
+`setup-arm.ts` gave init's catalog the UNDECIDED ruling class. Run 4 (`-155`, README present): 20 files added, none overwritten,
+no lean-flow-internal id or path; README untouched, so the Quick start template did not run (owner ruling: one more run without a
+README). README-less copy (`-155b`): run 1 stopped on a classifier reply the strict parser refused, run 2 completed: 21 files,
+the README's Quick start is one link to `docs/development/setup.md`, no internal id, the only OpenAPI line is init's
+`docs/api/README.md` placement 3-liner. The integrations template was not exercised (clinic has no integrations), recorded on
+the box. TASK-563 box 2 and TASK-564 box 3 ticked.
