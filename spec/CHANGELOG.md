@@ -20,6 +20,10 @@ names the types; the `BUG-<slug>.md` row and the temp-dir note say a reported bu
 file sits elsewhere, so MINOR. Consumer evidence: SPRINT-159's adopter audit (`docs/research/adopter-folder-audit.md`). Owner
 rulings 2026-11-02 (SPRINT-159 intake and G2; TASK-591).
 
+Also in 0.19.0 (ADR-057): research topic folders, one §2 row each (`research/conformance/`, `research/guard-audit/`,
+`research/mattpocock/`); data files beside research logs; rows for `archive/` (migrate's moved history), `qa/` with
+`QA.md`, and the generated `knowledge-index.md`; a per-feature sibling-doc rule. SPRINT-159 T6 (TASK-589).
+
 Rule ids, levels, marks and the `evals/fixtures/compat/` snapshot are untouched (ADR-034); `S2.R-TEMPDIR` is unchanged.
 
 ## 0.18.2 — 2026-10-31

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-11-02
 update_trigger: The case is re-run (Last run / Result updated in place), or /orchestrator's gates or scripts/qa-check.sh change
 status: current
 ---

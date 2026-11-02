@@ -5,7 +5,7 @@
 # These are the engine's first NEW coverage, so unlike the §9 family there is no prior checker whose
 # fixtures could be repointed -- every case here is written fresh, and RETAINED (TD-012: deleting the
 # fixtures with the prototype leaves the gate unguarded). The five finding names asserted below are
-# the ones already published in docs/research/conformance-dispositions.md § build; this harness
+# the ones already published in docs/research/conformance/conformance-dispositions.md § build; this harness
 # consumes that contract rather than inventing names to match the code (L-058).
 #
 #   ownership-header-missing · ownership-header-field-missing · update-trigger-absent ·

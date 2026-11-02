@@ -1069,7 +1069,7 @@ assert_S9_GATESABSENT() {
 
 # --- §1/§3 ownership-header family (SPRINT-075 T6) ------------------------------------------------
 # The first NEW coverage the engine adds -- four rules, five finding names already published in
-# docs/research/conformance-dispositions.md § build. This task CONSUMES that contract; it does not
+# docs/research/conformance/conformance-dispositions.md § build. This task CONSUMES that contract; it does not
 # choose it (L-058: a check specified without its finding name is a half-shipped gate).
 #
 #   S1.LAW2   -> owner-not-a-role
@@ -1457,7 +1457,7 @@ assert_S3_AGENTS() {
 # §4 ADR family (SPRINT-076 T2) -- S4.ONEFILE · S4.APPEND · S4.INDEX · S4.SECTIONS · S4.NEGATIVE
 #
 # Five mechanical rules firing five finding names ALREADY PUBLISHED in
-# docs/research/conformance-dispositions.md § build. This task CONSUMES that contract; it does not
+# docs/research/conformance/conformance-dispositions.md § build. This task CONSUMES that contract; it does not
 # choose it (L-058).
 #
 #   S4.ONEFILE  -> adr-path-noncanonical

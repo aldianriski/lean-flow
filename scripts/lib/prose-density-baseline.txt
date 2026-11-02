@@ -25,7 +25,7 @@
 docs/research/adhd-adaptation.md 2
 docs/research/allowed-tools-audit.md 1
 docs/research/architecture-baselines.md 1
-docs/research/conformance-coverage.md 5
+docs/research/conformance/conformance-coverage.md 5
 docs/research/council-improvements.md 5
 docs/research/fixture-coverage-audit.md 1
 docs/research/harness-delta.md 1

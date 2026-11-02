@@ -417,7 +417,7 @@ qb_checkpoint "leg 2f-ter: conformance engine sweep"
 #
 # Why not for most of it: this engine sweeps EVERY section's rules, and most are still unbuilt --
 # 27 of 43 `build` dispositions remain once SPRINT-078 lands its eleven
-# (docs/research/conformance-dispositions.md). The two families that ARE folded in below are folded
+# (docs/research/conformance/conformance-dispositions.md). The two families that ARE folded in below are folded
 # in because they are FULLY covered, so a red line from either is a real regression rather than an
 # unbuilt disposition.
 # Gating THIS gate on all of that would turn qa-check.sh permanently red over tracked, scheduled-
@@ -736,8 +736,8 @@ fi
 
 # Corpus = git-tracked ADR + research .md; stray untracked working-tree files are ignored so a WIP
 # research doc never fails the gate. Glob fallback outside a git work tree. (TASK-060)
-corpus_files=$(git ls-files -- docs/adr docs/research 2>/dev/null | grep -E '^docs/adr/ADR-[0-9]+.*\.md$|^docs/research/[^/]+\.md$')
-[ -n "$corpus_files" ] || corpus_files=$(ls docs/adr/ADR-*.md docs/research/*.md 2>/dev/null)
+corpus_files=$(git ls-files -- docs/adr docs/research 2>/dev/null | grep -E '^docs/adr/ADR-[0-9]+.*\.md$|^docs/research/([^/]+/)?[^/]+\.md$' | grep -Ev '^docs/research/(logs|archive)/')
+[ -n "$corpus_files" ] || corpus_files=$(ls docs/adr/ADR-*.md docs/research/*.md docs/research/*/*.md 2>/dev/null | grep -Ev '^docs/research/(logs|archive)/')
 
 # ONE awk read per corpus file (id/domain/status/tags/reftoks together, not one `fmv` call each) into
 # a tab-separated cache; the resids used to build the id universe fall out of the SAME pass instead of
@@ -770,6 +770,9 @@ for f in $corpus_files; do
   IFS='	' read -r c_id c_dom c_st c_tg c_reftoks <<EOF
 $row
 EOF
+  # Direct topic docs carry an id; copied skill folders (e.g. storm/) are not research.
+  # Inspect the raw first field: read's whitespace IFS would collapse an empty id column.
+  case "$f" in docs/research/*/*.md) [ -n "${row%%	*}" ] || continue ;; esac
   case "$f" in */research/*) [ -n "$c_id" ] && resids="$resids
 $c_id" ;; esac
   corpus_cache="$corpus_cache$b	$c_id	$c_dom	$c_st	$c_tg	$c_reftoks

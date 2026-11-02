@@ -95,8 +95,12 @@ for f in "$root"/docs/research/archive/*.md; do
 done
 
 # --- (c): superseded + uncited docs must not linger in docs/research/ ---------------------------
-for f in "$root"/docs/research/*.md; do
+for f in "$root"/docs/research/*.md "$root"/docs/research/*/*.md; do
   [ -f "$f" ] || continue
+  case "$f" in
+    "$root"/docs/research/logs/*|"$root"/docs/research/archive/*) continue ;;
+    "$root"/docs/research/*/*.md) [ -n "$(fmv "$f" id)" ] || continue ;;
+  esac
   st=$(fmv "$f" status)
   [ "$st" = "superseded" ] || continue
   considered=$((considered + 1))

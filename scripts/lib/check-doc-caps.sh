@@ -5,7 +5,7 @@
 # Why derivation rather than "add docs/research/ to the list": the coverage got out of step with the
 # standard precisely because it was hand-listed. `qa-check.sh` named four globs; §2 states a cap on
 # far more rows than that, and every unlisted row was a cap with nothing behind it -- a comment.
-# docs/research/mattpocock.md then absorbed 39 lines over its cap across four sprints with no signal,
+# docs/research/mattpocock/mattpocock.md then absorbed 39 lines over its cap across four sprints with no signal,
 # while an open TD row cited a line count that had been wrong since the sprint it was filed in
 # (L-097). Adding one more glob by hand would have fixed that file and left the mechanism intact.
 #

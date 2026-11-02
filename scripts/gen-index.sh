@@ -81,9 +81,12 @@ awk '
 # newlines (repo naming convention: kebab-case, no embedded newlines), so newline-delimiting is safe.
 # `[ -f "$f" ] || continue` is applied BEFORE the sort so a glob with no match (which sh leaves
 # unexpanded, e.g. "ADR-*.md" verbatim) is filtered out first, exactly as it was pre-fix.
+# Include direct topic folders; the frontmatter id check below excludes copied skills.
+# Keep one global C-byte sort of full paths (flat, archive and topic), not folder batches.
 gi_files=$(
-  for f in "$ROOT"/docs/adr/ADR-*.md "$ROOT"/docs/research/*.md "$ROOT"/docs/research/archive/*.md; do
+  for f in "$ROOT"/docs/adr/ADR-*.md "$ROOT"/docs/research/*.md "$ROOT"/docs/research/*/*.md; do
     [ -f "$f" ] || continue
+    case "$f" in "$ROOT"/docs/research/logs/*) continue ;; esac
     printf '%s\n' "$f"
   done | LC_ALL=C sort
 )

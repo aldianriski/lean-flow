@@ -85,7 +85,7 @@ ADR-010's spawn-with-brief (C) stands, and ADR-010 was deliberately not edited. 
 was never the per-run cost the question had been framed around: Claude Code **serializes concurrent
 invocations of the same forked skill**, and our fan-out runs one procedure skill across N tasks at
 once, so B removes the concurrency it was being considered for. Trail, evidence, revisit-if and a
-dated expiry → [`.out-of-scope/skill-self-fork.md`](../../.out-of-scope/skill-self-fork.md).
+dated expiry → [`.out-of-scope/skill-self-fork.md`](../../../.out-of-scope/skill-self-fork.md).
 
 **Closed at SPRINT-054 T2 (TASK-155) — negation in anti-patterns: no change warranted.** The claim is
 real but narrower than `writing-for-agents` states; our ❌ rows already pair each trap with a positive

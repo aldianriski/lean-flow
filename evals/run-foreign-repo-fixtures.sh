@@ -338,7 +338,7 @@ if sweep_gate "findings-name-a-path-the-standard-owns"; then
     echo "PASS fixture(findings-name-a-path-the-standard-owns): every named finding points at a file the target has, or at a §2 canonical path it owes ($_sweep_reached/$_sweep_total FAIL line(s) swept)"
   else
     echo "FAIL fixture(findings-name-a-path-the-standard-owns): finding(s) name paths that are neither in the target nor named by §2 --$unactionable"
-    echo "  (per the Plan this is evidence about docs/research/conformance-dispositions.md, not a reason to quieten the engine)"
+    echo "  (per the Plan this is evidence about docs/research/conformance/conformance-dispositions.md, not a reason to quieten the engine)"
     fail=1
   fi
 fi

@@ -14,7 +14,7 @@ rejection.
 
 ## What was being decided
 
-`docs/research/mattpocock.md` scan 1 identified three ways to hand a dispatched sub-agent its
+`docs/research/mattpocock/mattpocock.md` scan 1 identified three ways to hand a dispatched sub-agent its
 procedure skill, and carried the B-vs-C question forward through two further scans with "no new
 evidence either way":
 

@@ -80,6 +80,20 @@ run_case_anywhere "worktree-lookalike-citer" 0 \
 # is the claim-bearing case; the PASS twin is its control (same reader, no finding to hide behind).
 work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'rm -rf "$work"' EXIT INT TERM
+# TASK-589: topic docs obey the same retention rule; copied skills are outside the corpus.
+mkdir -p "$work/topic/docs/research/topic" "$work/skill/docs/research/storm"
+cp "$fx/superseded-uncited-lingering/docs/research/forgotten.md" "$work/topic/docs/research/topic/forgotten.md"
+run_case_anywhere "topic-superseded-uncited" 1 \
+  "docs/research/topic/forgotten.md is superseded and cited by nothing live" -- \
+  sh "$checker" "$work/topic"
+printf '%s\n' '---' 'status: superseded' '---' '# Copied skill' 'id: body-only' > "$work/skill/docs/research/storm/SKILL.md"
+run_case_anywhere "topic-idless-skill-excluded" 0 \
+  "skip (no superseded or archived research docs)" -- \
+  sh "$checker" "$work/skill"
+printf '%s\n' 'See topic/forgotten.md.' > "$work/topic/docs/research/consumer.md"
+run_case_anywhere "topic-superseded-cited" 0 \
+  "superseded but still cited by docs/research/consumer.md -- correctly left in place" -- \
+  sh "$checker" "$work/topic"
 raw_awk_dir "$work/rawawk"
 crlf_twin "$fx/archived-not-superseded" "$work/crlf-archived-not-superseded"
 run_case_anywhere "crlf-archived-not-superseded" 1 \

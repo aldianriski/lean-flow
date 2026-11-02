@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-11-02
 update_trigger: Rollback process changes
 status: current
 ---
@@ -14,7 +14,7 @@ status: current
 ## Rollback process
 lean-flow is a Claude Code plugin — markdown only, no server, no build, no runtime state. There is
 nothing to migrate back.
-1. Revert the `release:` commit (or re-point the marketplace entry to the prior tag).
+1. Revert the `release:` commit (or re-point the marketplace entry to the prior release commit; no release tags exist).
 2. Push. Users get the reverted version on their next `claude plugin install` / marketplace refresh.
 
 ## Rollback verification — by a real signal, not a proxy

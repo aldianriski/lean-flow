@@ -45,7 +45,7 @@
 // Fixture seed content lives under evals/fixtures/gen-index-locale/ (TASK-389).
 
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -238,6 +238,62 @@ function localeEnv(lc: string): NodeJS.ProcessEnv {
         : `${!sourcesGenIndex ? "" : "scripts/qa-check.sh appears to `.`/source gen-index.sh, which this fixture does not model -- "}` +
           `${noLeakGrep ? "" : `caller locale changed after the vocab grep: before=${JSON.stringify(before)}, after=${JSON.stringify(afterGrep)}`}`,
     );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+// TASK-589: full-path C order across flat, archived and topic docs; logs and copied skills
+// are not research. A body-only id is deliberately insufficient to admit a copied skill.
+{
+  const dir = buildTempRepo();
+  try {
+    for (const folder of ["topic", "archive", "logs", "storm"]) {
+      mkdirSync(join(dir, "docs/research", folder), { recursive: true });
+      writeFileSync(join(dir, "docs/research", folder, "note.md"), folder === "storm"
+        ? "---\nstatus: superseded\n---\n# Copied skill\nid: body-only\n"
+        : `---\nid: ${folder}-note\ntags: [process]\ndomain: governance\nstatus: current\n---\n`);
+    }
+    const run = sh(["scripts/gen-index.sh"], { cwd: dir });
+    const index = readFileSync(join(dir, "docs/knowledge-index.md"), "utf8");
+    const tagLine = index.split("\n").find((line) => line.startsWith("- **process**")) ?? "";
+    const links = [...tagLine.matchAll(/\]\((research\/[^)]+)\)/g)].map((m) => m[1]);
+    report("topic-index-order", run.code === 0 && JSON.stringify(links) === JSON.stringify([
+      "research/Zeta-notes.md", "research/alpha-notes.md", "research/archive/note.md", "research/topic/note.md",
+    ]), `full-path byte order: ${links.join(", ")}`);
+    report("topic-index-exclusions", !index.includes("research/storm/") && !index.includes("research/logs/"),
+      "id-less copied skills and logs stay outside the index");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+// Exercise only QA's actual corpus leg, never the full gate. Both tracked and glob-fallback
+// selection must reach a topic's bad metadata and related ids, while ignoring id-less skills.
+for (const tracked of [true, false]) {
+  const dir = buildTempRepo();
+  try {
+    for (const folder of ["topic", "logs", "archive", "storm"]) {
+      mkdirSync(join(dir, "docs/research", folder), { recursive: true });
+      writeFileSync(join(dir, "docs/research", folder, `${folder}.md`), folder === "storm"
+        ? "---\nstatus: superseded\n---\n# Skill\nid: body-only\n"
+        : `---\nid: ${folder}-id\ntags: [invalid-tag]\ndomain: governance\nstatus: current\nrelated: [absent-id]\n---\n`);
+    }
+    writeFileSync(join(dir, "docs/research/consumer.md"),
+      "---\nid: consumer\ntags: [process]\ndomain: governance\nstatus: current\nrelated: [topic-id]\n---\n");
+    if (tracked) execFileSync("git", ["add", "docs"], { cwd: dir });
+    const qa = readFileSync(QA_CHECK_SCRIPT, "utf8");
+    const start = qa.indexOf("corpus_files=$(");
+    const end = qa.indexOf("# --- 5.", start);
+    if (start < 0 || end < 0) throw new Error("QA corpus boundaries missing");
+    writeFileSync(join(dir, "corpus.sh"), 'ok() { echo "PASS $*"; }; bad() { echo "FAIL $*"; };\n' + qa.slice(start, end));
+    const run = sh(["corpus.sh"], { cwd: dir });
+    const mode = tracked ? "tracked" : "fallback";
+    report(`topic-corpus-${mode}`, run.code === 0 && run.stdout.includes("topic.md:absent-id") &&
+      run.stdout.includes("topic.md(tag:invalid-tag)") && !run.stdout.includes("consumer.md:topic-id"),
+      "topic metadata and dangling refs checked; topic id resolves from flat consumer");
+    report(`topic-corpus-exclusions-${mode}`, run.code === 0 &&
+      !/storm\.md|logs\.md|archive\.md/.test(run.stdout), "logs, archive and id-less skill excluded");
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

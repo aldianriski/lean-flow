@@ -1797,7 +1797,7 @@ status: current
     §2 row should report as an explicit **uncovered** row rather than as silence, since silence is what
     made this invisible. Note the interaction: EPIC-004's engine has to resolve §2's path patterns
     anyway, so this may be subsumed rather than fixed in place.
-  - Tracker: SPRINT-072 G2 Execution Log (the probe) · `docs/research/conformance-baseline.md`
+  - Tracker: SPRINT-072 G2 Execution Log (the probe) · `docs/research/conformance/conformance-baseline.md`
     § Findings recorded for later sprints · **L-132** · L-058 · ADR-015 (soft caps report, and cannot
     be grandfathered)
   - **Re-reviewed 2026-08-18 (SPRINT-075 promote, 3 sprints open) — held, trigger unfired.** SPRINT-074

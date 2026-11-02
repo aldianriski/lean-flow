@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — research docs that form a series live in topic folders (`docs/research/<topic>/`, one §2 row each), and the knowledge index, research checks and caps read them; §2 also places `docs/archive/`, `docs/qa/` with `QA.md`, the generated knowledge index, data files beside research logs, and per-feature sibling docs (spec 0.19.0, ADR-057).
 - **Changed** — `/lean-doc-generator migrate`, re-run on a repo already on lean-flow, reads untyped tasks as features without rewriting them and proposes existing bug notes, `BUG-*.md` files, bug-flavoured tasks and verification-capture folders as bug items and evidence, moving only what you approve.
 - **Changed** — `/prime` reports open bug items (count and oldest) beside the task count; `/flow` sends a reported bug to `/triage` and builds a bug item through `/diagnose`; the close retro lists each fixed bug item with its one-line root cause.
 - **Changed** — `/triage` files a reported bug as a `type: bug` work item with its repro and redacted evidence; `/diagnose` reads that item first and, at its post-mortem, writes the root cause, fix, regression test and prevention into it.

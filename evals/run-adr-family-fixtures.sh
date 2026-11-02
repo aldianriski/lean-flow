@@ -4,7 +4,7 @@
 # (SPRINT-076 T2).
 #
 # The five finding names asserted below are the ones ALREADY PUBLISHED in
-# docs/research/conformance-dispositions.md § build. This harness CONSUMES that contract; it does not
+# docs/research/conformance/conformance-dispositions.md § build. This harness CONSUMES that contract; it does not
 # invent names to match the code (L-058 -- a check specified without its finding name is a
 # half-shipped gate). Every case is RETAINED (TD-012: deleting the fixtures with the prototype leaves
 # the gate unguarded).
