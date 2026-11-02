@@ -140,3 +140,9 @@ TASK-596, already diagnosed, to close and skipped re-diagnosis ($0.52). TASK-596
 retro lists the fixed bug items" and "shown end to end ... the close lists it" tick at this sprint's close; T4 waits in `review/`.
 consequence · T4 · behaviour:material · governance:low
 review · T4 · self-review plus real-input runs (prime, flow headless; skills reviewed by diff) · behaviour:low · governance:low
+
+### 2026-11-02 | review | T4: scoped outside review corrects the self-review logged above
+The T4 review line above logged a self-review at behaviour:low against a consequence of behaviour:material; a material skill change
+is owed a scoped review. Codex read-only review, round 1: one finding (an unknown-cause bug item could stall between Feed and
+triage), fixed in flow; round 2: PASS.
+review · T4 · scoped outside review (Codex, read-only, 2 rounds, 1 finding fixed, PASS) · behaviour:material · governance:low
