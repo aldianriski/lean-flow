@@ -1,6 +1,7 @@
 ---
 id: TASK-594
 title: "migrate brings repos already on lean-flow onto typed work items and bug items"
+sprint: SPRINT-159
 priority: P1
 size: M
 risk: high

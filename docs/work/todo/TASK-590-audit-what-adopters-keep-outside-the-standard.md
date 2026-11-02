@@ -1,6 +1,7 @@
 ---
 id: TASK-590
 title: "Audit what adopters keep outside the standard, and rule on each finding"
+sprint: SPRINT-159
 priority: P1
 size: S
 risk: low

@@ -1,6 +1,7 @@
 ---
 id: TASK-591
 title: "Work items carry a type, and a bug item carries its repro, evidence and root-cause report"
+sprint: SPRINT-159
 priority: P1
 size: M
 risk: high

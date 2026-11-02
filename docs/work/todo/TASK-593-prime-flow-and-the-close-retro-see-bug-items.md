@@ -1,6 +1,7 @@
 ---
 id: TASK-593
 title: "/prime, /flow and the close retro see bug items"
+sprint: SPRINT-159
 priority: P2
 size: S
 risk: low

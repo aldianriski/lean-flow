@@ -1,6 +1,7 @@
 ---
 id: TASK-592
 title: "/triage files a bug item and /diagnose writes its root cause, fix and regression test into it"
+sprint: SPRINT-159
 priority: P1
 size: M
 risk: med
