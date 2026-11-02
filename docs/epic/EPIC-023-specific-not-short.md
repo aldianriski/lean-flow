@@ -115,6 +115,10 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   ships without a passing arm (D6); development runs may continue during an arm, one worker's worth, so nothing waits on it
   (SPRINT-158 T1 made the sweep safe for that). A capacity check at 3 and 4 workers sets the release arm's worker count by
   amendment (target 40-50 minutes; RAM, not CPU, is the limit on this PC). Arm A4b (bundle 2) is the last per-bundle arm.
+- **D17** — Bundle 2 is ship-eligible (owner, 2026-11-02): arm A4b (TASK-583, 584, 585 on A4a) measured 32/32 VALID at two
+  workers, 93.8% vs A4a 90.6%, +3.1 [0.0, 9.4], no symptom regression (convention +11.5, business +5.6, scope +6.3), 0 parks,
+  cost 0.68x A1, ruled by non-inferiority (Amendment 8; `ab-measurements-a4b.md` § Report 2026-11-02). It ships with A4a in the
+  next release, which D16 gates on a passing arm; invitation-issued-by still fails its business judge in both arms.
 
 ## Open questions
 

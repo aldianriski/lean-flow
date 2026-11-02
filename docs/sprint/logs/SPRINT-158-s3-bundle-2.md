@@ -134,3 +134,12 @@ review · T4 · scoped outside review (Codex, read-only, 2 rounds, PASS) · beha
 The owner read the headless run's line and ruled it meets TASK-583 box 2 (popup). No skill text changed under T2.
 consequence · T2 · behaviour:low · governance:low
 review · T2 · self-review (no skill text changed in this sprint; the line's figures checked against the files) · behaviour:low · governance:low
+
+### 2026-11-02 | progress | T5: A4b ran unattended at two workers and is ruled ship-eligible (owner-signed); EPIC-023 D16, D17
+A4b's 30 remaining slots ran detached at two workers after the owner approved the pilot: 32/32 VALID in about 75 minutes. Against
+A4a by non-inferiority (Amendment 8): 93.8% vs 90.6%, +3.1 [0.0, 9.4], no symptom regression, 0 parks of 32, cost 0.68x A1;
+the twelve untouched tasks tie at 24 of 24. Owner signed ship-eligible (EPIC-023 D17). Mid-run the owner asked why every bundle
+needs a two-hour arm; after a Codex process review they adopted EPIC-023 D16 (parallel development runs per improvement, a full
+arm only before a release, nothing blocks on an arm) and TASK-586 (a 3/4-worker capacity check) was filed.
+consequence · T5 · behaviour:low · governance:high
+review · T5 · scoped outside review (Codex on Amendment 8, 2 rounds, 1 high + 1 med + 1 low fixed, PASS) · behaviour:low · governance:high
