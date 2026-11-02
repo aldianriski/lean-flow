@@ -106,3 +106,14 @@ neither task declared it. Impact: T2 and T3 Layers add it; the file stays within
 place. Re-confirm G2: not needed (the signed designs make both changes).
 
 Cites, per the scope-change of T1's findings: T1 cites `storm/` (finding F10, ruled to TASK-595).
+
+### 2026-11-02 | progress | T2: typed work items and the bug item landed; VPS gate 472/0; TASK-591 done
+Coordinator wrote the standard side (ADR-056; spec 0.19.0 MINOR: the typed work-store row, `work/evidence/TASK-NNN/`,
+`product/business-notes.md` *(was `BUSINESS-NOTES.md`)*, the bug-intake text; the work README schema; the bug-item template;
+`task-file.md`; README; CONTEXT.md). Codex built the check side (`check-work-type.ts`, its fixtures and qa-check leg; v1-to-v2 learns
+`type`; the ownership walk skips `docs/work/evidence/TASK-<n>/`). Outside review (Codex, worktree-isolated, consequential engine
+change): round 1 FIX (four med: the skip too wide, the legacy row not in `(was …)` form, evidence blocking §11 pruning, §12c), all
+fixed with seeded fixtures; round 2 PASS. The gate then caught the always-loaded token budget (+20 tokens; trimmed), a stale index,
+non-doc ids in a `related:` field, and two attribution slips; all fixed.
+consequence · T2 · behaviour:material · governance:high
+review · T2 · scoped outside review (Codex, worktree-isolated, 2 rounds, 4 med fixed, PASS) · behaviour:material · governance:high
