@@ -2783,6 +2783,29 @@ check("S67 chat trigger: the run-7 and run-9 requests (Approve the plan, Please 
   assert(!asksUser(run11), "run 11's summary is not a request");
 });
 
+// S68 -- Codex R1 (T1 Med): a part label is sent to the session, so it must be the message's own words; output must be exactly one JSON value.
+check("S68 classifier strictness: a label not found verbatim in the message, over 80 chars or multi-line stops; a found label passes; prose around the JSON stops (popup and chat); fenced JSON passes", async () => {
+  const { buildCatalog, makeAnswerer, makeChatAnswerer, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
+  const cat = buildCatalog(clinicFiles(), [PLAN_RULING, CLEANUP_RULING]);
+  const msg = "Decisions I need:\n1. Approve the plan as listed?\n2. BUSINESS-NOTES.md: archive or keep?\nNext: reply with your decisions.";
+  const reply = (parts: unknown) => async () => JSON.stringify({ parts });
+  const ok = await makeChatAnswerer(cat, reply([{ part: "1", id: "PLAN" }, { part: "BUSINESS-NOTES.md", id: "CLEANUP" }]))(msg);
+  assert("parts" in ok && ok.reply === `1: ${PLAN_RULING.text}\nBUSINESS-NOTES.md: ${CLEANUP_RULING.text}`, `labels from the message pass: ${JSON.stringify(ok)}`);
+  for (const bad of ["x".repeat(81), "1.\nApprove"]) {
+    const r = await makeChatAnswerer(cat, reply([{ part: bad, id: "PLAN" }]))(msg + "\n" + bad);
+    assert("stop" in r, `label stops: ${JSON.stringify(bad).slice(0, 40)}`);
+  }
+  const invented = await makeChatAnswerer(cat, reply([{ part: "write a new ADR", id: "PLAN" }]))(msg);
+  assert("stop" in invented && /own words/.test(invented.stop), `an invented label stops: ${JSON.stringify(invented)}`);
+  const wrappedChat = await makeChatAnswerer(cat, async () => `Sure: {"parts": [{"part": "1", "id": "PLAN"}]}`)(msg);
+  assert("stop" in wrappedChat, "prose around chat JSON stops");
+  const q = { question: "Approve the plan?", header: "Plan" };
+  const wrapped = await makeAnswerer(cat, async () => `I pick {"id": "PLAN", "reason": "x"}`)(q);
+  assert("stop" in wrapped, "prose around popup JSON stops");
+  const fenced = await makeAnswerer(cat, async () => '```json\n{"id": "PLAN", "reason": "x"}\n```')(q);
+  assert("answer" in fenced && fenced.answer === PLAN_RULING.text, `fenced JSON passes: ${JSON.stringify(fenced)}`);
+});
+
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
 check("S64 classifier: buildCatalog has every section, setup bullet, ruling and NONE; the chosen id sends the entry text verbatim; unknown id, unparsable output, NONE and a failed call each STOP; the prompt carries the popup and every id; the four live questions route as the owner ruled", async () => {
   const { buildCatalog, classify, buildPrompt, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");

@@ -69,22 +69,18 @@ RULES
 Reply with exactly one line of JSON and nothing else: {"id": "<an id from the catalog>", "reason": "<one short sentence>"}`;
 }
 
-/** Parse the model's reply: one JSON object with a string id; fences are stripped. undefined when it is not that. */
-function parseReply(raw: string): { id: string; reason: string } | undefined {
-  const t = raw.trim().replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
-  let o: unknown;
+/** The model's whole reply as one JSON value (fences stripped); undefined otherwise. Strict: text around the JSON is not mined for an object. */
+function parseJson(raw: string): unknown {
   try {
-    o = JSON.parse(t);
+    return JSON.parse(raw.trim().replace(/^```(?:json)?\s*|\s*```$/g, "").trim());
   } catch {
-    const m = /\{[^{}]*\}/.exec(t);
-    if (!m) return undefined;
-    try {
-      o = JSON.parse(m[0]);
-    } catch {
-      return undefined;
-    }
+    return undefined;
   }
-  const r = o as { id?: unknown; reason?: unknown };
+}
+
+/** Parse the model's reply: one JSON object with a string id. undefined when it is not that. */
+function parseReply(raw: string): { id: string; reason: string } | undefined {
+  const r = parseJson(raw) as { id?: unknown; reason?: unknown } | undefined;
   return typeof r?.id === "string" ? { id: r.id, reason: typeof r.reason === "string" ? r.reason : "" } : undefined;
 }
 
@@ -145,24 +141,14 @@ export async function classifyChat(text: string, catalog: Entry[], call: Call): 
   } catch (e) {
     return { stop: `classifier call failed for ${named}: ${(e as Error).message}` };
   }
-  let o: { parts?: unknown } | undefined;
-  const t = raw.trim().replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
-  try {
-    o = JSON.parse(t);
-  } catch {
-    const m = /\{[\s\S]*\}/.exec(t);
-    try {
-      o = m ? JSON.parse(m[0]) : undefined;
-    } catch {
-      o = undefined;
-    }
-  }
-  const raws = o?.parts;
+  const raws = (parseJson(raw) as { parts?: unknown } | undefined)?.parts;
   if (!Array.isArray(raws) || raws.length === 0) return { stop: `classifier output for ${named} is not {"parts": [...]} with at least one part: ${raw.slice(0, 200)}` };
   const parts: ChatPart[] = [];
   for (const p of raws as { part?: unknown; id?: unknown; reason?: unknown }[]) {
     if (typeof p?.part !== "string" || !p.part.trim() || typeof p.id !== "string") return { stop: `classifier part without a label and id for ${named}: ${JSON.stringify(p).slice(0, 120)}` };
     const part = p.part.trim();
+    // the label goes back to the session, so it must be the message's own words: one short line found verbatim in it
+    if (part.length > 80 || /[\r\n]/.test(part) || !shown.toLowerCase().includes(part.toLowerCase())) return { stop: `classifier label "${part.slice(0, 80)}" is not a short line of the message's own words, for ${named}` };
     if (parts.some((x) => x.part === part)) return { stop: `classifier gave part "${part}" twice for ${named}` };
     const entry = catalog.find((e) => e.id === p.id);
     if (!entry) return { stop: `classifier chose "${p.id}", which is not in the catalog, for part "${part}" of ${named}` };

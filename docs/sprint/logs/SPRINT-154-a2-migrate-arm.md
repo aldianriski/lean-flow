@@ -150,3 +150,11 @@ date popup was asked), and `overview.md` / `requirements.md` end over their caps
 snapshot went to `%TEMP%` only (a plan handoff and an inventory script). Frozen: `workdoo-a2.manifest.json` (1244 files; differs
 from A1's in exactly the three files). `hash-prereg.ts` now pins both A2 arms and `schedule-a2.json`; every S0 pin and the corpus
 hash still match the pre-registration. Selftest 72/72. Amendment 6 drafted with the A2 hashes, awaiting Codex review.
+
+### 2026-11-02 | review | T1: Codex R1 over the operator, Amendment 6 draft and both operator logs: T2-T4 CLEAR, T1 one Med, fixed
+`codex exec` (gpt-6-astra, read-only, static; 41.9k tokens). T2 (setup validity), T3 (Amendment 6 vs the pre-registration) and T4
+(freeze integrity) CLEAR. T1 Med: a multi-part chat reply carried the model's own `part` label to the session, and both parsers
+mined an object out of surrounding prose. Fixed: a label must be one line of at most 80 characters found verbatim in the message,
+else stop; the reply must be exactly one JSON value (fences allowed). S68 (fails on the old classifier); selftest 73/73. Effect on
+the frozen arms: none. Every label the operator sent in either setup appears verbatim in its session's text (10 of 10, checked
+against the transcripts), so no model-written words reached a session.
