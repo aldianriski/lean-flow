@@ -2,6 +2,7 @@
 id: TASK-587
 title: "The design opens the repo's business-facts file and quotes the fact it honours"
 epic: EPIC-023
+sprint: SPRINT-160
 priority: P2
 size: S
 risk: med

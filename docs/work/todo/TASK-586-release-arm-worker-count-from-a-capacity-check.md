@@ -2,6 +2,7 @@
 id: TASK-586
 title: "Set the release arm's worker count from a 3- and 4-worker capacity check"
 epic: EPIC-023
+sprint: SPRINT-160
 priority: P2
 size: S
 risk: med

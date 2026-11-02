@@ -2,6 +2,7 @@
 id: TASK-588
 title: "The build never deletes a path outside the working tree"
 epic: EPIC-023
+sprint: SPRINT-160
 priority: P2
 size: S
 risk: med

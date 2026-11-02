@@ -1,6 +1,7 @@
 ---
 id: TASK-595
 title: "Decide docs/research/storm (a copied skill) under the curation bar"
+sprint: SPRINT-160
 priority: P3
 size: S
 risk: low
