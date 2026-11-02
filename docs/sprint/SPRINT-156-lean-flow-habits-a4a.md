@@ -38,8 +38,8 @@ any harness change beyond what Amendment 7 needs · a release (D6: only on a pas
 Layers: `skills/` · `CHANGELOG.md` · `docs/research/`
 Depends-on: none
 Cites: TASK-573 · L-272 · `docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02
-The parked sessions' streams were swept, so the cause comes from a fresh headless run on a task that parked, on a research copy
-of its A2 snapshot. The fix is skill text that keeps a probe inside the working tree or on the repo's own test runner.
+The parked sessions' streams are kept, so the cause is quoted from them (scope-change 2026-11-02). The fix is skill text that keeps a
+probe inside the working tree or on the repo's own test runner, else a judgment tick.
 
 **Acceptance:** the tasks that parked re-run headless with the fixed plugin and stop at no popup.
 
@@ -66,16 +66,16 @@ at this task's G2.
 Layers: `evals/ab/` · `docs/research/logs/ab-measurements-a4a.md` · `docs/epic/EPIC-023-specific-not-short.md`
 Depends-on: T1, T2
 Cites: TASK-574 · `evals/ab/PREREGISTRATION.md` Amendment 6 · EPIC-023 D8, D10, D12
-A4a is A2's frozen snapshots with the plugin pinned at the commit carrying all three fixes, so no new setup runs. Amendment 7 is
+A4a is A2's frozen snapshots with the plugin pinned at the commit carrying T1's and T2's fixes, so no new setup runs. Amendment 7 is
 signed before any trial; validity on its own 32 slots first, then the ruling against A2.
 
 **Acceptance:** A4a's 32 slots are scored under a signed Amendment 7 in their own log, and the log records the ruling against A2.
 
 ## Decisions (pre-locked)
 
-- **D1** — One arm for three fixes (owner, EPIC-023 D12). T1-T3 land in that order and A4a pins the commit after T3; S4's
+- **D1** — One arm for two fixes (owner, EPIC-023 D12 and D13). T1 then T2 land, and A4a pins the commit after T2; S4's
   leave-one-out attributes the effect.
-- **D2** — Shared files: `skills/` and `CHANGELOG.md` are touched by T1, T2 and T3, in that commit order (sequential, no parallel
+- **D2** — Shared files: `skills/` and `CHANGELOG.md` are touched by T1 then T2, in that commit order (sequential, no parallel
   build). `docs/research/` is T1's alone.
 - **D3** — Every diagnosis and re-run uses a research copy of an A2 snapshot and a pinned clone of the plugin, never a frozen arm
   snapshot and never the live checkout from an interactive session (L-277).

@@ -52,3 +52,15 @@ moves to `cancel/` with a `.out-of-scope/` entry, and A4a pins the commit carryi
 T3 leaves the Plan; T4 depends on T1 and T2; D1 and D2 read T1 and T2. Probe rule for T1 (owner ruling): prefer the repo's
 existing runners; a check that needs a script keeps it inside the working tree and deletes it before the report; never a system
 temp dir; otherwise the criterion is ticked on judgment and says so.
+
+### 2026-11-02 | progress | G2 designs drafted; builder check on T1, T2, T4 (Codex readers), findings settled
+Each design went to a fresh Codex reader with its frozen Done-when and touched paths. All three returned findings, all facts or
+contradictions, settled by the coordinator: the Plan prose for T1, T4, D1 and D2 now matches the scope-changes (kept streams; two
+fixes, pin after T2); the re-run population is the four distinct workdoo tasks with a scored park plus clinic appointment-lookup,
+and a run counts only if it reaches the build; T1's verifier reads the scratch rows' exit plus a stream scan with unclassifiable
+commands listed, never passed; T2's verifier reads `(g2.firstRound ?? g2).scope`; T2's doc clause includes behaviour-required
+docs and the pin-first qualifier lands on both SKILL.md lines; `--comparator` leaves the cost ratio against A1; the park rate is
+reported over scored slots; the five development runs are not A4a trials and Amendment 7 discloses them.
+builder-check · T1 · 2 contradictions · 5 questions · settled: Plan prose, re-run population, verifier boundary, build-reach rule
+builder-check · T2 · 2 contradictions · 3 questions · settled: doc clause, firstRound read, pin-first on both lines, population
+builder-check · T4 · 2 contradictions · 3 questions · settled: cost ratio vs A1, park-rate denominator, development runs disclosed
