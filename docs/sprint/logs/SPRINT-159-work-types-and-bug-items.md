@@ -38,3 +38,13 @@ against STANDARD §2, cross-checked by a second listing with a different selecti
 with a proposed ruling per finding; owner rulings by popup; approved new tasks filed by the coordinator; changes to TASK-591, 594
 or 589 by a logged scope-change that cites the doc. T2-T6 are designed after T1's findings (they depend on them).
 builder-check · T1 · 5 contradictions · 3 questions · settled by fact (population kept to the frozen text; lean-flow docs read fresh; filing and citing steps added)
+
+### 2026-11-02 | scope-change | T2, T5, T6: TASK-591, TASK-594 and TASK-589 take T1's findings (owner rulings)
+What broke: T1's census (`docs/research/adopter-folder-audit.md`) found what the frozen Done-whens did not foresee: workdoo keeps
+546 of its 709 doc files as verification evidence in a folder the standard does not place; both adopters keep a root business-notes
+file with no row; and five legitimate kinds of file (migrate's archive, the QA folder and checklist, the generated knowledge index,
+data files beside research logs, per-feature sibling docs) have no §2 row.
+Impact, by owner ruling (popup, 2026-11-02): TASK-591's evidence folder serves every work item, not only bugs, and its amendment
+gives business facts a placed row; TASK-594's migrate also proposes mapping existing capture folders onto their items; TASK-589's
+§2 amendment also places the five kinds above. Each task cites the audit doc. `storm/` goes to a new backlog task (TASK-595).
+Re-confirm G2: T2, T5 and T6 are designed after this entry, at their G2.
