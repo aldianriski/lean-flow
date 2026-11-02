@@ -39,7 +39,6 @@ harness only, never a gate.
 `evals/ab/run-baseline.ts` · `evals/ab/lib/isolate.ts` · `evals/ab/selftest.ts` · `evals/ab/PREREGISTRATION.md` (amendment)
 
 ## Assumes
-  until it exits (SPRINT-156 D4).
 - RAM, not the CLI's rate limit, is the binding constraint at N = 2; the capacity check confirms it.
 - Unattended launch with a completion notification already works (detached driver plus an exit watcher, SPRINT-156 T4); folding it
   into a launcher script is part of this task if it stays small.
