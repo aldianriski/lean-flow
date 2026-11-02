@@ -51,7 +51,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-153](../sprint/archive/SPRINT-153-s1-discovery-profile.md) | S1: Discovery Profile (stream s1-discovery; heavy runs on the VPS) | closed · `82990174` | init and migrate write a cited repo profile through the installed plugin, shown on an unprofiled repo (all seven topics) and on kalasuara (migrate kept every decision file and Closed-when set unchanged); question sets for React/Vite, Vue/Vite, Go/chi and Postgres; spec 0.18.2. Details in its Retro. Open for the S1 condition: arm A2 (TASK-555) and the profile on both A/B repos |
 | [SPRINT-154](../sprint/archive/SPRINT-154-a2-migrate-arm.md) | A2: Migrate Arm (S1's arm A2 through a real migrate; stream s1-discovery) | closed · `c6255747` | S1's arm: A2 set up by a real `migrate` from the S1 pin with an operator answering from frozen entries, 32/32 VALID, ruled failed (below the A0 floor; no gain or regression vs A1), so S1 does not ship (D6). Ticks S1; S3's intake found the regressions are UNKNOWN verdicts (D11) |
 | [SPRINT-156](../sprint/archive/SPRINT-156-lean-flow-habits-a4a.md) | S3: Three lean-flow Habits, Measured as A4a (stream s3-expertise) | closed · `0c556367` | S3's first slice: two lean-flow habits fixed in `/orchestrator` (probes stay in the working tree, designs list only what the change needs inside their layers) and measured as arm A4a, 32/32 VALID, 90.6% vs A2 78.1%, gain +12.5 [3.1, 21.9], no regression, cost 0.55x A1; ship-eligible, tuning-sensitive, shipped by owner ruling (D15). S3 stays open for bundle 2 (TASK-583, 584, 585, 581) |
-| [SPRINT-158](../sprint/SPRINT-158-s3-bundle-2.md) | S3 Bundle 2: Progress Reports, Clean Checks, Business Facts, Parallel Trials (stream s3-expertise) | active | — |
+| [SPRINT-158](../sprint/archive/SPRINT-158-s3-bundle-2.md) | S3 Bundle 2: Progress Reports, Clean Checks, Business Facts, Parallel Trials (stream s3-expertise) | closed · `074b0f78` | S3's second bundle on A4a: a Progress line, an every-mode check-leftover rule and a G2 business-facts box, measured as arm A4b at two workers (parallel trials, TASK-582): 93.8% vs A4a 90.6%, +3.1 [0.0, 9.4], no regression, 0 parks, ship-eligible by non-inferiority (D17); D16 moves full arms to releases. S3 stays open for bundle 3 (TASK-587, 588) |
 
 ## Decisions
 
@@ -140,7 +140,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
-  → TASK-581, TASK-583, TASK-584, TASK-585
+  → TASK-587, TASK-588
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)
