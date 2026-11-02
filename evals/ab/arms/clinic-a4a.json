@@ -1,0 +1,10 @@
+{
+  "id": "clinic-a4a",
+  "snapshot": "D:\\Research\\ab-arm-clinic-a2",
+  "manifest": "evals/ab/arms/clinic-a4a.manifest.json",
+  "plugin": {
+    "path": "D:\\Research\\ab-pins\\lean-flow-156-56964ce2",
+    "sha": "56964ce239aa1a243cda97a9062773c03ad933a4",
+    "hash": "758044c9ea2be27addf805ffba41a31691690fdaf42c10064ed6829efe0ca81c"
+  }
+}
