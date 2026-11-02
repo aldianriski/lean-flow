@@ -131,12 +131,12 @@ One file per task, `docs/work/<status>/TASK-NNN-<slug>.md` — status is the fol
 ```
 ---
 id: TASK-NNN
-title: "<verb-first title>"   type: feature|bug|debt   # optional, absent = feature (ADR-056)
+title: "<verb-first title>"   type: feature|bug|debt
 epic: EPIC-NNN · sprint: SPRINT-NNN   # each only when set (sprint by promote)
 priority: P0-P3 · size: S|M|L · risk: low|med|high · autonomy: HITL|AFK · tier: G|X|P
 class:     decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
 authority: J0 | J1 | J2   (whose authority it runs on — declared at promote/G2; ABSENT reads as J2)
-origin:    decomposer | close-retro | triage-bug | manual   (where the task came from — set by whoever files it)
+origin:    decomposer | close-retro | triage-bug | manual   (set by whoever files it)
 state:     ready | needs-info | blocked   (backlog only; set by /triage)
 depends-on: [TASK-NNN]
 ---
