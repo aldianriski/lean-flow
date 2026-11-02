@@ -26,12 +26,11 @@ need: the task's own work file (59), `acceptance-criteria.md` (12), the flow doc
 Owner ruling 2026-11-02: bundled with TASK-573 and TASK-576 into one arm, A4a (TASK-574).
 
 ## Done when
-- [ ] Cause named: the skill text that leads a design to list the task file, product docs or flow docs for a coding change is
-      quoted, from the kept streams of the measured sessions (`D:\ab-work\kept\`) (scope-change 2026-11-02, owner ruling).
+- [x] Cause named: the skill text that leads a design to list the task file, product docs or flow docs for a coding change is quoted, from the kept streams of the measured sessions (`D:\ab-work\kept\`) (scope-change 2026-11-02, owner ruling). ✓ 2026-11-02: 82 of 93 first designs failed scope (tests 45, docs 35, task file alone 14, code 2); the cause is the unbounded pin-first clauses and no rule on what a design lists, quoted in the SPRINT-156 log
 - [ ] Fixed: the named text changed so a coding task's design declares only the files its change needs; a doc is listed only when
       the task's own Done-when or the change's behaviour requires it, and ticking the task file stays coordinator bookkeeping
       outside the design's file list. Re-run headless on the same tasks, one run each: the first G2 scope check passes; streams kept.
-- [ ] Consumer surface: CHANGELOG `[Unreleased]` entry (unversioned until its arm passes, D6).
+- [x] Consumer surface: CHANGELOG `[Unreleased]` entry (unversioned until its arm passes, D6). ✓ 2026-11-02: CHANGELOG [Unreleased] Changed line for `/orchestrator` G2 (`56964ce2`)
 
 ## Touches
 the skill(s) the diagnosis names (`skills/**`, likely `orchestrator` and its references) · CHANGELOG.md

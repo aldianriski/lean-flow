@@ -91,3 +91,15 @@ ones carry `sprint(156):` subjects; these two stay as written (`ca13d54e` betwee
 `docs/work/todo/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`,
 `docs/work/in_progress/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md` and
 `docs/work/done/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`, as SPRINT-154's T1 did. Impact: none on scope.
+
+### 2026-11-02 | progress | T2: cause named from the kept streams (box 1); rule landed in orchestrator/SKILL.md (box 3 CHANGELOG)
+Evidence, the 93 measured A1/A2 sessions' kept streams and rows: 82 first G2 designs failed the scope check; outside the layers
+were tests in 45 (assertions added to `scripts/verify-*.mjs`), docs in 35 (acceptance criteria, flow docs, requirements,
+BUSINESS-NOTES.md), the task file alone in 14, other code in 2. The skill text behind them: SKILL.md's "a change to working
+behaviour opens with its pin" and "adds a pin first, whatever its route" (no layer bound), and no rule on what a design's file
+list holds, while the trial prompt asks for "every file you will touch", so the session lists the task file it will tick and the
+docs it habitually refreshes. Fix (`56964ce2`): the G2 Approach line now says the file list holds only what the change needs, inside
+the declared layers, with ticking as bookkeeping and docs only when the task or the change's behaviour needs them; both pin-first
+clauses are bound to the declared layers, a pin outside them named as an open point. SKILL.md stays at 140 lines, density
+baseline 13. Box 2 waits for the shared re-run batch, which starts now (the plugin pin for it is this commit).
+consequence · T2 · behaviour:material · governance:low
