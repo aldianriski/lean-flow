@@ -11,7 +11,7 @@ tier: X
 authority: J2
 origin: decomposer
 state: blocked
-depends-on: [TASK-555, TASK-573]
+depends-on: [TASK-573, TASK-575, TASK-576]
 ---
 
 # TASK-574 — Measure the popup-stop fix as arm A4a against A2
@@ -23,7 +23,7 @@ arm, not targeted runs only.
 
 ## Done when
 - [ ] PREREGISTRATION Amendment 7 owner-signed before any A4a trial: arm A4a (both repos, A2's snapshots and manifests unchanged,
-      plugin pinned at TASK-573's fix commit), a 32-slot schedule built like A2's, a derived pilot, its own log with a
+      plugin pinned at the commit that carries the fixes of TASK-573, TASK-575 and TASK-576), a 32-slot schedule built like A2's, a derived pilot, its own log with a
       freeze line, and section 11 validity first. The ruling against A2 follows Amendment 6 §7's rules with A2 as the comparator, and the park
       rate is reported as the mechanism measure.
 - [ ] All 32 slots measured; A4a passes section 11's run-validity rule on its own slots.
@@ -37,6 +37,11 @@ evals/ab/hash-prereg.ts · docs/research/logs/ab-measurements-a4a.md · the anal
 - TASK-555 extends the analysis to a comparator other than A0, and this task reuses it rather than writing a second one.
 - About $65 and 2 hours of trials, run by the owner in their terminal, as for A2.
 - If TASK-555 rules A2 failed, A4a still stacks on A2 (owner ruling 2026-11-02).
+
+## Amended 2026-11-02
+Owner ruling: arm A4a bundles three lean-flow fixes (TASK-573 popup stops, TASK-575 declared files only, TASK-576 light
+path for small tasks) and is measured once against A2; S4's leave-one-out attributes them. The plugin pin and `depends-on` now
+name all three; TASK-555 is done.
 
 ## Tracker
 EPIC-023 § Closed when S3 · D8 · D10

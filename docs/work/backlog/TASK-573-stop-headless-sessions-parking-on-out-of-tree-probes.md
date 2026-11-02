@@ -10,8 +10,8 @@ class: decision
 tier: P
 authority: J2
 origin: decomposer
-state: blocked
-depends-on: [TASK-555]
+state: ready
+depends-on: []
 ---
 
 # TASK-573 — Stop lean-flow sessions parking a headless run by writing verification probes outside the working tree
