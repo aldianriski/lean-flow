@@ -596,3 +596,69 @@ A2 log's header. Harness code (`lib/*.ts`) is not hashed (section 20); `hash-pre
 | `evals/ab/arms/clinic-a2.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
 | `evals/ab/schedule-a2.json` | `d87e435b094291579df9a2a9213a2af7caa05da12d973dc61357b8b5e73b2eba` |
 | plugin pin (A2, S1) sha / content hash | `8299017428b02ef6db7f0374f498b4c92350bf77` / `b8c3b484cc8567ae52b3b2392d775cc21ff0e1bf4e0802946123a3555b0e1752` |
+
+## Amendment 7 (2026-11-02, arm A4a before any A4a trial)
+
+What changed:
+
+- **1. Arm A4a.** Two new measured arms, `workdoo-a4a` and `clinic-a4a` (`evals/ab/arms/<repo>-a4a.json`). Their snapshots are A2's,
+  unchanged (`D:\Research\ab-arm-<repo>-a2`), checked by `<repo>-a4a.manifest.json`, a byte copy of the A2 manifest (same sha256).
+  Only the plugin differs: lean-flow at `56964ce239aa1a243cda97a9062773c03ad933a4`, content hash
+  `758044c9ea2be27addf805ffba41a31691690fdaf42c10064ed6829efe0ca81c`, a clone in `D:\Research\ab-pins\lean-flow-156-56964ce2`, loaded
+  by `--plugin-dir` in an isolated config with no user plugins, as at A2. No setup runs: A4a's docs are A2's migrated docs.
+- **2. The treatment.** Against A2's pin (`82990174`) the plugin's skills differ in 11 files. Two edits to
+  `skills/orchestrator/SKILL.md` are the fixes under test (EPIC-023 D12 and D13; SPRINT-156 T1 and T2, TASK-573 and TASK-575):
+  - evidence for a criterion ticked on judgment comes from the repo's existing runners first, and a throwaway probe script lives
+    inside the working tree and is deleted before the report, never in a system temp dir;
+  - a design's file list holds only what the change needs, inside the task's declared layers (ticking or moving the task file is
+    bookkeeping; a doc only when the task or the change's behaviour needs it), and a pin that belongs outside the declared layers
+    is named as an open point, not added.
+  The other 10 files are `lean-doc-generator` templates and its init reference (SPRINT-155). In all 32 A2 sessions the only skill
+  invoked was `lean-flow:orchestrator` and no plugin file was read (from the kept streams), so those files are not expected to
+  reach a trial. Exposure is measured, not assumed: from each A4a slot's kept streams, any `Skill` call other than the
+  orchestrator and any read of one of the ten files counts as exposure. With zero exposure the ruling is stated as the effect of
+  the two orchestrator edits; with any, the exposed slots are named and the ruling is stated as the effect of the A4a plugin
+  against the A2 plugin, the two edits being its intended treatment. Either way S4's leave-one-out attributes components.
+- **3. Schedule.** `evals/ab/schedule-a4a.json`: `schedule-a2.json` with each arm renamed to A4a, same order: 2 repos x 8 tasks x
+  k = 2 = 32 slots. Amendment 6 item 4's pilot applies (N = 2).
+- **4. Log.** A4a rows go to `docs/research/logs/ab-measurements-a4a.md`, whose header carries A4a's own freeze line (it carries over
+  nothing). The S0 and A2 logs stay closed.
+- **5. Validity first.** A4a must pass section 11's run-validity rule on its own 32 slots before any comparison; a run that is
+  INVALID or FAILED there gets no ruling.
+- **6. Comparison and ruling.** A4a is compared with A2 on the combined slot data (S0's A0 and A1, A2's, A4a's, all first pass) by
+  Amendment 6 item 7's rules with A2 in place of A1 as the comparator: gain = pooled primary of A4a minus A2 (90% task-bootstrap
+  interval, `analyze.ts --comparator A2`, "Delta vs A2"); a symptom regresses when A4a minus A2 is below -0.05. The
+  never-worse-than-A0 floor (section 8) applies, and the cost ceiling stays 2.0x A1 (section 9, unchanged). The ruling is:
+  - **ship-eligible**: the gain holds (>= +0.10 and lower end > 0), no symptom regresses, A4a is not below A0, and its cost is
+    within 2.0x A1;
+  - **failed**: a symptom regresses, or A4a is below A0, or its cost exceeds 2.0x A1;
+  - **inconclusive**: otherwise.
+- **7. Park rate (reported, not decisive).** The share of A4a's 32 scored slots whose exit is `parked:`, beside A2's 3 of 32, read
+  from the log rows. It explains the result and rules nothing.
+- **8. Development runs, disclosed.** Before this amendment, five development runs used the A4a plugin on research copies of the A2
+  snapshots (`D:\Research\dev156\`), one each of workdoo self-onboarding-guard, reissue-invitation, pilot-seat-limit,
+  access-activity-type-filter and clinic appointment-lookup, into a scratch log that no analysis reads. Section 18's R-c (no trial
+  on an A/B repo or a task-set task before this document's hash is recorded) is not breached: they ran after Amendment 6's hash
+  was recorded, under its freeze line. They are not A4a trials and contribute no row. Because they checked the fixes on five of
+  the sixteen tasks, the A4a report also gives, as a labelled secondary that decides nothing, A4a minus A2 on the eleven tasks no
+  development run touched. Its use is predeclared: the decisive ruling stays the one over all sixteen tasks, and if A4a is
+  ship-eligible there while its point gain over A2 on the eleven untouched tasks is below +0.10, the ruling is reported as
+  **ship-eligible, tuning-sensitive**, and A4a does not ship under EPIC-023 D6 without the owner's ruling.
+
+Why: EPIC-023 D8 measures each S3 step on its own arm, D10 has S3 compare against A2, and D12/D13 bundle the two fixes into one arm.
+A2's kept streams showed lean-flow sessions writing probes outside the repo (A1 33 of 61, A2 18 of 32, A0 3 of 49; 6 parked) and
+first designs failing the scope check (82 of 93), each a revise round.
+
+No other rule changed: the endpoints, thresholds, task corpus, the A0, A1 and A2 arms, the allow-list, models, judges and their
+prompts, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen. Section 19
+gains the rows below; no existing row changes. This file's own sha256 changes and is recorded at the owner's re-signature in the
+A4a log's header. Harness code (`lib/*.ts`) is not hashed (section 20); `hash-prereg.ts` now also pins the A4a files.
+
+| What | Value |
+|---|---|
+| `evals/ab/arms/workdoo-a4a.json` | `f55409fd7503e9cdc7b38f7a4e5a82e2bfcb0c545e29d3ec39079bc38f47d50a` |
+| `evals/ab/arms/workdoo-a4a.manifest.json` | `f71a220af1bea50708f131aaed837a6196c6580fba1966053869f46d4eaacbff` |
+| `evals/ab/arms/clinic-a4a.json` | `97422feeecc10ab28c660b5a828ded935501a7cc34c17a7e73c19b11df4b6869` |
+| `evals/ab/arms/clinic-a4a.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
+| `evals/ab/schedule-a4a.json` | `1359855622b35d94f55f89ed890f349316064549e83f696ff98a3789d2cf9cc3` |
+| plugin pin (A4a) sha / content hash | `56964ce239aa1a243cda97a9062773c03ad933a4` / `758044c9ea2be27addf805ffba41a31691690fdaf42c10064ed6829efe0ca81c` |

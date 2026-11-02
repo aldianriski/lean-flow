@@ -127,3 +127,13 @@ by the coordinator (a small diff, the same recipe as `deltaVsA1`, nothing above 
 Selftest 75/75 here (Codex's sandbox showed S43 failing on process-tree cleanup, a sandbox limit); tsc clean. Must-FAIL: a
 baseline computed from A1 instead of the comparator reddens S70 alone. Next: Codex review of Amendment 7, then the owner signs.
 review · T4 · self-review (coordinator; diff +103 lines, execution piece, Codex-built) · behaviour:low · governance:low
+
+### 2026-11-02 | review | T4: Codex R1 and R2 on Amendment 7; one Med ruled by the owner; Amendment 7 appended, awaiting signature
+R1 (78.2k Codex tokens): two Med. Item 8 had not reconciled section 18's R-c with the five development runs nor said how a ruling
+reads after tuning on five tasks; item 2 named other-skill calls but no consequence for attribution and missed direct reads. Both
+revised: the runs postdate Amendment 6's recorded hash, a secondary on the eleven untouched tasks is reported; exposure (any other
+Skill call or read of the ten changed files) is measured from the kept streams and, if above zero, the ruling is stated for the
+A4a plugin against the A2 plugin. R2 (42.9k): item 2 closed; one Med left on item 8 (the five tuned tasks still count in the
+decisive ruling). Stop rule reached; owner ruling by popup: the sixteen-task ruling decides, and a ship-eligible A4a whose gain on
+the eleven untouched tasks is below +0.10 is reported "ship-eligible, tuning-sensitive" and does not ship under D6 without the
+owner's ruling. Amendment 7 appended (CRLF); the document's sha256 is recorded at signature.
