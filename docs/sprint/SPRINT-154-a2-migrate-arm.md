@@ -31,7 +31,7 @@ freeze lines · the consumer-docs work (stream codex-pilot, SPRINT-155).
 ## Plan
 
 ### T1 — Set up, freeze and run arm A2, then rule it against A1 `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `evals/ab/` · `docs/research/logs/ab-measurements-a2.md`
+Layers: `evals/ab/` · `evals/ab/setup-arm.ts` · `docs/research/logs/ab-measurements-a2.md`
   · `docs/work/todo/TASK-555-run-arm-a2-on-both-ab-repos-and-record-it-against-a1.md`
   · `docs/work/in_progress/TASK-555-run-arm-a2-on-both-ab-repos-and-record-it-against-a1.md`
   · `docs/work/done/TASK-555-run-arm-a2-on-both-ab-repos-and-record-it-against-a1.md`
@@ -68,8 +68,48 @@ the pre-registered ruling.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/lib/operated-session.ts` · `lib/classifier.ts` · `setup-arm.ts` | T1 | the setup operator: popups and chat requests answered by choosing a frozen entry, never model-written text | med | S64-S68 |
+| `evals/ab/arms/{workdoo,clinic}-a2{,.manifest}.json` · `schedule-a2.json` · `hash-prereg.ts` | T1 | arm A2 frozen and pinned | high | hash-prereg, freeze check |
+| `evals/ab/PREREGISTRATION.md` | T1 | Amendment 6, owner-signed | high | Codex R1+R2 |
+| `evals/ab/analyze.ts` · `lib/analyze.ts` | T1 | combined analysis (several slot files) and symptom differences vs A1 | med | S69 + two must-FAIL seeds |
+| `docs/research/logs/ab-measurements-a2.md` | T1 | A2's log: freeze line, 32 harness rows, § Report 2026-11-02 | — | build-slots, analyze |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Outcome** — 1 of 1 member delivered (TASK-555). A2 was set up through a real `migrate` from the S1 pin on both A1 snapshots,
+frozen, pre-registered (Amendment 6, owner-signed) and run: 32 of 32 slots, 0 infra-lost, VALID on its own slots. A2 scored 78.1%
+against A1 81.2% and A0 89.6%, no gain over A1 (-3.1, interval spans zero), no symptom regression, 0.93x A1's tokens, but below
+the A0 floor: ruled **failed**, owner-signed (`docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02). Under D6, S1 stays
+under [Unreleased]. S3's intake ran while the trials measured and was redirected by its own finding (D11, TASK-573/574).
+
+**Retrieval check** — cross-check held twice and missed once. The combined analysis reproduced S0's signed figures before any A2
+figure was read, and S69's seeds reddened only S69. The miss: the S3 intake first quoted park and FAIL counts from raw log rows,
+voided pilot rows included (A1 "6 of 48"); the built slots gave 3 of 48 and the epic and task were corrected the same day (L-276).
+
+**Cost** — A2 trials 64.81 USD notional, scored (subscription). Setup: ten operator-built clinic sessions plus run 11 and one
+workdoo session. Codex review of the operator and Amendment 6: two rounds, 53k tokens. Owner time: the pilot and full run in the
+owner's terminal, the setup rulings, two signatures.
+
+**Worked**
+- The setup operator: a model only chooses a frozen entry and the text sent is the entry's own words, so setup is reproducible
+  and every label sent was checked verbatim against its transcript.
+- Validity first, then the comparison, each from a command anyone can rerun.
+- Using measurement wait time for intake surfaced the finding that redirected S3.
+
+**Friction**
+- Eleven clinic setup sessions before one completed: each new question shape stopped the operator until a ruling class
+  covered it, and a substring trigger misread a finished summary (fixed with whole words, S67).
+- A start from a plain PowerShell window lost a paid session at grading to a missing `sh` (L-275).
+- The parked sessions' streams were swept with their trial copies, so the cause of the parks needs a fresh run (TASK-573).
+
+**Pattern candidates**
+- L-275 (count 1): a paid start checks its spawn dependencies first; same class as TD-270.
+- L-276 (count 1): split a regression by verdict and cause, on the analysis population, before it admits work.
+
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] maintainer-only entry with the A2 result. Tech debt: TD-283 progress
+(symptom differences vs A1 now printed; the verdict line stays open). Follow-ups: TASK-573 and TASK-574, filed by S3's
+intake (`origin: decomposer`), none new from this Retro. Learnings: L-275, L-276. TASK-555 is in `done/`. No handoff entry was
+taken in this sprint. No release: S1 is held by D6 and the harness is maintainer-only. Retention and the archive move wait for
+the owner's approval.

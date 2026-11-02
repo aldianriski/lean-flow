@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Measured (maintainer-only)** — arm A2 (S1's `migrate` on the 2.x A/B snapshots) scored 78.1% against A1's 81.2% and A0's 89.6%, at 0.93x A1's tokens. It is ruled failed under the pre-registration (below the A0 floor; no gain over A1, no symptom regression), so the S1 entries below stay unreleased (EPIC-023 D6). `evals/ab/`: the setup operator answers `migrate`'s questions from frozen entries, and `analyze.ts` reads several slot files and prints symptom differences against A1.
 - **Fixed** — README Quick start links to the setup guide without repeating its steps; the integrations template names an API contract file only when it exists.
 - **Fixed** — `/lean-doc-generator` templates and `init` guidance state their rules without maintainer-specific ids, names or file references; format examples remain.
 - **Changed** — `/prime` and `/flow` route an unprofiled repo to `/lean-doc-generator init` (no CLAUDE.md, CONTEXT.md or architecture overview) or `migrate` (docs but no `## Stack`): as the next step when nothing is tracked yet, otherwise named beside it. `init` writes an undecided business topic as `Not decided yet (owner, init)`, and its heading keeps `[CUSTOMIZE]` until it is decided (SPRINT-153, TASK-554).

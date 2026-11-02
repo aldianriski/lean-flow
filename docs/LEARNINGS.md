@@ -123,6 +123,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-276 [tags: process] [status: active]: **A regression made of UNKNOWN verdicts is not a regression of what the judge measures, so split it by verdict and cause before admitting work on it.** S0's convention (-10.3) and business (-11.1) regressions admitted S3 as an expertise experiment (EPIC-023 D10). At S3's intake the verdicts behind them showed no more FAILs in A1 than in A0 (convention 1 vs 2, business 0 vs 0, first pass, each measure's own tasks). The deficit was UNKNOWN verdicts (8 vs 3, 4 vs 1): sessions parked at a permission popup (L-272), and judges that could not see enough of the diff. Better briefs cannot fix a park, so the first slice was redirected to the parks (D11, TASK-573). The intake's own first figures were wrong the same way one level down: counted from raw log rows, they included voided pilot rows and tasks outside each measure (A1 parks "6 of 48" against the true 3). The built slots, a second population, caught it before the ruling. Durable form: before a regression admits work, tabulate it as FAIL vs UNKNOWN-by-cause on the analysis population, never on the raw log.
+- seen: 2026-11-02 (SPRINT-154 close; S3 intake, EPIC-023 D11)
+- count: 1
+- promoted: no
+- related: L-274 (read both decision rules) · L-272 (the parks) · L-198 (vary the selection, here raw rows vs built slots)
+
+---
+
+## L-275 [tags: tooling] [status: active]: **The A/B grader runs through `sh`, so a measured start from a plain PowerShell window loses the slot's whole session at grading.** The A2 pilot's first start ran plan, G2, revise and build, then grading failed with `ENOENT ... uv_spawn 'sh'`, because Git's `usr\bin` was not on that terminal's PATH. No row was written, so nothing counted and the next start ran the slot as attempt 1, but a full paid session was spent first. Same class as TD-270 (checkers from a plain PowerShell PATH fail misleadingly): a tool that assumes Git Bash's PATH fails late and far from the cause. Durable form: a start that will spend money checks its spawn dependencies before the first paid step, or its runbook names the PATH line.
+- seen: 2026-11-02 (SPRINT-154 T1, A2 pilot)
+- count: 1
+- promoted: no
+- related: TD-270
+
+---
+
 ## L-274 [tags: process] [status: active]: **An absolute defect rule and a relative regression rule can disagree, and an admission ruling has to read both.** S0's R-b rule judged A1 alone (fail rate at least 20% with a 90% lower bound above 10%) and found no symptom a defect. Section 4's regression test, A1 minus A0, found three regressions (convention -10.3, business -11.1, lost detail -8.3), and A1 sat below the A0 floor. `analyze.ts` prints R-b's verdicts but leaves section 4's thresholds to the reader. The first draft of the report read "no defect, S2 and S3 admit nothing", and the regressions surfaced only when the coordinator applied section 4 by hand. Rule: before ruling admission on a measured run, apply every frozen decision rule to the figures, not just the one that prints a verdict.
 - seen: 2026-11-01 (SPRINT-152 T4, S0 report; owner ruling D10 then admitted S3 on the regressions)
 - count: 1

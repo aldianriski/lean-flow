@@ -101,9 +101,11 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   A0 (no lean-flow docs) and A1 (2.x) measured on both repos; each of the three symptoms recorded as
   *measured defect* or *not reproduced* → TASK-544, TASK-545 ✓ SPRINT-152: all three not reproduced
   (`docs/research/logs/ab-measurements.md` § Report 2026-11-01)
-- [ ] S1: `init`/`migrate` produce a repo profile on both A/B repos and on an unprofiled stack through the
+- [x] S1: `init`/`migrate` produce a repo profile on both A/B repos and on an unprofiled stack through the
   installed plugin; a real 2.x `migrate` keeps every existing decision; arm A2 measured vs A1
-  → TASK-548, TASK-549, TASK-550, TASK-551, TASK-552, TASK-553, TASK-554, TASK-555
+  → TASK-548, TASK-549, TASK-550, TASK-551, TASK-552, TASK-553, TASK-554, TASK-555 ✓ SPRINT-153 (profile, migrate keeps
+  every decision) + SPRINT-154: A2 measured vs A1, ruled **failed** (below the A0 floor; no gain, no regression vs A1), so S1
+  does not ship under D6 (`docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02)
 - [x] S2: not admitted at S0 (D2, D10): symptom 3 not reproduced, and its −8.3-point regression against A0
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a

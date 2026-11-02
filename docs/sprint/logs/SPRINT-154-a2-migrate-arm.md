@@ -182,6 +182,6 @@ A2 78.1% [65.6, 90.6] vs A1 81.2% vs A0 89.6%; gain vs A1 -3.1 [-12.5, +6.3], no
 +3.1 (none below -5); cost 0.93x A1. A2 is below A0, so Amendment 6 item 7 rules it **failed**; the owner signed it by popup.
 Report: `docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02. Under D6, S1 stays under [Unreleased]. Three A2
 slots parked at a popup (temp-dir check scripts, L-272's shape) and are scored; TASK-573/574 (EPIC-023 D11) target them. The
-combined analysis needed `analyze.ts` to read two slot files (`e8f0ff5b`, S69 with two must-FAIL seeds; selftest 74/74).
+combined analysis needed `analyze.ts` to read two slot files (`b4fc8c4b`, S69 with two must-FAIL seeds; selftest 74/74).
 Correction, same day: D11 and TASK-573 first quoted parks and FAIL counts from raw log rows, including voided pilot rows
-(A1 "6 of 48"); recomputed on the analysis population (A1 3 of 48) in `a1877474`.
+(A1 "6 of 48"); recomputed on the analysis population (A1 3 of 48) in `de5a758d`.

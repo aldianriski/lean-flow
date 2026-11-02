@@ -408,6 +408,8 @@ status: current
   - Impact: med. An admission ruling read from the printed verdicts alone would miss a regression.
   - Mitigation (hypothesis, re-derive first): print each symptom's A-minus-A0 difference and the section 4 verdict as computed lines,
     keeping the thresholds as frozen constants pinned by a selftest; a pre-registration amendment for later arms only.
+  - Progress (SPRINT-154): the report now prints each arm's symptom difference against A1 (`b4fc8c4b`, selftest S69), which
+    is Amendment 6's comparator. Still open: the section 4 verdict line, and differences against a comparator other than A1.
 - **TD-282** severity: trivial | status: open | created: Sprint-148 (close-time scoped review of T3/T4, PLAUSIBLE, owner kept the rule)
   - Summary: **Reading the LAST `QA-CHECK:` line (TD-268's fix) can trust a nested line when the run's own verdict never prints.**
     A qa-check run that exits rc 0 after nested fixture output printed `QA-CHECK: 5 pass, 0 fail`, but dies before its own verdict
