@@ -27,14 +27,11 @@ way. The parked sessions' streams are kept in `D:\ab-work\kept\` (an earlier lin
 Owner ruling 2026-11-02: S3's first slice targets these popup stops; S3a's brief fields wait.
 
 ## Done when
-- [ ] Cause named: the kept streams of the parked sessions (`D:\ab-work\kept\`) show the out-of-tree write or prompted command and the
-      design step that led to it, and the skill text or behaviour behind it is quoted (scope-change 2026-11-02, owner ruling). If the cause is not lean-flow text (the model's own default), that is recorded with the stream as
-      evidence, and the fix below is the guidance that counters it.
+- [x] Cause named: the kept streams of the parked sessions (`D:\ab-work\kept\`) show the out-of-tree write or prompted command and the design step that led to it, and the skill text or behaviour behind it is quoted (scope-change 2026-11-02, owner ruling). If the cause is not lean-flow text (the model's own default), that is recorded with the stream as evidence, and the fix below is the guidance that counters it. ✓ 2026-11-02: from the nine kept parked streams: pin-first adds verify-script tests outside the layers, G2 refuses, the revise round promises a throwaway probe "outside the repo", the build writes it to the OS temp folder; no lean-flow sentence names the temp folder (the model's own default), quoted in the SPRINT-156 log
 - [ ] Fixed: the named skill text changed so a verification probe stays inside the working tree, or uses the repo's own test
       runner, and is removed afterwards. The same tasks re-run headless with the fixed plugin, one run each, stop at 0 popups;
       streams kept.
-- [ ] Consumer surface: CHANGELOG `[Unreleased]` entry (unversioned until its arm passes, D6); README only if a
-      user-visible behaviour changes.
+- [x] Consumer surface: CHANGELOG `[Unreleased]` entry (unversioned until its arm passes, D6); README only if a user-visible behaviour changes. ✓ 2026-11-02: CHANGELOG [Unreleased] Changed line for `/orchestrator` (`ca13d54e`); README unchanged, no user-visible mode change
 
 ## Touches
 the skill(s) the diagnosis names (`skills/**`) · CHANGELOG.md · evidence under `docs/research/` (streams summarised, never

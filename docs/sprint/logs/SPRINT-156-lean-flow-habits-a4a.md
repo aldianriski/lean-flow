@@ -68,3 +68,18 @@ builder-check · T4 · 2 contradictions · 3 questions · settled: cost ratio vs
 ### 2026-11-02 | progress | batch G1 and G2 signed for T1, T2, T4 (owner, by popup) at 7f770538
 G1 by fast-path (origin decomposer; the scope moved only by the two owner-ruled scope-changes). G2 on the settled designs.
 Order: T1, then T2 (shared `skills/` and `CHANGELOG.md`), then the five development re-runs, then T4.
+
+### 2026-11-02 | progress | T1: cause named from the kept streams (box 1); rule landed in orchestrator/SKILL.md (box 3 CHANGELOG)
+Evidence, all nine parked sessions' kept streams (six scored, three voided A1 pilot attempts). Each scored park follows one chain.
+Phase 1's design adds assertions to `scripts/verify-*.mjs`, from SKILL.md's "a change to working behaviour opens with its pin".
+G2's scope check refuses it (outside the task's layers). The revise round drops the tests and writes, in its own words, "The
+evidence will come from a throwaway script I run from the OS temp folder, outside the repo" (iso-cs4n9X) and "I'll check the rule
+with a throwaway HTTP probe ... The probe lives in the OS temp folder and is never committed" (iso-XlJw7m). The build then says
+"Next is the out-of-repo probe for the new rule" (iso-XlJw7m) and writes `probe.mjs`/`check.mjs`/`check.ts` to `%TEMP%`, or a
+`mktemp -d` heredoc (iso-mBpUkJ), and the CLI's permission prompt parks the run. No lean-flow sentence names the temp folder: the
+SKILL.md Reachability rule ends at "the criterion stays a judgment tick and says so", and the build is told to touch only its
+`Files:` list, so the model's own default puts the probe outside the repo (the box's "model's own default" branch). Fix
+(`ca13d54e`): that Reachability line now says evidence comes from the repo's existing runners first and a throwaway probe lives
+inside the working tree, deleted before the report, never in a system temp dir; SKILL.md stays at 140 lines, density baseline
+unchanged (13). CHANGELOG [Unreleased] carries it. Box 2 waits for the shared re-run batch after T2.
+consequence · T1 · behaviour:material · governance:low
