@@ -662,3 +662,81 @@ A4a log's header. Harness code (`lib/*.ts`) is not hashed (section 20); `hash-pr
 | `evals/ab/arms/clinic-a4a.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
 | `evals/ab/schedule-a4a.json` | `1359855622b35d94f55f89ed890f349316064549e83f696ff98a3789d2cf9cc3` |
 | plugin pin (A4a) sha / content hash | `56964ce239aa1a243cda97a9062773c03ad933a4` / `758044c9ea2be27addf805ffba41a31691690fdaf42c10064ed6829efe0ca81c` |
+
+## Amendment 8 (2026-11-02, two workers for later arms and arm A4b, before any A4b trial)
+
+What changed:
+
+- **1. Two workers from arm A4b on.** `run-baseline.ts --workers 2` runs up to two slots at once inside one driver, under its one
+  lock and one log (SPRINT-158 T1, TASK-582, `15012173`). Slots are dispatched in schedule order, so section 2's "execution order"
+  is the dispatch order; rows are appended as trials finish. A stop (a usage limit, an owner-ruling exit, three consecutive infra
+  attempts, the pilot) starts no further slot; a trial already running finishes and records its row, scored by the unchanged
+  rules. Section 18's "consecutive ... in run order" counts infra attempts in the order they finish. The pilot (Amendment 6 item
+  4) still stops the run before any non-pilot slot starts, and a pilot slot that ends without a scored attempt stops it for an
+  owner ruling (exit 12) before any non-pilot slot, as the serial three-infra abort would. The 45-minute limit, provisioning outside it, the retry limits, the
+  classification and the scoring of every exit are unchanged; a trial that shares the PC runs slower, inside the same limit.
+  Earlier arms (A0, A1, A2, A4a) stay as measured at one worker. Capacity check, disclosed: before this amendment, 4 slots of
+  A4a's arms and pin (workdoo access-activity-type-filter and clinic patient-cancel-all, trials 1 and 2) ran at two workers into a
+  scratch log that no analysis reads; all 4 ended `ok` and passed, as in A4a's serial trials of the same slots, with no timeout,
+  no infra attempt and the pilot stop holding (owner accepted, 2026-11-02). They are not A4a trials and contribute no row.
+- **2. Arm A4b.** Two new measured arms, `workdoo-a4b` and `clinic-a4b` (`evals/ab/arms/<repo>-a4b.json`). Their snapshots are
+  A2's, unchanged (`D:\Research\ab-arm-<repo>-a2`), checked by `<repo>-a4b.manifest.json`, a byte copy of the A4a manifest (itself
+  a byte copy of A2's). Only the plugin differs: lean-flow at `c10eeb8fcebf0153d1c4773968c6fb16e04c7099`, content hash
+  `6389b7c11b37a38d58cce6ddd1f0fb0b979f49e0b4ce46686796fde8ebf174a5`, a clone in `D:\Research\ab-pins\lean-flow-158-c10eeb8f`,
+  loaded by `--plugin-dir` in an isolated config with no user plugins, as at A4a. No setup runs.
+- **3. The treatment.** Against A4a's pin (`56964ce2`) exactly one plugin file differs, `skills/orchestrator/SKILL.md`, with three
+  edits under test (EPIC-023 D14 and D15; SPRINT-158 T2 to T4, TASK-583, TASK-584 and TASK-585):
+  - every boundary report carries a `Progress:` line after its verdict (sprint members done, epic conditions ticked, a running
+    job's done/total and ETA);
+  - in every mode, before the report, anything a check created in the working tree is removed unless the task's declared files
+    include it, and what the repo's own tests leave outside the working tree is named in the report, never deleted;
+  - G2 gains a business-facts box: the design reads the repo's stated business facts first, names each one the change touches and
+    how it honours it, and where a fact and the neighbouring code disagree, the fact wins.
+  The same file also joins two pairs of lines of its continuation-contract paragraph with no word changed (to stay within its
+  140-line cap) and renumbers one task id. With one file differing, A4a's exposure measure (Amendment 7 item 2) does not apply:
+  the ruling is stated as the effect of these edits.
+- **4. Schedule.** `evals/ab/schedule-a4b.json`: `schedule-a4a.json` with each arm renamed to A4b, same order, checked slot by
+  slot: 2 repos x 8 tasks x k = 2 = 32 slots. Amendment 6 item 4's pilot applies (its 2 slots run together at two workers).
+- **5. Log.** A4b rows go to `docs/research/logs/ab-measurements-a4b.md`, whose header carries A4b's own freeze line (it carries
+  over nothing). The S0, A2 and A4a logs stay closed.
+- **6. Validity first.** A4b must pass section 11's run-validity rule on its own 32 slots before any comparison; a run that is
+  INVALID or FAILED there gets no ruling.
+- **7. Comparison and ruling, by non-inferiority.** A4b is compared with A4a on the combined slot data (S0's A0 and A1, A2's, A4a's
+  and A4b's, all first pass), `analyze.ts --comparator A4A`, "Delta vs A4A": the difference is the pooled primary of A4b minus A4a
+  with its 90% task-bootstrap interval. A gain rule cannot be used: A4a scores 90.6%, so no arm can gain more than +9.4 points
+  over it, under Amendment 7's +0.10 (L-279). The never-worse-than-A0 floor (section 8) applies, and the cost ceiling stays 2.0x
+  A1 (section 9). A symptom regresses when A4b minus A4a is below -0.05. The ruling is:
+  - **ship-eligible**: the interval's lower end is above -0.05, no symptom regresses, A4b is not below A0, and its cost is within
+    2.0x A1;
+  - **failed**: a symptom regresses, or A4b is below A0, or its cost exceeds 2.0x A1, or the interval's upper end is below -0.05;
+  - **inconclusive**: otherwise.
+  Reported beside it, deciding nothing: the business and scope symptoms of A4b minus A4a (the measures the edits target) and the
+  park rate, the share of A4b's 32 scored slots whose exit is `parked:`, beside A4a's 1 of 32.
+- **8. Development runs, disclosed.** Before this amendment, development runs used earlier builds of the treatment (plugin pins
+  `11c768c3` and `a9b7097f`) on research copies of the A2 snapshots (`D:\Research\dev156\`): workdoo invitation-issued-by,
+  self-onboarding-guard (twice) and reissue-invitation, and clinic appointment-lookup, into a scratch log that no analysis reads;
+  and one headless run of the changed skill on lean-flow's own repository, not an A/B repo. Section 18's R-c is not breached: they
+  ran after Amendment 7's hash was recorded, under its freeze line. They are not A4b trials and contribute no row. On the twelve
+  tasks no development run touched, A4a passed all 24 slots, so a gain cannot show there; the labelled secondary looks for harm
+  instead and decides nothing: A4b minus A4a on those twelve tasks. Its use is predeclared: if A4b is ship-eligible while that
+  point difference is below -0.05 (two or more of the 24 slots lost), the ruling is reported as **ship-eligible, untouched-task
+  regression**, and A4b does not ship under EPIC-023 D6 without the owner's ruling.
+
+Why: EPIC-023 D14 tests related fixes as one bundle with one arm, run unattended after its pilot; D15 makes A4a the base and the
+comparator for the next bundle; L-279 checks a predeclared bar against the comparator's ceiling before it is frozen. Two workers
+take about a quarter off an arm's wall time (the capacity check: 4 slots in 13 minutes against about 17 serially).
+
+No other rule changed: the endpoints, thresholds, task corpus, the A0, A1, A2 and A4a arms, the allow-list, models, judges and
+their prompts, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen.
+Section 19 gains the rows below; no existing row changes. This file's own sha256 changes and is recorded at the owner's
+re-signature in the A4b log's header. Harness code (`lib/*.ts`, `run-baseline.ts`) is not hashed (section 20); `hash-prereg.ts`
+now also pins the A4b files.
+
+| What | Value |
+|---|---|
+| `evals/ab/arms/workdoo-a4b.json` | `92f77e9015b9c46d9b8c4cc252ca751b531327ffb5ee88ff7b5e36bd050152e5` |
+| `evals/ab/arms/workdoo-a4b.manifest.json` | `f71a220af1bea50708f131aaed837a6196c6580fba1966053869f46d4eaacbff` |
+| `evals/ab/arms/clinic-a4b.json` | `4571dace24eefe27ce5294fba9664bc35602effd9d7577237714bde560c57cb6` |
+| `evals/ab/arms/clinic-a4b.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
+| `evals/ab/schedule-a4b.json` | `16ad90fb54321afa9e5d747b723e6a4f629d2f8256ff9fbdc4b3cd04329e0762` |
+| plugin pin (A4b) sha / content hash | `c10eeb8fcebf0153d1c4773968c6fb16e04c7099` / `6389b7c11b37a38d58cce6ddd1f0fb0b979f49e0b4ce46686796fde8ebf174a5` |
