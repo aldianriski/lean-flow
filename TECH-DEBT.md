@@ -391,6 +391,17 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-285** severity: medium | status: open | created: Sprint-155 (close system verify)
+  - Summary: **`check-sprint-by-reference.ts` can read another sprint's log as a baseline, so an append-only log reports
+    `LOG-REWRITTEN`.** `logPaths` takes every path `git log --follow` gives for the log, and `--follow`'s rename guess can
+    link two sprint logs that share the template header. `fileAt` then returns the first known path in the tree, which at
+    SPRINT-155's `plan_commit` was SPRINT-154's log. It only fires when a baseline read is needed (a Done-when change), so it
+    surfaced when a tick's evidence ran onto continuation lines.
+  - Evidence: SPRINT-155 close, VPS gate at `16f28eaa` (352/2); an instrumented copy showed the baseline text starting
+    `# SPRINT-154 — Execution Log`; the log diff since `2ea2af75` is a pure append.
+  - Impact: med. A freeze-edit that a scope-change entry covers would still fail, and the finding names the wrong cause.
+  - Mitigation (hypothesis, re-derive first): resolve the baseline log by the sprint's own basename (or its frontmatter `sprint:`)
+    before the `--follow` set, or drop `--follow` for logs; a must-FAIL fixture with two template-identical logs.
 - **TD-284** severity: medium | status: open | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
   - Summary: **A finished A/B trial keeps no record of its post-run file list, so a changed manifest rule cannot be re-applied to it.**
     `lib/isolate.ts` deletes the trial copy once the row is appended and keeps only the `stream*.jsonl` transcripts. When Amendment 5

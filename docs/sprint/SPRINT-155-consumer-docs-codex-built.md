@@ -177,7 +177,7 @@ SPRINT-154's sitting and the popup rulings.
 - L-277 (count 1): an interactive session can prefer the installed copy of a plugin over `--plugin-dir`; prove a checkout's
   behaviour headless, or with the installed copy disabled.
 
-**Buckets routed** — Shipped: CHANGELOG [Unreleased] already carries T1 and T2 (Fixed). Tech debt: none new. Follow-ups: none
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] already carries T1 and T2 (Fixed). Tech debt: TD-285 (the members check can read another sprint's log as its baseline, found at this close's system verify). Follow-ups: none
 new. Learnings: L-277. Every member is in `done/`. No handoff entry was taken in this sprint. No release: the changes stay under
 [Unreleased] with S1's (EPIC-023 D6). The owner rules on Codex as the default builder from the table above. Retention and the
 archive move wait for the owner's approval.
