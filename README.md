@@ -191,11 +191,11 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **orient** | `/prime` | session start — ordered context load + health check (incl. whether the installed skills match the repo) |
 | **plan** | `/lean-doc-generator` | docs / ADRs / sprint promote + close (WHY & WHERE only) — **ships its own templates + standard** |
 | | `/task-decomposer` | intent / ticket / PRD → `TASK-NNN` backlog entries (tracer-bullet slices; or a **fog-map** for foggy work too big to plan) |
-| | `/triage` | re-prioritise + state the backlog; route rejects to `.out-of-scope/` |
+| | `/triage` | re-prioritise + state the backlog; route rejects to `.out-of-scope/`; file a reported bug as a `type: bug` work item |
 | **build** | `/orchestrator` | gate-driven execution — `quick` · `mvp` · `sprint-bulk` · `overnight` |
 | | `/prototype` | throwaway code to answer one design question (logic TUI / web UI variants / customer-review demo) |
 | | `/tdd` | build NEW behaviour test-first — vertical-slice red-green-refactor |
-| **maintain** | `/diagnose` | 6-phase systematic debugging with a regression test |
+| **maintain** | `/diagnose` | 6-phase systematic debugging with a regression test; writes the root cause, fix and regression test into the bug item |
 | | `/refactor-advisor` | find shallow→deep refactors (seams · deletion test) and design them |
 | **ship** | `/release-patch` | manifest-detect PATCH bump + changelog; stops before push |
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |

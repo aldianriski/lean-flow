@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — work items carry an optional `type:` (feature, bug or debt), and a reported bug becomes a `type: bug` work item that carries its repro, evidence and root cause instead of a temp-only report; evidence for any item lives in `docs/work/evidence/TASK-NNN/`, and business facts get a placed `docs/product/business-notes.md` (spec 0.19.0, ADR-056).
 - **Added (maintainer-only)** — `evals/ab/run-dev.ts` runs a batch of development trials in parallel (`--workers N`, default 3), each slot with its own scratch log, and prints one result line per slot (EPIC-023 D16).
 - **Changed (maintainer-only)** — `evals/ab/run-baseline.ts --workers N` runs up to N A/B trials at once under one driver, lock and log (default 1, unchanged); a stop lets running trials finish, and the pilot still stops before any other slot. The stale-workspace sweep now keeps a directory whose owning driver is alive, so a second driver no longer deletes a running trial.
 - **Changed** — `/orchestrator` G2: a design names each stated business fact its change touches (requirements, business notes, the repo profile's business topics) and how it honours it; where a fact and the neighbouring code disagree, the fact wins.

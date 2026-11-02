@@ -37,6 +37,7 @@ The layout check has already refused a tree with `TODO.md` in it, so `TODO.md` i
 ---
 id: TASK-042
 title: "<verb-first title, full prose>"
+type: feature            # optional — feature (default when absent) | bug | debt (ADR-056)
 epic: EPIC-NNN            # only when the work advances an epic; omit otherwise
 priority: P2              # P0–P3 initial tier; /triage re-ranks later
 size: S | M | L
@@ -77,6 +78,8 @@ gates_signed: G1,G2 @ 1a2b3c4d     # optional — written by /orchestrator, neve
 ```
 
 - **No `status:` field, no `sprint:`.** The folder is the status; `sprint:` is stamped at promote.
+- **`type:` shapes the body.** A `bug` item adds the bug sections from the bug template (symptom, repro, expected, actual,
+  evidence; root cause, fix, regression test and prevention after `/diagnose`); a `debt` item cites its `TD-NNN`.
 - **Readiness is `state:`, never a folder.** A `blocked` or `needs-info` task stays in `backlog/`;
   a `blocked` task names its blocker in `depends-on:` or a `blocked-by:` line.
 - `assumes:` from the registry → `## Assumes` lines; the done-when → `## Done when` checkboxes;

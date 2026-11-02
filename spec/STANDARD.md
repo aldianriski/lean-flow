@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-31
+last_updated: 2026-11-02
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.18.2
+version: 0.19.0
 status: current
 ---
 
@@ -129,6 +129,7 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 |---|---|---|---|---|---|
 | `product/requirements.md` | base | Dev / PM | 150 soft | init, or first sanitized PRD lands, or `migrate` adds the profile — **on an existing repo whose AI-context files already ARE the spec** (`CONTEXT.md` carries the behaviour, `CLAUDE.md` the principles + DoD) it **cites** them topic by topic and never copies them: a third copy is a second SSOT. Greenfield `init` is unaffected — nothing owns the content yet | a requirement is approved / changed (via PR) |
 | `product/acceptance-criteria.md` | base | Dev / QA | 120 soft | with requirements | acceptance criteria change |
+| `product/business-notes.md` *(was `BUSINESS-NOTES.md`)* (created lazily; an adopter's root file is accepted where it is) | as needed | Dev / AI | 150 soft | the owner states business facts the code must honour (init's business evidence, or the first fact a design names) | a stated fact changes; a design reads it before naming the facts its change touches (ADR-056) |
 | `architecture/overview.md` *(was `docs/ARCHITECTURE.md`)* | base | Tech lead | 150 | init (always) | major structural change |
 | `architecture/data-flow.md` | backend, or overview cap-split | Dev | 120 | a non-trivial data path exists | that flow changes |
 | `architecture/authentication.md` | auth exists | Dev | 120 | auth is introduced | authn/authz architecture changes |
@@ -149,13 +150,14 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 | `flows/<slug>.md` (Mermaid) | medium+ | Dev | 100 each | a flow needs shared understanding | that flow changes |
 | `epic/EPIC-NNN-<slug>.md` + `epic/INDEX.md` (created lazily) | lean loop | Team / AI | 200 soft | a **multi-sprint** outcome is named — one sprint's worth of work is a sprint, and an unnameable destination is fog (`--fog`) until it isn't | a member sprint closes, or a decision changes the outcome |
 | `product/roadmap.md` *(was `docs/roadmap.md`)* (created lazily; scoped row plans in `product/roadmap/<row>.md` are free-form) | as needed | Dev / PM | 150 soft | a delivery sequence spanning ≥ 2 sprints or epics is planned | a row changes status or is re-sequenced |
-| `work/<status>/TASK-NNN-<slug>.md` — the **work-item store**, one file per task (schema: `work/README.md`) | lean loop | Dev / AI | no container cap — one file per task, so nothing accumulates | lean loop — work is tracked in-repo: the first task file is written (`/task-decomposer` · `/triage`), or `migrate` converts a v1 `TODO.md` | status = the folder (`backlog · todo · in_progress · review · done · cancel`), changed by a `git mv` in its own commit; title = the filename; membership = `sprint:` / `epic:` frontmatter (ADR-045) → §11 prune of `done/` · `cancel/` |
+| `work/<status>/TASK-NNN-<slug>.md` — the **work-item store**, one file per task, typed by an optional `type:` of feature, bug or debt (absent = feature; a `bug` item carries its repro, evidence and root cause, a `debt` item cites its `TD-NNN`; ADR-056) (schema: `work/README.md`) | lean loop | Dev / AI | no container cap — one file per task, so nothing accumulates | lean loop — work is tracked in-repo: the first task file is written (`/task-decomposer` · `/triage`), or `migrate` converts a v1 `TODO.md` | status = the folder (`backlog · todo · in_progress · review · done · cancel`), changed by a `git mv` in its own commit; title = the filename; membership = `sprint:` / `epic:` frontmatter (ADR-045) → §11 prune of `done/` · `cancel/` |
+| `work/evidence/TASK-NNN/` — evidence for one work item, any type (a bug's repro, a task's verification captures) | lean loop | Dev / AI | no cap — one folder per item | the first evidence an item needs, written by the skill that captures it (`/triage` · `/diagnose` · a verification step) | linked from its item; **redacted before commit**; never moved by a status change; owes no §3 header; never a `.log` file (S12); counts as history, never a live citation (§11) — pruned with its item (ADR-056) |
 | `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | Files Changed · Retro during sprint (Plan frozen at promote; DoD ticks land in the member task files, §9) → §11 archive |
 | `sprint/logs/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | append-only | lazily, at the first Execution Log entry | every Execution Log entry → §11 archive with its sprint. **Must live in the `logs/` subdirectory**: the sprint-file checks glob `docs/sprint/SPRINT-*.md`, which is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 400 and schema-checked as a Plan (ADR-014) |
 | `LEARNINGS.md` | lean loop | Team / AI | append-only | first confirmed learning | close confirms · promote collapses (§11) |
 | `research/<slug>.md` | as needed | Team / AI | 130 soft (ADR-020) | a decision-driving question | question revisited · verdict changes; a verdict a decision has been built on is marked `status: superseded` rather than edited → §11 archive once nothing live cites it. **`status: superseded` ⇒ FROZEN, and the cap does not apply** (ADR-020): the only content that can still legally grow on a spent verdict is the annotation recording *why* it is spent, so a cap here measures the supersession trail and asks you to delete it. It exits via §11 archive, never via a diet |
 | `research/logs/<slug>.md` | as needed | Team / AI | append-only | a research question accretes a **second measurement round** — created lazily, never pre-created (**placement rule only, no template**: it is the decision doc's appendix — carry the same frontmatter with `id: <slug>-log` and `status: active`, then append one `## Round N — <question> (<source>, <date>)` section per measurement) | every round appended → §11 archive with its decision doc. **Must live in the `logs/` subdirectory**: the cap check derives its glob from this table's File cell and `docs/research/*.md` is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 120 and schema-checked as a decision doc (the ADR-014 mechanism, applied to research — SPRINT-062 T1). **Never a `related:` id** — the index globs `docs/research/*.md` non-recursively too, so naming it would dangle the corpus-ref check; link it from the body |
-| `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported — **written to the OS temp dir, never committed** (see the temp-dir note below) | routed away at `/triage`; the file is intake scaffolding, so once its content lands in a `TASK-NNN` / `TD-NNN` / `/diagnose` run there is nothing to retain and no §11 row to reach |
+| `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported — its intake now goes straight into a `type: bug` work item (ADR-056); a `BUG-<slug>.md`, if written at all, is **written to the OS temp dir, never committed** (see the temp-dir note below) | routed away at `/triage`; the file is intake scaffolding, so once its content lands in a `TASK-NNN` / `TD-NNN` / `/diagnose` run there is nothing to retain and no §11 row to reach |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`; tree docs use a flattened name
 (`architecture-overview.md.template` · `database-erd.md.template` · …).
@@ -221,7 +223,8 @@ ceiling on the doc *set*.
 **working feature PRD** `/task-decomposer` synthesizes) are never referenced from durable docs — copy
 to `docs/research/` (verdicts) before citing. They are intake or hand-off scaffolding: their substance
 moves into a durable artifact (a `TASK-NNN` · `TD-NNN` · a regression test · `docs/product/requirements.md`)
-and the scaffolding itself is simply gone. **This is why §11 has no row for either** — retention acts on
+and the scaffolding itself is simply gone. A reported bug no longer needs the scaffolding at all: `/triage` writes its intake into a
+`type: bug` work item, which `/diagnose` completes (ADR-056). **This is why §11 has no row for either** — retention acts on
 committed files, and neither is ever committed. Absence there is the rule, not a gap in it.
 
 ¹ **README is the full front-door** — the complete overview of the repo. Don't truncate it to hit a
@@ -776,7 +779,7 @@ them**. Append-only is preserved *inside* each archive file.
 **Live citation (task files only).** A live citation is an open task's `depends-on:`, an active sprint's
 `## Members`, or the task id as a whole word (`TASK-357`, never the prefix of `TASK-3570`; a zero-padded id
 counts by number) in any tracked `.md` file that is not **history**. History is the closed task files
-themselves (`docs/work/done/`, `docs/work/cancel/`), every `archive/` directory (`docs/sprint/archive/`,
+themselves (`docs/work/done/`, `docs/work/cancel/`) and their evidence (`docs/work/evidence/`, ADR-056), every `archive/` directory (`docs/sprint/archive/`,
 `docs/epic/archive/`, `docs/research/archive/`), `docs/changelog/`, root `CHANGELOG.md`, `docs/adr/`,
 `docs/LEARNINGS.md`, `TECH-DEBT.md`, the archive indexes `docs/sprint/INDEX.md` and `docs/epic/INDEX.md`, and
 the generated `docs/knowledge-index.md` (matched case-insensitively); a worktree copy under
@@ -854,7 +857,8 @@ clears the boundary on content, not format — a well-formatted secret is still 
 `build/`, `coverage/`, `.cache/`, `*.log`, `.DS_Store`, `Thumbs.db`, IDE dirs (`.idea/` + personal
 `.vscode/settings.json` — shared `.vscode/extensions.json` MAY be committed). Rule: **anything
 reproducible by a command stays out**; the only exceptions are artifacts a deployment/distribution
-process actually requires.
+process actually requires, and **evidence** under `docs/work/evidence/TASK-NNN/`: a capture of what was observed at one
+moment (a defect's screenshot, a verification run as it was reviewed) is a record, not a build product (ADR-056).
 
 **d. The clean separation:**
 

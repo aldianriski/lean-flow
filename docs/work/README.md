@@ -42,8 +42,8 @@ Vocabulary adopted verbatim from `kerjaan` (EPIC-017 "Reference adopted").
 
 ## Frontmatter fields
 
-`id · title · epic · sprint · priority · size · risk · autonomy · class · tier · authority ·
-origin · state · depends-on · gates_signed`. `sprint:` / `epic:` may be absent (a plain backlog file usually has
+`id · title · type · epic · sprint · priority · size · risk · autonomy · class · tier · authority ·
+origin · state · depends-on · gates_signed`. `type:` is optional: `feature` (the default when absent), `bug` or `debt` (ADR-056). `sprint:` / `epic:` may be absent (a plain backlog file usually has
 neither); `gates_signed:` is optional too — `<GATE>[,<GATE>] @ <sha>` (a `YYYY-MM-DD` date only in a repo without git), the owner's G1/G2 sign-off for work done without a sprint. Absent means NOT signed, never approval.
 
 ## Membership
@@ -60,6 +60,18 @@ sprint's subtree instead of staying one glob (ADR-045 D1).
 
 `## Why` (optional) · `## Approved design` (optional) · `## Done when` · `## Amended <date>` (optional) · `## Touches` ·
 `## Assumes` · `## Tracker`.
+
+## Bug and debt items
+
+A `type: bug` item also carries the bug template's sections: symptom, repro, expected, actual and evidence (the intake,
+written by `/triage`), then root cause, fix, regression test and prevention (written by `/diagnose`). A `type: debt` item
+cites its `TD-NNN` from `TECH-DEBT.md`.
+
+## Evidence
+
+`docs/work/evidence/TASK-NNN/` holds the evidence for one item of any type (a bug's repro, a task's verification captures),
+linked from the item. It is redacted before commit (no auth headers, tokens or secrets), never moved by a status change, owes
+no ownership header, and never holds a `.log` file. A skill creates it the first time an item needs it (ADR-056).
 
 ## `## Assumes` conventions
 

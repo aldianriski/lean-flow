@@ -982,6 +982,14 @@ v2_old_task() {
 }
 d="$work/v2-prune"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 010 SPRINT-880
 assert_finding "v2-closed-task-past-retention" "$d" "closed-task-past-retention: docs/work/done/TASK-010-old.md"
+# Evidence is history, even when it is the only tracked citation of its own task.
+mkdir -p "$d/docs/work/evidence/TASK-010"
+printf 'Evidence for TASK-010.\n' > "$d/docs/work/evidence/TASK-010/note.md"
+git -C "$d" add docs/work/evidence/TASK-010/note.md
+assert_finding "v2-closed-task-past-retention-evidence-only" "$d" "closed-task-past-retention: docs/work/done/TASK-010-old.md"
+# An open task BODY citation still retains the same closed task (no depends-on edge).
+printf '\nFollow-up to TASK-010.\n' >> "$d/$T902"
+assert_absent "v2-closed-task-past-retention-control-open-body" "$d" "closed-task-past-retention: docs/work/done/TASK-010-old.md"
 d="$work/v2-prune-cancel"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" cancel 011 SPRINT-880   # SELECTION: the other folder
 assert_finding "v2-closed-task-past-retention-cancel-folder" "$d" "closed-task-past-retention: docs/work/cancel/TASK-011-old.md"
 d="$work/v2-prune-boundary"; mkdir -p "$d"; v2_repo "$d" log; v2_old_task "$d" done 012 SPRINT-898     # exactly the spec's delay

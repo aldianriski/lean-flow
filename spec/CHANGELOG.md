@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-31
+last_updated: 2026-11-02
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,19 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.19.0 — 2026-11-02
+
+**MINOR (§15): work items carry an optional `type:` (feature, bug or debt), and a bug becomes a work item with its evidence
+and root cause (ADR-056).** §2 adds a `work/evidence/TASK-NNN/` row (evidence for any item, redacted, no §3 header, never a
+`.log`) and a `product/business-notes.md` row (legacy `BUSINESS-NOTES.md` at the root); evidence counts as §11 history and §12c names
+it a record, not a build product; the work-store row
+names the types; the `BUG-<slug>.md` row and the temp-dir note say a reported bug now goes straight into a `type: bug` item.
+§15's test (could a repository that conformed now fail?): only through the new placed basename `business-notes.md` if such a
+file sits elsewhere, so MINOR. Consumer evidence: SPRINT-159's adopter audit (`docs/research/adopter-folder-audit.md`). Owner
+rulings 2026-11-02 (SPRINT-159 intake and G2; TASK-591).
+
+Rule ids, levels, marks and the `evals/fixtures/compat/` snapshot are untouched (ADR-034); `S2.R-TEMPDIR` is unchanged.
 
 ## 0.18.2 — 2026-10-31
 

@@ -178,23 +178,29 @@ mk_store() {   # <dir> -- one clean, headed doc plus the header-less task files 
   done
 }
 d="$work/store-exempt"; mk_store "$d"
+mkdir -p "$d/docs/work/evidence/TASK-1"
+printf '# supporting evidence without a header\n' > "$d/docs/work/evidence/TASK-1/note.md"
 out=$(sh "$engine" "$d" --spec "$own_spec" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -qE '^FAIL +(ownership-header|update-trigger|owner-not)'; then
-  echo "PASS fixture(store-task-files-exempt): a header-less task file in each of the six status folders raised no ownership finding, exit 0"
+  echo "PASS fixture(store-task-files-exempt): six header-less task files and docs/work/evidence/TASK-1/note.md raised no ownership finding, exit 0"
 else
-  echo "FAIL fixture(store-task-files-exempt): expected exit 0 and no ownership finding on six header-less docs/work/<status>/TASK-*.md -- got exit $rc:"
+  echo "FAIL fixture(store-task-files-exempt): expected exit 0 and no ownership finding on task files or evidence -- got exit $rc:"
   printf '%s\n' "$out" | grep -E '^FAIL '; fail=1
 fi
 # the exemption does not touch the count of docs actually carrying a header
 if printf '%s\n' "$out" | grep -q 'all 1 doc(s) carry a complete ownership header'; then
-  echo "PASS fixture(store-task-files-exempt-control-count): only the 1 headed doc is counted -- the six task files left the swept set, not the report"
+  echo "PASS fixture(store-task-files-exempt-control-count): only the 1 headed doc is counted -- task files and evidence left the swept set, not the report"
 else
   echo "FAIL fixture(store-task-files-exempt-control-count): expected 'all 1 doc(s) carry a complete ownership header' -- got:"
   printf '%s\n' "$out" | grep -E 'S1\.LAW3|S3\.SCHEMA'; fail=1
 fi
-# SELECTION: a non-task doc under docs/work/ (its README) is a doc like any other.
-d="$work/store-readme"; mk_store "$d"; printf '# work store README with no header\n' > "$d/docs/work/README.md"
-run_case_anywhere "store-non-task-doc-still-checked" 1 "ownership-header-missing: docs/work/README.md" -- \
+# SELECTION: a non-task doc under docs/work/ is a doc like any other.
+run_case_anywhere "evidence-root-doc-still-checked" 1 "ownership-header-missing: docs/work/evidence/policy.md" -- \
+  sh "$engine" "$fx/evidence-root" --spec "$own_spec"
+run_case_anywhere "evidence-unrelated-folder-still-checked" 1 "ownership-header-missing: docs/work/evidence/unrelated/design.md" -- \
+  sh "$engine" "$fx/evidence-unrelated" --spec "$own_spec"
+d="$work/store-other"; mk_store "$d"; printf '# other doc with no header\n' > "$d/docs/work/other.md"
+run_case_anywhere "store-non-task-doc-still-checked" 1 "ownership-header-missing: docs/work/other.md" -- \
   sh "$engine" "$d" --spec "$own_spec"
 # SELECTION: the other glob arm -- a non-TASK file INSIDE a status folder.
 d="$work/store-notes"; mk_store "$d"; printf '# scratch notes\n' > "$d/docs/work/done/NOTES.md"

@@ -131,7 +131,7 @@ One file per task, `docs/work/<status>/TASK-NNN-<slug>.md` — status is the fol
 ```
 ---
 id: TASK-NNN
-title: "<verb-first title>"
+title: "<verb-first title>"   type: feature|bug|debt   # optional, absent = feature (ADR-056)
 epic: EPIC-NNN · sprint: SPRINT-NNN   # each only when set (sprint by promote)
 priority: P0-P3 · size: S|M|L · risk: low|med|high · autonomy: HITL|AFK · tier: G|X|P
 class:     decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)

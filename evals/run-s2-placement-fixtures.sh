@@ -204,6 +204,34 @@ else
 fi
 
 # --- PASS control ---------------------------------------------------------------------------------
+# Exercise the coordinator's new row in a derived spec until it lands in the real STANDARD.
+# Once present upstream, use that row unchanged rather than inserting a duplicate.
+business_spec="$work/spec-business.md"
+if grep -q '^| `product/business-notes.md`' "$s2_spec"; then
+  cp "$s2_spec" "$business_spec"
+else
+  awk '{ print } /^\| `product\/requirements.md`/ {
+    print "| `product/business-notes.md` *(was `BUSINESS-NOTES.md`)* | as needed | PM | 150 soft | business notes exist | business decisions change |"
+  }' "$s2_spec" > "$business_spec"
+fi
+business="$work/business-legacy"
+build_conformant "$business"
+printf '# Legacy business notes\n' > "$business/BUSINESS-NOTES.md"
+[ ! -e "$business/docs/product/business-notes.md" ] || { echo "FAIL harness: canonical business notes unexpectedly exist"; exit 2; }
+out=$(sh "$engine" "$business" --spec "$business_spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'file-outside-canonical-placement' &&
+   printf '%s\n' "$out" | grep -q 'BUSINESS-NOTES.md.*matched second'; then
+  echo "PASS fixture(repo-root-business-legacy): root legacy path is matched second without a placement finding"
+else
+  echo "FAIL fixture(repo-root-business-legacy): expected a named root legacy match and no placement finding"
+  printf '%s\n' "$out"; fail=1
+fi
+rm "$business/BUSINESS-NOTES.md"
+mkdir -p "$business/docs/notes"
+printf '# Misplaced business notes\n' > "$business/docs/notes/business-notes.md"
+run_case_anywhere "business-notes-wrong-place" 1 "file-outside-canonical-placement: docs/product/business-notes.md" -- \
+  sh "$engine" "$business" --spec "$business_spec"
+
 clean="$work/clean"
 build_conformant "$clean"
 run_case_anywhere "conformant-repo-passes" 0 "unconditional core file(s) present at their canonical §2 path" -- \

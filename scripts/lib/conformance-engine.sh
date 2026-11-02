@@ -1179,6 +1179,10 @@ _own_docs() {
         docs/adr/ADR-*.md) continue ;;
         */templates/*)     continue ;;
         */SKILL.md)        continue ;;
+        # Work-item evidence is supporting material, exempt from ownership metadata (TASK-591).
+        docs/work/evidence/TASK-*/*)
+          item=${rel#docs/work/evidence/TASK-}; item=${item%%/*}
+          case "$item" in ''|*[!0-9]*) ;; *) continue ;; esac ;;
         # A store task file carries its own schema (ADR-045; work/README.md), and its status is its
         # folder -- so the ownership header is not owed there (owner ruling D2, SPRINT-110 T3). Exactly
         # docs/work/<status>/TASK-*.md: a `case` `*` crosses `/`, so the inner case refuses a deeper
@@ -2824,8 +2828,8 @@ _s11_task_citations() {   # <repo> -> sets $cited (task numbers, one per line); 
     _repo_files "$1" | grep '\.md$' > "$_tcd/all"
   fi
   # History (spec §11), case-insensitive: closed task files, every archive/ directory, archive indexes, changelogs,
-  # ADRs, LEARNINGS, TECH-DEBT; and a worktree copy is not the repository.
-  grep -viE '^\.claude/worktrees/|^docs/work/(done|cancel)/|(^|/)archive/|^docs/sprint/INDEX\.md$|^docs/epic/INDEX\.md$|^docs/knowledge-index\.md$|^docs/changelog/|^CHANGELOG\.md$|^docs/adr/|^docs/LEARNINGS\.md$|^TECH-DEBT\.md$' "$_tcd/all" > "$_tcd/live"
+  # task evidence, ADRs, LEARNINGS, TECH-DEBT; and a worktree copy is not the repository.
+  grep -viE '^\.claude/worktrees/|^docs/work/(done|cancel|evidence)/|(^|/)archive/|^docs/sprint/INDEX\.md$|^docs/epic/INDEX\.md$|^docs/knowledge-index\.md$|^docs/changelog/|^CHANGELOG\.md$|^docs/adr/|^docs/LEARNINGS\.md$|^TECH-DEBT\.md$' "$_tcd/all" > "$_tcd/live"
   [ $? -le 1 ] || { _TC_WHY="grep failed on the file list"; rm -rf "$_tcd"; return 1; }
   : > "$_tcd/read"
   while IFS= read -r _tcf; do [ -f "$1/$_tcf" ] && printf '%s\n' "$_tcf" >> "$_tcd/read"; done < "$_tcd/live"

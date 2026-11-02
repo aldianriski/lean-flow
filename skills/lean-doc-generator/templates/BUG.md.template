@@ -1,13 +1,14 @@
-<!-- BUG report — capture a defect at intake, then route it (CONTEXT.md § the bug-intake rule):
-     trivial known cause → a TASK-NNN · needs investigation → /diagnose · architectural → TD-NNN.
-     Lean: repro + expected/actual is the core; drop a field that is genuinely N/A. WHY/WHERE, never HOW.
-     No STANDARD §3 header on purpose: renders to the OS temp dir, never committed. -->
+<!-- Bug item — the body of a `type: bug` work item, `docs/work/<status>/TASK-NNN-<slug>.md` (ADR-056). It sits under the
+     task file's frontmatter (`type: bug`, `origin: triage-bug`) in place of a feature task's free body, beside its `## Done when`.
+     `/triage` writes the intake sections; `/diagnose` writes the last four. Evidence files go in
+     `docs/work/evidence/TASK-NNN/`, redacted before commit (no auth headers, tokens or secrets) and never a `.log` file.
+     Lean: drop a field that is genuinely N/A. WHY/WHERE, never HOW. -->
 
-# BUG — [short symptom title] [CUSTOMIZE]
+## Symptom
+[what is wrong, one or two lines — observed, not inferred]
 
 - **Severity:** trivial | minor | medium | high | critical
 - **Blast radius:** [who/what is affected — users · a command · a skill · data]
-- **Suspected area:** [skill / file / layer, or "unknown"]
 - **Reported:** YYYY-MM-DD by [role — not a personal name]
 
 ## Repro
@@ -20,5 +21,17 @@
 ## Actual
 [what happens instead — the exact error / wrong output / timing]
 
-## Notes
-[logs · environment · when first seen · anything that narrows the cause — optional]
+## Evidence
+- [`docs/work/evidence/TASK-NNN/<file>` — what it shows]
+
+## Root cause
+[the winning hypothesis, confirmed — written by /diagnose]
+
+## Fix
+[what changed and where (commit) — written by /diagnose]
+
+## Regression test
+[the test or fixture that fails without the fix, or why no seam exists — written by /diagnose]
+
+## Prevention
+[what would have stopped it: a TD-NNN, a rule, a check — or "none needed" — written by /diagnose]

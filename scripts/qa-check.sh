@@ -370,6 +370,26 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2e-bis: work type"
+# --- 2e-bis. Optional work-item type and its required evidence (TASK-591) ----------------------
+wt_script="scripts/lib/check-work-type.ts"
+if [ ! -f "$wt_script" ]; then
+  bad "work type: checker not found at $wt_script"
+else
+  wt_out=$(bun "$wt_script" "$ROOT" 2>&1); wt_code=$?
+  printf '%s\n' "$wt_out"
+  wt_pass=$(printf '%s\n' "$wt_out" | grep -cE '^PASS')
+  wt_fails=$(printf '%s\n' "$wt_out" | grep -cE '^FAIL')
+  pass=$((pass + wt_pass))
+  if [ "$wt_code" -ne 0 ]; then
+    if [ "$wt_fails" -gt 0 ]; then
+      fail=$((fail + wt_fails))
+    else
+      bad "work type: checker exited $wt_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 qb_checkpoint "leg 2f-bis: §13 attestation"
 # --- 2f-bis. §13 attestation -- now READ OUT OF the engine run below, not run separately ----------
 # SPRINT-078 T1. This leg used to invoke scripts/lib/check-attestation.sh as its own process. That
@@ -1171,7 +1191,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts run-workflow-command-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-work-type-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts run-workflow-command-fixtures.ts"
 eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-test-fixtures.ts run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
