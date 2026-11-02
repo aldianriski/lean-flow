@@ -391,6 +391,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-287** severity: low | status: open | created: Sprint-158 (close)
+  - Summary: **Trial isolation dirs made for judges stay in the work root until the next driver start.** `cleanupIsolation` removes
+    a trial's own dir after its row is appended, but the judges' dirs are left for `sweepStale`, which only runs when a driver
+    starts; with `owner.json` naming a live driver they are kept for the whole run. At two workers 94 piled up during A4b (about
+    5 MB each).
+  - Evidence: `D:/ab-work` listing during the A4b run (2026-11-02, about 11:45 UTC); each dir holds `owner.json`, `cfg`, `home`,
+    `outside`, `trial`.
+  - Impact: low (disk only; D: had 64 GB free). Grows with workers and arm length.
+  - Mitigation (hypothesis, re-derive first): clean each judge's isolation when the judge returns, as the trial's own is cleaned.
 - **TD-286** severity: low | status: open | created: Sprint-156 (close retro)
   - Summary: **The A/B harness's design scope check (G2) refuses a design that lists the task file, while its post-run breach check
     exempts `docs/work/`.** The two checks disagree on the same path, so a design that names the task it ticks pays a revise round
