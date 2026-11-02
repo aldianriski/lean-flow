@@ -64,3 +64,7 @@ reported over scored slots; the five development runs are not A4a trials and Ame
 builder-check · T1 · 2 contradictions · 5 questions · settled: Plan prose, re-run population, verifier boundary, build-reach rule
 builder-check · T2 · 2 contradictions · 3 questions · settled: doc clause, firstRound read, pin-first on both lines, population
 builder-check · T4 · 2 contradictions · 3 questions · settled: cost ratio vs A1, park-rate denominator, development runs disclosed
+
+### 2026-11-02 | progress | batch G1 and G2 signed for T1, T2, T4 (owner, by popup) at 7f770538
+G1 by fast-path (origin decomposer; the scope moved only by the two owner-ruled scope-changes). G2 on the settled designs.
+Order: T1, then T2 (shared `skills/` and `CHANGELOG.md`), then the five development re-runs, then T4.
