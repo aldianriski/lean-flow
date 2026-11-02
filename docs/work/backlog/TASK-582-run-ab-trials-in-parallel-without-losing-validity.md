@@ -1,5 +1,5 @@
 ---
-id: TASK-577
+id: TASK-582
 title: "Run A/B trials in parallel without losing validity"
 epic: EPIC-023
 priority: P1
@@ -10,11 +10,11 @@ class: decision
 tier: X
 authority: J2
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-574]
 ---
 
-# TASK-577 — Run A/B trials in parallel without losing validity
+# TASK-582 — Run A/B trials in parallel without losing validity
 
 ## Why
 A full arm (32 slots) takes about 2 hours because `run-baseline.ts` runs one trial at a time. Codex's process review (SPRINT-156,
@@ -39,7 +39,6 @@ harness only, never a gate.
 `evals/ab/run-baseline.ts` · `evals/ab/lib/isolate.ts` · `evals/ab/selftest.ts` · `evals/ab/PREREGISTRATION.md` (amendment)
 
 ## Assumes
-- **blocked-by:** A4a's 30-slot run (TASK-574) is running on this machine; no harness change, selftest or second driver runs
   until it exits (SPRINT-156 D4).
 - RAM, not the CLI's rate limit, is the binding constraint at N = 2; the capacity check confirms it.
 - Unattended launch with a completion notification already works (detached driver plus an exit watcher, SPRINT-156 T4); folding it

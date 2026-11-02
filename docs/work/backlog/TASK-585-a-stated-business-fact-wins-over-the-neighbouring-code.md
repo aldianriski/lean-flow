@@ -1,5 +1,5 @@
 ---
-id: TASK-580
+id: TASK-585
 title: "A stated business fact wins over the pattern in the neighbouring code"
 epic: EPIC-023
 priority: P2
@@ -14,7 +14,7 @@ state: ready
 depends-on: []
 ---
 
-# TASK-580 — A stated business fact wins over the pattern in the neighbouring code
+# TASK-585 — A stated business fact wins over the pattern in the neighbouring code
 
 ## Why
 "Misreads the business" is EPIC-023's symptom 2. In A2, workdoo invitation-issued-by failed both trials: the session formatted

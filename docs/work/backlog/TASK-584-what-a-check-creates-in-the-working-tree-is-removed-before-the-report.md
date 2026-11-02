@@ -1,5 +1,5 @@
 ---
-id: TASK-579
+id: TASK-584
 title: "Whatever a check creates inside the working tree is removed before the report"
 epic: EPIC-023
 priority: P2
@@ -14,7 +14,7 @@ state: ready
 depends-on: []
 ---
 
-# TASK-579 — Whatever a check creates inside the working tree is removed before the report
+# TASK-584 — Whatever a check creates inside the working tree is removed before the report
 
 ## Why
 A2's clinic appointment-lookup slot followed the repo's own setup doc, started a local test database in `.pgdata/` inside the

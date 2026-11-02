@@ -123,7 +123,7 @@ governance:…` to the Execution Log the moment the table above is consulted, wh
 Full routing · skip table · the Standards-vs-Spec axes · the revise loop · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
 
 **Report shape** — every boundary report (a gate verdict, a task done, the sprint-bulk exit) and every confirmation popup opens with ONE line that carries both its verdict (what is true now, or what was decided) and the next step, then a `Progress:` line, then the evidence, then exactly one `Next:` line; context the reader already has is not restated.
-The sprint-bulk exit rollup is a machine-read contract (night-run.md Part 4) and keeps its own shape, `run · N of M DoD ticked` first; the rule governs the prose around it (TASK-321). `Progress:` gives sprint members done and epic conditions ticked, each N of M with %; a running job adds done/total, % and an ETA (TASK-578).
+The sprint-bulk exit rollup is a machine-read contract (night-run.md Part 4) and keeps its own shape, `run · N of M DoD ticked` first; the rule governs the prose around it (TASK-321). `Progress:` gives sprint members done and epic conditions ticked, each N of M with %; a running job adds done/total, % and an ETA (TASK-583).
 
 ## Red flags
 
