@@ -28,7 +28,7 @@ A plain prohibition the build meets at the moment it cleans up is the next try (
       names a path outside the working tree; such a path is reported, not removed.
 - [ ] Shown on real input: parallel development runs on workdoo reissue-invitation and self-onboarding-guard (two each) end with
       no delete outside the working tree and no popup; streams read.
-- [ ] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap.
+- [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ `4c840af5`: one `[Unreleased]` bullet; `check-doc-caps` PASS (140 <= 140)
 
 ## Touches
 `skills/orchestrator/SKILL.md` · CHANGELOG.md

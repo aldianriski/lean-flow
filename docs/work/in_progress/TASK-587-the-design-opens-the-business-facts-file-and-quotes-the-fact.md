@@ -29,7 +29,7 @@ the design must open the file and quote the line. Owner ruling: TASK-585 box 3 h
       says which sources it opened.
 - [ ] Shown on real input: parallel development runs (EPIC-023 D16) on self-onboarding-guard (two) and invitation-issued-by produce
       designs that quote fact 6 and the en-GB fact; streams read.
-- [ ] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap.
+- [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ `00cfff0b`: one `[Unreleased]` bullet; `check-doc-caps` PASS (140 <= 140)
 
 ## Touches
 `skills/orchestrator/SKILL.md` · CHANGELOG.md
