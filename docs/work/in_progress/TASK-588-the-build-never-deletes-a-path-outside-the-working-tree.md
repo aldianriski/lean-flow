@@ -26,7 +26,7 @@ A plain prohibition the build meets at the moment it cleans up is the next try (
 ## Done when
 - [x] The orchestrator's every-mode cleanup line states it as a prohibition the build meets when it cleans up: no delete command ✓ `4c840af5` line 126; Codex read-only review CLEAR (1 round)
       names a path outside the working tree; such a path is reported, not removed.
-- [ ] Shown on real input: parallel development runs on workdoo reissue-invitation and self-onboarding-guard (two each) end with
+- [x] Shown on real input: parallel development runs on workdoo reissue-invitation and self-onboarding-guard (two each) end with ✓ pin `4c840af5`, 4 runs (iso-2Yd7Wk, iso-4xA0A8, iso-sISj5b, iso-wHKhSk): all ok, 0 parks, 0 denials; the one delete was an in-tree probe
       no delete outside the working tree and no popup; streams read.
 - [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ `4c840af5`: one `[Unreleased]` bullet; `check-doc-caps` PASS (140 <= 140)
 
