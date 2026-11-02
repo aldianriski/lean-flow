@@ -104,3 +104,5 @@ not needed (the signed design names both edits).
 What broke: the vocabulary SSOT carries the task frontmatter schema (T2 adds `type:`) and the bug-intake rule (T3 changes it);
 neither task declared it. Impact: T2 and T3 Layers add it; the file stays within its 150-line cap (149 now) by editing lines in
 place. Re-confirm G2: not needed (the signed designs make both changes).
+
+Cites, per the scope-change of T1's findings: T1 cites `storm/` (finding F10, ruled to TASK-595).

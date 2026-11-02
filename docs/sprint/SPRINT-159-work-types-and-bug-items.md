@@ -40,7 +40,7 @@ the generator's CRLF fix and `docs/development/setup.md` (SPRINT-157's T1 and T4
 ### T1 — Audit what adopters keep outside the standard `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `docs/research/`
 Depends-on: none
-Cites: TASK-590 · `spec/STANDARD.md` §2
+Cites: TASK-590 · `spec/STANDARD.md` §2 · `storm/` (finding F10, ruled to TASK-595, never touched here)
 The adopter copies are read, not changed; each finding gets an owner ruling, and a finding that changes a later task enters it by a
 logged scope-change.
 
@@ -49,7 +49,7 @@ logged scope-change.
 ### T2 — Work items carry a type; a bug item carries its repro, evidence and root cause `[size: M · risk: high · class: decision · HITL · J2]`
 Layers: `spec/` · `docs/adr/` · `docs/DECISIONS.md` · `skills/lean-doc-generator/` · `skills/lean-doc-generator/templates/BUG.md.template` · `skills/task-decomposer/` · `scripts/` · `evals/` · `CHANGELOG.md` · `README.md` · `docs/work/README.md` · `docs/QA.md` · `.claude/CONTEXT.md`
 Depends-on: T1
-Cites: TASK-591 · ADR-053 (consumer evidence) · ADR-018 · `TECH-DEBT.md` (the debt ledger, unchanged) · `BUSINESS-NOTES.md` (an adopter's legacy location, never touched here)
+Cites: TASK-591 · ADR-053 (consumer evidence) · ADR-018 · `TECH-DEBT.md` (the debt ledger, unchanged) · `BUSINESS-NOTES.md` (an adopter's legacy location, never touched here) · `storm/` (named only by a log note on T1's Cites)
 One store with types, ids unchanged, the debt ledger kept; the temp-only bug report is retired by ADR, and every check that reads
 work-item frontmatter is taught the new shape with a must-FAIL fixture.
 
