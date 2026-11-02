@@ -118,3 +118,12 @@ classified CLEANUP (BUSINESS-NOTES.md untouched), the plan popup PLAN, then a po
 files that get a new section was classified NONE and stopped; nothing written. **Setup deviation 2 (owner ruling):** yes, on the
 files that get a new section only. Added as the DATES ruling class for migrate arms, with CLEANUP's label excluding dates; a real
 classification of the live question picked DATES.
+
+### 2026-11-02 | progress | T1: clinic-a2 runs 9-10 stopped before writing; setup deviation 3 ruled (an unsettled convention is "Not decided yet")
+Run 9 stopped at a closing chat request whose decisions sat above the last 2000 characters the classifier saw; the operator now
+classifies the whole text (12000-char cap, first 4000 + last 8000) and answers a multi-part request one part per line
+(`f4ea7c0e`, S66). Run 10 stopped at a popup asking which folder layout a Vue view belongs in, which the frozen Conventions file
+does not settle; nothing written, the snapshot is still the pre-migrate copy. **Setup deviation 3 (owner ruling):** a coding
+convention the Conventions file does not settle is answered "Not decided yet (owner, migrate)". Added as the UNDECIDED ruling class
+for migrate arms; its label sends a question the Conventions file does settle to operator:conventions. A real classification of
+two live questions picked UNDECIDED for the folder layout and operator:conventions for the error envelope. Selftest 71/71.

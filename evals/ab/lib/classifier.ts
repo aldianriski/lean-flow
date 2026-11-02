@@ -13,11 +13,13 @@ export type Answerer = (q: PopupQuestion) => Promise<Decision>;
 /** The fixed rulings for a migrate arm (owner rulings, SPRINT-154). */
 export const PLAN_RULING: Ruling = { id: "PLAN", text: "Profile pass only: apply only the items that add ## Stack, ## Conventions in use and the five business topics (business goal, main flows, invariants, quality attributes, non-goals). Decline every other item, including archiving, moving, renaming or slimming any existing file." };
 export const CLEANUP_RULING: Ruling = { id: "CLEANUP", text: "Leave untouched: do not edit, archive, move, rename or slim this existing file." };
+export const UNDECIDED_RULING: Ruling = { id: "UNDECIDED", text: "Not decided yet (owner, migrate)" };
 export const DATES_RULING: Ruling = { id: "DATES", text: "Yes: update last_updated to today on the files that get a new section, and on no other file." };
 const RULING_LABELS: Record<string, string> = {
   PLAN: "a question asking which parts of a migrate plan to apply, or whether to apply it",
   CLEANUP: "a question asking whether to change, slim, reshape, consolidate, archive, move or rename something that ALREADY EXISTS (not a last_updated date; see DATES)",
   DATES: "a question asking whether to update the last_updated date of files that get a new section",
+  UNDECIDED: "a coding-convention question (how code is written or organised) that the operator:conventions entry does NOT settle; if that entry settles it, pick operator:conventions instead",
   CONTINUE: "a question asking whether to continue when docs already exist",
 };
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
