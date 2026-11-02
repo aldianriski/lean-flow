@@ -99,3 +99,8 @@ Cites, per the scope-changes above: T2 cites `BUSINESS-NOTES.md` and T6 cites `Q
 What broke: the work-item field schema lives in `docs/work/README.md` (the store row says so) and each qa-check leg has a row in
 `docs/QA.md`; T2 changes both and neither is in its Layers. Impact: T2 Layers add the two files; no Done-when changes. Re-confirm G2:
 not needed (the signed design names both edits).
+
+### 2026-11-02 | scope-change | T2, T3: Layers add `.claude/CONTEXT.md`
+What broke: the vocabulary SSOT carries the task frontmatter schema (T2 adds `type:`) and the bug-intake rule (T3 changes it);
+neither task declared it. Impact: T2 and T3 Layers add it; the file stays within its 150-line cap (149 now) by editing lines in
+place. Re-confirm G2: not needed (the signed designs make both changes).
