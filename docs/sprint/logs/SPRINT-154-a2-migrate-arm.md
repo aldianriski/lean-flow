@@ -174,3 +174,14 @@ scored, exit 10. workdoo-a2 access-activity-type-filter: G2 signed, every grader
 clinic-a2 appointment-lookup: G2 signed, every grader pass, all three judges PASS, $1.98, 148 s. Both rows pin the S1 plugin
 (`82990174`, `b8c3b484`). Cost per attempt sits beside A1's S0 mean ($2.08, 67 rows), far inside the 2.0x ceiling; A0's is $0.62.
 Owner review of cost and behaviour next; then the remaining 30 slots.
+
+### 2026-11-02 | progress | T1: A2 measured (32/32, VALID) and ruled **failed**, owner-signed; TASK-555 Done-when ticked
+Full run in the owner's terminal, driver exit 0: 32 of 32 slots scored on round 0, 0 infra-lost, no replacement round. Validity
+on A2's own slots: VALID. Combined analysis (S0 slots + A2 slots, 128/128, VALID, no audit finding; reproduces S0's figures):
+A2 78.1% [65.6, 90.6] vs A1 81.2% vs A0 89.6%; gain vs A1 -3.1 [-12.5, +6.3], not "holds"; symptoms vs A1 0.0 / -1.9 / +8.3 /
++3.1 (none below -5); cost 0.93x A1. A2 is below A0, so Amendment 6 item 7 rules it **failed**; the owner signed it by popup.
+Report: `docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02. Under D6, S1 stays under [Unreleased]. Three A2
+slots parked at a popup (temp-dir check scripts, L-272's shape) and are scored; TASK-573/574 (EPIC-023 D11) target them. The
+combined analysis needed `analyze.ts` to read two slot files (`e8f0ff5b`, S69 with two must-FAIL seeds; selftest 74/74).
+Correction, same day: D11 and TASK-573 first quoted parks and FAIL counts from raw log rows, including voided pilot rows
+(A1 "6 of 48"); recomputed on the analysis population (A1 3 of 48) in `a1877474`.
