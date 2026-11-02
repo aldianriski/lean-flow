@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — `/orchestrator`: anything a check creates inside the working tree (a database directory, a cache, a log) is removed before the report unless the task declares it; what the repo's own tests leave outside the working tree is named in the report, never deleted, since deleting it needs a permission an unattended run does not have.
 - **Changed** — `/orchestrator` reports: every boundary report (gate verdict, task done, waiting on a long job) carries a `Progress:` line after its verdict: sprint members done and epic conditions ticked, each with a percentage, plus units done and an ETA for a running job (TASK-583).
 - **Changed** — `/orchestrator` G2: a design's file list holds only what the change needs, inside the task's declared layers; ticking or moving the task file is bookkeeping, not a design file; a doc is listed only when the task or the change's behaviour needs it; a pin that belongs outside the declared layers is named as an open point, not added (TASK-575).
 - **Changed** — `/orchestrator`: evidence for a criterion ticked on judgment comes from the repo's existing runners first; a throwaway probe script lives inside the working tree and is deleted before the report, never in a system temp dir, because an unattended run cannot answer the permission prompt that write raises (TASK-573).
