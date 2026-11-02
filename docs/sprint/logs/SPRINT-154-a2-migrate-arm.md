@@ -185,3 +185,19 @@ slots parked at a popup (temp-dir check scripts, L-272's shape) and are scored; 
 combined analysis needed `analyze.ts` to read two slot files (`b4fc8c4b`, S69 with two must-FAIL seeds; selftest 74/74).
 Correction, same day: D11 and TASK-573 first quoted parks and FAIL counts from raw log rows, including voided pilot rows
 (A1 "6 of 48"); recomputed on the analysis population (A1 3 of 48) in `de5a758d`.
+
+### 2026-11-02 | progress | close system verify: 3 FAIL on the VPS, all fixed; then 1 FAIL (stale index), fixed
+First system verify at the pre-rewording HEAD: bun test 589 pass, 0 fail; qa-check 354 pass, 3 fail. Fixed: `typecheck` (three
+exactOptionalPropertyTypes errors in the setup operator, `e35ba972`, no behaviour change), `scope-change layers` (T1's
+`Layers:` now names `evals/ab/setup-arm.ts`, which the 2026-11-01 scope-change entry names), and `layers observed` (two
+coordinator commits carried subjects no attribution rule reads; owner ruling: their subjects were reworded to `sprint(154):` in
+local, unpushed history, file contents unchanged, backup branch `backup/pre-reword-154`; every commit from the intake on
+changed sha, and the three citations of old shas in this log and TD-283 were updated). Second run at `0e9a67be`: 356 pass,
+1 fail, the knowledge index stale after L-275/L-276; regenerated (`d755c410`).
+
+### 2026-11-02 | close | A2: Migrate Arm, 1 of 1 delivered (TASK-555), 3 of 3 DoD ticked
+run · 3 of 3 DoD ticked · PLAN_EXHAUSTED. TASK-555 is in `done/`; the close-time members check passes 4 of 4. System verify on
+the VPS at `d755c410`: bun test 589 pass, 0 fail; qa-check 357 pass, 0 fail. The Retro and buckets are filed: L-275, L-276,
+TD-283 progress, the CHANGELOG A2 result; follow-ups TASK-573 and TASK-574 came from S3's intake, none new. No handoff entry
+was taken in this sprint. No release: S1 is held by D6 (A2 failed) and the harness is maintainer-only. EPIC-023: S1's
+condition is ticked with the failed ruling; D11 redirects S3's first slice; the epic stays active on S3 and S4.
