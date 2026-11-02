@@ -130,3 +130,13 @@ shape, filed as TD-288. TD-285 resolved → TASK-596. The owner read the item. T
 `/prime` and `/flow` on it.
 consequence · T3 · behaviour:material · governance:low
 review · T3 · scoped outside review (Codex, worktree-isolated, 2 rounds, 1 high fixed, 1 medium to TD-288) · behaviour:material · governance:low
+
+### 2026-11-02 | progress | T4: prime, flow and the close retro see bug items; shown on TASK-596; two boxes wait for the close
+Skills (`acadea17`): prime's `Tasks:` line carries open bug items and the oldest (row 5 and the resolution reworded, 140 lines);
+flow's Feed sends a reported bug to `/triage` and its Build sends a bug item through `/diagnose` (two short lines, no new dense
+line); the close retro's Shipped bucket lists fixed bug items with their root cause. Real input, headless from a pinned clone in a
+lean-flow worktree, read-only: `/prime` printed "bugs: 1 open (oldest TASK-596, backlog, state: ready)" ($0.37); `/flow` routed
+TASK-596, already diagnosed, to close and skipped re-diagnosis ($0.52). TASK-596 then moved to `done/`. The boxes "the close
+retro lists the fixed bug items" and "shown end to end ... the close lists it" tick at this sprint's close; T4 waits in `review/`.
+consequence · T4 · behaviour:material · governance:low
+review · T4 · self-review plus real-input runs (prime, flow headless; skills reviewed by diff) · behaviour:low · governance:low
