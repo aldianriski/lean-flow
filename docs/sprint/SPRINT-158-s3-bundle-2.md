@@ -113,8 +113,54 @@ before any trial; the pilot is approved, then the full arm runs unattended with 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/run-baseline.ts` · `lib/isolate.ts` · `selftest.ts` | T1 | `--workers N`; the sweep keeps a live driver's dirs; the pilot barrier; S71-S77 | med | selftest 82/82, must-FAIL seeds |
+| `evals/ab/run-dev.ts` | T1 (D16) | development trials in parallel with per-slot logs | low | S77, dry run |
+| `skills/orchestrator/SKILL.md` | T3, T4 | every-mode check-leftover line; G2 business-facts box; two line joins (cap) | med | development runs, Codex 2 rounds |
+| `CHANGELOG.md` | T1, T3, T4, T5 | `[Unreleased]` lines and the A4b measurement | low | read-through |
+| `evals/ab/arms/*-a4b*` · `schedule-a4b.json` · `hash-prereg.ts` · `PREREGISTRATION.md` | T5 | arm A4b; Amendment 8 (owner-signed) | high | Codex 2 rounds, hash recorded |
+| `docs/research/logs/ab-measurements-a4b.md` | T5 | freeze line, 32 rows, report and ruling | med | analyze VALID |
+| `docs/epic/EPIC-023-specific-not-short.md` | coordinator | D16, D17; S3 mark; renumber note | low | epic checker |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 5 of 5 members delivered (TASK-582, 583, 584, 585, 581). Trials now run in parallel inside one driver (`--workers N`;
+the sweep keeps a live driver's workspace), adopted for later arms by Amendment 8. `/orchestrator` gained three edits on top of
+A4a: a `Progress:` line in every boundary report, an every-mode rule that a check's leftovers inside the working tree are removed
+and what the repo's tests leave outside it is named, never deleted, and a G2 business-facts box. Development runs: the en-GB fact
+named and honoured (the A2 failure fixed), fact 6 missed twice (owner ruling: half met), the outside-tree clause broken once in a
+counter-run. Arm A4b: 32/32 VALID at two workers, 93.8% against A4a's 90.6%, +3.1 [0.0, 9.4], no symptom regression (convention +11.5,
+business +5.6, scope +6.3), above A0, cost 0.68x A1, 0 parks; the twelve untouched tasks tie at 24 of 24. Ruled ship-eligible by
+non-inferiority, owner-signed (EPIC-023 D17). Process: EPIC-023 D16 replaces D14's arm per bundle.
+
+**Retrieval check** — one miss, one hold. Missed: T2's G2 chose the A/B development runs as its real input, but trial tasks are
+not sprint members, so no report there could carry sprint figures; a headless run on lean-flow's own sprint replaced it. Held:
+G2's builder check settled four of five designs by fact (A4a's breaches, the kept streams, the workdoo copy's sprint) before any
+paid run.
+
+**Cost** — development runs about $9 (five runs plus one re-run), capacity check $6.00, T2's headless run $0.55, A4b scored $46.86 (A4a $45.55).
+Codex: T1 build 85.5k + 51.4k, T3/T4 review 29.9k + 28.0k, Amendment 8 review 61.7k + 24.4k, process review 54.7k, the development-run helper 45.8k.
+Builder check: five Sonnet readers, about 257k.
+
+**Worked**
+- Workers inside one driver (one lock, one log): the A4b arm ran at about 2.3 minutes per slot against A4a's 4.3.
+- Codex reviewing the amendment against the harness found a real pilot bypass at two workers before any measured trial.
+- Development runs exposed what a grader cannot: a rule present in context and still not followed (fact 6, the outside delete).
+
+**Friction**
+- A full arm per bundle put a 1.5-2 hour wait inside the improvement loop twice; the owner had to raise it again (D16).
+- A cleanup rule placed in G2's Reachability line did not bind `quick`, which skips G2 (Codex review); moved to Report shape.
+- Scratch arm files without the shared `inventory.json` refused all four runs (no spend); a chr(92) path byte slipped twice.
+- Trial isolation dirs from judges are left until the next driver start; at two workers they pile up (94 during A4b).
+
+**Pattern candidates**
+- L-280 (count 1): a measurement step that blocks the owner belongs at the release gate, not in the improvement loop; state its
+  wall time before launching and offer the parallel or deferred option first.
+- L-281 (count 1): a rule meant for every mode goes where every mode passes (the report), not in a gate one mode skips.
+- L-282 (count 1): a rule in a session's context is not a rule followed; development runs measure following, not presence.
+
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] (TASK-582, 583, 584, 585; A4b measured). Tech debt: TD-287, judge
+isolation dirs survive until the next driver start. Follow-ups: TASK-586 (3/4-worker capacity check), TASK-587 and TASK-588 (bundle 3), TASK-589 (research topic folders).
+Learnings: L-280, L-281, L-282.

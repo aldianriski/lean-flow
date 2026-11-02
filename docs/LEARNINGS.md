@@ -123,6 +123,30 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-282 [tags: process] [status: active]: **A rule in a session's context is not a rule followed; measure the following.** In SPRINT-158 the G2 business-facts box and the outside-tree cleanup clause were both in the sessions' context (the build resumes the design session), yet two self-onboarding-guard designs never opened the business notes and one build ran `rm -rf` on a test's temp folder outside the repo. A grep that finds the rule in the stream proves presence only; a development run that reads what the session did proves following.
+- seen: 2026-11-02 (SPRINT-158 development runs `iso-9NayTL`, `iso-PtJHOH`)
+- count: 1
+- promoted: no
+- related: TASK-587 · TASK-588 · L-278
+
+---
+
+## L-281 [tags: process] [status: active]: **A rule meant for every mode goes where every mode passes, not into a gate one mode skips.** TASK-584's cleanup rule first sat in G2's Reachability line; `quick` mode never runs G2, so a quick task would never meet it (Codex review, round 1). It moved to its own line after Report shape, "In every mode, before the report". Before placing a rule, list the modes that must obey it and the sections each one reads.
+- seen: 2026-11-02 (SPRINT-158 T3 review)
+- count: 1
+- promoted: no
+- related: CLAUDE.md § Anti-Patterns (wiring) · L-020
+
+---
+
+## L-280 [tags: process] [status: active]: **A slow check that blocks the owner belongs at the release gate, not in the improvement loop; say its wait before starting it.** EPIC-023 D14 ran a full 32-slot arm per bundle, so each improvement waited 1.5-2 hours with the PC otherwise idle; the owner raised it twice before D16 moved full arms to releases and made development runs parallel. Before launching anything long, state its wall time and whether it blocks, and offer the parallel or deferred option first.
+- seen: 2026-11-02 (SPRINT-156 and SPRINT-158; EPIC-023 D16)
+- count: 1
+- promoted: no
+- related: TASK-582 · TASK-586 · memory: ab-testing-process
+
+---
+
 ## L-279 [tags: process] [status: active]: **A predeclared threshold on a subset is checked against what the comparator already scores there before it is frozen.** Amendment 7 item 8 asked A4a to gain +0.10 over A2 on the eleven tasks no development run touched; A2 already scored 90.9% on them, so the most any arm could gain was +9.1 and the bar could not be met. The ruling had to go to the owner on a check that could not discriminate. Compute the ceiling (1 minus the comparator's rate on the subset) when the amendment is drafted, and set the bar below it or name a different check.
 - seen: 2026-11-02 (SPRINT-156 T4, A4a ruling; EPIC-023 D15)
 - count: 1
