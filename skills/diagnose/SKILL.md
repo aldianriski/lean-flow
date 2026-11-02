@@ -32,6 +32,7 @@ commit message. Redact first, and prefer the mechanism over the reminder:
 agent-runnable pass/fail signal for the bug and you will find the cause. Spend disproportionate
 effort here; be aggressive, refuse to give up.
 
+- **A bug item exists?** (`type: bug`, ADR-056) Read its symptom, repro and evidence first; the loop must reproduce *its* repro.
 - Prefer an **automated test** at the seam that reaches the bug; then curl/HTTP, CLI snapshot-diff, headless browser, replay a captured trace, a throwaway harness, fuzz, `git bisect run`, or a differential loop. Full menu → `${CLAUDE_SKILL_DIR}/references/feedback-loops.md`.
 - **Iterate on the loop** — faster, sharper signal, more deterministic. A 2-second deterministic loop beats a 30-second flaky one.
 - **Non-deterministic bug?** Raise the reproduction *rate* (loop 100×, parallelise, stress), don't chase a clean one-shot repro.
@@ -80,6 +81,7 @@ reddens nothing has tested nothing. Prove the restore the same way.
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or the absence of a seam is documented)
 - [ ] All `[DEBUG-…]` instrumentation removed (grep the prefix); throwaway harnesses deleted
+- [ ] The bug item, when one exists, carries `## Root cause` · `## Fix` · `## Regression test` · `## Prevention`; new evidence goes redacted into `docs/work/evidence/TASK-NNN/`
 - [ ] The winning hypothesis is stated in the commit / PR message (passed through `/humanizer` embedded mode: commit `plain`, PR body `markdown` → the humanizer skill's `references/embedded.md` § Commit messages and PR bodies) — so the next debugger learns
 
 **Then ask: what would have prevented this?** If the answer is architectural (no good seam, tangled

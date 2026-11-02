@@ -45,7 +45,7 @@ lean-flow ships **no custom agent definitions and no hooks today** — both are 
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements; each completes its job
 invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole exception** — it *sequences* the stages, never
-re-implements one. **Bug intake** — a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`. **Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
+re-implements one. **Bug intake** — a bug enters at `/triage` as a `type: bug` item → trivial = `ready` · unknown = `/diagnose` (fills its root cause) · architectural = `TD-NNN`. **Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
 
 ## Gates
 

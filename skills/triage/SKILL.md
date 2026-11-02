@@ -24,7 +24,7 @@ On v1 or mixed, name it and refuse to groom — point to `/lean-doc-generator mi
 - The backlog has grown and priorities have drifted from reality.
 - Before a Sprint Promote, to surface what is genuinely ready.
 - A specific task needs a state or priority decision.
-- A bug report (`BUG.md.template`-shaped) needs intake routing.
+- A reported bug needs intake routing (it becomes a `type: bug` work item).
 
 ## Task states (light)
 
@@ -52,16 +52,14 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
    `→ next slice: <name>`. Unmarked, or every named id in `done/` · `cancel/` · missing = **uncovered**.
    `proposed` epics are exempt; `[x]` items need nothing. **Roadmap rows too:** each `Status: active` row of `docs/product/roadmap.md`
    (or `docs/roadmap.md`) — same verdicts, plus an `EPIC-NNN` mark must name an active epic (`references/epic-coverage.md` of `/lean-doc-generator`, § Source B).
-3. **Bug intake** — a BUG.md-shaped item (or bug-flavored backlog entry) is routed, not ranked like a feature:
-   - known cause + trivial fix → a new task file in `backlog/` (`state: ready`, **`origin: triage-bug`**) — same shape and id rule as `/task-decomposer` writes (id = max over `docs/work/*/TASK-*.md`, all six folders, + 1)
-   - unknown cause / needs investigation → record as a task, `next: /diagnose` (**`origin: triage-bug`**)
-   - systemic / architectural → file as `TD-NNN` in root `TECH-DEBT.md`
+3. **Bug intake** — a reported bug (or a bug-flavored backlog entry) becomes a **`type: bug` work item** (ADR-056), routed, not ranked like a feature:
+   - write it to `backlog/` with **`origin: triage-bug`** and the bug template's intake sections (symptom · repro · expected · actual · evidence), its evidence redacted into `docs/work/evidence/TASK-NNN/` — same id rule as `/task-decomposer` (max over `docs/work/*/TASK-*.md`, all six folders, + 1)
+   - known cause + trivial fix → `state: ready` · unknown cause / needs investigation → `- **next:** /diagnose` under `## Assumes`
+   - systemic / architectural → file as `TD-NNN` in root `TECH-DEBT.md` (it becomes a `type: debt` item only when scheduled)
    - **stamp `origin:` on every task you file here** — a bug converted at triage never met the intake
      grill, and the stamp is what stops G1 fast-pathing it on the strength of looking well-formed
-   - **then the report itself is done.** A `BUG-<slug>.md` is temp-dir intake scaffolding, never a
-     committed doc (STANDARD §2): once its repro and verdict live in the destination, the file has
-     no durable home to be moved to. Carry anything still load-bearing — repro steps especially —
-     **into** the `TASK`/`TD`/`/diagnose` brief rather than pointing back at a file that will vanish.
+   - **the item is the record** — carry every load-bearing detail (repro steps especially) into it; a temp
+     `BUG-<slug>.md`, if one was written, is never committed (STANDARD §2) and nothing points back at it.
 4. **Re-rank** — re-evaluate each task's `priority:` (P0–P3, by impact × urgency); propose moves with a one-line reason each. Sequence is then **derived** (§ Order), never hand-set.
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
 6. **State** — set `state:` `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
