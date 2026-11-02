@@ -29,7 +29,7 @@ now sends throwaway probes into the working tree, so leftover check artifacts ar
 - [x] Shown on real input: a development run on clinic appointment-lookup (and any A4a slot that breached on a check artifact) ✓ 2026-11-02: pin `11c768c3`: clinic appointment-lookup `iso-oxWVzF` scope PASS, nothing left; workdoo reissue-invitation `iso-57nCd5` no popup; counter-run `iso-PtJHOH` recorded; owner ruling: ticked as written
       ends with no such file left (stream and post-run file list read), and one on workdoo reissue-invitation ends with no popup
       (scope-change 2026-11-02).
-- [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ 2026-11-02: CHANGELOG.md:21 under `[Unreleased]` (17..48), added in `36054061`; `check-doc-caps.sh` PASS `cap skills/orchestrator/SKILL.md (140 <= 140)`
+- [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ 2026-11-02: CHANGELOG.md:21 under `[Unreleased]` (17..48), added in `36054061`; the repo's cap checker PASS for skills/orchestrator/SKILL.md (140 <= 140)
 
 ## Touches
 `skills/orchestrator/SKILL.md` · CHANGELOG.md
