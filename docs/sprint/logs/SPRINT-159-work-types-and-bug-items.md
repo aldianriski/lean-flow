@@ -146,3 +146,10 @@ The T4 review line above logged a self-review at behaviour:low against a consequ
 is owed a scoped review. Codex read-only review, round 1: one finding (an unknown-cause bug item could stall between Feed and
 triage), fixed in flow; round 2: PASS.
 review · T4 · scoped outside review (Codex, read-only, 2 rounds, 1 finding fixed, PASS) · behaviour:material · governance:low
+
+### 2026-11-02 | scope-change | T5: TASK-594 box 4 reads migrate's judgment on workdoo's bugs folder as met
+What broke: box 4 expected migrate to propose workdoo's `docs/bugs/` as a bug item with its screenshot as evidence. The headless
+plan run found the screenshot is a prototype reference, not a defect capture, cited by a frozen sprint Plan, and recommended
+deferring it; it proposed the two real defect tasks (TASK-053, TASK-070) as bug items instead.
+Impact, by owner ruling (popup, 2026-11-02): box 4 is met by that judgment; it reads that migrate classifies the bugs folder and
+proposes real defects as bug items. The apply run carries every recommended item (owner: all its recommendations).
