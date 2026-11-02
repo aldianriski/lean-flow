@@ -2,6 +2,7 @@
 id: TASK-583
 title: "Every task-done report carries a progress line with percentages"
 epic: EPIC-023
+sprint: SPRINT-158
 priority: P1
 size: S
 risk: low

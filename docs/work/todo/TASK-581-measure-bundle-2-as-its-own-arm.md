@@ -2,6 +2,7 @@
 id: TASK-581
 title: "Measure S3 bundle 2 (TASK-583, 584, 585) as its own arm"
 epic: EPIC-023
+sprint: SPRINT-158
 priority: P2
 size: M
 risk: high

@@ -2,6 +2,7 @@
 id: TASK-585
 title: "A stated business fact wins over the pattern in the neighbouring code"
 epic: EPIC-023
+sprint: SPRINT-158
 priority: P2
 size: M
 risk: med

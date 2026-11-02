@@ -2,6 +2,7 @@
 id: TASK-582
 title: "Run A/B trials in parallel without losing validity"
 epic: EPIC-023
+sprint: SPRINT-158
 priority: P1
 size: M
 risk: high

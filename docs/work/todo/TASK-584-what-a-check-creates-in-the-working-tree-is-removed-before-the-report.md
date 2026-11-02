@@ -2,6 +2,7 @@
 id: TASK-584
 title: "Whatever a check creates inside the working tree is removed before the report"
 epic: EPIC-023
+sprint: SPRINT-158
 priority: P2
 size: S
 risk: med
