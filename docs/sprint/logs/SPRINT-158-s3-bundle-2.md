@@ -114,3 +114,18 @@ the same command that removed its own in-tree probe (the outside-tree clause was
 - T2: the evidence G2 chose (workdoo runs) cannot carry sprint figures; replaced by a headless run of the pinned changed skill in a
   lean-flow worktree completing one real step of this sprint (TASK-584's last box), its Progress line read against SPRINT-158
   and EPIC-023.
+
+### 2026-11-02 | review | T3, T4: scoped outside review of the skill diffs; T2's headless real-input run
+Codex reviewed T3 and T4 read-only (`36054061`, `d09db7f5`, `a9b7097f`). Round 1, one medium finding: the check-leftover rule sat
+in G2's Reachability line, which `quick` mode never runs. Fixed in `6df692db`: the rule is its own line after Report shape,
+"In every mode, before the report", and one more pair of continuation-contract lines is joined word for word (140 lines, 13
+dense). Round 2: PASS, no finding (29.9k + 28.0k tokens).
+T2: a headless run of the pinned changed skill (`a9b7097f`, `--plugin-dir`) in a lean-flow worktree at `fdbcfb53` completed
+TASK-584's last box ($0.55, 15 turns) and reported "Progress: sprint members in `done/` 0 of 5 (0%) · Done-when boxes ticked
+across members 12 of 17 (71%) · EPIC-023 condition boxes 3 of 5 (60%)": each figure matches the member files and EPIC-023. Its
+tick (evidence on the box's first line, `check-doc-caps.sh` PASS) is ported to main unchanged. Awaits the owner's reading for
+TASK-583 box 2.
+consequence · T3 · behaviour:material · governance:low
+review · T3 · scoped outside review (Codex, read-only, 2 rounds, 1 med fixed, PASS) · behaviour:material · governance:low
+consequence · T4 · behaviour:material · governance:low
+review · T4 · scoped outside review (Codex, read-only, 2 rounds, PASS) · behaviour:material · governance:low
