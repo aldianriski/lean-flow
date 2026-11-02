@@ -24,7 +24,7 @@ for all three preparation responsibilities"); no run opened `BUSINESS-NOTES.md`.
 the design must open the file and quote the line. Owner ruling: TASK-585 box 3 half met; this is bundle 3 (EPIC-023 D16).
 
 ## Done when
-- [ ] The orchestrator's business-facts box makes the design open the repo's business-facts source (the profile's pointer, the
+- [x] The orchestrator's business-facts box makes the design open the repo's business-facts source (the profile's pointer, the ✓ `00cfff0b` line 48; Codex read-only review CLEAR (1 round)
       requirements and business-notes files) and quote, for each fact it honours, the fact's line; a design that names no fact
       says which sources it opened.
 - [ ] Shown on real input: parallel development runs (EPIC-023 D16) on self-onboarding-guard (two) and invitation-issued-by produce

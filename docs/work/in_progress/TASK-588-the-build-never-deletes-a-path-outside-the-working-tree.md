@@ -24,7 +24,7 @@ same command that removed its own in-tree probe; the run parked on the permissio
 A plain prohibition the build meets at the moment it cleans up is the next try (bundle 3, EPIC-023 D16).
 
 ## Done when
-- [ ] The orchestrator's every-mode cleanup line states it as a prohibition the build meets when it cleans up: no delete command
+- [x] The orchestrator's every-mode cleanup line states it as a prohibition the build meets when it cleans up: no delete command ✓ `4c840af5` line 126; Codex read-only review CLEAR (1 round)
       names a path outside the working tree; such a path is reported, not removed.
 - [ ] Shown on real input: parallel development runs on workdoo reissue-invitation and self-onboarding-guard (two each) end with
       no delete outside the working tree and no popup; streams read.
