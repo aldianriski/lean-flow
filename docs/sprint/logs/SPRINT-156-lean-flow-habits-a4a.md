@@ -103,3 +103,16 @@ the declared layers, with ticking as bookkeeping and docs only when the task or 
 clauses are bound to the declared layers, a pin outside them named as an open point. SKILL.md stays at 140 lines, density
 baseline 13. Box 2 waits for the shared re-run batch, which starts now (the plugin pin for it is this commit).
 consequence · T2 · behaviour:material · governance:low
+
+### 2026-11-02 | progress | development re-runs (5, scratch log, never a measurement): T1 box 2 and T2 box 2 pass
+Plugin pinned at `56964ce2` (a clone), arms `workdoo-dev156`/`clinic-dev156` on research copies of the A2 snapshots
+(`D:\Research\dev156\`, manifest drift 0), `run-trial.ts --measured --protocol d9` into a scratch log whose freeze line equals
+A2's. Tasks: self-onboarding-guard, reissue-invitation, pilot-seat-limit, access-activity-type-filter (workdoo) and
+appointment-lookup (clinic), one run each; every run reached the build. Results: 5 of 5 exit ok and pass every grader; first G2
+scope check passes in 5 of 5 (82 of 93 failed in A1/A2); 0 parks. Verifier (scratch `verify.py`: row exit plus a stream scan for
+Write/Edit paths outside the trial copy and temp markers in shell commands), proven first on A2's log, where it flagged all three
+parks. That control also showed the habit was wider than the parks: sessions writing a probe outside the repo were A0 3 of 49,
+A1 33 of 61, A2 18 of 32 (most by Bash, which raises no prompt). On the re-runs it flagged one command, read by hand: reissue-
+invitation piped its probe to `node` over stdin ("so no extra file gets written into the repo"), and only the probe's runtime
+database sat in `os.tmpdir()`, as the repo's own verify scripts do; no file was written outside the tree and nothing prompted.
+Cost, these five tasks: $7.62 against A2's per-task means summing to $11.52. Development evidence only; A4a measures it.

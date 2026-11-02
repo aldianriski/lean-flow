@@ -28,9 +28,7 @@ Owner ruling 2026-11-02: S3's first slice targets these popup stops; S3a's brief
 
 ## Done when
 - [x] Cause named: the kept streams of the parked sessions (`D:\ab-work\kept\`) show the out-of-tree write or prompted command and the design step that led to it, and the skill text or behaviour behind it is quoted (scope-change 2026-11-02, owner ruling). If the cause is not lean-flow text (the model's own default), that is recorded with the stream as evidence, and the fix below is the guidance that counters it. ✓ 2026-11-02: from the nine kept parked streams: pin-first adds verify-script tests outside the layers, G2 refuses, the revise round promises a throwaway probe "outside the repo", the build writes it to the OS temp folder; no lean-flow sentence names the temp folder (the model's own default), quoted in the SPRINT-156 log
-- [ ] Fixed: the named skill text changed so a verification probe stays inside the working tree, or uses the repo's own test
-      runner, and is removed afterwards. The same tasks re-run headless with the fixed plugin, one run each, stop at 0 popups;
-      streams kept.
+- [x] Fixed: the named skill text changed so a verification probe stays inside the working tree, or uses the repo's own test runner, and is removed afterwards. The same tasks re-run headless with the fixed plugin, one run each, stop at 0 popups; streams kept. ✓ 2026-11-02: plugin at `56964ce2`, five headless re-runs (the four workdoo tasks with a scored park plus clinic appointment-lookup): 0 popups, no probe file outside the tree (one stdin probe, its runtime DB in the OS temp dir, read by hand); streams kept in the SPRINT-156 log's scratch log
 - [x] Consumer surface: CHANGELOG `[Unreleased]` entry (unversioned until its arm passes, D6); README only if a user-visible behaviour changes. ✓ 2026-11-02: CHANGELOG [Unreleased] Changed line for `/orchestrator` (`ca13d54e`); README unchanged, no user-visible mode change
 
 ## Touches
