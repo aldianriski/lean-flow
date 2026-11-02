@@ -94,3 +94,8 @@ builder-check · T5 · 7 contradictions · 4 questions · settled by fact and on
 builder-check · T6 · 5 contradictions · 5 questions · settled by fact and one owner ruling (CR fix to SPRINT-157)
 
 Cites, per the scope-changes above: T2 cites `BUSINESS-NOTES.md` and T6 cites `QA.md` (named by their Done-whens, not touched).
+
+### 2026-11-02 | scope-change | T2: Layers add `docs/work/README.md` and `docs/QA.md`
+What broke: the work-item field schema lives in `docs/work/README.md` (the store row says so) and each qa-check leg has a row in
+`docs/QA.md`; T2 changes both and neither is in its Layers. Impact: T2 Layers add the two files; no Done-when changes. Re-confirm G2:
+not needed (the signed design names both edits).
