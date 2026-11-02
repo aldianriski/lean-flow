@@ -127,3 +127,14 @@ does not settle; nothing written, the snapshot is still the pre-migrate copy. **
 convention the Conventions file does not settle is answered "Not decided yet (owner, migrate)". Added as the UNDECIDED ruling class
 for migrate arms; its label sends a question the Conventions file does settle to operator:conventions. A real classification of
 two live questions picked UNDECIDED for the folder layout and operator:conventions for the error envelope. Selftest 71/71.
+
+### 2026-11-02 | progress | T1: clinic-a2 migrated (run 11) and frozen; the chat trigger now matches whole words
+Run 11 completed the migrate: popups and chat requests were classified PLAN ×4, CLEANUP ×4, quality attributes ×3, DATES and
+UNDECIDED, all from the frozen catalog. Audit against the pre-migrate manifest: only `docs/architecture/overview.md`,
+`docs/development/coding-standards.md` and `docs/product/requirements.md` changed (+52 lines); against the A1 snapshot the only
+removed lines are their three `last_updated` dates (deviation 2); `BUSINESS-NOTES.md` and every other file are byte-identical. The
+session's closing summary ("approved `last_updated` date", "Not confirmed") fired the chat trigger and the classifier returned no
+parts, so the operator exited 3 after the work was done; nothing was left to answer. The trigger now matches whole words
+(`approve`, `approval`, `confirm`), S67 holds the run-7/run-9 requests and run 11's summary; selftest 72/72. Arm frozen:
+`clinic-a2.manifest.json` (66 files; differs from A1's in exactly the three files above). Transcript and operator log:
+`D:\Research\ab-setup-clinic-a2\iso-IpCNU8\cfg`, `operator-clinic-a2.jsonl`.

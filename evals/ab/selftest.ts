@@ -2774,6 +2774,15 @@ check("S66 chat multi-part (fake classifier): the FULL closing text (not its las
   }
 });
 
+// S67 -- the chat trigger matches whole words: run 11's finished summary ("approved", "Not confirmed") stopped the operator.
+check("S67 chat trigger: the run-7 and run-9 requests (Approve the plan, Please confirm that date) and approval/should-I/trailing-? fire; run 11's closing summary (approved, Not confirmed) does not", async () => {
+  const { asksUser } = await import("./lib/operated-session.ts");
+  for (const t of ["1. Approve the plan as listed? You can approve or skip items.\n\nNext: reply with your decisions on 1-3.", "Every file I touch gets today's date. Please confirm that date.\n\nNext: reply with your choices.", "I need your approval first.", "Should I apply it", "Done. Anything else?"])
+    assert(asksUser(t), `fires: ${t.slice(0, 50)}`);
+  const run11 = "the only difference is the approved `last_updated` date.\n- the \"Not confirmed\" line now ends `Not decided yet`.\n\nNext: run `go test ./...` to close the Definition of Done.";
+  assert(!asksUser(run11), "run 11's summary is not a request");
+});
+
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
 check("S64 classifier: buildCatalog has every section, setup bullet, ruling and NONE; the chosen id sends the entry text verbatim; unknown id, unparsable output, NONE and a failed call each STOP; the prompt carries the popup and every id; the four live questions route as the owner ruled", async () => {
   const { buildCatalog, classify, buildPrompt, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
