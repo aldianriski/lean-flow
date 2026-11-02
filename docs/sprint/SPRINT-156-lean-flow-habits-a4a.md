@@ -52,7 +52,7 @@ cause is quoted from a kept stream; the fix keeps ticking as coordinator bookkee
 
 **Acceptance:** re-run on the same tasks, the first G2 scope check passes.
 
-### T3 — Give small coding tasks a light path through the loop `[size: M · risk: med · class: decision · HITL · J2]`
+### T3 — Give small coding tasks a light path through the loop `[size: M · risk: med · class: decision · HITL · J2]` — cancelled at G2 (scope-change 2026-11-02, TASK-576 in `cancel/`)
 Layers: `skills/` · `CHANGELOG.md` · `README.md`
 Depends-on: T2
 Cites: TASK-576 · `.claude/CLAUDE.md` § Design Principles (human-gated)
@@ -64,7 +64,7 @@ at this task's G2.
 
 ### T4 — Measure the three fixes as arm A4a against A2 `[size: M · risk: high · class: decision · HITL · J2]`
 Layers: `evals/ab/` · `docs/research/logs/ab-measurements-a4a.md` · `docs/epic/EPIC-023-specific-not-short.md`
-Depends-on: T1, T2, T3
+Depends-on: T1, T2
 Cites: TASK-574 · `evals/ab/PREREGISTRATION.md` Amendment 6 · EPIC-023 D8, D10, D12
 A4a is A2's frozen snapshots with the plugin pinned at the commit carrying all three fixes, so no new setup runs. Amendment 7 is
 signed before any trial; validity on its own 32 slots first, then the ruling against A2.

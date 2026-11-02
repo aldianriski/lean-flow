@@ -23,14 +23,12 @@ measure's own tasks, first pass: convention FAIL A1 1 vs A0 2, business FAIL 0 v
 3, business 4 vs 1). Part of them comes from lean-flow sessions that stopped at a permission popup and were parked, so no judge
 ran (L-272). Scored parks: A1 3 of 48, A2 3 of 32, A0 none. Five were a throwaway `check.mjs`/`probe.mjs`/`check.ts` written to
 the OS temp dir, and one a Bash `mktemp` heredoc writing a probe there. An adopter's unattended run loses the task the same
-way. The parked sessions' streams were swept, so the cause is not yet known.
+way. The parked sessions' streams are kept in `D:\ab-work\kept\` (an earlier line here said they were swept; corrected at G2).
 Owner ruling 2026-11-02: S3's first slice targets these popup stops; S3a's brief fields wait.
 
 ## Done when
-- [ ] Cause named: at least one fresh lean-flow session on a task that parked (reissue-invitation, access-activity-type-filter,
-      self-onboarding-guard or pilot-seat-limit), run headless on a research copy of its A2 snapshot (never the frozen
-      snapshot), reproduces an out-of-tree write or prompted command; its stream is kept and the skill text or behaviour that
-      led to it is quoted. If the cause is not lean-flow text (the model's own default), that is recorded with the stream as
+- [ ] Cause named: the kept streams of the parked sessions (`D:\ab-work\kept\`) show the out-of-tree write or prompted command and the
+      design step that led to it, and the skill text or behaviour behind it is quoted (scope-change 2026-11-02, owner ruling). If the cause is not lean-flow text (the model's own default), that is recorded with the stream as
       evidence, and the fix below is the guidance that counters it.
 - [ ] Fixed: the named skill text changed so a verification probe stays inside the working tree, or uses the repo's own test
       runner, and is removed afterwards. The same tasks re-run headless with the fixed plugin, one run each, stop at 0 popups;

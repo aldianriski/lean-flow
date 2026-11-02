@@ -94,6 +94,9 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   (TASK-573), a coding task's design declaring only the files its change needs (TASK-575; 82 of 93 measured A1/A2 sessions failed
   G2's first scope check and paid a revise round), and a light path for small tasks (TASK-576; A2's plan phase alone costs about
   A0's whole task). S4's leave-one-out attributes the effect.
+- **D13** — A4a's scope at SPRINT-156 G2 (owner, 2026-11-02): TASK-576 is cancelled. A2's kept streams show the design phase
+  already lean; the cost above A0 is the trial protocol's separate design, revise and build sessions, which a light path cannot
+  remove, and TASK-575 removes the revise round. A4a bundles TASK-573 and TASK-575 (`.out-of-scope/light-path-small-tasks.md`).
 
 ## Open questions
 
@@ -115,7 +118,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
-  → TASK-573, TASK-574, TASK-575, TASK-576
+  → TASK-573, TASK-574, TASK-575
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)

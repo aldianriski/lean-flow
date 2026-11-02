@@ -27,7 +27,7 @@ Owner ruling 2026-11-02: bundled with TASK-573 and TASK-576 into one arm, A4a (T
 
 ## Done when
 - [ ] Cause named: the skill text that leads a design to list the task file, product docs or flow docs for a coding change is
-      quoted, from a kept stream of a fresh lean-flow session on an A/B task (research copy, never a frozen snapshot).
+      quoted, from the kept streams of the measured sessions (`D:\ab-work\kept\`) (scope-change 2026-11-02, owner ruling).
 - [ ] Fixed: the named text changed so a coding task's design declares only the files its change needs; a doc is listed only when
       the task's own Done-when or the change's behaviour requires it, and ticking the task file stays coordinator bookkeeping
       outside the design's file list. Re-run headless on the same tasks, one run each: the first G2 scope check passes; streams kept.

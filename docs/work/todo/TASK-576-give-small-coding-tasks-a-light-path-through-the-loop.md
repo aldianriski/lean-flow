@@ -39,5 +39,10 @@ ruling 2026-11-02: bundled with TASK-573 and TASK-575 into one arm, A4a (TASK-57
 - The light path keeps the human-gated principle (CLAUDE.md): it shortens a gate, never removes sign-off.
 - Runs start after SPRINT-155 closes.
 
+## Amended 2026-11-02
+Cancelled at SPRINT-156 G2 (owner ruling). A2's kept streams show the design phase is already lean; the cost above A0 is the
+trial protocol's separate design, revise and build sessions, which a lean-flow light path cannot remove, and TASK-575 removes
+the revise round. Reason and revisit condition: `.out-of-scope/light-path-small-tasks.md`.
+
 ## Tracker
 EPIC-023 § Closed when S3 · D11 · S0 report (cost 3.9x A0) · A2 per-phase cost from its log rows
