@@ -6,6 +6,7 @@ epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-11-02
 status: closed
+close_commit: 0c556367
 plan_commit: ea07afd0
 gates_signed: G1,G2 @ 7f770538
 update_trigger: sprint execute/close events
