@@ -61,7 +61,8 @@ Owner rulings, 2026-11-02 (popup):
   location), so a design has a known file to open (EPIC-023 TASK-587).
 - **F4, F5, F7, F8, F9 → TASK-589.** Its §2 amendment also places per-feature sibling docs, `docs/archive/`, `docs/qa/` with
   `QA.md`, the generated knowledge index and data files under `research/logs/`.
-- **F10 → a backlog task** (TASK-595): decide `storm/` under ADR-001's curation bar; nothing moves in this sprint.
+- **F10 → a backlog task** (TASK-595): decide `storm/` under ADR-001's curation bar; nothing moves in this sprint. Resolved in
+  SPRINT-160 by owner ruling: moved out of the repo, git keeps it at `94248e54` (its keepers had already shipped in `/council`).
 - **F6, F11 keep:** mockups sit with the optional design contract; the exploratory pack is compliant under §3.
 - **F12 → TASK-589** (already in its scope: the roadmap moves under `product/`; the zip is ignored and stays).
 

@@ -12,7 +12,7 @@ related: [ADR-004]
 # Research — What should `/council` borrow from STORM and multi-agent-deliberation prior art?
 
 > **Question.** `/council` runs 5 fixed opinion lenses → anonymized peer review → chairman verdict.
-> Comparing it to the `storm-research` skill (`docs/research/storm/`) and the deliberation literature,
+> Comparing it to the `storm-research` skill (a copy kept in git at `94248e54`, removed by TASK-595) and the deliberation literature,
 > which mechanisms are worth adding — and at what token cost?
 > **Verdict.** Adopt the **near-free bundle** (pre-mortem line · dialectical Contrarian · calibrated
 > confidence+dissent in the verdict · perspective-guided questions · name the single-model ceiling) now;

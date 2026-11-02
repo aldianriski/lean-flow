@@ -119,7 +119,7 @@ W1–W6 and the one-shot W0 cleanup, in full → [`loop-hygiene-workstreams.md`]
 
 - Hook-based gate enforcement (TASK-006 — stays deferred; lint-in-script is the cheaper rung).
 - Council multi-model backend (TASK-047), graph view (TASK-040) — unchanged.
-- `docs/research/storm/` — excluded from this audit by owner decision.
+- `docs/research/storm/` — excluded from this audit by owner decision (the copy left the repo in TASK-595; git keeps it at `94248e54`).
 - README restructuring beyond the footer + count fixes (roster ordering difference is
   presentational, accepted).
 
