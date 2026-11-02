@@ -4,7 +4,7 @@ slug: work-types-and-bug-items
 stream: docs-structure
 owner: Maintainer
 last_updated: 2026-11-02
-status: active
+status: closed
 plan_commit: 9604dd69
 gates_signed: G1,G2 @ 635b85de
 update_trigger: sprint execute/close events
