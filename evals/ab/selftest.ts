@@ -2830,6 +2830,68 @@ check("S69 combined analysis (Amendment 6 item 7): analyze.ts pairs comma-listed
   assert(bad.exitCode === 2 && /pair by position/.test(bad.stderr.toString()), `mismatched lists exit 2: ${bad.exitCode} ${bad.stderr.toString().slice(0, 120)}`);
 });
 
+check("S70 comparator analysis: A4A minus A2 uses shared first-pass tasks and pooled symptom rates; existing A1 sections and cost ratios stay unchanged; an absent comparator exits 2", async () => {
+  const { analyze, bootstrap, renderReport } = await import("./lib/analyze.ts");
+  const { fixtureSlots, fixtureSchedule } = await import("./lib/fixture-slots.ts");
+  const dir = tmpdir("s70");
+  const spec = {
+    arms: { A0: { success: 0.35, tokens: 1000 }, A1: { success: 0.55, tokens: 1500 }, A2: { success: 0.7, tokens: 2400 }, A4A: { success: 0.95, tokens: 3300 } },
+    lost: [{ arm: "A4A", repo: "clinic", task: "t3", trial: 1, replacementPasses: true }],
+    unknown: [{ arm: "A2", task: "t2", trial: 2 }],
+  };
+  // A2 did not schedule clinic/t4: primary deltas use shared tasks; symptoms retain each arm's own task set.
+  const keep = (s: { arm: string; repo: string; task: string }) => !(s.arm === "A2" && s.repo === "clinic" && s.task === "t4");
+  const slots = fixtureSlots(spec).filter(keep);
+  const schedule = fixtureSchedule(spec).filter(keep);
+  const w = (f: string, v: unknown) => (fs.writeFileSync(path.join(dir, f), JSON.stringify(v)), path.join(dir, f));
+  const data = w("slots.json", { slots, voidedUsd: 0 });
+  const sch = w("schedule.json", schedule);
+  const run = (...args: string[]) => Bun.spawnSync(["bun", "--no-env-file", path.join(AB, "analyze.ts"), "--data", data, "--schedule", sch, ...args], { stdout: "pipe", stderr: "pipe" });
+  const plain = run();
+  const compared = run("--comparator", "A2");
+  const out = compared.stdout.toString();
+  assert(plain.exitCode === 0 && compared.exitCode === 0 && out.includes("analysis: VALID"), `both runs VALID: ${compared.exitCode} ${compared.stderr.toString()}`);
+  const section = (text: string, heading: string) => text.split("\n## ").find((s) => s.startsWith(`${heading}\n`))?.split("\n\nanalysis:")[0]?.trimEnd();
+  const deltaHeading = "Delta vs A2 (primary, bootstrap over tasks)";
+  const symptomHeading = "Symptom differences vs A2 (pooled point difference, arm minus A2)";
+  const delta = section(out, deltaHeading);
+  const symptoms = section(out, symptomHeading);
+  assert(delta && symptoms, "--comparator A2 adds both comparator sections");
+  for (const arm of ["A0", "A1", "A4A"]) assert(delta.includes(`- ${arm}:`) && symptoms.includes(`| ${arm} |`), `${arm} compared to A2 in both sections`);
+  assert(!delta.includes("- A2:") && !symptoms.includes("| A2 |"), "comparator is not compared to itself");
+
+  const rep = analyze(slots, schedule);
+  const shared = [...new Set(slots.filter((s) => s.arm === "A2").map((s) => `${s.repo}/${s.task}`))].sort();
+  const firstRate = (arm: string, task: string) => {
+    const trials = slots.filter((s) => s.arm === arm && `${s.repo}/${s.task}` === task);
+    return trials.filter((s) => s.first?.graders && s.first.business === "PASS").length / trials.length;
+  };
+  const pct1 = (x: number) => `${(x * 100).toFixed(1)}%`;
+  const expected = ["pooled", "clinic", "workdoo"].map((scope) => {
+    const keys = shared.filter((k) => scope === "pooled" || k.startsWith(`${scope}/`));
+    const salt = [...`delta-vs-A2:A4A:${scope}`].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const d = bootstrap(keys, (sample) => sample.reduce((n, k) => n + firstRate("A4A", k) - firstRate("A2", k), 0) / sample.length, rep.params.bootstrap, salt);
+    return `${scope} ${pct1(d.point)} [${pct1(d.lo)}, ${pct1(d.hi)}] n=${d.n}`;
+  });
+  assert(delta.split("\n").includes(`- A4A: ${expected.join("; ")}`), `A4A delta equals the independent first-pass bootstrap over shared tasks: ${delta}`);
+  const diffs = (["convention", "business", "lostDetail", "scope"] as const).map((k) => {
+    const d = rep.arms!.A4A!.symptoms[k].value - rep.arms!.A2!.symptoms[k].value;
+    return `${d >= 0 ? "+" : ""}${(d * 100).toFixed(1)}`;
+  });
+  assert(symptoms.split("\n").includes(`| A4A | ${diffs.join(" | ")} |`), `A4A symptom row subtracts A2's rates: ${symptoms}`);
+  assert(plain.stdout.toString() === `${renderReport(rep)}\nanalysis: VALID\n`, "without --comparator the report is byte-identical to the existing renderer");
+  for (const block of plain.stdout.toString().split("\n## ").slice(1)) {
+    const heading = block.split("\n")[0]!;
+    assert(section(out, heading) === section(plain.stdout.toString(), heading), `existing section unchanged: ${heading}`);
+  }
+  assert(out.includes("## Delta vs A1") && out.includes("## Symptom differences vs A1"), "both original A1 sections remain");
+  const cost = out.split("\n## ").find((s) => s.startsWith("Cost ("))!;
+  const costRow = cost.split("\n").find((s) => s.startsWith("| A4A |"))!.split("|").map((s) => s.trim());
+  assert(cost.includes("| ratio vs A1 | within 2x |") && costRow[7] === "2.20" && costRow[8] === "NO", `cost remains 2.20x A1 (above the ceiling), not 1.38x A2: ${costRow.join("|")}`);
+  const bad = run("--comparator", "AX");
+  assert(bad.exitCode === 2 && bad.stderr.toString().includes("AX"), `absent comparator exits 2 naming AX: ${bad.exitCode} ${bad.stderr.toString()}`);
+});
+
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
 check("S64 classifier: buildCatalog has every section, setup bullet, ruling and NONE; the chosen id sends the entry text verbatim; unknown id, unparsable output, NONE and a failed call each STOP; the prompt carries the popup and every id; the four live questions route as the owner ruled", async () => {
   const { buildCatalog, classify, buildPrompt, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");

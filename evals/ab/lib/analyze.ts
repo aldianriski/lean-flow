@@ -208,6 +208,29 @@ export function analyze(slots: Slot[], schedule: SlotKey[], params: Params = DEF
   return report;
 }
 
+export type Comparison = {
+  comparator: string;
+  delta: Record<string, Record<string, Interval>>;
+  symptoms: Record<string, Record<Measure4, number>>;
+};
+
+/** Additional comparisons only; the report's A1 cost ceiling and rulings remain unchanged. No figures for a non-VALID run. */
+export function compareTo(slots: Slot[], report: Report, comparator: string): Comparison | undefined {
+  const baseline = report.arms?.[comparator];
+  if (!baseline) return undefined;
+  const comparison: Comparison = { comparator, delta: {}, symptoms: {} };
+  const baseMeans = scoresOf(taskMeans(rowsOf(slots, "first-pass", comparator), success, "fail"));
+  for (const [arm, r] of Object.entries(report.arms!)) {
+    if (arm === comparator) continue;
+    const means = scoresOf(taskMeans(rowsOf(slots, "first-pass", arm), success, "fail"));
+    const shared = [...means.keys()].filter((k) => baseMeans.has(k));
+    const diff = new Map(shared.map((k) => [k, means.get(k)! - baseMeans.get(k)!]));
+    comparison.delta[arm] = intervals(diff, meanStat, report.params, `delta-vs-${comparator}:${arm}`);
+    comparison.symptoms[arm] = Object.fromEntries((Object.keys(SYMPTOMS) as Measure4[]).map((k) => [k, r.symptoms[k].value - baseline.symptoms[k].value])) as Record<Measure4, number>;
+  }
+  return comparison;
+}
+
 /**
  * Independent re-derivation of the claims most easily broken, from the raw slots and the frozen schedule (a different code path
  * from analyze). Findings are named: unknown-counted-as-pass | replaced-view-as-primary | infra-lost-in-symptom |
@@ -282,5 +305,16 @@ export function renderReport(rep: Report): string {
     L.push(``, `## A0 floor (an arm below ${p.a0} on the primary endpoint fails regardless of its delta)`, ``);
     for (const [a, v] of Object.entries(rep.a0Floor)) L.push(`- ${a}: ${pct(v.primary)} vs ${p.a0} ${pct(v.a0)} -- ${v.fails ? "FAILS the floor" : "above the floor"}`);
   }
+  return `${L.join("\n")}\n`;
+}
+
+/** Append-only sections for an explicitly requested comparator. */
+export function renderComparison(comparison: Comparison | undefined): string {
+  if (!comparison) return "";
+  const { comparator, delta, symptoms } = comparison;
+  const L = [``, `## Delta vs ${comparator} (primary, bootstrap over tasks)`, ``];
+  for (const [arm, d] of Object.entries(delta)) L.push(`- ${arm}: ${Object.entries(d).map(([k, v]) => `${k} ${iv(v)}`).join("; ")}`);
+  L.push(``, `## Symptom differences vs ${comparator} (pooled point difference, arm minus ${comparator})`, ``, `| arm | convention | business | lostDetail | scope |`, `|---|---|---|---|---|`);
+  for (const [arm, d] of Object.entries(symptoms)) L.push(`| ${arm} | ${(["convention", "business", "lostDetail", "scope"] as Measure4[]).map((k) => Number.isNaN(d[k]) ? "n/a" : `${d[k] >= 0 ? "+" : ""}${(d[k] * 100).toFixed(1)}`).join(" | ")} |`);
   return `${L.join("\n")}\n`;
 }
