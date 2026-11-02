@@ -141,3 +141,8 @@ owner's ruling. Amendment 7 appended (CRLF); the document's sha256 is recorded a
 ### 2026-11-02 | progress | T4: Amendment 7 owner-signed; A4a log created with its freeze line
 The owner signed Amendment 7 by popup. `docs/research/logs/ab-measurements-a4a.md` created, frozen 2026-11-02T06:10:41Z, sha256 `937e9855...3e03` at
 `5339c67c`; the harness reports no freeze problem. Next: the owner runs the A4a pilot (2 slots) in their own terminal.
+
+### 2026-11-02 | progress | T4: A4a pilot done (2 of 2 scored, both pass); owner approves the remaining 30
+workdoo-a4a access-activity-type-filter: G2 passed on the first round, every grader pass, convention/business/scope PASS, $1.46,
+156 s. clinic-a4a appointment-lookup: same, $1.49, 151 s. Both rows pin `56964ce2`. A2's pilot on the same two slots cost
+$2.26 and $1.98, and its workdoo slot needed a revise round. The owner approved the full run by popup before the pilot ended.
