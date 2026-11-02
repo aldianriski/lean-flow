@@ -26,8 +26,9 @@ message. Owner ruling 2026-11-02: one work store with types, not a separate bugs
       a `bug` item carries sections for symptom, repro, expected, actual, evidence, root cause, fix, regression test and prevention;
       evidence for any work item (a bug's repro, a task's verification captures) lives in `docs/work/evidence/TASK-NNN/`, redacted
       before commit, linked from the item, and never moves with status; business facts get a placed row (under `docs/product/`, a
-      root `BUSINESS-NOTES.md` accepted as a legacy location); the temp-only
-      `BUG-<slug>.md` rule is retired; a `debt` item cites its `TD-NNN`, and `TECH-DEBT.md` stays the debt ledger.
+      root `BUSINESS-NOTES.md` accepted as a legacy location); the temp-only `BUG-<slug>.md` intake is replaced by a bug item
+      and `S2.R-TEMPDIR` stays (a committed bug-report file remains wrong; scope-change 2026-11-02); a `debt` item cites its
+      `TD-NNN`, and `TECH-DEBT.md` stays the debt ledger.
 - [ ] The bug-item template replaces `BUG.md.template`, and the task-file reference names the `type:` field.
 - [ ] Every check that parses work-item frontmatter or the BUG temp rule accepts the new shape, each with a must-FAIL fixture
       (an unknown `type:` value; a bug item missing its repro section) that fails with its named finding.

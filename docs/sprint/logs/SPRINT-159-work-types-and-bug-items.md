@@ -68,3 +68,27 @@ reads another sprint's log as a baseline): T3's Layers add `scripts/lib/check-sp
 `TECH-DEBT.md` (the TD row marked converted). (3) box 4 runs migrate on a scratch copy of that research copy. (4) box 2 drops the
 CR fix (SPRINT-157 T1 owns it); T6 builds the topic-folder reading with its own must-FAIL fixture. T2's Cites corrects ADR-023 to
 ADR-018 (the spec's extraction ADR). Re-confirm G2: signed in the same popup.
+
+### 2026-11-02 | gate | G2 signed for T2-T6 (owner popup); builder check settled
+G2 designs (scratchpad `g2-159/designs.md`), with the scope-change above applied and the builder check settled by fact:
+- T2: additive spec 0.19.0 (MINOR, no rule id touched); findings named `work-type-unknown`, `bug-item-missing-repro`,
+  `debt-item-missing-td`; the frontmatter parsers enumerated from the recon (only `run-v1-to-v2-fixtures.ts` is strict both ways and
+  learns `type`; the others read their own keys); evidence holds images, JSON, text and header-exempt markdown, never `.log`;
+  `BUG.md.template` rewritten in place (34 templates unchanged); the ADR number derived at build.
+- T3: the bug-item shape lives in the template so triage stays within its cap; known and unknown causes become bug items, systemic
+  stays a TD; diagnose's no-item path is unchanged; the TD-285 fix is "other G" (maintainer-only): a must-FAIL fixture and one run
+  on its real artifact.
+- T4: `/triage` fires at `/flow`'s Feed step, `/diagnose` at its Build route; an open bug is one outside `done/` and `cancel/`, the
+  oldest is the lowest id; prime's read-order row is reworded, not lengthened; `/prime` and `/flow` are shown by headless runs; the
+  close-listing box ticks at this sprint's real close.
+- T5: untyped tasks read as `feature`, stated; bug-flavoured tasks are proposed too; a bug with no task gets a proposed new item
+  (written only on approval); capture folders are mapped only where a task id is cited; `init` documents the evidence folder as
+  created lazily; no business-notes move; skill line counts net zero.
+- T6: one §2 row per topic folder (exact globs for the cap check); only the three named series move; the six stale headers are the
+  two deployment guides, `docs/qa/README.md` and QA-001 to QA-003; the roadmap moves under the product rows; T2 opens the spec 0.19.0
+  block and T6 appends to it.
+builder-check · T2 · 6 contradictions · 5 questions · settled by fact and one owner ruling (bug rule kept)
+builder-check · T3 · 4 contradictions · 5 questions · settled by fact and one owner ruling (TD-285)
+builder-check · T4 · 3 contradictions · 5 questions · settled by fact
+builder-check · T5 · 7 contradictions · 4 questions · settled by fact and one owner ruling (scratch copy)
+builder-check · T6 · 5 contradictions · 5 questions · settled by fact and one owner ruling (CR fix to SPRINT-157)

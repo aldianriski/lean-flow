@@ -28,7 +28,8 @@ update sync for them; it must neither break them nor leave their bugs behind.
       evidence to `docs/work/evidence/TASK-NNN/`, and mapping existing verification-capture folders onto the items they prove, and
       applies only what the owner approves; nothing is deleted (scope-change 2026-11-02).
 - [ ] `init` creates the evidence folder only when a first bug item needs it.
-- [ ] Shown on real input: migrate on the workdoo research copy (`D:\Research\dev156\workdoo`) proposes its `docs/bugs/` as a bug
+- [ ] Shown on real input: migrate on a scratch copy of the workdoo research copy (`D:\Research\dev156\workdoo`; scope-change
+      2026-11-02) proposes its `docs/bugs/` as a bug
       item with the screenshot as evidence, and an approved run leaves every other file unchanged (diff read).
 - [ ] CHANGELOG `[Unreleased]` entry; README if a user-visible behaviour changes; the skill stays within its cap.
 

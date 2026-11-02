@@ -29,8 +29,8 @@ drops entries from CRLF files. Elsewhere: `docs/development/Lean-Flow-Governance
       `logs/` and `archive/` unchanged, and also place per-feature sibling docs beside a core file, `docs/archive/` (migrate's
       history), `docs/qa/` with `QA.md`, the generated knowledge index and data files under `research/logs/` (scope-change
       2026-11-02).
-- [ ] `scripts/gen-index.sh` and the cap check read topic folders, and the generator strips CR; each change has a must-FAIL fixture
-      (a doc in a subfolder, a CRLF doc) that fails on the current code.
+- [ ] `scripts/gen-index.sh` and the cap check read topic folders (the CR fix is SPRINT-157 T1's; scope-change 2026-11-02); each
+      change has a must-FAIL fixture (a doc in a topic folder) that fails on the current code.
 - [ ] `conformance/`, `guard-audit/` and `mattpocock/` hold their series, every live link updated (citation counts re-derived
       before the move); `loop-hygiene-*` and high-citation docs stay flat; the knowledge index lists every moved doc.
 - [ ] The governance roadmap moves under `docs/product/` per §2; the six stale headers are refreshed or re-dated with a reason.
