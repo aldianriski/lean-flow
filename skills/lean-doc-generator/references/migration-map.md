@@ -149,6 +149,8 @@ the standard did not place. The sync brings it across without rewriting it:
     those tasks; a folder no task cites stays where it is and is listed, never guessed onto a task.
 - **Moves keep history and links**: `git mv` (a plain move without git) into `docs/work/evidence/TASK-NNN/`, every live link to the
   old path updated in the same apply; a `.log` file moves as `.txt` (S12).
+  Frozen history keeps its old links (changelogs, archived sprints and logs, decided ADRs): a link there still resolves
+  through history, and history is never rewritten. A moved README's own relative links are rebased to its new depth.
 - **Redaction before any move**: a file carrying a token, an auth header, a key or a password is flagged and left in place, never
   moved into evidence unredacted.
 - **Kept, not moved**: a root `BUSINESS-NOTES.md` is the business-facts row's accepted legacy location; it is reported, not moved.
