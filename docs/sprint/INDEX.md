@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-01
+last_updated: 2026-11-02
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-154 — A2: Migrate Arm — closed 2026-11-02 · `c625574` · 1 of 1 members in `done/`, 3/3 DoD (no release: S1 held by EPIC-023 D6) · EPIC-023 (S1 arm) · A2 set up by a real `migrate` from the S1 pin, 32/32 VALID: 78.1% vs A1 81.2% vs A0 89.6%, ruled failed (below the A0 floor); S3 intake redirected by D11 (TASK-573/574)
 - SPRINT-152 — S0: Freeze and Baseline — closed 2026-11-01 · `ba3675d` · 4 of 4 members in `done/`, 12/12 DoD (no release: maintainer-only harness) · EPIC-023 (S0) · pre-registration frozen and amended five times under owner signature; paid A0/A1 baseline 96/96 VALID: A1 81.2% vs A0 89.6%, regressed on three symptoms, no R-b defect; S2 not admitted, D10 admits S3
 - SPRINT-153 — S1: Discovery Profile — closed 2026-11-01 · `8299017` · 8 of 8 members in `done/`, 23/23 DoD (no release: held under [Unreleased] per EPIC-023 D6) · EPIC-023 (S1) · init and migrate write a cited repo profile (stack, conventions, five business topics) with question sets by stack; migrate keeps every decision; /prime and /flow route an unprofiled repo; spec 0.18.2 PATCH
 - SPRINT-151 — S0: Answers, Tasks, Arms and Judges — closed 2026-10-31 · `a9f03af` · 7 of 8 members in `done/` (TASK-558 scoped out, 2 of 3), 33/33 DoD on the delivered seven (no release: held under [Unreleased] per EPIC-023 D6) · EPIC-023 (S0 waves 0-2) · answers files, 16 verified owner-signed tasks, four frozen arms, blind judges calibrated at 85.5%; promote can pull a dependent with its in-sprint blockers; review-depth FAIL ruled by the owner (TASK-559)

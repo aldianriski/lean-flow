@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-01
+last_updated: 2026-11-02
 update_trigger: An epic slice (S0-S4) promotes or closes, an A/B arm reports, or an owner ruling changes D1-D12
 status: current
 id: lean-flow-3-foundation
@@ -110,6 +110,11 @@ itself** — recorded in an ADR + CLAUDE.md, never a STANDARD rule imposed on ad
 > limit (`docs/research/logs/ab-measurements.md` § Report 2026-11-01). By EPIC-023 D10, S2 and arm A3 are not admitted; S3
 > runs as a measured experiment on the convention and business regressions, and its arms and S4 compare against A2. The
 > slicing below is the design as decided at S0 promote, kept as the record.
+>
+> **Status 2026-11-02 (after S1's arm).** A2 (S1's `migrate` on the 2.x snapshots) scored 78.1% against A1 81.2% and A0 89.6%,
+> ruled failed below the A0 floor (`docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02), so S1 does not ship (D6).
+> EPIC-023 D11: S0's convention and business regressions are judge UNKNOWN verdicts, part of them sessions parked at a
+> permission popup, so S3's first slice fixes those parks and measures the fix as A4a vs A2; S3a's brief fields wait.
 
 Each slice ends with **its own staged A/B arm** (§7). Two permissions are kept apart: a slice whose arm
 misses its threshold still **continues as an experimental prerequisite** of the next arm (H1 may only
