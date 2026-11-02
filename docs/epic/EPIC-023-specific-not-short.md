@@ -2,7 +2,7 @@
 epic: 023
 slug: specific-not-short
 owner: Maintainer
-last_updated: 2026-11-01
+last_updated: 2026-11-02
 status: active
 member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152, SPRINT-153, SPRINT-154]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -82,6 +82,12 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   9 tasks) regressions, and its `## Why` cites them; D5 still ships a role only on its own positive delta. S2 is not admitted:
   its lost-detail regression (−8.3) rests on 4 tasks. The STANDARD change stays under D2. With no A3, S3 and S4 compare
   against A2.
+- **D11** — S3's first slice (owner, 2026-11-02): the convention and business regressions D10 admits S3 on are judge UNKNOWN
+  verdicts, not more FAILs (A1 1 and 2 against A0's 2 and 3, round-0 rows). Some of those UNKNOWNs are lean-flow sessions parked at a permission
+  popup after writing a probe outside the working tree (A1 6 of 48, A2 3 of its first 17, A0 none). S3's first slice
+  therefore fixes those popup stops (TASK-573) and measures the fix as its own arm A4a against A2 (TASK-574). S3a's brief
+  fields wait; when they come, they apply to the session's own G1/G2 brief, since trial sessions dispatched a subagent in
+  4 of 98 A1/A2 rows. A4a stacks on A2 whatever A2's ruling is.
 
 ## Open questions
 
@@ -101,7 +107,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
-  → next slice: S3 Expertise candidates
+  → TASK-573, TASK-574
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)
