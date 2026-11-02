@@ -171,8 +171,7 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
       while (!firstStop && !failed && next < pending.length) {
         const slot = pending[next]!;
         const isPilot = pilotPending && pilot.includes(slot);
-        // Leave the last pilot finisher to stop for review, or continue if a pilot
-        // exhausted its attempts without scoring (the serial loop's behaviour).
+        // Leave the last pilot finisher to stop for review (Amendment 8: no non-pilot slot before it).
         if (pilotPending && !isPilot && runningPilot > 0) return;
         next++;
         if (isPilot) runningPilot++;
@@ -181,6 +180,10 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
         } finally {
           if (isPilot) runningPilot--;
         }
+        // Every pilot slot has run and the pilot is still not scored (a slot exhausted its attempts while the other worker's
+        // success reset the infra streak): stop for an owner ruling, as the serial loop's three-infra abort would have.
+        if (isPilot && runningPilot === 0 && !firstStop && !pending.slice(next).some((s) => pilot.includes(s)) && !pilotDone(countedRows(d.log)))
+          stop("abort", `a pilot slot ended without a scored attempt: aborted for an owner ruling before any non-pilot slot`);
       }
     } catch (e) {
       failed = true; // drain other running trials before the caller releases the log lock

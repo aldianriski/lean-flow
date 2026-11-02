@@ -3063,7 +3063,7 @@ check("S76 two-worker pilot barrier: the first finisher cannot spend non-pilot s
   deepStrictEqual(calls, [1, 2], "no non-pilot run before owner review");
   assert(result.stop === "pilot" && result.ran.length === 2, `pilot stop after both slots: ${JSON.stringify(result)}`);
 
-  // An exhausted, unscored pilot must not strand the remaining schedule.
+  // An exhausted, unscored pilot stops for an owner ruling; no non-pilot slot is spent (Amendment 8).
   const unscored = await dryRun();
   const attempts: string[] = [];
   const finish = new Map<string, () => void>();
@@ -3083,8 +3083,8 @@ check("S76 two-worker pilot barrier: the first finisher cannot spend non-pilot s
     if (id !== "1:3") assert(attempts.every((a) => /^[12]:/.test(a)), "no refill while pilot 1 is running");
   }
   const continued = await continuing;
-  assert(continued.stop === "done", `unscored pilot continues as the serial loop: ${continued.stop}`);
-  deepStrictEqual(attempts, ["1:1", "2:1", "1:2", "1:3", "3:1", "4:1"]);
+  assert(continued.stop === "abort", `unscored pilot stops for an owner ruling: ${continued.stop}`);
+  deepStrictEqual(attempts, ["1:1", "2:1", "1:2", "1:3"], "no non-pilot slot after an unscored pilot");
 });
 
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
