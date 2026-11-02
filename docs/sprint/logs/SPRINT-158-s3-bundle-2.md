@@ -61,3 +61,17 @@ builder-check · T2 · 3 contradictions · 3 questions · settled by fact (workd
 builder-check · T3 · 2 contradictions · 2 questions · settled by owner ruling (outside-tree scope-change) and fact
 builder-check · T4 · 3 contradictions · 5 questions · settled by fact
 builder-check · T5 · 4 contradictions · 5 questions · settled by fact and one owner ruling (non-inferiority)
+
+### 2026-11-02 | progress | T3, T4: skill text landed; T4's cause named from A2's kept streams; development runs wait for T1
+T3 (`36054061`): the Reachability line's probe sentence goes on: anything else a check creates in the working tree is removed
+before the report unless declared; what the repo's own tests leave outside it is named, never deleted. T4 (`d09db7f5`): a new G2 box,
+"Business facts" (the design names each stated fact it touches and how it honours it; a fact wins over the neighbouring code);
+two lines of the continuation-contract paragraph joined, words unchanged, so SKILL.md stays at 140 lines; dense lines 13 of 13.
+T4 cause (TASK-585 box 1), from A2's kept streams (pin `lean-flow-s1-82990174`): invitation-issued-by `iso-pHKUKD` and
+`iso-ZTaJYd`, self-onboarding-guard `iso-JM0yW0` and `iso-yPPt1S`. In all four the design phase never opened `BUSINESS-NOTES.md`
+(it appears once, in a grep's file list); the designs read the task file, the code and the API contract. invitation-issued-by's
+build reused the neighbouring `formatDate` helper (`'en'`) over fact 14 ("users see dates and times in UTC (en-GB style)");
+self-onboarding-guard searched the code for intake and responsibility and never met fact 6 ("The intake creator is initially
+available for all three preparation responsibilities"). No lean-flow sentence sent the design to the business facts.
+Development runs (T3 clinic appointment-lookup and workdoo reissue-invitation; T4 the two tasks above, which also give T2 its
+real input) start after T1's ownership-safe sweep lands.
