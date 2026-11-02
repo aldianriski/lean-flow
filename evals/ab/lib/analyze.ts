@@ -262,6 +262,13 @@ export function renderReport(rep: Report): string {
     L.push(``, `## Delta vs ${p.a1} (primary, bootstrap over tasks)`, ``);
     for (const [a, d] of Object.entries(rep.deltaVsA1)) L.push(`- ${a}: ${Object.entries(d).map(([k, v]) => `${k} ${iv(v)}`).join("; ")}`);
   }
+  if (rep.arms[p.a1] && Object.keys(rep.arms).length > 1) {
+    // Section 4's regression test with the comparator arm (A1) (Amendment 6 item 7): pooled point difference, each arm over its own
+    // task set; the -0.05 limit is applied by the reader, never here
+    const c = rep.arms[p.a1]!.symptoms;
+    L.push(``, `## Symptom differences vs ${p.a1} (pooled point difference, arm minus ${p.a1})`, ``, `| arm | convention | business | lostDetail | scope |`, `|---|---|---|---|---|`);
+    for (const [a, r] of Object.entries(rep.arms)) if (a !== p.a1) L.push(`| ${a} | ${(["convention", "business", "lostDetail", "scope"] as Measure4[]).map((k) => { const d = r.symptoms[k].value - c[k].value; return Number.isNaN(d) ? "n/a" : `${d >= 0 ? "+" : ""}${(d * 100).toFixed(1)}`; }).join(" | ")} |`);
+  }
   if (rep.gainVsA0) L.push(``, `## Gain of ${p.a1} over ${p.a0} (primary, ${p.a1} minus ${p.a0}; the pooled line decides)`, ``, `- ${Object.entries(rep.gainVsA0).map(([k, v]) => `${k} ${iv(v)}`).join("; ")}`);
   L.push(``, `## Cost (D5: execution tokens only, median over tasks of the per-task mean (first pass) vs ${p.a1})`, ``, `| arm | weighted median | input | output | cache-read | cache-write | ratio vs ${p.a1} | within ${p.costCeiling}x |`, `|---|---|---|---|---|---|---|---|`);
   for (const [a, r] of Object.entries(rep.arms)) L.push(`| ${a} | ${r.tokens.weightedMedian} | ${r.tokens.parts.input} | ${r.tokens.parts.output} | ${r.tokens.parts.cacheRead} | ${r.tokens.parts.cacheWrite} | ${rep.cost?.[a] ? rep.cost[a]!.ratioVsA1.toFixed(2) : "1.00"} | ${rep.cost?.[a]?.withinCeiling === null || !rep.cost?.[a] ? "-" : rep.cost[a]!.withinCeiling ? "yes" : "NO"} |`);

@@ -2806,6 +2806,30 @@ check("S68 classifier strictness: a label not found verbatim in the message, ove
   assert("answer" in fenced && fenced.answer === PLAN_RULING.text, `fenced JSON passes: ${JSON.stringify(fenced)}`);
 });
 
+check("S69 combined analysis (Amendment 6 item 7): analyze.ts pairs comma-listed --data/--schedule files and concatenates them; A2 gets a delta and a symptom difference vs A1 equal to the in-process figures; A2 alone has no comparator section; mismatched list lengths exit 2", async () => {
+  const { analyze } = await import("./lib/analyze.ts");
+  const { fixtureSlots, fixtureSchedule } = await import("./lib/fixture-slots.ts");
+  const dir = tmpdir("s69");
+  const s0 = { A0: { success: 0.45, tokens: 1000 }, A1: { success: 0.7, tokens: 1500 } };
+  const a2 = { A2: { success: 0.9, tokens: 1600 } };
+  const w = (f: string, v: unknown) => (fs.writeFileSync(path.join(dir, f), JSON.stringify(v)), path.join(dir, f));
+  const [d0, d2, h0, h2] = [w("s0.json", { slots: fixtureSlots({ arms: s0 }), voidedUsd: 0 }), w("a2.json", { slots: fixtureSlots({ arms: a2 }), voidedUsd: 0 }), w("s0-sch.json", fixtureSchedule({ arms: s0 })), w("a2-sch.json", fixtureSchedule({ arms: a2 }))];
+  const run = (data: string, sch: string) => Bun.spawnSync(["bun", path.join(AB, "analyze.ts"), "--data", data, "--schedule", sch], { stdout: "pipe", stderr: "pipe" });
+  const both = run(`${d0},${d2}`, `${h0},${h2}`);
+  const out = both.stdout.toString();
+  assert(both.exitCode === 0 && /analysis: VALID/.test(out), `combined run VALID: ${out.slice(-200)} ${both.stderr.toString().slice(0, 200)}`);
+  const rep = analyze([...fixtureSlots({ arms: s0 }), ...fixtureSlots({ arms: a2 })], [...fixtureSchedule({ arms: s0 }), ...fixtureSchedule({ arms: a2 })]);
+  const pct1 = (x: number) => `${(x * 100).toFixed(1)}%`;
+  const d = rep.deltaVsA1!.A2!.pooled!;
+  assert(rep.denominator === 72 && out.includes(`- A2: pooled ${pct1(d.point)} [${pct1(d.lo)}, ${pct1(d.hi)}] n=${d.n}`), `the A2 delta line equals the in-process delta over all 72 slots (48 + 24): ${rep.denominator}`);
+  const diff = (k: "convention" | "business") => { const x = rep.arms!.A2!.symptoms[k].value - rep.arms!.A1!.symptoms[k].value; return `${x >= 0 ? "+" : ""}${(x * 100).toFixed(1)}`; };
+  assert(out.includes("## Symptom differences vs A1") && new RegExp(`\\| A2 \\| \\${diff("convention")} \\| \\${diff("business")} \\|`).test(out), `A2's symptom row equals the in-process differences (${diff("convention")}, ${diff("business")})`);
+  const alone = run(d2, h2).stdout.toString();
+  assert(/analysis: VALID/.test(alone) && !alone.includes("Symptom differences") && !alone.includes("## Delta vs"), "A2 alone: validity and its own figures, no comparator section");
+  const bad = run(`${d0},${d2}`, h0);
+  assert(bad.exitCode === 2 && /pair by position/.test(bad.stderr.toString()), `mismatched lists exit 2: ${bad.exitCode} ${bad.stderr.toString().slice(0, 120)}`);
+});
+
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
 check("S64 classifier: buildCatalog has every section, setup bullet, ruling and NONE; the chosen id sends the entry text verbatim; unknown id, unparsable output, NONE and a failed call each STOP; the prompt carries the popup and every id; the four live questions route as the owner ruled", async () => {
   const { buildCatalog, classify, buildPrompt, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");
