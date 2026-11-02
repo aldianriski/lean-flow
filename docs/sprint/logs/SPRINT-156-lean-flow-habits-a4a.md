@@ -83,3 +83,11 @@ SKILL.md Reachability rule ends at "the criterion stays a judgment tick and says
 inside the working tree, deleted before the report, never in a system temp dir; SKILL.md stays at 140 lines, density baseline
 unchanged (13). CHANGELOG [Unreleased] carries it. Box 2 waits for the shared re-run batch after T2.
 consequence · T1 · behaviour:material · governance:low
+
+### 2026-11-02 | scope-change | T1: Layers names TASK-573's own member file in each status folder
+What changed: two commits under a `T1` subject moved and ticked TASK-573 (`f6e85058`, `29677d14`), and `layers observed` reads a
+Tn commit against that Tn's `Layers:`, which did not list the member file. Ticks and moves are coordinator bookkeeping and later
+ones carry `sprint(156):` subjects; these two stay as written (`ca13d54e` between them is cited), so T1's `Layers:` gains
+`docs/work/todo/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`,
+`docs/work/in_progress/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md` and
+`docs/work/done/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`, as SPRINT-154's T1 did. Impact: none on scope.

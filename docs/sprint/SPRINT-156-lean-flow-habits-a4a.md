@@ -37,6 +37,9 @@ any harness change beyond what Amendment 7 needs · a release (D6: only on a pas
 
 ### T1 — Stop sessions parking a headless run on probes written outside the repo `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `skills/` · `CHANGELOG.md` · `docs/research/`
+  · `docs/work/todo/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`
+  · `docs/work/in_progress/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`
+  · `docs/work/done/TASK-573-stop-headless-sessions-parking-on-out-of-tree-probes.md`
 Depends-on: none
 Cites: TASK-573 · L-272 · `docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02
 The parked sessions' streams are kept, so the cause is quoted from them (scope-change 2026-11-02). The fix is skill text that keeps a
