@@ -47,3 +47,4 @@ skills/task-decomposer/SKILL.md 3
 skills/tdd/SKILL.md 1
 skills/triage/SKILL.md 1
 spec/STANDARD.md 6
+docs/QA.md 7
