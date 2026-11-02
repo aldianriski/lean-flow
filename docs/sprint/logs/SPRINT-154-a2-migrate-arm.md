@@ -138,3 +138,15 @@ parts, so the operator exited 3 after the work was done; nothing was left to ans
 (`approve`, `approval`, `confirm`), S67 holds the run-7/run-9 requests and run 11's summary; selftest 72/72. Arm frozen:
 `clinic-a2.manifest.json` (66 files; differs from A1's in exactly the three files above). Transcript and operator log:
 `D:\Research\ab-setup-clinic-a2\iso-IpCNU8\cfg`, `operator-clinic-a2.jsonl`.
+
+### 2026-11-02 | progress | T1: workdoo-a2 migrated in one session and frozen; both A2 arms pinned in hash-prereg.ts
+The first workdoo-a2 session completed the migrate: PLAN, the five business topics, CLEANUP ×3 (the `migration-guide.md` cap
+breach, the overview table move, the requirements split) and UNDECIDED ×4 (component folders, component tests, env and config, UI
+errors). Its closing turn offered to write `.cap-dispositions`; no entry covered it and the operator stopped (exit 3) with nothing
+left to do. **Owner ruling:** declined under PLAN; the snapshot is frozen as migrate left it. Audit: only `overview.md` (150→158),
+`coding-standards.md` (53→72) and `requirements.md` (150→211) changed; no existing line removed except two `last_updated` dates.
+**Arm output recorded, not corrected (owner ruling):** `requirements.md` gained 61 lines but keeps `last_updated: 2026-10-25` (no
+date popup was asked), and `overview.md` / `requirements.md` end over their caps (hard 150, soft 150). Session writes outside the
+snapshot went to `%TEMP%` only (a plan handoff and an inventory script). Frozen: `workdoo-a2.manifest.json` (1244 files; differs
+from A1's in exactly the three files). `hash-prereg.ts` now pins both A2 arms and `schedule-a2.json`; every S0 pin and the corpus
+hash still match the pre-registration. Selftest 72/72. Amendment 6 drafted with the A2 hashes, awaiting Codex review.
