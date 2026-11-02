@@ -117,8 +117,50 @@ move with every link updated.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/adr/ADR-056`, `ADR-057` | T2, T6 | typed work items, bug items, evidence, business facts; research topic folders and placed extras; spec 0.19.0 MINOR | high | outside review 2 rounds each, VPS gate 479/0 |
+| `scripts/lib/check-work-type.ts` · `conformance-engine.sh` · `qa-check.sh` · `evals/` | T2 | the type check and its leg; the ownership walk skips item evidence; evidence is §11 history | high | seeded fixtures, outside review |
+| `skills/triage/`, `skills/diagnose/`, `skills/prime/`, `skills/flow/`, `skills/lean-doc-generator/` · `.claude/CONTEXT.md` | T3, T4, T5 | the bug item through intake, diagnosis, session start, the conductor, the close and migrate | med | headless real-input runs, Codex reviews |
+| `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` | T3 | TD-285 fixed as bug item TASK-596 | high | fixtures fail on the old code, outside review 2 rounds |
+| `scripts/gen-index.sh` · `scripts/lib/check-research-archive.sh` · `docs/research/` | T6 | topic folders read; three series moved; links updated | med | fixtures, regenerated index |
+| `docs/research/adopter-folder-audit.md` | T1 | the adopter census and its rulings | low | cross-checked listing |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Outcome** — 6 of 6 members delivered (TASK-590, 591, 592, 593, 594, 589). A bug is now a work item: `type: feature | bug | debt`
+on every work item, a bug item carrying its repro, evidence and root cause, evidence on the item in `docs/work/evidence/TASK-NNN/`
+(ADR-056). `/triage` files it, `/diagnose` completes it, `/prime` counts it, `/flow` routes it, the close lists it, and `migrate`
+brings adopted repos across, proposing and never forcing. `docs/research/` has three topic folders, and five kinds of doc adopters
+already keep have a §2 place (ADR-057). Spec 0.19.0 (MINOR).
+
+**Bugs fixed this sprint** — TASK-596 (TD-285): the sprint checker reported `LOG-REWRITTEN` for an append-only log, because git's
+copy detection linked a new sprint log to the previous sprint's log and the baseline was read from it; it now stops at a copy from
+another sprint and fails closed on unresolved history.
+
+**Retrieval check** — one miss, one hold. Missed: four frozen Done-whens needed a scope-change once real input arrived (the evidence
+scope, the bug rule's wording, the migrate target copy, the CR fix another stream owns). Held: the adopter census settled the
+evidence, business-facts and placement questions by fact before any design was signed.
+
+**Cost** — headless real-input runs about $7 (triage $0.63, diagnose $2.00, prime $0.37, flow $0.52, migrate plan $1.80, apply
+$1.44). Codex: T2 checks 63.0k + 80.3k, T2 review 57.1k + 33.5k, T3 review and fix 38.7k + 75.1k + 37.5k, T4 review 43.1k + ~20k,
+T5/T6 review 45.5k + ~15k, T6 build 77.0k (about 590k). Builder checks: six Sonnet readers, about 315k.
+
+**Worked**
+- The adopter census before the designs: three of the four rulings it produced reshaped the tasks.
+- Headless runs of the changed skills from a pinned clone (L-284).
+- Codex outside reviews: a too-wide evidence skip, a secret-copy path in migrate, a stall in /flow's routing, a same-sprint
+  history gap in the checker fix.
+
+**Friction**
+- The always-loaded token budget had a margin of a few tokens; two CONTEXT.md lines were trimmed to fit.
+- Notes appended under a scope-change heading (L-283), and one `chore(work):` subject reworded on the unpushed range.
+- Heredocs with apostrophes broke the shell wrapper twice; scripts went into files.
+
+**Pattern candidates**
+- L-283 (count 1): give every Execution Log note its own heading.
+- L-284 (count 1): show a skill change by running it headless from a pinned clone.
+
+**Buckets routed** — Shipped: CHANGELOG [Unreleased] (TASK-591, 592, 593, 594, 589; the TASK-596 fix). Tech debt: TD-288 (an
+unnumbered sprint path in the checker). Follow-ups: TASK-595 (`storm/` under the curation bar). Learnings: L-283, L-284.
