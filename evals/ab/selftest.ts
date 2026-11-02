@@ -2892,6 +2892,201 @@ check("S70 comparator analysis: A4A minus A2 uses shared first-pass tasks and po
   assert(bad.exitCode === 2 && bad.stderr.toString().includes("AX"), `absent comparator exits 2 naming AX: ${bad.exitCode} ${bad.stderr.toString()}`);
 });
 
+check("S71 sweep ownership: a real live second driver survives; dead and legacy owners are swept; unreadable owners are kept", async () => {
+  const { makeIsolation, sweepStale } = await import("./lib/isolate.ts");
+  const root = tmpdir("s71");
+  const child = Bun.spawn([process.execPath, "--no-env-file", "-e", "setInterval(() => {}, 1000)"], { stdout: "ignore", stderr: "pipe" });
+  const dead = Bun.spawn([process.execPath, "--no-env-file", "-e", "process.exit(0)"], { stdout: "ignore", stderr: "pipe" });
+  await dead.exited;
+  const dir = (name: string, owner?: string) => {
+    const d = path.join(root, `iso-${name}`);
+    fs.mkdirSync(d);
+    if (owner !== undefined) fs.writeFileSync(path.join(d, "owner.json"), owner);
+    return d;
+  };
+  try {
+    const live = dir("live", JSON.stringify({ pid: child.pid }));
+    dir("dead", JSON.stringify({ pid: dead.pid }));
+    dir("legacy");
+    const bad = dir("bad", "unreadable JSON");
+    const invalid = dir("invalid", JSON.stringify({ pid: -1 }));
+    const own = makeIsolation(root, { auth: "api-key" });
+    const swept = sweepStale(root).sort();
+    assert(fs.existsSync(live), "live second driver's workspace must survive the sweep");
+    deepStrictEqual(swept, ["iso-dead", "iso-legacy"]);
+    assert(fs.existsSync(bad) && fs.existsSync(invalid) && fs.existsSync(own.root), "uncertain and current owners kept");
+    assert(JSON.parse(fs.readFileSync(path.join(own.root, "owner.json"), "utf8")).pid === process.pid, "makeIsolation records driver pid");
+  } finally {
+    child.kill();
+    await child.exited;
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+check("S72 one worker: pre-pool call order, row bytes, stop and say lines; resume", async () => {
+  const { runBaseline } = await import("./run-baseline.ts");
+  const { appendRow } = await import("./lib/record.ts");
+  const f = await dryRun();
+  const schedule = [1, 2, 3].map((trial) => ({ arm: "a", repo: "repo", task: "task", trial }));
+  const before = fs.readFileSync(f.log, "utf8");
+  const calls: string[] = [], lines: string[] = [];
+  const run: import("./run-baseline.ts").Deps["run"] = async (ctx) => {
+    calls.push(`${ctx.slot.trial}:${ctx.attempt}`);
+    const infra = ctx.attempt === 1;
+    appendRow(f.log, specRow({ tag: ctx.tag, ...ctx.slot, attempt: ctx.attempt, exit: infra ? "cli-error" : "ok", cls: infra ? "infra:network" : "ok" }), new Date(T0 + calls.length * 1000));
+    return { exit: infra ? "cli-error" : "ok", cls: infra ? "infra:network" : "ok" };
+  };
+  const result = await runBaseline(0, { workers: 1, log: f.log, prereg: f.prereg, schedule, run, say: (l) => lines.push(l), now: () => NOW_OK });
+  // Captured from the sequential loop before the pool change (including the resumed run below).
+  deepStrictEqual(calls, ["1:1", "1:2"]);
+  deepStrictEqual(lines, ["round 0: a task #1 attempt 1", "round 0: a task #1 attempt 2"]);
+  deepStrictEqual(result, { stop: "pilot", message: "the 1 pilot slots each have a scored round-0 attempt: stopped for the owner's review of cost and behaviour", ran: [1, 2].map((attempt) => ({ slot: schedule[0], round: 0, attempt, tag: "measured round 0" })) });
+  const resumed = await runBaseline(0, { log: f.log, prereg: f.prereg, schedule, run, say: (l) => lines.push(l), now: () => NOW_OK });
+  deepStrictEqual(calls, ["1:1", "1:2", "2:1", "2:2", "3:1", "3:2"]);
+  deepStrictEqual(lines, ["round 0: a task #1 attempt 1", "round 0: a task #1 attempt 2", "round 0: a task #2 attempt 1", "round 0: a task #2 attempt 2", "round 0: a task #3 attempt 1", "round 0: a task #3 attempt 2"]);
+  deepStrictEqual(resumed, { stop: "done", message: "round 0 complete", ran: [2, 3].flatMap((trial) => [1, 2].map((attempt) => ({ slot: schedule[trial - 1], round: 0, attempt, tag: "measured round 0" }))) });
+  const expected = path.join(tmpdir("s72-expected"), "log.md");
+  fs.writeFileSync(expected, before);
+  const specs: [number, number, string, string][] = [[1, 1, "cli-error", "infra:network"], [1, 2, "ok", "ok"], [2, 1, "cli-error", "infra:network"], [2, 2, "ok", "ok"], [3, 1, "cli-error", "infra:network"], [3, 2, "ok", "ok"]];
+  specs.forEach(([trial, attempt, exit, cls], i) => appendRow(expected, specRow({ tag: "measured round 0", arm: "a", repo: "repo", task: "task", trial, attempt, exit, cls }), new Date(T0 + (i + 1) * 1000)));
+  assert(fs.readFileSync(f.log, "utf8") === fs.readFileSync(expected, "utf8"), "all row bytes match the pre-pool fixture");
+});
+
+check("S73 two workers: first stop drains the other trial, records both rows and starts no third slot or retry", async () => {
+  const { runBaseline, pendingSlots, withLock, lockPathFor } = await import("./run-baseline.ts");
+  const { appendRow } = await import("./lib/record.ts");
+  const { readRows, liveRows } = await import("./lib/log.ts");
+  for (const kind of ["usage-limit", "owner", "pilot", "abort"] as const) {
+    const f = await dryRun();
+    const schedule = [1, 2, 3, 4].map((trial) => ({ arm: trial % 2 ? "a" : "b", repo: "repo", task: "task", trial }));
+    // Abort starts with a two-infra streak, so the first completion reaches three.
+    if (kind === "abort") for (const attempt of [1, 2]) appendRow(f.log, specRow({ ...schedule[0]!, tag: "measured round 0", attempt, exit: "cli-error", cls: "infra:network" }), new Date(T0 + attempt * 1000));
+    const releases: (() => void)[] = [], calls: number[] = [];
+    let active = 0, peak = 0, settled = false;
+    const lock = lockPathFor(f.log);
+    const running = withLock(lock, () => runBaseline(0, {
+      workers: 2, log: f.log, prereg: f.prereg, schedule, now: () => NOW_OK,
+      run: async (ctx) => {
+        const index = calls.length;
+        calls.push(ctx.slot.trial);
+        peak = Math.max(peak, ++active);
+        await new Promise<void>((resolve) => releases.push(resolve));
+        // The second completion also requests an owner stop, or infra retry: neither may override/restart.
+        const exit = kind === "pilot" ? "ok" : index === 1 ? (kind === "owner" ? "cli-error" : "invalid: sibling") : kind === "owner" ? "usage-missing" : "cli-error";
+        const cls = exit === "ok" ? "ok" : exit === "cli-error" ? "infra:network" : "task-failure";
+        appendRow(f.log, specRow({ ...ctx.slot, tag: ctx.tag, attempt: ctx.attempt, exit, cls }), new Date(T0 + (10 + index) * 1000));
+        active--;
+        return { exit, cls, ...(index === 0 && kind === "usage-limit" ? { terminal: "You've hit your usage limit" } : {}) };
+      },
+    })).then((r) => { settled = true; return r; });
+    deepStrictEqual(calls, [1, 2]);
+    assert(peak === 2, "two trials overlap");
+    releases[0]!();
+    await Bun.sleep(0); // let the first completion latch its stop while its sibling is held
+    assert(!settled && fs.existsSync(lock), "driver and log lock wait for the running sibling");
+    deepStrictEqual(calls, [1, 2]);
+    releases[1]!();
+    const result = await running;
+    assert(result.stop === kind && result.message.includes(kind === "pilot" ? "pilot slots" : kind === "abort" ? "3 consecutive infra" : "a task #1"), `first stop retained: ${JSON.stringify(result)}`);
+    deepStrictEqual(calls, [1, 2]);
+    assert(result.ran.length === 2 && !fs.existsSync(lock), "both attempts drain before lock release");
+    const rows = readRows(f.log).filter((r) => r.tag.startsWith("measured"));
+    assert(rows.some((r) => r.trial === 2), "sibling row retained");
+    if (kind === "usage-limit") {
+      assert(rows.length === 3 && rows[1]!.exit === "void: usage-limit", "usage attempt followed by void and sibling row");
+      deepStrictEqual(pendingSlots(liveRows(readRows(f.log)), schedule, 0).map((s) => s.trial), [1, 3, 4]);
+    }
+  }
+});
+
+check("S74 workers CLI: zero, negative, fractional, nonnumeric and missing values exit 2 before work", async () => {
+  for (const value of ["0", "-1", "1.5", "nope", undefined]) {
+    const r = Bun.spawnSync([process.execPath, "--no-env-file", path.join(AB, "run-baseline.ts"), "--workers", ...(value === undefined ? [] : [value])], { stdout: "pipe", stderr: "pipe" });
+    assert(r.exitCode === 2 && /REFUSED: --workers/.test(r.stderr.toString()), `refused ${value}: ${r.exitCode} ${r.stderr}`);
+  }
+});
+
+check("S75 worker refill and infra streak: completion order resets the shared streak; retries remain per-slot", async () => {
+  const { runBaseline } = await import("./run-baseline.ts");
+  const { appendRow } = await import("./lib/record.ts");
+  const f = await dryRun();
+  const schedule = [1, 2, 3, 4, 5].map((trial) => ({ arm: "a", repo: "repo", task: "task", trial }));
+  appendRow(f.log, specRow({ ...schedule[0]!, tag: "measured round 0", attempt: 1, exit: "ok", cls: "ok" }), new Date(T0));
+  const calls: string[] = [];
+  const releases = new Map<string, (ok: boolean) => void>();
+  const running = runBaseline(0, { workers: 2, log: f.log, prereg: f.prereg, schedule, now: () => NOW_OK, run: async (ctx) => {
+    const id = `${ctx.slot.trial}:${ctx.attempt}`;
+    calls.push(id);
+    const ok = await new Promise<boolean>((resolve) => releases.set(id, resolve));
+    const exit = ok ? "ok" : "cli-error", cls = ok ? "ok" : "infra:network";
+    appendRow(f.log, specRow({ ...ctx.slot, tag: ctx.tag, attempt: ctx.attempt, exit, cls }), new Date(T0 + releases.size * 1000));
+    return { exit, cls };
+  } });
+  const finish = async (id: string, ok = false) => { assert(releases.has(id), `attempt started: ${id}`); releases.get(id)!(ok); await Bun.sleep(0); };
+  deepStrictEqual(calls, ["2:1", "3:1"]);
+  await finish("3:1"); // infra 1, retry in the same slot
+  await finish("2:1", true); // resets streak; refills with slot 4
+  deepStrictEqual(calls, ["2:1", "3:1", "3:2", "4:1"]);
+  await finish("3:2");
+  await finish("3:3"); // only two consecutive infra since slot 2 completed
+  assert(calls.at(-1) === "5:1", "two infra after success do not abort; exhausted slot refills");
+  await finish("4:1"); // third consecutive infra, with slot 5 already running
+  assert(!calls.includes("4:2"), "global streak abort suppresses retry");
+  await finish("5:1", true);
+  const result = await running;
+  assert(result.stop === "abort" && result.message === "3 consecutive infra attempts (last: a task #4 attempt 1, infra:network): aborted for an owner ruling", `completion-order abort: ${result.message}`);
+  deepStrictEqual(result.ran.map((c) => `${c.slot.trial}:${c.attempt}`), ["3:1", "2:1", "3:2", "3:3", "4:1", "5:1"]);
+});
+
+check("S76 two-worker pilot barrier: the first finisher cannot spend non-pilot slots before owner review", async () => {
+  const { runBaseline } = await import("./run-baseline.ts");
+  const { appendRow } = await import("./lib/record.ts");
+  const f = await dryRun();
+  const schedule = [1, 2, 3, 4].map((trial) => ({ arm: trial % 2 ? "a" : "b", repo: "repo", task: "task", trial }));
+  const calls: number[] = [], releases: (() => void)[] = [];
+  let settled = false;
+  const running = runBaseline(0, { workers: 2, log: f.log, prereg: f.prereg, schedule, now: () => NOW_OK, run: async (ctx) => {
+    calls.push(ctx.slot.trial);
+    if (ctx.slot.trial <= 2) await new Promise<void>((resolve) => releases.push(resolve));
+    appendRow(f.log, specRow({ ...ctx.slot, tag: ctx.tag, attempt: ctx.attempt, exit: "ok", cls: "ok" }), new Date(T0 + ctx.slot.trial * 1000));
+    return { exit: "ok", cls: "ok" };
+  } }).then((r) => { settled = true; return r; });
+  deepStrictEqual(calls, [1, 2]);
+  releases[0]!();
+  await Bun.sleep(0); // allow worker 1 to refill while pilot slot 2 is held
+  const callsBeforePilotFinished = [...calls];
+  const settledBeforePilotFinished = settled;
+  releases[1]!();
+  const result = await running;
+  deepStrictEqual(callsBeforePilotFinished, [1, 2], "no non-pilot run while the second pilot slot is running");
+  assert(!settledBeforePilotFinished, "driver waits for the second pilot slot");
+  deepStrictEqual(calls, [1, 2], "no non-pilot run before owner review");
+  assert(result.stop === "pilot" && result.ran.length === 2, `pilot stop after both slots: ${JSON.stringify(result)}`);
+
+  // An exhausted, unscored pilot must not strand the remaining schedule.
+  const unscored = await dryRun();
+  const attempts: string[] = [];
+  const finish = new Map<string, () => void>();
+  const continuing = runBaseline(0, { workers: 2, log: unscored.log, prereg: unscored.prereg, schedule, now: () => NOW_OK, run: async (ctx) => {
+    const id = `${ctx.slot.trial}:${ctx.attempt}`;
+    attempts.push(id);
+    if (ctx.slot.trial <= 2) await new Promise<void>((resolve) => finish.set(id, resolve));
+    const infra = ctx.slot.trial === 1;
+    const exit = infra ? "cli-error" : "ok", cls = infra ? "infra:network" : "ok";
+    appendRow(unscored.log, specRow({ ...ctx.slot, tag: ctx.tag, attempt: ctx.attempt, exit, cls }), new Date(T0 + attempts.length * 1000));
+    return { exit, cls };
+  } });
+  for (const id of ["1:1", "2:1", "1:2", "1:3"]) {
+    assert(finish.has(id), `pilot attempt started: ${id}`);
+    finish.get(id)!();
+    await Bun.sleep(0); // pilot 2's success resets the infra streak before pilot 1 exhausts
+    if (id !== "1:3") assert(attempts.every((a) => /^[12]:/.test(a)), "no refill while pilot 1 is running");
+  }
+  const continued = await continuing;
+  assert(continued.stop === "done", `unscored pilot continues as the serial loop: ${continued.stop}`);
+  deepStrictEqual(attempts, ["1:1", "2:1", "1:2", "1:3", "3:1", "4:1"]);
+});
+
 // S64 -- the classifier: a model only CHOOSES the entry; the answer sent is the entry's text verbatim; anything unclear stops.
 check("S64 classifier: buildCatalog has every section, setup bullet, ruling and NONE; the chosen id sends the entry text verbatim; unknown id, unparsable output, NONE and a failed call each STOP; the prompt carries the popup and every id; the four live questions route as the owner ruled", async () => {
   const { buildCatalog, classify, buildPrompt, PLAN_RULING, CLEANUP_RULING } = await import("./lib/classifier.ts");

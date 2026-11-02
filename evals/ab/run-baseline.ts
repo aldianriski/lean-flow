@@ -1,6 +1,6 @@
-// The A0 + A1 baseline driver (SPRINT-152 T4): walks evals/ab/schedule.json in order, one trial at a time, and runs each slot through the
+// The A0 + A1 baseline driver (SPRINT-152 T4): takes slots in schedule order (one worker by default), and runs each slot through the
 // documented trial path (A1: the D9 protocol, A0: the plain trial, both measured), tagging every attempt `measured round <r>`.
-//   bun evals/ab/run-baseline.ts [--round 0|1|2] [--log <md>] [--schedule <json>] [--prereg <md>] [--tasks <dir>]
+//   bun evals/ab/run-baseline.ts [--round 0|1|2] [--workers N] [--log <md>] [--schedule <json>] [--prereg <md>] [--tasks <dir>]
 //   bun evals/ab/run-baseline.ts --void <ts> [--log <md>]     (repair: append the void row of the attempt row stamped <ts>)
 //   bun evals/ab/run-baseline.ts --void <ts> --reason "<text>" [--log <md>]     (owner-ruled harness defect, Amendment 2: the void row carries the reason as `void: owner-ruled: <text>`; the slot re-runs from round 0 as if never run)
 // Round 0 is the schedule; rounds 1 and 2 re-run only the slots every earlier round lost to infrastructure (PREREGISTRATION section 11).
@@ -56,7 +56,8 @@ export type Deps = {
   log: string;
   prereg: string;
   schedule: SlotKey[];
-  /** run exactly one attempt and append exactly one row tagged `ctx.tag`; never called concurrently */
+  workers?: number;
+  /** Run one attempt and synchronously append one row tagged `ctx.tag`; up to workers calls overlap. */
   run: (ctx: Ctx) => Promise<Outcome>;
   now?: () => number;
   say?: (line: string) => void;
@@ -64,6 +65,11 @@ export type Deps = {
 export type StopKind = "done" | "pilot" | "owner" | "abort" | "usage-limit";
 export const EXIT_CODE: Record<StopKind, number> = { done: 0, pilot: 10, owner: 11, abort: 12, "usage-limit": 3 };
 export type Result = { stop: StopKind; message: string; ran: Ctx[] };
+
+function workerCount(n = 1): number {
+  if (!Number.isSafeInteger(n) || n < 1) throw new Refused(`--workers must be an integer >= 1, got ${n}`);
+  return n;
+}
 
 const slotName = (s: SlotKey) => `${s.arm} ${s.task} #${s.trial}`;
 const sameSlot = (r: LogRow, s: SlotKey) => r.arm === s.arm && r.task === s.task && r.trial === s.trial;
@@ -116,8 +122,10 @@ function rowOfAttempt(log: string, ctx: Ctx): LogRow {
 export async function runBaseline(round: number, d: Deps): Promise<Result> {
   const say = d.say ?? (() => {});
   const ran: Ctx[] = [];
-  const stop = (kind: StopKind, message: string): Result => ({ stop: kind, message, ran });
+  let firstStop: Result | undefined;
+  const stop = (kind: StopKind, message: string): Result => firstStop ??= { stop: kind, message, ran };
   if (![0, 1, 2].includes(round)) throw new Refused(`--round must be 0, 1 or 2, got ${round}`);
+  const workers = workerCount(d.workers);
 
   const at0 = countedRows(d.log);
   const pilot = d.schedule.slice(0, pilotSize(d.schedule));
@@ -131,10 +139,15 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
   }
   if (streak >= ABORT_AFTER) streak = 0;
 
-  for (const slot of pendingSlots(at0, d.schedule, round)) {
+  const pending = pendingSlots(at0, d.schedule, round);
+  let next = 0;
+  let runningPilot = 0;
+  let failed = false;
+  const runSlot = async (slot: SlotKey) => {
     const rows = countedRows(d.log);
     const have = stateIn(rows, slot, round);
     for (let attempt = have.infra + 1; attempt <= 1 + MAX_RETRIES; attempt++) {
+      if (firstStop || failed) return;
       const problem = freezeProblem(d);
       if (problem) throw new Refused(problem);
       const ctx: Ctx = { slot, round, attempt, tag: measuredTag(round) };
@@ -152,7 +165,32 @@ export async function runBaseline(round: number, d: Deps): Promise<Result> {
       if (!isInfra(out.cls)) break;
     }
     if (pilotPending && pilotDone(countedRows(d.log))) return stop("pilot", `the ${pilot.length} pilot slots each have a scored round-0 attempt: stopped for the owner's review of cost and behaviour`);
-  }
+  };
+  const worker = async () => {
+    try {
+      while (!firstStop && !failed && next < pending.length) {
+        const slot = pending[next]!;
+        const isPilot = pilotPending && pilot.includes(slot);
+        // Leave the last pilot finisher to stop for review, or continue if a pilot
+        // exhausted its attempts without scoring (the serial loop's behaviour).
+        if (pilotPending && !isPilot && runningPilot > 0) return;
+        next++;
+        if (isPilot) runningPilot++;
+        try {
+          await runSlot(slot);
+        } finally {
+          if (isPilot) runningPilot--;
+        }
+      }
+    } catch (e) {
+      failed = true; // drain other running trials before the caller releases the log lock
+      throw e;
+    }
+  };
+  const results = await Promise.allSettled(Array.from({ length: Math.min(workers, pending.length) }, worker));
+  const failure = results.find((r) => r.status === "rejected");
+  if (failure?.status === "rejected") throw failure.reason;
+  if (firstStop) return firstStop;
   return stop("done", `round ${round} complete`);
 }
 
@@ -167,7 +205,7 @@ const pidAlive = (pid: number): boolean => {
   }
 };
 
-/** One trial at a time, enforced across processes: the lock file holds the owner's pid, is created exclusively and removed when the run ends. A lock whose pid is dead is stale: removed with a note. */
+/** One driver per log: the lock holds the owner's pid, is created exclusively and removed after all workers drain. Dead locks are stale. */
 export async function withLock<T>(lock: string, fn: () => Promise<T>, note: (line: string) => void = (l) => console.error(l)): Promise<T> {
   let fd: number | undefined;
   for (let tries = 0; fd === undefined; tries++) {
@@ -208,6 +246,7 @@ if (import.meta.main) {
   const argv = process.argv.slice(2);
   const flag = (n: string) => (argv.indexOf(`--${n}`) >= 0 ? argv[argv.indexOf(`--${n}`) + 1] : undefined);
   try {
+    const workers = workerCount(argv.includes("--workers") ? Number(flag("workers")) : 1);
     const log = path.resolve(flag("log") ?? DEFAULT_LOG);
     const voidTs = flag("void");
     const reason = flag("reason")?.trim();
@@ -225,6 +264,7 @@ if (import.meta.main) {
       process.exit(0);
     }
     const deps: Deps = {
+      workers,
       log,
       prereg: path.resolve(flag("prereg") ?? path.join(AB, "PREREGISTRATION.md")),
       schedule: JSON.parse(fs.readFileSync(path.resolve(flag("schedule") ?? path.join(AB, "schedule.json")), "utf8")) as SlotKey[],
@@ -232,7 +272,7 @@ if (import.meta.main) {
       say: (l) => console.log(l),
     };
     const r = await withLock(lockPathFor(log), async () => {
-      sweepStale(defaultWorkRoot(), (l) => console.log(`run-baseline: ${l}`)); // the lock is ours, so every iso-* dir is a dead driver's
+      sweepStale(defaultWorkRoot(), (l) => console.log(`run-baseline: ${l}`));
       return runBaseline(Number(flag("round") ?? 0), deps);
     });
     console.log(`run-baseline: ${r.stop}: ${r.message} (${r.ran.length} attempt(s) this start)`);

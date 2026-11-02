@@ -20,7 +20,11 @@ export type Isolation = {
 };
 
 export function makeIsolation(workRoot: string, arm: Pick<Arm, "auth">, settings: Record<string, unknown> = {}): Isolation {
-  const root = fs.mkdtempSync(path.join(fs.realpathSync.native(workRoot), "iso-"));
+  // Publish only after the marker exists: another log's driver may sweep concurrently.
+  const staging = fs.mkdtempSync(path.join(fs.realpathSync.native(workRoot), ".creating-iso-"));
+  fs.writeFileSync(path.join(staging, "owner.json"), JSON.stringify({ pid: process.pid }));
+  const root = path.join(path.dirname(staging), path.basename(staging).replace(".creating-", ""));
+  fs.renameSync(staging, root);
   const iso: Isolation = { root, trialDir: path.join(root, "trial"), home: path.join(root, "home"), cfg: path.join(root, "cfg"), outside: path.join(root, "outside") };
   for (const d of [iso.trialDir, iso.home, iso.cfg, iso.outside]) fs.mkdirSync(d, { recursive: true });
   if (arm.auth === "subscription") {
@@ -61,17 +65,33 @@ export function assertWorkRoot(root: string): void {
 }
 
 /**
- * A driver that died mid-trial leaves its isolation dir (and maybe a running cluster). Called by the driver once it holds the lock, so
- * every `iso-*` dir in the work root is stale: stop any cluster in its `pgdata` (failure ignored), keep its stream*.jsonl under kept/,
- * delete it. Returns what was swept.
+ * Logs have separate locks but share a work root. Keep live or uncertain owners (including reused pids);
+ * sweep only dead owners and legacy dirs without a marker. Preserve streams and stop leftover clusters.
  */
+function keepOwner(root: string): boolean {
+  let owner: { pid?: unknown };
+  try {
+    owner = JSON.parse(fs.readFileSync(path.join(root, "owner.json"), "utf8"));
+  } catch (e) {
+    return (e as NodeJS.ErrnoException).code !== "ENOENT";
+  }
+  if (!owner || !Number.isSafeInteger(owner.pid) || Number(owner.pid) <= 0) return true;
+  try {
+    process.kill(Number(owner.pid), 0);
+    return true;
+  } catch (e) {
+    // EPERM and unknown errors cannot establish death. ESRCH is portable to Bun on Windows.
+    return (e as NodeJS.ErrnoException).code !== "ESRCH";
+  }
+}
+
 export function sweepStale(workRoot: string, say: (line: string) => void = () => {}): string[] {
   assertWorkRoot(workRoot);
   if (!fs.existsSync(workRoot)) return [];
   const swept: string[] = [];
   for (const d of fs.readdirSync(workRoot)) {
     const root = path.join(workRoot, d);
-    if (!/^iso-/.test(d) || !fs.statSync(root).isDirectory()) continue;
+    if (!/^iso-/.test(d) || !fs.statSync(root, { throwIfNoEntry: false })?.isDirectory() || keepOwner(root)) continue;
     const data = path.join(root, "pgdata");
     const stopped = fs.existsSync(data);
     if (stopped) spawnSync("pg_ctl", ["-D", data, "-m", "fast", "-w", "stop"], { stdio: "ignore" });
