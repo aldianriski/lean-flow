@@ -117,3 +117,16 @@ fixed with seeded fixtures; round 2 PASS. The gate then caught the always-loaded
 non-doc ids in a `related:` field, and two attribution slips; all fixed.
 consequence · T2 · behaviour:material · governance:high
 review · T2 · scoped outside review (Codex, worktree-isolated, 2 rounds, 4 med fixed, PASS) · behaviour:material · governance:high
+
+### 2026-11-02 | progress | T3: triage and diagnose wired to the bug item; TD-285 run end to end as TASK-596; TASK-592 done
+Skills (`1fec0b04`): triage step 3 files a `type: bug` item with redacted evidence; diagnose reads it first and writes root cause,
+fix, regression test and prevention at its post-mortem; CONTEXT.md's bug intake reworded within the token budget. Real input, run
+headless from a pinned clone of the changed skills in a worktree: `/triage` filed TD-285 as TASK-596 with a redacted gate excerpt
+($0.63); `/diagnose` confirmed the cause with a tagged probe (git's copy detection linked the SPRINT-155 log to SPRINT-154's),
+fixed the checker and wrote fixtures that fail on the old code ($2.00). The fix is consequential G (the conformance engine runs
+the checker): outside review round 1 found a high (stopping at every copy cut a sprint's own history), fixed by following
+same-sprint copies and failing closed on unresolved history; round 2 left one medium on unnumbered sprint paths, a census-zero
+shape, filed as TD-288. TD-285 resolved → TASK-596. The owner read the item. TASK-596 stays open in the backlog until T4 shows
+`/prime` and `/flow` on it.
+consequence · T3 · behaviour:material · governance:low
+review · T3 · scoped outside review (Codex, worktree-isolated, 2 rounds, 1 high fixed, 1 medium to TD-288) · behaviour:material · governance:low
