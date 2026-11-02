@@ -159,3 +159,5 @@ What broke: moving the three research series updates live links in `TECH-DEBT.md
 `.out-of-scope/skill-self-fork.md`, and the governance roadmap moves out of `docs/development/` (the Done-when names the move).
 Impact: T6 Layers add the four paths; no Done-when changes. Re-confirm G2: not needed (the signed design names the link updates and
 the roadmap move).
+
+T2 Layers name `skills/task-decomposer/references/task-file.md` and `scripts/lib/check-work-type.ts` explicitly (its tick evidence names them; layers completeness).

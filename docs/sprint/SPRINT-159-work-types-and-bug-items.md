@@ -47,7 +47,7 @@ logged scope-change.
 **Acceptance:** a research doc lists every unplaced folder with its ruling, read by the owner.
 
 ### T2 — Work items carry a type; a bug item carries its repro, evidence and root cause `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `spec/` · `docs/adr/` · `docs/DECISIONS.md` · `skills/lean-doc-generator/` · `skills/lean-doc-generator/templates/BUG.md.template` · `skills/task-decomposer/` · `scripts/` · `evals/` · `CHANGELOG.md` · `README.md` · `docs/work/README.md` · `docs/QA.md` · `.claude/CONTEXT.md`
+Layers: `spec/` · `docs/adr/` · `docs/DECISIONS.md` · `skills/lean-doc-generator/` · `skills/lean-doc-generator/templates/BUG.md.template` · `skills/task-decomposer/` · `skills/task-decomposer/references/task-file.md` · `scripts/` · `scripts/lib/check-work-type.ts` · `evals/` · `CHANGELOG.md` · `README.md` · `docs/work/README.md` · `docs/QA.md` · `.claude/CONTEXT.md`
 Depends-on: T1
 Cites: TASK-591 · ADR-053 (consumer evidence) · ADR-018 · `TECH-DEBT.md` (the debt ledger, unchanged) · `BUSINESS-NOTES.md` (an adopter's legacy location, never touched here) · `storm/` (named only by a log note on T1's Cites)
 One store with types, ids unchanged, the debt ledger kept; the temp-only bug report is retired by ADR, and every check that reads
