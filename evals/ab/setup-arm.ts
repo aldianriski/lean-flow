@@ -86,7 +86,7 @@ if (auto) {
   const res = await runOperatedSession({ cmd: operatedCommand(claude.slice(1)), cwd: arm.snapshot!, env, prompt: `/lean-doc-generator ${kind}`, answerer: makeAnswerer(catalog, modelCall(env)), chatAnswerer: makeChatAnswerer(catalog, modelCall(env)), allowTools: [...arm.allowedTools, "Read", "Glob", "Grep"], operatorLog: log });
   process.exit(reportAndExit(res, log));
 }
-const p = Bun.spawn(claude, { cwd: arm.snapshot, env: isolationEnv(iso, arm), stdin: "inherit", stdout: "inherit", stderr: "inherit" });
+const p = Bun.spawn(claude, { ...(arm.snapshot !== undefined ? { cwd: arm.snapshot } : {}), env: isolationEnv(iso, arm), stdin: "inherit", stdout: "inherit", stderr: "inherit" });
 const code = await p.exited;
 const transcripts: string[] = [];
 const walk = (d: string) => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".jsonl") && transcripts.push(path.join(d, e.name))));

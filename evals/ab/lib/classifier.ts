@@ -175,7 +175,7 @@ export const CLASSIFIER_MODEL = "claude-sonnet-5-5";
 export function modelCall(env: Record<string, string>, timeoutMs = 120_000): Call {
   return async (prompt) => {
     const prefix: string[] = process.env.AB_CLASSIFIER_CLI ? JSON.parse(process.env.AB_CLASSIFIER_CLI) : ["claude"];
-    const proc = Bun.spawn([...prefix, "-p", "--model", CLASSIFIER_MODEL, "--output-format", "json", "--max-turns", "1", "--tools", ""], { cwd: env.HOME, env, stdin: "pipe", stdout: "pipe", stderr: "pipe" });
+    const proc = Bun.spawn([...prefix, "-p", "--model", CLASSIFIER_MODEL, "--output-format", "json", "--max-turns", "1", "--tools", ""], { ...(env.HOME !== undefined ? { cwd: env.HOME } : {}), env, stdin: "pipe", stdout: "pipe", stderr: "pipe" });
     let timedOut = false;
     const timer = setTimeout(() => ((timedOut = true), proc.kill()), timeoutMs);
     proc.stdin.write(prompt);

@@ -134,7 +134,7 @@ export async function runOperatedSession(o: OperatedOpts): Promise<OperatedResul
         decided.push({ question: repeated, header: questions[texts.indexOf(repeated)]?.header, stop });
       }
       for (const q of stop === undefined ? questions : []) {
-        const a = await o.answerer({ question: q.question, header: q.header ?? "", options: q.options });
+        const a = await o.answerer({ question: q.question, header: q.header ?? "", ...(q.options !== undefined ? { options: q.options } : {}) });
         if ("stop" in a) {
           stop = a.stop;
           decided.push({ question: q.question, header: q.header, stop: a.stop });
