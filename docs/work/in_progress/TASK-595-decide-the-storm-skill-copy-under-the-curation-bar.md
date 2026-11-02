@@ -22,9 +22,9 @@ plus an HTML template, inside lean-flow's own research folder: outside `skills/`
 three citations. Owner ruling 2026-11-02: decide it in its own task; nothing moves in SPRINT-159.
 
 ## Done when
-- [ ] The owner rules, by popup, one of: adopt it into `skills/` through ADR-001's bar (useful, important, actually used), or move
+- [x] The owner rules, by popup, one of: adopt it into `skills/` through ADR-001's bar (useful, important, actually used), or move ✓ owner popup at SPRINT-160 G2: move out, git history only; `03289603` removes it, its 3 citing docs point to `94248e54`
       it out of the repo; its three citing docs are updated either way.
-- [ ] The repo's gate is green after the change.
+- [x] The repo's gate is green after the change. ✓ `gate-remote.ts` on `03289603`: QA-CHECK 476 pass, 0 fail
 
 ## Touches
 `docs/research/storm/` · the docs that cite it
