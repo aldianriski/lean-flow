@@ -29,8 +29,8 @@ update sync for them; it must neither break them nor leave their bugs behind.
       applies only what the owner approves; nothing is deleted (scope-change 2026-11-02).
 - [ ] `init` creates the evidence folder only when a first bug item needs it.
 - [ ] Shown on real input: migrate on a scratch copy of the workdoo research copy (`D:\Research\dev156\workdoo`; scope-change
-      2026-11-02) proposes its `docs/bugs/` as a bug
-      item with the screenshot as evidence, and an approved run leaves every other file unchanged (diff read).
+      2026-11-02) classifies its `docs/bugs/` (a bug item, or kept with its reason when it is not a defect) and proposes real defect
+      tasks as bug items (scope-change 2026-11-02), and an approved run leaves every other file unchanged (diff read).
 - [ ] CHANGELOG `[Unreleased]` entry; README if a user-visible behaviour changes; the skill stays within its cap.
 
 ## Touches
