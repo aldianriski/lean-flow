@@ -5,6 +5,7 @@ stream: docs-structure
 owner: Maintainer
 last_updated: 2026-11-02
 status: active
+plan_commit: 9604dd69
 update_trigger: sprint execute/close events
 ---
 
