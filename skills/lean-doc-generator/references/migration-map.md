@@ -151,8 +151,8 @@ the standard did not place. The sync brings it across without rewriting it:
   old path updated in the same apply; a `.log` file moves as `.txt` (S12).
   Frozen history keeps its old links (changelogs, archived sprints and logs, decided ADRs): a link there still resolves
   through history, and history is never rewritten. A moved README's own relative links are rebased to its new depth.
-- **Redaction before any move**: a file carrying a token, an auth header, a key or a password is flagged and left in place, never
-  moved into evidence unredacted.
+- **Secrets before anything else**: a file carrying a token, an auth header, a key or a password is flagged and deferred before
+  it is moved, copied, quoted or summarised into any item; nothing from it enters a task or evidence until the owner redacts it.
 - **Kept, not moved**: a root `BUSINESS-NOTES.md` is the business-facts row's accepted legacy location; it is reported, not moved.
 - **Nothing is deleted.** An approved run changes only what was approved; every other file is left byte-identical.
 
