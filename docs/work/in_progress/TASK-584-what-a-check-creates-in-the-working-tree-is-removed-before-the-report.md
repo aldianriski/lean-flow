@@ -23,7 +23,7 @@ repo, stopped it, and left the data directory; the trial scored `scope-breach` (
 now sends throwaway probes into the working tree, so leftover check artifacts are the next risk. Next S3 bundle (EPIC-023 D14).
 
 ## Done when
-- [ ] The orchestrator's rule names it: anything a check creates inside the working tree (a scratch script, a database directory, a
+- [x] The orchestrator's rule names it: anything a check creates inside the working tree (a scratch script, a database directory, a ✓ 2026-11-02: SKILL.md Reachability line, `36054061`; outside-tree half per the scope-change
       cache, a log), gitignored or not, is removed before the report, unless the task's declared files include it; what the
       repo's own tests leave outside the working tree is named in the report, never deleted (scope-change 2026-11-02).
 - [ ] Shown on real input: a development run on clinic appointment-lookup (and any A4a slot that breached on a check artifact)

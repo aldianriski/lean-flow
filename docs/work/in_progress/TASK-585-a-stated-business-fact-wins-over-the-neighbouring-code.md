@@ -26,9 +26,9 @@ step does not check against them. Next S3 bundle (EPIC-023 D14); it is S3a's "pr
 session's own design (D11).
 
 ## Done when
-- [ ] Cause named from the kept streams of those slots: whether the design read the business facts, and which neighbouring code it
+- [x] Cause named from the kept streams of those slots: whether the design read the business facts, and which neighbouring code it ✓ 2026-11-02: A2 streams iso-pHKUKD, iso-ZTaJYd, iso-JM0yW0, iso-yPPt1S never opened BUSINESS-NOTES.md; invitation-issued-by reused `formatDate` (`en`) over fact 14 (en-GB); SPRINT-158 log
       followed instead.
-- [ ] The orchestrator's G2 rule: the design names each stated business fact (requirements, business notes, the profile's business
+- [x] The orchestrator's G2 rule: the design names each stated business fact (requirements, business notes, the profile's business ✓ 2026-11-02: SKILL.md G2 box "Business facts", `d09db7f5`
       topics) that the change touches and says how it honours it; where a fact and the neighbouring code disagree, the fact wins
       and the design says so.
 - [ ] Shown on real input: development runs on invitation-issued-by and self-onboarding-guard produce designs that name the
