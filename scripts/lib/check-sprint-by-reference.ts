@@ -265,6 +265,12 @@ function commitTree(root: string, commit: string): Tree {
   };
 }
 
+class HistoryUnresolved extends Error {
+  constructor(readonly path: string, commit: string) {
+    super(`${path} at ${commit.slice(0, 7)} has history but no readable baseline`);
+  }
+}
+
 function main(argv: string[]) {
   const args = argv.filter((a) => a !== "--close" && a !== "--scope-change");
   const closeMode = argv.includes("--close");
@@ -307,17 +313,23 @@ function main(argv: string[]) {
   }
   // Where the sprint file and its log lived at any commit: archiving (`git mv` into archive/) and a
   // rename both move them, so every historical read resolves its path AT THAT COMMIT (round 2, major 1).
-  const follow = (rel: string) =>
-    git(root, ["log", "--format=%x00%H", "--name-only", "--follow", "--", rel])
-      .split("\0")
-      .filter((c) => c.trim().length > 0)
-      .map((c) => {
-        const [h, ...files] = c.trim().split("\n");
-        return { h: h!.trim(), path: files.map((f) => f.trim()).find((f) => f.length > 0) ?? rel };
-      })
-      .reverse();
+  // TD-285: stop only at a copy from another sprint. Own-sprint (or unnumbered) sources can be
+  // copy-then-delete moves; cutting those off loses the baseline just as cutting off a rename would.
+  const follow = (rel: string) => {
+    const out: { h: string; path: string; deleted: boolean }[] = [];
+    for (const c of git(root, ["log", "--format=%x00%H", "--name-status", "--follow", "--", rel]).split("\0")) {
+      if (c.trim().length === 0) continue;
+      const [h, ...rows] = c.trim().split("\n");
+      const f = (rows.map((r) => r.trim()).find((r) => r.length > 0) ?? "").split("\t");
+      out.push({ h: h!.trim(), path: f.length > 1 ? f[f.length - 1]! : rel, deleted: f[0] === "D" });
+      const sourceNo = sprintNumber(f[1]?.match(/SPRINT-(\d+)/i)?.[1] ?? null);
+      if (f[0]!.startsWith("C") && sourceNo !== null && sourceNo !== sprintNo) break;
+    }
+    return out.reverse();
+  };
   const hist = follow(sprintRel);
-  const logPaths = new Set([logRel, ...(existsSync(join(root, logRel)) ? follow(logRel).map((e) => e.path) : [])]);
+  const logHist = existsSync(join(root, logRel)) ? follow(logRel) : [];
+  const logPaths = new Set([logRel, ...logHist.map((e) => e.path)]);
   const sprintPaths = new Set([sprintRel, ...hist.map((e) => e.path)]);
   const treeCache = new Map<string, string[]>();
   const fileAt = (commit: string, kind: "sprint" | "log"): string | null => {
@@ -333,16 +345,23 @@ function main(argv: string[]) {
   };
   const showAt = (commit: string, kind: "sprint" | "log"): string => {
     const p = fileAt(commit, kind);
-    if (p === null) return "";
-    try {
-      return git(root, ["show", `${commit}:${p}`]);
-    } catch {
-      return "";
+    if (p === null) {
+      const history = kind === "sprint" ? hist : logHist;
+      const prior = [...history].reverse().find((e) => gitOk(root, ["merge-base", "--is-ancestor", e.h, commit]));
+      if (prior && !prior.deleted) throw new HistoryUnresolved(prior.path, commit);
+      return ""; // not yet created, or explicitly deleted
     }
+    let text = "";
+    try {
+      text = git(root, ["show", `${commit}:${p}`]);
+    } catch { /* the tree claims this path; an unreadable blob cannot be a new/empty baseline */ }
+    if (text === "") throw new HistoryUnresolved(p, commit);
+    return text;
   };
 
   const sprintRelAtPc = fileAt(pc, "sprint");
   if (sprintRelAtPc === null) {
+    showAt(pc, "sprint"); // distinguish an unresolved history from a Plan that did not exist yet
     bad("PLAN-COMMIT-NO-PLAN", `the sprint file does not exist at plan_commit ${planCommit} -- the freeze predates the Plan`);
     return;
   }
@@ -604,7 +623,8 @@ if (import.meta.main) {
   try {
     main(process.argv.slice(2));
   } catch (e) {
-    bad("CHECK-ERROR", `the check could not complete: ${String((e as Error).message).split("\n")[0]}`);
+    if (e instanceof HistoryUnresolved) bad(`HISTORY-UNRESOLVED ${e.path}`, e.message);
+    else bad("CHECK-ERROR", `the check could not complete: ${String((e as Error).message).split("\n")[0]}`);
   } finally {
     console.log(`check-sprint-by-reference: ${pass} pass, ${fail} fail`);
   }

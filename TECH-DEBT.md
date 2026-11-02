@@ -391,6 +391,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-288** severity: low | status: open | created: Sprint-159 (T3 outside review, round 2)
+  - Summary: **The sprint checker follows a copy whose source path carries no `SPRINT-<n>` number.** TASK-596's fix stops at a
+    copy from another sprint by comparing the `SPRINT-<n>` in the paths; a copy from an unnumbered path (e.g. `2026-09-01.md`)
+    is followed, so that file's earlier records could leak into the new sprint's history (a false `PLAN-COMMIT-LATE`).
+  - Evidence: Codex outside review round 2 of TASK-596 (2026-11-02), medium; census: every sprint file in this repo and the
+    A/B adopters is named `SPRINT-NNN-<slug>.md` (STANDARD §2), so no live case exists.
+  - Impact: low; only a repo that names sprint files outside the standard.
+  - Mitigation (hypothesis, re-derive first): resolve an unnumbered source's sprint from its historical `sprint:` frontmatter;
+    a sibling-sprint fixture with an unnumbered source.
 - **TD-287** severity: low | status: open | created: Sprint-158 (close)
   - Summary: **Trial isolation dirs made for judges stay in the work root until the next driver start.** `cleanupIsolation` removes
     a trial's own dir after its row is appended, but the judges' dirs are left for `sweepStale`, which only runs when a driver
@@ -409,7 +418,7 @@ status: current
   - Impact: low now (A4a's designs no longer list the task file); it biases any later arm whose skill text lists it.
   - Mitigation (hypothesis, re-derive first): exempt `docs/work/` in the G2 scope check as the breach check does, in a later
     owner-signed amendment (the rule is frozen), with a must-FAIL fixture for a design listing only the task file.
-- **TD-285** severity: medium | status: open | created: Sprint-155 (close system verify)
+- **TD-285** severity: medium | status: resolved → TASK-596 | created: Sprint-155 (close system verify)
   - Summary: **`check-sprint-by-reference.ts` can read another sprint's log as a baseline, so an append-only log reports
     `LOG-REWRITTEN`.** `logPaths` takes every path `git log --follow` gives for the log, and `--follow`'s rename guess can
     link two sprint logs that share the template header. `fileAt` then returns the first known path in the tree, which at
@@ -420,6 +429,8 @@ status: current
   - Impact: med. A freeze-edit that a scope-change entry covers would still fail, and the finding names the wrong cause.
   - Mitigation (hypothesis, re-derive first): resolve the baseline log by the sprint's own basename (or its frontmatter `sprint:`)
     before the `--follow` set, or drop `--follow` for logs; a must-FAIL fixture with two template-identical logs.
+  - Resolution (TASK-596, /diagnose): cause confirmed. `--follow` reads the new log as a copy (`C065`) of SPRINT-154's.
+    `follow` now ends its walk at a copy, and renames are still followed. Two retained by-reference cases cover it.
 - **TD-284** severity: medium | status: open | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
   - Summary: **A finished A/B trial keeps no record of its post-run file list, so a changed manifest rule cannot be re-applied to it.**
     `lib/isolate.ts` deletes the trial copy once the row is appended and keeps only the `stream*.jsonl` transcripts. When Amendment 5

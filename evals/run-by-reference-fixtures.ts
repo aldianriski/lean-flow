@@ -109,7 +109,7 @@ function build(o: Opts = {}): string {
 }
 
 function run(dir: string, close: boolean, sprint = SPRINT, scope = false): { findings: string[]; verdict: string; exit: number } {
-  const args = [CHECKER, join(dir, sprint)];
+  const args = ["--no-env-file", CHECKER, join(dir, sprint)];
   if (close) args.push("--close");
   if (scope) args.push("--scope-change");
   const r = spawnSync("bun", args, { encoding: "utf8" });
@@ -147,6 +147,35 @@ const INLINE = (d: string, body: string) => edit(d, SPRINT, "## Files Changed", 
 const EDIT_901 = (dir: string, rel: string) =>
   edit(dir, rel, "- [ ] a retained fixture covers the empty input", "- [ ] a retained fixture covers the empty input\n- [ ] a benchmark stays under 5ms");
 
+// TD-285 (SPRINT-155): the previous sprint's log, committed BEFORE the promote that adds this sprint's
+// from the same template. `git log --follow` reads that add as a copy (SPRINT-155's log showed `C065` from
+// SPRINT-154's), and the prior path sorts first in the plan_commit tree. Derived from this sprint's log as it
+// stands when called (template-identical, so the copy is detected); only the prior log is committed here.
+const PRIOR = "docs/sprint/logs/SPRINT-900-prior.md";
+const PRIOR_LOG = (d: string) => {
+  put(d, PRIOR, readFileSync(join(d, LOG), "utf8").replace(/SPRINT-901-fixture/g, "SPRINT-900-prior").replace(/901/g, "900"));
+  git(d, ["add", "--", PRIOR]);
+  git(d, ["commit", "-q", "-m", "sprint(900): its log, before SPRINT-901 exists"]);
+};
+const followsPrior = (d: string) => {
+  if (!git(d, ["log", "--follow", "--name-status", "--format=", "--", LOG]).match(new RegExp(`C\\d+\\t${PRIOR}\\t${LOG}`))) {
+    throw new Error(`git log --follow does not reach ${PRIOR} -- the TD-285 selection did not land`);
+  }
+};
+const MOVED_LOG = "docs/sprint/archive/logs/SPRINT-901-moved.md";
+const OLD_LOG = "docs/sprint/logs/SPRINT-901-original.md";
+const copyMoveLog = (d: string) => {
+  const intermediate = "docs/sprint/logs/SPRINT-901-copy.md";
+  put(d, intermediate, readFileSync(join(d, OLD_LOG), "utf8"));
+  commit(d, "copy own log");
+  git(d, ["rm", "--", OLD_LOG]);
+  commit(d, "delete original log");
+  mv(d, intermediate, MOVED_LOG);
+  const history = git(d, ["log", "--follow", "--name-status", "--format=", "--", MOVED_LOG]);
+  if (!history.includes(`C100\t${OLD_LOG}\t${intermediate}`) || !history.includes(`R100\t${intermediate}\t${MOVED_LOG}`)) {
+    throw new Error("same-sprint copy/delete/rename history did not land");
+  }
+};
 // Every member closed (done/ and cancel/), so a close-mode case exercises ONLY the log-side finding.
 const CLOSE_ALL = (d: string) => {
   mv(d, W("todo", T901), W("done", T901));
@@ -801,6 +830,61 @@ const CASES: Case[] = [
     },
     expect: ["FREEZE-EDIT TASK-901"],
   },
+  // --- TD-285 / TASK-596: a log `git log --follow` reports as a COPY of another sprint's log -----
+  {
+    name: "log-copied-from-prior-sprint-logged-edit (must-PASS: TD-285 -- the prior sprint's log is not this log's baseline)",
+    opts: { pre: PRIOR_LOG },
+    mutate: (d) => {
+      followsPrior(d); // the selection this case exists for, or it proves nothing
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      commit(d, "append-only entry + edit");
+    },
+    expect: [],
+  },
+  {
+    name: "log-copied-from-prior-sprint-old-entry-reworded (must-FAIL sibling: a real rewrite still reports LOG-REWRITTEN)",
+    opts: { pre: (d) => (logEntry(d, "scope-change", "beta widened", "TASK-902 widened."), PRIOR_LOG(d)) },
+    mutate: (d) => {
+      followsPrior(d);
+      edit(d, LOG, "TASK-902 widened.", "TASK-902 widened; TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "reword + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901", "LOG-REWRITTEN"],
+  },
+  ...[false, true].map((rewrite): Case => ({
+    name: `log-own-copy-move-${rewrite ? "rewritten" : "append-only"}`,
+    opts: { pre: (d) => {
+      logEntry(d, "scope-change", "beta widened", "TASK-902 widened.");
+      put(d, OLD_LOG, readFileSync(join(d, LOG), "utf8"));
+      rmSync(join(d, LOG));
+    } },
+    mutate: (d) => {
+      copyMoveLog(d);
+      if (rewrite) edit(d, MOVED_LOG, "TASK-902 widened.", "TASK-902 widened; TASK-901 gains a benchmark.");
+      else appendFileSync(join(d, MOVED_LOG), "\n### 2026-09-25 | scope-change | alpha widened\nTASK-901 gains a benchmark.\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit with moved log");
+    },
+    expect: rewrite ? ["FREEZE-EDIT TASK-901", "LOG-REWRITTEN"] : [],
+  })),
+  ...[LOG, SPRINT].map((path): Case => ({
+    name: `history-unresolved-${path === LOG ? "log" : "sprint"}`,
+    mutate: (d) => {
+      logEntry(d, "scope-change", "alpha widened", "TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "approved edit");
+      const pc = readFileSync(join(d, SPRINT), "utf8").match(/^plan_commit: (.+)$/m)![1]!;
+      const blob = git(d, ["rev-parse", `${pc}:${path}`]).trim();
+      const empty = execFileSync("git", ["hash-object", "-w", "--stdin"], { cwd: d, input: "", encoding: "utf8" }).trim();
+      git(d, ["replace", blob, empty]);
+      if (!git(d, ["ls-tree", pc, "--", path]).includes(blob) || git(d, ["show", `${pc}:${path}`]) !== "") {
+        throw new Error("history must claim the baseline path while its text resolves empty");
+      }
+    },
+    expect: [`HISTORY-UNRESOLVED ${path}`],
+  })),
   // --- selection: stamp and Members shapes (review round 1, minors) -----------------------------
   ...[
     ["quoted", 'sprint: "SPRINT-901"'],
