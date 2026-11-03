@@ -123,7 +123,7 @@ Full routing · skip table · the Standards-vs-Spec axes · the revise loop · a
 
 **Report shape** — every boundary report (a gate verdict, a task done, the sprint-bulk exit) and every confirmation popup opens with ONE line that carries both its verdict (what is true now, or what was decided) and the next step, then a `Progress:` line, then the evidence, then exactly one `Next:` line; context the reader already has is not restated.
 The sprint-bulk exit rollup is a machine-read contract (night-run.md Part 4) and keeps its own shape, `run · N of M DoD ticked` first; the rule governs the prose around it (TASK-321). `Progress:` gives sprint members done and epic conditions ticked, each N of M with %; a running job adds done/total, % and an ETA (TASK-583).
-In every mode, before the report: anything a check created in the working tree (a probe script, a database directory, a cache, a log), gitignored or not, is removed unless the task's declared files include it. When you clean up, no delete command names a path outside the working tree, not even in the command that removes your own in-tree files; such a path is reported, not removed: name it in the report (deleting it needs a permission an unattended run does not have).
+In every mode, before the report: anything a check created in the working tree (a probe, a database directory, a cache, a log), gitignored or not, is removed unless the task declares it. When you clean up, no delete command names a path outside the working tree, not even beside your in-tree files; such a path is reported, not removed: the report names it (unattended runs lack that permission).
 
 ## Red flags
 
