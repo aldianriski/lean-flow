@@ -836,3 +836,29 @@ now also pins the Final and Final-on-A1 files.
 | `evals/ab/schedule-final.json` | `b1eb7ef13af0ebb35768abaebe5412cc82f1bad369c1c4afe3b5a7cf2477dde1` |
 | `evals/ab/schedule-final-a1.json` | `ea6d334cb62856517dfd118fdfb46ba1b3dbc26c47c07fb2a62bafba95ec91f5` |
 | plugin pin (Final, Final-on-A1) sha / content hash | `cea7ffb8e5d46b70bd77504a51015804b4b573f5` / `b979ae44d3dd410a8f57cb418a2f0e603f09b9a0f2d326c99c7fe991645ddeb3` |
+
+## Amendment 10 (2026-11-03, arm Final cut to k = 2 while running, before any trial-3 slot)
+
+What changed:
+
+- **1. Final at k = 2.** `evals/ab/schedule-final.json` becomes its own first 32 entries, unchanged: `schedule-a4b.json` with each
+  arm renamed to Final, same order. The 16 trial-3 slots are dropped before any of them started. Amendment 9 item 4's "2 repos x
+  8 tasks x k = 3 = 48 slots" reads "k = 2 = 32 slots", and item 6's "(48 and 32 slots)" reads "(32 and 32 slots)". Final-on-A1,
+  every ruling of Amendment 9 item 7, the secondary of item 9 and everything else in Amendment 9 are unchanged.
+- **2. When and on what it was decided.** Owner ruling, 2026-11-03 (SPRINT-161 T2), on cost and wall time after an outside
+  review of the release-testing process (Codex): a third trial per task answered no question declared in advance and cost about
+  38 minutes and 27 USD. It was decided with 7 of Final's 48 slots scored. Beyond the two pilot slots the owner reviewed under
+  Amendment 9, no Final result (verdict, grader or score) was read before this amendment's signature: only row counts were.
+- **3. How it applies to the running arm.** Changing this file makes the driver refuse to start any further slot (section 18's
+  freeze check before every slot); the trials already running finish and are scored by the unchanged rules. The driver then
+  restarts on the 32-slot schedule under this amendment's freeze line, which carries over the Final and Final-on-A1 rows measured
+  since Amendment 9's freeze (2026-11-03T03:17:08Z). No trial is killed, and a slot already scored is not re-run.
+
+Why: the policy adopted with it (EPIC-023 D21): a release arm is k = 2 unless k = 3 answers a question declared in advance.
+
+No other rule changed. Section 19's row for `evals/ab/schedule-final.json` is superseded by the one below; no other row changes.
+This file's own sha256 changes and is recorded at the owner's re-signature in both logs' headers.
+
+| What | Value |
+|---|---|
+| `evals/ab/schedule-final.json` (Amendment 10, 32 slots) | `a37b2f7700303a06b142096ba5551b75b3b6af16022d70b5e8672525f6c7d517` |
