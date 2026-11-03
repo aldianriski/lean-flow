@@ -23,7 +23,7 @@ const ARMS_DIR = path.join(import.meta.dir, "..", "arms");
 
 /** Repo-relative paths of the lean-flow docs an arm adds (evals/ab/arms/<repo>-lf-docs.txt); none for an arm with no such list. */
 export function lfDocsOf(armId: string, armsDir = ARMS_DIR): Set<string> {
-  const f = path.join(armsDir, `${armId.replace(/[-_]a\d+$/i, "")}-lf-docs.txt`);
+  const f = path.join(armsDir, `${armId.replace(/-.*$/, "")}-lf-docs.txt`); // the repo is the arm id's first segment, whatever the arm
   return new Set(fs.existsSync(f) ? fs.readFileSync(f, "utf8").split(/\r?\n/).map((l) => l.trim().replaceAll("\\", "/")).filter(Boolean) : []);
 }
 

@@ -1305,6 +1305,7 @@ check("S37 judge context: post-change files from the trial dir / snapshot+patch,
   fs.writeFileSync(path.join(arms, "demo-lf-docs.txt"), ".claude/CLAUDE.md\nAGENTS.md\n");
   assert(j.lfDocsOf("demo-a1", arms).has("AGENTS.md") && j.lfDocsOf("smoke-a0", arms).size === 0, "the exclusion list comes from arms/<repo>-lf-docs.txt, none for an arm without one");
   assert(j.lfDocsOf("clinic-a1").has(".claude/CLAUDE.md"), "the committed clinic list is read");
+  assert(j.lfDocsOf("workdoo-a4b").size > 0 && j.lfDocsOf("clinic-final-a1").has(".claude/CLAUDE.md"), "every arm of a repo reads that repo's list, not only -a<digits> arms (A4a and A4b read none)");
 
   // calibration: snapshot + patch -> the file as it reads AFTER the patch
   const patch = "diff --git a/src/a.ts b/src/a.ts\n--- a/src/a.ts\n+++ b/src/a.ts\n@@ -1,2 +1,3 @@\n export const a = 1;\n // post-change-marker\n+export const b = 2;\n";

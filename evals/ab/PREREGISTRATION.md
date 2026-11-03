@@ -740,3 +740,97 @@ now also pins the A4b files.
 | `evals/ab/arms/clinic-a4b.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
 | `evals/ab/schedule-a4b.json` | `16ad90fb54321afa9e5d747b723e6a4f629d2f8256ff9fbdc4b3cd04329e0762` |
 | plugin pin (A4b) sha / content hash | `c10eeb8fcebf0153d1c4773968c6fb16e04c7099` / `6389b7c11b37a38d58cce6ddd1f0fb0b979f49e0b4ce46686796fde8ebf174a5` |
+
+## Amendment 9 (2026-11-03, arms Final and Final-on-A1 before any of their trials)
+
+What changed:
+
+- **1. Arm Final.** Two new measured arms, `workdoo-final` and `clinic-final` (`evals/ab/arms/<repo>-final.json`). Their snapshots
+  are A2's, unchanged (`D:\Research\ab-arm-<repo>-a2`), checked by `<repo>-final.manifest.json`, a byte copy of the A2 manifest
+  (the A4b manifest is the same bytes). Only the plugin differs: lean-flow at `cea7ffb8e5d46b70bd77504a51015804b4b573f5`, content
+  hash `b979ae44d3dd410a8f57cb418a2f0e603f09b9a0f2d326c99c7fe991645ddeb3`, a clone in `D:\Research\ab-pins\lean-flow-161-cea7ffb8`,
+  loaded by `--plugin-dir` in an isolated config with no user plugins, as at A4b. No setup runs. Analysis label `FINAL`.
+- **2. Arm Final-on-A1.** Two new measured arms, `workdoo-final-a1` and `clinic-final-a1`. Their snapshots are A1's, unchanged
+  (`D:\Research\ab-arm-<repo>-a1`), checked by `<repo>-final-a1.manifest.json`, a byte copy of the A1 manifest; the plugin is
+  Final's pin. Their docs are the ones lean-flow 2.19.1's `init` wrote for A1, not S1's (EPIC-023 intake ruling R2). S1's code is
+  inert in a trial (no trial runs `init` or `migrate`), so this arm measures the shipped set as an adopter who never re-runs
+  `migrate` meets it. Analysis label `FINAL-A1`. Before this amendment all four snapshots matched their manifests (no-spend
+  preflight, 2026-11-03).
+- **3. The treatment.** Against A4b's pin (`c10eeb8f`) ten plugin skill files differ. `skills/orchestrator/SKILL.md` carries S3's
+  bundle 3 and its residual (SPRINT-160 T1 and T2, SPRINT-161 T1; TASK-587, TASK-588, TASK-597): the design finds each
+  business-facts source by file name, reads every fact and quotes the line of each fact the change touches; and no delete command
+  names a path outside the working tree. The other nine files (`diagnose`, `flow`, `prime`, `triage`, `lean-doc-generator` with its
+  init and migration-map references and BUG template, and `task-decomposer`'s task-file reference) are work outside EPIC-023
+  (SPRINT-157, SPRINT-159) that ships in the same release. Exposure is measured as in Amendment 7 item 2: from each slot's kept
+  streams, any `Skill` call other than the orchestrator, or a read of one of the nine files, counts. With zero exposure the
+  bundle-3 ruling is stated as the effect of the orchestrator edits; with any, the exposed slots are named and it is stated as the
+  effect of Final's plugin against A4b's.
+- **4. Schedules.** `evals/ab/schedule-final.json`: `schedule-a4b.json` with each arm renamed to Final, same order (32 slots), then
+  trial 3 of each of the 16 tasks in the order the tasks first appear: 2 repos x 8 tasks x k = 3 = 48 slots.
+  `evals/ab/schedule-final-a1.json`: `schedule-a4b.json` with each arm renamed to Final-on-A1, same order: 32 slots (k = 2). Each
+  has Amendment 6 item 4's pilot (N = 2) and runs at two workers (Amendment 8 item 1; TASK-586 found no clean N above 2). Run
+  order: Final's pilot, then Final-on-A1's pilot, an owner review of both, then Final's remaining slots and then Final-on-A1's, one
+  driver run after the other, each under its own log and lock.
+- **5. Logs.** Rows go to `docs/research/logs/ab-measurements-final.md` and `ab-measurements-final-a1.md`, each header carrying its
+  own freeze line (it carries over nothing). The S0, A2, A4a and A4b logs stay closed.
+- **6. Validity first.** Each arm must pass section 11's run-validity rule on its own schedule (48 and 32 slots) before any
+  comparison. An INVALID or FAILED arm gets no ruling, nothing ships on it, and the owner rules whether it re-runs.
+- **7. Rulings.** Every comparison reads the combined slot data (S0's A0 and A1, A2's, A4a's, A4b's, Final's and Final-on-A1's, all
+  first pass), one `analyze.ts --comparator <arm>` report per comparator; a task's score is the mean over its own trials, so k = 3
+  and k = 2 arms compare task by task as before. "Difference" is the pooled primary of the first arm minus the comparator's, with
+  its 90% task-bootstrap interval; a symptom regresses when its difference is below -0.05. The never-worse-than-A0 floor (section
+  8) and the cost ceiling of 2.0x A1 (section 9) apply to every arm ruled on.
+  - **a. Final against A2, minimum gain** (Amendment 7 item 6): the point difference is >= +0.10, its lower end is > 0, and no
+    symptom regresses.
+  - **b. Final against A1, non-inferiority** (owner ruling, SPRINT-161 G2): the lower end of the difference is above -0.05, and no
+    symptom regresses. The gain over A1 is reported and decides nothing.
+  - **c. Final passes** when a and b hold, it is not below A0 and its cost is within 2.0x A1. A Final that does not pass means
+    nothing from EPIC-023 ships, whatever bundles 1 and 2 measured (EPIC-023 D6). When it passes:
+  - **d. Bundles 1 and 2** ship on their measured deltas (D15, D17).
+  - **e. Bundle 3 with TASK-597** ships when Final against A4b has a point difference above 0, a lower end above -0.05 and no
+    symptom regressing (D17's rule with a positive point). Otherwise it is ruled out, and the shipped set without it is unmeasured:
+    it needs a further arm before any release, or the outcome is no-ship.
+  - **f. S1** (the repo profile, question sets and template changes; owner ruling, SPRINT-161 G2: the point difference decides)
+    ships when the pooled point difference of Final minus Final-on-A1 is >= -0.05; the interval is reported. Otherwise S1 is ruled
+    out, and Final-on-A1, the shipped set without S1's docs, must itself pass a, b and c in Final's place, or nothing ships.
+- **8. Park rate (reported, not decisive).** The share of each arm's scored slots whose exit is `parked:`, beside A4b's 0 of 32.
+- **9. Development runs, disclosed.** After Amendment 8's hash was recorded, under its freeze line: SPRINT-160's development runs of
+  bundle 3 (plugin pins `4c840af5` and `2249c701`) on research copies of the A2 snapshots (`D:\Research\dev156\`), workdoo
+  self-onboarding-guard four times and invitation-issued-by and reissue-invitation twice each; TASK-586's capacity check, A4a's
+  arms and pin at N = 3 and N = 4 on workdoo access-activity-type-filter and shared-auth-failure and clinic patient-cancel-all and
+  confirmation-time; and SPRINT-161 T1's two runs of Final's own pin on self-onboarding-guard. All went into scratch logs that no
+  analysis reads. Section 18's R-c is not breached; they are not trials of any arm and contribute no row. As a labelled secondary
+  that decides nothing, the report gives Final minus A4b on the 13 tasks no development run of the treatment touched (all but
+  self-onboarding-guard, invitation-issued-by and reissue-invitation; the capacity check ran A4a's plugin). Its use is predeclared:
+  if bundle 3 is ship-eligible under item 7e while that point difference is below -0.05, the ruling is reported as
+  **ship-eligible, untouched-task regression**, and bundle 3 does not ship without the owner's ruling.
+- **10. Judge context, a harness fix disclosed.** `lfDocsOf` (`lib/judges.ts`) found an arm's lean-flow docs list only for arm ids
+  ending `-a<digits>`, so A4a's and A4b's judges did not leave lean-flow docs out of their context while A0's, A1's and A2's did.
+  A judge's context holds only files the trial's diff writes; from the kept streams, no A2, A4a or A4b trial wrote a listed
+  lean-flow doc with Write or Edit (A4b: 239 such writes, none listed), so the gap is not expected to have changed a past verdict.
+  Fixed before this amendment: the repo is the arm id's first segment, and selftest S37 asserts that every arm of a repo reads its
+  list. Final's and Final-on-A1's judges leave lean-flow docs out, as A0's to A2's did.
+
+Why: EPIC-023 S4 measures the final set against A1 and A2 before any release (D6, D16); intake rulings R1 (admission by stacked
+add-one deltas, recorded as D18) and R2 (S1 measured on A1's docs); SPRINT-161 G2 rulings (2026-11-03): non-inferiority against
+A1, S1 decided by the point difference, these schedules and this run order.
+
+No other rule changed: the endpoints, thresholds, task corpus, the A0, A1, A2, A4a and A4b arms, the allow-list, models, judges and
+their prompts, the retry limits, the 45-minute limit, the spend and stop rules and the scoring of every exit are as frozen.
+Section 19 gains the rows below; no existing row changes. This file's own sha256 changes and is recorded at the owner's
+re-signature in both new logs' headers. Harness code (`lib/*.ts`, `run-baseline.ts`) is not hashed (section 20); `hash-prereg.ts`
+now also pins the Final and Final-on-A1 files.
+
+| What | Value |
+|---|---|
+| `evals/ab/arms/workdoo-final.json` | `4c833efdd7baf8c546b0ba3959366a6ba9108190126414fc59e25e8888c8b5fa` |
+| `evals/ab/arms/workdoo-final.manifest.json` | `f71a220af1bea50708f131aaed837a6196c6580fba1966053869f46d4eaacbff` |
+| `evals/ab/arms/clinic-final.json` | `df61892718c03de5a800f6d321f4d8a34ec666b5040b214be4684ab9377165e8` |
+| `evals/ab/arms/clinic-final.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
+| `evals/ab/arms/workdoo-final-a1.json` | `5de00f32f08a0499444f277f74768e14c2a66707fe346990b601175c42b264c4` |
+| `evals/ab/arms/workdoo-final-a1.manifest.json` | `af6ddbdef28291f560e80bcfa6cd62b15806e51e5dd59f2e49e2aacf784ebda8` |
+| `evals/ab/arms/clinic-final-a1.json` | `f8184f3f6184dfe6f3d93b1e86a7ab20bcf9cf849745766a9bd650fe53974066` |
+| `evals/ab/arms/clinic-final-a1.manifest.json` | `c746aa2b180a69eca37bfda9463a35458f6df1dea298511f17127c8ff9209f5c` |
+| `evals/ab/schedule-final.json` | `b1eb7ef13af0ebb35768abaebe5412cc82f1bad369c1c4afe3b5a7cf2477dde1` |
+| `evals/ab/schedule-final-a1.json` | `ea6d334cb62856517dfd118fdfb46ba1b3dbc26c47c07fb2a62bafba95ec91f5` |
+| plugin pin (Final, Final-on-A1) sha / content hash | `cea7ffb8e5d46b70bd77504a51015804b4b573f5` / `b979ae44d3dd410a8f57cb418a2f0e603f09b9a0f2d326c99c7fe991645ddeb3` |

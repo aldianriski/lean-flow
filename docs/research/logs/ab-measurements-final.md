@@ -1,0 +1,22 @@
+---
+owner: Maintainer
+last_updated: 2026-11-03
+update_trigger: a Final trial run is appended (evals/ab, run by hand)
+status: active
+id: ab-measurements-final-log
+tags: [tooling, process]
+domain: governance
+related: [EPIC-023, TASK-598]
+---
+
+# A/B trial measurements, arm Final -- run log
+
+> Append-only. One row per run of `evals/ab/run-trial.ts` for arm Final (`workdoo-final`, `clinic-final`; schedule
+> `evals/ab/schedule-final.json`, 48 slots), written by the harness, never by hand. Same row format and rules as the S0 log
+> (`ab-measurements.md`), the A2, A4a and A4b logs, all closed. Tokens and cost come from the CLI's own `result` event.
+> A `usage-missing` row is invalid: the CLI reported no usage, and the trial stops for an owner ruling.
+>
+> Final is judged by Amendment 9 (validity on its own 48 slots first, then the rulings of its item 7). Its freeze line is added at the owner's signature of Amendment 9; until then no slot may start.
+
+| ts | tag | arm | repo | task | trial | attempt | graders | in | out | cache-read | cache-write | cost-usd | wall-s | exit | pins | raw | passed | deviation | g2 | park | measure |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
