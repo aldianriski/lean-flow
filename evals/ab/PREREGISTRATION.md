@@ -854,7 +854,7 @@ What changed:
   restarts on the 32-slot schedule under this amendment's freeze line, which carries over the Final and Final-on-A1 rows measured
   since Amendment 9's freeze (2026-11-03T03:17:08Z). No trial is killed, and a slot already scored is not re-run.
 
-Why: the policy adopted with it (EPIC-023 D21): a release arm is k = 2 unless k = 3 answers a question declared in advance.
+Why: the policy adopted with it (EPIC-023 D19): a release arm is k = 2 unless k = 3 answers a question declared in advance.
 
 No other rule changed. Section 19's row for `evals/ab/schedule-final.json` is superseded by the one below; no other row changes.
 This file's own sha256 changes and is recorded at the owner's re-signature in both logs' headers.

@@ -121,6 +121,15 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   workers, 93.8% vs A4a 90.6%, +3.1 [0.0, 9.4], no symptom regression (convention +11.5, business +5.6, scope +6.3), 0 parks,
   cost 0.68x A1, ruled by non-inferiority (Amendment 8; `ab-measurements-a4b.md` § Report 2026-11-02). It ships with A4a in the
   next release, which D16 gates on a passing arm; invitation-issued-by still fails its business judge in both arms.
+- **D18** — Admission by stacked add-one deltas (owner, 2026-11-03, TASK-598 intake ruling R1), in place of D5's per-candidate
+  leave-one-out: each S3 bundle is admitted on its measured delta over the arm it was stacked on (bundle 1: A4a vs A2; bundle 2:
+  A4b vs A4a; bundle 3 with TASK-597: Final vs A4b), and only when arm Final passes against A2 and A1 (Amendment 9 item 7c). S1
+  is measured by Final-on-A1, the same plugin on A1's docs (R2).
+- **D19** — Release-arm policy (owner, 2026-11-03, after a Codex process review; refines D16): an arm runs only before a release
+  that changes `/orchestrator` or gate behaviour, as one 16-task x k = 2 arm (32 slots) on the exact final stack at two workers,
+  about 75 minutes; docs and fix releases ship on the repo gate. A component-isolation arm or k = 3 runs only when declared in
+  advance as deciding a ship question. Three workers wait on TD-289's fix and a clean re-check (TASK-600). Applied at once:
+  Amendment 10 cut arm Final to k = 2 before any trial-3 slot; Final-on-A1 stays, as it alone decides S1.
 
 ## Open questions
 
