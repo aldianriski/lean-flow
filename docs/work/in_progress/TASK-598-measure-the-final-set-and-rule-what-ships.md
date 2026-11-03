@@ -26,19 +26,19 @@ unprofiled snapshots. Bundles 1 and 2 are measured; bundle 3 (SPRINT-160) and TA
 and every later arm stood on S1's docs. One Final arm and one S1 check decide the shipped set before any release (D6, D16).
 
 ## Done when
-- [ ] An owner-signed Amendment 9 to the pre-registration, hashed before any trial, defines arm Final (plugin pinned after TASK-597,
+- [x] An owner-signed Amendment 9 to the pre-registration, hashed before any trial, defines arm Final (plugin pinned after TASK-597, ✓ Amendment 9 signed (`bd524775`, sha256 `77334de9…`); k = 3 superseded by Amendment 10 (scope-change logged); Amendment 11 adds arm Release
       A2's snapshots, k = 3) and arm Final-on-A1 (the same pin, A1's snapshots, k = 2), their schedules and the rulings below, runs
       at two workers (Amendment 8), and discloses SPRINT-160's development runs and capacity check.
-- [ ] Both arms pass the pre-registration's run-validity rule, each after an owner-approved pilot, run unattended with an exit
+- [x] Both arms pass the pre-registration's run-validity rule, each after an owner-approved pilot, run unattended with an exit ✓ Final and Final-on-A1 32/32 VALID each, pilots approved, detached with watchers; Release 32/32 VALID
       watcher and a notification.
-- [ ] The rulings are recorded in the arms' log and in EPIC-023: Final against A2 (the minimum gain) and against A1, the
+- [x] The rulings are recorded in the arms' log and in EPIC-023: Final against A2 (the minimum gain) and against A1, the ✓ `ab-measurements-final.md` and `-release.md` § Report 2026-11-03; EPIC-023 D21: Final passes, bundle 3 ruled out, S1 ships; Release passes
       never-below-A0 floor, cost within 2x A1; a Final that fails any of these means nothing from EPIC-023 ships, whatever
       bundles 1 and 2 measured. When Final passes: bundles 1 and 2 on their measured deltas (D15, D17); bundle 3 only on a
       positive point delta of Final against A4b and non-inferiority (as D17); S1 ships only if Final on A2's snapshots is not
       below Final-on-A1 by more than 5 points, and when S1 is ruled out, Final-on-A1 (the shipped set without S1's docs) must pass
       the same gates against A1 and A2, else nothing ships. A ruled-out S3 bundle leaves the shipped set unmeasured: it needs a
       further arm before any release, or the outcome is no-ship.
-- [ ] EPIC-023 records D18 (add-one admission in place of per-candidate leave-one-out) and, per component, an ADR-001 record with
+- [x] EPIC-023 records D18 (add-one admission in place of per-candidate leave-one-out) and, per component, an ADR-001 record with ✓ EPIC-023 D18, D20 (S3a/b/c not built, triggers checked), D21 (per-component records)
       its numbers, admitted or not; S3a brief fields, S3b pilot reviewers and S3c roles are recorded as not built (D11), each
       deferred role's trigger checked against the residual failures.
 
