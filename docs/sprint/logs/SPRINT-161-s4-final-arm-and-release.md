@@ -160,3 +160,6 @@ bookkeeping fixes from its first run, `847911c0`: 487/4): QA-CHECK 490 pass, 0 f
 1-3 ticked; box 4 and EPIC-023 S4 wait for the owner's push (D7).
 consequence · T3 · behaviour:material · governance:high
 review · T3 · self-review + off-host gate (release mechanics only; the shipped set was measured by arm Release) · behaviour:material · governance:high
+
+### 2026-11-03 | progress | v2.20.0 pushed by the owner; T3 done; EPIC-023 S4 ticked (5 of 5 conditions)
+Owner push `ec30d8d9..00bf98de`. TASK-599 box 4 and EPIC-023 S4 ticked (D7). Every member is in `done/`; the sprint is ready to close.

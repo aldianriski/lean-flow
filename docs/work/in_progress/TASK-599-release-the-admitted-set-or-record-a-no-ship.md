@@ -33,7 +33,7 @@ TASK-598 changes that reading the release is a 2.x MINOR.
       re-running `migrate` adds, what changed in `/orchestrator`), D6's held notes resolved; every versioned manifest equal (the set
       derived with `grep -l '"version"' .*-plugin/*.json`) and the README footer; the CHANGELOG rotated as §11 requires for a new
       MINOR; the off-host gate green. It stops before push: the owner pushes.
-- [ ] EPIC-023's S4 condition is ticked only after the owner has pushed the release (D6: a release, not a commit, is what ships),
+- [x ] EPIC-023's S4 condition is ticked only after the owner has pushed the release (D6: a release, not a commit, is what ships), ✓ owner pushed `ec30d8d9..00bf98de` 2026-11-03; v2.20.0, release commit `847911c0`; EPIC-023 S4 ticked
       naming the version and its commit; or, when TASK-598 rules that nothing ships, on a recorded no-ship with its numbers and
       `[Unreleased]` held.
 

@@ -173,7 +173,8 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
   → TASK-587, TASK-588 ✓ SPRINT-160 (bundle 3 shown by development runs); residual → TASK-597 ✓ SPRINT-161: roles not built (D20); arms
   A4a, A4b measured; bundle 3 measured by Final and ruled out (D21)
-- [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
+- [x] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)
-  → TASK-598, TASK-599
+  → TASK-598, TASK-599 ✓ SPRINT-161: v2.20.0 pushed by the owner 2026-11-03 (release commit `847911c0`, pushed at
+  `00bf98de`); arm Release 93.8% (D21); 2.x MINOR (D22)
