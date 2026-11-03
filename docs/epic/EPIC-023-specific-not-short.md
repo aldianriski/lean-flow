@@ -2,7 +2,7 @@
 epic: 023
 slug: specific-not-short
 owner: Maintainer
-last_updated: 2026-11-02
+last_updated: 2026-11-03
 status: active
 member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152, SPRINT-153, SPRINT-154, SPRINT-156, SPRINT-158, SPRINT-160]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -52,7 +52,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-154](../sprint/archive/SPRINT-154-a2-migrate-arm.md) | A2: Migrate Arm (S1's arm A2 through a real migrate; stream s1-discovery) | closed · `c6255747` | S1's arm: A2 set up by a real `migrate` from the S1 pin with an operator answering from frozen entries, 32/32 VALID, ruled failed (below the A0 floor; no gain or regression vs A1), so S1 does not ship (D6). Ticks S1; S3's intake found the regressions are UNKNOWN verdicts (D11) |
 | [SPRINT-156](../sprint/archive/SPRINT-156-lean-flow-habits-a4a.md) | S3: Three lean-flow Habits, Measured as A4a (stream s3-expertise) | closed · `0c556367` | S3's first slice: two lean-flow habits fixed in `/orchestrator` (probes stay in the working tree, designs list only what the change needs inside their layers) and measured as arm A4a, 32/32 VALID, 90.6% vs A2 78.1%, gain +12.5 [3.1, 21.9], no regression, cost 0.55x A1; ship-eligible, tuning-sensitive, shipped by owner ruling (D15). S3 stays open for bundle 2 (TASK-583, 584, 585, 581) |
 | [SPRINT-158](../sprint/archive/SPRINT-158-s3-bundle-2.md) | S3 Bundle 2: Progress Reports, Clean Checks, Business Facts, Parallel Trials (stream s3-expertise) | closed · `074b0f78` | S3's second bundle on A4a: a Progress line, an every-mode check-leftover rule and a G2 business-facts box, measured as arm A4b at two workers (parallel trials, TASK-582): 93.8% vs A4a 90.6%, +3.1 [0.0, 9.4], no regression, 0 parks, ship-eligible by non-inferiority (D17); D16 moves full arms to releases. S3 stays open for bundle 3 (TASK-587, 588) |
-| [SPRINT-160](../sprint/SPRINT-160-s3-bundle-3.md) | S3 Bundle 3: Quoted Business Facts, No Delete Outside the Tree, Release Worker Count (stream s3-expertise) | active | — |
+| [SPRINT-160](../sprint/archive/SPRINT-160-s3-bundle-3.md) | S3 Bundle 3: Quoted Business Facts, No Delete Outside the Tree, Release Worker Count (stream s3-expertise) | closed · `ff9e9d71` | S3's third bundle on A4b, shown by development runs (D16): the G2 design opens each business-facts source and quotes every fact its change touches (fact 6 and the en-GB fact quoted on the revision; one run missed the file by name, TASK-597), and no delete names a path outside the working tree (4 of 4 runs clean). No worker count above 2 is clean, so release arms stay at two workers (TD-289). S3 stays open on TASK-597 |
 
 ## Decisions
 
@@ -141,7 +141,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
 - [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
-  → TASK-587, TASK-588
+  → TASK-587, TASK-588 ✓ SPRINT-160 (bundle 3 shown by development runs); residual → TASK-597
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)

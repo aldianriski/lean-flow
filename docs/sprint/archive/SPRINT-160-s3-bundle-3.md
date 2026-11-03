@@ -8,6 +8,7 @@ last_updated: 2026-11-02
 status: closed
 plan_commit: 3bacd634
 gates_signed: G1,G2 @ 688ed825
+close_commit: ff9e9d71
 update_trigger: sprint execute/close events
 ---
 
