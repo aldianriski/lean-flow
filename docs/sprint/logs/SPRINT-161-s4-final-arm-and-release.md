@@ -55,3 +55,18 @@ preflight `PREFLIGHT-OK` first (L-285); two single-slot runs in parallel, 2.79 U
 is initially available for all three preparation responsibilities"). No wording revision needed. Ticked; `done/`.
 consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped outside review (Codex, read-only, 1 round, CLEAR, 6.8k tokens) · behaviour:material · governance:low
+
+### 2026-11-03 | gate | T2 G2 and Amendment 9 signed by owner popup; freeze lines written; pilots launched
+G2 rulings (popup, before the draft): Final against A1 by non-inferiority (lower end above -0.05, no symptom below -0.05), the gain
+over A1 reported only; S1 decided by the pooled point difference Final minus Final-on-A1 >= -0.05; A2 confirmed (Final = A4b's 32
+slots renamed, then the 16 trial-3 slots appended; Final-on-A1 = A4b's order on A1's snapshots); run plan: both pilots, one owner
+review, then the two arms chained at two workers. A1 confirmed: all four frozen snapshots (A1 and A2, both repos) match their
+manifests (no-spend preflight).
+Build `aa678cc1`, `bd524775`: four arms on pin `cea7ffb8` (each `PREFLIGHT-OK`), `schedule-final.json` 48 and
+`schedule-final-a1.json` 32 (pilot N = 2 each), two logs, `hash-prereg.ts` pins them. Harness fix found while drafting: `lfDocsOf`
+matched only `-a<digits>` arm ids, so A4a's and A4b's judges kept lean-flow docs in context; kept streams show no A4b trial wrote a
+listed doc (Write/Edit none of 239; the 5 shell commands naming one are reads). Fixed; selftest S37 fails on the old parser (must-FAIL)
+and passes on the new, 82 of 82. Disclosed as Amendment 9 item 10.
+Codex R1 (read-only, 16.0k tokens): CLEAR; one Med (item 10 checked Write/Edit only), fixed by the shell-command check.
+builder-check · T2 · via Codex R1 · 0 contradictions · 0 owner questions
+Signed: `evals/ab/PREREGISTRATION.md` sha256 `77334de9…` at `bd524775`; freeze lines 2026-11-03T03:17:08Z in both logs (`FREEZE-OK`).
