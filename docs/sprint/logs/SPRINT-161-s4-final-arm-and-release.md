@@ -123,3 +123,9 @@ difference from `main` is bundle 3's two lines (`git diff c10eeb8f HEAD -- skill
 deletions), and drops the two bundle-3 CHANGELOG bullets. A size-S removal; no split. T2 then runs arm Release (A2's snapshots,
 the revert's pin, k = 2, 32 slots) under an Amendment 11, Codex-reviewed and owner-signed, after an approved pilot; it rules
 under Amendment 9 items 7a-7c. Re-confirm G2: owner ruling by popup.
+
+### 2026-11-03 | progress | T2 arm Release: pilot approved (owner popup); remaining 30 slots launched detached
+Pilot (2 slots, pin `1d6b616a`): both `ok`, graders pass, 0 parks, 1.42 and 1.70 USD; business UNKNOWN on access-activity-type-filter #1
+(the judge-context gap Final's pilot also hit on that task). An Amendment 12 replacing the arm by an equivalence ruling on A4b's data
+was drafted and reviewed by Codex: NOT CLEAR (cancelling a signed arm after results changes the decision rule; acceptable only as an
+explicit owner exception). Owner ruled: run the arm. Amendment 12 not applied.
