@@ -3,6 +3,7 @@ id: TASK-603
 title: "Re-check three workers for release arms now that clinic provisioning is serialised"
 type: debt
 epic: EPIC-023
+sprint: SPRINT-162
 priority: P2
 size: S
 risk: low

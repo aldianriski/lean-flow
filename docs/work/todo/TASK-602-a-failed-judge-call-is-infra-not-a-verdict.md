@@ -3,6 +3,7 @@ id: TASK-602
 title: "Treat a failed A/B judge call as an infra attempt, never as an UNKNOWN verdict"
 type: bug
 epic: EPIC-023
+sprint: SPRINT-162
 priority: P1
 size: S
 risk: med

@@ -41,6 +41,9 @@ review (2026-11-03): keep "the repo declares, lean-flow applies", start minimal,
 - Needs intake (`/task-decomposer`) after 2.20.0 ships: split, sized and grilled there; outside EPIC-023.
 - Later increments only on comparative evidence: a G2 line naming the adopted standard that changed a decision (an
   `/orchestrator` behaviour change, so an arm under EPIC-023 D19), and a curated principle library.
+- Intake also weighs EPIC-023 D20's kept candidate, which is close to the negative-scenario box: requirement and invariant
+  assertions with test anchors, inside G2 and review, each checked by "would the test fail if the behaviour broke". It
+  folds in here or is ruled out at intake; it is not tracked anywhere else (SPRINT-162 promote).
 
 ## Tracker
 Proposal drafted in SPRINT-161 (Codex-reviewed twice) · `docs/research/plugin-reference-delta.md` · backnotprop/pstack `6c75f4e6`

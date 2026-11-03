@@ -2016,3 +2016,14 @@ status: current
     judge call in any earlier arm.
   - Impact: medium; an unnoticed outage can turn a passing arm into a no-ship (Release read 87.5% before the voids, 93.8% after).
   - Mitigation: TASK-602 (classify a failed judge call as infra; retry or stop).
+
+- **TD-291** severity: low | status: open | created: Sprint-162 (promote; EPIC-023 D20)
+  - Summary: **Backend role watch: duplicated server logic keeps recurring in A/B runs, and no reviewer looks for it.** EPIC-023
+    D20 deferred every role agent; backend is the one it marked **watched**. The trigger fires when the residual failures of two
+    or more tasks concentrate in backend layers on the shipped plugin.
+  - Evidence: EPIC-023 D20 (`docs/epic/archive/EPIC-023-specific-not-short.md`); duplicated server logic on A4b
+    doctor-day-sheet, Final and Final-on-A1 reissue-invitation (x3) and appointment-lookup; arm Release had 0 convention FAILs,
+    so the trigger has not fired.
+  - Impact: low today; if it fires, review misses a defect class that G2 and the session's own checks do not catch.
+  - Mitigation: re-check the trigger at each release arm (D19). If it fires, propose an epic for a backend reviewer, admitted
+    under ADR-053 and measured by one arm against the shipped stack.
