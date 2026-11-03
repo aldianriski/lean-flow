@@ -5,7 +5,7 @@ stream: s4-release
 epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-11-03
-status: active
+status: closed
 plan_commit: d69b4cb9
 update_trigger: sprint execute/close events
 ---
@@ -104,7 +104,40 @@ Added by scope-change: a cross-process lock around port pick, initdb and `pg_ctl
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/SKILL.md` | T1, T3 | T1 found facts sources by file name; T3 reverted it to A4b's pin (bundle 3 ruled out) | med | 2 dev runs; arm Final; arm Release |
+| `CHANGELOG.md` | T1-T4 | Measured line, lock line, the v2.20.0 release entry | low | lockstep · off-host gate |
+| `evals/ab/PREREGISTRATION.md` | T2 | Amendments 9, 10 and 11 (Final, Final-on-A1, Final at k = 2, Release) | high | owner-signed; Codex CLEAR x3 |
+| `evals/ab/arms/*-final*`, `*-release*`, `schedule-final*.json`, `schedule-release.json` | T2 | the three arms, byte-copied manifests | med | `PREFLIGHT-OK`; hashes pinned |
+| `evals/ab/lib/judges.ts`, `evals/ab/selftest.ts`, `evals/ab/hash-prereg.ts` | T2 | judges leave lean-flow docs out for every arm id; pins | med | S37 must-FAIL on the old parser |
+| `evals/ab/lib/provision.ts`, `evals/ab/selftest.ts` | T4 | cross-process lock around clinic startup (TD-289) | med | S78 must-FAIL; selftest 83/83 |
+| `docs/research/logs/ab-measurements-{final,final-a1,release}.md` | T2 | the arms' rows, freeze lines and reports | high | build-slots; analyze VALID x3 |
+| `docs/epic/EPIC-023-specific-not-short.md` | T2, T3 | D18-D22; S3 and S4 ticked | med | caps, density |
+| `docs/research/plugin-reference-delta.md`, `docs/knowledge-index.md` | T2 | owner's ECC/pstack/Helix note committed (scope-change) | low | density PASS |
+| manifests x4, `README.md`, `docs/changelog/CHANGELOG-2.18.0.md` | T3 | 2.20.0 bump and §11 rotation | high | lockstep; off-host gate 490/0, bun test 589/0 |
 
 ## Retro
 
-<!-- Written at close (STANDARD §10). -->
+**Outcome** — 4 of 4 members delivered (TASK-597, 598, 599, 600); v2.20.0 pushed by the owner. Arm Final (bundles 1-3 and S1)
+scored 96.9% and passed against A2 and A1, but bundle 3 fell short of non-inferiority against A4b (convention -11.5) and came off
+`main`, taking T1's own change with it. Final-on-A1 cleared S1 (-3.1 point). Arm Release, the exact shipped set, scored 93.8%:
++15.6 over A2, +12.5 over A1, above A0, at 0.70x A1. S3's role agents were recorded as not built (D20); EPIC-023 closes.
+
+**Retrieval check** — yes, one miss. The tick-evidence format (L-261's family) bit twice: T1's evidence on a continuation line
+read as a Done-when edit, and TASK-598's short log names read as undeclared paths. Counted, not refiled.
+
+**Cost** — arms about 160 USD (Final 32 and Final-on-A1 32 with pilots about 105; Release 32 about 50; voids 3.01 apart);
+development runs 2.79 USD. Codex: about 75k tokens over nine reviews and one build. One Sonnet builder check (53k).
+
+**Worked**
+- A pre-registration hash change is a clean stop for a running arm: Amendment 10 cut k mid-run without killing a trial (L-286).
+- Timestamps settled the outage: four failures inside 40 seconds, at the login lapse, none in 230-odd earlier slots.
+- Codex caught a post-results rule change (Amendment 12) before it was applied; the arm ran and confirmed the set.
+
+**Friction**
+- Wall time was stated without saying it blocked no one; the owner read "about 3 h" as waiting (memory updated).
+- k = 3 was frozen at intake with no question it answered: about 38 minutes and 27 USD, found only when the owner asked (L-287).
+- A failed judge call was scored as an UNKNOWN verdict and silently turned a passing arm into a no-ship until read by hand
+  (L-288, TD-290, TASK-602).
+
+**Buckets** — Shipped: v2.20.0 (CHANGELOG). Tech debt: TD-290 (filed); TD-289 mitigated by T4, open on TASK-603. Follow-ups:
+TASK-601, TASK-602, TASK-603 (filed mid-sprint, backlog). Learnings: L-286, L-287, L-288.

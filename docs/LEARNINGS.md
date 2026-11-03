@@ -123,6 +123,30 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-288 [tags: tooling] [status: active]: **A failed call inside a scored step reads as a result. Check that every step a score depends on fails loudly, not only the step under test.** In arm Release (SPRINT-161), a login lapse failed two agent calls and two judge calls within 40 seconds. The agent phase reported `usage-missing` and the driver stopped; the judge phase returned UNKNOWN verdicts, which score as not-passed, so the arm read 87.5% and a no-ship. Only the timestamps (four failures in one minute, none in 230 earlier slots) showed it was an outage. TD-290, TASK-602.
+- seen: 2026-11-03 (SPRINT-161 T2, arm Release)
+- count: 1
+- promoted: no
+- related: TD-290 · TASK-602
+
+---
+
+## L-287 [tags: process] [status: active]: **A frozen measurement parameter needs the question it answers written beside it.** TASK-598's intake froze arm Final at k = 3, a third trial per task that answered no declared question. It cost about 38 minutes and 27 USD a run and surfaced only when the owner asked why a release took three hours; Amendment 10 cut it mid-run. EPIC-023 D19 now asks for that question before any k = 3 or isolation arm.
+- seen: 2026-11-03 (SPRINT-161 T2)
+- count: 1
+- promoted: no
+- related: EPIC-023 D19
+
+---
+
+## L-286 [tags: tooling] [status: active]: **To change a running measured arm, change the pre-registration: the driver's per-slot freeze check is its clean stop.** Writing Amendment 10 into `PREREGISTRATION.md` made `run-baseline.ts` refuse its next slot, let the two running trials finish and record, and exit 2. A new freeze line that "carries over the rows measured since" the earlier freeze resumed the arm with no slot lost or re-run. Never kill the process for this; a killed trial is paid for and lost.
+- seen: 2026-11-03 (SPRINT-161 T2, Amendment 10)
+- count: 1
+- promoted: no
+- related: L-285
+
+---
+
 ## L-285 [tags: tooling] [status: active]: **A scratch development arm needs what a measured arm has: its snapshot is the research copy it runs on, and `inventory.json` sits beside it. Run a no-spend preflight before the paid batch.** SPRINT-160's first three development batches failed before any trial started: an arm JSON written with single backslashes, a scratch arms folder without the `inventory.json` that supplies the session model, and a snapshot naming the frozen A2 copy while `run-dev.ts` passes the research copy (a measured run refuses any repo other than the arm's snapshot). The last one showed only as `infra:harness-crash` with no message. A short preflight (load the arm, `freezePreflight`, `verifyPin`) named it and printed `PREFLIGHT-OK` before the paid launch.
 - seen: 2026-11-02 (SPRINT-160 T1/T2 development batch: three launches, no spend)
 - count: 1

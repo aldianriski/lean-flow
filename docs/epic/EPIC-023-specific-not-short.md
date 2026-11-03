@@ -3,7 +3,7 @@ epic: 023
 slug: specific-not-short
 owner: Maintainer
 last_updated: 2026-11-03
-status: active
+status: closed
 member_sprints: [SPRINT-147, SPRINT-148, SPRINT-150, SPRINT-151, SPRINT-152, SPRINT-153, SPRINT-154, SPRINT-156, SPRINT-158, SPRINT-160, SPRINT-161]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -53,7 +53,7 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
 | [SPRINT-156](../sprint/archive/SPRINT-156-lean-flow-habits-a4a.md) | S3: Three lean-flow Habits, Measured as A4a (stream s3-expertise) | closed · `0c556367` | S3's first slice: two lean-flow habits fixed in `/orchestrator` (probes stay in the working tree, designs list only what the change needs inside their layers) and measured as arm A4a, 32/32 VALID, 90.6% vs A2 78.1%, gain +12.5 [3.1, 21.9], no regression, cost 0.55x A1; ship-eligible, tuning-sensitive, shipped by owner ruling (D15). S3 stays open for bundle 2 (TASK-583, 584, 585, 581) |
 | [SPRINT-158](../sprint/archive/SPRINT-158-s3-bundle-2.md) | S3 Bundle 2: Progress Reports, Clean Checks, Business Facts, Parallel Trials (stream s3-expertise) | closed · `074b0f78` | S3's second bundle on A4a: a Progress line, an every-mode check-leftover rule and a G2 business-facts box, measured as arm A4b at two workers (parallel trials, TASK-582): 93.8% vs A4a 90.6%, +3.1 [0.0, 9.4], no regression, 0 parks, ship-eligible by non-inferiority (D17); D16 moves full arms to releases. S3 stays open for bundle 3 (TASK-587, 588) |
 | [SPRINT-160](../sprint/archive/SPRINT-160-s3-bundle-3.md) | S3 Bundle 3: Quoted Business Facts, No Delete Outside the Tree, Release Worker Count (stream s3-expertise) | closed · `ff9e9d71` | S3's third bundle on A4b, by development runs (D16): the design quotes every business fact its change touches (fact 6 and the en-GB fact on the revision; one run missed the file by name, TASK-597), and no delete names a path outside the tree (4 of 4 runs). No worker count above 2 is clean, so arms stay at two workers (TD-289). S3 stays open on TASK-597 |
-| [SPRINT-161](../sprint/SPRINT-161-s4-final-arm-and-release.md) | S4: Final Arm and Release (stream s4-release) | active | — |
+| [SPRINT-161](../sprint/archive/SPRINT-161-s4-final-arm-and-release.md) | S4: Final Arm and Release (stream s4-release) | closed · `CLOSE_SHA` | Arms Final, Final-on-A1 and Release; bundle 3 ruled out and reverted; S1 and bundles 1-2 shipped as v2.20.0 (93.8%, +12.5 over A1); D18-D22 |
 
 ## Decisions
 
