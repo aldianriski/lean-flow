@@ -37,7 +37,7 @@ success versus A0's 89.6%; A2 versus A1 was −3.1 points, with an interval span
 in A0/A1. Three A2 trials parked at popups. These results establish a problem in the studied workflow. They do not establish a
 universal effect size or show that more reviewers would help.
 
-[EPIC-023 D11–D13](../epic/EPIC-023-specific-not-short.md) already routes the popup and over-scoped design failures to
+[EPIC-023 D11–D13](../epic/archive/EPIC-023-specific-not-short.md) already routes the popup and over-scoped design failures to
 TASK-573/575, measured by TASK-574 in [SPRINT-156](../sprint/SPRINT-156-lean-flow-habits-a4a.md). D13 cancelled TASK-576: the
 proposed small-task light path could not remove overhead imposed by the trial protocol's separate sessions. Do not revive it
 without the [recorded revisit condition](../../.out-of-scope/light-path-small-tasks.md).
