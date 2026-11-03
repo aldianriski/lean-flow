@@ -1993,6 +1993,43 @@ check("S47 provisioner: clinic -> Node 24 first on the path, npm ci from the cac
   assert(wrongNode instanceof ProvisionFailed && /expected Node 24/.test(wrongNode.message), `a Node that is not 24 is refused: ${wrongNode}`);
 });
 
+check("S78 provision lock: concurrent clinic startup windows do not overlap; stale lock reclaimed; success and failure release", async () => {
+  const { makeProvisioner, ProvisionFailed } = await import("./lib/provision.ts");
+  const provisionLock = path.join(tmpdir("prov-lock"), "lock");
+  const windows = [0, 1].map(() => ({ begin: Infinity, end: 0 }));
+  const results = await Promise.all(windows.map(async (window) => {
+    const fx = fakeExec();
+    const enter = () => { window.begin = Math.min(window.begin, performance.now()); };
+    const exec: import("./lib/provision.ts").Exec = async (cmd, opts) => {
+      if (cmd[0] === "initdb") enter();
+      const result = await fx.exec(cmd, opts);
+      if (cmd[0] === "pg_ctl" && cmd.at(-1) === "start") {
+        await Bun.sleep(200);
+        window.end = performance.now();
+      }
+      return result;
+    };
+    return makeProvisioner({ ...provOver(exec), provisionLock, freePort: async () => { enter(); return 54999; } })({ trialDir: repoShape("clinic"), root: tmpdir("provroot") });
+  }));
+  await Promise.all(results.map((p) => p.teardown()));
+  assert(windows.every((w) => Number.isFinite(w.begin) && w.end > w.begin), "both startup windows recorded");
+  assert(windows[0]!.end <= windows[1]!.begin || windows[1]!.end <= windows[0]!.begin, "freePort/initdb/pg_ctl start windows overlap");
+  assert(!fs.existsSync(provisionLock), "both successful provisions release the lock");
+
+  fs.mkdirSync(provisionLock);
+  const old = new Date(Date.now() - 10 * 60_000);
+  fs.utimesSync(provisionLock, old, old);
+  const stale = await makeProvisioner({ ...provOver(fakeExec().exec), provisionLock })({ trialDir: repoShape("clinic"), root: tmpdir("provroot") });
+  await stale.teardown();
+  assert(!fs.existsSync(provisionLock), "stale lock taken over and released");
+  for (const fail of ["initdb", "start"]) {
+    let err: unknown;
+    await makeProvisioner({ ...provOver(fakeExec({ fail }).exec), provisionLock })({ trialDir: repoShape("clinic"), root: tmpdir("provroot") }).catch((e) => (err = e));
+    assert(err instanceof ProvisionFailed && err.message.startsWith(fail === "start" ? "pg_ctl start:" : "initdb:"), `${fail}: original step failure retained`);
+    assert(!fs.existsSync(provisionLock), `${fail}: failed provision releases the lock`);
+  }
+});
+
 /** An injected provisioner: records the teardown and carries a fake database url and a Node dir. */
 function fakeProvision(o: { fail?: boolean } = {}) {
   const state = { calls: 0, teardowns: 0 };

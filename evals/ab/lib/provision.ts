@@ -6,6 +6,7 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
+import os from "node:os";
 import path from "node:path";
 
 /** Node 24 (the authors' toolchain; the host's own Node is older than workdoo's engines floor). */
@@ -26,7 +27,7 @@ export type Provisioned = {
   teardown: () => Promise<void>;
 };
 export type Provisioner = (dirs: { trialDir: string; root: string }) => Promise<Provisioned>;
-export type ProvDeps = { exec: Exec; node24Dir: string; cache: typeof CACHE; freePort: () => Promise<number>; /** npm's own entry script, found on the host path */ npmCli: () => string | undefined };
+export type ProvDeps = { exec: Exec; node24Dir: string; cache: typeof CACHE; freePort: () => Promise<number>; provisionLock?: string; /** npm's own entry script, found on the host path */ npmCli: () => string | undefined };
 
 export class ProvisionFailed extends Error {}
 
@@ -99,6 +100,30 @@ process.on("exit", () => {
 
 const lastLine = (s: string) => s.trim().split(/\r?\n/).filter(Boolean).at(-1) ?? "";
 
+async function acquireProvisionLock(lockDir: string): Promise<() => void> {
+  const deadline = Date.now() + 10 * 60_000;
+  try {
+    while (Date.now() < deadline) {
+      try {
+        fs.mkdirSync(lockDir);
+        return () => fs.rmSync(lockDir, { recursive: true, force: true });
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+      }
+      try {
+        // A crashed trial must not block subsequent trials indefinitely.
+        if (Date.now() - fs.statSync(lockDir).mtimeMs > 5 * 60_000) fs.rmSync(lockDir, { recursive: true, force: true });
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
+      }
+      await Bun.sleep(250);
+    }
+    throw new Error("timed out after 10 minutes");
+  } catch (e) {
+    throw new ProvisionFailed(`provision lock: ${(e as Error).message}`);
+  }
+}
+
 export function makeProvisioner(over: Partial<ProvDeps> = {}): Provisioner {
   const d: ProvDeps = { exec: realExec, node24Dir: NODE24_DIR, cache: CACHE, freePort, npmCli: hostNpmCli, ...over };
   return async ({ trialDir, root }) => {
@@ -137,11 +162,18 @@ export function makeProvisioner(over: Partial<ProvDeps> = {}): Provisioner {
         return { vars, pathFirst: [d.node24Dir], setupMs: Date.now() - t0, teardown: async () => {} };
       }
       await run("npm ci (web)", ci, path.join(trialDir, "web"), vars, 600_000);
-      await run("initdb", ["initdb", "-D", data, "-U", "postgres", "--auth=trust", "-E", "UTF8"], root, vars, 120_000);
-      const port = await d.freePort();
-      live.add(data);
-      started = true;
-      await run("pg_ctl start", ["pg_ctl", "-D", data, "-o", `-p ${port} -c listen_addresses=127.0.0.1`, "-l", path.join(data, "server.log"), "-w", "start"], root, vars, 120_000);
+      const release = await acquireProvisionLock(d.provisionLock ?? path.join(os.tmpdir(), "lf-ab-clinic-provision.lock"));
+      let port: number;
+      try {
+        // Separate trial processes share startup resources, so initdb also belongs inside the lock.
+        port = await d.freePort();
+        await run("initdb", ["initdb", "-D", data, "-U", "postgres", "--auth=trust", "-E", "UTF8"], root, vars, 120_000);
+        live.add(data);
+        started = true;
+        await run("pg_ctl start", ["pg_ctl", "-D", data, "-o", `-p ${port} -c listen_addresses=127.0.0.1`, "-l", path.join(data, "server.log"), "-w", "start"], root, vars, 120_000);
+      } finally {
+        release();
+      }
       await run("create databases", ["psql", "-h", "127.0.0.1", "-p", String(port), "-U", "postgres", "-c", "create database clinic", "-c", "create database clinic_test"], root, vars, 60_000);
       const url = (db: string) => `postgres://postgres@127.0.0.1:${port}/${db}`;
       for (const db of ["clinic", "clinic_test"]) await run(`migrate ${db}`, ["go", "run", "./cmd/migrate"], trialDir, { ...vars, DATABASE_URL: url(db) }, 300_000);
