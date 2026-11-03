@@ -32,3 +32,15 @@ blocker); stream s4-release (new). Sizes S, M, M; no `L`. TASK-598 and TASK-599 
 intake rulings R1 (add-one admission) and R2 (S1 measured on A1's docs), draft reviewed by Codex in two rounds, CLEAR.
 Status moves in `6fdf5463`.
 promote-check: 10 pass, 0 fail (T1 cites the A/B repo's business-notes file, as at SPRINT-160).
+
+### 2026-11-03 | gate | G1 signed for T1-T3, G2 for T1, by owner popup; T2 and T3 take their G2 when reached
+G1: T1 (`origin: manual`) took the full checklist: size S, files as in its `Layers:`, out of scope as § Scope says. T2 and T3
+(`origin: decomposer`) fast-path: scope unchanged since intake approval. T1's Assume (cancel if the release arm shows no missed
+source) lapses: D3 pins Final after T1, so T1 lands first.
+G2 T1: line 48 of `skills/orchestrator/SKILL.md` replaced in place: the design finds each business-facts source (the profile's
+pointer, requirements and business-notes files) by file name in any case, not by content, and calls one absent only if no name
+matches; it reads every fact and quotes the line of each fact the change touches. 400 characters, still 140 lines. The CHANGELOG
+line-20 bullet gains the clause. Evidence: two development runs of self-onboarding-guard on a pinned clone of the T1 commit, after a
+no-spend preflight; pass = each opens `BUSINESS-NOTES.md` and quotes fact 6; a miss allows one wording revision. Codex read-only
+review, at most 2 rounds (D5). T2's and T3's G2 come when each is reached (A1, A2 at T2; A3 at T3).
+builder-check · T1 · 0 contradictions · 2 questions · settled: case-insensitive name match folded in ("in any case"); requirements found by name like the rest
