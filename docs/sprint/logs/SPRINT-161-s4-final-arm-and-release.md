@@ -114,3 +114,12 @@ Both arms VALID on their own 32 slots, 0 infra-lost, 0 parks; Final-on-A1 resume
 Owner ruling (popup), strict: revert bundle 3 and TASK-597 off `main`, then one further 32-slot arm on the exact release set
 (Amendment 11) before any release. Spend: Final and Final-on-A1 about 105 USD including pilots.
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-11-03 | scope-change | T2 gains a further arm (Amendment 11); T3 removes bundle 3 and TASK-597 from `main` first
+What broke: T2's item 7e ruled bundle 3 with TASK-597 out, so the release set (bundles 1 and 2, S1, the SPRINT-157 and SPRINT-159
+work) is unmeasured as a set (TASK-598 box 3: "it needs a further arm before any release"); owner ruling: strict.
+Impact: T3's `Layers:` gains `skills/orchestrator/SKILL.md`; T3 reverts that file to A4b's pin (`c10eeb8f`), whose only
+difference from `main` is bundle 3's two lines (`git diff c10eeb8f HEAD -- skills/orchestrator/SKILL.md`: 2 insertions, 2
+deletions), and drops the two bundle-3 CHANGELOG bullets. A size-S removal; no split. T2 then runs arm Release (A2's snapshots,
+the revert's pin, k = 2, 32 slots) under an Amendment 11, Codex-reviewed and owner-signed, after an approved pilot; it rules
+under Amendment 9 items 7a-7c. Re-confirm G2: owner ruling by popup.

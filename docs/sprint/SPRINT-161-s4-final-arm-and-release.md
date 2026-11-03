@@ -51,7 +51,7 @@ each arm's pilot is approved, then it runs unattended at two workers with a noti
 **Acceptance:** both arms VALID, and every component's ruling recorded with its numbers in the arms' log and EPIC-023.
 
 ### T3 — Release the admitted set as 2.20.0, or record a no-ship `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `CHANGELOG.md` · `docs/changelog/` · `.claude-plugin/` · `.codex-plugin/` · `.kimi-plugin/` · `README.md` · `docs/epic/EPIC-023-specific-not-short.md`
+Layers: `CHANGELOG.md` · `skills/orchestrator/SKILL.md` · `docs/changelog/` · `.claude-plugin/` · `.codex-plugin/` · `.kimi-plugin/` · `README.md` · `docs/epic/EPIC-023-specific-not-short.md`
 Depends-on: T2
 Cites: TASK-599 · EPIC-023 D6, D9, D16 · STANDARD §15 (versioning)
 The version follows T2's result. A ruled-out component comes off `main` first (a scope-change widens these Layers to its files,
