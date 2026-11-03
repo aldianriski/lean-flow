@@ -894,6 +894,10 @@ What changed:
   and symptoms, and the park rate. S1's ruling (item 7f, measured with bundle 3 in the plugin) stands; this arm carries S1's docs
   in its snapshots, so a Release that passes also measures S1 within the shipped set.
 - **8. Development runs, disclosed.** None since Amendment 10's freeze ran on this pin.
+- **9. Selection, disclosed (Codex review).** This arm was added after Final's results were read, and it reuses the earlier
+  arms as comparators, so its intervals are nominal, not adjusted for that selection. Stopping is fixed in advance: a VALID
+  Release that fails item 7 is final for this release (no-ship, no further arm for it), and only an INVALID or FAILED run may
+  re-run, by section 11's replacement rounds.
 
 Why: EPIC-023 D6 (nothing ships without a passing arm) and Amendment 9 item 7e; owner ruling 2026-11-03 (strict).
 
