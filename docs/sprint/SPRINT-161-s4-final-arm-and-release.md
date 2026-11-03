@@ -42,7 +42,7 @@ repo had none. The business-facts box makes the design find each source by name 
 **Acceptance:** development runs on self-onboarding-guard (two) open the business-notes file and quote fact 6.
 
 ### T2 — Measure the Final set and S1's no-harm check, and rule what ships `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `evals/ab/` · `docs/research/logs/` · `docs/epic/EPIC-023-specific-not-short.md` · `CHANGELOG.md`
+Layers: `evals/ab/` · `docs/research/logs/` · `docs/epic/EPIC-023-specific-not-short.md` · `CHANGELOG.md` · `docs/research/plugin-reference-delta.md` · `docs/knowledge-index.md`
 Depends-on: T1
 Cites: TASK-598 · EPIC-023 D6, D9, D15, D16, D17 · intake rulings R1, R2 (2026-11-03) · TD-289
 Bundles 1 and 2 are measured; bundle 3, TASK-597 and S1's docs are not, as a shipped set. Amendment 9 is signed before any trial;

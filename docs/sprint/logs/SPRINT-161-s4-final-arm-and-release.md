@@ -91,3 +91,11 @@ the 9 rows against the 32-slot schedule. Chain relaunched 10:53 local; about 2 h
 EPIC-023 D18 (stacked add-one admission, intake R1) and D19 (release-arm policy: one 32-slot final-stack arm at two workers, only
 for `/orchestrator` or gate behaviour changes; isolation arms and k = 3 only when declared decision-relevant) recorded. TASK-600
 (backlog; serialise clinic DB provisioning, re-check N = 3; TD-289) filed. Re-confirm G2: owner signed Amendment 10.
+
+### 2026-11-03 | scope-change | T2: Layers widened to the reference-delta research note and the knowledge index
+What broke: the owner's untracked `docs/research/plugin-reference-delta.md` (pstack, ECC, Helix against lean-flow's surface) failed
+two gate legs (prose density: 11 lines over 400 characters; layers observed: undeclared). T2's close-out of S3 (TASK-598 box 4:
+S3a/b/c recorded as not built, deferred roles checked) cites it, as the owner asked for the role-agent ruling to weigh ECC.
+Impact: T2's `Layers:` gains `docs/research/plugin-reference-delta.md` and `docs/knowledge-index.md` (regenerated for the note).
+The note's 11 long paragraphs are wrapped at 130 characters with the word sequence asserted unchanged; density PASS. No DoD
+changes. Re-confirm G2: owner chose this work by popup (option D).
