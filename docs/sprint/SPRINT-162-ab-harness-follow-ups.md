@@ -4,6 +4,7 @@ slug: ab-harness-follow-ups
 owner: Maintainer
 last_updated: 2026-11-03
 status: active
+plan_commit: 1a610a18
 update_trigger: sprint execute/close events
 ---
 
