@@ -129,3 +129,16 @@ Pilot (2 slots, pin `1d6b616a`): both `ok`, graders pass, 0 parks, 1.42 and 1.70
 (the judge-context gap Final's pilot also hit on that task). An Amendment 12 replacing the arm by an equivalence ruling on A4b's data
 was drafted and reviewed by Codex: NOT CLEAR (cancelling a signed arm after results changes the decision rule; acceptable only as an
 explicit owner exception). Owner ruled: run the arm. Amendment 12 not applied.
+
+### 2026-11-03 | gate | T2 arm Release ruled: the release set passes (Amendment 11); T3 G2 signed: 2.20.0
+Release (pin `1d6b616a`, 32 slots, two workers): VALID, 0 infra-lost. Four attempts voided as owner-ruled harness defects (3.01
+USD, apart from every figure): at 09:21Z the subscription login lapsed; two agent attempts ended `usage-missing` (voided before
+any result was read) and two judge calls failed with `api_error`, which the harness scored as UNKNOWN verdicts (voided after the
+result was read, disclosed in each void reason; a failed judge call appears in no earlier arm). All four slots re-ran clean.
+Ruling (Amendment 9 items 7a-7c in Final's place): 93.8%; vs A2 +15.6 [6.3, 25.0]; vs A1 +12.5 [0.0, 26.0]; no symptom
+regression against either; above A0 (89.6%); cost 0.70x A1. **Passes: the release set ships.** Vs A4B 0.0 [-6.3, 6.3], reported.
+Amendment 12 (skip the arm by equivalence) was drafted, Codex NOT CLEAR, and not applied; the owner ran the arm.
+T3 G2 (owner popup): 2.20.0, a 2.x MINOR with bundles 1 and 2, S1 and the SPRINT-157/159 work (A3 confirmed); the STANDARD MAJOR
+and 3.0.0 not taken (H1 failed at A2, H2 never admitted, no consumer contract break). S3: the backend trigger did not fire on
+the shipped plugin (0 convention FAILs in Release); recorded as watched. Also ruled: TD-290 and TASK-602 (judge API failure
+scored as a verdict); TASK-600 merges as T4, its N = 3 re-check split to TASK-603.
