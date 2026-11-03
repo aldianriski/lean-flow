@@ -99,3 +99,18 @@ S3a/b/c recorded as not built, deferred roles checked) cites it, as the owner as
 Impact: T2's `Layers:` gains `docs/research/plugin-reference-delta.md` and `docs/knowledge-index.md` (regenerated for the note).
 The note's 11 long paragraphs are wrapped at 130 characters with the word sequence asserted unchanged; density PASS. No DoD
 changes. Re-confirm G2: owner chose this work by popup (option D).
+
+### 2026-11-03 | gate | T2 rulings (Amendment 9 item 7, Final at k = 2): Final passes; bundles 1, 2 and S1 ship; bundle 3 ruled out
+Both arms VALID on their own 32 slots, 0 infra-lost, 0 parks; Final-on-A1 resumed once after a usage-limit stop (attempt voided,
+`void: usage-limit`, slot re-run). Reports: scratch `t3/out/vs-{A2,A1,A4B,FINAL-A1}.md`.
+- 7a Final vs A2: 96.9% vs 78.1%, +18.8 [6.3, 31.3], no symptom regression. Pass.
+- 7b Final vs A1: +15.6 [1.0, 31.3] (lower end above -5), no symptom regression. Pass.
+- 7c above A0 (89.6%), cost 0.73x A1. **Final passes.** 7d: bundles 1 and 2 ship (D15, D17).
+- 7e bundle 3 with TASK-597 vs A4B: +3.1 [-6.3, 15.6], convention -11.5 (Final 80.8% vs A4b 92.3%: three duplicated-logic FAILs,
+  two judge UNKNOWNs). Lower end and a symptom fail: **ruled out**. Its target held (invitation-issued-by business PASS in both
+  trials, FAIL in both A4b trials); Final-on-A1, the same pin, also sits below A4b on convention (84.6%). Item 9 secondary
+  (13 untouched tasks): -3.8, not reached since 7e failed. Exposure (item 3): 0 slots.
+- 7f S1: Final minus Final-on-A1 = -3.1 (point, >= -5): **S1 ships**. Final-on-A1 scored 100.0%.
+Owner ruling (popup), strict: revert bundle 3 and TASK-597 off `main`, then one further 32-slot arm on the exact release set
+(Amendment 11) before any release. Spend: Final and Final-on-A1 about 105 USD including pilots.
+consequence · T2 · behaviour:material · governance:high
