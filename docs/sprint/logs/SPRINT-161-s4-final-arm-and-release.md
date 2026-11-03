@@ -79,3 +79,15 @@ rules: an unparseable convention reply (appointment-lookup) and a business judge
 (access-activity-type-filter; that slot is not-passed; the same task drew a business UNKNOWN in TASK-586's capacity check).
 Launched detached (`chain.ps1`): Final's remaining 46 slots, then, only on its exit 0, Final-on-A1's 30; about 3 h, about 120 USD;
 an exit watcher notifies. No clinic development trial runs beside it (D4, TD-289).
+
+### 2026-11-03 | scope-change | T2: arm Final cut to k = 2 by Amendment 10; release-arm policy D19; TASK-600 filed
+What broke: the owner asked whether a 3-hour release arm is normal; a Codex process review (7.8k tokens) found the k = 3 third
+trial answered no question declared in advance (about 38 min, 27 USD), while Final-on-A1 alone decides S1 and stays.
+Impact: TASK-598 box 1's "k = 3" is superseded by Amendment 10 (owner-signed popup; Codex R1 CLEAR, 7.2k tokens, one Low: fill
+the slot count, done). Applied with 9 of Final's slots scored and none of trial 3 started: the amendment's hash change made the
+driver refuse its next slot, the running trials finished and recorded, the driver exited 2, and both logs were re-frozen
+(2026-11-03T03:53:04Z, sha256 `633c4c09…` at `1e4c5af8`) carrying over the rows since Amendment 9's freeze; build-slots counts
+the 9 rows against the 32-slot schedule. Chain relaunched 10:53 local; about 2 h left, ending about 12:55.
+EPIC-023 D18 (stacked add-one admission, intake R1) and D19 (release-arm policy: one 32-slot final-stack arm at two workers, only
+for `/orchestrator` or gate behaviour changes; isolation arms and k = 3 only when declared decision-relevant) recorded. TASK-600
+(backlog; serialise clinic DB provisioning, re-check N = 3; TD-289) filed. Re-confirm G2: owner signed Amendment 10.
