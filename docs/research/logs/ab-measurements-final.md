@@ -16,7 +16,11 @@ related: [EPIC-023, TASK-598]
 > (`ab-measurements.md`), the A2, A4a and A4b logs, all closed. Tokens and cost come from the CLI's own `result` event.
 > A `usage-missing` row is invalid: the CLI reported no usage, and the trial stops for an owner ruling.
 >
-> Final is judged by Amendment 9 (validity on its own 48 slots first, then the rulings of its item 7). Its freeze line is added at the owner's signature of Amendment 9; until then no slot may start.
+> Final is judged by Amendment 9 (validity on its own 48 slots first, then the rulings of its item 7).
+>
+> **Pre-registration frozen 2026-11-03T03:17:08Z (owner-signed, SPRINT-161 T2, Amendment 9):** `evals/ab/PREREGISTRATION.md` sha256
+> `77334de9f837320824e23f13017e3da4db6fd7a7e3a56771b2cc4f6172822d08`, at commit `bd524775`. It carries over nothing: every Final
+> row must postdate this instant.
 
 | ts | tag | arm | repo | task | trial | attempt | graders | in | out | cache-read | cache-write | cost-usd | wall-s | exit | pins | raw | passed | deviation | g2 | park | measure |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
