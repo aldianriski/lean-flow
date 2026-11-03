@@ -807,7 +807,9 @@ What changed:
 - **10. Judge context, a harness fix disclosed.** `lfDocsOf` (`lib/judges.ts`) found an arm's lean-flow docs list only for arm ids
   ending `-a<digits>`, so A4a's and A4b's judges did not leave lean-flow docs out of their context while A0's, A1's and A2's did.
   A judge's context holds only files the trial's diff writes; from the kept streams, no A2, A4a or A4b trial wrote a listed
-  lean-flow doc with Write or Edit (A4b: 239 such writes, none listed), so the gap is not expected to have changed a past verdict.
+  lean-flow doc with Write or Edit (A4b: 239 such writes, none listed), and every A4b shell command that names a listed doc reads
+  it (`cat`, `grep`, `sed -n`, `head`; checked by hand, 5 trials), so no listed doc is expected in the judge context of A4b,
+  the comparator of item 7e, and the gap is not expected to have changed its verdicts. A4a's verdicts (D15) are not re-examined here.
   Fixed before this amendment: the repo is the arm id's first segment, and selftest S37 asserts that every arm of a repo reads its
   list. Final's and Final-on-A1's judges leave lean-flow docs out, as A0's to A2's did.
 
