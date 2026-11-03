@@ -104,7 +104,42 @@ move out by popup. An adopt ruling widens `Layers:` to the roster files by scope
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/SKILL.md` | T1 | business-facts box: open each source, read every fact, quote every fact the change touches | Med | 6 development runs, Codex 2 rounds |
+| `skills/orchestrator/SKILL.md` | T2 | cleanup line: no delete names a path outside the working tree; reported, not removed | Med | 4 development runs, Codex 1 round |
+| `CHANGELOG.md` | T1, T2 | one `[Unreleased]` bullet each | Low | read |
+| `docs/research/storm/` (removed) · `council-improvements.md` · `loop-hygiene-prd.md` · `adopter-folder-audit.md` | T4 | the copied skill leaves the repo by owner ruling; citations point to `94248e54` | Low | off-host gate 476/0 |
+| `TECH-DEBT.md` | close | TD-289 (concurrent clinic Postgres start) | Low | census 107 rows, no duplicate id |
+| `docs/LEARNINGS.md` | close | L-285; sightings on L-261 and L-251 | Low | no duplicate id |
 
 ## Retro
 
-<!-- Written at close (STANDARD §10). -->
+**Outcome** — 4 of 4 members delivered (TASK-587, 588, 586, 595). `/orchestrator`'s G2 design now opens each business-facts source,
+reads every fact and quotes every fact the change touches; on the revision both target facts were quoted (fact 6, the en-GB fact)
+where SPRINT-158's runs opened no facts file. Its cleanup line now forbids a delete naming a path outside the working tree: 4 of 4
+runs kept every delete inside the tree, with no popup. No worker count above 2 is clean, so the release arm stays at two workers
+(owner ruling; TD-289). The copied storm skill is out of the repo. Bundle 3 is shown by development runs only (EPIC-023 D16); the
+2.20.0 arm measures bundles 1-3 together.
+
+**Retrieval check** — yes, two misses. Both close-time FAILs repeat promoted learnings: tick evidence naming a script (L-261) and
+a rewritten line passing `check-doc-caps` while crossing the prose-density limit (L-251). Both were loaded; neither was run before
+the commit. Counted as sightings, not new entries.
+
+**Cost** — development runs 12.91 USD (8 runs; 5 on the first pin, 3 on the revision); capacity check 19.39 USD (14 slots); three
+failed launches cost nothing. Codex 13.8k tokens (T1/T2 7.8k, T1 revision 6.0k). Builder check: four Sonnet readers, about 208k.
+Shape: coordinator inline, Codex reviewer, four readers; no builder sub-agent (every member was decision-class one-line text).
+
+**Worked**
+- The builder check settled every fact before G2, so the popup carried four real intent questions and nothing else.
+- Reading streams with one extractor (design text, delete commands, denials) turned box 2 into a count, not an impression.
+- The free-RAM sampler showed the infra failures were not memory: lowest free RAM was at N = 3's 2-slot pilot, not at N = 4.
+
+**Friction**
+- Three development launches failed on scratch-arm setup before any trial (L-285).
+- A Windows worktree for a clean gate run failed on a long fixture path; the off-host gate was the clean route.
+- Two close-time FAILs from rules already in context (L-261, L-251).
+
+**Pattern candidates**
+- L-285 (count 1): a scratch development arm needs a research-copy snapshot and an inventory beside it; preflight before paying.
+
+**Buckets routed** — Shipped: CHANGELOG `[Unreleased]` (TASK-587, TASK-588). Tech debt: TD-289. Follow-ups: TASK-597 (find the
+facts sources by file name; filed mid-sprint by owner ruling). Learnings: L-285; sightings on L-261 and L-251.
