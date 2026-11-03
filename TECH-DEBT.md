@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-30
+last_updated: 2026-11-03
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -390,6 +390,16 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-289** severity: low | status: open | created: Sprint-160 (T3 capacity check)
+  - Summary: **Two clinic A/B trials that provision at the same moment can fail to start Postgres.** In TASK-586's capacity check
+    both infra attempts were `provision-failed: pg_ctl start: exit 1`, each when two clinic slots began provisioning together
+    (N = 3: patient-cancel-all #2 beside confirmation-time #1; N = 4: confirmation-time #1 beside patient-cancel-all #2).
+  - Evidence: SPRINT-160 log, T3 entry; A4b at two workers had 0 provisioning failures in 32 slots; no Windows
+    resource-exhaustion event in the window, and free RAM was lower at N = 3 than at N = 4.
+  - Impact: low; it blocks more than two workers for release arms (Amendment 8's N = 2 stands), so an arm takes about 75 minutes.
+  - Mitigation (hypothesis, re-derive first): a port or startup race between concurrent clinic provisions; reproduce with two
+    clinic provisions in parallel before choosing a fix, then re-run the N = 3 check.
 
 - **TD-288** severity: low | status: open | created: Sprint-159 (T3 outside review, round 2)
   - Summary: **The sprint checker follows a copy whose source path carries no `SPRINT-<n>` number.** TASK-596's fix stops at a

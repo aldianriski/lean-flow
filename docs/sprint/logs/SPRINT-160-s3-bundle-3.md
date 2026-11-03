@@ -108,3 +108,22 @@ file contents for "business-notes", never matched `BUSINESS-NOTES.md` by name, a
 Owner ruling (popup): TASK-587 box 2 met in substance; ticked, `done/`. Follow-up TASK-597 (backlog, EPIC-023, `origin: manual`):
 the design finds the facts sources by file name before saying one is absent. Codex round 2 on the revision: CLEAR (6.0k tokens).
 review · T1 · scoped outside review (Codex, read-only, 2 rounds, CLEAR both) · behaviour:material · governance:low
+
+### 2026-11-03 | gate | T3 capacity check: no clean N above 2; owner rules N = 2 stands, no amendment; TD-289
+Capacity check (TASK-586), A4a's arms and pin, scratch schedules and logs no analysis reads, a free-RAM sampler every 5 s, PC
+otherwise idle (D4). Tasks A4a passed in both trials: workdoo access-activity-type-filter and shared-auth-failure, clinic
+patient-cancel-all and confirmation-time. Each N stopped at its 2-slot pilot and was restarted.
+- N = 3 (6 slots, 01:27-01:43 UTC, 8.54 USD): 0 timeouts; 1 infra attempt (patient-cancel-all #2, `provision-failed: pg_ctl start:
+  exit 1`; its retry passed); 0 low-memory kills; lowest free RAM 375 MB, during the 2-slot pilot; 6 of 6 outcomes as A4a's serial
+  trials (ok, graders pass, convention, business and scope PASS).
+- N = 4 (8 slots, 01:43-01:57 UTC, 10.85 USD): 0 timeouts; 1 infra attempt (confirmation-time #1, same `pg_ctl start` failure;
+  retry passed); 0 low-memory kills; lowest free RAM 1,971 MB; 2 changed outcomes: patient-cancel-all #2 `scope-breach` (a
+  `.pgdata/` directory left in the tree) and access-activity-type-filter #2 business UNKNOWN (A4a PASS).
+- Low-memory kills checked two ways: no exit without a scored attempt other than the two provisioning failures, and no
+  `Resource-Exhaustion-Detector` event in the System log for the window. Free RAM was 2.27 GB before the first trial.
+Both infra attempts came when two clinic slots began provisioning together; A4b at two workers had none in 32 slots. Owner
+ruling (popup): TASK-586 box 1 read; box 2 ticked by ruling: no clean N above 2, so no Amendment 9 and Amendment 8's N = 2 stands
+for the release arm. TD-289 filed (the concurrent clinic Postgres start). When the release arm's amendment is written, it
+discloses this check as Amendment 8 disclosed the N = 2 one.
+consequence · T3 · behaviour:low · governance:low
+review · T3 · self-review (measurement and an owner ruling; no file in the Plan changed) · behaviour:low · governance:low
