@@ -27,7 +27,7 @@ the design must open the file and quote the line. Owner ruling: TASK-585 box 3 h
 - [x] The orchestrator's business-facts box makes the design open the repo's business-facts source (the profile's pointer, the ✓ `00cfff0b` line 48; Codex read-only review CLEAR (1 round)
       requirements and business-notes files) and quote, for each fact it honours, the fact's line; a design that names no fact
       says which sources it opened.
-- [ ] Shown on real input: parallel development runs (EPIC-023 D16) on self-onboarding-guard (two) and invitation-issued-by produce
+- [x] Shown on real input: parallel development runs (EPIC-023 D16) on self-onboarding-guard (two) and invitation-issued-by produce ✓ owner ruling 2026-11-03 (met in substance): on revision `2249c701`, `iso-DQY8DN` quotes the en-GB fact, `iso-sFQB2S` quotes fact 6; `iso-gJqQ1a` missed (content grep for the file name); follow-up TASK-597
       designs that quote fact 6 and the en-GB fact; streams read.
 - [x] CHANGELOG `[Unreleased]` entry; `skills/orchestrator/SKILL.md` stays within its cap. ✓ `00cfff0b`: one `[Unreleased]` bullet; `check-doc-caps` PASS (140 <= 140)
 
