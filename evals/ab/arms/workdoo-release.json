@@ -1,0 +1,10 @@
+{
+  "id": "workdoo-release",
+  "snapshot": "D:\\Research\\ab-arm-workdoo-a2",
+  "manifest": "evals/ab/arms/workdoo-release.manifest.json",
+  "plugin": {
+    "path": "D:\\Research\\ab-pins\\lean-flow-161-1d6b616a",
+    "sha": "1d6b616a0862a1977731f028f15222870340870e",
+    "hash": "89123cabe51e3332e212fa86c28e641fc0d90a82257c8e084c0aaae8e96ca73a"
+  }
+}

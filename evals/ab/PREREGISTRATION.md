@@ -862,3 +862,49 @@ This file's own sha256 changes and is recorded at the owner's re-signature in bo
 | What | Value |
 |---|---|
 | `evals/ab/schedule-final.json` (Amendment 10, 32 slots) | `a37b2f7700303a06b142096ba5551b75b3b6af16022d70b5e8672525f6c7d517` |
+
+## Amendment 11 (2026-11-03, arm Release on the exact release set, before any Release trial)
+
+What changed:
+
+- **1. Arm Release.** Two new measured arms, `workdoo-release` and `clinic-release`. Their snapshots are A2's, unchanged
+  (`D:\Research\ab-arm-<repo>-a2`), checked by `<repo>-release.manifest.json`, a byte copy of the A2 manifest. The plugin is
+  lean-flow at `1d6b616a0862a1977731f028f15222870340870e`, content hash
+  `89123cabe51e3332e212fa86c28e641fc0d90a82257c8e084c0aaae8e96ca73a`, a clone in `D:\Research\ab-pins\lean-flow-161-1d6b616a`, loaded
+  as at A4b. No setup runs. Analysis label `RELEASE`.
+- **2. Why this arm.** Amendment 9 item 7e ruled bundle 3 with TASK-597 out (Final vs A4B +3.1 [-6.3, 15.6], convention -11.5),
+  and the owner ruled it off `main` (commit `1d6b616a`: `skills/orchestrator/SKILL.md` back to A4b's pin, byte for byte). The set
+  that would ship (bundles 1 and 2, S1, and the SPRINT-157 and SPRINT-159 work) was not measured as a set; item 7e requires a
+  further arm before any release.
+- **3. The treatment.** Against A4b's pin (`c10eeb8f`) exactly nine plugin files differ, all work outside EPIC-023: `diagnose`,
+  `flow`, `prime`, `triage`, `lean-doc-generator` with its init and migration-map references and BUG template, and
+  `task-decomposer`'s task-file reference. Exposure is measured as in Amendment 9 item 3 (any `Skill` call other than the
+  orchestrator, or a read of one of the nine files), and reported.
+- **4. Schedule.** `evals/ab/schedule-release.json`: `schedule-a4b.json` with each arm renamed to Release, same order, 32 slots
+  (k = 2, EPIC-023 D19), at two workers, with Amendment 6 item 4's pilot (N = 2).
+- **5. Log.** Rows go to `docs/research/logs/ab-measurements-release.md`, whose header carries its own freeze line. Every earlier
+  log stays closed.
+- **6. Validity first.** Release must pass section 11's run-validity rule on its own 32 slots; an INVALID or FAILED arm gets no
+  ruling, nothing ships on it, and the owner rules whether it re-runs.
+- **7. Ruling.** On the combined slot data (S0's A0 and A1, A2's, A4a's, A4b's, Final's, Final-on-A1's and Release's, all first
+  pass), Release takes Amendment 9 items 7a, 7b and 7c in Final's place: against A2 the point difference is >= +0.10 with its
+  lower end > 0 and no symptom regressing; against A1 the lower end is above -0.05 and no symptom regresses; it is not below A0
+  and its cost is within 2.0x A1. Release passes all three: the release set ships (EPIC-023 D6). Otherwise nothing from EPIC-023
+  ships. Reported beside it, deciding nothing: Release minus A4B (the nine non-epic files plus nothing else) with its interval
+  and symptoms, and the park rate. S1's ruling (item 7f, measured with bundle 3 in the plugin) stands; this arm carries S1's docs
+  in its snapshots, so a Release that passes also measures S1 within the shipped set.
+- **8. Development runs, disclosed.** None since Amendment 10's freeze ran on this pin.
+
+Why: EPIC-023 D6 (nothing ships without a passing arm) and Amendment 9 item 7e; owner ruling 2026-11-03 (strict).
+
+No other rule changed. Section 19 gains the rows below; no existing row changes. This file's own sha256 changes and is recorded
+at the owner's re-signature in the Release log's header. `hash-prereg.ts` now also pins the Release files.
+
+| What | Value |
+|---|---|
+| `evals/ab/arms/workdoo-release.json` | `8efcba3d242df6d364e69b231d177b63879d8511c7f0842d399e098bab2ccbf4` |
+| `evals/ab/arms/workdoo-release.manifest.json` | `f71a220af1bea50708f131aaed837a6196c6580fba1966053869f46d4eaacbff` |
+| `evals/ab/arms/clinic-release.json` | `9e0e5f9660c401add75af75f16af4049f6f3588d1c5266c55dea2c94ee2f328b` |
+| `evals/ab/arms/clinic-release.manifest.json` | `e0d69b7edfca30230226c68e53f8fb065ea3e5a4ed6682f9ebbd15d865f16697` |
+| `evals/ab/schedule-release.json` | `0563938b12ce3073577ca605508bd57676310468098ce64ea9c7c498df032d09` |
+| plugin pin (Release) sha / content hash | `1d6b616a0862a1977731f028f15222870340870e` / `89123cabe51e3332e212fa86c28e641fc0d90a82257c8e084c0aaae8e96ca73a` |

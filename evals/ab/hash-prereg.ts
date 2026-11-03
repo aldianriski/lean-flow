@@ -41,9 +41,9 @@ export function corpusManifest(base: string, dirs: string[]): { listing: string;
   return { listing, sha256: sha256(listing), files: files.length };
 }
 
-export const MEASURED_ARMS = ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1", "workdoo-a2", "clinic-a2", "workdoo-a4a", "clinic-a4a", "workdoo-a4b", "clinic-a4b", "workdoo-final", "clinic-final", "workdoo-final-a1", "clinic-final-a1"];
+export const MEASURED_ARMS = ["workdoo-a0", "workdoo-a1", "clinic-a0", "clinic-a1", "workdoo-a2", "clinic-a2", "workdoo-a4a", "clinic-a4a", "workdoo-a4b", "clinic-a4b", "workdoo-final", "clinic-final", "workdoo-final-a1", "clinic-final-a1", "workdoo-release", "clinic-release"];
 /** Repo-relative (to evals/ab) files whose sha256 is pinned besides the corpus. */
-export const PINNED_FILES = [...MEASURED_ARMS.flatMap((a) => [`arms/${a}.json`, `arms/${a}.manifest.json`]), "arms/inventory.json", "judges/prompts.lock.json", "schedule.json", "schedule-a2.json", "schedule-a4a.json", "schedule-a4b.json", "schedule-final.json", "schedule-final-a1.json"];
+export const PINNED_FILES = [...MEASURED_ARMS.flatMap((a) => [`arms/${a}.json`, `arms/${a}.manifest.json`]), "arms/inventory.json", "judges/prompts.lock.json", "schedule.json", "schedule-a2.json", "schedule-a4a.json", "schedule-a4b.json", "schedule-final.json", "schedule-final-a1.json", "schedule-release.json"];
 
 export function pinnedHashes(ab: string = AB): Record<string, string> {
   return Object.fromEntries(PINNED_FILES.map((f) => [`evals/ab/${f}`, sha256(canonicalBytes(path.join(ab, f)))]));
