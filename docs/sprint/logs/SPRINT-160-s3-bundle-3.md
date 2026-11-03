@@ -99,3 +99,12 @@ denials. Streams read with a scratch extractor (design text, every delete comman
   fact the change touches; still 140 lines, cap PASS. Box 1's words stay verbatim. Pin `D:\Research\ab-pins\lean-flow-160-2249c701`
   (hash `83f75809…`); only the three missing runs re-run.
 review · T2 · scoped outside review (Codex, read-only, 1 round, CLEAR) · behaviour:material · governance:low
+
+### 2026-11-03 | gate | T1 done by owner ruling on box 2; follow-up TASK-597 filed; T3 starts
+Revision runs on pin `2249c701` (3 runs, 17:02-17:08 UTC 2026-11-02, 4.83 USD; development total 12.91 USD): all `ok` and passed,
+0 parks, every delete inside the tree. Invitation-issued-by `iso-DQY8DN` quotes the en-GB fact verbatim (business rule 14) and
+says it wins over the neighbouring `formatDate`; self-onboarding-guard `iso-sFQB2S` quotes fact 6 verbatim; `iso-gJqQ1a` searched
+file contents for "business-notes", never matched `BUSINESS-NOTES.md` by name, and wrote that the repo had none.
+Owner ruling (popup): TASK-587 box 2 met in substance; ticked, `done/`. Follow-up TASK-597 (backlog, EPIC-023, `origin: manual`):
+the design finds the facts sources by file name before saying one is absent. Codex round 2 on the revision: CLEAR (6.0k tokens).
+review · T1 · scoped outside review (Codex, read-only, 2 rounds, CLEAR both) · behaviour:material · governance:low
