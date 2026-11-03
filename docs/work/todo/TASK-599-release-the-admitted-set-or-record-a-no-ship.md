@@ -3,6 +3,7 @@ id: TASK-599
 title: "Release the admitted set as 2.20.0, or record a no-ship"
 type: feature
 epic: EPIC-023
+sprint: SPRINT-161
 priority: P1
 size: M
 risk: high

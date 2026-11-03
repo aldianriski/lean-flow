@@ -3,6 +3,7 @@ id: TASK-598
 title: "Measure the Final set and S1's no-harm check, and rule what ships"
 type: feature
 epic: EPIC-023
+sprint: SPRINT-161
 priority: P1
 size: M
 risk: high

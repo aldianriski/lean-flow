@@ -3,6 +3,7 @@ id: TASK-597
 title: "The design finds the repo's business-facts sources by file name, not by a content search"
 type: feature
 epic: EPIC-023
+sprint: SPRINT-161
 priority: P2
 size: S
 risk: med
