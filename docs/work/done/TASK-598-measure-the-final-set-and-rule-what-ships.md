@@ -31,7 +31,7 @@ and every later arm stood on S1's docs. One Final arm and one S1 check decide th
       at two workers (Amendment 8), and discloses SPRINT-160's development runs and capacity check.
 - [x] Both arms pass the pre-registration's run-validity rule, each after an owner-approved pilot, run unattended with an exit ✓ Final and Final-on-A1 32/32 VALID each, pilots approved, detached with watchers; Release 32/32 VALID
       watcher and a notification.
-- [x] The rulings are recorded in the arms' log and in EPIC-023: Final against A2 (the minimum gain) and against A1, the ✓ `ab-measurements-final.md` and `-release.md` § Report 2026-11-03; EPIC-023 D21: Final passes, bundle 3 ruled out, S1 ships; Release passes
+- [x] The rulings are recorded in the arms' log and in EPIC-023: Final against A2 (the minimum gain) and against A1, the ✓ `docs/research/logs/ab-measurements-final.md` and `docs/research/logs/ab-measurements-release.md` § Report 2026-11-03; EPIC-023 D21: Final passes, bundle 3 ruled out, S1 ships; Release passes
       never-below-A0 floor, cost within 2x A1; a Final that fails any of these means nothing from EPIC-023 ships, whatever
       bundles 1 and 2 measured. When Final passes: bundles 1 and 2 on their measured deltas (D15, D17); bundle 3 only on a
       positive point delta of Final against A4b and non-inferiority (as D17); S1 ships only if Final on A2's snapshots is not

@@ -149,3 +149,6 @@ inside this sprint's range; its boxes 2 and 3 need an idle-PC capacity check, wh
 Impact: § Plan gains `### T4` (Layers `evals/ab/lib/provision.ts` · `evals/ab/selftest.ts`; Depends-on T2, since no harness
 change lands while an arm runs) and § Members gains TASK-600. TASK-600's Done when keeps box 1 (the lock and its must-FAIL
 selftest S78); boxes 2 and 3 move to TASK-603 (backlog). Re-confirm G2: owner popup ("merge TASK-600 into this release").
+
+### 2026-11-03 | review | T2 outside reviews recorded
+review · T2 · scoped outside review (Codex, read-only: Amendment 9 1 round CLEAR with one Med fixed; Amendment 10 CLEAR; Amendment 11 CLEAR with one Med fixed; Amendment 12 NOT CLEAR, not applied; S3 close-out and standards proposal reviewed) · behaviour:material · governance:high

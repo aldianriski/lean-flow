@@ -22,6 +22,13 @@ TD-290. In arm Release (SPRINT-161), the subscription login lapsed at 09:21Z: tw
 driver stopped for a ruling, but two judge calls failed with `judge run failed: exit 1, api_error` and were scored as UNKNOWN
 verdicts, so their slots counted as not-passed and the arm read 87.5% instead of 93.8% until the owner voided them.
 
+## Repro
+1. Run a measured arm (`run-baseline.ts`) on a subscription login, and let the login lapse mid-run (or make the judge CLI
+   return `exit 1, api_error`).
+2. Read the row of a slot whose agent phase finished before the lapse: `measure.judges.business.verdict` is `UNKNOWN` with
+   reason `judge call failed: judge run failed: exit 1, api_error`, `attemptClass` is not infra, and the slot is scored
+   not-passed. Seen in `docs/research/logs/ab-measurements-release.md` at 09:21:20Z and 09:21:32Z.
+
 ## Done when
 - [ ] A judge call that fails (CLI exit, API or auth error, no reply) marks the attempt infra, so the slot retries or stops for a
       ruling under section 18, as a failed agent call already does; a judge that replies UNKNOWN stays a scored verdict.
