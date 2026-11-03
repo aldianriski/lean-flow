@@ -127,3 +127,12 @@ for the release arm. TD-289 filed (the concurrent clinic Postgres start). When t
 discloses this check as Amendment 8 disclosed the N = 2 one.
 consequence · T3 · behaviour:low · governance:low
 review · T3 · self-review (measurement and an owner ruling; no file in the Plan changed) · behaviour:low · governance:low
+
+### 2026-11-03 | progress | system verify green after two close-time fixes; every member in done/
+`check-sprint-by-reference.ts --close`: 10 pass, 0 fail (all four in `done/`, every `## Done when` unchanged since `3bacd634`).
+System verify, off-host `QA_FULL=1` at `e54a60cd`: 477 pass, 2 fail. (1) prose-density: lines 48 and 126 of
+`skills/orchestrator/SKILL.md` had passed 400 characters (15 dense lines against a baseline of 13); both trimmed with the same
+rule (`e2058cae` T1, `3a0e377e` T2; 382 and 396 characters, 140 lines). The trims came after the development runs and the Codex
+rounds, which saw the longer wording; no rule was dropped (open each source, read every fact, quote every fact the change
+touches; no delete outside the tree, reported not removed). (2) layers completeness: TASK-595's tick evidence named the gate
+script, read as a touched file; the evidence now names no script. Re-run at `e5d1d568`: QA-CHECK 479 pass, 0 fail.
