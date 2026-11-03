@@ -70,3 +70,12 @@ and passes on the new, 82 of 82. Disclosed as Amendment 9 item 10.
 Codex R1 (read-only, 16.0k tokens): CLEAR; one Med (item 10 checked Write/Edit only), fixed by the shell-command check.
 builder-check · T2 · via Codex R1 · 0 contradictions · 0 owner questions
 Signed: `evals/ab/PREREGISTRATION.md` sha256 `77334de9…` at `bd524775`; freeze lines 2026-11-03T03:17:08Z in both logs (`FREEZE-OK`).
+
+### 2026-11-03 | progress | T2 pilots approved by owner popup; the two arms launched as one detached chain
+Pilots (2 slots each, at two workers, driver exit 10 both): Final workdoo access-activity-type-filter #1 and clinic
+appointment-lookup #1; Final-on-A1 the same slots. All `ok`, graders pass, 0 parks, pin `cea7ffb8`; cost 1.45-1.85 USD a slot
+(A4b's same slots 1.35-1.67), pilot spend 6.74 USD. Judges: Final-on-A1 all PASS; Final two UNKNOWN, both ordinary under the frozen
+rules: an unparseable convention reply (appointment-lookup) and a business judge that could not see the event-type sources
+(access-activity-type-filter; that slot is not-passed; the same task drew a business UNKNOWN in TASK-586's capacity check).
+Launched detached (`chain.ps1`): Final's remaining 46 slots, then, only on its exit 0, Final-on-A1's 30; about 3 h, about 120 USD;
+an exit watcher notifies. No clinic development trial runs beside it (D4, TD-289).
