@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-29
+last_updated: 2026-11-03
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -14,7 +14,27 @@ status: current
 
 ---
 
-## [Unreleased]
+## v2.20.0 — the design reads the business facts and stays in scope, a repo profile, and reported bugs become work items (2026-11-03)
+
+**MINOR** — ships EPIC-023's measured set: S1 (the repo profile through `init` and `migrate`, stack question sets, leaner
+templates) and S3's first two `/orchestrator` bundles, with the bug-item work of SPRINT-157 and SPRINT-159. No new skill; the
+roster stays at 15. The standard moves to spec 0.19.0. Restart the session after installing. Measured before release (EPIC-023
+D6): the exact shipped set scored 93.8% against 2.19.x's 81.2% and the no-plugin baseline's 89.6%, at 0.70x 2.19.x's tokens, with
+no symptom regression (`docs/research/logs/ab-measurements-release.md` § Report). This releases the S1 entries held under D6 below.
+S3's third bundle was measured and did not ship. The STANDARD major and 3.0.0 are not taken: no consumer contract breaks.
+
+**Upgrading:**
+- Installing is enough for `/orchestrator`'s changes: G2 names each stated business fact the change touches and lets the fact
+  win over neighbouring code, a design stays inside the task's declared layers, every boundary report carries a `Progress:` line,
+  probes live in the working tree and are deleted before the report, and what a repo's own tests leave outside the tree is named,
+  never deleted.
+- To add the repo profile (Stack, Conventions in use, business facts) to a repo already on lean-flow, re-run
+  `/lean-doc-generator migrate`. It takes a backup point, keeps every existing decision and moves only what you approve. Skipping
+  it is safe: every skill works with the docs you have.
+- Work items gain an optional `type:` (feature, bug or debt); untyped items read as features. `/triage` files a reported bug as a
+  `type: bug` item, and `migrate` proposes existing bug notes as bug items, moving only what you approve.
+
+### Changes
 
 - **Changed (maintainer-only)** — `evals/ab/`: clinic trials take a cross-process lock from port pick through `pg_ctl start`, so concurrent trials no longer race their Postgres startup (TD-289; the three-worker re-check is TASK-603).
 - **Measured (maintainer-only)** — the release arms (EPIC-023 S4): arm Final (bundles 1-3, S1, on A2's snapshots) scored 96.9% and passed against A2 and A1, but bundle 3 and its residual (the business-facts box finding sources by file name, no delete outside the tree) fell short of non-inferiority against A4b (+3.1 [-6.3, 15.6], convention -11.5) and came off `main`; Final-on-A1 (S1's docs swapped for A1's) scored 100.0%, so S1 ships. Arm Release, the exact shipped set, scored 93.8%: +15.6 [6.3, 25.0] over A2 and +12.5 [0.0, 26.0] over A1 at 0.70x A1's tokens, above A0, so it ships (Amendments 9-11). `evals/ab/`: every arm's judges now leave the repo's lean-flow docs out of their context (the list was read only for `-a<digits>` arm ids).
@@ -98,35 +118,3 @@ The standard is unchanged (spec 0.18.1). Restart the session after installing.
 
 ---
 
-## v2.18.0 — commit messages humanized inline, the riskiest ready slice built first, and three template deltas (2026-10-26)
-
-**MINOR** — ships SPRINT-144 (Wire the Milestone, Cut the Cost), a feature sprint. No new skill; the roster stays at 15.
-Installing the release is enough; no upgrade step. The standard is unchanged (spec 0.18.1). Restart the session after
-installing.
-
-### SPRINT-144 — Wire the Milestone, Cut the Cost (2026-10-26)
-
-**Consumer-facing:**
-- Commit messages are humanized inline. The caller reads the three pattern catalogs once per session (again after a
-  compaction) and runs the fact list and check itself, instead of starting a sub-agent per message that re-read about
-  49 KB of catalogs each time. PR bodies and documents keep the sub-agent pass (TASK-524).
-- `/task-decomposer` lists first the ready slice that removes the most uncertainty. It reads the Proof goal in
-  `requirements.md` § First milestone and puts the slice that proves it (or the ready slice that unblocks it) first;
-  without a proof goal it says so and ranks ready slices by risk likelihood. The order is a proposal, and the
-  requirements template now names the decomposer as the proof goal's reader (TASK-520).
-- The ADR template gains an optional **Revisit when:** header line beside Status and Deciders: the condition that
-  would reopen the decision, never a date. The worked example fills it. It is not a required §4 section, so the
-  conformance engine's ADR checks are unchanged (TASK-515).
-- The flows template's Steps that matter is now a table: each step records the record it changes, its owner and the
-  next owner (roles, never names), because business flows tend to break at the handover between steps (TASK-517).
-- The authentication template's role table gains a Data scope column (own records, one tenant or site, all), and a line
-  stating that permissions are enforced at the application boundary; hiding a control in the UI is not enforcement
-  (TASK-518).
-
-**Maintainer-side:**
-- TD-278 resolved: 18 commit messages took the inline pass with no child, about 3.1k tokens each against ~73k. The
-  fact-keep fixture records the inline recipe and three runs (all eleven facts kept in each; run 1 added an actor, a
-  TD-274 sighting).
-- L-257, L-258 and L-259 filed; v2.16.x rotated to `docs/changelog/CHANGELOG-2.16.0.md`.
-
----
