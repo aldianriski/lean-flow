@@ -2008,3 +2008,11 @@ status: current
     SPRINT-073 (spec annotation, all HITL, no night run) is the wrong sprint for it. Recorded
     explicitly so the next reviewer starts from *"unblocked but unscheduled"* rather than re-deriving
     a block that has already lifted.
+- **TD-290** severity: medium | status: open | created: Sprint-161 (T2 arm Release)
+  - Summary: **A failed A/B judge call is scored as an UNKNOWN verdict, so an outage lowers an arm's score silently.** Two judge
+    calls in arm Release failed with `api_error` during a login lapse and counted as not-passed slots; the agent phase stops on
+    the same fault (`usage-missing`), the judge phase did not.
+  - Evidence: `docs/research/logs/ab-measurements-release.md` (rows 09:21:20Z and 09:21:32Z, voided by owner ruling); no failed
+    judge call in any earlier arm.
+  - Impact: medium; an unnoticed outage can turn a passing arm into a no-ship (Release read 87.5% before the voids, 93.8% after).
+  - Mitigation: TASK-602 (classify a failed judge call as infra; retry or stop).

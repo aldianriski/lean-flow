@@ -142,3 +142,10 @@ T3 G2 (owner popup): 2.20.0, a 2.x MINOR with bundles 1 and 2, S1 and the SPRINT
 and 3.0.0 not taken (H1 failed at A2, H2 never admitted, no consumer contract break). S3: the backend trigger did not fire on
 the shipped plugin (0 convention FAILs in Release); recorded as watched. Also ruled: TD-290 and TASK-602 (judge API failure
 scored as a verdict); TASK-600 merges as T4, its N = 3 re-check split to TASK-603.
+
+### 2026-11-03 | scope-change | T4 added: TASK-600 joins as T4 (cross-process lock), its N = 3 re-check split to TASK-603
+What broke: TASK-600 (backlog, owner-approved G1 as a one-off) was built by Codex on branch `task-600` (`40b2a264`) and must land
+inside this sprint's range; its boxes 2 and 3 need an idle-PC capacity check, which this sprint does not run.
+Impact: § Plan gains `### T4` (Layers `evals/ab/lib/provision.ts` · `evals/ab/selftest.ts`; Depends-on T2, since no harness
+change lands while an arm runs) and § Members gains TASK-600. TASK-600's Done when keeps box 1 (the lock and its must-FAIL
+selftest S78); boxes 2 and 3 move to TASK-603 (backlog). Re-confirm G2: owner popup ("merge TASK-600 into this release").

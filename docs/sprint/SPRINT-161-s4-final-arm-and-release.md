@@ -29,6 +29,7 @@ reviewers and S3c roles (recorded as not built, D11) · the clinic provisioning 
 - docs/work/todo/TASK-597-the-design-finds-the-business-facts-sources-by-file-name.md
 - docs/work/todo/TASK-598-measure-the-final-set-and-rule-what-ships.md
 - docs/work/todo/TASK-599-release-the-admitted-set-or-record-a-no-ship.md
+- docs/work/backlog/TASK-600-serialise-clinic-db-provisioning-and-recheck-three-workers.md
 
 ## Plan
 
@@ -58,6 +59,14 @@ The version follows T2's result. A ruled-out component comes off `main` first (a
 and a large removal is split out); the release stops before push.
 
 **Acceptance:** the release commit prepared and pushed by the owner, or a no-ship recorded with its numbers.
+
+### T4 — Serialise clinic database provisioning in A/B trials `[size: S · risk: med · class: execution · HITL · J2]`
+Layers: `evals/ab/lib/provision.ts` · `evals/ab/selftest.ts`
+Depends-on: T2
+Cites: TASK-600 · TD-289 · TASK-603
+Added by scope-change: a cross-process lock around port pick, initdb and `pg_ctl start`; built by Codex in a worktree.
+
+**Acceptance:** selftest S78 fails with the lock disabled and passes with it; the full selftest passes on `main`.
 
 ## Owner-action checklist
 - [ ] Sign Amendment 9 before any trial (T2).
