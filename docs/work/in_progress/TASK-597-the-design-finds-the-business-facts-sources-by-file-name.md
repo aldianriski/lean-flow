@@ -25,10 +25,13 @@ name, and wrote that the repo had no business-notes file. Owner ruling 2026-11-0
 follow-up covers how the design finds the sources.
 
 ## Done when
-- [ ] The orchestrator's business-facts box makes the design find each facts source by file name (and by the profile's pointer)
-      before it may say a source is absent; `skills/orchestrator/SKILL.md` stays within its cap.
-- [ ] Shown on real input: development runs on self-onboarding-guard (two) open `BUSINESS-NOTES.md` and quote fact 6; streams read.
-- [ ] CHANGELOG `[Unreleased]` entry.
+- [x] The orchestrator's business-facts box makes the design find each facts source by file name (and by the profile's pointer)
+      before it may say a source is absent; `skills/orchestrator/SKILL.md` stays within its cap. ✓ `cea7ffb8`, line 48, 400
+      characters, 140 lines, cap PASS; Codex read-only R1 CLEAR
+- [x] Shown on real input: development runs on self-onboarding-guard (two) open `BUSINESS-NOTES.md` and quote fact 6; streams read.
+      ✓ pin `cea7ffb8`, `iso-9C9f3P` and `iso-BfZSjn`: each found the sources by a mixed-case file-name Glob, read
+      `BUSINESS-NOTES.md` and quoted fact 6 verbatim; both passed, 2.79 USD
+- [x] CHANGELOG `[Unreleased]` entry. ✓ `cea7ffb8`, the `/orchestrator` G2 business-facts bullet
 
 ## Touches
 `skills/orchestrator/SKILL.md` · CHANGELOG.md

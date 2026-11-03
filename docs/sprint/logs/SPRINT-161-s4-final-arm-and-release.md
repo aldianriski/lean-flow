@@ -44,3 +44,14 @@ line-20 bullet gains the clause. Evidence: two development runs of self-onboardi
 no-spend preflight; pass = each opens `BUSINESS-NOTES.md` and quotes fact 6; a miss allows one wording revision. Codex read-only
 review, at most 2 rounds (D5). T2's and T3's G2 come when each is reached (A1, A2 at T2; A3 at T3).
 builder-check · T1 · 0 contradictions · 2 questions · settled: case-insensitive name match folded in ("in any case"); requirements found by name like the rest
+
+### 2026-11-03 | progress | T1 done on real input: both development runs find the sources by name and quote fact 6
+Commit `cea7ffb8`: line 48 replaced in place (400 characters, 140 lines, cap and prose-density PASS; the one density FAIL is the
+untracked `docs/research/plugin-reference-delta.md`, outside this sprint). CHANGELOG line-20 bullet extended.
+Development batch on pin `D:\Research\ab-pins\lean-flow-161-cea7ffb8` (hash `b979ae44…`), research copy `dev156/workdoo`, no-spend
+preflight `PREFLIGHT-OK` first (L-285); two single-slot runs in parallel, 2.79 USD, about 5.5 min wall: `iso-9C9f3P` and
+`iso-BfZSjn`, both `ok` and passed, 0 deletes, 0 denials. Each ran a mixed-case file-name Glob
+(`**/*{requirement,business,REQUIREMENT,BUSINESS,…}*`), read `BUSINESS-NOTES.md` and quoted fact 6 verbatim ("The intake creator
+is initially available for all three preparation responsibilities"). No wording revision needed. Ticked; `done/`.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped outside review (Codex, read-only, 1 round, CLEAR, 6.8k tokens) · behaviour:material · governance:low
