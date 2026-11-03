@@ -152,3 +152,11 @@ selftest S78); boxes 2 and 3 move to TASK-603 (backlog). Re-confirm G2: owner po
 
 ### 2026-11-03 | review | T2 outside reviews recorded
 review · T2 · scoped outside review (Codex, read-only: Amendment 9 1 round CLEAR with one Med fixed; Amendment 10 CLEAR; Amendment 11 CLEAR with one Med fixed; Amendment 12 NOT CLEAR, not applied; S3 close-out and standards proposal reviewed) · behaviour:material · governance:high
+
+### 2026-11-03 | progress | T3 release v2.20.0 committed (`847911c0`), off-host gate green; waiting on the owner's push
+`release.py`: four grep-derived manifests and the README footer 2.19.1 -> 2.20.0 (lockstep PASS), `[Unreleased]` became the v2.20.0
+entry with Upgrading notes, v2.18.x rotated to `docs/changelog/CHANGELOG-2.18.0.md`. Off-host gate on `1b19e8a4` (after four
+bookkeeping fixes from its first run, `847911c0`: 487/4): QA-CHECK 490 pass, 0 fail; bun test 589 pass, 0 fail. TASK-599 boxes
+1-3 ticked; box 4 and EPIC-023 S4 wait for the owner's push (D7).
+consequence · T3 · behaviour:material · governance:high
+review · T3 · self-review + off-host gate (release mechanics only; the shipped set was measured by arm Release) · behaviour:material · governance:high

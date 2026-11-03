@@ -24,12 +24,12 @@ EPIC-023 S4's release half: the version follows the measured result (D9), and no
 TASK-598 changes that reading the release is a 2.x MINOR.
 
 ## Done when
-- [ ] The version ruling is recorded in EPIC-023: a 2.x MINOR unless H1/H2 held and a named consumer contract breaks (D9); when
+- [x] The version ruling is recorded in EPIC-023: a 2.x MINOR unless H1/H2 held and a named consumer contract breaks (D9); when ✓ EPIC-023 D22: 2.20.0 MINOR; STANDARD major and 3.0.0 not taken (H1 failed, H2 not admitted, no contract break)
       they did not hold, the STANDARD MAJOR is recorded as not taken, with the reason.
-- [ ] Every component TASK-598 ruled out is absent from what ships, and what ships is a set TASK-598 measured as passing:
+- [x] Every component TASK-598 ruled out is absent from what ships, and what ships is a set TASK-598 measured as passing: ✓ bundle 3 + TASK-597 off `main` at `1d6b616a` before the bump; arm Release measured the exact set (93.8%, passes); off-host gate 490/0, bun test 589/0
       removed from `main` before the version bump, with the gate green (a removal larger than size S is split into its own task
       first).
-- [ ] When TASK-598 rules that something ships: `[Unreleased]` becomes the release entry with migration notes for adopters (what
+- [x] When TASK-598 rules that something ships: `[Unreleased]` becomes the release entry with migration notes for adopters (what ✓ `847911c0`: release entry with Upgrading notes, D6's held S1 notes released, 4 grep-derived manifests + README footer 2.20.0 (lockstep PASS), v2.18.x rotated; stops before push
       re-running `migrate` adds, what changed in `/orchestrator`), D6's held notes resolved; every versioned manifest equal (the set
       derived with `grep -l '"version"' .*-plugin/*.json`) and the README footer; the CHANGELOG rotated as §11 requires for a new
       MINOR; the off-host gate green. It stops before push: the owner pushes.
