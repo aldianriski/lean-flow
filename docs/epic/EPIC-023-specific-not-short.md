@@ -130,6 +130,26 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   about 75 minutes; docs and fix releases ship on the repo gate. A component-isolation arm or k = 3 runs only when declared in
   advance as deciding a ship question. Three workers wait on TD-289's fix and a clean re-check (TASK-600). Applied at once:
   Amendment 10 cut arm Final to k = 2 before any trial-3 slot; Final-on-A1 stays, as it alone decides S1.
+- **D20** — S3's role agents are not built now (owner, 2026-11-03; TASK-598): a prioritisation ruling, not a finding that roles
+  cannot help, and it supersedes D14's S3a/S3b/S3c. Three fix bundles took A2 78.1% to A4b 93.8% with no agent definition; no arm
+  tested a role. S3a's dispatch brief would reach 3 of 93 sessions (D11); S3b's three pilots are prompted in the session's own
+  G2, which is not the independent scrutiny a role adds. Deferred-role triggers on the residuals ("concentrate" = two or more
+  tasks in the role's layers): none fired on the shipped plugin (Release: 0 convention FAILs); backend is **watched**, as
+  duplicated server logic recurred on other pins (A4b doctor-day-sheet; Final and Final-on-A1 reissue-invitation x3,
+  appointment-lookup); design-system and release roles have no corpus coverage. ECC (`b38be6a7`, 71 agents) and pstack
+  (`6c75f4e6`) add reference breadth, not a measured increment (`research/plugin-reference-delta.md`). Kept candidates, inside
+  G2 and review: requirement and invariant assertions with test anchors, checked by "would the test fail if the behaviour broke".
+- **D21** — What ships, per component (ADR-001 records; Amendments 9 and 11; logs `ab-measurements-final*.md`, `-release.md`):
+  | Component | Measured | Ruling |
+  |---|---|---|
+  | Release set (bundles 1, 2, S1, SPRINT-157/159) | 93.8%; vs A2 +15.6 [6.3, 25.0]; vs A1 +12.5 [0.0, 26.0]; > A0; 0.70x A1 | ships |
+  | S3 bundle 1 (TASK-573, 575) | A4a vs A2 +12.5 [3.1, 21.9] (D15) | ships |
+  | S3 bundle 2 (TASK-583, 584, 585) | A4b vs A4a +3.1 [0.0, 9.4] (D17) | ships |
+  | S3 bundle 3 + residual (TASK-587, 588, 597) | Final vs A4b +3.1 [-6.3, 15.6], convention -11.5 | ruled out, off `main` (`1d6b616a`) |
+  | S1 (TASK-548..553, 560) | Final minus Final-on-A1 -3.1 (point; Final-on-A1 100.0%) | ships |
+  | S2, S3a, S3b, S3c | not built (D2, D20) | — |
+- **D22** — Version (owner, 2026-11-03, TASK-599): 2.20.0, a 2.x MINOR. H1 failed (A2) and H2 was never admitted, and no consumer
+  contract breaks, so the STANDARD MAJOR and 3.0.0 are not taken (D9).
 
 ## Open questions
 
@@ -149,9 +169,10 @@ or `qa-check.sh` leg · imposing R5 (measured context changes) on adopters.
   does not ship under D6 (`docs/research/logs/ab-measurements-a2.md` § Report 2026-11-02)
 - [x] S2: not admitted at S0 (D2, D10): symptom 3 not reproduced, and its −8.3-point regression against A0
   rests on 4 tasks; TASK-567..572 cancelled (`.out-of-scope/pointer-carry-through.md`) ✓ SPRINT-152, recorded 2026-11-01
-- [ ] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
+- [x] S3: the three pilot roles (and any S3c role) runnable in the harness; arms A4a vs A2 and A4b vs A4a
   measured (A4c vs A4b if S3c runs); each deferred role's trigger checked against the residual failures
-  → TASK-587, TASK-588 ✓ SPRINT-160 (bundle 3 shown by development runs); residual → TASK-597
+  → TASK-587, TASK-588 ✓ SPRINT-160 (bundle 3 shown by development runs); residual → TASK-597 ✓ SPRINT-161: roles not built (D20); arms
+  A4a, A4b measured; bundle 3 measured by Final and ruled out (D21)
 - [ ] S4: shipped set = only components with a positive ablation delta, the final set re-measured vs A1
   and A2; STANDARD MAJOR and 3.0.0 only if H1/H2 held and a named consumer contract breaks, else 2.x
   MINORs; released with migration notes (or a recorded no-ship with numbers)
