@@ -5,7 +5,7 @@ stream: s3-expertise
 epic: EPIC-023
 owner: Maintainer
 last_updated: 2026-11-02
-status: active
+status: closed
 plan_commit: 3bacd634
 gates_signed: G1,G2 @ 688ed825
 update_trigger: sprint execute/close events
