@@ -24,7 +24,7 @@ TD-289: two clinic trials that provision at the same moment can fail `pg_ctl sta
 arm earns three workers only once this is fixed and a capacity check shows N = 3 changes no outcome against serial runs.
 
 ## Done when
-- [ ] Clinic provisioning is serialised across concurrent trials (one clinic `pg_ctl start` at a time); a selftest fails on
+- [x] Clinic provisioning is serialised across concurrent trials (one clinic `pg_ctl start` at a time); a selftest fails on ✓ cherry-picked from `40b2a264`; S78 fails with the lock disabled, passes with it; selftest 83/83 on main
       two overlapping provisions without it and passes with it.
 - Boxes 2 and 3 (the N = 3 capacity check, adopting N = 3) moved to TASK-603 by SPRINT-161's scope-change.
 
