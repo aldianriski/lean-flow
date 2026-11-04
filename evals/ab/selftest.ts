@@ -3261,6 +3261,35 @@ check("S79 judge failures are infra in both trial paths; real UNKNOWN and malfor
   assert(message === `${failure}: ${limit}`, `realJudge preserves prefix and trimmed result: ${message}`);
 });
 
+check("S80 signer failures are infra across rounds; refusal and malformed replies stay scored", async () => {
+  const { runProtocolTrial } = await import("./lib/protocol.ts");
+  const failure = "judge run failed: exit 1, api_error";
+  for (const kind of ["throw", "empty", "whitespace", "refuse", "malformed", "recovered"]) {
+    const fz = await frozenSmoke();
+    const dir = tmpdir("signer-failure");
+    const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+    let calls = 0;
+    const judge: import("./lib/protocol.ts").Judge = async () => {
+      calls++;
+      if (kind === "recovered" && calls === 2) return SIGN;
+      if (kind === "throw" || kind === "recovered") throw new Error(failure);
+      return kind === "empty" ? "" : kind === "whitespace" ? " \n\t " : kind === "refuse" ? '{"verdict":"refuse","reason":"outside task scope"}' : "not JSON";
+    };
+    const r = await runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke -- not a measurement", runner: rep.runner, judge, measure: { judge: recJudge(PASSV) } });
+    const m = r.row.measure!;
+    const infra = ["throw", "empty", "whitespace", "recovered"].includes(kind);
+    assert(calls === 2, `${kind}: both signer rounds called`);
+    assert(infra ? m.attemptClass === "infra:judge-failed" : !m.attemptClass.startsWith("infra:"), `${kind}: attemptClass was ${m.attemptClass}`);
+    assert(m.attemptKind === (infra ? "infra" : "scored") && r.cls === m.attemptClass, `${kind}: measure kind and returned cls propagate`);
+    assert(!r.row.passed, `${kind}: failed signer or refusal cannot pass`);
+    if (kind === "throw" || kind === "recovered") assert(r.terminal?.includes(failure), `${kind}: failure reaches terminal`);
+    if (kind === "empty" || kind === "whitespace") assert(r.terminal?.includes("empty reply"), `${kind}: empty reply reaches terminal`);
+    if (kind === "recovered") assert(r.exit === "ok" && r.grade.passed && rep.calls.n === 3 && r.row.g2?.judge === "sign", "a passing revise/build does not erase the first signer failure");
+    else assert(r.exit.startsWith("g2-refused: policy:"), `${kind}: exit remains a policy refusal: ${r.exit}`);
+  }
+  // S44 covers signer failures at the trial deadline: they must remain timeout.
+});
+
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;

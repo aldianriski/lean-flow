@@ -2003,6 +2003,8 @@ status: current
     `infra:judge-failed`, so it retries or counts toward the 3-infra abort, and a usage-limit judge failure pauses the run.
     **Carry-forward (owner ruling, SPRINT-162 G2):** stays open until the next arm's amendment discloses this change, because
     harness code is not hashed; the amendment's author resolves it.
+    The G2 signer took the same rule at SPRINT-163 T1 (TASK-604; selftest S80): a thrown or empty signer call in any round marks
+    the attempt `infra:judge-failed`; the same amendment discloses both.
 
 - **TD-291** severity: low | status: open | created: Sprint-162 (promote; EPIC-023 D20)
   - Summary: **Backend role watch: duplicated server logic keeps recurring in A/B runs, and no reviewer looks for it.** EPIC-023
