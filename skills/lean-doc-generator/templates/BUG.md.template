@@ -24,6 +24,10 @@
 ## Evidence
 - [`docs/work/evidence/TASK-NNN/<file>` — what it shows]
 
+## Done when
+- [ ] <observable result of the fix>
+- [ ] Negative: <what must keep working after the fix — the regression its test pins>
+
 ## Root cause
 [the winning hypothesis, confirmed — written by /diagnose]
 

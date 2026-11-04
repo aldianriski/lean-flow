@@ -140,7 +140,7 @@ origin:    decomposer | close-retro | triage-bug | manual   (set by whoever file
 state:     ready | needs-info | blocked   (backlog only; set by /triage)
 depends-on: [TASK-NNN]
 ---
-## Done when    <- the task's DoD, observable outcomes as `- [ ]`
+## Done when    <- the task's DoD, observable `- [ ]` outcomes; `Negative:` scenario box, or `Negative: n/a: <reason>` when exempt
 ```
 
 **States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal to `HITL`/`AFK` (who acts).

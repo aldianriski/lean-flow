@@ -437,6 +437,7 @@ graceful window — every `2.x` queue skill carries exactly one read path.
    `/orchestrator` and promote/close all read the store from here on. A sprint now **references**
    its member task files instead of copying their DoD into its Plan. Each task's DoD lives only in
    its own `## Done when`, and `plan_commit` is the freeze (ADR-047); with no git, a verbatim snapshot in the promote entry is (ADR-054).
+   Done-when needs a `Negative:` scenario box for feature/bug tasks and behaviour-changing debt; docs/config/spike and other debt use `Negative: n/a: <reason>` when exempt.
 
 **Already on 2.x?** Re-run `/lean-doc-generator migrate`. It adds the profile sections and
 `docs/product/requirements.md`, citing what your CLAUDE.md and CONTEXT.md already say and never copying

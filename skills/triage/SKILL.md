@@ -54,7 +54,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
    (or `docs/roadmap.md`) — same verdicts, plus an `EPIC-NNN` mark must name an active epic (`references/epic-coverage.md` of `/lean-doc-generator`, § Source B).
 3. **Bug intake** — a reported bug (or a bug-flavored backlog entry) becomes a **`type: bug` work item** (ADR-056), routed, not ranked like a feature:
    - write it to `backlog/` with **`origin: triage-bug`** and the bug template's intake sections (symptom · repro · expected · actual · evidence), its evidence redacted into `docs/work/evidence/TASK-NNN/` — same id rule as `/task-decomposer` (max over `docs/work/*/TASK-*.md`, all six folders, + 1)
-   - known cause + trivial fix → `state: ready` · unknown cause / needs investigation → `- **next:** /diagnose` under `## Assumes`
+   - known cause + trivial fix → `state: ready` only when Done-when has a `Negative:` box naming what must keep working after the fix (the regression its test pins); otherwise `needs-info` with that missing scenario as a `- **open:**` line under `## Assumes` · unknown cause / needs investigation → `- **next:** /diagnose` under `## Assumes`
    - systemic / architectural → file as `TD-NNN` in root `TECH-DEBT.md` (it becomes a `type: debt` item only when scheduled)
    - **stamp `origin:` on every task you file here** — a bug converted at triage never met the intake
      grill, and the stamp is what stops G1 fast-pathing it on the strength of looking well-formed
@@ -62,7 +62,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
      `BUG-<slug>.md`, if one was written, is never committed (STANDARD §2) and nothing points back at it.
 4. **Re-rank** — re-evaluate each task's `priority:` (P0–P3, by impact × urgency); propose moves with a one-line reason each. Sequence is then **derived** (§ Order), never hand-set.
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
-6. **State** — set `state:` `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
+6. **State** — set `state:` `ready` / `needs-info` / `blocked`; a bug cannot be `ready` without a Done-when `Negative:` box naming what must keep working after the fix (the regression its test pins), otherwise `needs-info` with that as an `open:` line; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
 7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then move the task file `backlog/ → cancel/` — `git mv` in the git case, a plain move with no git (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
 8. **Output** — the groomed backlog in derived order + a **ready-to-promote shortlist** (that order, `ready` only) + **uncovered epic conditions and roadmap rows**, one line each:
    `EPIC-NNN · "<condition, ~60 chars>" · uncovered (unmarked | stale: TASK-NNN done/cancelled | missing: TASK-NNN)`; a row: `roadmap · P2a · "<outcome, ~60 chars>" · uncovered (… | stale: EPIC-NNN not active)`.

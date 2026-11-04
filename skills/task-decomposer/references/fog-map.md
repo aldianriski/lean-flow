@@ -49,6 +49,7 @@ tickets · wire dependencies · stop.
 **Work** → claim a ticket · resolve it via its routed skill · record the answer in DECISIONS SO FAR ·
 close it · update the map · **graduate** any now-concrete buildable work into `TASK-NNN` (the normal
 pipeline) and any newly-visible fog into fresh tickets.
+Graduated tasks inherit step-6 validation, including the `Negative:` scenario or explicit n/a box.
 **Graduating writes a task file, nothing else does.** A graduated task goes through Procedure steps
 6–7 like any other: validated, approved, then written as its own `docs/work/backlog/TASK-NNN-<slug>.md`
 (shape + id rule → `task-file.md`). Decision-tickets stay on the map — they resolve a decision, not a

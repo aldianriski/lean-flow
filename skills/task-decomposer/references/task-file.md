@@ -61,6 +61,8 @@ gates_signed: G1,G2 @ 1a2b3c4d     # optional — written by /orchestrator, neve
 ## Done when
 
 - [ ] <observable outcome>
+- [ ] Negative: <what must not happen, or the failure path and its observable result>
+<!-- Instead, when exempt: - [ ] Negative: n/a: <reason> (e.g. docs only) -->
 
 ## Touches
 
@@ -77,6 +79,7 @@ gates_signed: G1,G2 @ 1a2b3c4d     # optional — written by /orchestrator, neve
 <source: epic scope item · PRD user story · ticket id>
 ```
 
+- **Negative:** feature/bug and behaviour-changing debt tasks need a scenario; docs/config/spike and debt with no observable behaviour change use `- [ ] Negative: n/a: <reason>` when no scenario applies; bugs name what must keep working after the fix, not just the repro.
 - **No `status:` field, no `sprint:`.** The folder is the status; `sprint:` is stamped at promote.
 - **`type:` shapes the body.** A `bug` item adds the bug sections from the bug template (symptom, repro, expected, actual,
   evidence; root cause, fix, regression test and prevention after `/diagnose`); a `debt` item cites its `TD-NNN`.
