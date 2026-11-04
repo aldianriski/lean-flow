@@ -28,10 +28,10 @@ lower the score that way, as TD-290 did before TASK-602.
 2. The row ends `g2-refused`, `attemptClass` is not infra, and the slot is scored not-passed.
 
 ## Done when
-- [ ] A signer call that fails (CLI exit, API or auth error, no reply) marks the attempt `infra:judge-failed`, so the slot retries or
+- [x] A signer call that fails (CLI exit, API or auth error, no reply) marks the attempt `infra:judge-failed`, so the slot retries or ✓ fe0c2f65; S80 (thrown, empty, failed-then-signed revise → infra; refuse and unparseable stay scored; deadline stays timeout)
       stops for a ruling under section 18; a signer that replies `refuse` still refuses, and a reply that does not parse still refuses.
-- [ ] Selftest S44 and the fail-closed check are updated to the new rule, and a new check fails on a thrown signer scored as a refusal.
-- [ ] The change is recorded for the next arm's amendment, like TD-290 (harness code is not hashed).
+- [x] Selftest S44 and the fail-closed check are updated to the new rule, and a new check fails on a thrown signer scored as a refusal. ✓ S80 FAIL on the unfixed code, PASS after; S44 and the fail-closed check hold unchanged (sign stays false); selftest 85/85
+- [x] The change is recorded for the next arm's amendment, like TD-290 (harness code is not hashed). ✓ TD-290 line, fe0c2f65
 
 ## Touches
 `evals/ab/lib/protocol.ts` · `evals/ab/selftest.ts` · `TECH-DEBT.md`

@@ -47,3 +47,11 @@ nothing marked the exemption. Owner rulings (popup, 2026-11-04): extend the oper
 the n/a box, which is what that ruling means. T3 also adds `skills/lean-doc-generator/templates/BUG.md.template` and
 `skills/task-decomposer/references/fog-map.md`.
 Impact: T2 adds a small maintainer-only harness change; T3 two more files; no new mechanism. G2 re-confirmed by the same popup.
+
+### 2026-11-04 | progress | T1 done: a failed G2 signer call is infra (`fe0c2f65`)
+Built by Codex (`codex exec`, workspace-write, worktree `s163-t1`, 49k Codex tokens), test-first; landed with blob hashes equal to
+the worktree's. Must-FAIL: S80 FAILs on the unfixed library (a throwaway worktree at `d99bbd28` with only the new selftest),
+PASSes with the fix. Selftest in the worktree: 85 of 85 (S44 unchanged). Typecheck passed in Codex's run. TD-290 gains the signer.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 findings · behaviour:material · governance:low
+Box 2 note: S44 and the fail-closed check needed no edit, because the rule they assert (sign stays false) still holds; S80 is the new check.
