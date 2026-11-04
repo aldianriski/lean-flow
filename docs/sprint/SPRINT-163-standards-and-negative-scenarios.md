@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-11-04
 status: active
 plan_commit: 3e002777
+gates_signed: G1,G2 @ 059cb506
 update_trigger: sprint execute/close events
 ---
 
@@ -40,7 +41,7 @@ in a protocol arm can lower the score. Same rule as TASK-602, applied to the sig
 **Acceptance:** a thrown signer call ends the attempt `infra:judge-failed`; a real `refuse` still refuses; the selftest passes.
 
 ### T2 — Let a repo declare the standards it adopts, and have review apply them `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `skills/lean-doc-generator/templates/development-coding-standards.md.template` · `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/migration-map.md` · `skills/orchestrator/references/review-scoping.md` · `README.md` · `CHANGELOG.md`
+Layers: `skills/lean-doc-generator/templates/development-coding-standards.md.template` · `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/migration-map.md` · `skills/orchestrator/references/review-scoping.md` · `README.md` · `CHANGELOG.md` · `evals/ab/lib/classifier.ts` · `evals/ab/lib/operator.ts` · `evals/ab/selftest.ts`
 Depends-on: none
 Cites: TASK-605 · intake rulings 2026-11-04 · `docs/research/plugin-reference-delta.md`
 The repo declares, lean-flow applies. The Standards comparand already carries coding-standards excerpts, so the change is the
@@ -50,7 +51,7 @@ section's shape, the one `init`/`migrate` question, and how the reviewer reports
 accepted, and a repo with none reviewed as today.
 
 ### T3 — Make a feature or bug Done-when name a negative scenario and its test `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` · `skills/triage/SKILL.md` · `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md`
+Layers: `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` · `skills/triage/SKILL.md` · `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md` · `skills/lean-doc-generator/templates/BUG.md.template` · `skills/task-decomposer/references/fog-map.md`
 Depends-on: none
 Cites: TASK-606 · EPIC-023 D20 · intake rulings 2026-11-04
 Done-when today asks only for an observable outcome. Decomposition, `/triage`'s bug intake and G2 each check for a negative
