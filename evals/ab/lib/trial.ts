@@ -160,14 +160,18 @@ export async function runTrial(o: TrialOpts): Promise<TrialResult> {
     raw: { usage: stream.result?.usage ?? null, modelUsage: stream.result?.modelUsage ?? null, subagent_stats: stream.result?.subagent_stats ?? null },
   };
   let cls: AttemptClass | undefined;
+  let judgeFailures: string[] = [];
   if (o.measure) {
     cls = setup.failed !== undefined ? PROVISION_CLASS : classifyAttempt({ thrown, raw, stream, exit });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol -> trial would otherwise cycle
     const { realJudge } = await import("./protocol.ts");
-    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams: [stream], exit, cls, judge: o.measure.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 })).measure;
+    const measured = await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams: [stream], exit, cls, judge: o.measure.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 });
+    row.measure = measured.measure;
+    judgeFailures = measured.judgeFailures;
+    cls = row.measure.attemptClass as AttemptClass;
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
   cleanupIsolation(iso, o.workRoot); // the cluster is already down; the trial copy and its dependencies go, the stream files stay under kept/
-  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: setup.failed !== undefined ? "" : terminalText(stream, raw), ...(cls ? { cls } : {}) };
+  return { exit, valid: exit === "ok", grade: graded ?? { passed: false, graders: [] }, row, terminal: [setup.failed !== undefined ? "" : terminalText(stream, raw), ...judgeFailures].filter(Boolean).join("\n"), ...(cls ? { cls } : {}) };
 }

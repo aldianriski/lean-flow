@@ -3219,6 +3219,48 @@ check("S77 run-dev: bounded workers, ordered starts, isolated logs, failure and 
   assert(await runDev(success, async () => 0, () => {}) === 0, "all successful children pass the batch");
 });
 
+check("S79 judge failures are infra in both trial paths; real UNKNOWN and malformed replies stay scored", async () => {
+  const { runProtocolTrial, realJudge } = await import("./lib/protocol.ts");
+  const { dimensionOf } = await import("./lib/judges.ts");
+  const { isUsageLimit } = await import("./run-baseline.ts");
+  const failure = "judge run failed: exit 1, api_error";
+  const limit = "You've hit your limit";
+  const cliJudge = realJudge(tmpdir("judge-error"), (await frozenSmoke()).arm, async () => ({ stdout: JSON.stringify({ type: "result", is_error: true, terminal_reason: "api_error", result: `  ${limit}  ` }), stderr: "", exitCode: 1, wallMs: 1 }));
+  for (const protocol of [false, true]) {
+    const go = async (judge: import("./lib/protocol.ts").Judge) => {
+      if (!protocol) return (await measuredTrial({ edit: buildOk, judge })).res;
+      const fz = await frozenSmoke();
+      const dir = tmpdir("judge-protocol");
+      const rep = protoReplay({ design: designOf(["src/add.ts"]), build: buildOk });
+      return runProtocolTrial({ arm: fz.arm, srcRepo: fz.src, repo: "smoke-repo", task: await protoTask(), trial: 1, attempt: 1, workRoot: dir, logPath: path.join(dir, "l.md"), tag: "smoke -- not a measurement", runner: rep.runner, judge: judgeSays(SIGN).fn, measure: { judge } });
+    };
+    for (const kind of ["throw", "empty", "whitespace", "unknown", "malformed", "limit"]) {
+      const seen: string[] = [];
+      const judge: import("./lib/protocol.ts").Judge = async (p) => {
+        seen.push(p);
+        if (dimensionOf(p) !== "business") return PASSV;
+        if (kind === "throw") throw new Error(failure);
+        if (kind === "limit") return cliJudge(p);
+        return kind === "empty" ? "" : kind === "whitespace" ? " \n\t " : kind === "unknown" ? '{"verdict":"UNKNOWN","reason":"not enough context"}' : "not JSON";
+      };
+      const r = await go(judge);
+      const m = r.row.measure!;
+      const infra = ["throw", "empty", "whitespace", "limit"].includes(kind);
+      const label = `${protocol ? "protocol" : "trial"} ${kind}`;
+      assert(r.exit === "ok" && r.grade.passed && seen.length === 3, `${label}: agent and graders pass; all three judges called`);
+      assert(m.attemptClass === (infra ? "infra:judge-failed" : "ok"), `${label}: attemptClass was ${m.attemptClass}`);
+      assert(m.attemptKind === (infra ? "infra" : "scored") && r.cls === m.attemptClass, `${label}: measure kind and returned cls propagate`);
+      assert(r.row.passed === !infra && m.judges.business.verdict === "UNKNOWN", `${label}: failed call cannot pass; UNKNOWN retained`);
+      assert(m.judges.convention.verdict === "PASS" && m.judges.scope.verdict === "PASS", `${label}: sibling verdicts unchanged`);
+      if (kind === "throw") assert(r.terminal?.includes(failure), `${label}: failure reaches terminal`);
+      if (kind === "empty" || kind === "whitespace") assert(r.terminal?.includes("empty reply"), `${label}: empty reply reaches terminal`);
+      if (kind === "limit") assert(r.terminal?.includes(`${failure}: ${limit}`) && isUsageLimit(r.terminal), `${label}: CLI result text reaches usage-limit detection`);
+    }
+  }
+  const message = await cliJudge("p").then(() => "", (e) => (e as Error).message);
+  assert(message === `${failure}: ${limit}`, `realJudge preserves prefix and trimmed result: ${message}`);
+});
+
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;

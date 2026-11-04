@@ -3,7 +3,7 @@
 import type { Stream } from "./parse.ts";
 import type { RawRun } from "./run.ts";
 
-export type InfraKind = "harness-crash" | "api-error" | "network" | "sandbox-before-action";
+export type InfraKind = "harness-crash" | "api-error" | "network" | "sandbox-before-action" | "judge-failed";
 export type AttemptClass = "ok" | "task-failure" | `infra:${InfraKind}`;
 export const isInfra = (c: AttemptClass | string): boolean => c.startsWith("infra:");
 export const MAX_RETRIES = 2;

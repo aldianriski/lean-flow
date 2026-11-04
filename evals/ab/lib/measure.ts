@@ -93,7 +93,7 @@ export type MeasureOpts = {
 };
 
 /** The extended record for one attempt. Judges run only on a finished, ok attempt; otherwise they are UNKNOWN with the reason. */
-export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; prompts: Record<string, string> }> {
+export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; prompts: Record<string, string>; judgeFailures: string[] }> {
   const exec = executionTokens(o.streams);
   const verdict = (name: string) => {
     const g = o.graded?.graders.find((x) => x.name === name);
@@ -105,6 +105,7 @@ export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; 
   let judges: Measure["judges"] = { convention: unknown(`not-run: ${o.exit}`), business: unknown(`not-run: ${o.exit}`), scope: unknown(`not-run: ${o.exit}`) };
   let overhead = { ...ZERO, costUsd: 0 };
   let prompts: Record<string, string> = {};
+  let judgeFailures: string[] = [];
   if (o.exit === "ok" && o.graded) {
     const diff = trialDiff(o.srcRepo, o.trialDir, o.changed);
     const files = contextFromTree(o.trialDir, diffPaths(diff), lfDocsOf(o.arm.id)); // post-change files from the trial dir, lean-flow docs left out
@@ -112,6 +113,8 @@ export async function buildMeasure(o: MeasureOpts): Promise<{ measure: Measure; 
     judges = r.judges;
     overhead = r.overhead;
     prompts = r.prompts;
+    judgeFailures = r.failed;
   }
-  return { measure: { graders, judges, exec, setup: o.setupTokens ?? null, judgeOverhead: overhead, attemptKind: isInfra(o.cls) ? "infra" : "scored", attemptClass: o.cls, ...(o.setupWallS !== undefined ? { setupWallS: o.setupWallS } : {}) }, prompts };
+  const cls = judgeFailures.length > 0 ? "infra:judge-failed" : o.cls;
+  return { measure: { graders, judges, exec, setup: o.setupTokens ?? null, judgeOverhead: overhead, attemptKind: isInfra(cls) ? "infra" : "scored", attemptClass: cls, ...(o.setupWallS !== undefined ? { setupWallS: o.setupWallS } : {}) }, prompts, judgeFailures };
 }

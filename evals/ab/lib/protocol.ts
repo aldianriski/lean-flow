@@ -106,7 +106,7 @@ export function realJudge(workRoot: string, arm: Arm, runner: Runner = spawnRunn
     clearSynced(iso.cfg);
     const raw = await runner(buildCommand(jarm, prompt, ["--tools", ""], { promptViaStdin: true }), { cwd: iso.trialDir, env: isolationEnv(iso, jarm), timeoutMs: cap, stdin: prompt });
     const res = parseStream(raw.stdout).result;
-    if (!res || res.is_error) throw new Error(`judge run failed: exit ${raw.exitCode}, ${res?.terminal_reason ?? "no result event"}`);
+    if (!res || res.is_error) throw new Error(`judge run failed: exit ${raw.exitCode}, ${res?.terminal_reason ?? "no result event"}${res?.is_error ? `: ${String(res.result ?? "").trim()}` : ""}`);
     return { text: String(res.result ?? ""), totals: totalsOf(res) };
   };
 }
@@ -298,20 +298,24 @@ export async function runProtocolTrial(o: ProtocolOpts): Promise<TrialResult> {
     park: park && { tool: park.tool, input: park.input },
   };
   let cls: AttemptClass | undefined;
+  let judgeFailures: string[] = [];
   if (o.measure) {
     cls = setup.failed !== undefined ? PROVISION_CLASS : classifyAttempt({ raw: lastRaw, stream: last, exit, trialActed: streams.some(firstActionSeen) });
     const { buildMeasure } = await import("./measure.ts"); // dynamic: measure -> judges -> protocol would otherwise cycle
-    row.measure = (await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 })).measure;
+    const measured = await buildMeasure({ arm: o.arm, task: o.task, srcRepo: o.srcRepo, trialDir: iso.trialDir, changed, graded, streams, exit, cls, judge: o.measure.judge ?? o.judge ?? realJudge(o.workRoot, o.arm), setupTokens: o.measure.setupTokens, setupWallS: setup.setupMs / 1000 });
+    row.measure = measured.measure;
+    judgeFailures = measured.judgeFailures;
     // the G2 signer(s) are judge calls: overhead, never execution (section 9). A revise round has two, the first in g2.firstRound.
     for (const u of [g2?.judgeUsage, g2?.firstRound?.judgeUsage]) {
       if (!u) continue;
       const jo = row.measure.judgeOverhead;
       row.measure.judgeOverhead = { input: jo.input + u.input, output: jo.output + u.output, cacheRead: jo.cacheRead + u.cacheRead, cacheWrite: jo.cacheWrite + u.cacheWrite, costUsd: jo.costUsd + u.costUsd };
     }
+    cls = row.measure.attemptClass as AttemptClass;
     if (cls.startsWith("infra:")) row.passed = false;
   }
   appendRow(o.logPath, row);
   cleanupIsolation(iso, o.workRoot); // the cluster is already down; the trial copy and its dependencies go, the stream files stay under kept/
   const valid = exit === "ok" || /^(g2-refused|parked|scope-breach):/.test(exit);
-  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: setup.failed !== undefined ? "" : terminalText(last, lastRaw), ...(cls ? { cls } : {}) };
+  return { exit, valid, grade: graded ?? { passed: false, graders: [] }, row, terminal: [setup.failed !== undefined ? "" : terminalText(last, lastRaw), ...judgeFailures].filter(Boolean).join("\n"), ...(cls ? { cls } : {}) };
 }

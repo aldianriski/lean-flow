@@ -2016,6 +2016,10 @@ status: current
     judge call in any earlier arm.
   - Impact: medium; an unnoticed outage can turn a passing arm into a no-ship (Release read 87.5% before the voids, 93.8% after).
   - Mitigation: TASK-602 (classify a failed judge call as infra; retry or stop).
+  - Fixed in the harness at SPRINT-162 T1 (TASK-602; selftest S79): a thrown or empty judge call marks the attempt
+    `infra:judge-failed`, so it retries or counts toward the 3-infra abort, and a usage-limit judge failure pauses the run.
+    **Carry-forward (owner ruling, SPRINT-162 G2):** stays open until the next arm's amendment discloses this change, because
+    harness code is not hashed; the amendment's author resolves it.
 
 - **TD-291** severity: low | status: open | created: Sprint-162 (promote; EPIC-023 D20)
   - Summary: **Backend role watch: duplicated server logic keeps recurring in A/B runs, and no reviewer looks for it.** EPIC-023

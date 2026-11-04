@@ -149,13 +149,14 @@ export function parseVerdict(text: string): JudgeOut {
 }
 
 export type JudgeUsage = { input: number; output: number; cacheRead: number; cacheWrite: number; costUsd: number };
-export type Judged = { judges: Record<Dimension, JudgeOut>; overhead: JudgeUsage; prompts: Record<Dimension, string> };
+export type Judged = { judges: Record<Dimension, JudgeOut>; overhead: JudgeUsage; prompts: Record<Dimension, string>; failed: string[] };
 
 /** Three isolated calls. A prompt that fails the blind check is never sent (UNKNOWN); a wrong judge model or missing usage is UNKNOWN. */
 export async function runJudges(input: JudgeInput, judge: Judge, blind: string[] = []): Promise<Judged> {
   const overhead: JudgeUsage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, costUsd: 0 };
   const judges = {} as Record<Dimension, JudgeOut>;
   const prompts = {} as Record<Dimension, string>;
+  const failed: string[] = [];
   const ctxLeak = (input.files ?? []).flatMap((f) => blindProblems(`${f.path}\n${f.content}`, blind).map((x) => `judge-context-leak: ${f.path}: ${x.replace("judge-prompt-leak: ", "")}`));
   for (const dim of DIMENSIONS) {
     const prompt = (prompts[dim] = buildPrompt(dim, input));
@@ -175,13 +176,15 @@ export async function runJudges(input: JudgeInput, judge: Judge, blind: string[]
         overhead.cacheWrite += t.cacheWrite;
         overhead.costUsd += t.costUsd;
       }
+      if (!reply.text.trim()) throw new Error("empty reply");
       if (t === null || (t && (t.models.length !== 1 || t.models[0] !== JUDGE_MODEL))) judges[dim] = { verdict: "UNKNOWN", reason: `judge ran ${t ? t.models.join(",") : "with no usage report"}, not exactly ${JUDGE_MODEL}` };
       else judges[dim] = parseVerdict(reply.text);
     } catch (e) {
       judges[dim] = { verdict: "UNKNOWN", reason: `judge call failed: ${(e as Error).message}` };
+      failed.push((e as Error).message);
     }
   }
-  return { judges, overhead, prompts };
+  return { judges, overhead, prompts, failed };
 }
 
 // ---- the diff a trial produced ----
