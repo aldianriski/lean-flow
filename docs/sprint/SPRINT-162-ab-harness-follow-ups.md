@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-11-03
 status: active
 plan_commit: 1a610a18
+gates_signed: G1,G2 @ f9b8345e
 update_trigger: sprint execute/close events
 ---
 
@@ -29,7 +30,7 @@ release arm.
 ## Plan
 
 ### T1 — Treat a failed judge call as infra, never as an UNKNOWN verdict `[size: S · risk: med · class: execution · HITL · J2]`
-Layers: `evals/ab/lib/judges.ts` · `evals/ab/lib/measure.ts` · `evals/ab/selftest.ts`
+Layers: `evals/ab/lib/judges.ts` · `evals/ab/lib/measure.ts` · `evals/ab/lib/trial.ts` · `evals/ab/lib/protocol.ts` · `evals/ab/lib/retry.ts` · `evals/ab/selftest.ts` · `TECH-DEBT.md`
 Depends-on: none
 Cites: TASK-602 · TD-290 · `docs/research/logs/ab-measurements-release.md` (09:21:20Z, 09:21:32Z)
 In arm Release a login lapse made two judge calls fail, and they were scored UNKNOWN, which read 87.5% until the owner voided

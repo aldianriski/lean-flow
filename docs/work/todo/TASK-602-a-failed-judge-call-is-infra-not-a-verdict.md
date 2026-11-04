@@ -34,7 +34,8 @@ verdicts, so their slots counted as not-passed and the arm read 87.5% instead of
 - [ ] A judge call that fails (CLI exit, API or auth error, no reply) marks the attempt infra, so the slot retries or stops for a
       ruling under section 18, as a failed agent call already does; a judge that replies UNKNOWN stays a scored verdict.
 - [ ] A selftest fails on a judge `api_error` scored as UNKNOWN, and passes with the fix; a control (a real UNKNOWN reply) stays scored.
-- [ ] The change is disclosed in the next arm's amendment (harness code is not hashed).
+- [ ] The change is recorded for the next arm's amendment: TD-290 stays open until that amendment discloses it (harness code is
+      not hashed).
 
 ## Touches
 `evals/ab/lib/judges.ts` · `evals/ab/lib/measure.ts` · `evals/ab/selftest.ts`

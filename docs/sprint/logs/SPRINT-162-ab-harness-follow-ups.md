@@ -26,3 +26,26 @@ S; no `L`. Status moves in `e45d9790`.
 Filed with this promote, by owner popup: TD-291 (EPIC-023 D20's backend-role watch) and a note on TASK-601 that D20's kept
 candidate (invariant assertions with test anchors) is weighed at its intake.
 promote-check: 7 pass, 0 fail.
+
+### 2026-11-04 | progress | batch G1 and G2 signed by the owner (popup); T1 built by Codex
+G1 (full checklist; both members `origin: manual`): goals, sizes S and S, touched files, out-of-scope and assumptions confirmed.
+G2 rulings, by owner popup: the G2 signer (`policyCheck`) stays out of T1, so a failed signer call still refuses (`g2-refused`)
+and goes to the Retro as a follow-up; a failed judge call is labelled with a new kind, `infra:judge-failed`; the two amendment
+boxes close by carry-forward in the TD ledger (scope-change below); T1 is Codex-built in a worktree, test-first, Claude-reviewed,
+coordinator-committed; T2 repeats TASK-586's N = 3 leg after T1 lands, with the PC idle (about 16 minutes, about 8.5 USD).
+T1 design: `runJudges` reports which calls failed (a thrown call, or a reply with empty text); `buildMeasure` turns the attempt
+into `infra:judge-failed` when any of the three failed; both callers take the class from the measure, so the retry loop, the
+3-infra abort and the row's `attemptKind` all see it; `realJudge` adds the CLI's error text to its thrown message, so a
+usage-limit judge failure pauses and voids like an agent one. A non-empty reply that does not parse stays a scored UNKNOWN.
+builder-check · T1 · 4 contradictions · 3 questions · settled: deadline throw never reaches the measure judges (exception dropped); usage-limit text needs realJudge's error to carry the result text (added); guard on an already-infra class is vacuous (dropped); caller line ranges corrected; one failed call of three makes the attempt infra; empty-reply rule safe (no selftest stub sends empty text)
+builder-check · T2 · 0 contradictions · 3 questions · settled: the last N = 3 run's provisioning failure is the race TASK-600 fixed, which this check tests; the slot list is rebuilt from TASK-586's and shown before launch; the spend was approved at G2; box 2 by the scope-change below
+
+### 2026-11-04 | scope-change | T1, T2: T1 Layers widened to the judge callers and the retry kinds; the amendment boxes carry forward
+What broke: the builder check found that fixing the measure alone never reaches the retry loop. The class is computed before the
+judges run, in `evals/ab/lib/trial.ts` and `evals/ab/lib/protocol.ts`, and the new kind lives in `evals/ab/lib/retry.ts`. T1's
+Layers gain all three, plus `TECH-DEBT.md` for its carry-forward.
+Both "next arm's amendment" boxes (TASK-602 box 3, TASK-603 box 2) cannot be ticked inside this sprint: the pre-registration is
+hash-frozen, and any edit to it is an amendment with a re-signature. By owner ruling they are reworded so that the record sits
+where the next amendment's author reads it: TD-290 stays open until that amendment discloses the judge fix, and TD-289 likewise
+for N = 3.
+Impact: four more files in T1, no new behaviour; T2 unchanged in work. G2 re-confirmed by the same popup.

@@ -25,7 +25,8 @@ kept release arms at two workers (about 75 minutes for 32 slots); EPIC-023 D19 a
 ## Done when
 - [ ] A capacity check at N = 3 on A4a's arms and pin (TASK-586's tasks, scratch log) has no provisioning failure and every
       outcome as in A4a's serial trials, or the owner rules the differences noise; free RAM is sampled and reported.
-- [ ] When clean, the next release arm's amendment adopts N = 3, and TD-289 is resolved; when not, TD-289 records why.
+- [ ] When clean, TD-289 records N = 3 for the next release arm's amendment to adopt and stays open until it does; when not,
+      TD-289 records why.
 
 ## Touches
 `TECH-DEBT.md` · the next release arm's amendment
