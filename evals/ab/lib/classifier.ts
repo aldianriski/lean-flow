@@ -1,6 +1,6 @@
 // The setup operator's classifier: a model CHOOSES which frozen entry answers a popup question; it never writes an answer.
 // The answer text sent is always the chosen entry's text verbatim (or a fixed ruling text). Anything unclear is a stop: never a guess.
-import { section, setupBullets, type Files } from "./operator.ts";
+import { section, setupBullets, standardsAnswer, type Files } from "./operator.ts";
 
 export type Entry = { id: string; kind: "repo" | "operator" | "setup" | "ruling" | "none"; label: string; text: string };
 export type Ruling = { id: string; text: string };
@@ -11,7 +11,7 @@ export type Call = (prompt: string) => Promise<string>;
 export type Answerer = (q: PopupQuestion) => Promise<Decision>;
 
 /** The fixed rulings for a migrate arm (owner rulings, SPRINT-154). */
-export const PLAN_RULING: Ruling = { id: "PLAN", text: "Profile pass only: apply only the items that add ## Stack, ## Conventions in use and the five business topics (business goal, main flows, invariants, quality attributes, non-goals). Decline every other item, including archiving, moving, renaming or slimming any existing file." };
+export const PLAN_RULING: Ruling = { id: "PLAN", text: "Profile pass only: apply only the items that add ## Stack, ## Conventions in use, ## Standards adopted and the five business topics (business goal, main flows, invariants, quality attributes, non-goals). Decline every other item, including archiving, moving, renaming or slimming any existing file." };
 export const CLEANUP_RULING: Ruling = { id: "CLEANUP", text: "Leave untouched: do not edit, archive, move, rename or slim this existing file." };
 export const UNDECIDED_RULING: Ruling = { id: "UNDECIDED", text: "Not decided yet (owner, migrate)" };
 export const DATES_RULING: Ruling = { id: "DATES", text: "Yes: update last_updated to today on the files that get a new section, and on no other file." };
@@ -40,7 +40,8 @@ export function buildCatalog(files: Files, rulings: Ruling[] = []): Entry[] {
     const text = section(files[file], heading);
     if (text) out.push({ id, kind: file, label, text });
   }
-  for (const b of setupBullets(files.operator)) out.push({ id: `setup:${slug(b.label)}`, kind: "setup", label: `setup answer: ${b.label}`, text: b.text });
+  for (const b of setupBullets(files.operator).filter((b) => b.label.toLowerCase() !== "standards")) out.push({ id: `setup:${slug(b.label)}`, kind: "setup", label: `setup answer: ${b.label}`, text: b.text });
+  out.push({ id: "setup:standards", kind: "setup", label: "named standards the repo adopts, their scope, references, checks and exceptions (none is allowed)", text: standardsAnswer(files.operator) });
   for (const r of rulings) out.push({ id: r.id, kind: "ruling", label: RULING_LABELS[r.id] ?? `ruling ${r.id}`, text: r.text });
   out.push({ id: "NONE", kind: "none", label: "no entry answers the question, or you are unsure", text: "" });
   return out;
@@ -61,6 +62,7 @@ ${cat}
 
 RULES
 - Choose the ONE entry whose text answers what the question asks.
+- A Standards question asking which named standards the repo adopts picks setup:standards, including when its answer is none.
 - A question asking for the content of a profile topic picks that topic's entry even if it names the file the content goes into (a Performance, Availability or Scalability target picks repo:quality-attributes; a Go timeout or Vue folder-layout convention picks operator:conventions ONLY if that entry's text actually addresses it).
 - PLAN only for a question asking which parts of a migrate plan to apply, or whether to apply it.
 - CLEANUP for a question asking whether to change, slim, reshape, consolidate, archive, move or rename something that ALREADY EXISTS.
@@ -125,6 +127,7 @@ ${cat}
 RULES
 - Cover every decision the message asks for (for example the parts a closing line like "reply with your choices, e.g. A yes, B1+B2, C archive, team 1, date ok" names). Give each one its own part, labelled exactly as the request labels it (A, B, C, team, date). A message with a single decision has a single part.
 - For each part choose the ONE entry whose text answers that decision.
+- A Standards question asking which named standards the repo adopts picks setup:standards, including when its answer is none.
 - A question asking for the content of a profile topic picks that topic's entry even if it names the file the content goes into.
 - PLAN only for a decision on which parts of a migrate plan to apply; CLEANUP for a decision on changing, slimming, consolidating, archiving, moving or renaming something that ALREADY EXISTS; DATES for updating last_updated dates, when it is in the catalog.
 - If a requested decision has no entry, or you are unsure, give it a part with id NONE. Do not leave any requested decision out.

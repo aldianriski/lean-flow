@@ -18,8 +18,8 @@ Hand each review pass a brief, not the repo. The brief states: Never open `.env`
   a drift from the quoted ruling is a concrete violation, and the loop feeds it back.
 - the host repo's **standards docs** — the Standards comparand. The coordinator (who builds the brief)
   finds the files that document how code should be written (CONTRIBUTING, coding-standards, style
-  guides, CLAUDE.md / AGENTS.md) and passes their paths plus the relevant excerpts; when there are
-  none, the brief says so. The reviewer never searches the repo for them.
+  guides, CLAUDE.md / AGENTS.md) and passes their paths plus the relevant excerpts, including the whole
+  `## Standards adopted` section when present; when there are none, the brief says so. The reviewer never searches the repo for them.
 - the host's **pinning tests** — for each changed file, the existing tests and harnesses that reference it, found by
   searching for its path, its file name, and the names it exports or defines (a `git grep` over the host's test and harness
   files). Run all pinning tests and harnesses found; name any search hit excluded as unrelated, with a one-line reason each.
@@ -42,7 +42,10 @@ A review answers two independent questions, and a change can pass one while fail
 
 - **Standards** — does the code obey the repo's conventions? (naming, structure, and the smell baseline —
   duplicated code, feature envy, mysterious names, data clumps; documented repo standards override the baseline. The report names the standards docs it judged
-  against, or says none were supplied.)
+  against, or says none were supplied.) When `## Standards adopted` is present, check each adopted entry's
+  checks against the diff. Report a failed check as `<standard> · <check> · <file:line>`. A case named by
+  the entry's exceptions passes; the report says which exception. Never report a standard's name without
+  a failed check. Without the section, this axis is unchanged.
 - **Spec** — does it build the *right thing*? (correctness against the **comparand ladder** below.)
 
 **The Spec comparand is the artifact that predates the task.** A `done-when` is written by the same

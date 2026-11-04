@@ -55,10 +55,10 @@ don't hand-reconcile, and you're not lost in your own existing code.
 
 Adds the site-specific profile. It reuses init's procedure by pointer
 (`${CLAUDE_SKILL_DIR}/references/init.md`) — do not restate it: **step 1** scan (Stack · Conventions in
-use) · **1b** business evidence · **1c** question sets · the **step-3** business and conventions rounds ·
+use) · **1b** business evidence · **1c** question sets · the **step-3** business and conventions rounds + Standards question ·
 the **step-5** citation rule. Migrate's deltas only:
 
-- **Targets** — `## Stack` (`docs/architecture/overview.md`), `## Conventions in use`
+- **Targets** — `## Stack` (`docs/architecture/overview.md`), `## Conventions in use` and optional `## Standards adopted`
   (`docs/development/coding-standards.md`), and Business goal · Main flows · Invariants · Quality attributes ·
   Non-goals (`docs/product/requirements.md`). First milestone is init-only, not part of this pass. A repo whose
   `CONTEXT.md` / `CLAUDE.md` already carry the spec still gets `requirements.md`: each topic they settle is
@@ -67,7 +67,9 @@ the **step-5** citation rule. Migrate's deltas only:
 - **Existing target file** — add the missing headings as **new** sections; never rewrite, reorder or reword
   existing text. **Absent** — create it from its template; coding-standards only when the repo has code (init's
   row).
-- **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. A target section whose body is only template
+- **Standards adopted** — keep an existing section verbatim and do not ask again, even if checks are undecided.
+  Otherwise reuse init's Standards question; answers (including undecided checks) cite `(owner, migrate)`.
+- **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. Except for Standards adopted, a target section whose body is only template
   placeholders or a `Not decided yet (owner, …)` line is present-but-unfilled: the pass may fill it, asking that
   topic again. If another section in the same file already
   covers a topic (e.g. `## Problem` for Business goal, `## Non-functional requirements` for Quality
@@ -81,8 +83,8 @@ the **step-5** citation rule. Migrate's deltas only:
   untouched; propose a **consolidate** plan item, not applied in this pass.
 - **Rounds** — the business and conventions rounds run after the plan is approved (no tier popup); ask only
   what nothing settles. Headless is unchanged: park with the plan; nothing is written.
-- **Report** — every topic, all seven (Stack and Conventions included), as `settled (<source>)` ·
-  `asked (answered)` · `asked (not decided yet)`.
+- **Report** — every profile topic (Stack, Conventions and optional Standards adopted included), as `settled (<source>)` ·
+  `asked (answered)` · `asked (not decided yet)` · `skipped (none)` for standards declined.
 
 ## Preserve inventory (backup before Apply, compared after each action)
 
@@ -132,6 +134,8 @@ as a per-item plan, exactly like first adoption. Guarantees:
 - **What it compares** — the current plugin's standard/templates against the repo's docs' current
   *shape/convention* (a doc missing a new template section, an outdated wiring pointer), **not** the
   user's prose. Structure drift is flagged; wording is left alone.
+
+A repo adopted before `## Standards adopted` existed sees a missing optional template section as a delta; applying it asks the Standards question, and `none` skips the section.
 
 ### Typed work items, bug items and evidence (spec 0.19.0, ADR-056)
 

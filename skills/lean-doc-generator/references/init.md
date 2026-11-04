@@ -78,6 +78,13 @@ planned write to an existing path is skipped and listed under "skipped (pre-exis
      4-questions limit; a topic shared by two loaded sets is asked once. Options are *not decided yet*
      plus at most three observed options from the code as drafted choices; init never generates
      candidates. The same *I'll describe it* free-text path applies.
+   - **Standards question** — ask once, only when init writes coding-standards (the repo has code).
+     It rides in the conventions popup when that round fires, else in its own popup. Free text:
+     "Does this repo adopt named standards (e.g. SOLID, clean architecture, a Mermaid diagram for
+     each main flow)?" Default `none`; never infer from code. `none` writes no section. Draft an
+     answer into `## Standards adopted` entries and show them back before writing, cited `(owner, init)`.
+     For a standard named without checks, ask for its checks once more; if still absent, write
+     `checks: not decided yet (owner, init)`. Never invent checks. Headless: parks with step 3 below.
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
      `architecture/authentication.md` (auth exists). Templates → table below.

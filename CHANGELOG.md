@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — coding-standards gains an optional `## Standards adopted` section; `init` and `migrate` ask once what the repo adopts (default `none`), and review applies its checks and exceptions, naming each failed check and location (TASK-605).
 - **Fixed (maintainer-only)** — `evals/ab/`: a judge call that fails or returns an empty reply now marks the attempt `infra:judge-failed`, so its slot retries or counts toward the 3-infra abort instead of scoring as not-passed, and a usage-limit judge failure pauses the run (TASK-602; root cause: the attempt class was computed before the judges ran, and the caught failure became an UNKNOWN verdict; TD-290 stays open until the next arm's amendment discloses it).
 - **Measured (maintainer-only)** — three workers re-checked after the provisioning lock: 6 slots, no provisioning failure, no infra attempt (TASK-603); the next release arm adopts N = 3 (TD-289).
 

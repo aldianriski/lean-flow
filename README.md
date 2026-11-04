@@ -247,6 +247,9 @@ reports, so a type error surfaces before merge-back. After each merge the coordi
 script), and ticks verified boxes in that same session. A review also runs the existing tests that pin what the
 change touches, searched by path, file name and exported names, and reports them in their own section. The self-review checklist also carries a code-slop box.
 
+Coding standards can carry an optional `## Standards adopted` section: `init` and `migrate` ask once which named standards your repo adopts, with `none` as the default.
+Review applies each entry's checks and exceptions, naming the failed check and its location.
+
 **Plan-mode approvals** — `quick`/`mvp` record the owner's G1/G2 approval on the task file (`gates_signed:` + `## Approved design`). You MAY set Claude Code's `plansDirectory` setting to a repo folder so plan mode's own plan file is kept; the task's record then cites that file. lean-flow never edits a settings file.
 
 **Modes** (`/orchestrator <mode>`) — three: `quick` (single small low-risk task, G1 only) · `mvp`

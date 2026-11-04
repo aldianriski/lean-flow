@@ -24,6 +24,13 @@ status: current
 **Not confirmed:**
 - [A convention the scan could not settle — asked, not assumed]
 
+## Standards adopted [CUSTOMIZE — delete this section if the repo adopts none]
+<!-- Belongs: standards the owner explicitly adopts, with scope, an authoritative reference,
+     concrete yes/no checks and exceptions. Entries come only from the owner's answer, never
+     inferred from code. Does not belong: assumed standards or invented checks. Omit this entire
+     section when the repo adopts none. -->
+**[Standard name]** — scope: [where it applies] · reference: [URL or doc] · checks: [yes/no checks, one line each] · exceptions: [cases that pass anyway, or none]
+
 ## Naming conventions [CUSTOMIZE]
 <!-- Belongs: why a naming rule exists and where the code breaks it. Does not belong: a rule the
      file names already show. -->

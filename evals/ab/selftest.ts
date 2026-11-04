@@ -3290,6 +3290,27 @@ check("S80 signer failures are infra across rounds; refusal and malformed replie
   // S44 covers signer failures at the trial deadline: they must remain timeout.
 });
 
+check("S81 standards answers route verbatim, default to none, and stay inside the profile plan", async () => {
+  const { buildCatalog, classify, PLAN_RULING } = await import("./lib/classifier.ts");
+  const { answerFor } = await import("./lib/operator.ts");
+  const q = { header: "Standards", question: "Does this repo adopt named standards (SOLID, clean architecture, a Mermaid diagram for each main flow)?" };
+  const entry = "SOLID — scope: services · reference: docs/solid.md · checks: no service imports UI · exceptions: none";
+  for (const value of [entry, "none", undefined]) {
+    const files = { repo: "", operator: value === undefined ? "" : `## Setup answers\n- standards: ${value}\n` };
+    const expected = value ?? "none";
+    const catalog = buildCatalog(files, [PLAN_RULING]);
+    const routed = await classify(q, catalog, async (prompt) => {
+      assert(prompt.includes(q.question) && prompt.includes("id: setup:standards"), "Standards question and answer key reach the classifier");
+      return '{"id":"setup:standards","reason":"the adopted standards answer"}';
+    });
+    assert("answer" in routed && routed.answer === expected, "classifier returns supplied standards or none verbatim");
+    const direct = answerFor(q, files, []);
+    assert("answer" in direct && direct.answer === expected, "operator routes standards despite flow examples; missing key defaults to none");
+  }
+  const plan = await classify({ header: "Plan", question: "Apply ## Standards adopted and archive README.md?" }, buildCatalog({ repo: "", operator: "" }, [PLAN_RULING]), async () => '{"id":"PLAN","reason":"plan approval"}');
+  assert("answer" in plan && plan.answer.includes("## Standards adopted") && plan.answer.includes("Decline every other item, including archiving"), "plan applies Standards adopted and declines unrelated archiving");
+});
+
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined; // `--only P6` runs the one check whose name starts with it
 let failed = 0;
