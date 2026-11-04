@@ -2,6 +2,7 @@
 id: TASK-606
 title: "Make a feature or bug task's Done-when name a negative scenario, with the test that would catch it"
 type: feature
+sprint: SPRINT-163
 priority: P2
 size: M
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-604
 title: "Treat a failed G2 signer call in an A/B protocol trial as infra, never as a refusal"
 type: bug
+sprint: SPRINT-163
 priority: P2
 size: S
 risk: med

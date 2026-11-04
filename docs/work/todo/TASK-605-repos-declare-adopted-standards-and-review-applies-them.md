@@ -2,6 +2,7 @@
 id: TASK-605
 title: "Let a repo declare the engineering standards it adopts, and have review apply them"
 type: feature
+sprint: SPRINT-163
 priority: P2
 size: M
 risk: med
