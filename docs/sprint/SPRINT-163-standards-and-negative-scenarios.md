@@ -4,6 +4,7 @@ slug: standards-and-negative-scenarios
 owner: Maintainer
 last_updated: 2026-11-04
 status: active
+plan_commit: 3e002777
 update_trigger: sprint execute/close events
 ---
 
