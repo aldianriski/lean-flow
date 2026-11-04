@@ -47,3 +47,7 @@ review (2026-11-03): keep "the repo declares, lean-flow applies", start minimal,
 
 ## Tracker
 Proposal drafted in SPRINT-161 (Codex-reviewed twice) · `docs/research/plugin-reference-delta.md` · backnotprop/pstack `6c75f4e6`
+
+## Amended 2026-11-04
+Superseded by its intake (`/task-decomposer`, owner approve, `07c197ef`): TASK-605 (adopted standards, review applies them),
+TASK-606 (negative scenario in Done-when, with its test) and TASK-607 (release arm, then release or no-ship). Cancelled by `/triage`.
