@@ -55,3 +55,33 @@ PASSes with the fix. Selftest in the worktree: 85 of 85 (S44 unchanged). Typeche
 consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 findings · behaviour:material · governance:low
 Box 2 note: S44 and the fail-closed check needed no edit, because the rule they assert (sign stays false) still holds; S80 is the new check.
+
+### 2026-11-04 | progress | T2 and T3 built by Codex and landed (`3ea9b762`, `3e2ea838`); the gate's three findings fixed (`ae92652c`)
+T2: Codex in worktree `s163-t2` from `88b6856b` (64k Codex tokens); landed with blob hashes equal. Selftest 86 of 86; S81 FAILs on
+the unfixed harness, PASSes with it. Template 67 lines.
+T3: Codex in worktree `s163-t3` from `d99bbd28`, in parallel with T1 and T2; landed by a 3-way apply onto T2 (CHANGELOG conflict
+resolved by keeping both lines, T2's first, as D1 says). Line counts held: orchestrator 140, task-decomposer 134, triage 131.
+Off-host gate at `3e2ea838`: 493 pass, 3 fail, all T3's: the always-loaded token budget 19 over (the CONTEXT.md line), and
+prose-density on task-decomposer and triage (step 6 lines grew past 400 characters). The bounded builder retry, made inline as a
+mechanical fix: the rule moved to its own lines (task-decomposer 136, triage 132, both at their baseline dense counts), the
+CONTEXT.md line shortened and a clause repeating "(optional, never a gate)" dropped (~12684 tokens, under budget). Off-host gate
+at `ae92652c`: 496 pass, 0 fail; bun test 589 pass, 0 fail.
+consequence · T2 · behaviour:material · governance:low
+consequence · T3 · behaviour:material · governance:low
+Review of both diffs by Claude (a different model from the builder), 1 round each, 0 blocking; the consumer proofs follow.
+
+### 2026-11-04 | surprise | T2 proof: the operated migrate route cannot reach the Standards question
+Two operated migrate runs (copies `s163-std-a` and `-b`, in parallel) were stopped by Claude Code when the PC ran critically low on
+memory; nothing was written. Re-run alone, copy A stopped at migrate's first plan popup: four bundled questions (which of 8 plan
+items, an `overview.md` cap fit, evidence placement, a tool block) that the operator's classifier has no answer for, and the session
+reported Bash and PowerShell blocked, which migrate's apply step needs. Owner ruling (popup): prove boxes 3-5 by review runs now,
+and box 2 by an interactive owner run on a git-initialised copy (`D:\Research\s163-std-c`, remote removed).
+
+### 2026-11-04 | progress | T2 proofs: boxes 1 and 3-6 ticked by owner ruling; box 2 waits for the owner's migrate run
+Review proofs: a scoped `claude -p` reviewer (sonnet, no tools) given the pinned clone's review procedure verbatim, the copy's whole
+coding-standards as the comparand, and a diff on `server/companyProfile.ts`. Copy A carries two adopted standards (errors carry the
+operation; a Mermaid diagram per main flow). Violating (`ApiError(500, 'INTERNAL', 'Something went wrong.')`): FAIL, reported as
+`Errors carry context · … · server/companyProfile.ts:99`. Compliant (the error names the operation): PASS, no standard flagged.
+Exception (a 400 with a field list): PASS, citing the exception. Copy B (no section) with the violating diff: FAIL on the
+error-handling convention, no adopted standard named; the pre-T2 procedure on the same input gave the same findings and verdict.
+Cost about 0.30 USD for the five runs. The killed and stopped migrate runs' cost was not reported by the harness.

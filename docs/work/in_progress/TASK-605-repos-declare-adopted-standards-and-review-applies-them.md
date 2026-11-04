@@ -24,17 +24,17 @@ loosely. The repo declares, lean-flow applies. ADR-053 ruling (owner, intake 202
 work, unfrozen; no checker, gate leg or ledger is added.
 
 ## Done when
-- [ ] The coding-standards template has an optional `## Standards adopted` section; each entry gives the standard, its scope, an
+- [x] The coding-standards template has an optional `## Standards adopted` section; each entry gives the standard, its scope, an ✓ 3ea9b762 (template, 67 lines)
       authoritative reference, concrete yes/no checks, and exceptions. A repo that adopts none has no such section.
 - [ ] `init` and `migrate` ask once whether the repo adopts a named standard (free text with examples, default none) and never
       infer one; "none" writes nothing, and a re-run of `migrate` keeps the entries already there.
-- [ ] Review's Standards axis checks the diff against each adopted entry's checks and names the failed check and where it fails,
+- [x] Review's Standards axis checks the diff against each adopted entry's checks and names the failed check and where it fails, ✓ review proofs on a copy, pinned clone ae92652c: violating → `Errors carry context · … · server/companyProfile.ts:99`, FAIL; exception → PASS citing it (owner ruled)
       never only the standard's name; a case listed under the entry's exceptions passes.
-- [ ] Negative: a repo with no `## Standards adopted` section gets the same review as today, and a change that fails no check is
+- [x] Negative: a repo with no `## Standards adopted` section gets the same review as today, and a change that fails no check is ✓ the no-section copy: same findings and FAIL as the pre-T2 procedure on the same input, no adopted standard named; compliant diff PASS (owner ruled)
       never flagged under a standard's name.
-- [ ] Shown on a consumer repo copy with two adopted standards, through a pinned clone of the change: a violating change caught, a
+- [x] Shown on a consumer repo copy with two adopted standards, through a pinned clone of the change: a violating change caught, a ✓ four review runs (violating, compliant, exception, none) plus a pre-T2 control, about 0.30 USD; owner ruled 2026-11-04
       compliant one passed, a justified exception accepted, and a repo with none adopted unchanged.
-- [ ] README and CHANGELOG `[Unreleased]` name the new section, the question, and review applying adopted checks and exceptions.
+- [x] README and CHANGELOG `[Unreleased]` name the new section, the question, and review applying adopted checks and exceptions. ✓ 3ea9b762
 
 ## Touches
 `skills/lean-doc-generator/templates/development-coding-standards.md.template` · `skills/lean-doc-generator/references/init.md` ·
