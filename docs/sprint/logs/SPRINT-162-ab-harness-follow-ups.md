@@ -60,3 +60,19 @@ consequence · T1 · behaviour:material · governance:low
 review · T1 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 blocking · behaviour:material · governance:low
 Review notes (Low, for the Retro): `run-trial.ts` still exits 0 when the final attempt is a judge-infra failure (`r.valid`
 reads the exit, a dev CLI outside T1's Layers); an empty reply from a wrong model now counts as infra, not as a model-pin UNKNOWN.
+
+### 2026-11-04 | gate | T2 capacity check at N = 3: clean on capacity; two judge UNKNOWNs ruled noise; N = 3 carried to the next amendment
+Capacity check (TASK-603), A4a's arms and pin, a scratch schedule and log no analysis reads (the Release log's freeze header, hash
+unchanged), a free-RAM sampler every 5 s, PC otherwise idle. Slots: clinic patient-cancel-all #1 and #2, confirmation-time #1 and
+#2; workdoo access-activity-type-filter #1, shared-auth-failure #1. A 2-slot pilot (stopped for the owner's review), then 4 slots
+at three workers, 02:41-03:02 UTC.
+- 6 of 6 scored on attempt 1; 0 provisioning failures, with three clinic starts overlapping (TASK-600's lock held); 0 infra
+  attempts; 0 low-memory kills (no `Resource-Exhaustion-Detector` event in the window); lowest free RAM 362 MB in the pilot, 890 MB
+  at three workers.
+- All graders pass. Four of six outcomes as A4a's serial trials. Two differ, each a scored UNKNOWN reply, never a FAIL:
+  access-activity-type-filter #1 business (the event writers are not in the files shown) and confirmation-time #1 convention
+  (cannot tell whether a timezone helper exists). Owner ruling (popup): noise; N = 3 adopted for the next release arm.
+- Cost 13.85 USD (12.54 agents, 1.31 judges), above the 8.5 USD estimated at G2.
+TD-289 gains a carry-forward line: the next release arm's amendment adopts N = 3 and resolves it.
+consequence · T2 · behaviour:low · governance:low
+review · T2 · self-review (a measurement and an owner ruling; no code changed) · behaviour:low · governance:low

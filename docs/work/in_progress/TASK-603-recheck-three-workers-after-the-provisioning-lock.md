@@ -23,9 +23,9 @@ Split from TASK-600 by SPRINT-161's scope-change: the lock (selftest S78) landed
 kept release arms at two workers (about 75 minutes for 32 slots); EPIC-023 D19 adopts three only after a clean re-check.
 
 ## Done when
-- [ ] A capacity check at N = 3 on A4a's arms and pin (TASK-586's tasks, scratch log) has no provisioning failure and every
+- [x] A capacity check at N = 3 on A4a's arms and pin (TASK-586's tasks, scratch log) has no provisioning failure and every ✓ 6 slots, 0 provisioning failures, free RAM sampled (min 362 MB); 2 judge UNKNOWNs ruled noise by the owner (popup, 2026-11-04)
       outcome as in A4a's serial trials, or the owner rules the differences noise; free RAM is sampled and reported.
-- [ ] When clean, TD-289 records N = 3 for the next release arm's amendment to adopt and stays open until it does; when not,
+- [x] When clean, TD-289 records N = 3 for the next release arm's amendment to adopt and stays open until it does; when not, ✓ TD-289 carry-forward line
       TD-289 records why.
 
 ## Touches
