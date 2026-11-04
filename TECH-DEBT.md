@@ -400,6 +400,10 @@ status: current
   - Impact: low; it blocks more than two workers for release arms (Amendment 8's N = 2 stands), so an arm takes about 75 minutes.
   - Mitigation (hypothesis, re-derive first): a port or startup race between concurrent clinic provisions; reproduce with two
     clinic provisions in parallel before choosing a fix, then re-run the N = 3 check.
+  - Re-checked at SPRINT-162 T2 (TASK-603), after TASK-600's provisioning lock: N = 3 on A4a's arms and pin, 6 slots,
+    2026-11-04 02:41-03:02 UTC, 13.85 USD. 0 provisioning failures (three clinic starts overlapped), 0 infra attempts, 0 low-memory
+    kills, lowest free RAM 362 MB; all graders pass; two scored judge UNKNOWNs where A4a had PASS, ruled noise by the owner.
+    **Carry-forward (owner ruling):** the next release arm's amendment adopts N = 3 and resolves this row; until then it stays open.
 
 - **TD-288** severity: low | status: open | created: Sprint-159 (T3 outside review, round 2)
   - Summary: **The sprint checker follows a copy whose source path carries no `SPRINT-<n>` number.** TASK-596's fix stops at a
