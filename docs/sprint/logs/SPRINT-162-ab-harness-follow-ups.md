@@ -2,8 +2,8 @@
 sprint: 162
 slug: ab-harness-follow-ups
 owner: Maintainer
-last_updated: 2026-11-03
-status: active
+last_updated: 2026-11-04
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -76,3 +76,9 @@ at three workers, 02:41-03:02 UTC.
 TD-289 gains a carry-forward line: the next release arm's amendment adopts N = 3 and resolves it.
 consequence · T2 · behaviour:low · governance:low
 review · T2 · self-review (a measurement and an owner ruling; no code changed) · behaviour:low · governance:low
+
+### 2026-11-04 | close | 2 of 2 members done, 5 of 5 boxes; Retro written; buckets filed
+System verify before close: full gate off-host at `c1380994`, qa-check 487 pass, 0 fail; bun test 589 pass, 0 fail.
+Buckets: Shipped, two `[Unreleased]` CHANGELOG lines (maintainer-only, no release). Tech debt, TD-292. Follow-ups, TASK-604
+(`origin: close-retro`). Learnings, L-289 new and L-238 at count 3. TD-289 and TD-290 stay open as carry-forwards. No epic, no
+handoff entry to reconcile.

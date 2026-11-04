@@ -2,8 +2,8 @@
 sprint: 162
 slug: ab-harness-follow-ups
 owner: Maintainer
-last_updated: 2026-11-03
-status: active
+last_updated: 2026-11-04
+status: closed
 plan_commit: 1a610a18
 gates_signed: G1,G2 @ f9b8345e
 update_trigger: sprint execute/close events
@@ -71,5 +71,37 @@ why not.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/lib/judges.ts`, `evals/ab/lib/measure.ts` | T1 | a thrown or empty judge call is recorded as failed and makes the attempt `infra:judge-failed` | med | S79 must-FAIL on the old code; selftest 84/84 |
+| `evals/ab/lib/trial.ts`, `evals/ab/lib/protocol.ts`, `evals/ab/lib/retry.ts` | T1 | both trial paths take the class from the measure; `realJudge` keeps the CLI error text; the new infra kind | med | S79 (both paths, usage-limit) |
+| `evals/ab/selftest.ts` | T1 | S79 | low | red on `ebf6cfe6`'s lib, green with the fix |
+| `TECH-DEBT.md` | T1, T2 | TD-290 and TD-289 carry-forward lines | low | check-sprint-by-reference |
 
 ## Retro
+
+**Outcome** — 2 of 2 members delivered (TASK-602, TASK-603), 5 of 5 boxes. A failed judge call no longer scores: it retries,
+counts toward the 3-infra abort, or pauses on a usage limit. Three workers ran clean after TASK-600's lock (6 of 6 slots on
+attempt 1, three clinic starts overlapping, no provisioning failure); the owner ruled two judge UNKNOWNs noise, so the next
+release arm adopts N = 3. Both amendment boxes carry forward in TD-290 and TD-289 (owner ruling at G2).
+
+**Retrieval check** — yes, one miss. L-238 (a coordinator write commits as bare `sprint(N):`) was in context from priming and
+still broken: T2's tick and Log went under `sprint(162) T2:`. `check-layers-observed` caught it before close; the two commits
+were local and re-split. Counted on L-238 (3).
+
+**Cost** — Codex built T1 for 58k tokens. One Sonnet builder check, 87k tokens. The T2 check cost 13.85 USD (12.54 agents,
+1.31 judges) in 22 minutes, against 8.5 USD estimated at G2: the same six slots had cost 8.54 USD at SPRINT-160, so the gap is
+run-to-run variance in agent spend. Two off-host gate runs. Claude session tokens: not available.
+
+**Worked**
+- The builder check found that fixing the measure alone would never reach the retry loop, before any build (L-289).
+- Codex built test-first, and S79 went red on the unfixed code in a throwaway worktree; Claude's review found no blocker.
+- The pilot stop gave a cheap read before three workers ran.
+
+**Friction**
+- S43 failed inside Codex's sandbox and passed on the host, so a builder's suite result is not the host's.
+- The T2 estimate came from one earlier run of the same slots, and agent spend varies more than one run shows.
+
+**Pattern candidate**
+- L-289: trace a changed field to every reader before calling a classification fixed.
+
+**Buckets** — Shipped: two `[Unreleased]` CHANGELOG lines (maintainer-only; no release). Tech debt: TD-292 (filed); TD-289 and
+TD-290 carried forward. Follow-ups: TASK-604 (the G2 signer, `origin: close-retro`). Learnings: L-289 (new), L-238 (count 3).

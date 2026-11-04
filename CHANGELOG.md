@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-03
+last_updated: 2026-11-04
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -13,6 +13,11 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+
+## [Unreleased]
+
+- **Fixed (maintainer-only)** — `evals/ab/`: a judge call that fails or returns an empty reply now marks the attempt `infra:judge-failed`, so its slot retries or counts toward the 3-infra abort instead of scoring as not-passed, and a usage-limit judge failure pauses the run (TASK-602; root cause: the attempt class was computed before the judges ran, and the caught failure became an UNKNOWN verdict; TD-290 stays open until the next arm's amendment discloses it).
+- **Measured (maintainer-only)** — three workers re-checked after the provisioning lock: 6 slots, no provisioning failure, no infra attempt (TASK-603); the next release arm adopts N = 3 (TD-289).
 
 ## v2.20.0 — the design reads the business facts and stays in scope, a repo profile, and reported bugs become work items (2026-11-03)
 

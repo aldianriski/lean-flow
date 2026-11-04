@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-03
+last_updated: 2026-11-04
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2035,3 +2035,12 @@ status: current
   - Impact: low today; if it fires, review misses a defect class that G2 and the session's own checks do not catch.
   - Mitigation: re-check the trigger at each release arm (D19). If it fires, propose an epic for a backend reviewer, admitted
     under ADR-053 and measured by one arm against the shipped stack.
+
+- **TD-292** severity: trivial | status: open | created: Sprint-162 (close; T1 review)
+  - Summary: **Two edges of TASK-602's judge-failure rule.** `run-trial.ts` exits 0 when its last attempt is a judge-infra failure
+    (`r.valid` reads the exit, which is `ok`), and an empty reply from a judge on the wrong model now counts as infra, not as a
+    model-pin UNKNOWN (the empty-reply check runs before the pin check in `runJudges`).
+  - Evidence: SPRINT-162 log, T1 review notes; `evals/ab/run-trial.ts` (exit line), `evals/ab/lib/judges.ts` (`runJudges`).
+  - Impact: trivial; `run-trial.ts` is a single-trial dev CLI the measured driver does not use, and a wrong-model empty reply has
+    not been seen.
+  - Mitigation: fold into TASK-604 if it touches the same paths; otherwise accept.
