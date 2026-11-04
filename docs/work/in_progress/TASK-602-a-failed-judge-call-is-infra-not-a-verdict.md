@@ -31,10 +31,10 @@ verdicts, so their slots counted as not-passed and the arm read 87.5% instead of
    not-passed. Seen in `docs/research/logs/ab-measurements-release.md` at 09:21:20Z and 09:21:32Z.
 
 ## Done when
-- [ ] A judge call that fails (CLI exit, API or auth error, no reply) marks the attempt infra, so the slot retries or stops for a
+- [x] A judge call that fails (CLI exit, API or auth error, no reply) marks the attempt infra, so the slot retries or stops for a ✓ 626247d5; S79 (both trial paths: thrown, empty, whitespace, usage-limit → `infra:judge-failed`, returned cls, terminal)
       ruling under section 18, as a failed agent call already does; a judge that replies UNKNOWN stays a scored verdict.
-- [ ] A selftest fails on a judge `api_error` scored as UNKNOWN, and passes with the fix; a control (a real UNKNOWN reply) stays scored.
-- [ ] The change is recorded for the next arm's amendment: TD-290 stays open until that amendment discloses it (harness code is
+- [x] A selftest fails on a judge `api_error` scored as UNKNOWN, and passes with the fix; a control (a real UNKNOWN reply) stays scored. ✓ S79 FAIL on ebf6cfe6's lib (red worktree), PASS with the fix; worktree selftest 84/84, main before 83/83
+- [x] The change is recorded for the next arm's amendment: TD-290 stays open until that amendment discloses it (harness code is ✓ TD-290 carry-forward line, 626247d5
       not hashed).
 
 ## Touches

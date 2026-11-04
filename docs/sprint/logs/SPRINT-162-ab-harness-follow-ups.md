@@ -49,3 +49,14 @@ hash-frozen, and any edit to it is an amendment with a re-signature. By owner ru
 where the next amendment's author reads it: TD-290 stays open until that amendment discloses the judge fix, and TD-289 likewise
 for N = 3.
 Impact: four more files in T1, no new behaviour; T2 unchanged in work. G2 re-confirmed by the same popup.
+
+### 2026-11-04 | progress | T1 done: a failed judge call is infra (`626247d5`)
+Built by Codex (`codex exec`, workspace-write, worktree `s162-t1`, 58k Codex tokens), test-first; landed by the coordinator with
+blob hashes equal to the worktree's. Must-FAIL: S79 FAILs on the unfixed library (a throwaway worktree at `ebf6cfe6` with only
+the new selftest), PASSes with the fix. Selftest: worktree 84 of 84; main before the change 83 of 83. Codex's own run showed S43
+(the process-tree kill) failing inside its sandbox; it passes on the host, and T1 does not touch that code. Typecheck (`tsc
+--noEmit`) passed in Codex's run, including the calibration consumer. TD-290 keeps a carry-forward line (box 3).
+consequence · T1 · behaviour:material · governance:low
+review · T1 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 blocking · behaviour:material · governance:low
+Review notes (Low, for the Retro): `run-trial.ts` still exits 0 when the final attempt is a judge-infra failure (`r.valid`
+reads the exit, a dev CLI outside T1's Layers); an empty reply from a wrong model now counts as infra, not as a model-pin UNKNOWN.
