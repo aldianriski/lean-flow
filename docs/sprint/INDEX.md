@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-02
+last_updated: 2026-11-04
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-162 — A/B Harness Follow-ups — closed 2026-11-04 · `411713b` · 2 of 2 members in `done/`, 5/5 DoD (no release: two maintainer-only lines under [Unreleased]) · no epic · a failed judge call is infra, not an UNKNOWN verdict (TASK-602, S79); three workers clean after the provisioning lock, N = 3 carried to the next release arm (TASK-603); TD-289/TD-290 carry forward; TD-285 row deleted (§11)
 - SPRINT-161 — S4: Final Arm and Release — closed 2026-11-03 · `affd871` · 4 of 4 members in `done/` · **released v2.20.0** (owner push `00bf98de`) · EPIC-023 (S4, stream s4-release) · arms Final, Final-on-A1 and Release; bundle 3 ruled out and reverted; S1 and S3 bundles 1-2 shipped (93.8%, +12.5 over A1)
 - SPRINT-160 — S3 Bundle 3: Quoted Business Facts, No Delete Outside the Tree, Release Worker Count — closed 2026-11-03 · `ff9e9d7` · 4 of 4 members in `done/` (no release yet: next release per EPIC-023 D16) · EPIC-023 (S3, stream s3-expertise) · the G2 design opens each business-facts source and quotes every fact its change touches; no delete names a path outside the working tree; no worker count above 2 is clean (TD-289); the storm copy leaves the repo · [archive](archive/SPRINT-160-s3-bundle-3.md)
 - SPRINT-159 — Work Types, Bug Items and Research Folders — closed 2026-11-02 · `4872cfb` · 6 of 6 members in `done/` (no release yet) · stream docs-structure, no epic · work items typed feature, bug or debt, and a bug becomes a work item with its repro, evidence and root cause through /triage, /diagnose, /prime, /flow, the close and migrate (ADR-056); research topic folders and five placed extras (ADR-057); spec 0.19.0; TD-285 fixed as TASK-596

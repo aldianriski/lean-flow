@@ -432,19 +432,6 @@ status: current
   - Impact: low now (A4a's designs no longer list the task file); it biases any later arm whose skill text lists it.
   - Mitigation (hypothesis, re-derive first): exempt `docs/work/` in the G2 scope check as the breach check does, in a later
     owner-signed amendment (the rule is frozen), with a must-FAIL fixture for a design listing only the task file.
-- **TD-285** severity: medium | status: resolved → TASK-596 | created: Sprint-155 (close system verify)
-  - Summary: **`check-sprint-by-reference.ts` can read another sprint's log as a baseline, so an append-only log reports
-    `LOG-REWRITTEN`.** `logPaths` takes every path `git log --follow` gives for the log, and `--follow`'s rename guess can
-    link two sprint logs that share the template header. `fileAt` then returns the first known path in the tree, which at
-    SPRINT-155's `plan_commit` was SPRINT-154's log. It only fires when a baseline read is needed (a Done-when change), so it
-    surfaced when a tick's evidence ran onto continuation lines.
-  - Evidence: SPRINT-155 close, VPS gate at `16f28eaa` (352/2); an instrumented copy showed the baseline text starting
-    `# SPRINT-154 — Execution Log`; the log diff since `2ea2af75` is a pure append.
-  - Impact: med. A freeze-edit that a scope-change entry covers would still fail, and the finding names the wrong cause.
-  - Mitigation (hypothesis, re-derive first): resolve the baseline log by the sprint's own basename (or its frontmatter `sprint:`)
-    before the `--follow` set, or drop `--follow` for logs; a must-FAIL fixture with two template-identical logs.
-  - Resolution (TASK-596, /diagnose): cause confirmed. `--follow` reads the new log as a copy (`C065`) of SPRINT-154's.
-    `follow` now ends its walk at a copy, and renames are still followed. Two retained by-reference cases cover it.
 - **TD-284** severity: medium | status: open | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
   - Summary: **A finished A/B trial keeps no record of its post-run file list, so a changed manifest rule cannot be re-applied to it.**
     `lib/isolate.ts` deletes the trial copy once the row is appended and keeps only the `stream*.jsonl` transcripts. When Amendment 5
@@ -783,7 +770,6 @@ status: current
     `check-sprint-by-reference.ts --close` uses, or retire the signal once no pre-ledger log is in scope.
 
 
-
 - **TD-228** severity: low | status: open | created: Sprint-116 (close, T1 Codex R1)
   - Summary: **The Shell §4 rules disagree on an empty-slug ADR (`docs/adr/ADR-001-.md`).** S4.ONEFILE's glob needs one or more slug
     characters and FAILs it; S4.INDEX · S4.SECTIONS · S4.NEGATIVE iterate `_adr_canonical`, whose glob admits an empty slug, and PASS the
@@ -821,7 +807,6 @@ status: current
   - done-when: the git call that fails on a rename-only commit has its stderr captured and either handled or suppressed with a reason, and
     a `git mv` commit in the checked range produces no `fatal:` line.
 
-
 - **TD-219** severity: low | status: open | created: Sprint-114 (close retro, T1 RC cut)
   - Summary: **`scripts/lib/check-manifest-lockstep.sh` cannot read a prerelease version.** `ver_of` matches `X.Y.Z` only (l.26), so
     `2.0.0-rc.1` is read as `2.0.0`. The lockstep check would pass four manifests whose prerelease suffixes disagree, and it cannot report what
@@ -839,7 +824,6 @@ status: current
     three shapes; each detector was seed-proven to fire (1/1/1). Census-zero → TD, not a fix loop (owner rule).
   - Mitigation (hypothesis): match the closing `---` at a line start including the immediate-close case, strip a leading BOM, allow a trailing
     YAML comment, and follow symlinks via `statSync` — each with a must-FAIL fixture under the maintainer-only bar.
-
 
 - **TD-216** severity: low | status: open | created: Sprint-113 (T1 seeded break B)
   - Summary: **`qa-check.sh` has no listed-but-missing check for `eval_harnesses_excluded`.** A name in the excluded list whose file no
@@ -1043,7 +1027,6 @@ status: current
     ADR-029's tiering: this is Tier G by the false-negative test.
 
 
-
 - **TD-162** severity: minor | status: open | created: Sprint-101
   - Summary: **SPRINT-094's archived close summary now contradicts its own checkboxes.** It reads
     *"Closed at 22 of 23 DoD. The single open box is the owner-action ruling on archiving
@@ -1222,7 +1205,6 @@ status: current
   - **Re-file fresh if** the depth accounting is revisited, or a malformed bracket is found to
     corrupt a verdict rather than only its diagnostic.
 
-
 - **TD-117** severity: medium | status: open | created: Sprint-091
   - **Route (SPRINT-130 promote, 2026-10-19, owner):** → `TASK-367`, beside TD-090 — the same Windows gate-cost question; its
     open line asks for the default-profile re-measure on this host. Not decomposed on its own: the off-host route is the working
@@ -1335,7 +1317,6 @@ status: current
   - **Re-file fresh if** the archive gains a retroactive log backfill, or a sprint is ever expected to
     carry a handoff record without a paired log.
 
-
 - **TD-136** severity: minor | status: open | created: Sprint-094
   - Summary: **`evals/fixtures/compat/rule-ids-v0.10.0.txt` — ADR-034's frozen semantic-compatibility
     surface — has zero executable readers.** Nothing regenerates it, diffs it, or fails on it.
@@ -1387,7 +1368,6 @@ status: current
     costume, and every rule added to it will have its own counterexample.
   - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
     stops being load-bearing.
-
 
 - **TD-094** severity: trivial | status: open | created: Sprint-085
   - Summary: **ADR-030's epic-log split has never been executed.** Contribution rows are supposed to
@@ -1603,7 +1583,6 @@ status: current
   - Sibling: **TD-078** (a template that ships a doc which cannot pass its own standard). Both are the
     reference implementation disagreeing with the standard it publishes, in opposite directions — one
     ships a defect, this one ships an unstated change.
-
 
 - **TD-076** severity: minor | status: open | created: Sprint-080
   - Summary: **Controls across the existing check families report only silence, so a control that is
