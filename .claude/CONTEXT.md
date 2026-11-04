@@ -140,10 +140,10 @@ origin:    decomposer | close-retro | triage-bug | manual   (set by whoever file
 state:     ready | needs-info | blocked   (backlog only; set by /triage)
 depends-on: [TASK-NNN]
 ---
-## Done when    <- the task's DoD, observable `- [ ]` outcomes; `Negative:` scenario box, or `Negative: n/a: <reason>` when exempt
+## Done when    <- the DoD: observable `- [ ]` outcomes + a `Negative:` box (`n/a: <reason>` if exempt)
 ```
 
 **States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal to `HITL`/`AFK` (who acts).
 **Authority** — `J0` needs none (additive · reversible · inside the frozen Plan) · `J1` is delegated in advance by a recorded pre-launch approval and executes unattended **inside that envelope only** · `J2` is human-reserved and **parks**. Declared, never inferred; absent = J2, because an undeclared class is an unasked question and an unasked question is a BLOCK. Against `HITL`/`AFK` it is a **one-way implication, not independence**: `J2` ⇒ `HITL` always, `HITL` ⇏ `J2` — staffing describes the run, the J-class describes the task, so a J1 run with a human present is still J1 (`orchestrator/references/night-run.md` Part 0). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
 **Origin** gates G1's fast-path: only `origin: decomposer` met the intake grill, so only it confirms scope in one line — every other origin gets the full G1 checklist. A **fact about where the task came from**, never a self-assessed "was it grilled?" and never inferred from `tracker:`; close-Retro follow-ups and `/triage`-converted bugs are stamped by the skill that files them.
-**QA (optional, never a gate)** — a task may note a `qa:` hint (tests/lint/security/perf to suggest at Review) — a suggestion for the owner, not a requirement.
+**QA (optional, never a gate)** — a task may note a `qa:` hint (tests/lint/security/perf to suggest at Review).
