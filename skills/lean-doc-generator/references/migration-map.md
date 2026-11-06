@@ -24,12 +24,13 @@ don't hand-reconcile, and you're not lost in your own existing code.
      the user to the host's security process.
 2. **Plan** — for *each* existing doc, propose one action: **keep · reformat · relocate · split ·
    index · archive · consolidate · retire · leave (out of scope)** — with its lean-flow target and a
-   one-line why. Present the whole plan; **wait for approval**. Never start rewriting before the human
-   signs off.
+   one-line why. Present the whole plan as text, then raise the approval and every ruling it needs as
+   an `AskUserQuestion` popup, each with a recommended answer; **wait for approval**. Never start rewriting
+   before the human signs off.
    - **Headless (no approval can arrive)** — you are headless when there is no ask channel: probe it
      (`ToolSearch select:AskUserQuestion` → *no matching deferred tools* means unregistered, and under
      `dontAsk` any prompting call is auto-denied). Verify before concluding either way; an interactive
-     session waits in prose and that is correct. Once verified, waiting is not an option and neither is
+     session asks by popup and waits, and that is correct. Once verified, waiting is not an option and neither is
      deciding, so the halt is *recorded* before it happens: write the proposed plan and what it waits on into a
      `/handoff` doc (there is no sprint file at this entry point) and name the unblock condition —
      "owner approves the per-file plan". Then halt. A prose-only "waiting on your approval" ends the
