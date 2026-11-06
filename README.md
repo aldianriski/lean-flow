@@ -249,6 +249,7 @@ change touches, searched by path, file name and exported names, and reports them
 
 Coding standards can carry an optional `## Standards adopted` section: `init` and `migrate` ask once which named standards your repo adopts, with `none` as the default.
 Review applies each entry's checks and exceptions, naming the failed check and its location.
+A standard named without checks is shown back with one more ask. If none come, it is written as `checks: not decided yet`, and review says it has nothing to check.
 
 **Plan-mode approvals** — `quick`/`mvp` record the owner's G1/G2 approval on the task file (`gates_signed:` + `## Approved design`). You MAY set Claude Code's `plansDirectory` setting to a repo folder so plan mode's own plan file is kept; the task's record then cites that file. lean-flow never edits a settings file.
 

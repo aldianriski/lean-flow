@@ -17,6 +17,7 @@ status: current
 ## [Unreleased]
 
 - **Added (maintainer-only)** — `scripts/session-cost.ts` reports where a repo's Claude Code spend goes; `docs/research/router-mode.md` plans how to test a router against it (TASK-609). No skill changed.
+- **Fixed** — `migrate` writes a named standard with no checks as `checks: not decided yet (owner, migrate)`, the form `init` already wrote, and its report uses the topic labels word for word. Before, it marked every field undecided and described the topic in its own prose, so a search for the marker found nothing (TASK-610).
 
 ## v2.21.0 — a repo declares the standards it adopts, and a task names what must not happen (2026-11-06)
 

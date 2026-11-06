@@ -2039,6 +2039,7 @@ status: current
   - Evidence: SPRINT-163 log, 2026-11-06 entries; TASK-605 and TASK-606 tick notes.
   - Impact: a wrong branch would first show on a consumer's repo.
   - Mitigation: exercise each when a later consumer proof passes that way; no dedicated run planned.
+  - Runs: draft-back and undecided checks (TASK-610): operated `init` and `migrate` plus scoped reviews on copies of a real repo. Before, pin `022ba994`: `init` passed; `migrate` missed the marker and the report label. After, pin `f94bdef1`: both show. The re-run (`cmp`) and `none` kept their before-run results.
 - **TD-295** severity: trivial | status: open | created: Sprint-163 (close; system verify)
   - Summary: **`gate-remote.ts`'s local bundle step was denied in the default temp directory, cause unknown.** Two consecutive runs failed
     with `cannot create … lf-gate-<sha>-<pid>.bundle: Permission denied`, after two earlier runs that day had passed. The same `git bundle
@@ -2046,3 +2047,9 @@ status: current
   - Evidence: SPRINT-163 log, close entry; `scripts/gate-remote.ts` (`tmpdir()`).
   - Impact: trivial; it reported a transport failure and no verdict, which is the safe reading.
   - Mitigation: scope the temp directory to the one invocation when it recurs; look for the cause only on a repeat.
+- **TD-296** severity: low | status: open | created: Sprint-164 (T1 after-run)
+  - Summary: **`migrate`'s report labels do not cover two cases.** A topic left unasked because the owner kept its file untouched fits no label,
+    and the run's report said so. A Standards answer mixing a standard with checks and one without has no named label either.
+  - Evidence: SPRINT-164 log, T1 entries; `skills/lean-doc-generator/references/migration-map.md` (Report).
+  - Impact: the report falls back on prose for these two cases; nothing is written wrong.
+  - Mitigation: name both labels when a real migrate hits one; no run planned.
