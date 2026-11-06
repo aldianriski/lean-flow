@@ -23,10 +23,10 @@ process not stop". `skills/lean-doc-generator/references/migration-map.md` says 
 correct", which conflicts with the popup rule in `.claude/CLAUDE.md` § Behavioral Guidelines. The run followed the skill.
 
 ## Done when
-- [ ] An interactive migrate shows its plan as text and raises the approval and each ruling as a popup, recommending an answer.
-- [ ] Negative: a headless migrate still records the plan and its unblock condition in a `/handoff` doc and halts, never asking or deciding.
-- [ ] Shown once on a consumer repo copy through a pinned clone.
-- [ ] CHANGELOG `[Unreleased]` names the change.
+- [x] An interactive migrate shows its plan as text and raises the approval and each ruling as a popup, recommending an answer. ✓ owner's interactive run on copy s163-std-b, pin ced08844: the plan as text, then the first popup 10 seconds later, each option carrying a recommendation; the owner reported done
+- [x] Negative: a headless migrate still records the plan and its unblock condition in a `/handoff` doc and halts, never asking or deciding. ✓ headless run, same pin, 0.31 USD: plan saved to a handoff doc, nothing written to the repo; Codex T2 OK
+- [x] Shown once on a consumer repo copy through a pinned clone. ✓ see box 1
+- [x] CHANGELOG `[Unreleased]` names the change. ✓ ced08844
 
 ## Touches
 `skills/lean-doc-generator/references/migration-map.md` · `CHANGELOG.md`
