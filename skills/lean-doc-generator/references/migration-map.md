@@ -69,7 +69,8 @@ the **step-5** citation rule. Migrate's deltas only:
   existing text. **Absent** — create it from its template; coding-standards only when the repo has code (init's
   row).
 - **Standards adopted** — keep an existing section verbatim and do not ask again, even if checks are undecided.
-  Otherwise reuse init's Standards question; answers (including undecided checks) cite `(owner, migrate)`.
+  Otherwise reuse init's Standards question; answers cite `(owner, migrate)`, and a standard still without checks
+  reads `checks: not decided yet (owner, migrate)`, with the citation on `checks` itself.
 - **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. Except for Standards adopted, a target section whose body is only template
   placeholders or a `Not decided yet (owner, …)` line is present-but-unfilled: the pass may fill it, asking that
   topic again. If another section in the same file already
@@ -84,8 +85,9 @@ the **step-5** citation rule. Migrate's deltas only:
   untouched; propose a **consolidate** plan item, not applied in this pass.
 - **Rounds** — the business and conventions rounds run after the plan is approved (no tier popup); ask only
   what nothing settles. Headless is unchanged: park with the plan; nothing is written.
-- **Report** — every profile topic (Stack, Conventions and optional Standards adopted included), as `settled (<source>)` ·
-  `asked (answered)` · `asked (not decided yet)` · `skipped (none)` for standards declined.
+- **Report** — every profile topic (Stack, Conventions and optional Standards adopted included), labelled with exactly one of
+  `settled (<source>)` · `asked (answered)` · `asked (not decided yet)` · `skipped (none)` for standards declined, in those words.
+  Standards adopted whose every named standard lacks checks is `asked (not decided yet)`.
 
 ## Preserve inventory (backup before Apply, compared after each action)
 
