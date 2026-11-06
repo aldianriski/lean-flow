@@ -258,6 +258,7 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
   // SPRINT-147 T1 (TASK-533): the A/B measurement harness runs by hand and is never a gate leg; its
   // selftest PASS/FAIL lines are read by its own exit code, and no column-keyed consumer reads them.
   { test: (f) => f.startsWith("evals/ab/"), why: "maintainer-only A/B measurement harness, run by hand, never a gate checker" },
+  { test: (f) => f === "scripts/session-cost.ts", why: "maintainer-only spend report (TASK-609), run by hand, emits no finding" },
   {
     test: (f) =>
       f === "scripts/qa-check.sh" || f === "scripts/gen-index.sh" ||
