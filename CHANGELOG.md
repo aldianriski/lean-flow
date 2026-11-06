@@ -16,6 +16,8 @@ status: current
 
 ## [Unreleased]
 
+- **Added (maintainer-only)** — `scripts/session-cost.ts` reports where a repo's Claude Code spend goes; `docs/research/router-mode.md` plans how to test a router against it (TASK-609). No skill changed.
+
 ## v2.21.0 — a repo declares the standards it adopts, and a task names what must not happen (2026-11-06)
 
 **MINOR** — no new skill; the roster stays at 15 and the standard stays at spec 0.19.0. Restart the session after installing.

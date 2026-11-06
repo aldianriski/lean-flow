@@ -68,6 +68,7 @@ A write costs about 40 times a read, so cold starts matter more than the first d
 - **`tools` takes whole tool names,** so a router has no shell at all and every command costs a worker.
 - **The ceiling exists.** `CLAUDE_CODE_AUTO_COMPACT_WINDOW` (100k to 1M) and the agent field `autoCompactWindow` are documented. Where the variable may be set was not confirmed; the launching shell is assumed.
 - **Sprint-to-sprint noise is large.** USD per sprint commit by delivery session runs from 0.82 to 2.21, with one at 7.74. Two unmatched sprints cannot show a 25% change.
+- **Baseline for the ceiling test.** About 1.7 USD per box: 565 USD over 335 boxes, SPRINT-133 to 151, 24 to 31 Oct, 1.2 to 2.7 by session. `scripts/session-cost.ts` repeats the cost side; box counts come from `docs/sprint/INDEX.md`.
 - **A/B fixtures cannot test this lever.** Arm Release slots average 1.54 USD, 175 seconds and 1.45M total cache reads (largest 3.01M). That is too short to reach a 200k context, so the ceiling never fires there and a router's saving is mostly absent.
 
 ## Options considered
@@ -82,7 +83,7 @@ Forecasts for delivery only, on recovered prices. **These are models, not measur
 **A now, B only if earned, C and D rejected.** What is measured is where money goes, not what a change saves. Speed is not promised: gates stay human and disjoint work already runs in parallel. Quality is what can sink B, since a worker knows less than a long session.
 
 ### Plan
-**Step 1 — Ceiling on real work (no extra spend).** Set `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000` in the launching shell for the next two sprints of at least 5 `Done when` boxes. Record cost, elapsed time, close-time gate failures, blocking review findings and owner corrections.
+**Step 1 — Ceiling on real work (no extra spend; approved 2026-11-06, tracked in TASK-609).** Set `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000` in the launching shell for the next two sprints of at least 5 `Done when` boxes. Record cost, elapsed time, close-time gate failures, blocking review findings and owner corrections.
 This is **directional, not proof**: only a large change can show against the noise, and that is acceptable because it is one reversible variable.
 *Keep* if no guard is worse and cost per box is not up. *Revert at once* on any lost decision, wrong rework from a summary, or a quality failure. Either way, record the number with its limit.
 
