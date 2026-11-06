@@ -22,3 +22,6 @@ Composition: TASK-610, TASK-611 and TASK-612 (ready, P2, from the TD-294 intake,
 TASK-612 depends on the other two for shared-file order and the TD-294 flip, and all three join here, so it sits in the second wave. Status moves in `85bcb960`.
 G1 and G2 are not signed; `/orchestrator` signs them.
 promote-check: 10 pass, 0 fail.
+
+### 2026-11-06 | progress | opt-in gate green off-host at the recorded plan_commit
+`gate-remote.ts` ran `45707062`: `QA-CHECK: 507 pass, 0 fail`, `bun test` 589 pass, 0 fail.
