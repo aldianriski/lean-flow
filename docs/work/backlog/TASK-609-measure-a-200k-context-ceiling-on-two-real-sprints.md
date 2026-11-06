@@ -2,6 +2,7 @@
 id: TASK-609
 title: "Measure a 200k context ceiling on the next two real sprints, then decide whether a router trial is worth funding"
 type: feature
+epic: EPIC-024
 priority: P2
 size: S
 risk: med

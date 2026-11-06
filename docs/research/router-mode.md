@@ -6,7 +6,7 @@ status: current
 id: router-mode
 tags: [process, tooling]
 domain: skills
-related: [harness-delta, fog-fleet-orchestration, ADR-001, ADR-010, ADR-044, ADR-053, L-017]
+related: [EPIC-024, harness-delta, fog-fleet-orchestration, ADR-001, ADR-010, ADR-044, ADR-053, L-017]
 ---
 
 # Research — Should lean-flow take DeepSeek's router-and-worker mode, and would it deliver faster and cheaper with quality held?
@@ -83,6 +83,7 @@ Forecasts for delivery only, on recovered prices. **These are models, not measur
 **A now, B only if earned, C and D rejected.** What is measured is where money goes, not what a change saves. Speed is not promised: gates stay human and disjoint work already runs in parallel. Quality is what can sink B, since a worker knows less than a long session.
 
 ### Plan
+Tracked in `docs/epic/EPIC-024-agent-roles-one-by-one.md`, which adds a dispatch-guidance row ahead of the router, at the owner's direction.
 **Step 1 — Ceiling on real work (no extra spend; approved 2026-11-06, tracked in TASK-609).** Set `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000` in the launching shell for the next two sprints of at least 5 `Done when` boxes. Record cost, elapsed time, close-time gate failures, blocking review findings and owner corrections.
 This is **directional, not proof**: only a large change can show against the noise, and that is acceptable because it is one reversible variable.
 *Keep* if no guard is worse and cost per box is not up. *Revert at once* on any lost decision, wrong rework from a summary, or a quality failure. Either way, record the number with its limit.
