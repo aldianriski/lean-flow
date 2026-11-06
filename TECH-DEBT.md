@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-04
+last_updated: 2026-11-06
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2025,3 +2025,24 @@ status: current
   - Impact: trivial; `run-trial.ts` is a single-trial dev CLI the measured driver does not use, and a wrong-model empty reply has
     not been seen.
   - Mitigation: fold into TASK-604 if it touches the same paths; otherwise accept.
+- **TD-293** severity: low | status: open | created: Sprint-163 (close; T2 surprise)
+  - Summary: **The operated migrate route stopped before the Standards question.** On a real-repo copy, an operated migrate halted at its
+    first plan popup: four bundled questions the classifier has no answer for, with Bash and PowerShell reported blocked. The operator
+    can answer the Standards question and its plan item (S81), but that run never got there.
+  - Evidence: SPRINT-163 log, 2026-11-04 surprise entry; `evals/ab/lib/classifier.ts`, `evals/ab/lib/operator.ts`.
+  - Impact: an arm that runs migrate this way may not exercise the question. Whether TASK-607's arm takes this route is unchecked.
+  - Mitigation: settle it at TASK-607's amendment, before its freeze line.
+- **TD-294** severity: low | status: open | created: Sprint-163 (close; T2 and T3 proofs)
+  - Summary: **Three branches of SPRINT-163's rules have never run.** `/task-decomposer` refusing a draft with no scenario; `/triage` holding
+    back a known-cause bug that has no `Negative:` box (each run's agent wrote one); and the draft-back of a named standard, with its
+    `checks: not decided yet` path. The owner ruled the boxes ticked with this stated.
+  - Evidence: SPRINT-163 log, 2026-11-06 entries; TASK-605 and TASK-606 tick notes.
+  - Impact: a wrong branch would first show on a consumer's repo.
+  - Mitigation: exercise each when a later consumer proof passes that way; no dedicated run planned.
+- **TD-295** severity: trivial | status: open | created: Sprint-163 (close; system verify)
+  - Summary: **`gate-remote.ts`'s local bundle step was denied in the default temp directory, cause unknown.** Two consecutive runs failed
+    with `cannot create … lf-gate-<sha>-<pid>.bundle: Permission denied`, after two earlier runs that day had passed. The same `git bundle
+    create` by hand in that directory worked, and the wrapper passed with `TMP`, `TEMP` and `TMPDIR` set to a scratch directory for one run.
+  - Evidence: SPRINT-163 log, close entry; `scripts/gate-remote.ts` (`tmpdir()`).
+  - Impact: trivial; it reported a transport failure and no verdict, which is the safe reading.
+  - Mitigation: scope the temp directory to the one invocation when it recurs; look for the cause only on a repeat.

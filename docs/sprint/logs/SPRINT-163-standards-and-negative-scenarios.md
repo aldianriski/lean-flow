@@ -3,7 +3,7 @@ sprint: 163
 slug: standards-and-negative-scenarios
 owner: Maintainer
 last_updated: 2026-11-06
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -103,3 +103,8 @@ Off-host gate at `04364572`: 496 pass, 0 fail; bun test 589 pass, 0 fail. Boxes 
 ### 2026-11-06 | progress | T2 done: TASK-605 box 2 ticked by owner ruling; every member's boxes ticked
 Owner's interactive migrate on copy `s163-std-c`, pin `310d6164`: the Standards question appeared in one popup only, naming SOLID, clean architecture and a Mermaid diagram per main flow, `None` first; the owner typed "i think not yet, you can check"; the run checked whether a live doc adopts one and skipped; the `coding-standards` diff has no section. That answer left no entry to keep, so the owner ruled by popup that the coordinator proves the re-run clause, replacing the interactive-run ruling for that one clause only. Headless re-run on copy `s163-std-a` (two hand-written entries committed on a proof branch; Sonnet; two sessions; 0.93 USD; prompts never mention the section): the 508-byte section is byte-identical by `cmp`, the plan says it "stays verbatim and isn't asked again", the report marks it settled, and only `coding-standards` changed. Some of its compound Bash commands were denied, so it skipped the backup hash list and its own clean-tree check; neither touches this clause. The draft-back of a named standard never ran in any session; the box does not require it.
 Friction for the Retro: migrate's first plan listed its rulings as prose until the owner typed "ask for clarify so process not stop" (L-002). The scope-change's shortened paths repeat L-257.
+
+### 2026-11-06 | close | 3 of 3 members done, 15 of 15 boxes; Retro written; buckets filed
+System verify before close: full gate off-host at `33f5917d`, qa-check 496 pass, 0 fail; bun test 589 pass, 0 fail. Two earlier attempts at that commit stopped at the wrapper's local bundle step (permission denied in the default temp directory), reported as transport failures and not gate results; a temp directory scoped to the one invocation cleared it (TD-295).
+Buckets: Shipped, the `[Unreleased]` lines plus the signer fix (no release; TASK-607 decides 2.21.0). Tech debt, TD-293, TD-294, TD-295. Follow-ups, TASK-608 (`origin: close-retro`). Learnings, L-290 new and L-257 at count 3. No epic, no handoff entry to reconcile.
+A correction to the T2 entry's friction note: migrate's prose wait at the plan is what `skills/lean-doc-generator/references/migration-map.md` tells an interactive session to do, so the run followed the skill; TASK-608 changes the skill.

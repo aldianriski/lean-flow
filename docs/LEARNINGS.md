@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-04
+last_updated: 2026-11-06
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -120,6 +120,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **cross-check → moved: docs/LEARNINGS.md` § Durable rules › cross-check** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Behavioral Guidelines · learnings: L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198
 
 - **Cross-check a query before acting on it** — a search/count/grep whose result you will act on *immediately* gets a **second query that must agree**: an inverse whose sum is the known total, a count reconciled against a census, or a seeded gap the query must detect. Run it before the conclusion, not after it surprises you. **Why an action and not a caution:** the "match by shape, not substring" rule was promoted, correctly placed and *loaded in context* for all eleven sightings, and reached none — 8 of them ad-hoc queries inside a governance pass, where a wrong answer is acted on with no review between query and conclusion. Every one that was caught was caught by a *disagreeing second number*, never by recalling the rule. A negative control alone is not enough: it proves the query fires on rows it reaches, never that it reached them all (SPRINT-064 T1 — a nested `getline` silently examined 20 of 31 and returned "clean"). **A value entering a *frozen artifact* — an assumption, a DoD, an acceptance threshold — is a query result and gets the same treatment at the moment it is written, then again at execution.** Both grains count: a **figure** (SPRINT-071 wrote `~121` sites into A1; the real number was 39, so the DoD built on it was unsatisfiable the moment it froze) and a **structural claim about another document** (SPRINT-074 froze "the checker reads §14's tables" into three artifacts; §14 has no per-rule table). The guard does not fire on its own because *authoring* feels like planning, not querying — but the number is acted on later, by someone who cannot re-derive it, against a Plan nobody can amend cheaply. A **third grain: an identifier for a new row** — a `TD-NNN`, `TASK-NNN` or `L-NNN` — is a query result too, so **derive the maximum in use; never increment the one you remember**. Twice in one sprint the assumed id was wrong: a register cited `TASK-241`, which was that task's own twin, and a debt row filed as `TD-066` collided with an existing row whose subject was the very bug another task was fixing. Nothing rejects a duplicate id, and a second row with the same number reads as an edit to the first (L-143 ×2). **And derive it with the worktrees excluded** — `.claude/worktrees/` holds complete repo copies during isolated dispatch, so a bare `grep -r` over this repo counts them as content and returns a maximum that is not a row. It has now returned `L-999` (SPRINT-013's deliberate dangling-reference *negative-test token*) twice: once against a real max of `L-168`, once against `L-180` — the second time inside a close Retro, in a session that had already derived two `TD-NNN` correctly minutes earlier, because id-derivation feels like bookkeeping rather than querying. Treat a suspiciously high maximum as contamination before treating it as a row (L-170 ×2). **And the second query must vary the SELECTION rule, not the direction of the count.** An inverse whose two halves sum to the known total proves only that the rows were *partitioned* — both halves run the same selector, so they agree perfectly on the wrong population. SPRINT-098 got `37 open + 60 closed = 97` against a real figure of **5**; SPRINT-099 derived ten archive-exclusion call sites by grepping one predicate SHAPE and cross-checked by grepping the same shape, while an eleventh site written as `grep -v` sat outside what either query could reach — on a live gate leg, failing silently. Both were caught only by a number derived through a *different route*. The cheap tell: would both halves of your check break identically if the selector were wrong? (L-198 ×2). Full family → CONTEXT.md § Gates (L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198).
+
+---
+
+## L-290 [tags: process] [status: active]: **A rule stated in a skill and again in its reference must carry the same condition: a run follows the softer one.** SPRINT-163 T3 wrote "docs/config/spike tasks write `Negative: n/a`" in `skills/task-decomposer/SKILL.md` and "use n/a when no scenario applies" in its reference. Review read both and passed. The consumer proof's docs task carried a real scenario, failing the frozen box as written. Only a run whose prompt never named the rule showed it.
+- seen: 2026-11-06 (SPRINT-163 T3, consumer proof)
+- count: 1
+- promoted: no
+- related: L-007 · TASK-606
 
 ---
 
@@ -379,8 +387,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-257 [tags: sprint-model] [status: promoted]: **A scope-change entry names its paths in full: the leg reads every backticked span as a path, so a shortened path or a backticked folder word reads as undeclared.** SPRINT-144 wrote `humanizer/SKILL.md` and `fact-keep/NOTES.md` in a T1 entry whose `Layers:` held the full paths, and later backticked `todo/`, `in_progress/` and `done/` as prose in a T1+T4 entry; the scope-change leg reddened on both before commit. L-229 and L-234 say what the leg compares; neither says that every backticked token in the body is a candidate path. Write full repo paths in backticks, and plain words for folders mentioned as prose.
-- seen: 2026-10-26 (SPRINT-144 G2, T1 scope-change) · 2026-10-26 (SPRINT-144 close, T1+T4 scope-change)
-- count: 2
+- seen: 2026-10-26 (SPRINT-144 G2, T1 scope-change) · 2026-10-26 (SPRINT-144 close, T1+T4 scope-change) · 2026-11-06 (SPRINT-163 close, T3 scope-change; the gate caught it after commit)
+- count: 3
 - **L-257 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — appended to the scope-change line (L-234's): every backticked span in the body is read as a path, so paths go in full and folder words stay plain prose.
 - related: L-229 · L-234 · TD-263 (fragment corroboration)
 

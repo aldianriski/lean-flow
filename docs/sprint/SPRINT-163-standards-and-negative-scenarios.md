@@ -2,8 +2,8 @@
 sprint: 163
 slug: standards-and-negative-scenarios
 owner: Maintainer
-last_updated: 2026-11-04
-status: active
+last_updated: 2026-11-06
+status: closed
 plan_commit: 3e002777
 gates_signed: G1,G2 @ 059cb506
 update_trigger: sprint execute/close events
@@ -61,7 +61,7 @@ scenario on feature and bug tasks, and G2 names the test that would fail if it b
 is not asked for one.
 
 ## Owner-action checklist
-- [ ] Rule each consumer-proof run's result (T2, T3) when it is shown.
+- [x] Rule each consumer-proof run's result (T2, T3) when it is shown.
 
 ## Decisions (pre-locked)
 - **D1** — Shared files: `CHANGELOG.md` and `README.md` belong to T2 first, then T3, which rebases on T2's lines; T2 and T3 share no
@@ -83,5 +83,42 @@ is not asked for one.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/ab/lib/protocol.ts`, `evals/ab/selftest.ts` | T1 | a thrown G2 signer call makes the attempt `infra:judge-failed`; a real `refuse` still refuses | med | S80 must-FAIL on the unfixed library; selftest 85/85 |
+| `TECH-DEBT.md` | T1 | TD-290 gains the signer for the next arm's amendment | low | check-sprint-by-reference |
+| `skills/lean-doc-generator/templates/development-coding-standards.md.template` | T2 | optional `## Standards adopted`, each entry with scope, reference, checks and exceptions | med | review proofs on a consumer copy |
+| `skills/lean-doc-generator/references/init.md`, `skills/lean-doc-generator/references/migration-map.md` | T2 | ask once, free text, default none, never infer; a re-run keeps entries unasked | med | owner's interactive migrate; headless re-run, section byte-identical |
+| `skills/orchestrator/references/review-scoping.md` | T2 | review applies each entry's checks and exceptions and names the failed check and where | med | four review runs plus a pre-T2 control |
+| `evals/ab/lib/classifier.ts`, `evals/ab/lib/operator.ts`, `evals/ab/selftest.ts` | T2 | the operator can answer the Standards question and the plan item | low | S81 must-FAIL; selftest 86/86 |
+| `skills/task-decomposer/SKILL.md`, `skills/task-decomposer/references/task-file.md`, `skills/task-decomposer/references/fog-map.md` | T3 | a `Negative:` box at validation; docs, config and spike name one when it applies, else n/a | med | consumer proofs, rounds 1 and 2 |
+| `skills/triage/SKILL.md`, `skills/lean-doc-generator/templates/BUG.md.template` | T3 | a bug is not `ready` until it names what must keep working | med | unknown-cause and known-cause reports |
+| `skills/orchestrator/SKILL.md` | T3 | Reachability reads a `Negative:` box and names its test, or a stated judgment tick | med | G2 draft on the feature task |
+| `.claude/CONTEXT.md`, `README.md`, `CHANGELOG.md` | T2, T3 | the task entry shape and the user-visible rules | low | off-host gate |
 
 ## Retro
+
+**Outcome** — 3 of 3 members delivered (TASK-604, TASK-605, TASK-606), 15 of 15 boxes. A repo can declare the standards it adopts and
+have review apply them; a feature or bug task names what must not happen, with its test at G2; a failed signer call no longer lowers an
+arm's score. Consumer-visible, so nothing is released here: TASK-607's arm decides 2.21.0.
+
+**Retrieval check** — yes, one miss. L-257 (scope-change paths in full) was a durable rule and the entry still shortened two paths.
+The gate caught it after commit; counted on L-257 (3).
+
+**Cost** — Codex built T1 for 49k tokens and T2 for 64k; T3's figure was not recorded. Headless proofs 2.66 USD: review 0.30, T3 rounds
+1.04 and 0.39, migrate re-run 0.93. The owner's interactive migrate sessions were not costed. Claude session tokens: not available.
+
+**Worked**
+- Prompts that never named the rule made a failure visible: the docs task's real scenario is what exposed the two wordings.
+- A second run on a known-cause bug reached the `ready` check the first run went around.
+- Reading the owner's transcripts and the file settled "migrate applied", and showed one clause still had no subject.
+
+**Friction**
+- Migrate's plan waits in prose by design, so the owner typed "ask for clarify so process not stop" to get popups (TASK-608).
+- The 2026-11-04 entry recorded T2's and T3's reviews as prose, so the gate reddened two days later on a missing `review ·` line.
+- Fixing the scope-change path meant editing a past Log entry, since an appended correction leaves the leg red.
+- The gate's local bundle step was denied twice in the default temp directory (TD-295).
+
+**Pattern candidate**
+- L-290: a rule stated in a skill and again in its reference must carry the same condition; a run follows the softer one.
+
+**Buckets** — Shipped: two `[Unreleased]` consumer lines plus the signer fix (no release). Tech debt: TD-293, TD-294, TD-295 (filed).
+Follow-ups: TASK-608 (`origin: close-retro`). Learnings: L-290 (new), L-257 (count 3). TASK-607 gains a line on TD-293.

@@ -39,6 +39,7 @@ TASK-602's judge fix).
   margin is decided there, before any trial.
 - About 50 minutes at three workers and about 50 USD (Release cost about 50 USD at two workers); the arm runs unattended with a
   notification after its pilot is approved.
+- Whether this arm's migrate route reaches the Standards question is unchecked (TD-293); settle it at the amendment, before the freeze line.
 - **blocked-by:** TASK-605 and TASK-606 both done.
 
 ## Tracker
