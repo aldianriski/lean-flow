@@ -85,3 +85,7 @@ operation; a Mermaid diagram per main flow). Violating (`ApiError(500, 'INTERNAL
 Exception (a 400 with a field list): PASS, citing the exception. Copy B (no section) with the violating diff: FAIL on the
 error-handling convention, no adopted standard named; the pre-T2 procedure on the same input gave the same findings and verdict.
 Cost about 0.30 USD for the five runs. The killed and stopped migrate runs' cost was not reported by the harness.
+
+### 2026-11-06 | scope-change | T3: TASK-606 boxes 1 and 4 reworded: a docs, config or spike task names a scenario when one applies, otherwise the n/a box
+What broke: the consumer proof's docs task (TASK-089 on copy `s163-std-b`, plugin pin `d77e801b`) carried a real scenario ("the page does not claim the rehearsal restores production") instead of the `Negative: n/a: docs only` box 4 required. `task-decomposer/SKILL.md` said docs tasks write n/a; `references/task-file.md` said n/a "when no scenario applies". Owner ruling (popup, 2026-11-06): the second rule holds. Never refused, never silent, which keeps the 2026-11-04 ruling's "never a silent judgement".
+Impact: boxes 1 and 4 reworded; one line in `task-decomposer/SKILL.md` and the README and CHANGELOG wording aligned; no new file. Owner also asked for a run with a docs task that has nothing to guard, and a triage run on a known-cause bug so the `ready` path's check fires. G2 re-confirmed by the same popup.

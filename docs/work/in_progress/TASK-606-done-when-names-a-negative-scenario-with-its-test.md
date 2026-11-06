@@ -26,12 +26,13 @@ ruling). ADR-053 ruling: skill work, unfrozen; G2's existing Reachability line r
 ## Done when
 - [ ] `/task-decomposer` validation fails a `feature` or `bug` task whose Done-when names no negative scenario (what must not
       happen, or the failure path and its observable result); a `debt` task needs one only when it changes observable behaviour,
-      and a docs, config or spike task carries `Negative: n/a: <reason>` instead of a scenario.
+      and a docs, config or spike task names a scenario when one applies, otherwise carries `Negative: n/a: <reason>`.
 - [ ] A bug filed by `/triage` (the bug intake path, also run by `/flow`) is not marked `ready` until its Done-when names what
       must keep working after the fix; shown once on a real bug report.
 - [ ] G2 treats each negative scenario as a criterion under Reachability, and its verification names the test that would fail if
       that behaviour broke; a negative scenario with no such test stays a judgment tick and says so.
-- [ ] Negative: a docs task decomposed after the change carries `Negative: n/a: docs only` instead of a scenario and is not refused.
+- [ ] Negative: a docs task decomposed after the change is not refused: it carries a scenario when one applies, otherwise
+      `Negative: n/a: <reason>`, never no box at all.
 - [ ] Shown on a consumer repo copy through a pinned clone: a decomposed feature task carries its negative scenario, and that
       task's G2 names the test for it.
 - [ ] CONTEXT.md § Task entry shape, README and CHANGELOG `[Unreleased]` reflect the rule.
