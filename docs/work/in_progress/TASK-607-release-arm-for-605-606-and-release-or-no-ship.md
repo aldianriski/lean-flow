@@ -25,11 +25,11 @@ Medium for the operator and classifier routing, the Standards setup and review, 
 enforcement, since reading cannot show how often they add turns, cost or rejections. The exception covers this release only; D19 stands.
 
 ## Done when
-- [ ] The one-time D19 exception is recorded here and in the CHANGELOG entry, with the owner's reason and Codex's verdict.
-- [ ] Every versioned manifest and the README footer read 2.21.0, derived with `grep -l '"version"' .*-plugin/*.json`.
-- [ ] CHANGELOG has the 2.21.0 entry, says no arm measured it, and `[Unreleased]` is emptied into it.
-- [ ] The off-host gate is green at the release commit, and nothing is pushed.
-- [ ] Negative: no trial runs for this release, and TD-289 and TD-290 stay open for the next arm's amendment.
+- [x] The one-time D19 exception is recorded here and in the CHANGELOG entry, with the owner's reason and Codex's verdict. ✓ 1b1e1a6e
+- [x] Every versioned manifest and the README footer read 2.21.0, derived with `grep -l '"version"' .*-plugin/*.json`. ✓ four manifests and the footer, 1b1e1a6e
+- [x] CHANGELOG has the 2.21.0 entry, says no arm measured it, and `[Unreleased]` is emptied into it. ✓ 1b1e1a6e; v2.19.x rotated (§11)
+- [x] The off-host gate is green at the release commit, and nothing is pushed. ✓ gate at 1b1e1a6e: 487 pass, 0 fail; bun test 589 pass, 0 fail; push is the owner's
+- [x] Negative: no trial runs for this release, and TD-289 and TD-290 stay open for the next arm's amendment. ✓ no trial ran; both rows open
 
 ## Touches
 `CHANGELOG.md` · `.claude-plugin/` · `.codex-plugin/` · `.kimi-plugin/` · `README.md`
