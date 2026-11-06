@@ -24,7 +24,7 @@ status: current
 **Not confirmed:**
 - [A convention the scan could not settle — asked, not assumed]
 
-## Standards adopted [CUSTOMIZE — delete this section if the repo adopts none]
+## Standards adopted [CUSTOMIZE]
 <!-- Belongs: standards the owner explicitly adopts, with scope, an authoritative reference,
      concrete yes/no checks and exceptions. Entries come only from the owner's answer, never
      inferred from code. Does not belong: assumed standards or invented checks. Omit this entire

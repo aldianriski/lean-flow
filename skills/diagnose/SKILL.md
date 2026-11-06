@@ -81,7 +81,7 @@ reddens nothing has tested nothing. Prove the restore the same way.
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or the absence of a seam is documented)
 - [ ] All `[DEBUG-…]` instrumentation removed (grep the prefix); throwaway harnesses deleted
-- [ ] The bug item, when one exists, carries `## Root cause` · `## Fix` · `## Regression test` · `## Prevention`; new evidence goes redacted into `docs/work/evidence/TASK-NNN/`
+- [ ] The bug item, when one exists, carries `## Root cause` · `## Fix` · `## Regression test` · `## Prevention`, and a `Negative:` box in `## Done when` naming what the regression test pins if it has none; new evidence goes redacted into `docs/work/evidence/TASK-NNN/`
 - [ ] The winning hypothesis is stated in the commit / PR message (passed through `/humanizer` embedded mode: commit `plain`, PR body `markdown` → the humanizer skill's `references/embedded.md` § Commit messages and PR bodies) — so the next debugger learns
 
 **Then ask: what would have prevented this?** If the answer is architectural (no good seam, tangled

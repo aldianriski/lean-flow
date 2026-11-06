@@ -63,7 +63,7 @@ export function answerFor(q: Question, files: Files, rules: Rule[]): Answer {
   const excl = rules.filter((r) => r.exclusive && !(r.topicHeaderExempt && topicHeader) && ((r.match.lastIndex = 0), r.match.test(q.question)));
   if (excl.length === 1) return { answer: excl[0]!.answer, source: excl[0]!.source };
   if (excl.length > 1) return { stop: `${named} matches several exclusive run rules (${excl.map((r) => r.source).join("; ")}); the operator never guesses` };
-  if (/^standards(?: question)?$/i.test(q.header.trim()) || /\bstandards adopted\b|\badopt(?:s|ed)? (?:named |engineering )?standards?\b/i.test(q.question)) {
+  if (/^standards(?: question)?$/i.test(q.header.trim()) || /\badopt(?:s|ed)? (?:any )?(?:named |engineering )?standards?\b/i.test(q.question)) {
     return { answer: standardsAnswer(files.operator), source: "operator § Setup answers: standards" };
   }
   for (const r of rules) {

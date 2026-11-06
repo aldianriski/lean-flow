@@ -3309,6 +3309,11 @@ check("S81 standards answers route verbatim, default to none, and stay inside th
   }
   const plan = await classify({ header: "Plan", question: "Apply ## Standards adopted and archive README.md?" }, buildCatalog({ repo: "", operator: "" }, [PLAN_RULING]), async () => '{"id":"PLAN","reason":"plan approval"}');
   assert("answer" in plan && plan.answer.includes("## Standards adopted") && plan.answer.includes("Decline every other item, including archiving"), "plan applies Standards adopted and declines unrelated archiving");
+  const adopting = { repo: "", operator: `## Setup answers\n- standards: ${entry}\n` };
+  const live = answerFor({ header: "Profile", question: "Does this repo adopt any named standards (for example SOLID)?" }, adopting, []);
+  assert("answer" in live && live.answer === entry, "the question as a real migrate worded it gets the standards answer under any header");
+  const unrelated = answerFor({ header: "Plan", question: "Apply ## Standards adopted and archive README.md?" }, adopting, []);
+  assert(!("answer" in unrelated && unrelated.answer === entry), "a plan question that only names the section never gets the adoption answer");
 });
 
 const onlyIdx = process.argv.indexOf("--only");

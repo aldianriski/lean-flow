@@ -63,7 +63,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 4. **Re-rank** — re-evaluate each task's `priority:` (P0–P3, by impact × urgency); propose moves with a one-line reason each. Sequence is then **derived** (§ Order), never hand-set.
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
 6. **State** — set `state:` `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
-   A bug is never `ready` without that `Negative:` box (step 3); until it has one it is `needs-info` with that `open:` line.
+   A bug does not move to `ready` without that `Negative:` box (step 3); until it has one it is `needs-info` with that `open:` line. A bug already `ready` is not demoted for lacking one.
 7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then move the task file `backlog/ → cancel/` — `git mv` in the git case, a plain move with no git (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
 8. **Output** — the groomed backlog in derived order + a **ready-to-promote shortlist** (that order, `ready` only) + **uncovered epic conditions and roadmap rows**, one line each:
    `EPIC-NNN · "<condition, ~60 chars>" · uncovered (unmarked | stale: TASK-NNN done/cancelled | missing: TASK-NNN)`; a row: `roadmap · P2a · "<outcome, ~60 chars>" · uncovered (… | stale: EPIC-NNN not active)`.
