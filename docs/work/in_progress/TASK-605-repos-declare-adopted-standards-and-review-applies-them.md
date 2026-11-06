@@ -26,7 +26,7 @@ work, unfrozen; no checker, gate leg or ledger is added.
 ## Done when
 - [x] The coding-standards template has an optional `## Standards adopted` section; each entry gives the standard, its scope, an ✓ 3ea9b762 (template, 67 lines)
       authoritative reference, concrete yes/no checks, and exceptions. A repo that adopts none has no such section.
-- [ ] `init` and `migrate` ask once whether the repo adopts a named standard (free text with examples, default none) and never
+- [x] `init` and `migrate` ask once whether the repo adopts a named standard (free text with examples, default none) and never ✓ owner's interactive migrate on s163-std-c: asked once, nothing inferred, none wrote nothing; headless re-run on s163-std-a: section byte-identical, not asked again (owner ruled 2026-11-06)
       infer one; "none" writes nothing, and a re-run of `migrate` keeps the entries already there.
 - [x] Review's Standards axis checks the diff against each adopted entry's checks and names the failed check and where it fails, ✓ review proofs on a copy, pinned clone ae92652c: violating → `Errors carry context · … · server/companyProfile.ts:99`, FAIL; exception → PASS citing it (owner ruled)
       never only the standard's name; a case listed under the entry's exceptions passes.
