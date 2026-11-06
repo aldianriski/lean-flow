@@ -12,6 +12,7 @@ authority: J2
 origin: close-retro
 state: ready
 depends-on: []
+gates_signed: G1 @ 07e2c1b6
 ---
 
 # TASK-608 — Make an interactive migrate raise its plan approval and rulings as a popup
