@@ -65,6 +65,7 @@ row → say so and offer `/lean-doc-generator roadmap` (create) or plain decompo
 6. **Validate** — every task has an observable acceptance criterion ("done when …"); no two tasks share identical criteria (merge or differentiate). For multi-slice breakdowns, run the **breakdown quiz** (reference) — confirm granularity, dependencies, merge/split, HITL/AFK — before Write.
    **Negative scenario** — a feature/bug task, or a debt task that changes observable behaviour, needs a `Negative:` box: what must
    not happen, or a failure path and its observable result; docs/config/spike tasks name one when it applies, else write `Negative: n/a: <reason>` (never a silent exemption; shape → `references/task-file.md`).
+   A draft that needs this box and names no scenario is not written on that `approve`: show the drafted box, write nothing, and wait for a fresh `approve`; the earlier one never covered a box added after it.
    A draft someone reviews before `approve` runs that review under `orchestrator/references/review-scoping.md` § Draft reviews (at most two rounds).
 7. **Write** — after the layout check above (v1/mixed stops here) and only after the human types `approve`, write **one file per task** to `docs/work/backlog/TASK-NNN-<slug>.md`, blockers first.
    Id = max in use across all six status folders + 1; shape + id rule → `${CLAUDE_SKILL_DIR}/references/task-file.md`. Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.

@@ -80,6 +80,7 @@ gates_signed: G1,G2 @ 1a2b3c4d     # optional — written by /orchestrator, neve
 ```
 
 - **Negative:** feature/bug and behaviour-changing debt tasks need a scenario; docs/config/spike and debt with no observable behaviour change use `- [ ] Negative: n/a: <reason>` when no scenario applies; bugs name what must keep working after the fix, not just the repro.
+  A draft that needs this box and names no scenario is not written on that `approve`: show the drafted box, write nothing, and wait for a fresh `approve`; the earlier one never covered a box added after it.
 - **No `status:` field, no `sprint:`.** The folder is the status; `sprint:` is stamped at promote.
 - **`type:` shapes the body.** A `bug` item adds the bug sections from the bug template (symptom, repro, expected, actual,
   evidence; root cause, fix, regression test and prevention after `/diagnose`); a `debt` item cites its `TD-NNN`.
