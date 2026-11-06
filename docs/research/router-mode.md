@@ -6,7 +6,7 @@ status: current
 id: router-mode
 tags: [process, tooling]
 domain: skills
-related: [EPIC-024, harness-delta, fog-fleet-orchestration, ADR-001, ADR-010, ADR-044, ADR-053, L-017]
+related: [harness-delta, fog-fleet-orchestration, ADR-001, ADR-010, ADR-044, ADR-053, L-017]
 ---
 
 # Research — Should lean-flow take DeepSeek's router-and-worker mode, and would it deliver faster and cheaper with quality held?
