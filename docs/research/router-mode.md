@@ -59,7 +59,8 @@ Only the 11 sessions classed as delivery count below; a session with 25% or more
 | Everything else, mostly subagents | 113 | 19% |
 | **Total** (components rounded) | **590** | |
 
-- **Recovered prices** (USD per million, read, write, output): Opus 0.20, 8.06, 20.42; Opus 1M 0.18, 7.80, 25.26; Sonnet 0.09, 2.41, 14.55. Delivery sessions used both Opus variants, so its reads average about 0.20. A write costs about 40 times a read, so cold starts matter more than the first draft of this plan assumed.
+- **Recovered prices** (USD per million, read, write, output): Opus 0.20, 8.06, 20.42; Opus 1M 0.18, 7.80, 25.26; Sonnet 0.09, 2.41, 14.55. Delivery sessions used both Opus variants, so its reads average about 0.20.
+A write costs about 40 times a read, so cold starts matter more than the first draft of this plan assumed.
 - **Long context is the cost.** Across all sessions, 78% of main-thread turns ran above 200k and they carry 91% of cache-read USD; 400k and up carries 61%. Delivery main-thread turns read 367k each; subagent turns across all sessions read 96k.
 - **The dispatch rule does not hold.** Main threads across all sessions made 4,915 Bash, 630 Edit and 418 Write calls against 323 Agent calls. Some of that is gate running and bookkeeping that a worker would still have to do and pay for.
 - **A router can be enforced.** On a scratch repo, under 0.02 USD: a plugin agent run with `claude --agent spike:router` and `tools: Read, Glob, Grep, Agent, AskUserQuestion, SendMessage` answered `NO_SHELL_TOOL` to a shell request and wrote no file, while a subagent it
@@ -72,7 +73,8 @@ Only the 11 sessions classed as delivery count below; a session with 25% or more
 ## Options considered
 Forecasts for delivery only, on recovered prices. **These are models, not measurements,** and leave out rework.
 - **A — Context ceiling at 200k.** Reads fall to about 90 USD at a 120k average (unvalidated), and writes rise 30% (a guess) to 174, netting **about −25%.** Summaries, re-reads and lost detail are not priced. *Trade-off:* no speed gain; can be undone by unsetting one variable.
-- **B — Router, 70% of main turns moved.** Router 125k per turn, workers at 96k and 7.3k writes per turn: **about −50% with Sonnet workers, about −25% with Opus workers,** before dispatch turns, reports and retries, none of which the spike measured. *Trade-off:* the saving depends on the cheaper tier, which is where quality could go.
+- **B — Router, 70% of main turns moved.** Router 125k per turn, workers at 96k and 7.3k writes per turn: **about −50% with Sonnet workers, about −25% with Opus workers,** before dispatch turns, reports and retries, none of which the spike measured.
+*Trade-off:* the saving depends on the cheaper tier, which is where quality could go.
 - **C — The video's roster.** Duplicates the delta table's first three rows; fails ADR-001.
 - **D — Run the prototype.** Needs DSH, tmux, an agent GitHub account and full OS-user access; Windows only through an unofficial fork. No gain to lean-flow.
 
@@ -84,14 +86,19 @@ Forecasts for delivery only, on recovered prices. **These are models, not measur
 This is **directional, not proof**: only a large change can show against the noise, and that is acceptable because it is one reversible variable.
 *Keep* if no guard is worse and cost per box is not up. *Revert at once* on any lost decision, wrong rework from a summary, or a quality failure. Either way, record the number with its limit.
 
-**Step 2 — Decide whether a router trial is worth funding (tokens only).** Re-run the attribution with the ceiling on. *Continue only if* a complete-cycle forecast, including dispatch, reports, cold starts and retries, still shows at least 20% of delivery cost, from one real task run through a local router. *And only if* the owner has already ruled how a passing router would be released, by a funded arm or an exception, since a pass with no release path wastes the spend. Otherwise stop, and mark this doc final.
+**Step 2 — Decide whether a router trial is worth funding (tokens only).** Re-run the attribution with the ceiling on.
+*Continue only if* a complete-cycle forecast, including dispatch, reports, cold starts and retries, still shows at least 20% of delivery cost, from one real task run through a local router.
+*And only if* the owner has already ruled how a passing router would be released, by a funded arm or an exception, since a pass with no release path wastes the spend. Otherwise stop, and mark this doc final.
 
 **Step 3 — Matched replay (the only proof, paid, budget set by the owner beforehand).** Rebuild one closed multi-task sprint from its `plan_commit`, twice each: ordinary session, and router with `SendMessage` reuse, both under the same ceiling so only routing differs.
-Same frozen `Done when`, same model tiers declared up front, same gate. Rough cost 60 to 100 USD from the 1.48 USD per sprint commit seen here; set a hard cap. *Go* only if both router runs cost at least 25% less, elapsed time is no worse, and every acceptance box, the gate and review all pass. *Anything else, including inconclusive, is no-go:* record it and stop. Four runs can only show a large effect, and that is the only effect worth shipping for.
+Same frozen `Done when`, same model tiers declared up front, same gate. Rough cost 60 to 100 USD from the 1.48 USD per sprint commit seen here; set a hard cap. *Go* only if both router runs cost at least 25% less, elapsed time is no worse, and every acceptance box, the gate and review all pass.
+*Anything else, including inconclusive, is no-go:* record it and stop. Four runs can only show a large effect, and that is the only effect worth shipping for.
 
-**Step 4 — Ship opt-in, if and only if Step 3 passed.** A plugin `agents/router.md`, one ADR, and wiring in `/flow`, `/prime`, CONTEXT and README. Before release: prove a clean plugin install, prove `/orchestrator` and `/flow` behave the same without the agent, and prove a Codex or Kimi host falls back to the skills. Adding wiring means "defaults unchanged" is a requirement to test, not a given. D19 was settled at Step 2.
+**Step 4 — Ship opt-in, if and only if Step 3 passed.** A plugin `agents/router.md`, one ADR, and wiring in `/flow`, `/prime`, CONTEXT and README.
+Before release: prove a clean plugin install, prove `/orchestrator` and `/flow` behave the same without the agent, and prove a Codex or Kimi host falls back to the skills. Adding wiring means "defaults unchanged" is a requirement to test, not a given. D19 was settled at Step 2.
 
-**Facts to watch in Step 3.** A worker per command may cost more than it saves: count spawns and reuse. A worker's blocking question returns to the router, which asks by popup and resumes that worker. Gate judgment stays on Opus (ADR-010); only the mechanical run of a gate goes to a worker. 37 worktrees are registered today, so reaping comes before more parallel work. Background workers cannot prompt, so permissions come first.
+**Facts to watch in Step 3.** A worker per command may cost more than it saves: count spawns and reuse. A worker's blocking question returns to the router, which asks by popup and resumes that worker. Gate judgment stays on Opus (ADR-010); only the mechanical run of a gate goes to a worker.
+37 worktrees are registered today, so reaping comes before more parallel work. Background workers cannot prompt, so permissions come first.
 
 **Rule fit.** ADR-044 admits an agent; this measured cost and dispatch failure are an ADR-053 basis to investigate; ADR-001 still requires shown incremental use before adding one.
 
