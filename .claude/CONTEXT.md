@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-25
+last_updated: 2026-11-06
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
