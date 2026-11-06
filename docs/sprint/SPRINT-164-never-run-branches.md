@@ -32,7 +32,7 @@ reason); an owner override for a feature with no scenario; TD-295.
 ## Plan
 
 ### T1 — Run the standards draft-back on init and migrate, and fix what it exposes `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/migration-map.md` · `skills/orchestrator/references/review-scoping.md` · `skills/lean-doc-generator/templates/development-coding-standards.md.template` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md`
+Layers: `skills/lean-doc-generator/references/migration-map.md` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md`
 Depends-on: none
 Cites: TASK-610 · TD-294 · TD-293 · SPRINT-163 T2 · owner rulings 2026-11-06
 This is the only slice whose route is unproven, since TD-293's operated migrate stopped at its plan popup, so it runs first. The
@@ -97,6 +97,8 @@ evidenced one reaches `ready` citing it; TD-294 moves to `resolved` citing all t
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/lean-doc-generator/references/migration-map.md` | TASK-610 | Spell out the undecided-checks marker and require the report labels word for word; a run showed `migrate` missing both | low | R2 before and after on pins |
+| `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` | TASK-610 | Name the rule; TD-294 `Runs:` line; TD-296 for two label gaps | low | gate |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->

@@ -39,3 +39,24 @@ G1 fast path: scope unchanged since approval. G2 design, all three tasks J2, HIT
 - T2 runs: D1 no scenario, D1b fresh approve, D2 scenario named, D3 docs with nothing to guard. A1 confirmed: 136 lines today, at most 138.
 - T3 runs: B1 known cause outside the checkout (A4's pick: the copy's code can always suggest a neighbour for a bug inside it); B2 one session with an evidenced bug, an unknown cause and a seeded `ready` bug. A1 confirmed: 132 lines, edits inside existing lines. Box 2 runs through the report; the code path is not run.
 Every box is a judgment tick or a stated query on a run's artifact (`check-verify-reaches`: 0 mechanical `Verify:` clauses). The owner rules each result when shown.
+
+### 2026-11-06 | progress | T1 before-run on pin `022ba994`: init passes, migrate misses the marker and the report label
+R1 `init` (`s164-init`, SOLID plus one standard with checks): draft shown, one further ask naming SOLID, before the first Write; `checks: not decided yet (owner, init)` count 1; the entry with checks not asked again. R2 `migrate` (`s164-mig`, SOLID only): draft and one ask before any doc write, but all four fields read `not decided yet` with the citation at the line's end (`(owner, migrate)` marker count 0), and the report described the topic in prose. R3b re-run: SOLID `cmp` same, no Standards question. R4 `init` with `none`: no section. R5 and R5b scoped reviews: both failed `Errors carry context`, neither failed anything under SOLID, both said SOLID has no check to run.
+A2 confirmed: every ask was answered through `--ruling`, no `evals/ab/` change. A3 disproved: review says so without a clause. A5 confirmed: copies from `cf41a20`, `D:\Research\workdoo` hashed before (1242 files).
+
+### 2026-11-06 | surprise | R3's first attempt stopped on a multi-select popup the classifier had no entry for
+Exit 3 on "Sections"; R3b added one more `--ruling` and ran through. Also: the classifier answered the overview cap popup with CLEANUP, so `## Stack` was not added on either migrate run. A harness side effect, not this branch.
+
+### 2026-11-06 | progress | T1 fix `f94bdef1`: owner ruled "fix both"; Codex 2 rounds; gate green; re-run passes
+Two lines in `migration-map.md`, then a third after Codex round 1 found a standard with checks absent could still be labelled `asked (answered)`. Round 2 OK on all items. Gate on `f94bdef1`: 589 bun tests, qa-check 508 pass, 0 fail.
+R2-after (`s164-mig2`, pin `f94bdef1`): the popup's preview showed the draft and one ask named SOLID's checks, before any doc edit (only migrate's inventory script was written first, in temp). `checks: not decided yet (owner, migrate)` count 1; report row `Standards adopted: SOLID | asked (not decided yet)`.
+The fix changed the entry's shape, so one review re-ran on it (R5c, beyond the single re-run the ruling named, stated to the owner): failed `Errors carry context` at `server/companyProfile.ts:43`, nothing under SOLID, and "its checks are 'not decided yet', so there is nothing to check against". R3b's `cmp` stays on the old shape, stated to the owner.
+The report said two rows fit no label; filed as TD-296 with the mixed-answer case, on the owner's ruling.
+consequence · T1 · behaviour:material · governance:low
+review · T1 · Codex read-only review of the rule text (a different model from the writer), 2 rounds, 1 finding fixed · behaviour:material · governance:low
+
+### 2026-11-06 | scope-change | T1 drops three unused paths from its Layers (TASK-610 box 6 needed one skill file)
+The runs exposed one defect, in `skills/lean-doc-generator/references/migration-map.md`. `skills/lean-doc-generator/references/init.md`, `skills/orchestrator/references/review-scoping.md` and `skills/lean-doc-generator/templates/development-coding-standards.md.template` were declared for a defect no run showed, so T1's `Layers:` drops them (L-240). No Done-when text changed.
+
+### 2026-11-06 | progress | T1 done: owner accepted the result and ruled TD-296 filed
+TASK-610's seven boxes ticked after that ruling.

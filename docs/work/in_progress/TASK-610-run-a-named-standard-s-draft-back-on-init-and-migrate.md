@@ -23,13 +23,13 @@ on a consumer's repo. Build this slice first: it is the only one whose route is 
 plan popup). ADR-053: a defect fix in shipped skill text, unfrozen.
 
 ## Done when
-- [ ] On an operated `init` and an operated `migrate`, each on a repo copy with code, the answer naming a standard with no checks gets its drafted entry shown back before anything is written, and one more ask for its checks.
-- [ ] With checks still absent, coding-standards carries the entry with `checks: not decided yet (owner, init)` or `(owner, migrate)`, and migrate's report lists the topic as `asked (not decided yet)`.
-- [ ] A review of a diff on that copy, given the section as its comparand, reports no failed check under the undecided standard, and the report says the standard was not checked; a second adopted entry with real checks on the same copy still fails its violating diff.
-- [ ] A `migrate` re-run keeps the undecided entry byte-identical (`cmp`) and does not ask again.
-- [ ] Negative: no run invents a check; `none` writes no section; a standard answered with its checks is not asked again.
-- [ ] Every defect found is fixed in the skill text and re-shown on a new pin, or filed as `TD-NNN` with its reason; TD-294 records the runs, pins and result for this branch.
-- [ ] CHANGELOG `[Unreleased]` and README name any user-visible change.
+- [x] On an operated `init` and an operated `migrate`, each on a repo copy with code, the answer naming a standard with no checks gets its drafted entry shown back before anything is written, and one more ask for its checks. ✓ R1 init on pin `022ba994` and R2-after migrate on `f94bdef1`: draft shown, one further ask naming SOLID, before any doc write (tool order from each transcript; migrate's temp inventory script came first)
+- [x] With checks still absent, coding-standards carries the entry with `checks: not decided yet (owner, init)` or `(owner, migrate)`, and migrate's report lists the topic as `asked (not decided yet)`. ✓ `init` count 1 (R1), `migrate` count 1 on `f94bdef1` (0 before the fix); R2-after report row `asked (not decided yet)`
+- [x] A review of a diff on that copy, given the section as its comparand, reports no failed check under the undecided standard, and the report says the standard was not checked; a second adopted entry with real checks on the same copy still fails its violating diff. ✓ R5c on the shipped entry, `f94bdef1`: failed `Errors carry context` at `server/companyProfile.ts:43`, nothing under SOLID, said it has nothing to check; R5 and R5b agree on the old shape
+- [x] A `migrate` re-run keeps the undecided entry byte-identical (`cmp`) and does not ask again. ✓ R3b on `s164-mig`, pin `022ba994`: SOLID `cmp` same, no Standards question; on the old entry shape, stated to the owner at the ruling
+- [x] Negative: no run invents a check; `none` writes no section; a standard answered with its checks is not asked again. ✓ judgment tick: R1 and R2-after entries trace to the answer or carry the marker; R4 `## Standards adopted` count 0; R1's further ask names SOLID only
+- [x] Every defect found is fixed in the skill text and re-shown on a new pin, or filed as `TD-NNN` with its reason; TD-294 records the runs, pins and result for this branch. ✓ one defect, fixed in `f94bdef1` and re-shown; two label gaps filed as TD-296 on the owner's ruling; TD-294 `Runs:` line added
+- [x] CHANGELOG `[Unreleased]` and README name any user-visible change. ✓ CHANGELOG `[Unreleased]` Fixed bullet; README one line under Standards adopted
 
 ## Touches
 `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/migration-map.md` ·
