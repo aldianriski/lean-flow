@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-11-06
-update_trigger: Step 1 or Step 2 results arrive, or a step's stop rule fires
+update_trigger: A trial in EPIC-024 reports, or its stop rule fires
 status: current
 id: router-mode
 tags: [process, tooling]
@@ -13,8 +13,9 @@ related: [harness-delta, fog-fleet-orchestration, ADR-001, ADR-010, ADR-044, ADR
 
 > **Question.** The owner wants faster and cheaper delivery at the same quality. Does a session that only routes, with workers doing all
 > execution, achieve that on lean-flow, judged as a delta over what already ships (L-017)?
-> **Verdict.** Not proven, and not yet worth funding. Try a context ceiling first, since it is reversible and needs no component. Fund a matched
-> router replay only if a credible saving remains and the owner has settled the release budget. Do not build the video's agent roster. Reviewed by Codex in two rounds: three High and five Med in round 1, CLEAR in round 2.
+> **Verdict.** Yes in part, for a different reason than DeepSeek's. The router alone will not do it: lean-flow's cost comes from one session doing all planning reads and all execution.
+> Make the coordinator small first (a worker contract, planning reads in workers, a light `/prime`), and fund a router replay only if a saving remains. A context limit is the wrong test. Do not build the video's roster.
+> Amended 2026-11-06 after measuring a real session; the first plan's Step 1 is withdrawn. Codex reviewed each version.
 
 ## Why this matters
 Most of delivery spend is one long session re-reading and re-writing its own context. Guessing wrong either ships an agent that costs
@@ -82,25 +83,26 @@ Forecasts for delivery only, on recovered prices. **These are models, not measur
 ## Recommendation
 **A now, B only if earned, C and D rejected.** What is measured is where money goes, not what a change saves. Speed is not promised: gates stay human and disjoint work already runs in parallel. Quality is what can sink B, since a worker knows less than a long session.
 
+### Amended 2026-11-06: what one real session showed
+Session `f0e86365`, Opus, `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000`, 42 turns, in intake and promote only. The owner challenged the limit, and the numbers agree.
+- **The limit fired near 170k, not 200k, and context returned to about 108k.** That leaves about 60k of room, used in about 20 turns.
+- **Each compaction costs real money and time:** 55 seconds, a 0.60 USD re-write on the next turn, and the summary call, which the transcript does not show (about 0.15 USD, estimated). Two so far: about 1.20 USD of 4.88 USD.
+- **Option A's 25% was too high.** Reads at the 200k limit plus compaction come to about 0.066 USD per turn against 0.073 with no limit: about 11% on reads, with the summary call's cost estimated. Reads are 47% of delivery spend, so about 5% of total if nothing else moves. 300k models near 30% on reads, assuming 3k growth per turn. These are models from one session.
+- **The floor is set before any build.** Start 64k, after `/prime` 83k (the median of 10 sessions), after `/task-decomposer` 152k. Skill bodies and `CONTEXT.md` are about 20k of that growth; the rest is reads for this task and the session's own drafting. A simpler task would read less, unmeasured.
+- **Later growth probably comes from inline execution:** past main threads averaged 367k per turn. This session has not reached a build, so that is not established, and the first build step has no baseline yet.
+- **Subagents cannot use `AskUserQuestion`** (documented), and a resumed subagent keeps its history. So a stage run in a worker must return its question to the coordinator. `context: fork` skills exist, but do not see the conversation.
+
 ### Plan
-Tracked in `docs/epic/EPIC-024-agent-roles-one-by-one.md`, which adds a dispatch-guidance row ahead of the router, at the owner's direction.
-**Step 1 — Ceiling on real work (no extra spend; approved 2026-11-06, tracked in TASK-609).** Set `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000` in the launching shell for the next two sprints of at least 5 `Done when` boxes. Record cost, elapsed time, close-time gate failures, blocking review findings and owner corrections.
-This is **directional, not proof**: only a large change can show against the noise, and that is acceptable because it is one reversible variable.
-*Keep* if no guard is worse and cost per box is not up. *Revert at once* on any lost decision, wrong rework from a summary, or a quality failure. Either way, record the number with its limit.
+Tracked in `docs/epic/EPIC-024-agent-roles-one-by-one.md`, one change per trial, each landing a sprint apart:
+1. A worker contract and coordinator rules.
+2. Decompose and promote doing their reading in workers, with an intake brief that carries conversation-only intent, constraints and approvals.
+3. A light `/prime`, only after each stage names and loads what it needs, since it removes context downstream skills assume is there.
+4. The router, by one real task and then the matched replay below, only if a complete-cycle forecast still shows at least 20% of delivery cost and the owner has ruled how it would be released.
 
-**Step 2 — Decide whether a router trial is worth funding (tokens only).** Re-run the attribution with the ceiling on.
-*Continue only if* a complete-cycle forecast, including dispatch, reports, cold starts and retries, still shows at least 20% of delivery cost, from one real task run through a local router.
-*And only if* the owner has already ruled how a passing router would be released, by a funded arm or an exception, since a pass with no release path wastes the spend. Otherwise stop, and mark this doc final.
+**Matched replay (the only proof, paid, budget set by the owner beforehand).** Rebuild one closed multi-task sprint from its `plan_commit`, twice each: ordinary session, and router with `SendMessage` reuse. Same frozen `Done when`, same model tiers declared up front, same gate.
+Rough cost 60 to 100 USD from the 1.48 USD per sprint commit seen here; set a hard cap. *Go* only if both router runs cost at least 25% less, elapsed time is no worse, and every acceptance box, the gate and review all pass. *Anything else, including inconclusive, is no-go.* Four runs can only show a large effect, and that is the only effect worth shipping for.
 
-**Step 3 — Matched replay (the only proof, paid, budget set by the owner beforehand).** Rebuild one closed multi-task sprint from its `plan_commit`, twice each: ordinary session, and router with `SendMessage` reuse, both under the same ceiling so only routing differs.
-Same frozen `Done when`, same model tiers declared up front, same gate. Rough cost 60 to 100 USD from the 1.48 USD per sprint commit seen here; set a hard cap. *Go* only if both router runs cost at least 25% less, elapsed time is no worse, and every acceptance box, the gate and review all pass.
-*Anything else, including inconclusive, is no-go:* record it and stop. Four runs can only show a large effect, and that is the only effect worth shipping for.
-
-**Step 4 — Ship opt-in, if and only if Step 3 passed.** A plugin `agents/router.md`, one ADR, and wiring in `/flow`, `/prime`, CONTEXT and README.
-Before release: prove a clean plugin install, prove `/orchestrator` and `/flow` behave the same without the agent, and prove a Codex or Kimi host falls back to the skills. Adding wiring means "defaults unchanged" is a requirement to test, not a given. D19 was settled at Step 2.
-
-**Facts to watch in Step 3.** A worker per command may cost more than it saves: count spawns and reuse. A worker's blocking question returns to the router, which asks by popup and resumes that worker. Gate judgment stays on Opus (ADR-010); only the mechanical run of a gate goes to a worker.
-37 worktrees are registered today, so reaping comes before more parallel work. Background workers cannot prompt, so permissions come first.
+**Shipping.** Whatever passes ships opt-in or by default as its row says, after a clean plugin install, a same-behaviour check without any agent, and a Codex or Kimi fallback. D19 is ruled before the spend.
 
 **Rule fit.** ADR-044 admits an agent; this measured cost and dispatch failure are an ADR-053 basis to investigate; ADR-001 still requires shown incremental use before adding one.
 

@@ -8,53 +8,59 @@ member_sprints: []
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
 
-# EPIC-024 — Dispatch Guidance, Then Agent Roles, One by One
+# EPIC-024 — A Small Coordinator, Then Agent Roles, One by One
 
-> **Outcome:** each change from the router-and-worker pattern has a recorded verdict (keep, drop, inconclusive or did not run) from its own trial on lean-flow,
-> and only a change whose numbers passed reaches adopters.
+> **Outcome:** a lean-flow session reaches its build stage with a small main-thread context and keeps it small, and each change that was tried has a recorded verdict
+> (keep, drop, inconclusive or did not run); only what passed reaches adopters.
 
 ## Why this, why now
 
-Owner goal (2026-11-06): deliver faster and cheaper with quality held, trying the pattern's parts one at a time with every step tracked. Owner's reading: the real gap is that `/orchestrator` spawns
-agents without a proper guide. Transcripts from 19 sessions over 14 days agree: `orchestrator/references/dispatch.md` (808 lines, mostly coordinator mechanics) was read in 2 sessions, 55 of 414 Agent
-prompts named a procedure skill, and main threads made 4,915 Bash calls against 323 Agent calls. It defines no worker report states and no path for a worker's question. DeepSeek's equivalents are short role prompts:
-a router told what it never does, and a worker told what it owns and how to report.
+Owner goal (2026-11-06): deliver faster and cheaper with quality held, trying the pattern's parts one at a time with every step tracked. Owner's reading: the limit is not the problem, because DeepSeek's
+router stays small by never doing the reading, while lean-flow's one session does everything. The numbers agree. In one session, `/prime` left 83k (the median of 10 recent sessions) and `/task-decomposer` left 152k, before any build.
+Past main threads averaged 367k read per turn, with 4,915 Bash calls against 323 Agent calls, which points to inline execution but does not establish it as the cause. `orchestrator/references/dispatch.md` was read in 2 of 19 sessions, and it defines no worker report states or route for a worker's question.
 Evidence and limits → [`docs/research/router-mode.md`](../research/router-mode.md). Trials need real sprints in turn, so this spans sprints.
 
 ## Scope
 
-**In:** one trial per row, in order; a short worker contract and coordinator rules; trial agents loaded only for the run that tests them; a recorded verdict for each; shipping what passed.
+**In:** a worker contract; decompose and promote doing their reading in workers; a light `/prime`; then the ladder's other rows, one trial each; shipping what passed.
 **Out (explicitly not):** running DeepSeek's prototype; GitHub or chat listeners; cloud state; changing `night-run`; dropping G1 and G2. DeepSeek's router may not add plans or acceptance criteria, but lean-flow's gates exist to set them, so that rule stays out.
 
 ## The ladder
 
-Run top to bottom, one at a time. Every trial records USD per box across all agents (`bun scripts/session-cost.ts`, baseline about 1.7), elapsed time, close-time gate failures, blocking review findings and owner corrections.
-A row passes only with **overall cost or elapsed time better and no guard worse**; a better sub-measure alone is not a pass. Source says whose idea it is.
+Run top to bottom, one at a time. Every trial records main-thread context after `/prime` (83k, median of 10), after decompose (152k, one session) and at the first build step (no baseline yet; take it from SPRINT-164), compactions, USD per box across all agents (`bun scripts/session-cost.ts`, baseline about 1.7), elapsed time,
+close-time gate failures, blocking review findings and owner corrections. A row passes only with **overall cost or elapsed time better and no guard worse**; a better sub-measure alone is not a pass.
 
 | # | Change | Source | Trial | Must also show | Status |
 |---|---|---|---|---|---|
-| 0 | Context limit, no agent | This repo's data | Two sprints of at least 5 boxes at 200k (TASK-609) | Compaction fired near 200k, or the trial is void | **In progress** |
-| 1 | **Worker contract and coordinator rules**, no agent: what a worker owns, its report states, one concrete question | DeepSeek's `worker.md`, adapted | One sprint, with the text where `/orchestrator` always reads it | Nearly every dispatch carries it (no baseline; 55 of 414 name a skill today); a worker's question reaches the owner as a popup | Next |
-| 2 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc: both runs at least 25% cheaper, elapsed no worse, every check passes | Not started |
-| 3 | Named worker with its model and context limit, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
-| 4 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started |
-| 5 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Waiting on evidence |
-| 6 | Checker | Video | Only with a named miss by the gate and review | Finds what they missed | Did not run, unless that miss appears |
-| 7 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | Did not run, unless that gap appears |
+| 0 | Context limit | This repo's data | One session at 200k | | **Closed: wrong test.** Fired near 170k with 60k of room; see the research doc |
+| 1 | **Worker contract and dispatch standard**: model by `class:`, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Nearly every dispatch has the marker and a set model (113 of 417 unset today); a worker's question reaches the owner by popup and returns to that worker | Drafted on `prep/epic-024-row1`; lands after SPRINT-164 |
+| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | Not started |
+| 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Not started |
+| 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started |
+| 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
+| 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started |
+| 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Waiting on evidence |
+| 8 | Checker | Video | Only with a named miss by the gate and review | Finds what they missed | Did not run, unless that miss appears |
+| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | Did not run, unless that gap appears |
 
 ## Decisions
 
 - **D1** — Trial agents are passed for that launch only (`--agents` or `--plugin-dir`), never left in `.claude/agents/`, because a discoverable description can change an ordinary session and blur its numbers. The router runs as the main thread through `--agent`.
-- **D2** — One change per trial, so a result can be traced to it.
-- **D3** — No trial adds spend beyond the sprint it runs on, except row 2, under a hard cap the owner sets first.
+- **D2** — One change per trial, so a result can be traced to it. Skill changes in rows 1 to 3 land one sprint apart.
+- **D3** — No trial adds spend beyond the sprint it runs on, except row 4, under a hard cap the owner sets first.
 - **D4** — Real sprints show direction, not proof; they differ too much to show a small change. A verdict says which it is. Inconclusive means not shipped.
-- **D5** — Shipping needs a separate owner ruling per release on an arm or an exception (EPIC-023 D19), a clean install and, for an agent, a fallback on hosts without agents. Row 1 changes `/orchestrator`, so D19 applies to it too.
-- **D6** — Gate, grill and design judgment stay on the session model (ADR-010), whichever part runs the mechanical work.
+- **D5** — Shipping needs a separate owner ruling per release on an arm or an exception (EPIC-023 D19), a clean install and, for an agent, a fallback on hosts without agents. Rows 1 to 3 change shipped skills, so D19 applies to them too.
+- **D6** — Gate, grill and design judgment stay on the session model (ADR-010), whichever part runs the mechanical work. Subagents cannot use `AskUserQuestion` (documented), so a worker's question always returns to the coordinator.
+- **D8** — `docs/work/` task files stay the unit of work, with no rename to tickets. The video's ticket is what a task file already holds. DeepSeek's Ticket is a different thing: a runtime record of a stage and its worker Assignment, with no acceptance criteria. Only the worker record is taken, in row 1.
+- **D9** — Status stays the folder, and ADR-045 stands; not a prerequisite for row 1. Measured: 55 of 7,080 main-thread turns moved a task, about 6.4 USD of about 800. That is partial (225 status-move commits show those turns do not cover every move), so the saving from any change is unproven, not nil.
+  A field would touch 24 skill files, 62 eval files and adopters' trees. Workers do not move tasks; transitions stay with the coordinator. Batching moves into one commit would need ADR-045 D6 amended: not now.
+- **D7** — A context limit may return later as a safety net, only as its own row and with evidence from rows 1 to 3.
 
 ## Open questions
 
-- How would a passing router be released: a funded arm or an exception? → owner ruling, before row 2.
-- Is "compiler" a role the owner wants apart from build and typecheck in a worker's checks? → owner, when row 6 comes up.
+- How would a passing router be released: a funded arm or an exception? → owner ruling, before row 4.
+- Does a return-and-resume grill keep its quality, and does it cost less than reading in the main thread? → row 2's trial.
+- Is "compiler" a role the owner wants apart from build and typecheck in a worker's checks? → owner, when row 8 comes up.
 
 ## Member sprints
 
@@ -63,8 +69,9 @@ A row passes only with **overall cost or elapsed time better and no guard worse*
 
 ## Closed when
 
-- [ ] Row 0 has a recorded verdict → TASK-609
-- [ ] Row 1 has a recorded verdict → next slice: worker contract and coordinator rules
-- [ ] Row 2 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
-- [ ] Rows 3 to 7 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
+- [ ] Row 1 has a recorded verdict → next slice: land the worker contract after SPRINT-164
+- [ ] Row 2 has a recorded verdict → next slice: decompose and promote read in workers
+- [ ] Row 3 has a recorded verdict → next slice: light `/prime`
+- [ ] Row 4 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
+- [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
 - [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → next slice: release, if anything passes
