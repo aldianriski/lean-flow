@@ -1,46 +1,42 @@
 ---
 id: TASK-607
-title: "Run the release arm for TASK-605 and TASK-606, and release 2.21.0 or record a no-ship"
+title: "Release 2.21.0 without an arm, under a one-time D19 exception"
 type: feature
 priority: P2
-size: M
-risk: high
+size: S
+risk: med
 autonomy: HITL
 class: decision
 tier: P
 authority: J2
 origin: decomposer
-state: blocked
-depends-on: [TASK-605, TASK-606]
+state: ready
+depends-on: [TASK-605, TASK-606, TASK-608]
+gates_signed: G1 @ ced08844
 ---
 
-# TASK-607 — Run the release arm for TASK-605 and TASK-606, and release 2.21.0 or record a no-ship
+# TASK-607 — Release 2.21.0 without an arm, under a one-time D19 exception
 
 ## Why
-EPIC-023 D19: an arm runs before a release that changes `/orchestrator` or gate behaviour; TASK-606 changes G2 and TASK-605 the
-review's Standards axis. The arm's amendment also closes two carry-forwards: TD-289 (adopt three workers) and TD-290 (disclose
-TASK-602's judge fix).
+EPIC-023 D19 runs an arm before a release that changes `/orchestrator` or gate behaviour, and TASK-606 changes a G2 line. Owner ruling
+(popup, 2026-11-06): no arm for this release, because about 50 USD and a measuring run are not worth it for a change this size. A Codex
+review of the whole change stands in: round 1 found four Med and no High, all fixed in `07e2c1b6`; round 2 CLEAR. Codex rated arm risk
+Medium for the operator and classifier routing, the Standards setup and review, negative-scenario decomposition, bug readiness and G2
+enforcement, since reading cannot show how often they add turns, cost or rejections. The exception covers this release only; D19 stands.
 
 ## Done when
-- [ ] An owner-signed amendment, frozen before any trial, adopts three workers (TD-289 resolved), discloses TASK-602's judge fix
-      (TD-290 resolved) and any other harness change since arm Release, and pre-registers the ship rule against arm Release.
-- [ ] One 32-slot arm on the exact final stack is VALID, and its result and the ship ruling are recorded with their numbers.
-- [ ] Negative: no trial starts before the amendment's freeze line, and a result that fails the pre-registered rule ships nothing
-      (a no-ship recorded with its numbers).
-- [ ] Released as 2.21.0 (MINOR; every versioned manifest and the README footer in lockstep, stopping before push), or the no-ship
-      recorded.
+- [ ] The one-time D19 exception is recorded here and in the CHANGELOG entry, with the owner's reason and Codex's verdict.
+- [ ] Every versioned manifest and the README footer read 2.21.0, derived with `grep -l '"version"' .*-plugin/*.json`.
+- [ ] CHANGELOG has the 2.21.0 entry, says no arm measured it, and `[Unreleased]` is emptied into it.
+- [ ] The off-host gate is green at the release commit, and nothing is pushed.
+- [ ] Negative: no trial runs for this release, and TD-289 and TD-290 stay open for the next arm's amendment.
 
 ## Touches
-`evals/ab/PREREGISTRATION.md` · `evals/ab/arms/` · `evals/ab/schedule-*.json` · `docs/research/logs/` · `TECH-DEBT.md` ·
 `CHANGELOG.md` · `.claude-plugin/` · `.codex-plugin/` · `.kimi-plugin/` · `README.md`
 
 ## Assumes
-- The ship rule is the owner's call at the amendment: the expected shape is non-inferiority against arm Release (93.8%), but the
-  margin is decided there, before any trial.
-- About 50 minutes at three workers and about 50 USD (Release cost about 50 USD at two workers); the arm runs unattended with a
-  notification after its pilot is approved.
-- Whether this arm's migrate route reaches the Standards question is unchecked (TD-293); settle it at the amendment, before the freeze line.
-- **blocked-by:** TASK-605 and TASK-606 both done.
+- Replaces the arm task as first written; the rewrite and its scope were approved by owner popup at G1, 2026-11-06.
+- TD-293 needs no ruling now: with no arm, nothing depends on the operated migrate route until the next one.
 
 ## Tracker
-TASK-601 (superseded) · intake ruling 2026-11-04 (release arm included) · EPIC-023 D19 · TD-289 · TD-290
+TASK-601 (superseded) · EPIC-023 D19 · TD-289 · TD-290 · TD-293 · owner rulings 2026-11-06
