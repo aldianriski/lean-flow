@@ -96,3 +96,6 @@ Round 2: pin `310d6164`, three sessions, 0.39 USD. Docs task with nothing to gua
 Off-host gate at `310d6164`: 589 bun tests pass; qa-check 494 pass, 3 fail, all bookkeeping. The 2026-11-04 entry recorded the T2 and T3 reviews as prose and no `review ·` line (the lines below). The scope-change above shortened two paths in backticks (L-257): corrected in place to their full paths, the one edit of a past entry, made because the leg reads that entry and an appended correction would leave it red; meaning unchanged, unpushed.
 review · T2 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 blocking · behaviour:material · governance:low
 review · T3 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 blocking; the one-line alignment `310d6164` self-reviewed · behaviour:material · governance:low
+
+### 2026-11-06 | progress | T3 done: all six TASK-606 boxes ticked by owner ruling (popups); off-host gate green at `04364572`
+Off-host gate at `04364572`: 496 pass, 0 fail; bun test 589 pass, 0 fail. Boxes 1, 3, 5 and 6 ruled first, boxes 2 and 4 after round 2. T2 still waits on TASK-605 box 2, the owner's interactive migrate run; TASK-607 stays blocked on it.
