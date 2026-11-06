@@ -2,7 +2,7 @@
 sprint: 163
 slug: standards-and-negative-scenarios
 owner: Maintainer
-last_updated: 2026-11-04
+last_updated: 2026-11-06
 status: active
 update_trigger: an Execution Log entry is appended
 ---
@@ -87,5 +87,12 @@ error-handling convention, no adopted standard named; the pre-T2 procedure on th
 Cost about 0.30 USD for the five runs. The killed and stopped migrate runs' cost was not reported by the harness.
 
 ### 2026-11-06 | scope-change | T3: TASK-606 boxes 1 and 4 reworded: a docs, config or spike task names a scenario when one applies, otherwise the n/a box
-What broke: the consumer proof's docs task (TASK-089 on copy `s163-std-b`, plugin pin `d77e801b`) carried a real scenario ("the page does not claim the rehearsal restores production") instead of the `Negative: n/a: docs only` box 4 required. `task-decomposer/SKILL.md` said docs tasks write n/a; `references/task-file.md` said n/a "when no scenario applies". Owner ruling (popup, 2026-11-06): the second rule holds. Never refused, never silent, which keeps the 2026-11-04 ruling's "never a silent judgement".
-Impact: boxes 1 and 4 reworded; one line in `task-decomposer/SKILL.md` and the README and CHANGELOG wording aligned; no new file. Owner also asked for a run with a docs task that has nothing to guard, and a triage run on a known-cause bug so the `ready` path's check fires. G2 re-confirmed by the same popup.
+What broke: the consumer proof's docs task (TASK-089 on copy `s163-std-b`, plugin pin `d77e801b`) carried a real scenario ("the page does not claim the rehearsal restores production") instead of the `Negative: n/a: docs only` box 4 required. `skills/task-decomposer/SKILL.md` said docs tasks write n/a; `skills/task-decomposer/references/task-file.md` said n/a "when no scenario applies". Owner ruling (popup, 2026-11-06): the second rule holds. Never refused, never silent, which keeps the 2026-11-04 ruling's "never a silent judgement".
+Impact: boxes 1 and 4 reworded; one line in `skills/task-decomposer/SKILL.md` and the README and CHANGELOG wording aligned; no new file. Owner also asked for a run with a docs task that has nothing to guard, and a triage run on a known-cause bug so the `ready` path's check fires. G2 re-confirmed by the same popup.
+
+### 2026-11-06 | progress | T3 consumer proofs run in two rounds; the gate's three findings fixed
+Round 1: copy `s163-std-b`, plugin pin `d77e801b`, Sonnet, six sessions, 1.04 USD; prompts never mentioned a negative scenario. Feature task carried `Negative: a non-admin member, an inactive admin, or an admin of another organization gets 403/404 and no file…`; its G2 listed the API cases for the box and marked the hidden-action check a judgment tick, and also refused `verify:workspace:api` as proof (no delivery coverage). Docs task carried a real scenario, not the n/a box (the scope-change above). Bug from the screenshot in the copy's `docs/bugs/` (report text written by the coordinator): `needs-info`, `next: /diagnose`, drafted Negative box. My script passed `TASK` instead of the id to the G2 run; it assumed the right task. G2 skipped its builder check and said so.
+Round 2: pin `310d6164`, three sessions, 0.39 USD. Docs task with nothing to guard: `Negative: n/a: docs-only change, no behaviour affected…`. Known-cause bug (the dialog scroll report, on a worktree at `6556bda`, before its fix `1fab2fe`): `state: ready`, with `Negative: the other delivery dialogs and the People/Access dialogs keep their current layout and scrolling…`, and the run named that box as why it was ready. Each kind ran once. No run fed a draft without a scenario, so box 1's refusal rests on reading the skill (owner ruled a judgment tick).
+Off-host gate at `310d6164`: 589 bun tests pass; qa-check 494 pass, 3 fail, all bookkeeping. The 2026-11-04 entry recorded the T2 and T3 reviews as prose and no `review ·` line (the lines below). The scope-change above shortened two paths in backticks (L-257): corrected in place to their full paths, the one edit of a past entry, made because the leg reads that entry and an appended correction would leave it red; meaning unchanged, unpushed.
+review · T2 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 blocking · behaviour:material · governance:low
+review · T3 · scoped review by Claude of the Codex-built diff (a different model from the builder), 1 round, 0 blocking; the one-line alignment `310d6164` self-reviewed · behaviour:material · governance:low
