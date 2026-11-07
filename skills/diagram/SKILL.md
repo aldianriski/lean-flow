@@ -1,6 +1,6 @@
 ---
 name: diagram
-description: Use when asked to draw, map or explain how a system fits together - architecture, workflow, sequence, data flow, state or ERD - and every box and arrow must be provably real. Triggers - "diagram", "draw the architecture", "map how X calls Y", "show the data flow", "ERD of this schema", "sequence diagram for". Produces Mermaid plus an evidence table that ties each component and edge to a source line. Do not use for a decorative picture, a chart of numbers, or prose that needs no diagram.
+description: Use to draw how a system fits together (architecture, workflow, sequence, data flow, state, ERD) as Mermaid plus an evidence table tying each box and arrow to a source line. Triggers - "diagram", "draw the architecture", "map how X calls Y", "show the data flow", "ERD of this schema". Not for decorative pictures or charts of numbers.
 argument-hint: "[what to draw - e.g. the request path, the loop, the schema]"
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash
 user-invocable: true
