@@ -66,3 +66,12 @@ worker · T2 · ad846f93816158134 · sonnet · none
 
 ### 2026-11-07 | scope-change | T1 cites the ledger, because the gate read the earlier entry's path as undeclared
 The gate on `4d97cb53` failed `scope-change layers`: the earlier T1 entry names `HANDOFF-LEDGER.md`, absent from T1's `Layers:` and `Cites:`. The coordinator wrote that entry without checking its paths against the Plan, though the log's header states the rule. The path is the ruling's subject and no commit in this repo touches it, so it goes on T1's `Cites:`. No Done-when text changes.
+
+### 2026-11-07 | surprise | two close-time gate failures on `4d97cb53`, both on the coordinator's side of the brief
+`gate-remote.ts`: `QA-CHECK: 461 pass, 2 fail`. One: `typecheck`, TS2532 in T2's harness. The coordinator's brief told the builder not to run the full gate and did not name the typecheck leg, which `dispatch.md` § Dev dependencies asks a brief to name (L-262's shape). Not caused by the worker contract's text. Two: `scope-change layers`, the coordinator's own T1 entry naming a path outside T1's `Layers:` and `Cites:`, fixed in `cce0ce67`. The Sonnet reviewer had returned CLEAR on the same commit, since it was scoped to the diff and not asked to run the typecheck.
+
+### 2026-11-07 | progress | T2 built: the gate names its informational count, 63 on the real repo
+Commits `4d97cb53` and `41d2fd4d`. Pin: `bun test` on `evals/qa-verdict.test.ts` and `evals/gate-remote.test.ts`, 90 pass and 0 fail before and after. Harness red first (2 pass, 12 fail), then 14 pass, 0 fail. Not-run cases assert the not-run line for the leg not running, a setup-failure row and an output with no rule row.
+Return path, worker `ad846f93816158134`, same id: return 1 `ready`, return 2 `ready` after the typecheck fix by SendMessage. No question raised.
+Real run, gate on `41d2fd4d`: `QA-CHECK: 463 pass, 0 fail`, `bun test` 589 pass, 0 fail. The line reads 63. A first comparison gave 64 `INFO` rows against 63: the odd row is `prose-density` at line 149, printed by another leg, so the design's "any other non-engine producer" applied. Two selections then agree on 63, and N is non-zero, so the box discriminates.
+review · T2 · one scoped Sonnet reviewer, CLEAR, 5 of 5 spec items · behaviour:low · governance:low
