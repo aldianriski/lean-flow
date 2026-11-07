@@ -39,7 +39,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 0 | Context limit | This repo's data | One session at 200k | | **Closed: wrong test.** Fired near 170k with 60k of room; see the research doc |
 | 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | **Inconclusive, direction only (D4), not shipped**, owner ruling 2026-11-07. The rule's numbers as written read keep; like for like, 1.09 to 1.14 USD/box and 4.9 min/box sit inside the baselines. Coverage 2 of 2, and the planned question returned to the same agent. Text stays on `trial/epic-024-row1` at `32ac2f42`. Measures → TASK-613 § Results |
 | 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive, not shipped** (owner popup, 2026-11-07), thin case: the video kit held nothing that cleared the bar, so no sprint ran, no cost was measured, and promote and a question round went untested. Text stays on `trial/epic-024-row2` at `65ace762`; TASK-616 § Results. Row 1's text reaches `main` only after a later row reads keep, or by owner ruling |
-| 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Not started |
+| 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Ready to launch with rows 1 and 2 (D11): `trial/epic-024-bundle` at `e485a7cc`, rules in TASK-617 |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started |
@@ -61,6 +61,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
   A field would reach adopters' trees and whatever reads the folders: a text search hits 18 skill files and 62 eval files, not a confirmed migration scope. Workers do not move tasks; transitions stay with the coordinator. Batching moves into one commit would need ADR-045 D6 amended: not now. Owner reaffirmed on these corrected figures, 2026-11-07.
 - **D7** — A context limit may return later as a safety net, only as its own row and with evidence from rows 1 to 3.
 - **D10** — One operator session runs the workers and brings gates to the owner as popups. A second session opens only for a trial launch or when context runs out, and sessions do not relay work to each other. No session messages a measured trial, because that adds to its context and blurs the numbers. Owner ruling, 2026-11-07.
+- **D11** — Rows 1, 2 and 3 run together as one trial, an exception to D2, because each small change alone read inconclusive. A bad result will not show which row caused it. The owner rules on the router from the result. Owner ruling, 2026-11-07.
 
 ## Open questions
 
@@ -78,7 +79,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 
 - [x] Row 1 has a recorded verdict → inconclusive, on SPRINT-165, recorded by TASK-613
 - [ ] Row 2 has a recorded verdict (inconclusive, thin case, no member sprint, so no tick until the owner rules) → TASK-616
-- [ ] Row 3 has a recorded verdict → next slice: light `/prime`
+- [ ] Row 3 has a recorded verdict → TASK-617
 - [ ] Row 4 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
 - [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
 - [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → next slice: release, if anything passes
