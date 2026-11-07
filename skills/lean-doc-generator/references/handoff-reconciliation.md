@@ -15,8 +15,8 @@ repo would ever know.
 
 ## The status vocabulary
 
-Every handoff record — an Execution Log `handoff` entry, or a `HANDOFF-LEDGER.md` row when no sprint
-exists — carries exactly one of three states, tracked via two fields (`handoff-status:` +
+Every handoff record — an Execution Log `handoff` entry, or a `HANDOFF-LEDGER.md` row (no sprint, or
+a side handoff) — carries exactly one of three states, tracked via two fields (`handoff-status:` +
 `handoff-path:`) inside its `### <date> | handoff | <summary>` block:
 
 | Status | Means | Set by |
@@ -64,10 +64,12 @@ Before setting `status: closed`:
    if any record for a `status: closed` sprint is still `live`/`consumed`, or UNKNOWN. This is what
    makes step 1–3 non-optional rather than aspirational — a close that skips it does not go green.
 
-## The no-sprint fallback (root `HANDOFF-LEDGER.md`)
+## The ledger (root `HANDOFF-LEDGER.md`)
 
-Governance work, a `/triage` pass, or a research session has no sprint Execution Log to write into.
-`/handoff` creates `HANDOFF-LEDGER.md` lazily (STANDARD's create-lazily rule — never pre-created
+Governance work, a `/triage` pass, or a research session has no sprint Execution Log to write into, and a
+side session unrelated to the active sprint must not write into it: a handoff is the sprint's own when the
+session's focus names a member task of that sprint; any other is a side handoff and goes to the ledger, so
+a side `live` entry never fails that sprint's close. `/handoff` creates `HANDOFF-LEDGER.md` lazily (STANDARD's create-lazily rule — never pre-created
 empty) with the same ownership header + two-field entry shape. There is no "close" event to hook a
 hard gate onto, so:
 

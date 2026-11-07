@@ -60,8 +60,10 @@ the sprint closed past it) — so "was this actioned?" is answerable without ope
    (still more than one → ask). Its members — the `## Members` paths ∪ every `docs/work/*/TASK-*.md`
    stamped `sprint: SPRINT-NNN`, whatever folder it sits in — name the task in focus. The log to use
    is `docs/sprint/logs/` + the sprint file's own filename (it exists since promote; create it from
-   `sprint-log.md.template` only if absent — a sprint promoted before that rule). No active sprint → the fallback ledger, root
-   `HANDOFF-LEDGER.md` (create lazily, same two-field shape, no sprint-specific content).
+   `sprint-log.md.template` only if absent — a sprint promoted before that rule). A handoff is the sprint's own when the
+   session's focus names a member task of that sprint; any other is a side handoff and goes to the fallback ledger, root
+   `HANDOFF-LEDGER.md` (create lazily, same two-field shape, no sprint-specific content), as does any handoff with no
+   active sprint. Unsure whether the focus is a member task → ask.
 2. **Close out a prior handoff you are now resuming** — if that log/ledger's newest entry for this
    context is `handoff-status: live`, append one entry reusing its `handoff-path` with
    `handoff-status: consumed` before writing the new one below (this session picked it up).

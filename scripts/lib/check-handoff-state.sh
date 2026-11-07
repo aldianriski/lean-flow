@@ -7,8 +7,10 @@
 # actioned, or still live?" is answerable without opening the temp file or having been in the session.
 #
 # Owner ruling (G2, recorded in the Execution Log promote entry): the stub is an Execution Log
-# `handoff` event where a sprint exists, PLUS one named fallback ledger (root HANDOFF-LEDGER.md,
-# create-lazily) for the no-sprint case -- governance work, a /triage pass, a research session. Both
+# `handoff` event for the active sprint's own work, PLUS one named ledger (root HANDOFF-LEDGER.md,
+# create-lazily) for every other handoff -- governance work, a /triage pass, a research session, or a
+# side session unrelated to the active sprint (TASK-614, TD-298). The ledger is read whatever the sprint
+# state, so a side stub never lands in a sprint log where a `live` entry could fail that sprint's close. Both
 # carry the SAME three-state status so neither path can silently default to `spent`:
 #   live     -- a session may still resume it
 #   consumed -- a session resumed it and the work continued
@@ -178,8 +180,8 @@ $recs
 RECEOF
 done
 
-# --- no-sprint fallback: root HANDOFF-LEDGER.md, create-lazily -- gated on UNKNOWN only, since there
-#     is no "close" event here to force reconciliation against; live/consumed rows are reported for
+# --- ledger: root HANDOFF-LEDGER.md, create-lazily; read with or without an active sprint -- gated on
+#     UNKNOWN only, since there is no "close" event here to force reconciliation against; live/consumed rows are reported for
 #     the next promote's governance review to reconcile (propose->approve, TD-aging's shape) ----------
 ledger="$root/HANDOFF-LEDGER.md"
 if [ -f "$ledger" ]; then

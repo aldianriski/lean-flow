@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-02
+last_updated: 2026-11-07
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,14 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.19.1 — 2026-11-07
+
+**PATCH (§15): the `HANDOFF-LEDGER.md` row's create-lazily trigger widens from "no active sprint to log into" to "not the
+active sprint's own" (TASK-614, TD-298).** A side session unrelated to the active sprint now stubs its handoff in the ledger
+instead of a sprint Log, where a `live` entry could fail that sprint's close. §15's test (could a repository that conformed
+now fail?): no. The ledger was already read whatever the sprint state and gated only on an UNKNOWN status, so no verdict
+moves. Owner ruling 2026-11-07 (SPRINT-165 T1).
 
 ## 0.19.0 — 2026-11-02
 

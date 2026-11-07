@@ -52,12 +52,12 @@ is **covered** when its mark names `next slice:`, an open task (outside `done/` 
 **uncovered**. Count both; `proposed` epics and `planned`/`done` rows exempt. Procedure → `lean-doc-generator/references/epic-coverage.md`.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed. When its **Uncertain writes** item names one, the `Handoff:` row adds `· uncertain write: <target> → reconcile first` (the row is emitted for this even when no repo-side `handoff` entry exists) and `Next:` leads with reading that target back before any retry (a timeout is not a failure); `none` adds nothing.
 
-**Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root
-`HANDOFF-LEDGER.md` when none is active, may carry a `handoff` entry (see
-`sprint-log.md.template`'s event vocabulary). Report the LATEST such entry's `handoff-status:` —
-`live` (not yet resumed), `consumed` (resumed, still open), or none outstanding. Never write it
-(that is `/handoff`'s and `/lean-doc-generator close`'s job, not this one's) — priming only surfaces
-what a reader would otherwise have to open the temp file, or have been in the session, to know.
+**Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log and root
+`HANDOFF-LEDGER.md` may each carry a `handoff` entry: a handoff is the sprint's own when the session's focus
+names a member task of that sprint; any other is a side handoff, in the ledger. Report the LATEST such entry's
+`handoff-status:` from each — `live` (not yet resumed), `consumed` (resumed, still open), or none outstanding.
+Never write it (`/handoff`'s and `/lean-doc-generator close`'s job, not this one's) — priming only surfaces what
+a reader would otherwise have to open the temp file, or have been in the session, to know.
 
 ## Skill freshness — a report, not a gate
 
@@ -118,8 +118,8 @@ Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
 Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run — only if an open AFK J0/J1 member exists)
 ```
 
-The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reachable (no active
-sprint AND no `HANDOFF-LEDGER.md`) — otherwise report it, including `none outstanding`, so its
+The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reachable (neither an active
+sprint's Log nor a `HANDOFF-LEDGER.md` carries one) — otherwise report it, including `none outstanding`, so its
 absence is never mistaken for "nothing was ever taken."
 
 The `Coverage:` row is omitted only when there is neither an active epic nor a roadmap; otherwise it reports the count, `0 uncovered` included. Prime never edits either.

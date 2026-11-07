@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-02
+last_updated: 2026-11-07
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.19.0
+version: 0.19.1
 status: current
 ---
 
@@ -60,7 +60,7 @@ gating → §6.
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
 | `TODO.md` — **v1 layout, retired at 0.12.0** | Dev / AI | 320 soft (ADR-019) | none since 0.12.0 — the queue lives in the `docs/work/` store (below); a v1 repo's file is read only by `/lean-doc-generator migrate`; nothing measures it since 0.13.0 (`S11.TODOCAP` is a retired no-op) | none — not edited under 0.12.0 | `migrate` converts it into `docs/work/`, then deletes it (§11) |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
-| `HANDOFF-LEDGER.md` | Dev / AI | append-only | **create-lazily** — the first handoff taken with **no active sprint to log into** (governance work · a `/triage` pass · a research session); never pre-created empty (§7) | a handoff is taken, resumed, or reconciled — its status moves `live` → `consumed` → `spent` | §11 prune (entries `spent` ≥ 3 sprints) |
+| `HANDOFF-LEDGER.md` | Dev / AI | append-only | **create-lazily** — the first handoff that is **not the active sprint's own** — no sprint to log into, or a side session whose focus names no member task of it (governance work · a `/triage` pass · a research session); never pre-created empty (§7) | a handoff is taken, resumed, or reconciled — its status moves `live` → `consumed` → `spent` | §11 prune (entries `spent` ≥ 3 sprints) |
 
 **`spec/` — the standard itself, where a repo publishes one:**
 

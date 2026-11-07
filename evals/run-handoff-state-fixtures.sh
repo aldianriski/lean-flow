@@ -119,6 +119,34 @@ run_case_anywhere "ledger-live-reported" 0 \
   "entry 'live' at /tmp/handoff-research-x.md -- reconciled at the next promote governance review" -- \
   sh "$checker" "$work/ledger-live-reported"
 
+# --- TASK-614 (TD-298): a side-session stub lives in the root ledger WHILE a sprint is active -----
+# The ledger is read on every run whatever the sprint state, and gated on UNKNOWN only; a sprint's own
+# `live` entry is gated at close. These cases pair a sprint tree with a side ledger so neither half of
+# that split can be loosened or tightened without one of them reddening.
+mk_ledger side-live "### 2026-11-07 | handoff | unrelated side session, mid-stop" \
+  "handoff-status: live" "handoff-path: /tmp/handoff-side-x.md"
+mk_ledger side-unknown "### 2026-11-07 | handoff | unrelated side session, path never recorded" \
+  "handoff-status: live"
+side_tree() {   # <name> <sprint-fixture> <ledger-dir> -- a sprint tree with a side ledger at its root
+  cp -R "$fx/$2" "$work/$1" && cp "$work/$3/HANDOFF-LEDGER.md" "$work/$1/HANDOFF-LEDGER.md"
+}
+side_tree side-active-live open-live-not-yet side-live
+run_case_anywhere "side-stub-active-sprint-live" 0 \
+  "HANDOFF-LEDGER.md entry 'live' at /tmp/handoff-side-x.md -- reconciled at the next promote governance review" -- \
+  sh "$checker" "$work/side-active-live"
+side_tree side-closed-spent closed-all-spent side-live
+run_case_anywhere "side-stub-does-not-redden-closed-sprint" 0 \
+  "handoff spent at /tmp/handoff-934-x.md" -- \
+  sh "$checker" "$work/side-closed-spent"
+side_tree side-closed-own-live closed-live-outstanding side-live
+run_case_anywhere "side-stub-beside-sprints-own-live" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-930-x.md)" -- \
+  sh "$checker" "$work/side-closed-own-live"
+side_tree side-active-unknown open-live-not-yet side-unknown
+run_case_anywhere "side-stub-unknown-still-fails" 1 \
+  "HANDOFF-LEDGER.md entry at line 15 (<no handoff-path recorded>) carries UNKNOWN status ('live')" -- \
+  sh "$checker" "$work/side-active-unknown"
+
 # --- L-166: pointed at the REAL motivating case, not fixtures alone -------------------------------
 # The vocabulary this checker reads is new -- no historical commit literally carries a
 # `handoff-status:` field, so an unmodified historical blob cannot be replayed against it the way
