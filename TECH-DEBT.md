@@ -2032,7 +2032,7 @@ status: current
   - Evidence: SPRINT-163 log, 2026-11-04 surprise entry; `evals/ab/lib/classifier.ts`, `evals/ab/lib/operator.ts`.
   - Impact: an arm that runs migrate this way may not exercise the question. Whether TASK-607's arm takes this route is unchecked.
   - Mitigation: settle it at TASK-607's amendment, before its freeze line.
-- **TD-294** severity: low | status: open | created: Sprint-163 (close; T2 and T3 proofs)
+- **TD-294** severity: low | status: resolved → TASK-610, TASK-611, TASK-612 | created: Sprint-163 (close; T2 and T3 proofs)
   - Summary: **Three branches of SPRINT-163's rules have never run.** `/task-decomposer` refusing a draft with no scenario; `/triage` holding
     back a known-cause bug that has no `Negative:` box (each run's agent wrote one); and the draft-back of a named standard, with its
     `checks: not decided yet` path. The owner ruled the boxes ticked with this stated.
@@ -2041,6 +2041,7 @@ status: current
   - Mitigation: exercise each when a later consumer proof passes that way; no dedicated run planned.
   - Runs: draft-back and undecided checks (TASK-610): operated `init` and `migrate` plus scoped reviews on copies of a real repo. Before, pin `022ba994`: `init` passed; `migrate` missed the marker and the report label. After, pin `f94bdef1`: both show. The re-run (`cmp`) and `none` kept their before-run results.
   - Runs: no-scenario draft (TASK-611): `/task-decomposer` on a copy of a real repo. Before, pin `022ba994`: wrote an unasked box on the first `approve`. Pin `9997af10`: held, but wrote reworded lines. After, pin `61b2dcd3`: held, showed one exact line, wrote it unchanged after a fresh `approve`. A named scenario and a docs draft ran on `9997af10`: both written on the first `approve`, the docs draft with `Negative: n/a`; not re-run, since the rule's condition did not change.
+  - Runs: known-cause bug with no named scenario (TASK-612): `/triage` on copies of a real repo. Before, pin `022ba994`: already held, no text said where a box comes from, and an unknown-cause bug got a filler box. After, pin `c35613aa`: held with an `open:` line and no box; a bug whose report names the scenario reached `ready` citing it; a `ready` bug with no box unchanged; an unknown-cause bug got `next: /diagnose` and no box. The path where only the code names the scenario was not run, per the signed design.
 - **TD-295** severity: trivial | status: open | created: Sprint-163 (close; system verify)
   - Summary: **`gate-remote.ts`'s local bundle step was denied in the default temp directory, cause unknown.** Two consecutive runs failed
     with `cannot create … lf-gate-<sha>-<pid>.bundle: Permission denied`, after two earlier runs that day had passed. The same `git bundle

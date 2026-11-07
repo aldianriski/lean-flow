@@ -19,6 +19,7 @@ status: current
 - **Added (maintainer-only)** — `scripts/session-cost.ts` reports where a repo's Claude Code spend goes; `docs/research/router-mode.md` plans how to test a router against it (TASK-609). No skill changed.
 - **Fixed** — `migrate` writes a named standard with no checks as `checks: not decided yet (owner, migrate)`, the form `init` already wrote, and its report uses the topic labels word for word. Before, it marked every field undecided and described the topic in its own prose, so a search for the marker found nothing (TASK-610).
 - **Fixed** — `/task-decomposer` no longer writes a `Negative:` box the owner never saw. A draft that needs one and names no scenario is held at `approve`: it shows the exact line, writes nothing, and writes that line unchanged after a fresh `approve` (TASK-611).
+- **Fixed** — `/triage` no longer lets a bug's `Negative:` box come from nowhere. A known-cause bug reaches `ready` only with a box citing the report or code that names what must keep working; otherwise it stays `needs-info` with an `open:` line and no box. The bug template says the same, so an unknown-cause bug no longer gets a filler box (TASK-612).
 
 ## v2.21.0 — a repo declares the standards it adopts, and a task names what must not happen (2026-11-06)
 
