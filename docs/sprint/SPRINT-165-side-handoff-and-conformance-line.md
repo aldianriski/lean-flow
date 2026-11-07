@@ -5,6 +5,7 @@ epic: EPIC-024
 owner: Maintainer
 last_updated: 2026-11-07
 status: active
+gates_signed: G1,G2 @ 0a106887
 plan_commit: 6b12630a
 update_trigger: sprint execute/close events
 ---
