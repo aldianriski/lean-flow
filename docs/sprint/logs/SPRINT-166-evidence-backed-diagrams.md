@@ -47,3 +47,16 @@ Codex R1 (`81a1198e`): NOT CLEAR, three Medium: a README rule contradicted `prop
 Codex R2 (`f291493c`): three RESOLVED, no new issue; one STILL OPEN: five lines could come from one row's range. Closed by the coordinator inline in `ed762f49` (one phrase, now five different rows), which also reworded the last 5-word run shared with the kit. Not re-reviewed: the two-round cap was reached.
 Copied text: every 5-word run of the kit's SKILL.md and all three references compared with `skills/diagram/`: 0 shared after `ed762f49`.
 Ticks via `tick-box.ts`: each re-run gave check-sprint-by-reference 4 pass and check-layers-completeness 9 pass.
+
+### 2026-11-08 | progress | T2 and T3 dispatched in parallel
+Preflight CLEAR on `4a98aa93`. TASK-619 and TASK-620 moved to `in_progress` in `4a98aa93`.
+worker · T2 · a860ebe0063fb1379 · sonnet · none
+worker · T3 · a55141039455ea464 · sonnet · none
+Isolation: shared tree, not worktrees. Their files are disjoint, but `git worktree list` shows 17 leftover agent worktrees, and the protocol says to clean those before an isolated dispatch (stale-branch reuse, #51596). Removing them is the owner's call, so this wave uses the protocol's shared-tree fallback: no git writes by either worker, and the coordinator commits each task by path.
+consequence · T2 · behaviour: none (roster, docs, templates, one eval list) · governance: none → session-model read-through (D3), plus the off-host gate after commit
+consequence · T3 · behaviour: new update step in a shipped skill · governance: none → session-model read-through (D3)
+
+### 2026-11-08 | progress | T3 (TASK-620) done: 3 of 3 boxes
+Worker added `## Update` to SKILL.md (77 lines) and a five-step `## Updating` to references/evidence-record.md, and ran it by hand on an in-tree fixture, since deleted: one edge change touched only E1's line and row; a deleted source kept N4's row as `unknown` dated 2026-11-08; a rerun with no change gave an empty diff.
+Read-through (D3), two fixes inline in `5614e062`: the worker's edit wrote SKILL.md's section sign as a lone Latin-1 byte, now UTF-8; and the hand run gave edge E2 `none found` although its own line still existed, so step 3 now says only a row whose own line is gone takes that form, and an edge into it keeps its source and drops by step 2.
+Ticks via `tick-box.ts`: check-sprint-by-reference 4 pass, check-layers-completeness 9 pass.
