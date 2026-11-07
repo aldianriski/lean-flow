@@ -3,7 +3,7 @@ sprint: 165
 slug: side-handoff-and-conformance-line
 owner: Maintainer
 last_updated: 2026-11-07
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
