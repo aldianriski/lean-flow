@@ -60,3 +60,6 @@ Conformance engine fixtures all green on the T1 edit, from the builder's backgro
 Spec: the builder chose PATCH and Codex argued MAJOR. The coordinator ruled MINOR from §15's own test and MINOR row, 0.20.0, so the owner's popup "not MAJOR" holds. Not traced to an owner ruling beyond that.
 Left unchanged, Codex item 6 OK: `sprint-log.md.template`'s "No sprint to log into" line and `night-run.md` row 3.
 review · T1 · Codex read-only (a different model from the writer), 2 rounds, 2 findings fixed by the same worker · behaviour:material · governance:low
+
+### 2026-11-07 | progress | T2 build dispatched
+worker · T2 · ad846f93816158134 · sonnet · none
