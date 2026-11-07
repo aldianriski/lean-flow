@@ -73,6 +73,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ❌ Proving "without the plugin" from a **sub-agent** — it inherits the host session's plugins and CLAUDE.md, so it can never be the agent with no lean-flow installed. Run the proof as a separate headless process (`claude -p --setting-sources local --disable-slash-commands --output-format stream-json`, stdin redirected from `/dev/null`, in a trusted folder outside `~/.claude/`) and judge it from that run's own `system/init` event, not from the agent's report (L-241 ×2).
   Pick that folder for trust first: an untrusted one (the scratchpad, a fresh clone) denies every write, while a worktree inside a trusted repo inherits the trust. Pass it as the long path; an 8.3 short path (`HYPEAM~1`) misses the match and fails the same way. A headless run never writes a plugin manifest or the README footer, so a bump stays in the attended session (L-249 ×2).
 
+❌ Stating a rule in a skill and again in its reference or template with different conditions — a consumer's run follows the softer one, and review reads both and passes. When a rule is written twice, give both the same condition, and prove it with a run whose prompt never names the rule (L-290 ×2).
+
 ### wiring
 
 - **wiring → moved: docs/LEARNINGS.md` § Durable rules › wiring** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Anti-Patterns · learnings: L-020
@@ -139,10 +141,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-290 [tags: process] [status: active]: **A rule stated in a skill and again in its reference must carry the same condition: a run follows the softer one.** SPRINT-163 T3 wrote "docs/config/spike tasks write `Negative: n/a`" in `skills/task-decomposer/SKILL.md` and "use n/a when no scenario applies" in its reference. Review read both and passed. The consumer proof's docs task carried a real scenario, failing the frozen box as written. Only a run whose prompt never named the rule showed it.
+## L-290 [tags: process] [status: promoted]: **A rule stated in a skill and again in its reference must carry the same condition: a run follows the softer one.** SPRINT-163 T3 wrote "docs/config/spike tasks write `Negative: n/a`" in `skills/task-decomposer/SKILL.md` and "use n/a when no scenario applies" in its reference. Review read both and passed. The consumer proof's docs task carried a real scenario, failing the frozen box as written. Only a run whose prompt never named the rule showed it.
 - seen: 2026-11-06 (SPRINT-163 T3, consumer proof) · 2026-11-07 (SPRINT-164 T3, `/triage` steps and the bug template; Codex round 1 caught it)
 - count: 2
-- promoted: no
+- **L-290 → promoted: `docs/LEARNINGS.md` § Durable rules › consumer-side** · disposition: merge — appended as its own line, since both sightings came from consumer proofs and `.claude/CLAUDE.md` already points there; no shipped skill text changed, because EPIC-024 row 1's trial allows one change (SPRINT-165 promote)
 - related: L-007 · TASK-606
 
 ---
