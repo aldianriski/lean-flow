@@ -99,6 +99,8 @@ evidenced one reaches `ready` citing it; TD-294 moves to `resolved` citing all t
 |------|------|--------------|------|------|
 | `skills/lean-doc-generator/references/migration-map.md` | TASK-610 | Spell out the undecided-checks marker and require the report labels word for word; a run showed `migrate` missing both | low | R2 before and after on pins |
 | `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` | TASK-610 | Name the rule; TD-294 `Runs:` line; TD-296 for two label gaps | low | gate |
+| `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` | TASK-611 | Hold a no-scenario draft at `approve`, show the exact line, write it unchanged; a run showed the box written unasked, then reworded | low | D1 before and after on pins |
+| `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` | TASK-611 | Name the hold; TD-294 `Runs:` line | low | gate |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->

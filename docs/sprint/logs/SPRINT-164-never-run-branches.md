@@ -60,3 +60,17 @@ The runs exposed one defect, in `skills/lean-doc-generator/references/migration-
 
 ### 2026-11-06 | progress | T1 done: owner accepted the result and ruled TD-296 filed
 TASK-610's seven boxes ticked after that ruling.
+
+### 2026-11-06 | progress | T2 before-run on pin `022ba994`: an unasked box is written on the first approve
+D1 (feature draft, no scenario, `approve`) wrote TASK-088 with a box the owner never saw, the expected defect. D2 (names a scenario) wrote a box from the named line. D3 (docs) wrote `Negative: n/a`.
+
+### 2026-11-06 | surprise | T2's first fix held the draft but wrote reworded lines, and the first line check proved nothing
+On `9997af10` D1 wrote nothing and asked for a fresh approve, but it showed loose bullets and D1b wrote reworded `Negative:` lines, so box 2 failed. The check itself had first passed falsely: D1 printed no literal `- [ ] Negative:` line, so `grep -Fx` ran with an empty pattern and matched 11 blank lines. The re-run's check counted the shown lines first.
+
+### 2026-11-07 | progress | T2 fix `61b2dcd3`: the exact line is shown and written unchanged
+Codex round 1 on `9997af10` and round 2 on the tightened text: OK on all items. Gate on `61b2dcd3`: 589 bun tests, qa-check 509 pass, 0 fail. On that pin D1 wrote nothing (`status after D1: []`) and showed one `- [ ] Negative:` line, and D1b's file holds that line (`grep -Fx` count 1, one shown, one written). D2 and D3 keep their `9997af10` results, since the rule's condition did not change; the owner was told at the ruling.
+consequence · T2 · behaviour:material · governance:low
+review · T2 · Codex read-only review of the rule text (a different model from the writer), 2 rounds, 0 findings; the rewording came from the run · behaviour:material · governance:low
+
+### 2026-11-07 | progress | T2 done: owner accepted the result
+TASK-611's five boxes ticked after that ruling.

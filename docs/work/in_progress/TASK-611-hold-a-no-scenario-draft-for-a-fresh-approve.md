@@ -23,11 +23,11 @@ TD-294: `/task-decomposer` refusing a draft with no scenario has never run; TASK
 approve never covered that box. ADR-053: a defect fix in shipped skill text, unfrozen.
 
 ## Done when
-- [ ] A consumer-copy run given a feature draft with no scenario and an `approve` writes no task file, shows a drafted `Negative:` box, and asks for a fresh approve.
-- [ ] After that approve, the written file carries exactly the box shown.
-- [ ] Negative: a feature draft that already names a scenario is written on its first approve with no added ask, and a docs draft with nothing to guard gets `Negative: n/a: <reason>` and is not held for a scenario.
-- [ ] The rule reads the same in `skills/task-decomposer/SKILL.md` and `skills/task-decomposer/references/task-file.md` (L-290), and SKILL.md stays within its cap (136 lines today, ~140).
-- [ ] TD-294 records the runs, pins and result for this branch; CHANGELOG `[Unreleased]` and README name any user-visible change.
+- [x] A consumer-copy run given a feature draft with no scenario and an `approve` writes no task file, shows a drafted `Negative:` box, and asks for a fresh approve. ✓ D1 on pin `61b2dcd3`: `status after D1: []`, one `- [ ] Negative:` line shown, final message asks for `approve` again
+- [x] After that approve, the written file carries exactly the box shown. ✓ D1b on `61b2dcd3`: `grep -Fx` of the shown line against the written file, count 1; one shown, one written. Failed on `9997af10`, which led to the fix
+- [x] Negative: a feature draft that already names a scenario is written on its first approve with no added ask, and a docs draft with nothing to guard gets `Negative: n/a: <reason>` and is not held for a scenario. ✓ D2 on `9997af10`: one file on first approve, box from the named line, no added ask; D3 on `9997af10`: one file on first approve with `Negative: n/a: <reason>`; not re-run on `61b2dcd3`, stated to the owner at the ruling
+- [x] The rule reads the same in `skills/task-decomposer/SKILL.md` and `skills/task-decomposer/references/task-file.md` (L-290), and SKILL.md stays within its cap (136 lines today, ~140). ✓ same sentence in both files (`grep` count 1 each, written by one script); `check-doc-caps` 137 <= 140
+- [x] TD-294 records the runs, pins and result for this branch; CHANGELOG `[Unreleased]` and README name any user-visible change. ✓ TD-294 `Runs:` line names pins `022ba994`, `9997af10`, `61b2dcd3` and the result; CHANGELOG `[Unreleased]` Fixed bullet; README one line after the `Negative:` rule
 
 ## Touches
 `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md`
