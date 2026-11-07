@@ -3,8 +3,8 @@ epic: 024
 slug: agent-roles-one-by-one
 owner: Maintainer
 last_updated: 2026-11-07
-status: proposed
-member_sprints: []
+status: active
+member_sprints: [SPRINT-165]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
 
@@ -30,11 +30,13 @@ Evidence and limits → [`docs/research/router-mode.md`](../research/router-mode
 Run top to bottom, one at a time. Every trial records main-thread context after `/prime` (83k, median of 10), after decompose (152k, one session) and at the first build step (no baseline yet; take it from SPRINT-164), compactions, USD per box across all agents (`bun scripts/session-cost.ts`, baseline about 1.7), elapsed time,
 close-time gate failures, blocking review findings and owner corrections. A row passes only with **overall cost or elapsed time better and no guard worse**; a better sub-measure alone is not a pass.
 
+From row 2 on, cost and time use one basis, by owner ruling after row 1 (TASK-613 § Results). USD per box runs from the promote call to the sprint's last commit, across all agents; a whole session also pays for decomposing and releasing. Minutes per box merge main-thread and worker activity, dropping gaps over 5 minutes; summed `turn_duration` overcounts, by 41 to 192 minutes per session on the four sprints checked. On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPRINT-139, 140, 146).
+
 | # | Change | Source | Trial | Must also show | Status |
 |---|---|---|---|---|---|
 | 0 | Context limit | This repo's data | One session at 200k | | **Closed: wrong test.** Fired near 170k with 60k of room; see the research doc |
-| 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | Drafted on `prep/epic-024-row1`; lands after SPRINT-164 |
-| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | Not started |
+| 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | **Inconclusive, direction only (D4), not shipped**, owner ruling 2026-11-07. The rule's numbers as written read keep; like for like, 1.09 to 1.14 USD/box and 4.9 min/box sit inside the baselines. Coverage 2 of 2, and the planned question returned to the same agent. Text stays on `trial/epic-024-row1` at `32ac2f42`. Measures → TASK-613 § Results |
+| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | Not started; builds on `trial/epic-024-row1`, so row 1 is in place without being on `main` (owner ruling 2026-11-07). Row 1's text reaches `main` only after a later row reads keep, or by owner ruling |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Not started |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
@@ -56,6 +58,7 @@ close-time gate failures, blocking review findings and owner corrections. A row 
   Measured over 14 days: 230 of 7,080 main-thread turns ran `git mv` under `docs/work/`, about 34 USD of about 840. That is what those whole turns cost, not what a change would save, so the saving from any change is unproven, not nil.
   A field would reach adopters' trees and whatever reads the folders: a text search hits 18 skill files and 62 eval files, not a confirmed migration scope. Workers do not move tasks; transitions stay with the coordinator. Batching moves into one commit would need ADR-045 D6 amended: not now. Owner reaffirmed on these corrected figures, 2026-11-07.
 - **D7** — A context limit may return later as a safety net, only as its own row and with evidence from rows 1 to 3.
+- **D10** — One operator session runs the workers and brings gates to the owner as popups. A second session opens only for a trial launch or when context runs out, and sessions do not relay work to each other. No session messages a measured trial, because that adds to its context and blurs the numbers. Owner ruling, 2026-11-07.
 
 ## Open questions
 
@@ -67,11 +70,11 @@ close-time gate failures, blocking review findings and owner corrections. A row 
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| SPRINT-165 | A home for side-session handoffs, and the conformance line | closed `b63a9acc` | Ran row 1's worker contract and dispatch standard on real build work: 10 of 10 boxes, one planned `blocked` question returned to the same agent. Row 1's verdict is recorded by TASK-613, not here |
+| SPRINT-165 | A home for side-session handoffs, and the conformance line | closed `b63a9acc` | Ran row 1's worker contract and dispatch standard on real build work: 10 of 10 boxes, one planned `blocked` question returned to the same agent. Row 1's verdict: inconclusive, recorded by TASK-613 |
 
 ## Closed when
 
-- [ ] Row 1 has a recorded verdict → next slice: land the worker contract after SPRINT-164
+- [x] Row 1 has a recorded verdict → inconclusive, TASK-613
 - [ ] Row 2 has a recorded verdict → next slice: decompose and promote read in workers
 - [ ] Row 3 has a recorded verdict → next slice: light `/prime`
 - [ ] Row 4 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
