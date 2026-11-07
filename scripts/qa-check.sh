@@ -115,6 +115,27 @@ fi
 # tripped it. The name carries "-early" so a reader (and the fixtures) can tell this checkpoint fired
 # from leg 12's own, later one.
 qb_early_tripped=0
+# The conformance line (SPRINT-165 T2, TD-081): printed directly before every `QA-CHECK:` verdict so a
+# reader of the last lines sees how many informational findings leg 2f-ter relabelled INFO. A separate
+# line, not an addition to the verdict: qa-verdict.ts anchors on that line at both ends. The count reads
+# the same selection as the relabel awk in 2f-ter (every FAIL row except gates-signed:, S13.* and
+# conformance:). Not-run is its own state, never 0: no count exists when the leg did not run, or when the
+# engine produced no rule row or a setup failure.
+ce_ran=0
+ce_out=""
+ce_mode=""
+# conformance-line:begin
+qb_conformance_line() {
+  if [ "${ce_ran:-0}" != "1" ] \
+    || printf '%s\n' "$ce_out" | grep -qE '^FAIL  conformance:' \
+    || ! printf '%s\n' "$ce_out" | grep -qE '^(PASS|FAIL)  '; then
+    printf 'conformance: not run, no informational count\n'
+    return 0
+  fi
+  qb_cl_n=$(printf '%s\n' "$ce_out" | grep -E '^FAIL  ' | grep -vcE '^FAIL  (gates-signed:|S13\.[A-Z]+ |conformance:)')
+  printf 'conformance: %s informational finding(s), %s spec, not in the tally\n' "${qb_cl_n:-0}" "${ce_mode%% *}"
+}
+# conformance-line:end
 # qb_all_legs -- the ordered leg list, DERIVED from this file's own qb_checkpoint calls rather than
 # hand-maintained beside them (SPRINT-099 T2). A second hand-written list is a registry that drifts
 # from the thing it registers the first time a leg is added or renamed, and nothing would report the
@@ -138,6 +159,7 @@ qb_checkpoint() { # <leg-label>
       qb_unrun=$(qb_all_legs | qa_unreached_from "$1")
       qa_truncation_line "checkpoint '$1'" "$qb_elapsed" "$QA_BUDGET_SECONDS" "$qb_unrun" || true
       printf '\n----------------------------------------\n'
+      qb_conformance_line
       printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
       exit 1
       ;;
@@ -518,6 +540,7 @@ else
     { print }
   ')
   printf '%s\n' "$ce_out_display"
+  ce_ran=1
   gs_lines=$(printf '%s\n' "$ce_out" | grep -E '^(PASS|FAIL)  gates-signed:')
   gs_pass=$(printf '%s\n' "$gs_lines" | grep -cE '^PASS')
   gs_fails=$(printf '%s\n' "$gs_lines" | grep -cE '^FAIL')
@@ -1194,7 +1217,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-work-type-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts run-workflow-command-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-work-type-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts run-workflow-command-fixtures.ts run-conformance-line-fixtures.ts"
 eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-test-fixtures.ts run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
@@ -1648,5 +1671,6 @@ qp_sample "final: summary"
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 [ -n "${qb_trunc_line:-}" ] && printf "%s\n" "$qb_trunc_line"
+qb_conformance_line
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
 [ "$fail" -eq 0 ] || exit 1

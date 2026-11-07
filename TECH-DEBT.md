@@ -1540,7 +1540,7 @@ status: current
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
   - **Absorbs (SPRINT-116 promote, owner-approved 2026-10-06):** TD-050 · TD-066 · TD-071, the same cost mechanism.
 
-- **TD-081** severity: medium | status: open | created: Sprint-082
+- **TD-081** severity: medium | status: resolved → TASK-615 | created: Sprint-082
   - Summary: **`qa-check.sh` prints two verdicts and only one is the tally, so `0 fail` does not mean
     the conformance engine found nothing.** Line 237 states the leg is *"informational except the two
     FULLY-COVERED families"* — a deliberate, reasoned boundary, not a bug. The hazard is the
