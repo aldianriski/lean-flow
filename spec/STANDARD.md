@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-11-07
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.19.1
+version: 0.20.0
 status: current
 ---
 

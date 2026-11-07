@@ -64,9 +64,10 @@ the sprint closed past it) — so "was this actioned?" is answerable without ope
    session's focus names a member task of that sprint; any other is a side handoff and goes to the fallback ledger, root
    `HANDOFF-LEDGER.md` (create lazily, same two-field shape, no sprint-specific content), as does any handoff with no
    active sprint. Unsure whether the focus is a member task → ask.
-2. **Close out a prior handoff you are now resuming** — if that log/ledger's newest entry for this
-   context is `handoff-status: live`, append one entry reusing its `handoff-path` with
-   `handoff-status: consumed` before writing the new one below (this session picked it up).
+2. **Close out a prior handoff you are now resuming** — find the record being resumed by its
+   `handoff-path`, or check both the sprint Log and the ledger. If its newest entry is `handoff-status: live`,
+   append one entry reusing that `handoff-path` with `handoff-status: consumed` to the file that holds it —
+   Log or ledger, not necessarily the one step 1 picked — before writing the new one below.
 3. **Append the new stub**, after writing the temp doc:
    ```
    ### YYYY-MM-DD | handoff | <one-line focus>
