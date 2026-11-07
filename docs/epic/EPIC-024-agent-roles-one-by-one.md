@@ -38,7 +38,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 |---|---|---|---|---|---|
 | 0 | Context limit | This repo's data | One session at 200k | | **Closed: wrong test.** Fired near 170k with 60k of room; see the research doc |
 | 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | **Inconclusive, direction only (D4), not shipped**, owner ruling 2026-11-07. The rule's numbers as written read keep; like for like, 1.09 to 1.14 USD/box and 4.9 min/box sit inside the baselines. Coverage 2 of 2, and the planned question returned to the same agent. Text stays on `trial/epic-024-row1` at `32ac2f42`. Measures → TASK-613 § Results |
-| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | Ready to launch: `trial/epic-024-row2` at `65ace762`, a child of row 1's branch, so row 1 is in place without being on `main` (owner ruling 2026-11-07). Hosted by adopting the owner's video kit; rules in TASK-616. Row 1's text reaches `main` only after a later row reads keep, or by owner ruling |
+| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive, not shipped** (owner popup, 2026-11-07), thin case: the owner's video kit held nothing that cleared the bar, so no sprint ran, cost was not measured, and promote and a question round went untested. Context after decompose 129.2k, not comparable. Text stays on `trial/epic-024-row2` at `65ace762`; TASK-616 § Results. Row 1's text reaches `main` only after a later row reads keep, or by owner ruling |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Not started |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
@@ -65,7 +65,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 ## Open questions
 
 - How would a passing router be released: a funded arm or an exception? → owner ruling, before row 4.
-- Does a return-and-resume grill keep its quality, and does it cost less than reading in the main thread? → row 2's trial.
+- Does a return-and-resume grill keep its quality, and does it cost less than reading in the main thread? → still open: row 2's thin case asked no questions and measured no cost (TASK-616).
 - Is "compiler" a role the owner wants apart from build and typecheck in a worker's checks? → owner, when row 8 comes up.
 
 ## Member sprints
@@ -77,7 +77,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 ## Closed when
 
 - [x] Row 1 has a recorded verdict → inconclusive, on SPRINT-165, recorded by TASK-613
-- [ ] Row 2 has a recorded verdict → next slice: decompose and promote read in workers
+- [x] Row 2 has a recorded verdict → inconclusive, thin case with no member sprint, recorded by TASK-616
 - [ ] Row 3 has a recorded verdict → next slice: light `/prime`
 - [ ] Row 4 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
 - [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
