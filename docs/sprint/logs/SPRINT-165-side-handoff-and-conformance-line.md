@@ -47,3 +47,7 @@ consequence · T2 · behaviour:low · governance:low
 
 ### 2026-11-07 | progress | T1 build dispatched
 worker · T1 · a7068354b1a6cc1d6 · sonnet · none
+
+### 2026-11-07 | scope-change | T1 adds the spec and reconciliation text after the owner's stub-home ruling
+T1's builder (`a7068354b1a6cc1d6`) returned `blocked` with one question before any edit, and the owner ruled by popup: a handoff unrelated to the active sprint goes to the root `HANDOFF-LEDGER.md`, with the spec edits inside T1. Unrelated means the session's focus names no member task of the active sprint, and `/handoff` asks when unsure.
+What broke: `spec/STANDARD.md` § 2 and `skills/lean-doc-generator/references/handoff-reconciliation.md` call the ledger a no-sprint fallback, and neither was in T1's `Layers:`. Impact: T1's `Layers:` gains those two and `spec/CHANGELOG.md`. No Done-when text changes. G2 re-confirmed by the same popup. No ADR governs the ledger's trigger; under §15 no verdict moves, so the bump is not MAJOR.

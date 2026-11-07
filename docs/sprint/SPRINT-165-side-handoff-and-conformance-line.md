@@ -28,7 +28,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Give a side-session handoff a home that /prime can see `[size: S · risk: low · class: execution · HITL · J2]`
-Layers: `skills/handoff/SKILL.md` · `skills/prime/SKILL.md` · `scripts/lib/check-handoff-state.sh` · `evals/run-handoff-state-fixtures.sh` · `CHANGELOG.md` · `TECH-DEBT.md`
+Layers: `skills/handoff/SKILL.md` · `skills/prime/SKILL.md` · `scripts/lib/check-handoff-state.sh` · `evals/run-handoff-state-fixtures.sh` · `CHANGELOG.md` · `TECH-DEBT.md` · `spec/STANDARD.md` · `spec/CHANGELOG.md` · `skills/lean-doc-generator/references/handoff-reconciliation.md`
 Depends-on: none
 Cites: TASK-614 · TD-298 · TASK-613 · owner ruling 2026-11-07
 The owner had to name a handoff's path by hand on 2026-11-06. Where the stub lives is deliberately unruled at G2, so the builder returns `blocked` with one question and a recommendation; that is row 1's return-path check.
