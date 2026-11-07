@@ -2068,3 +2068,13 @@ status: current
   - Evidence: 2026-11-06, the EPIC-024 prep handoff skipped its stub for this reason, and the owner had to name the path in the next session's prompt. `skills/handoff/SKILL.md` § Repo-side status stub; `skills/prime/SKILL.md` § Handoff status. The in-sprint path works as designed (SPRINT-094 T2).
   - Impact: low; the path is named by hand. The owner expected `/prime` to find every handoff, so it reads as a bug.
   - Mitigation: fix direction, not a ruling: let a handoff unrelated to the active sprint use `HANDOFF-LEDGER.md`, read by `/prime` alongside the sprint Log; a committed ledger entry must not redden an active sprint's checks. Name the path in the prompt until then.
+- **TD-299** severity: low | status: open | created: Sprint-165 (promote)
+  - Summary: **Promote's §11 scan of closed task files is done by hand, and one reported nothing due while files were overdue.** SPRINT-164's promote said "nothing due"; SPRINT-165's found 26 due, 25 of them old enough at SPRINT-164. A citation that lapsed in between could explain some; that was not checked.
+  - Evidence: SPRINT-165 Log, promote entry; `d0a9752a` deleted the 26, two selectors agreeing on 25.
+  - Impact: low; a stale file costs little, and nothing wrong reaches an adopter.
+  - Mitigation: derive the list at each promote, by the live-citation rule in STANDARD §11, as the SPRINT-165 scan did. A checker needs an ADR-053 reason; one sighting is not one.
+- **TD-300** severity: low | status: open | created: Sprint-165 (T1 review)
+  - Summary: **`/handoff` step 2's resume path has no run.** Codex round 1 found a resumed side stub could stay `live`, and `750963c0` fixed the text. The proof ran on `8d099eda`, before the fix, and covered first handoffs only.
+  - Evidence: SPRINT-165 Log, T1 entry.
+  - Impact: low; the worst case is a `live` ledger row that promote's handoff line then shows.
+  - Mitigation: run it the next time a real side handoff is resumed; no run planned.

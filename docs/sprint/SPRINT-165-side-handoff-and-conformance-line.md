@@ -4,7 +4,7 @@ slug: side-handoff-and-conformance-line
 epic: EPIC-024
 owner: Maintainer
 last_updated: 2026-11-07
-status: active
+status: closed
 gates_signed: G1,G2 @ 0a106887
 plan_commit: 6b12630a
 update_trigger: sprint execute/close events
@@ -44,7 +44,7 @@ The line `QA-CHECK: 173 pass, 0 fail` can sit below seven conformance FAIL rows 
 **Acceptance:** the gate prints the informational finding count directly before an unchanged verdict line, and a retained must-FAIL fixture reddens when that line is removed or miscounts.
 
 ## Owner-action checklist
-- [ ] Rule TD-298's stub home when T1's builder returns `blocked` (T1).
+- [x] Rule TD-298's stub home when T1's builder returns `blocked` (T1). ✓ owner ruling by popup, recorded in the Log's T1 scope-change
 
 ## Decisions (pre-locked)
 - **D1** — Shared files: `TECH-DEBT.md` and `evals/` are edited in T1, T2 order; `Depends-on: T1` makes that the ownership order. No parallel wave.
@@ -65,5 +65,34 @@ The line `QA-CHECK: 173 pass, 0 fail` can sit below seven conformance FAIL rows 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/handoff/SKILL.md` | T1 | a side handoff's stub goes to the ledger; a resumed record closes where it sits | Med | proof runs A and B; Codex 2 rounds |
+| `skills/prime/SKILL.md` | T1 | reports the sprint Log and the ledger | Med | proof run A2 |
+| `skills/lean-doc-generator/references/handoff-reconciliation.md` | T1 | the ledger is no longer a no-sprint fallback only | Low | Codex |
+| `spec/STANDARD.md` · `spec/CHANGELOG.md` | T1 | § 2's ledger row, spec 0.20.0, MINOR | Low | Codex; §15's test |
+| `scripts/lib/check-handoff-state.sh` | T1 | comments only, so they match the ledger's reach | Low | fixtures |
+| `evals/run-handoff-state-fixtures.sh` | T1 | four side-stub cases | Low | 31 PASS |
+| `scripts/qa-check.sh` | T2 | one function prints the conformance line before both verdict prints; the harness joins leg 12 | Low | gate, 63 on the real repo |
+| `evals/run-conformance-line-fixtures.ts` | T2 | must-FAIL fixtures for the line | Low | 14 pass |
+| `TECH-DEBT.md` | T1 · T2 | TD-298 and TD-081 resolved; TD-299 and TD-300 filed at close | Low | read |
+| `CHANGELOG.md` | T1 · close | `[Unreleased]` entries | Low | read |
 
 ## Retro
+
+**Retrieval check** — yes, two misses, both the coordinator's. L-262 (a brief names the typecheck leg) was promoted and in reach when T2's brief told the builder not to run the full gate and named no leg. L-234 (run the scope-change leg before committing the entry) was in the log's own header when the T1 entry named `HANDOFF-LEDGER.md`. Both counted.
+
+**Cost** — coordinator on Opus plus two Sonnet builders, two Sonnet builder-check readers, one Sonnet reviewer and two Codex rounds. Three headless proof runs cost 1.65 USD. The whole session's USD per box is not available at close, since this session's cost row is not yet written; TASK-613 records it against the baselines. 10 of 10 boxes delivered.
+
+**Worked**
+- The planned question came back as `blocked` with one question and a recommendation before any edit, and the answer returned to the same agent id.
+- Both builders kept to the contract: no status moves, no sprint-file writes, and the T1 builder stopped at the classifier's denial instead of working around it.
+- The fresh readers paid for themselves: T2's reader found the second verdict print inside `qb_checkpoint` and the reduced-spec 0, before any code.
+- Box 3's second selection caught a 64 against 63, explained by another leg's row rather than rounded away.
+
+**Friction**
+- Two close-time gate failures on the first full gate, both from the coordinator's side (Log, 2026-11-07 surprise entry). Neither traces to the worker contract's text, though its "run the relevant checks" did not stop a brief from leaving a leg out.
+- A1 was wrong: the checker reads the ledger whatever the sprint state. The reader caught it at G2.
+- The T1 proof needed a second owner popup, because no one had decided at G2 who launches a nested headless run.
+- The builder picked PATCH and Codex argued MAJOR; §15's own test and MINOR row settled it.
+- The tally fell from 504 to 460 with the 26 deletions, and the per-leg cause was not traced.
+
+**Pattern candidate** — L-293 (who launches a proof is a G2 decision).

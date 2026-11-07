@@ -75,3 +75,10 @@ Commits `4d97cb53` and `41d2fd4d`. Pin: `bun test` on `evals/qa-verdict.test.ts`
 Return path, worker `ad846f93816158134`, same id: return 1 `ready`, return 2 `ready` after the typecheck fix by SendMessage. No question raised.
 Real run, gate on `41d2fd4d`: `QA-CHECK: 463 pass, 0 fail`, `bun test` 589 pass, 0 fail. The line reads 63. A first comparison gave 64 `INFO` rows against 63: the odd row is `prose-density` at line 149, printed by another leg, so the design's "any other non-engine producer" applied. Two selections then agree on 63, and N is non-zero, so the box discriminates.
 review · T2 · one scoped Sonnet reviewer, CLEAR, 5 of 5 spec items · behaviour:low · governance:low
+
+### 2026-11-07 | progress | system verify on the integrated tree
+system-verify · PASS · `gate-remote.ts` on `30bd417f`: `QA-CHECK: 463 pass, 0 fail`, `bun test` 589 pass, 0 fail. Before it, the Sprint-close checker: 6 pass, 0 fail, both members in `done/`.
+
+### 2026-11-07 | close | Retro written, buckets routed, two of two members done
+run · 10 of 10 DoD ticked. Terminal state PLAN_EXHAUSTED. Measures against the baselines and the row 1 verdict stay with TASK-613, outside this sprint.
+Filed: TD-299, TD-300, L-293; L-262 and L-234 at count 3; follow-ups none. No handoff entries to reconcile in this Log.

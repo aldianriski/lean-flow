@@ -125,6 +125,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-293 [tags: process] [status: active]: **Who launches a headless proof is a G2 decision: a worker's nested `claude -p` can be denied by the host's classifier.** SPRINT-165 T1's design gave the proof to the builder. The classifier denied its launch as "Create Unsafe Agents", so the builder returned `blocked` with the work done and the box open, and the owner had to approve the runs in a second popup. Name the launcher and get the approval at G2, and have the builder stage the proof only.
+- seen: 2026-11-07 (SPRINT-165 T1, consumer proof)
+- count: 1
+- promoted: no
+- related: L-241 · L-249 · TASK-614
+
+---
+
 ## L-292 [tags: process] [status: active]: **A proof's fixture must be true of the code the run reads, and a re-run rebuilds its copy instead of seeding it again.** SPRINT-164 T3's first B2 after-run told the agent a dialog wrapper set `overflow: visible`, which was false for that copy, and re-using the copy planted a second instance of the seeded bug. The agent merged the duplicates, committed, and took the dialog bug down another path, so the run said nothing about the fix. Rebuilding both pins' copies from one commit, with a cause seeded and true, gave runs that could be compared. An agent that reads the code will test the report against it, so a false premise changes the path under test.
 - seen: 2026-11-07 (SPRINT-164 T3, consumer proof)
 - count: 1
@@ -366,8 +374,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-262 [tags: process] [status: promoted]: **A builder brief that names the task's tests but not `tsc --noEmit` gets a commit that passes its tests and fails the typecheck leg.** SPRINT-148 had two sightings. The T3 builder committed gate-remote's new code with its file tests and the full `bun test` green, and the VPS gate went red on seven strict-index errors in that code. The T2 builder, in a worktree, never ran `tsc` at all, and nine `exactOptionalPropertyTypes` errors surfaced only when the coordinator's post-merge `merge-check` ran (L-218 working as written). Bun runs TypeScript without type-checking it, so a green test run says nothing about types. L-218 is the coordinator's side, catching it after the merge; this is the brief's side. Every dispatch brief that touches `.ts` names `bunx tsc --noEmit` among the checks to run before commit.
-- seen: 2026-10-29 (SPRINT-148 T3: red VPS typecheck at `54eed65d`, fixed in `cfbb748c` · T2: post-merge `merge-check` red, fixed in `c6503711`)
-- count: 2
+- seen: 2026-10-29 (SPRINT-148 T3: red VPS typecheck at `54eed65d`, fixed in `cfbb748c` · T2: post-merge `merge-check` red, fixed in `c6503711`) · 2026-11-07 (SPRINT-165 T2: the coordinator's brief named no typecheck leg, TS2532 red on the VPS at `4d97cb53`, fixed in `41d2fd4d`)
+- count: 3
 - **L-262 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — into L-251's "run every check that reads a touched file" line: the dispatch brief names those checks, `bunx tsc --noEmit` included whenever it touches `.ts` (SPRINT-149 promote)
 - related: L-218 (coordinator-side legs after each merge) · L-251 (run every check that reads a touched file)
 
@@ -576,8 +584,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **L-235 → promoted: merged into L-224** · disposition: merge — L-224's rule (check with the checker the gate actually runs, after every write) already covers a whole-tree leg a diff review cannot see; both sightings are counted on L-224, this entry's text stays as the record.
 
 ## L-234 [tags: sprint-model] [status: promoted]: **A scope-change entry is attributed by its HEADING, so the heading must name every `Tn` whose files the body lists.** SPRINT-125's Plan-meta entry named TASK-434 in its heading and then listed paths for T3, T7 and D1; the scope-change-layers check charged them all to T1 and system verify reddened. The log is append-only, so the fix cost a `Cites:` note on T1 rather than an edit. Write one entry per task, or a heading listing every `Tn`.
-- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0)
-- count: 2
+- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0) · 2026-11-07 (SPRINT-165 T1: the entry named `HANDOFF-LEDGER.md`, red at `4d97cb53`, fixed by a `Cites:` addition in `cce0ce67`)
+- count: 3
 - **L-234 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: move-to-reference — a scope-change heading names every `Tn` its body touches, and the scope-change leg runs before the entry is committed.
 - related: L-229 · L-151
 

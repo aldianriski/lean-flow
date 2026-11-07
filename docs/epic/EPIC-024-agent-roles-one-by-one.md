@@ -67,7 +67,7 @@ close-time gate failures, blocking review findings and owner corrections. A row 
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| SPRINT-165 | A home for side-session handoffs, and the conformance line | active | Host sprint for row 1's trial |
+| SPRINT-165 | A home for side-session handoffs, and the conformance line | closed, `close_commit` pending | Ran row 1's worker contract and dispatch standard on real build work: 10 of 10 boxes, one planned `blocked` question returned to the same agent. Row 1's verdict is recorded by TASK-613, not here |
 
 ## Closed when
 
