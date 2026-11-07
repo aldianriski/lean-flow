@@ -63,3 +63,6 @@ review · T1 · Codex read-only (a different model from the writer), 2 rounds, 2
 
 ### 2026-11-07 | progress | T2 build dispatched
 worker · T2 · ad846f93816158134 · sonnet · none
+
+### 2026-11-07 | scope-change | T1 cites the ledger, because the gate read the earlier entry's path as undeclared
+The gate on `4d97cb53` failed `scope-change layers`: the earlier T1 entry names `HANDOFF-LEDGER.md`, absent from T1's `Layers:` and `Cites:`. The coordinator wrote that entry without checking its paths against the Plan, though the log's header states the rule. The path is the ruling's subject and no commit in this repo touches it, so it goes on T1's `Cites:`. No Done-when text changes.
