@@ -4,7 +4,7 @@ slug: agent-roles-one-by-one
 owner: Maintainer
 last_updated: 2026-11-07
 status: active
-member_sprints: [SPRINT-165]
+member_sprints: [SPRINT-165, SPRINT-166]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
 
@@ -74,6 +74,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | SPRINT-165 | A home for side-session handoffs, and the conformance line | closed `b63a9acc` | Ran row 1's worker contract and dispatch standard on real build work: 10 of 10 boxes, one planned `blocked` question returned to the same agent. Row 1's verdict: inconclusive, recorded by TASK-613 |
+| SPRINT-166 | Evidence-backed diagrams | active | Hosts the bundled trial of rows 2 and 3 (TASK-617): decompose and promote ran through workers, and the build runs the new `/diagram` skill. Verdicts are recorded by TASK-616 and TASK-617 after close |
 
 ## Closed when
 
