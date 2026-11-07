@@ -961,7 +961,8 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-165** severity: medium | status: open | created: Sprint-102
+- **TD-165** severity: medium | status: resolved → TASK-479, TASK-403 | created: Sprint-102
+  - **Resolved 2026-11-07 (owner ruling, EPIC-024 row 1 G2):** nothing named here is left. The parse is TASK-479 below. The clock-input sighting was already fixed when that note called it open: SPRINT-115 T1 (TASK-403, `6184fd23`, TD-225) made `run-qa-budget-position-fixtures.sh` case 2 assert position, and `run-qa-budget-fixtures.sh` case 12 reads a frozen clock. Cases 1 and 3 still run under `timeout 60`, which could false-red on a loaded host; never observed, so re-file only if it does.
   - **Narrowed (SPRINT-137 T2, TASK-479, `e4eb536e`):** the pass-count parse is done: a retained test in the dod-delta suite runs every harness's parse line (six, found by two agreeing selectors) over an ANSI-coloured sample, with a stripless control per harness; a seeded strip revert reddened exactly its harness. What stays open is the SPRINT-103 clock-input sighting below.
   - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
     discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that
