@@ -44,3 +44,6 @@ T2: one function, called directly before both `QA-CHECK:` prints, prints `confor
 `check-verify-reaches`: 0 mechanical `Verify:` clauses, so every box is a judgment tick or a stated query on an artifact.
 consequence · T1 · behaviour:material · governance:low
 consequence · T2 · behaviour:low · governance:low
+
+### 2026-11-07 | progress | T1 build dispatched
+worker · T1 · a7068354b1a6cc1d6 · sonnet · none
