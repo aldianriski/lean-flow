@@ -11,7 +11,6 @@ class: decision
 tier: P
 authority: J2
 origin: manual
-state: blocked
 depends-on: []
 ---
 
@@ -35,6 +34,9 @@ measured cost and that a ceiling may save about 25% (modelled) with no new compo
 - Baseline, 24 to 31 Oct: about 1.7 USD per box, from 565 USD by cost rows over 335 boxes in SPRINT-133 to 151; 1.2 to 2.7 by session. Some sprints span sessions, and a resumed session's cost row can undercount.
 - Where the variable may be set was not confirmed in the docs; the launching shell is assumed. Check at the first sprint that compaction fires near 200k.
 - **Step 2 needs an owner ruling first:** how a passing router would be released, by a funded arm or an exception.
+
+## Amended 2026-11-06
+Cancelled by owner ruling (popup). One session at 200k showed a limit is the wrong test: it fired near 170k with about 60k of room, compacting about every 20 turns, because planning already reached 152k before any build. `docs/research/router-mode.md` has the numbers; EPIC-024 row 0 records the verdict, and D7 keeps a limit possible later as a safety net.
 
 ## Tracker
 `docs/research/router-mode.md` · owner rulings 2026-11-06 · Codex review, CLEAR in round 2
