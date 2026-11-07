@@ -71,4 +71,6 @@ The `/prime` figure is inflated by an interrupted `/lean-doc-generator` run: at 
 
 **Verdict: inconclusive, not shipped.** No drop condition fired: context stayed below 152k, with no gate failure, blocking finding or owner correction traced to the route, and no intent lost on the way to the worker. Keep is ruled out in the thin case. The promote worker and the question-and-resume round remain untested, so this says little about either. Row 2's text stays on `trial/epic-024-row2` at `65ace762`.
 
-**Open boxes.** The two unticked boxes cannot be met in the thin case. This task stays in `in_progress` until the owner rules, because no task in `done/` carries an open box (0 of 74).
+**Open boxes.** The two unticked boxes cannot be met in the thin case. This task stays in `in_progress` until the owner rules, because no task in `done/` carries an open box (0 of 74). EPIC-024's row 2 condition also stays unticked, because `epic-state` requires a tick to name a member sprint and row 2 has none.
+
+**Gate on this record.** The first run failed 2 checks, both on the wording of this record in the epic: `epic-state` and `prose-density`. Neither traces to the route. Both were fixed by changing the text, not the checks.
