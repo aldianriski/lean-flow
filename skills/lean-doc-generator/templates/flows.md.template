@@ -9,7 +9,7 @@ status: current
      FLOW, kebab-case slug named after the flow itself (e.g. authentication-flow.md,
      checkout-flow.md) — never a single shared flows.md. Created when a flow needs shared
      understanding across more than one person; WHY/WHERE-level steps, never a line-by-line
-     code trace. -->
+     code trace. To draw it from code, with a source and status per step and edge, run /diagram. -->
 
 # [Flow Name] Flow [CUSTOMIZE]
 

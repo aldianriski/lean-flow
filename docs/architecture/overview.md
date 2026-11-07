@@ -28,12 +28,13 @@ spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.18.2) · CHAN
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 packs/            CONTRACT.md · <family>.md · examples/ — workflow packs any agent follows alone (ADR-055)
-skills/           15 skills (auto-discovered at root)
+skills/           16 skills (auto-discovered at root)
   flow/                                                  opt-in conductor
   prime/ lean-doc-generator/ orchestrator/ task-decomposer/ triage/
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
   humanizer/                                             writing utility: rewrite AI-sounding prose
+  diagram/                                               drawing utility: Mermaid + per-id evidence table
   <skill>/references/   on-demand depth — uncounted by the SKILL.md cap (ADR-006):
     tdd/references/testability.md                 what to mock · design-for-testability · refactor candidates
     diagnose/references/feedback-loops.md         10 ways to build a loop · determinism · perf

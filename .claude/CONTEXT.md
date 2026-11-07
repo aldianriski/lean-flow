@@ -14,7 +14,7 @@ SSOT for the loop, roster, gates, modes, tiers, and sprint model. README and CLA
 `/prime → (/task-decomposer → /triage →) /lean-doc-generator promote → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) → next `/prime` reads it.
 Every skill works standalone; the loop is just the order they reward most together. (Diagram → README.)
 
-## Skill roster (15 — 12 stage-skills · 1 conductor · 1 decision aid · 1 writing utility)
+## Skill roster (16 — 12 stage-skills · 1 conductor · 1 decision aid · 2 utilities)
 
 | Skill | Role | One-line purpose |
 |---|---|---|
@@ -32,9 +32,10 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/handoff` | continuity | compact the conversation → temp-dir doc for the next session |
 | `/insights` | learn | anytime — a friction → an `L-NNN` candidate in `LEARNINGS` (or bump a match's `count`); complements the Sprint-Close Retro |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
-| `/humanizer` | utility | rewrite AI-sounding prose in place (pasted text or a file); EN catalog vendored from blader/humanizer (MIT) + overlay + ID catalog/term policy; audit, EN↔ID if asked. Not a stage, so `/flow` does not name it; wired: `/lean-doc-generator` · `/release-patch` · `/handoff` · commit messages (inline) · PR bodies (child) |
+| `/humanizer` | utility | rewrite AI-sounding prose in place; EN catalog vendored from blader/humanizer (MIT) + overlay + ID catalog; audit, EN↔ID if asked. Not a stage, so `/flow` does not name it; wired: `/lean-doc-generator` · `/release-patch` · `/handoff` · commit messages (inline) · PR bodies (child) |
+| `/diagram` | utility | Mermaid + evidence table: each box and arrow tied to a source line; standalone |
 
-**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2). Both run **by frontier round** — batch every question whose prerequisites are settled into one popup, serialise only dependents (dependency is the discriminator, not count); facts are the agent's job to resolve, never the user's. **Implement routing** (`/orchestrator`):
+**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2). Both run **by frontier round** — batch every question whose prerequisites are settled into one popup, serialise only dependents (dependency decides, not count); facts are the agent's job to resolve, never the user's. **Implement routing** (`/orchestrator`):
 new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct. `/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
 
 ## Built-in leverage
@@ -111,7 +112,7 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 
 **Creates vs consumes** — `/lean-doc-generator` creates every core doc (`epic` · `prd` · sprint · ADRs · `migrate`/`init`); `/task-decomposer` consumes them and emits tasks. Two things share the name "PRD": the **working feature PRD** is disposable intake scaffolding the decomposer synthesizes to slice against (not a §2 file), while **`docs/product/requirements.md`** is the durable project-scoped core doc — pipeline is *feature PRD → sanitize → requirements.md*, and that write is the generator's. `--prd <path>` always means *consume*.
 
-LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `spec/STANDARD.md` (the SSOT — ADR-023): §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree; when the growth is an **append-only series** it splits to a `logs/` sibling instead — ADR-014's mechanism, now carried by both the `sprint/logs/` and `research/logs/` rows) · §12 Git boundary; templates → `…/templates/` (34 core + 2 non-core). Domain glossary lives **here** when the project has terms worth fixing (canonical + `_Avoid_:` synonyms) — **create-lazily**, never pre-created empty (STANDARD §7); lean-flow has none yet, and `/refactor-advisor` adds the first term when one is named. ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
+LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `spec/STANDARD.md` (the SSOT — ADR-023): §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree; an **append-only series** splits to a `logs/` sibling instead — ADR-014's mechanism, carried by the `sprint/logs/` and `research/logs/` rows) · §12 Git boundary; templates → `…/templates/` (34 core + 2 non-core). Domain glossary lives **here** when the project has terms worth fixing (canonical + `_Avoid_:` synonyms) — **create-lazily**, never pre-created empty (STANDARD §7); lean-flow has none yet; `/refactor-advisor` adds the first when one is named. ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
 ## Orientation
 

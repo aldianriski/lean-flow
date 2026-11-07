@@ -5,8 +5,8 @@
 
 # lean-flow
 
-**A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, an opt-in decision council, and a writing utility.
-<br />**15 skills · a repo scaffolder (`/lean-doc-generator init`) · no hooks and no agent definitions in the roster today.** Drop it into any repo and adapt.
+**A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, an opt-in decision council, and two utilities (writing, diagrams).
+<br />**16 skills · a repo scaffolder (`/lean-doc-generator init`) · no hooks and no agent definitions in the roster today.** Drop it into any repo and adapt.
 
 [![MIT License][license-shield]][license-url]
 [![Claude Code][claude-shield]][claude-url]
@@ -182,7 +182,7 @@ by hand) — same artifacts either way.
 
 ## The skills
 
-One conductor + twelve standalone stages + an opt-in decision council + a writing utility (`/humanizer`). `/flow` conducts; the twelve
+One conductor + twelve standalone stages + an opt-in decision council + two utilities (`/humanizer`, `/diagram`). `/flow` conducts; the twelve
 stage-skills each also run **standalone** (none require another); `/council` is for hard forks.
 
 | Stage | Skill | Use it for |
@@ -202,6 +202,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
 | **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → a calibrated `verdict-<slug>.md` (pre-mortem · confidence+dissent · optional gated fact-verify) → feed an ADR (uses sub-agents) |
 | **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) plus an Indonesian catalog (slop patterns, a term policy that keeps English where the KBBI coinage is uncommon) and a lean-flow overlay of six more patterns; on request it audits first (numbered findings, only the picked ones change) or translates EN↔ID; it reports before → after counts of dashes, bold labels and curly quotes; other skills call it in a child context for docs, CHANGELOG entries, handoffs and PR bodies, and inline for commit messages |
+| | `/diagram` | draw architecture, workflow, sequence, data flow, state or ERD as Mermaid plus an evidence table that ties every box and arrow to a source line, marked called, configured, proposed or unknown; read-only git only; standalone |
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
 promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates · modes →
@@ -488,7 +489,7 @@ Full map — composition rule, the loop, integration points, boundaries →
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 .codex-plugin/    plugin.json                           (Codex CLI manifest, lockstep version)
 .kimi-plugin/     plugin.json                           (Kimi Code CLI manifest, lockstep version)
-skills/           15 skills — /flow conductor + 12 stages + /council + /humanizer (auto-discovered)
+skills/           16 skills — /flow conductor + 12 stages + /council + /humanizer + /diagram (auto-discovered)
   lean-doc-generator/
     references/   STANDARD.md · migration-map.md · ADR-example.md
     templates/    34 canonical doc templates (core, incl. EPIC · SPRINT · ADR · RESEARCH ·

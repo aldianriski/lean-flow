@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Added** — `/diagram` draws architecture, workflow, sequence, data-flow, state and ERD diagrams as Mermaid with an evidence table that ties every box and arrow to a source line, each marked called, configured, proposed or unknown. The roster is now 16 skills; the data-flow and flows doc templates point to it (TASK-619).
 - **Added (maintainer-only)** — `scripts/session-cost.ts` reports where a repo's Claude Code spend goes; `docs/research/router-mode.md` plans how to test a router against it (TASK-609). No skill changed.
 - **Fixed** — `migrate` writes a named standard with no checks as `checks: not decided yet (owner, migrate)`, the form `init` already wrote, and its report uses the topic labels word for word. Before, it marked every field undecided and described the topic in its own prose, so a search for the marker found nothing (TASK-610).
 - **Fixed** — `/task-decomposer` no longer writes a `Negative:` box the owner never saw. A draft that needs one and names no scenario is held at `approve`: it shows the exact line, writes nothing, and writes that line unchanged after a fresh `approve` (TASK-611).

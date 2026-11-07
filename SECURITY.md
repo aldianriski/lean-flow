@@ -20,11 +20,11 @@ threat surface, and it is what this file is about.
 
 ## What this plugin can do in your repo
 
-Skills declare their own tool grants. Of the 15:
+Skills declare their own tool grants. Of the 16:
 
 | Grant | Skills |
 |---|---|
-| **Unscoped `Bash`** | `diagnose` · `flow` · `handoff` · `orchestrator` · `prototype` · `tdd` |
+| **Unscoped `Bash`** | `diagnose` · `diagram` (instructed read-only git only) · `flow` · `handoff` · `orchestrator` · `prototype` · `tdd` |
 | Scoped `Bash(git *)` etc. | `lean-doc-generator` · `release-patch` · `triage` |
 | No shell at all | `council` · `humanizer` · `insights` · `prime` · `refactor-advisor` · `task-decomposer` |
 
