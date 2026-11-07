@@ -40,3 +40,10 @@ Miss named: G2 was signed at promote without the builder check (`references/buil
 What broke: TASK-618's fourth box calls `D:\Research\workdoo` git-less, but it has a `.git` (HEAD `cf41a203`), so that run read revisions from git. The premise came from intake, not from a check.
 Impact: the second-repo run still tests a repo of different shape with no lean-flow path leaked; the no-git path ran on the throwaway fixture, which had no git. The run wrote nothing to workdoo, so no snapshot or revert was needed.
 Re-confirm: owner ruled by popup, "Reword, then tick". Box 4 now reads without "git-less" and without "snapshot then revert"; no other box changes.
+
+### 2026-11-08 | progress | T1 (TASK-618) done: 8 of 8 boxes
+Built by the worker in `81a1198e` (SKILL.md and references/evidence-record.md). Coordinator review added the edge-end rule (an edge never outranks either end), which corrected one hand-run label in the workdoo output.
+Codex R1 (`81a1198e`): NOT CLEAR, three Medium: a README rule contradicted `proposed`, one sentence closely paraphrased the kit, and the self-check opened 3 lines against the box's 5. Fixed in `f291493c`, plus an ER example.
+Codex R2 (`f291493c`): three RESOLVED, no new issue; one STILL OPEN: five lines could come from one row's range. Closed by the coordinator inline in `ed762f49` (one phrase, now five different rows), which also reworded the last 5-word run shared with the kit. Not re-reviewed: the two-round cap was reached.
+Copied text: every 5-word run of the kit's SKILL.md and all three references compared with `skills/diagram/`: 0 shared after `ed762f49`.
+Ticks via `tick-box.ts`: each re-run gave check-sprint-by-reference 4 pass and check-layers-completeness 9 pass.

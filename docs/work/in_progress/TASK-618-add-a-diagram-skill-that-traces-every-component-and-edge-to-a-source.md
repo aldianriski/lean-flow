@@ -30,14 +30,14 @@ Rules: a configured adapter never called is never drawn `called`; never invent s
 Output location (STANDARD §2 slots, each within its cap; if diagram plus table would pass the cap, split into an overview and targeted views): workflow, sequence, state → `docs/flows/<slug>.md` (100) · dataflow → `docs/architecture/data-flow.md` (120) · cross-service calls → `docs/architecture/service-dependencies.md` (120) · ERD → `docs/database/erd.md` (120) · whole-system view → a section of `docs/architecture/overview.md` (150). A consumer without these docs gets the output inline or at the path they name; the skill creates no folder layout of its own.
 
 ## Done when
-- [ ] `/diagram` on lean-flow's own loop (`prime` to `handoff`) gives a Mermaid diagram plus an evidence table where every id has a row.
-- [ ] Citation check: at least 5 sampled rows are opened, and each `path:line` exists and says what the row claims; misses are named.
-- [ ] A throwaway fixture repo with one configured-but-never-called adapter and one source-less claim is run through `/diagram`: the adapter is labelled `configured`, the source-less claim is `unknown`; the fixture is deleted after.
-- [ ] A second real repo of different shape (`D:\Research\workdoo`, read-only; the no-git path is covered by the fixture) gives a valid diagram with no lean-flow path leaked.
-- [ ] The output path follows the map above and stays within each slot's cap, checked by `wc -l`.
-- [ ] Copied-text check: take at least 15 distinctive phrases (4 or more words each) from the kit's `SKILL.md` and its three references, search each in `skills/diagram/`, and report hits; target 0, any hit is rewritten. The same search finds none of the words Archify, TemiDev, motion or video in `skills/diagram/`.
-- [ ] SKILL.md is 80 lines or fewer.
-- [ ] Negative: on the fixture, the configured-but-never-called adapter is labelled `configured` and no `-->` edge marked `called` touches it, and the source-less claim appears as `unknown`, never as a plain edge.
+- [x] `/diagram` on lean-flow's own loop (`prime` to `handoff`) gives a Mermaid diagram plus an evidence table where every id has a row. ✓ 15 ids, one row each, scope prime to handoff (worker run on 81a1198e)
+- [x] Citation check: at least 5 sampled rows are opened, and each `path:line` exists and says what the row claims; misses are named. ✓ 9 of 9 sampled rows open and match; E4 is unknown with no directing line
+- [x] A throwaway fixture repo with one configured-but-never-called adapter and one source-less claim is run through `/diagram`: the adapter is labelled `configured`, the source-less claim is `unknown`; the fixture is deleted after. ✓ never-called mailer labelled configured, README replication claim unknown; fixture deleted, tree clean
+- [x] A second real repo of different shape (`D:\Research\workdoo`, read-only; the no-git path is covered by the fixture) gives a valid diagram with no lean-flow path leaked. ✓ workdoo read-only at cf41a203, 15 ids, no lean-flow path; E1 corrected to configured by the edge-end rule
+- [x] The output path follows the map above and stays within each slot's cap, checked by `wc -l`. ✓ both outputs fit an overview section, 30 and 28 lines by wc -l against 150
+- [x] Copied-text check: take at least 15 distinctive phrases (4 or more words each) from the kit's `SKILL.md` and its three references, search each in `skills/diagram/`, and report hits; target 0, any hit is rewritten. The same search finds none of the words Archify, TemiDev, motion or video in `skills/diagram/`. ✓ 20 phrases gave 0 hits; every 5-word run of all 4 kit files checked, last shared run reworded in ed762f49; 0 forbidden words
+- [x] SKILL.md is 80 lines or fewer. ✓ 70 lines by wc -l
+- [x] Negative: on the fixture, the configured-but-never-called adapter is labelled `configured` and no `-->` edge marked `called` touches it, and the source-less claim appears as `unknown`, never as a plain edge. ✓ on the fixture the only solid edge is N1 to N2; no solid edge touches N3, and the README claim is unknown
 
 ## Touches
 `skills/diagram/SKILL.md`, `skills/diagram/references/evidence-record.md`. The fixture is throwaway and deleted.
