@@ -30,7 +30,9 @@ Evidence and limits → [`docs/research/router-mode.md`](../research/router-mode
 Run top to bottom, one at a time. Every trial records main-thread context after `/prime` (83k, median of 10), after decompose (152k, one session) and at the first build step (no baseline yet; take it from SPRINT-164), compactions, USD per box across all agents (`bun scripts/session-cost.ts`, baseline about 1.7), elapsed time,
 close-time gate failures, blocking review findings and owner corrections. A row passes only with **overall cost or elapsed time better and no guard worse**; a better sub-measure alone is not a pass.
 
-From row 2 on, cost and time use one basis, by owner ruling after row 1 (TASK-613 § Results). USD per box runs from the promote call to the sprint's last commit, across all agents; a whole session also pays for decomposing and releasing. Minutes per box merge main-thread and worker activity, dropping gaps over 5 minutes; summed `turn_duration` overcounts, by 41 to 192 minutes per session on the four sprints checked. On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPRINT-139, 140, 146).
+From row 2 on, cost and time use one basis, by owner ruling after row 1 (TASK-613 § Results). USD per box runs from the promote call to the sprint's last commit, across all agents; a whole session also pays for decomposing and releasing.
+Minutes per box merge main-thread and worker activity, dropping gaps over 5 minutes; summed `turn_duration` overcounts, by 41 to 192 minutes per session on the four sprints checked.
+On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPRINT-139, 140, 146).
 
 | # | Change | Source | Trial | Must also show | Status |
 |---|---|---|---|---|---|
@@ -74,7 +76,7 @@ From row 2 on, cost and time use one basis, by owner ruling after row 1 (TASK-61
 
 ## Closed when
 
-- [x] Row 1 has a recorded verdict → inconclusive, TASK-613
+- [x] Row 1 has a recorded verdict → inconclusive, on SPRINT-165, recorded by TASK-613
 - [ ] Row 2 has a recorded verdict → next slice: decompose and promote read in workers
 - [ ] Row 3 has a recorded verdict → next slice: light `/prime`
 - [ ] Row 4 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
