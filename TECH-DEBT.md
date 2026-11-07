@@ -2061,3 +2061,9 @@ status: current
   - Evidence: SPRINT-164 log, T1 entries; `skills/lean-doc-generator/references/migration-map.md` (Report).
   - Impact: the report falls back on prose for these two cases; nothing is written wrong.
   - Mitigation: name both labels when a real migrate hits one; no run planned.
+- **TD-298** severity: low | status: open | created: Sprint-164 (EPIC-024 prep; owner report)
+  - Summary: **A handoff made outside the active sprint's work has no stub home, so `/prime` cannot see it.** `/handoff` writes its stub to the active sprint's Log, or to `HANDOFF-LEDGER.md` only when no sprint is active, and `/prime` reports from the same places.
+    With a second session running a sprint, a side session's handoff either lands in a log that is not its own, where a `live` entry can fail that sprint's close check, or gets no stub.
+  - Evidence: 2026-11-06, the EPIC-024 prep handoff skipped its stub for this reason, and the owner had to name the path in the next session's prompt. `skills/handoff/SKILL.md` § Repo-side status stub; `skills/prime/SKILL.md` § Handoff status. The in-sprint path works as designed (SPRINT-094 T2).
+  - Impact: low; the path is named by hand. The owner expected `/prime` to find every handoff, so it reads as a bug.
+  - Mitigation: fix direction, not a ruling: let a handoff unrelated to the active sprint use `HANDOFF-LEDGER.md`, read by `/prime` alongside the sprint Log; a committed ledger entry must not redden an active sprint's checks. Name the path in the prompt until then.
