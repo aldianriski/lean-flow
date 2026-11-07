@@ -2,7 +2,7 @@
 epic: 024
 slug: agent-roles-one-by-one
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-07
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
@@ -33,7 +33,7 @@ close-time gate failures, blocking review findings and owner corrections. A row 
 | # | Change | Source | Trial | Must also show | Status |
 |---|---|---|---|---|---|
 | 0 | Context limit | This repo's data | One session at 200k | | **Closed: wrong test.** Fired near 170k with 60k of room; see the research doc |
-| 1 | **Worker contract and dispatch standard**: model by `class:`, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Nearly every dispatch has the marker and a set model (113 of 417 unset today); a worker's question reaches the owner by popup and returns to that worker | Drafted on `prep/epic-024-row1`; lands after SPRINT-164 |
+| 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | Drafted on `prep/epic-024-row1`; lands after SPRINT-164 |
 | 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | Not started |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Not started |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started |
@@ -52,8 +52,9 @@ close-time gate failures, blocking review findings and owner corrections. A row 
 - **D5** — Shipping needs a separate owner ruling per release on an arm or an exception (EPIC-023 D19), a clean install and, for an agent, a fallback on hosts without agents. Rows 1 to 3 change shipped skills, so D19 applies to them too.
 - **D6** — Gate, grill and design judgment stay on the session model (ADR-010), whichever part runs the mechanical work. Subagents cannot use `AskUserQuestion` (documented), so a worker's question always returns to the coordinator.
 - **D8** — `docs/work/` task files stay the unit of work, with no rename to tickets. The video's ticket is what a task file already holds. DeepSeek's Ticket is a different thing: a runtime record of a stage and its worker Assignment, with no acceptance criteria. Only the worker record is taken, in row 1.
-- **D9** — Status stays the folder, and ADR-045 stands; not a prerequisite for row 1. Measured: 55 of 7,080 main-thread turns moved a task, about 6.4 USD of about 800. That is partial (225 status-move commits show those turns do not cover every move), so the saving from any change is unproven, not nil.
-  A field would touch 24 skill files, 62 eval files and adopters' trees. Workers do not move tasks; transitions stay with the coordinator. Batching moves into one commit would need ADR-045 D6 amended: not now.
+- **D9** — Status stays the folder; not a prerequisite for row 1. ADR-045 D6 stands as a rule (a transition is its own commit), but not its reason: git records no rename either way, so `git mv` gains nothing over a move and `git add`.
+  Measured over 14 days: 230 of 7,080 main-thread turns ran `git mv` under `docs/work/`, about 34 USD of about 840. That is what those whole turns cost, not what a change would save, so the saving from any change is unproven, not nil.
+  A field would reach adopters' trees and whatever reads the folders: a text search hits 18 skill files and 62 eval files, not a confirmed migration scope. Workers do not move tasks; transitions stay with the coordinator. Batching moves into one commit would need ADR-045 D6 amended: not now. Owner reaffirmed on these corrected figures, 2026-11-07.
 - **D7** — A context limit may return later as a safety net, only as its own row and with evidence from rows 1 to 3.
 
 ## Open questions

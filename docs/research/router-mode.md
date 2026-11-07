@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-07
 update_trigger: A trial in EPIC-024 reports, or its stop rule fires
 status: current
 id: router-mode
@@ -71,6 +71,14 @@ A write costs about 40 times a read, so cold starts matter more than the first d
 - **Sprint-to-sprint noise is large.** USD per sprint commit by delivery session runs from 0.82 to 2.21, with one at 7.74. Two unmatched sprints cannot show a 25% change.
 - **Baseline for the ceiling test.** About 1.7 USD per box: 565 USD over 335 boxes, SPRINT-133 to 151, 24 to 31 Oct, 1.2 to 2.7 by session. `scripts/session-cost.ts` repeats the cost side; box counts come from `docs/sprint/INDEX.md`.
 - **A/B fixtures cannot test this lever.** Arm Release slots average 1.54 USD, 175 seconds and 1.45M total cache reads (largest 3.01M). That is too short to reach a 200k context, so the ceiling never fires there and a router's saving is mostly absent.
+
+### Figures behind EPIC-024 D9 and row 1
+Main-thread transcripts for the 14 days to 2026-11-06 15:32 UTC, and `git log` over the same window. These were one-off queries and the scripts were not kept, so the selection is stated here.
+
+- **Task moves:** 230 of 7,080 turns ran `git mv` under `docs/work/`, and 226 of them also committed in that call. Those turns cost about 34 USD of about 840, at the recovered prices above. That counts each whole turn, not what a change would save.
+- **Correction:** the first version of this query found 55 turns and 6.4 USD. It read only the first record of each message, and a tool call usually sits in a later record. The corrected count fits git: of 1,028 commits, 222 have a rename under `docs/work/` and 225 have a status-move subject.
+- **Agent calls:** 327 unique calls, 90 with no model set, 39 with isolation set. The earlier 113 of 417 counted 90 calls twice, because they also appear in a second record type.
+- **Files naming the status folders:** file hits, not a confirmed migration scope. With `docs/work/(backlog|todo|in_progress|review|done|cancel)`, 18 skill files and 62 eval files. With looser patterns, 24 and 76.
 
 ## Options considered
 Forecasts for delivery only, on recovered prices. **These are models, not measurements,** and leave out rework.
