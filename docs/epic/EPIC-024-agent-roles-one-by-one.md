@@ -67,6 +67,7 @@ close-time gate failures, blocking review findings and owner corrections. A row 
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
+| SPRINT-165 | A home for side-session handoffs, and the conformance line | active | Host sprint for row 1's trial |
 
 ## Closed when
 

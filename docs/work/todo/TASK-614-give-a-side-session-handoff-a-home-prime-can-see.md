@@ -3,6 +3,7 @@ id: TASK-614
 title: "Give a side-session handoff a home that /prime can see"
 type: debt
 epic: EPIC-024
+sprint: SPRINT-165
 priority: P2
 size: S
 risk: low

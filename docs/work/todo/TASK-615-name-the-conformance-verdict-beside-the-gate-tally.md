@@ -3,6 +3,7 @@ id: TASK-615
 title: "Name the conformance verdict beside the gate's tally"
 type: debt
 epic: EPIC-024
+sprint: SPRINT-165
 priority: P2
 size: S
 risk: low
