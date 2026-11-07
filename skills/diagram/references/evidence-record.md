@@ -36,7 +36,7 @@ diagram; the diagram carries only ids, names and statuses.
 ## Self-check before delivering
 
 1. Every id drawn has exactly one row, and every row has an id drawn.
-2. Every `called` row cites a call site; open at least five cited lines (all of them if fewer) and confirm each says what its claim says.
+2. Every `called` row cites a call site; open the cited line of at least five different rows (every row if fewer) and confirm each says what its claim says.
 3. No solid `-->` touches an id that is not `called`; every dotted edge label names its status.
 4. No `called` edge touches a component that is not `called`, and no edge outranks either end.
 5. No credential, token or private address survives in a claim or source cell.

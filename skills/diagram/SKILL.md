@@ -45,7 +45,7 @@ Bash is for read-only git only (`git rev-parse HEAD`, `git status --short`).
 ## Where the output goes
 
 If the repo already has the standard doc slots, use them and keep each within its line cap, with
-diagram and table together. Over the cap: split into an overview and targeted views.
+diagram and table together. Over the cap: one overview diagram, then one diagram per area.
 
 | View | Path | Cap |
 |---|---|---|
