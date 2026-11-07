@@ -33,7 +33,7 @@ Output location (STANDARD §2 slots, each within its cap; if diagram plus table 
 - [ ] `/diagram` on lean-flow's own loop (`prime` to `handoff`) gives a Mermaid diagram plus an evidence table where every id has a row.
 - [ ] Citation check: at least 5 sampled rows are opened, and each `path:line` exists and says what the row claims; misses are named.
 - [ ] A throwaway fixture repo with one configured-but-never-called adapter and one source-less claim is run through `/diagram`: the adapter is labelled `configured`, the source-less claim is `unknown`; the fixture is deleted after.
-- [ ] A second real repo of different shape (`D:\Research\workdoo`, git-less, snapshot then revert) gives a valid diagram with no lean-flow path leaked.
+- [ ] A second real repo of different shape (`D:\Research\workdoo`, read-only; the no-git path is covered by the fixture) gives a valid diagram with no lean-flow path leaked.
 - [ ] The output path follows the map above and stays within each slot's cap, checked by `wc -l`.
 - [ ] Copied-text check: take at least 15 distinctive phrases (4 or more words each) from the kit's `SKILL.md` and its three references, search each in `skills/diagram/`, and report hits; target 0, any hit is rewritten. The same search finds none of the words Archify, TemiDev, motion or video in `skills/diagram/`.
 - [ ] SKILL.md is 80 lines or fewer.

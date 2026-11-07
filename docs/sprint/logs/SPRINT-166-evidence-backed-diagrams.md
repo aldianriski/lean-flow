@@ -28,3 +28,15 @@ Promote governance checklist, signed by the owner by popup:
 - ☑ epic rollup currency: EPIC-024 current (SPRINT-165 row with `close_commit` b63a9acc). ☑ epic coverage: EPIC-024 fully covered (5 open, 5 mapped). ☑ roadmap: none (no roadmap file). ☑ handoff ledger: none (no ledger file).
 Composition: TASK-618 (M), TASK-619 (M), TASK-620 (S); no `L`. Waves: T1, then T2 and T3. TASK-617 hosts here but is not a member; TASK-616 and TASK-617 are untouched. Single stream; epic: EPIC-024 (owner ruling). The member files carry no `epic:` stamp. Filing commit `4118690b`; status moves in `6facb783`.
 G1 and G2 signed by the owner by popup on `4118690b`, tier P for all three, with the two build notes recorded as D4 and D5. Reviews: Codex on TASK-618, at most 2 rounds (D3).
+
+### 2026-11-08 | progress | T1 dispatched
+Preflight CLEAR on `34b05c9b` (T1=0, T2=1, T3=1; `skills/diagram/*` owned T1 then T3). TASK-618 moved to `in_progress` in `85a6308e`.
+worker · T1 · a34e7ffcc26c3523b · sonnet · none
+consequence · T1 · behaviour: new shipped skill, consumer-facing · governance: none (no spec, ADR or protocol contract) → Codex review of the skill text, at most 2 rounds (D3)
+Routing: implement directly, `/tdd` declined because skill prose has no test harness; the Done-when boxes are the manual verification, each run on real input.
+Miss named: G2 was signed at promote without the builder check (`references/builder-check.md`). The worker contract's stop rule stands in for it on T1; not re-opening G2.
+
+### 2026-11-08 | scope-change | T1 (TASK-618): box 4 drops "git-less"
+What broke: TASK-618's fourth box calls `D:\Research\workdoo` git-less, but it has a `.git` (HEAD `cf41a203`), so that run read revisions from git. The premise came from intake, not from a check.
+Impact: the second-repo run still tests a repo of different shape with no lean-flow path leaked; the no-git path ran on the throwaway fixture, which had no git. The run wrote nothing to workdoo, so no snapshot or revert was needed.
+Re-confirm: owner ruled by popup, "Reword, then tick". Box 4 now reads without "git-less" and without "snapshot then revert"; no other box changes.
