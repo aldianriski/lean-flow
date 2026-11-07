@@ -74,3 +74,9 @@ The `/prime` figure is inflated by an interrupted `/lean-doc-generator` run: at 
 **Open boxes.** The two unticked boxes cannot be met in the thin case. This task stays in `in_progress` until the owner rules, because no task in `done/` carries an open box (0 of 74). EPIC-024's row 2 condition also stays unticked, because `epic-state` requires a tick to name a member sprint and row 2 has none.
 
 **Gate on this record.** The first run failed 2 checks, both on the wording of this record in the epic: `epic-state` and `prose-density`. Neither traces to the route. Both were fixed by changing the text, not the checks.
+
+**Kit bring-up, evidence only.** Session `8085a3de-246b-4e96-a900-068d8e9a1f1e`, run from the kit folder with this branch loaded, so its numbers do not count toward the verdict.
+The intake worker ran on `sonnet` with the contract first. Its questions reached the owner in two popup rounds, 7 questions in all, but no resume followed, because the owner ended the process with "process to big, just running it".
+So no task was drafted, promote did not run, and resume on intake answers is still untested. The one build dispatch, `sonnet`, did not start with the contract: a miss, outside any sprint.
+The build took 77 seconds and needed no code fix, after about 39 minutes of intake, most of it waiting on the owner's second answer. The launch prompt invited those questions, and that was the coordinator's wording, not the route's.
+Context stayed at or below 100.3k after `/clear`. Migrate, before that `/clear`, had reached 242k in the main thread, and its prose worker named no model: row 1's rule lives in the orchestrator and does not reach it.
