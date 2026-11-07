@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-11-07
 status: active
 gates_signed: G1,G2 @ 4118690b
+plan_commit: 3b2c5170
 update_trigger: sprint execute/close events
 ---
 
