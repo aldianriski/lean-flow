@@ -42,6 +42,13 @@ Bash is for read-only git only (`git rev-parse HEAD`, `git status --short`).
   entities - ERD.
 - Too dense for one canvas? Draw an overview plus targeted views; never drop an edge to make it fit.
 
+## Update
+
+`/diagram update <diagram file>` re-reads the sources behind an existing diagram and its table, and
+changes only the ids whose source changed. Keep ids stable; a rerun with no source change writes
+nothing. A vanished source turns its row `unknown` with the date, never deleted. Procedure:
+`references/evidence-record.md` § Updating.
+
 ## Where the output goes
 
 If the repo already has the standard doc slots, use them and keep each within its line cap, with

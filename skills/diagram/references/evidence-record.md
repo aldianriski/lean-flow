@@ -47,3 +47,19 @@ diagram; the diagram carries only ids, names and statuses.
 For skills, runbooks and other text that directs a reader rather than running code, an edge is
 `called` only when a line makes the step happen. A line that merely recommends or offers the next
 step ("Next: run X") is `configured`; a loop drawn in a doc but directed by no source line is `unknown`.
+
+## Updating
+
+For `/diagram update` on a diagram and its table, work row by row and touch nothing that did not change.
+
+1. Re-read each row's cited source. A row is **unchanged** when the cited line still supports the claim
+   at the same status. Leave its table row, its diagram lines and its revision cell exactly as they are;
+   do not refresh a revision just because you looked.
+2. **Changed** (the line moved, or now shows a different caller or status): edit only that row and only
+   the diagram lines that carry that id. An edge whose end dropped in status drops with it, per the status rules.
+3. **Vanished** (file or line gone and no match elsewhere): the row stays, status `unknown`, source
+   `none found (was <old path:line>)`, revision the date, e.g. `2026-11-08`. Its diagram label and
+   line style follow. Never delete the row or the id. Only a row whose own cited line is gone takes this
+   form; an edge into it keeps its own source and drops to `unknown` under step 2.
+4. Ids are never renumbered or reused. A new component the user asks for takes the next free id.
+5. Nothing changed: write nothing, and say so. Run the self-check on the result.
