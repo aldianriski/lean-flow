@@ -21,7 +21,7 @@ diagram; the diagram carries only ids, names and statuses.
 - **status** - exactly one of:
   - `called` - a call site, write or read of it was found in the source, not just a declaration
   - `configured` - declared, wired or imported, but no caller found
-  - `proposed` - exists only in a plan, ticket or design, not in running code
+  - `proposed` - a plan, ticket, design or README says it is intended or future, and no running code has it
   - `unknown` - no source supports it, or the source could not be opened
 
 ## How to decide status
@@ -31,12 +31,12 @@ diagram; the diagram carries only ids, names and statuses.
 - Two supporting lines for one edge: cite the stronger (the call site).
 - An edge is never stronger than either end. A `called` edge needs both ends `called`; finding a call into a component makes that component `called`. An edge to an `unknown` component is `unknown`.
 - Unsure between two statuses, take the weaker one and say why in the claim.
-- A claim that came from the user or a README with nothing in code behind it is `unknown`, source `none found`.
+- A doc, README or ticket describing intended or future behaviour gives `proposed`. One claiming the system does something now, with no code behind it, gives `unknown`, source `none found`.
 
 ## Self-check before delivering
 
 1. Every id drawn has exactly one row, and every row has an id drawn.
-2. Every `called` row cites a call site; open at least three cited lines and confirm each says what its claim says.
+2. Every `called` row cites a call site; open at least five cited lines (all of them if fewer) and confirm each says what its claim says.
 3. No solid `-->` touches an id that is not `called`; every dotted edge label names its status.
 4. No `called` edge touches a component that is not `called`, and no edge outranks either end.
 5. No credential, token or private address survives in a claim or source cell.

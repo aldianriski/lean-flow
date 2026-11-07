@@ -17,15 +17,16 @@ Bash is for read-only git only (`git rev-parse HEAD`, `git status --short`).
 
 1. **Frame it.** State the question, the audience, the scope, and whether the diagram shows the
    system as it is (**actual**) or as it should be (**proposed**). Ask only if that is genuinely unclear.
-2. **Read the sources.** Entry points, config, call sites, persistence, deploy files. A folder name or
-   a README sentence is not a runtime edge: find the call, the write or the read.
+2. **Read the sources.** Entry points, config, call sites, persistence, deploy files. Runtime
+   evidence is a call, a write or a read that you can point at, not a name or a description.
 3. **Write the evidence table** before drawing - one row per component or edge id. Columns,
    statuses and examples: `references/evidence-record.md`. No source found means status `unknown`.
 4. **Draw the Mermaid** from the table only. Status goes in the label text of every id, since style
    alone is lost in some viewers; dotted lines are a secondary cue.
    - Node: `N1["api - called"]`. Edge: `A -->|E1 called| B`; otherwise `A -.->|E2 configured| B`
      (also `proposed`, `unknown`).
-   - Sequence: `A->>B: E1 called`. ER: put the status in the relationship label.
+   - Sequence: `A->>B: E1 called`. ER: status in the relationship label,
+     e.g. `CUSTOMER ||--o{ ORDER : "E3 called"`.
 5. **Place it** (map below) and report the unknowns last.
 
 ## Rules
