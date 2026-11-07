@@ -28,3 +28,10 @@ Promote governance checklist, signed by the owner by popup:
 - ☑ epic rollup currency: no active epic. ☑ epic coverage: none (EPIC-024 stays `proposed`, owner ruling). ☑ roadmap: none. ☑ handoff ledger: none.
 Composition: TASK-614 and TASK-615 (ready, P2, filed for EPIC-024 row 1); single stream. Sizes S, S; no `L`. TASK-613 is not a member. Status moves in `bc41dc66`.
 G1 and G2 are not signed; `/orchestrator` signs them.
+
+### 2026-11-07 | progress | opt-in gate green off-host at the recorded plan_commit
+`gate-remote.ts` ran `edd24ef5`: `QA-CHECK: 460 pass, 0 fail`, `bun test` 589 pass, 0 fail. The trial head showed 504 pass, so the tally fell by 44 with the 26 task-file deletions in `d0a9752a`; 0 fail held, and the per-leg cause of the drop was not traced. A first launch ran nothing (`LF_GATE_HOST` unset), and its exit 0 was a pipe's; only the run above counts.
+
+### 2026-11-07 | progress | builder check run on the two G2 designs before sign-off
+builder-check · T1 · 1 contradiction · 1 question · settled: the design's evidence map was off by one box and now names the CHANGELOG entry and TD-298 row for box 4; the UNKNOWN fixture stays as a pin of existing behaviour; the checker reads the ledger whatever the sprint state and fails it only on UNKNOWN, so A1's wording is wrong and a ledger answer would change its header comment and shipped text, not its logic. The stub home stays open by owner ruling
+builder-check · T2 · 3 contradictions · 5 questions · settled: `qb_checkpoint` prints its own verdict and exits, so the line prints before both verdict sites through one function; a setup failure or an empty engine output reads as not run; box 3 compares two separate selections from a `QA_FULL=1` run and reports N of 0 as not discriminating; the line names full or reduced spec, since the default profile's 0 would read as a clean sweep. The truncation question was read as fact from the Done when's "directly before the verdict line", so no intent question reaches the owner
