@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-07
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -123,9 +123,25 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-290 [tags: process] [status: active]: **A rule stated in a skill and again in its reference must carry the same condition: a run follows the softer one.** SPRINT-163 T3 wrote "docs/config/spike tasks write `Negative: n/a`" in `skills/task-decomposer/SKILL.md` and "use n/a when no scenario applies" in its reference. Review read both and passed. The consumer proof's docs task carried a real scenario, failing the frozen box as written. Only a run whose prompt never named the rule showed it.
-- seen: 2026-11-06 (SPRINT-163 T3, consumer proof)
+## L-292 [tags: process] [status: active]: **A proof's fixture must be true of the code the run reads, and a re-run rebuilds its copy instead of seeding it again.** SPRINT-164 T3's first B2 after-run told the agent a dialog wrapper set `overflow: visible`, which was false for that copy, and re-using the copy planted a second instance of the seeded bug. The agent merged the duplicates, committed, and took the dialog bug down another path, so the run said nothing about the fix. Rebuilding both pins' copies from one commit, with a cause seeded and true, gave runs that could be compared. An agent that reads the code will test the report against it, so a false premise changes the path under test.
+- seen: 2026-11-07 (SPRINT-164 T3, consumer proof)
 - count: 1
+- promoted: no
+- related: L-007 · L-202 · TASK-612
+
+---
+
+## L-291 [tags: process] [status: active]: **A check fed by an extract proves nothing until the extract is shown to hold what it should.** SPRINT-164 T2 compared the `Negative:` line a run showed with the line it wrote, using the shown line as a `grep -Fx` pattern. The run showed no such line, so the extract was empty, and an empty pattern matched 11 blank lines: a pass on the failure the check existed to catch. Read by eye, it was caught; the re-run counted the shown lines first and failed that fix. Assert the extract's count before using it as a selector.
+- seen: 2026-11-07 (SPRINT-164 T2, consumer proof)
+- count: 1
+- promoted: no
+- related: L-136 · L-198 · TASK-611
+
+---
+
+## L-290 [tags: process] [status: active]: **A rule stated in a skill and again in its reference must carry the same condition: a run follows the softer one.** SPRINT-163 T3 wrote "docs/config/spike tasks write `Negative: n/a`" in `skills/task-decomposer/SKILL.md` and "use n/a when no scenario applies" in its reference. Review read both and passed. The consumer proof's docs task carried a real scenario, failing the frozen box as written. Only a run whose prompt never named the rule showed it.
+- seen: 2026-11-06 (SPRINT-163 T3, consumer proof) · 2026-11-07 (SPRINT-164 T3, `/triage` steps and the bug template; Codex round 1 caught it)
+- count: 2
 - promoted: no
 - related: L-007 · TASK-606
 

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-07
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2049,6 +2049,12 @@ status: current
   - Evidence: SPRINT-163 log, close entry; `scripts/gate-remote.ts` (`tmpdir()`).
   - Impact: trivial; it reported a transport failure and no verdict, which is the safe reading.
   - Mitigation: scope the temp directory to the one invocation when it recurs; look for the cause only on a repeat.
+- **TD-297** severity: trivial | status: open | created: Sprint-164 (close; T3 proof)
+  - Summary: **The bug template has no `## Assumes` heading, though `/triage` and the template's own `Negative:` line name it.** Agents add the
+    section when a bug stays `needs-info`, so the `open:` line still lands where the skill says.
+  - Evidence: SPRINT-164 log, T3 fix entry; `skills/lean-doc-generator/templates/BUG.md.template`; `skills/triage/SKILL.md` steps 3 and 6.
+  - Impact: trivial; every T3 run wrote the section correctly, and a bug with no open question does not need one.
+
 - **TD-296** severity: low | status: open | created: Sprint-164 (T1 after-run)
   - Summary: **`migrate`'s report labels do not cover two cases.** A topic left unasked because the owner kept its file untouched fits no label,
     and the run's report said so. A Standards answer mixing a standard with checks and one without has no named label either.

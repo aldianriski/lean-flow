@@ -2,8 +2,8 @@
 sprint: 164
 slug: never-run-branches
 owner: Maintainer
-last_updated: 2026-11-06
-status: active
+last_updated: 2026-11-07
+status: closed
 plan_commit: 9bb225f7
 gates_signed: G1,G2 @ a535b273
 update_trigger: sprint execute/close events
@@ -62,7 +62,7 @@ because it flips TD-294 and shares the docs with T1 and T2; there is no logic de
 evidenced one reaches `ready` citing it; TD-294 moves to `resolved` citing all three tasks, or stays open naming the unrun branch.
 
 ## Owner-action checklist
-- [ ] Rule each consumer-proof run's result when it is shown (T1, T2, T3).
+- [x] Rule each consumer-proof run's result when it is shown (T1, T2, T3). ✓ owner rulings by popup, recorded in the Log's T1, T2 and T3 done entries
 
 ## Decisions (pre-locked)
 - **D1** — Shared files: `CHANGELOG.md`, `README.md` and `TECH-DEBT.md` are edited in T1, T2, T3 order, each rebasing on the last, so
@@ -106,3 +106,32 @@ evidenced one reaches `ready` citing it; TD-294 moves to `resolved` citing all t
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->
+
+**Outcome** — 3 of 3 members delivered (TASK-610, TASK-611, TASK-612), 17 of 17 boxes. The three branches TD-294 listed have now run on
+copies of a real repo through pinned clones, and each run changed the skill text. TD-294 is resolved. Nothing is released; the three fixes
+wait under `[Unreleased]`.
+
+**Retrieval check** — yes, one miss. L-290 (a rule stated twice must carry the same condition) was a day old when T3's bug template was
+written weaker than `/triage` steps 3 and 6. Codex caught it in round 1; counted on L-290 (2).
+
+**Cost** — headless proofs for T2 and T3: 2.35 USD over 15 runs, including the void and tightened re-runs. T1's runs recorded no figure,
+nor did the Codex rounds. Claude session tokens: not available.
+
+**Worked**
+- Running before the fix corrected the premise: T3's expected invented box did not appear, and the run found a filler box on an
+  unknown-cause bug instead.
+- The literal check in TASK-611's box 2 failed a fix that looked right, since the first fix held the draft and then reworded its lines.
+- Hashing the source repo before and after showed the proofs left it untouched.
+
+**Friction**
+- T2's first line check passed falsely: an empty extract made `grep -Fx` match 11 blank lines (L-291).
+- T3's first B2 after-run was void, because the copy was re-seeded and the report's stated cause was false for its code (L-292).
+- R3's first attempt stopped on a multi-select popup the classifier had no entry for.
+- The gate's temp folder vanished once, a transport failure and not a result.
+
+**Pattern candidate**
+- L-291: a check fed by an extract proves nothing until the extract is shown to hold what it should.
+- L-292: a fixture's stated cause must be true of the code the run reads, and a re-run rebuilds its copy.
+
+**Buckets** — Shipped: three `[Unreleased]` Fixed lines (no release; no `type: bug` member). Tech debt: TD-297 (new); TD-296 filed in T1;
+TD-294 resolved. Follow-ups: none. Learnings: L-291, L-292 (new), L-290 (count 2).

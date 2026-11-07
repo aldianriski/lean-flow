@@ -2,8 +2,8 @@
 sprint: 164
 slug: never-run-branches
 owner: Maintainer
-last_updated: 2026-11-06
-status: active
+last_updated: 2026-11-07
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -89,3 +89,8 @@ review · T3 · Codex read-only review of the rule text (a different model from 
 
 ### 2026-11-07 | progress | T3 done: owner accepted the result and resolved TD-294
 TASK-612's five boxes ticked after that ruling.
+
+### 2026-11-07 | close | 3 of 3 members done, 17 of 17 boxes; Retro written; buckets filed
+System verify before close: full gate off-host at `0f41d9f2`, qa-check 509 pass, 0 fail; bun test 589 pass, 0 fail. Close check: 8 pass, 0 fail.
+The source repo was only read: all 1242 baseline hashes match, and no file outside `node_modules`, `dist` and `.git` is newer than the baseline.
+Buckets: Shipped, three `[Unreleased]` Fixed lines (no release). Tech debt, TD-297 new, TD-296 filed in T1, TD-294 resolved. Follow-ups, none. Learnings, L-291 and L-292 new, L-290 at count 2. No epic, no handoff entry to reconcile.
