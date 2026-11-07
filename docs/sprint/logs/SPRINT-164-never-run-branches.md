@@ -74,3 +74,18 @@ review · T2 · Codex read-only review of the rule text (a different model from 
 
 ### 2026-11-07 | progress | T2 done: owner accepted the result
 TASK-611's five boxes ticked after that ruling.
+
+### 2026-11-07 | progress | T3 before-run on pin `022ba994`: the hold already worked, and an unknown-cause bug got a filler box
+B1 (known cause outside the checkout, nothing named): `needs-info`, `open:` line, 0 boxes, so the expected invented box did not appear. B2: the dialog bug `ready` citing the report, the seeded `ready` bug unchanged, the unknown-cause bug `next: /diagnose` plus a filler `Negative:` box. The text changes anyway under the signed design, since no line said where a box comes from.
+
+### 2026-11-07 | surprise | T3's first B2 after-run was void because of the fixture
+Re-using the copy seeded a second copy of the bug, and the report's cause (a dialog wrapper with `overflow: visible`) was false for that code, so the agent merged the duplicates, committed, and sent the dialog bug down another path. Both were harness faults. B2 was rebuilt on fresh copies with a true seeded cause (`.body` in `src/ui/PreviewDialog.module.css`), one seed, and changes read against the seed commit, then run on both pins. A5's snapshot and revert were unaffected: `D:\Research\workdoo` was only read.
+
+### 2026-11-07 | progress | T3 fix `c35613aa`: a box must cite the report or code that names the scenario
+Codex round 1 found the template weaker than steps 3 and 6 (no citation, no word on omitting the box); both fixed. Round 2 OK on all items. Gate on `c35613aa`: 589 bun tests, qa-check 509 pass, 0 fail (one earlier attempt was a transport failure, not a gate result: the temp folder had gone). On that pin B1: `needs-info`, `open:` line, 0 boxes. B2: dialog bug `ready` with a box citing the report's sentence; seeded bug diff 0 lines; unknown-cause bug `next: /diagnose`, no box. The path where only the code names the scenario was not run, per the design.
+The bug template has no `## Assumes` heading though steps 3 and 6 name it; agents add the section, so nothing failed. Filed at close.
+consequence · T3 · behaviour:material · governance:low
+review · T3 · Codex read-only review of the rule text (a different model from the writer), 2 rounds, 2 findings fixed · behaviour:material · governance:low
+
+### 2026-11-07 | progress | T3 done: owner accepted the result and resolved TD-294
+TASK-612's five boxes ticked after that ruling.

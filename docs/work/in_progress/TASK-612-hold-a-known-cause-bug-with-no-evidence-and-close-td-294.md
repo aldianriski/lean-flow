@@ -24,11 +24,11 @@ when drawn from evidence it cites, report or code; otherwise `needs-info`, and a
 shipped skill text, unfrozen.
 
 ## Done when
-- [ ] A consumer-copy run on a known-cause bug report whose evidence names nothing that must keep working leaves the bug `needs-info` with the missing scenario as an `- **open:**` line, and writes no invented `Negative:` box.
-- [ ] A known-cause bug whose report or code does name it reaches `ready` with a box citing that evidence.
-- [ ] Negative: a bug already `ready` with no box is not demoted, and an unknown-cause bug still gets `- **next:** /diagnose`.
-- [ ] Triage steps 3 and 6 and `skills/lean-doc-generator/templates/BUG.md.template` carry the same condition (L-290), and SKILL.md stays within its cap (132 lines today, ~140).
-- [ ] TD-294 records this branch's runs and result and moves to `resolved`, citing all three tasks, or stays open naming the branch still unrun; CHANGELOG `[Unreleased]` and README name any user-visible change.
+- [x] A consumer-copy run on a known-cause bug report whose evidence names nothing that must keep working leaves the bug `needs-info` with the missing scenario as an `- **open:**` line, and writes no invented `Negative:` box. ✓ B1 on pin `c35613aa`: `state: needs-info`, `open:` line naming the missing scenario, 0 `Negative:` boxes (0 before the fix too)
+- [x] A known-cause bug whose report or code does name it reaches `ready` with a box citing that evidence. ✓ B2 on `c35613aa`: `state: ready`, box names the People and Access dialogs and cites the report's sentence; exercised through the report, the code-names-it path not run, per the design
+- [x] Negative: a bug already `ready` with no box is not demoted, and an unknown-cause bug still gets `- **next:** /diagnose`. ✓ B2 on `c35613aa`: seeded `ready` bug `git diff` 0 lines against the seed commit; unknown-cause item has `- **next:** /diagnose`
+- [x] Triage steps 3 and 6 and `skills/lean-doc-generator/templates/BUG.md.template` carry the same condition (L-290), and SKILL.md stays within its cap (132 lines today, ~140). ✓ judgment tick: steps 3 and 6 and the template read side by side, Codex round 2 OK on the same question; `check-doc-caps` 132 <= 140
+- [x] TD-294 records this branch's runs and result and moves to `resolved`, citing all three tasks, or stays open naming the branch still unrun; CHANGELOG `[Unreleased]` and README name any user-visible change. ✓ TD-294 `status: resolved → TASK-610, TASK-611, TASK-612` with this branch's `Runs:` line; CHANGELOG `[Unreleased]` Fixed bullet; README one line after the hold
 
 ## Touches
 `skills/triage/SKILL.md` · `skills/lean-doc-generator/templates/BUG.md.template` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md`

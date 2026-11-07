@@ -101,6 +101,8 @@ evidenced one reaches `ready` citing it; TD-294 moves to `resolved` citing all t
 | `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` | TASK-610 | Name the rule; TD-294 `Runs:` line; TD-296 for two label gaps | low | gate |
 | `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` | TASK-611 | Hold a no-scenario draft at `approve`, show the exact line, write it unchanged; a run showed the box written unasked, then reworded | low | D1 before and after on pins |
 | `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` | TASK-611 | Name the hold; TD-294 `Runs:` line | low | gate |
+| `skills/triage/SKILL.md` · `skills/lean-doc-generator/templates/BUG.md.template` | TASK-612 | A bug's box must cite the report or code that names the scenario; with neither, `needs-info` and no box | low | B1 and B2 before and after on pins |
+| `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` | TASK-612 | Name the rule; TD-294 `Runs:` line and `resolved` | low | gate |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->
