@@ -59,7 +59,7 @@ function sites(src: string): { at: number; prev: string }[] {
   lines.forEach((l, i) => {
     if (!/^\s*printf 'QA-CHECK:/.test(l)) return;
     let j = i - 1;
-    while (j >= 0 && (lines[j].trim() === "" || lines[j].trim().startsWith("#"))) j--;
+    while (j >= 0 && ((lines[j] ?? "").trim() === "" || (lines[j] ?? "").trim().startsWith("#"))) j--;
     out.push({ at: i, prev: lines[j] ?? "" });
   });
   return out;
