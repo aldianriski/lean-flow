@@ -26,7 +26,7 @@
 
 ## Done when
 - [ ] <observable result of the fix>
-- [ ] Negative: <what must keep working after the fix — the regression its test pins>
+- [ ] Negative: <what must keep working after the fix, citing the report or code that names it — the regression its test pins; if neither names it, omit this box and add an `- **open:**` line under `## Assumes`>
 
 ## Root cause
 [the winning hypothesis, confirmed — written by /diagnose]
