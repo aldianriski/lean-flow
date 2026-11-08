@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-08
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
@@ -81,9 +81,9 @@ A HITL step is **parked** (record → continue disjoint AFK → clean halt via `
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the active sprint's member tasks |
 
-**`overnight`** is the **canonical** name for the unattended headless run — named after the contract it runs, not the launching script. Aliases `night-run` · `unattended` · `sprint-bulk unattended` all still resolve to it (`scripts/lib/resolve-run-mode.sh`), so no installed trigger breaks; an unrecognised mode string is **refused, never defaulted**.
+**`overnight`** is the **canonical** name for the unattended headless run; its aliases (`night-run` · `unattended` · `sprint-bulk unattended`) still resolve, and an unrecognised mode string is refused, never defaulted → `orchestrator/SKILL.md` § Mode dispatch · `orchestrator/references/night-run.md` Part 0.
 
-**Continuation contract** (`orchestrator/references/night-run.md` Part 0b) — a run **does not pause between tasks the owner already approved**: a `J1` task is one the recorded approval covers, so re-confirming it re-asks a settled question. It ends at **exactly one of five terminal states**, named in the rollup — `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP`; anything else is a stop nobody declared. The **launcher** writes the state, as it already writes the DoD count (ADR-016): this changes *when* a run stops, never *who* records it.
+**Continuation contract** — a run does not pause between tasks the owner already approved, and ends at exactly one of five terminal states, named in the rollup by the launcher: `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` → `orchestrator/references/night-run.md` Part 0b.
 
 ## Model tiers (dispatch discipline · ADR-010)
 
@@ -145,6 +145,6 @@ depends-on: [TASK-NNN]
 ```
 
 **States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal to `HITL`/`AFK` (who acts).
-**Authority** — `J0` needs none (additive · reversible · inside the frozen Plan) · `J1` is delegated in advance by a recorded pre-launch approval and executes unattended **inside that envelope only** · `J2` is human-reserved and **parks**. Declared, never inferred; absent = J2, because an undeclared class is an unasked question and an unasked question is a BLOCK. Against `HITL`/`AFK` it is a **one-way implication, not independence**: `J2` ⇒ `HITL` always, `HITL` ⇏ `J2` — staffing describes the run, the J-class describes the task, so a J1 run with a human present is still J1 (`orchestrator/references/night-run.md` Part 0). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
+**Authority** — `J0` · `J1` · `J2`, declared per task, never inferred; absent = J2 → `orchestrator/references/night-run.md` Part 0. Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
 **Origin** gates G1's fast-path: only `origin: decomposer` met the intake grill, so only it confirms scope in one line — every other origin gets the full G1 checklist. A **fact about where the task came from**, never a self-assessed "was it grilled?" and never inferred from `tracker:`; close-Retro follow-ups and `/triage`-converted bugs are stamped by the skill that files them.
 **QA (optional, never a gate)** — a task may note a `qa:` hint (tests/lint/security/perf to suggest at Review).
