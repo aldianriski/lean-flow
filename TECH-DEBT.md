@@ -961,45 +961,6 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-165** severity: medium | status: resolved → TASK-479, TASK-403 | created: Sprint-102
-  - **Resolved 2026-11-07 (owner ruling, EPIC-024 row 1 G2):** nothing named here is left. The parse is TASK-479 below. The clock-input sighting was already fixed when that note called it open: SPRINT-115 T1 (TASK-403, `6184fd23`, TD-225) made `run-qa-budget-position-fixtures.sh` case 2 assert position, and `run-qa-budget-fixtures.sh` case 12 reads a frozen clock. Cases 1 and 3 still run under `timeout 60`, which could false-red on a loaded host; never observed, so re-file only if it does.
-  - **Narrowed (SPRINT-137 T2, TASK-479, `e4eb536e`):** the pass-count parse is done: a retained test in the dod-delta suite runs every harness's parse line (six, found by two agreeing selectors) over an ANSI-coloured sample, with a stripless control per harness; a seeded strip revert reddened exactly its harness. What stays open is the SPRINT-103 clock-input sighting below.
-  - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
-    discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that
-    left `run-dod-delta-fixtures.sh`, `run-s4-ts-evaluators.sh` and `run-s4-differential-parity.sh`
-    reporting `only 0 test(s) ran` over green suites (156 assertions silently unrun). The fix is
-    sound and its discrimination was demonstrated — seeded `test(` → `test.skip(`, harness reddened
-    on the **real** count `only 47 test(s) ran` rather than the old stuck-at-0, sibling control green
-    in the same pass, restore verified byte-identical under one stated hash convention
-    (`git hash-object` vs `git rev-parse HEAD:<path>`). **Reproduced independently by the coordinator,
-    not taken on the builder's report.** But the seed was reverted, so nothing persists.
-  - **Why it was not retained, and why that is a judgement rather than an omission.** These three
-    harnesses do not loop a `evals/fixtures/<name>/` directory the way the other `run-*-fixtures.sh`
-    do — they wrap `bun test` directly over **real production test files**. Retaining a must-FAIL
-    would mean either (a) seeding a permanent break into a shipped test file, which trades a silent
-    guard gap for a permanently red suite, or (b) new runner scaffolding to hold the fixture, which
-    would be a new `.sh` — against the standing rule that executable logic is TypeScript run by Bun.
-    There is also repo precedent: `run-s4-ts-evaluators.sh`'s own header documents an identical live
-    `describe.skip` proof from SPRINT-092's review. The builder flagged this gap itself rather than
-    presenting the live proof as satisfying the retained-fixture bar.
-  - Impact: **a revert of the one `sed` strip is undetectable until someone reads a count.** That is
-    exactly how the original defect survived — the harnesses failed loud, but only a *complete* gate
-    run reaches leg 12, and TD-117 meant most runs truncated before it. The failure mode is not a
-    false green; it is a true red nobody looks at for weeks.
-  - Fix direction (**not a ruling**): a TypeScript test asserting the parse against a captured
-    ANSI-coloured `bun test` sample would retain the discrimination without a shipped broken test and
-    without new shell — it tests the *parser*, not the suite. Weigh against ADR-029: the parsing step
-    is Tier **G** by the false-negative test, so the bar applies even though the fix was one line.
-  - **Second sighting, SPRINT-103 T5 (the shape is not isolated to this harness).**
-    `evals/run-qa-budget-position-fixtures.sh` case 2 asserts *no budget verdict within 60 s* — an
-    assertion whose input is a wall clock, the same shape as case 12 here. Proven wait-bound on
-    measurement: two runs **0.1 s apart** while their CPU totals differed by more than **2x**
-    (16.5 s vs 35.6 s), only 24% of the first run's wall being CPU. A host fast enough to reach
-    leg 12's own loop-internal check inside `WINDOW` reddens correct code. So this row's fix
-    direction should assume a **class** of clock-input assertions rather than one case, and the
-    `WINDOW` lever trades directly against flakiness under load (a coverage decision, D6).
-  - **Narrowed (SPRINT-116 T1, ADR-051):** two of the three wrappers it names (`run-s4-ts-evaluators.sh` · `run-s4-differential-parity.sh`) are deleted; the debt stands for the surviving `run-dod-delta-fixtures.sh`, whose pass-count parser still has no retained must-FAIL fixture.
-
 - **TD-164** severity: medium | status: open | created: Sprint-101
   - Summary: **SPRINT-101's SIGNED `approval_envelope:` encodes a superseded reading of the rule it
     cites, and the record cannot be re-signed.** Its `design` dimension states *"the seeded Plan is
@@ -1540,28 +1501,6 @@ status: current
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
   - **Absorbs (SPRINT-116 promote, owner-approved 2026-10-06):** TD-050 · TD-066 · TD-071, the same cost mechanism.
 
-- **TD-081** severity: medium | status: resolved → TASK-615 | created: Sprint-082
-  - Summary: **`qa-check.sh` prints two verdicts and only one is the tally, so `0 fail` does not mean
-    the conformance engine found nothing.** Line 237 states the leg is *"informational except the two
-    FULLY-COVERED families"* — a deliberate, reasoned boundary, not a bug. The hazard is the
-    **report**: the tally line is the last thing printed and reads as the run's verdict, while
-    conformance FAIL rows sit ~130 lines above it and never reach it.
-  - Evidence: a SPRINT-082 run printed `QA-CHECK: 173 pass, 0 fail` with **seven**
-    `FAIL dod-criterion-names-no-check` rows in the same output (S9.VERIFYCLAUSE, against the real
-    sprint file, ticked criteria naming no evidence). Caught only because the FAIL rows were grepped
-    separately; reading the tally alone — which is what a green run invites — would have shipped them.
-  - Impact: this is the L-120 shape one level up. Not a wrapper's status standing in for the gate's,
-    but **one of the gate's own two verdicts standing in for both**. It hits hardest exactly when the
-    tally is green, since nobody greps a passing run. Consumer-facing: `conformance.sh` is the adopter
-    entry point (ADR-027) and an adopter reading a green tally inherits the same misreading.
-  - Mitigation (hypothesis, not a plan): have the tally line name the other verdict rather than stay
-    silent about it — e.g. `QA-CHECK: N pass, M fail · conformance: K finding(s), informational`. A
-    count of 0 then says so explicitly, and a non-zero count is visible without grepping. Folding the
-    conformance findings into the tally is the alternative and is **rejected here**: it would make the
-    gate block on rules the standard deliberately marks judgment-only or implementation-directed.
-  - Filed by SPRINT-082 T4 (dogfood), per its DoD that a discovered defect is filed rather than
-    absorbed into the sprint that found it.
-
 - **TD-080** severity: minor | status: open | created: Sprint-081
   - Summary: **§2 states the standard's own update trigger and nothing enforces it.** The
     `spec/STANDARD.md` row reads *"a rule is added, amended or reclassified — bump per
@@ -2033,16 +1972,6 @@ status: current
   - Evidence: SPRINT-163 log, 2026-11-04 surprise entry; `evals/ab/lib/classifier.ts`, `evals/ab/lib/operator.ts`.
   - Impact: an arm that runs migrate this way may not exercise the question. Whether TASK-607's arm takes this route is unchecked.
   - Mitigation: settle it at TASK-607's amendment, before its freeze line.
-- **TD-294** severity: low | status: resolved → TASK-610, TASK-611, TASK-612 | created: Sprint-163 (close; T2 and T3 proofs)
-  - Summary: **Three branches of SPRINT-163's rules have never run.** `/task-decomposer` refusing a draft with no scenario; `/triage` holding
-    back a known-cause bug that has no `Negative:` box (each run's agent wrote one); and the draft-back of a named standard, with its
-    `checks: not decided yet` path. The owner ruled the boxes ticked with this stated.
-  - Evidence: SPRINT-163 log, 2026-11-06 entries; TASK-605 and TASK-606 tick notes.
-  - Impact: a wrong branch would first show on a consumer's repo.
-  - Mitigation: exercise each when a later consumer proof passes that way; no dedicated run planned.
-  - Runs: draft-back and undecided checks (TASK-610): operated `init` and `migrate` plus scoped reviews on copies of a real repo. Before, pin `022ba994`: `init` passed; `migrate` missed the marker and the report label. After, pin `f94bdef1`: both show. The re-run (`cmp`) and `none` kept their before-run results.
-  - Runs: no-scenario draft (TASK-611): `/task-decomposer` on a copy of a real repo. Before, pin `022ba994`: wrote an unasked box on the first `approve`. Pin `9997af10`: held, but wrote reworded lines. After, pin `61b2dcd3`: held, showed one exact line, wrote it unchanged after a fresh `approve`. A named scenario and a docs draft ran on `9997af10`: both written on the first `approve`, the docs draft with `Negative: n/a`; not re-run, since the rule's condition did not change.
-  - Runs: known-cause bug with no named scenario (TASK-612): `/triage` on copies of a real repo. Before, pin `022ba994`: already held, no text said where a box comes from, and an unknown-cause bug got a filler box. After, pin `c35613aa`: held with an `open:` line and no box; a bug whose report names the scenario reached `ready` citing it; a `ready` bug with no box unchanged; an unknown-cause bug got `next: /diagnose` and no box. The path where only the code names the scenario was not run, per the signed design.
 - **TD-295** severity: trivial | status: open | created: Sprint-163 (close; system verify)
   - Summary: **`gate-remote.ts`'s local bundle step was denied in the default temp directory, cause unknown.** Two consecutive runs failed
     with `cannot create … lf-gate-<sha>-<pid>.bundle: Permission denied`, after two earlier runs that day had passed. The same `git bundle
@@ -2062,12 +1991,6 @@ status: current
   - Evidence: SPRINT-164 log, T1 entries; `skills/lean-doc-generator/references/migration-map.md` (Report).
   - Impact: the report falls back on prose for these two cases; nothing is written wrong.
   - Mitigation: name both labels when a real migrate hits one; no run planned.
-- **TD-298** severity: low | status: resolved → TASK-614 | created: Sprint-164 (EPIC-024 prep; owner report)
-  - Summary: **A handoff made outside the active sprint's work has no stub home, so `/prime` cannot see it.** `/handoff` writes its stub to the active sprint's Log, or to `HANDOFF-LEDGER.md` only when no sprint is active, and `/prime` reports from the same places.
-    With a second session running a sprint, a side session's handoff either lands in a log that is not its own, where a `live` entry can fail that sprint's close check, or gets no stub.
-  - Evidence: 2026-11-06, the EPIC-024 prep handoff skipped its stub for this reason, and the owner had to name the path in the next session's prompt. `skills/handoff/SKILL.md` § Repo-side status stub; `skills/prime/SKILL.md` § Handoff status. The in-sprint path works as designed (SPRINT-094 T2).
-  - Impact: low; the path is named by hand. The owner expected `/prime` to find every handoff, so it reads as a bug.
-  - Mitigation: fix direction, not a ruling: let a handoff unrelated to the active sprint use `HANDOFF-LEDGER.md`, read by `/prime` alongside the sprint Log; a committed ledger entry must not redden an active sprint's checks. Name the path in the prompt until then.
 - **TD-299** severity: low | status: open | created: Sprint-165 (promote)
   - Summary: **Promote's §11 scan of closed task files is done by hand, and one reported nothing due while files were overdue.** SPRINT-164's promote said "nothing due"; SPRINT-165's found 26 due, 25 of them old enough at SPRINT-164. A citation that lapsed in between could explain some; that was not checked.
   - Evidence: SPRINT-165 Log, promote entry; `d0a9752a` deleted the 26, two selectors agreeing on 25.
