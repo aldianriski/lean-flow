@@ -3,7 +3,7 @@ sprint: 166
 slug: evidence-backed-diagrams
 owner: Maintainer
 last_updated: 2026-11-07
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -73,3 +73,10 @@ review · T3 · coordinator read-through (session model, not the builder; two fi
 ### 2026-11-08 | progress | T2 (TASK-619) done: 5 of 5 boxes
 Worker derived the touch set with a stale-count grep and a roster-name grep; together they also found the CONTEXT.md header count and SECURITY.md's "Of the 15". Roster now 16 with /diagram as the second utility; data-flow and flows templates point to it; the ERD template got none because its guidance says to draw nothing the migrations already show. The always-loaded token budget went 12684 → 12735 (FAIL) → 12688 against 12691 after tightening CONTEXT.md wording; the budget file is unchanged. A fresh `claude -p --plugin-dir` session on `main` loaded `lean-flow:diagram`. Coordinator read-through fixed README and CHANGELOG, which had named the statuses "actual or proposed". SECURITY.md lists /diagram under unscoped Bash, noted as instructed read-only git, because SKILL.md grants plain `Bash`.
 Gate: red on the first run (see the correction entry), green on `7bfe5fca`: `bun test` 589 pass, 0 fail; QA-CHECK 477 pass, 0 fail.
+
+### 2026-11-08 | progress | system verify on the integrated tree
+system-verify · PASS · `gate-remote.ts` on `7bfe5fca`: `QA-CHECK: 477 pass, 0 fail`, `bun test` 589 pass, 0 fail. Commits after it are ticks, moves and log only. Sprint-close checker: 8 pass, 0 fail, three members in `done/`.
+
+### 2026-11-08 | close | Retro written, buckets routed, three of three members done
+run · 16 of 16 DoD ticked. Terminal state PLAN_EXHAUSTED. Close commit `e13120d1`; archived by owner approval (popup). Measures and the verdicts for rows 1 to 3 stay with TASK-616 and TASK-617, outside this sprint.
+Filed: TD-301, TD-302, L-294, L-295; an L-130 sighting; follow-ups none. No handoff entries to reconcile in this Log. No release, by the owner's constraint.

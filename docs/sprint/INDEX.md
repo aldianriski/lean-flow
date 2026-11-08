@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-07
+last_updated: 2026-11-08
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-166 — Evidence-Backed Diagrams — closed 2026-11-08 · `e13120d` · 3 of 3 members in `done/`, 16/16 DoD (no release: `[Unreleased]` entry) · `EPIC-024` · host for the bundled trial of rows 1 to 3: a new `/diagram` skill draws Mermaid with a source and status per component and edge, plus an update path, roster 16 · `TD-301` · `TD-302` filed · `L-294` · `L-295` · the rows' verdicts are TASK-616's and TASK-617's
 - SPRINT-165 — A Home for Side-Session Handoffs, and the Conformance Line — closed 2026-11-07 · `b63a9ac` · 2 of 2 members in `done/`, 10/10 DoD (no release: `[Unreleased]` entries, spec 0.20.0) · `EPIC-024` · host for row 1's trial: a side handoff's stub goes to the root ledger and `/prime` reports it (TD-298), and the gate names its informational count above the verdict, 63 on this repo (TD-081) · `TD-299` · `TD-300` filed · `L-293` · row 1's verdict is TASK-613's
 - SPRINT-164 — Run the Never-Run Branches — closed 2026-11-07 · `61adbce` · 3 of 3 members in `done/`, 17/17 DoD (no release: three `[Unreleased]` fixes) · no epic · the three branches TD-294 listed ran on copies of a real repo: `migrate` writes the undecided-checks marker and report labels (TASK-610), `/task-decomposer` holds a draft whose box the owner never saw (TASK-611), `/triage` requires a bug's box to cite its evidence (TASK-612); TD-294 resolved; TD-296, TD-297 filed
 - SPRINT-163 — Standards and Negative Scenarios — closed 2026-11-06 · `bead912` · 3 of 3 members in `done/`, 15/15 DoD (no release: TASK-607's arm decides 2.21.0) · no epic · a repo declares the standards it adopts and review applies them (TASK-605); a feature or bug Done-when names a negative scenario, with its test at G2 (TASK-606); a failed signer call is infra (TASK-604); TD-293 to TD-295, TASK-608 filed
