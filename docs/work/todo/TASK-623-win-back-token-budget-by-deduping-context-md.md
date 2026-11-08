@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-167
 ---
 
 # TASK-623 — Win back always-loaded token budget by replacing CONTEXT.md text its satellites already hold with pointers (TD-302)

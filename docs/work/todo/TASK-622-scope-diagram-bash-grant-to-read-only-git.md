@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-167
 ---
 
 # TASK-622 — Scope /diagram's Bash grant to read-only git and move its SECURITY.md row (TD-301)
