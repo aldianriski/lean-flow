@@ -21,6 +21,9 @@ depends-on: []
 Row 8 is a standard safeguard to prove (D13): a checker that finds a defect the gate and review missed. No such miss is on record.
 The planted case shows the checker works, not that it is needed (ADR-053), so a pass ships only by an owner exception (owner popup, 2026-11-08).
 
+## G2 (signed 2026-11-09)
+Batch G2 signed for SPRINT-170: the design is the SPRINT-170 Execution Log entry "2026-11-09 | gate | G2 batch signed" (its draft section for this task, as amended by its settlements S0 to S36, which win on any conflict).
+
 ## Done when
 - [ ] The seeded defect in a small real change, and a materiality rule for findings, are frozen before any run. The seed is never replaced.
 - [ ] The full existing procedure runs on the seeded change: the gate and the scoped review, including its second look after zero findings, with their verdict lines recorded. If either catches the seed, the row records "no gap shown" and is no-go.

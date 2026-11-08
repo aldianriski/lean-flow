@@ -32,6 +32,9 @@ Split at promote (SPRINT-170): this task builds the files and proves the harness
 - **Replay.** SPRINT-167 from `6a7cadf2` (run by TASK-638).
 - Out: any release, pushing, `night-run`, changing the gates.
 
+## G2 (signed 2026-11-09)
+Batch G2 signed for SPRINT-170: the design is the SPRINT-170 Execution Log entry "2026-11-09 | gate | G2 batch signed" (its draft section for this task, as amended by its settlements S0 to S36, which win on any conflict).
+
 ## Done when
 - [ ] The router and Executor files are built on a trial branch with a table mapping each DeepSeek rule to kept, changed or dropped, with a reason. Codex reviews their fidelity against DeepSeek's files, at most 2 rounds.
 - [ ] A headless probe in each arm shows the same settings in effect: `LF_GATE_DIR` arrives unchanged, a background worker outlives the main thread's last turn and survives past the former 10-minute cutoff, and a worker's permitted `.claude/CONTEXT.md` edit is actually made, not only allowed. Probe logs (stream-json, stderr, gate logs) go to the operator's scratch folder, never a run's worktree or its parent.

@@ -21,6 +21,9 @@ depends-on: []
 Row 7 is a standard safeguard to prove (D13): a watcher that catches a hung worker. No real hang appeared in 18 workers. The night-run watchdog is an external wrapper for unattended runs, so an attended session has nothing watching.
 The planted case shows the watcher works, not that it is needed (ADR-053), so a pass ships only by an owner exception (owner popup, 2026-11-08).
 
+## G2 (signed 2026-11-09)
+Batch G2 signed for SPRINT-170: the design is the SPRINT-170 Execution Log entry "2026-11-09 | gate | G2 batch signed" (its draft section for this task, as amended by its settlements S0 to S36, which win on any conflict).
+
 ## Done when
 - [ ] A hang oracle is frozen before any run: what counts as progress, the alert deadline and the watcher's overhead limit.
 - [ ] A planted hung worker, one that stops making progress without exiting, runs in an attended session without the watcher. The record shows what the coordinator, the host and the owner noticed within the alert deadline. An inactive watchdog is recorded as no coverage, not as a failed detection.

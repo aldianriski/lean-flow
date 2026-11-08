@@ -21,6 +21,9 @@ depends-on: []
 Row 9 is a standard safeguard to prove (D13): a reproducer that turns a bug report into a working repro. `/diagnose` already builds a feedback loop (Phase 1) and reproduces (Phase 2), so the reproducer must add to those.
 No named gap in them is on record, so a pass ships only by an owner exception (ADR-053; owner popup, 2026-11-08).
 
+## G2 (signed 2026-11-09)
+Batch G2 signed for SPRINT-170: the design is the SPRINT-170 Execution Log entry "2026-11-09 | gate | G2 batch signed" (its draft section for this task, as amended by its settlements S0 to S36, which win on any conflict).
+
 ## Done when
 - [ ] A seeded bug report with a hidden cause, its clean twin, and a numeric saving threshold are frozen before any run.
 - [ ] `/diagnose` Phases 1 and 2, and the reproducer, each run on the report in fresh sessions, in counterbalanced order, with the same report, model, resources and limits, and with the answer key hidden from both.

@@ -21,6 +21,9 @@ depends-on: [TASK-638]
 Row 6 asks whether a merger worker should run the merge-back queue. SPRINT-167 merged twice (`0137a51c`, `9375b607`), but no replay used worktree isolation, so no replay merged anything.
 Owner popup, 2026-11-08: allow isolation in all replay arms, as the original sprint ran. TASK-632 owns the shared harness and TASK-638 the two ordinary baseline runs; this task consumes them.
 
+## G2 (signed 2026-11-09)
+Batch G2 signed for SPRINT-170: the design is the SPRINT-170 Execution Log entry "2026-11-09 | gate | G2 batch signed" (its draft section for this task, as amended by its settlements S0 to S36, which win on any conflict).
+
 ## Done when
 - [ ] Every replay arm, TASK-638's included, builds both tasks in worktrees inside the run's own scratch repository and merges both back. An ordinary run with fewer than the two merge-backs is invalid for both this verdict and TASK-638's.
 - [ ] Two merger runs of the SPRINT-167 replay from `6a7cadf2`, on TASK-632's frozen settings: ordinary coordination plus a merger worker that runs the merge-back queue, the coordinator merging nothing itself. One case asks for an unsafe merge, and the merger refuses it with the target unchanged.

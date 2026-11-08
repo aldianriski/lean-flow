@@ -22,6 +22,9 @@ depends-on: [TASK-632]
 Second half of row 4b, split from TASK-632 at promote (SPRINT-170) because the whole was size L. TASK-632 builds the thin router and Executor files and proves the shared harness; this task runs the matched replay with them and records the verdict, held to row 4's cost bar.
 The two ordinary runs are the shared baseline: TASK-634 consumes them, and an invalid baseline run voids both verdicts.
 
+## G2 (signed 2026-11-09)
+Batch G2 signed for SPRINT-170: the design is the SPRINT-170 Execution Log entry "2026-11-09 | gate | G2 batch signed" (its draft section for this task, as amended by its settlements S0 to S36, which win on any conflict).
+
 ## Done when
 - [ ] The four replay runs of SPRINT-167 from `6a7cadf2`, two ordinary and two thin-router, alternated, each starting cold from a fresh session on the settings TASK-632's G2 froze, finish within the sprint cap. Each records USD, elapsed minutes, boxes ticked, gate verdict and review result, or each deviation is recorded. Each run builds both tasks in worktrees inside its own scratch repository and merges both back; an ordinary run that misses any of the 11 boxes, the gate, the review or either merge-back is invalid.
 - [ ] Each router run is audited for the router's tool use, unchanged relays and Executor identity.
