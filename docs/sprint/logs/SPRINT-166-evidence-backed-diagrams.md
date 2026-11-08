@@ -69,3 +69,7 @@ The off-host gate ran `1b5ccb91` (old sha): `bun test` 589 pass, 0 fail; QA-CHEC
 review · T1 · scoped outside review (Codex, read-only, 2 rounds: NOT CLEAR then 1 item open, closed inline) · behaviour:material · governance:low
 review · T2 · coordinator read-through (session model, not the builder; one wording fix) · behaviour:low · governance:low
 review · T3 · coordinator read-through (session model, not the builder; two fixes inline) · behaviour:material · governance:low
+
+### 2026-11-08 | progress | T2 (TASK-619) done: 5 of 5 boxes
+Worker derived the touch set with a stale-count grep and a roster-name grep; together they also found the CONTEXT.md header count and SECURITY.md's "Of the 15". Roster now 16 with /diagram as the second utility; data-flow and flows templates point to it; the ERD template got none because its guidance says to draw nothing the migrations already show. The always-loaded token budget went 12684 → 12735 (FAIL) → 12688 against 12691 after tightening CONTEXT.md wording; the budget file is unchanged. A fresh `claude -p --plugin-dir` session on `main` loaded `lean-flow:diagram`. Coordinator read-through fixed README and CHANGELOG, which had named the statuses "actual or proposed". SECURITY.md lists /diagram under unscoped Bash, noted as instructed read-only git, because SKILL.md grants plain `Bash`.
+Gate: red on the first run (see the correction entry), green on `7bfe5fca`: `bun test` 589 pass, 0 fail; QA-CHECK 477 pass, 0 fail.

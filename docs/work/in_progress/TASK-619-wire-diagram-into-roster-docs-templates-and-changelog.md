@@ -33,11 +33,11 @@ Touch set, derived with two queries (a "15 skills" grep and a roster-name grep o
 - `skills/flow`, `skills/orchestrator` and `dispatch.md` name `refactor-advisor` in rosters. Check whether any job really triggers /diagram; today none does (standalone utility), so no chain is added, and the report names the files checked.
 
 ## Done when
-- [ ] Every file in the touch set reads 16 skills or lists /diagram as appropriate; the count is derived with `ls skills`, not remembered; a second grep for stale "15 skills" and a roster-name grep both come back clean.
-- [ ] The off-host gate (`bun test`, `QA_FULL`) passes.
-- [ ] Wiring: in a real fresh session with the plugin loaded from the build, the prompt "draw the architecture of this repo" loads /diagram; the transcript shows which skill loaded.
-- [ ] Template pointers are in the data-flow and flows templates, and the template checks stay green.
-- [ ] Negative: `git diff` shows no change to any manifest `"version"` or the README footer, and every commit from this task still appears in `git log origin/main..HEAD`, so nothing was pushed; the check is run and its output read.
+- [x] Every file in the touch set reads 16 skills or lists /diagram as appropriate; the count is derived with `ls skills`, not remembered; a second grep for stale "15 skills" and a roster-name grep both come back clean. ✓ ls skills gives 16; stale-count grep clean outside history; roster grep finds /diagram in README, CONTEXT, overview, SECURITY and the eval list
+- [x] The off-host gate (`bun test`, `QA_FULL`) passes. ✓ VPS gate on 7bfe5fca: bun test 589 pass 0 fail, QA-CHECK 477 pass 0 fail (first run on 1b5ccb91 was red, 5 fail, fixed and logged)
+- [x] Wiring: in a real fresh session with the plugin loaded from the build, the prompt "draw the architecture of this repo" loads /diagram; the transcript shows which skill loaded. ✓ claude -p with --plugin-dir on main in workdoo loaded Skill lean-flow:diagram; init shows lean-flow@inline 2.21.0, no shadowing
+- [x] Template pointers are in the data-flow and flows templates, and the template checks stay green. ✓ pointers inside the existing comments of the data-flow and flows templates; doc-caps, bun test and layout fixtures 41 pass
+- [x] Negative: `git diff` shows no change to any manifest `"version"` or the README footer, and every commit from this task still appears in `git log origin/main..HEAD`, so nothing was pushed; the check is run and its output read. ✓ git diff 3b2c5170..HEAD on the three plugin manifests is empty, README footer unchanged; every sprint commit is in origin/main..HEAD
 
 ## Touches
 The list under Approved design.
