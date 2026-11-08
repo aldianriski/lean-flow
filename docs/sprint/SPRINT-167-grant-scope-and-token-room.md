@@ -4,7 +4,7 @@ slug: grant-scope-and-token-room
 owner: Maintainer
 last_updated: 2026-11-08
 status: active
-plan_commit: none
+plan_commit: 8fe3592b
 update_trigger: sprint execute/close events
 ---
 
