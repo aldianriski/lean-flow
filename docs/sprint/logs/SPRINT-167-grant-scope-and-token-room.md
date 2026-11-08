@@ -28,3 +28,12 @@ Promote governance checklist, signed by the owner by popup. Sign-off text, verba
 - ☑ epic rollup currency: EPIC-024 current. ☑ epic coverage: EPIC-024 fully covered (3 open, 3 mapped), not touched by this sprint. ☑ roadmap: none (no roadmap file). ☑ handoff ledger: none (no ledger file).
 Composition: TASK-622 (S), TASK-623 (S); no `L`. No dependency; disjoint files. Single stream; no epic. TASK-621 is outside the sprint and untouched. Filing commit `ecb4ad27`; status moves `2eab339c`.
 G1 and G2 are not yet signed; `gates_signed` is recorded in the sprint frontmatter only after the owner's sign-off is relayed.
+
+### 2026-11-08 | gates | G1 + G2 signed (batch, sprint-bulk)
+G1: fast-path, both members `origin: decomposer`; scope unchanged since the decomposer `approve`. G2: designs for T1 and T2 as settled by the builder checks (coordinator scratch design file). Owner sign-off by popup, verbatim: "Sign G1 + G2 (Recommended)". Recorded as `gates_signed: G1,G2 @ ea0e636d`.
+builder-check · T1 · 0 contradictions · 2 questions · both factual, settled in the design: both probe arms run with `--setting-sources project`, and an arm whose JSON shows no `/diagram` output is void
+builder-check · T2 · 0 contradictions · 3 questions · all factual, settled by the coordinator: the alias resolver and "refused, never defaulted" sit in `night-run.md` Part 0 and `orchestrator/SKILL.md` Mode dispatch; "launcher writes the state" sits in `night-run.md` Part 0b; `night-run.md` has no "Authority classes" heading, so the Authority pointer cites `night-run.md` Part 0
+consequence · T1 · behaviour: low (narrower grant) · governance: shipped-skill security grant → one scoped `sonnet` reviewer pre-merge
+consequence · T2 · behaviour: none · governance: always-loaded workflow-contract text → one scoped `sonnet` reviewer pre-merge
+Overlap map: T1 owns `skills/diagram/SKILL.md` · `SECURITY.md` · `CHANGELOG.md`; T2 owns `.claude/CONTEXT.md`; no shared file, no `Depends-on` → one parallel wave, worktree-isolated, declared base `ea0e636d` plus this commit. Coordinator owns the sprint file, this Log, member ticks and moves, the T1 headless probe and system verify.
+Worktree cleanup before the fan-out, owner ruling by popup, verbatim: "Remove 8 clean, keep 9 (Recommended)". Removed 8 merged and clean agent worktrees (branches kept); 9 holding uncommitted work stay for a separate review.
