@@ -114,6 +114,13 @@ Rough cost 60 to 100 USD from the 1.48 USD per sprint commit seen here; set a ha
 
 **Rule fit.** ADR-044 admits an agent; this measured cost and dispatch failure are an ADR-053 basis to investigate; ADR-001 still requires shown incremental use before adding one.
 
+### Amended 2026-11-08: row 4's result, and what DeepSeek's router is
+The router as built was a no-go (TASK-630 § Results): one completed router replay cost 4.94 USD and took 40 minutes, against an ordinary mean of 3.87 USD and about 24.
+- **Correction.** Read at first hand (`docs/003-execution.md`, `docs/004-prompts.md`, `prompts/orchestrator.md`), DeepSeek's main session keeps `bash` with 5-second limits and a smaller tool set. It "makes no technical decisions", writes routing notes of at most 30 words, and never waits.
+  One Executor session per ticket reads the sources, judges scope, implements and verifies, and takes its own follow-ups. Row 4 removed the shell but kept the judgment, which is the opposite trade.
+- **Option B's forecast was wrong in principle.** Moving 70% of main turns does not remove their cost: the router's own thread fell about 4% while worker cost rose about 3.5 times.
+- **DeepSeek aims at time and attention.** A reproduction of its essay (the original was not read) describes trading tokens for shorter, steadier completion times. A faithful trial (EPIC-024 row 4b) is held to lean-flow's cost bar by owner ruling.
+
 ## Out of scope / open questions
 - Peer messaging ("team" mode): nothing here needs it.
 - Unattended runs: `night-run` stays as it is; a router has no human to route to.
