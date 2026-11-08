@@ -259,6 +259,7 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
   // selftest PASS/FAIL lines are read by its own exit code, and no column-keyed consumer reads them.
   { test: (f) => f.startsWith("evals/ab/"), why: "maintainer-only A/B measurement harness, run by hand, never a gate checker" },
   { test: (f) => f === "scripts/session-cost.ts", why: "maintainer-only spend report (TASK-609), run by hand, emits no finding" },
+  { test: (f) => f === "scripts/jev-done-when.ts", why: "maintainer-only Jev judge (TASK-626), run by hand, never a gate checker; no column-keyed consumer reads it" },
   {
     test: (f) =>
       f === "scripts/qa-check.sh" || f === "scripts/gen-index.sh" ||
