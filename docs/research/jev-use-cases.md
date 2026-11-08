@@ -55,6 +55,7 @@ The post's Doom, Wikiracing and side-by-side items are demos, not uses.
 Shortlist, in order:
 1. **Done-when judge** (TASK-626). Compared with: G1 checklist and the qa-check doc legs. Two Nouls per task file.
 2. **Cheap A/B judge**. Compared with: D16 per-run scoring. Try after 1 proves the call path.
+   Tried (TASK-628, SPRINT-169): 0.000384 against 0.0783 USD a call; on decided cells Jev agrees with the judge 93.3%, 66.7% and 93.9% over three runs, 37.5% unsure. Owner ruling: trial it as a pre-screen (TASK-631).
 3. **Concept match in `/triage` and `/insights`**. Compared with: the running model's own match. Try only if backlog reads get costly.
 4. **Watcher (trace classification)**. Compared with: night-run rollup check. Wait for a measured need.
 5. **Router**. Covered by the tier table in CONTEXT. Not worth a trial.

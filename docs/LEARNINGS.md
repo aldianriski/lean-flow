@@ -125,6 +125,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-297 [tags: tooling] [status: active]: **Bun loads a dotenv key from the repo into a script's environment even when the shell variable is unset, so a guard test of a paid script that passes `--run` makes a live call.** SPRINT-169 T1's builder ran `--run` with the shell `jev_key` unset to test the missing-key guard. Bun read `jev_key` from the repo's dotenv (the script never opened it), and one unapproved pass of 96 calls ran: 0.036843 USD, output not saved, so it was re-run and saved on the owner's ruling. A key guard that reads `process.env` cannot tell a shell variable from Bun's autoload. Test a paid script with `bun --no-env-file`, as the gate runner does, and never pass `--run` in a test; the dry run and the `--replies` fixture are the test surface.
+- seen: 2026-11-08 (SPRINT-169 T1, TASK-628)
+- count: 1
+- promoted: no
+- related: TASK-628 · TASK-626
+
+---
+
 ## L-296 [tags: process] [status: active]: **A task whose only `Layers:` token is a git-ignored path can never satisfy the dead-token rule; name the task's own file instead.** SPRINT-168 T3 (TASK-624) acts on `.claude/worktrees/`, which `.gitignore:16` ignores, so no commit ever touches it and the rule (TD-177, `check-layers-observed.ts`) FAILs the finished task at close. G2 caught it by reading the checker, not by a run, and moved `Layers:` to the task's own `in_progress/` file by scope-change.
 - seen: 2026-11-08 (SPRINT-168 T3 G2)
 - count: 1
@@ -405,8 +413,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - related: L-218 (coordinator-side legs after each merge) · L-251 (run every check that reads a touched file)
 
 ## L-261 [tags: edit-safety] [status: promoted]: **Prose that a guard parses is a structured field: a path-shaped token written into it is a claim the guard will check.** At SPRINT-147's system verify, two of three FAILs were the coordinator's own words. Tick evidence on TASK-533 named the bare `run-trial.ts` and a dotted `result.…` token, which the member-layers check reads as undeclared files. A scope-change entry backticked two directory names, which the scope-change check reads as paths the entry claims, though T1's `Layers:` did not hold them. Both guards were right; the author wrote file-shaped tokens where plain words were meant. L-108 is the guard's side of this (match by shape, not substring); this is the writer's side. Inside a governed artifact (tick evidence, a log entry's paths, Plan lines), write a token in backticks with a path shape only when it names a file the task touches or cites; otherwise use words.
-- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0)
-- count: 3
+- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0) · 2026-11-08 (SPRINT-169 system verify on `05c9fcbe`: the coordinator's T1 `consequence ·` line carried prose where the checker reads `behaviour:(low|material) · governance:(low|high)`; `review-depth-consequence-vocab` FAIL, QA-CHECK 495/1; fixed in place per L-176, then 496/0)
+- count: 4
 - **L-261 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — into L-257's scope-change line, widened from a scope-change body to every governed field a guard parses (tick evidence, log paths, Plan lines) (SPRINT-149 promote)
 - related: L-108 (the guard's side) · L-176 (structured fields in a narrative file) · L-251 (run every check that reads a touched file)
 

@@ -1997,6 +1997,7 @@ status: current
   - Evidence: SPRINT-165 Log, promote entry; `d0a9752a` deleted the 26, two selectors agreeing on 25.
   - Impact: low; a stale file costs little, and nothing wrong reaches an adopter.
   - Mitigation: derive the list at each promote, by the live-citation rule in STANDARD §11, as the SPRINT-165 scan did. A checker needs an ADR-053 reason; one sighting is not one.
+  - **Sighting (SPRINT-169 close, 2026-11-08):** the promote doc-aging line named TD deletion only. A two-selector census at close (sprint 166 or earlier, no live citation outside history, and a tree grep that agreed) found 10 due task files: TASK-604, 605, 606 (SPRINT-163), 610, 611, 612 (164), 615 (165), 618, 619, 620 (166). Deleted at close on the owner's approval.
 - **TD-300** severity: low | status: open | created: Sprint-165 (T1 review)
   - Summary: **`/handoff` step 2's resume path has no run.** Codex round 1 found a resumed side stub could stay `live`, and `750963c0` fixed the text. The proof ran on `8d099eda`, before the fix, and covered first handoffs only.
   - Evidence: SPRINT-165 Log, T1 entry.
@@ -2012,3 +2013,8 @@ status: current
   - Evidence: SPRINT-166 Log, T2 entry; `check-doc-caps.ts` token-budget line.
   - Impact: low; the check fails loudly, but each addition pays for a trim.
   - Mitigation: at the next promote doc-aging pass, dedup CONTEXT.md against its satellites (TD-006, L-008) to win back room; raising the budget needs its own ruling.
+- **TD-303** severity: low | status: open | created: Sprint-169 (T1 review)
+  - Summary: **`jev-ab-judge.ts` derives its "not sent" figure as a remainder.** The Infra line prints cells outside the scored set minus the failed calls. That is correct while the 96-cell key pre-flight holds, and wrong if any path other than a failed call or a blind-check skip ever drops a cell.
+  - Evidence: SPRINT-169 Log, T1 review entry; `scripts/jev-ab-judge.ts`, the Infra line.
+  - Impact: low; an informational infra count could be off, and no scored figure moves.
+  - Mitigation: count not-sent cells where a prompt is skipped. Census-zero today, so no run planned.
