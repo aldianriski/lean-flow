@@ -66,7 +66,8 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - **D12** — Rows 1 and 2 land on `main` unreleased, with CONTEXT.md read in full, although the bundle read drop: an exception to D4, by owner ruling on 2026-11-08. Both drops traced to the CONTEXT skip, which saved about 0.01 USD per box. The next real sprints are the check; release only under D5.
   **Check run:** SPRINT-168 (14 boxes), 0 gate failures traced to rows 1 and 2; 0.68 to 0.71 USD/box (Codex build excluded), 3.4 min/box, 0 compactions.
 
-- **D13** — Rows 7 to 9 are standard safeguards to prove, not wait for: each runs against a planted failure (a hung worker, a defect past the gate and review, a seeded bug report) and ships only if it catches its case and leaves a clean run alone. Owner ruling, 2026-11-08. Rows 4b to 9 run together as one sprint (SPRINT-170) under one 60 USD all-in cap, one change per trial (D2 stands). Owner ruling, 2026-11-08.
+- **D13** — Rows 7 to 9 are standard safeguards to prove, not wait for: each runs against a planted failure (a hung worker, a defect past the gate and review, a seeded bug report) and ships only if it catches its case and leaves a clean run alone. Owner ruling, 2026-11-08.
+  Order: rows 4b to 9 run together as one sprint (SPRINT-170) under one 60 USD all-in cap, one change per trial (D2 stands). Owner ruling, 2026-11-08.
 - **D14** — Row 4 recorded no-go, 2026-11-08, with its deviations in TASK-630 § Results. Codex found it tested a thick router: DeepSeek's keeps a limited shell, makes no technical decisions, and its benchmark traded tokens for time. By owner popup the faithful shape gets its own trial, row 4b, held to the same cost bar.
 ## Open questions
 
