@@ -1,0 +1,8 @@
+{
+  "clinic/fx-lead|reference|convention": { "body": { "answers": { "pass": { "noul": 0.92 } }, "usage": { "input_tokens": 900 } } },
+  "clinic/fx-lead|reference|business": { "body": { "answers": { "pass": { "noul": 0.5 } }, "usage": { "input_tokens": 900 } } },
+  "clinic/fx-lead|reference|scope": { "status": 500, "body": "upstream error" },
+  "clinic/fx-lead|wrong|convention": { "body": { "answers": { "pass": { "noul": 0.08 } }, "usage": { "input_tokens": 900 } } },
+  "clinic/fx-lead|wrong|business": { "body": "" },
+  "clinic/fx-lead|wrong|scope": { "body": { "answers": { "pass": { "noul": 0.81 } }, "usage": { "input_tokens": 900 } } }
+}

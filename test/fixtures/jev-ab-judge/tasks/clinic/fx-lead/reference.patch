@@ -1,0 +1,8 @@
+--- a/internal/rules/lead.go
++++ b/internal/rules/lead.go
+@@ -1,3 +1,6 @@
+ package rules
+
++func BookableAt(now, slotStart time.Time) bool {
++	return slotStart.Sub(now) >= 2*time.Hour
++}

@@ -1,0 +1,35 @@
+pre-flight: 6 cells planned; the key set equals every run's (run-a.md, run-b.md)
+estimate: 6 calls; 4218 input tokens; 0.000177 USD
+
+# Jev vs the recorded judge runs
+
+Jev jev-1.14.0, 6 cells, recorded replies (no network). Thresholds: >=0.7 PASS, <=0.3 FAIL, else unsure (UNKNOWN).
+Infra, outside every count: Jev 2 of 6 (2 failed calls, 0 not sent)
+- clinic/fx-lead|reference|scope: HTTP 500: upstream error
+- clinic/fx-lead|wrong|business: empty reply
+Jev unsure rate: 1/4 = 25.0%
+
+## Jev against each run (same cell, both sides scored)
+
+| run | judge infra | unmatched | pairs | agree, unsure counted as disagreement | agree, unsure left out |
+|---|---|---|---|---|---|
+| run-a.md | 1 | 0 | 4 | 3/4 = 75.0% | 3/3 = 100.0% |
+| run-b.md | 0 | 0 | 4 | 2/4 = 50.0% | 2/3 = 66.7% |
+
+## Against the expectation (reference PASS, broken dimension FAIL)
+
+| who | graded | hit, unsure counted as a miss | hit, unsure left out |
+|---|---|---|---|
+| Jev | 3 | 2/3 = 66.7% | 2/2 = 100.0% |
+| run-a.md | 3 | 3/3 = 100.0% | 3/3 = 100.0% |
+| run-b.md | 4 | 2/4 = 50.0% | 2/4 = 50.0% |
+
+## The judge against itself (cells scored in both runs)
+
+| runs | pairs | agree |
+|---|---|---|
+| run-a.md / run-b.md | 5 | 3/5 = 60.0% |
+
+## Cost
+
+Jev: 0.000223 USD for 6 calls (estimated from body length where usage was not reported; 0.042 USD per Mtok input, output free).

@@ -1,0 +1,7 @@
+{
+  "id": "fx-lead",
+  "prompt": "Refuse a booking whose slot starts less than 2 hours from now. Exactly 2 hours is still fine.",
+  "layers": ["internal/rules"],
+  "outOfScope": ["cancellation behaviour"],
+  "graders": [{ "name": "fixture", "cmd": "not applicable" }]
+}
