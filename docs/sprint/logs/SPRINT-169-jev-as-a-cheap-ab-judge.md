@@ -38,3 +38,6 @@ A failed or empty Jev call, and a judge-side "judge call failed" cell, is infra 
 Verify: box 1 is a judgment tick on the paid run's report · box 2 the by-hand fixture run (`test/fixtures/jev-ab-judge/`) · Negative the fixture run, plus `git diff --stat e5219eef..HEAD -- evals/ab/` empty, plus `lockProblems()` clean. Layers unchanged, nothing pruned. Tier G (other): a must-FAIL fixture plus one run on the real artifact.
 builder-check · T1 · 4 contradictions · 6 questions · settled in the design (key pre-flight, judge-side infra, harness-unchanged check, unsure reported both ways, one pass joined to three runs); the intent questions went to the owner above.
 consequence · T1 · behaviour: a new maintainer-only script, no shipped behaviour changed · governance: none (not a gate leg, no spec or ADR) → one scoped sonnet reviewer, at most 2 rounds.
+
+### 2026-11-08 | progress | T1 builder dispatched (phase 1: build, fixture, dry run; the paid run waits for review)
+worker · T1 · a795df7b5128babea · sonnet · none
