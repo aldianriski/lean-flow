@@ -54,3 +54,17 @@ Inventory: nine registered worktrees, one empty unregistered folder, and two str
 ### 2026-11-08 | T1 done | Jev use cases mapped; A1 refuted as worded, Noul replaces Box
 Worker: Sonnet, one pass, no paid call, no key use. `docs/research/jev-use-cases.md` (61 lines, doc-caps PASS) and the regenerated `docs/knowledge-index.md` were committed in 2dcd54d4. Shortlist by delta: the Done-when judge first, then a cheap A/B judge, concept match, watcher, and router (covered by the tier table). API facts: `POST https://api.typesafe.ai/v1/systemone`, Bearer auth, `model: jev-1.14.0`. Box is an image-region type, so the sprint's A1 is refuted as worded, and T2 uses Noul (P(yes), 0 to 1). The 0.7/0.3 thresholds are a vendor-skill default, not on a docs page, and T2's trial settles them. All Done-when ticks are judgment ticks from the coordinator's read (01323bde); moved to done in f273b62c. The doc ranks the A/B judge above concept match, the reverse of the TASK-627 → TASK-628 chain; this is raised with the owner at T2's G2.
 - consequence · T1 · behaviour: none (docs) · governance: none → self-review plus coordinator read
+
+### 2026-11-08 | G2 | T2 design signed; the sprint's G1 and G2 are now complete
+Signed by the owner by popup, verbatim: "Sign; one retune allowed (Recommended)". Design:
+- A single Bun file using plain fetch to `POST https://api.typesafe.ai/v1/systemone` with `jev-1.14.0`. It asks Noul questions rather than Box (A1 refuted by T1): `observable` on every box, and `concrete_negative` on a Negative box.
+- Scores ≥0.7 pass and ≤0.3 fail. A fail on `observable` is finding UNOBSERVABLE; a fail on `concrete_negative` is NEGATIVE-VAGUE.
+- Dry run is the default and prints an `estimate:` line. Under `--run`, the budget check and then the `jev_key` check happen before any fetch, each stopping with exit 2.
+- No `*.test.ts`, so it stays out of `bun test` and the gate.
+- The fixture is at `test/fixtures/jev-done-when/sample-task.md`; its control box checks the dry-run `estimate:` line.
+- Retune policy: the coordinator may reword the two questions once if the paid fixture run misses. Thresholds stay fixed, and a second miss goes to the owner.
+- Builder: Codex in a worktree with no network. A Sonnet reviewer checks it, with a cap of 2 rounds. The coordinator runs the paid runs.
+- The real-files run exiting 1 is expected and recorded.
+Backlog ruling, verbatim: "Leave it for /triage (Recommended)". The research ranks TASK-628 above TASK-627; this goes to the close Retro, and /triage re-orders it.
+- builder-check · T2 · 3 contradictions · 4 questions · settled: the Layers wording is fixed (files are new); the control box now names the dry-run `estimate:` line instead of an undefined `--help`; one table row per box is accepted; the retune owner is ruled; spend falls back to `(estimated)`; the exit 1 on real files is expected; `--no-env-file` is confirmed at scripts/gate-remote.ts:245
+- consequence · T2 · behaviour: new maintainer script, advisory · governance: none (outside the gate) → one scoped Sonnet reviewer
