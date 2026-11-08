@@ -41,11 +41,11 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive alone, thin case** (2026-11-07); bundled, drop twice. By owner exception (D12) it **landed on `main`, unreleased**, 2026-11-08. TASK-616 § Results |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | **Drop twice, bundled (D11)**: SPRINT-166 then SPRINT-167. Cost, time and context read keep both times (about 0.70 USD/box, 2.9 and 3.4 min/box); each first gate failed on CONTEXT.md rules a stage skipped (L-294). Skipping CONTEXT is reverted; only the architecture-map deferral landed with rows 1 and 2 (D12). TASK-617, TASK-621 |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started. Owner popup, 2026-11-08: runs after one check sprint on `main` (D12) shows no gate failure traced to rows 1 and 2; hard cap 100 USD for the task and the replay |
-| 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
-| 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started |
-| 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Waiting on evidence |
-| 8 | Checker | Video | Only with a named miss by the gate and review | Finds what they missed | Did not run, unless that miss appears |
-| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | Did not run, unless that gap appears |
+| 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started. Owner popup, 2026-11-08: trial against plain subagents after row 4. Already seen unprompted: 4 of 4 review and gate fixes in SPRINT-165 to 167 went back to the same builder |
+| 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started. Owner popup, 2026-11-08: trial after row 4, on a sprint with parallel builds. SPRINT-167's merge-back: 11 main-thread commands, 0 bad merges |
+| 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Not started. Owner popup, 2026-11-08: a planted-failure trial, a hung worker, after rows 4 to 6. No real hang in 18 workers so far |
+| 8 | Checker | Video | Only with a named miss by the gate and review | Finds what they missed | Not started. Owner popup, 2026-11-08: a planted-failure trial, a defect that passes the gate and review, after row 7 |
+| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | Not started. Owner popup, 2026-11-08: a planted-failure trial, a seeded bug report, after row 8; it must add to `/diagnose`'s own reproduce step |
 
 ## Decisions
 
@@ -64,6 +64,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - **D11** — Rows 1, 2 and 3 run together as one trial, an exception to D2, because each small change alone read inconclusive. A bad result will not show which row caused it. The owner rules on the router from the result. Owner ruling, 2026-11-07.
 - **D12** — Rows 1 and 2 land on `main` unreleased, with CONTEXT.md read in full, although the bundle read drop: an exception to D4, by owner ruling on 2026-11-08. Both drops traced to the CONTEXT skip, which saved about 0.01 USD per box. The next real sprints are the check; release only under D5.
 
+- **D13** — Rows 7 to 9 are standard safeguards to prove, not wait for: each runs against a planted failure (a hung worker, a defect past the gate and review, a seeded bug report) and ships only if it catches its case and leaves a clean run alone. Owner ruling, 2026-11-08. Order after the D12 check sprint: rows 4, 5, 6, 7, 8, 9, one at a time (D2).
 ## Open questions
 
 - How would a passing router be released: a funded arm or an exception? → owner ruling, 2026-11-08: decided when it passes, on its numbers.
