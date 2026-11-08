@@ -88,7 +88,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - [x] Row 1 has a recorded verdict → inconclusive, on SPRINT-165, recorded by TASK-613
 - [x] Row 2 has a recorded verdict → inconclusive alone, thin case; then bundled with rows 1 and 3 on SPRINT-166, drop, recorded by TASK-616 and TASK-617
 - [x] Row 3 has a recorded verdict → drop, bundled with rows 1 and 2 on SPRINT-166, recorded by TASK-617
-- [x] Row 4 has a recorded verdict → no-go, recorded by TASK-630
+- [x] Row 4 has a recorded verdict → no-go, step 1 on SPRINT-169 and the matched replay, recorded by TASK-630
 - [ ] Row 4b has a recorded verdict, or a recorded reason it did not run → TASK-632
 - [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
 - [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → next slice: release, if anything passes
