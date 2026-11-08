@@ -699,6 +699,7 @@ status: current
     holds. Their branches were deleted with `-D` on that proof. Also removed: the 6 empty orphan directories. Kept: 1 locked and 9
     dirty (two with one commit not in main). 10 remain registered; 2 stray files (`qa-t4.out`, `red.txt`) are left for the owner.
     Still open: nothing removes worktrees as they accumulate, which is the debt itself.
+  - **Sighting (SPRINT-168 T3, TASK-624, 2026-11-08):** the pile was back to 9 registered worktrees (WIP from sprints 107 to 135), 1 empty folder and the 2 stray files. All 12 removed on owner rulings, patches saved first, 48 branches kept; `git worktree list` now shows 0 `.claude/worktrees/` entries. The creating mechanism is unchanged, so the row stays open.
 
 - **TD-245** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
   - Summary: **Epic ids now span two repositories and nothing derives the next one across both.** EPIC-016 to 020 live in workdoo

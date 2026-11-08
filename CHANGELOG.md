@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Added (maintainer-only)** — `scripts/jev-done-when.ts` asks TypeSafe's Jev whether each Done-when box is observable and each Negative box concrete, and prints a finding per box (dry run by default; `--run` needs a budget and a key, and a run failure exits 3). `docs/research/jev-use-cases.md` maps where Jev could help and records the API facts. On the 108 task files it judged 395 boxes: 166 pass, 229 unsure, 9 unobservable. It is advisory and outside the gate; no skill changed (TASK-625, TASK-626).
 - **Changed** — `/task-decomposer` and `/lean-doc-generator promote` do their reading in one worker on `sonnet`, which returns questions to the session as popups and resumes with the answers. Every build dispatch starts with a worker contract and names its model. `/prime` no longer reads the architecture map; the stage that needs it reads its section (EPIC-024 rows 1 and 2, TASK-621).
 - **Changed** — /diagram's Bash grant is scoped to `git rev-parse` and `git status`, so the harness enforces the read-only-git limit the skill only stated in prose; any other git command, such as `git commit`, now falls to your session's permission mode (TASK-622).
 - **Added** — `/diagram` draws architecture, workflow, sequence, data-flow, state and ERD diagrams as Mermaid with an evidence table that ties every box and arrow to a source line, each marked called, configured, proposed or unknown. The roster is now 16 skills; the data-flow and flows doc templates point to it (TASK-619).
