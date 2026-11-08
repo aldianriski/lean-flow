@@ -43,7 +43,7 @@ An advisory maintainer instrument outside the gate. Tier G (other): one must-FAI
 **Acceptance:** the fixture run exits non-zero naming UNOBSERVABLE and NEGATIVE-VAGUE with the control box passing, and one run over the real task files is recorded with its spend.
 
 ### T3 — Rule on the nine leftover worktrees `[size: S · risk: low · class: decision · HITL · J2]`
-Layers: `.claude/worktrees/`
+Layers: `docs/work/in_progress/TASK-624-review-the-nine-leftover-agent-worktrees.md`
 Depends-on: none
 Cites: TASK-624
 Nine agent worktrees hold uncommitted work; each sprint fan-out pays a ruling until someone reviews them. No tracked file changes.

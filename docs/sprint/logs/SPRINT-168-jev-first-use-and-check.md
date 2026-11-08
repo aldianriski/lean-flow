@@ -28,3 +28,21 @@ Promote governance checklist, signed by the owner by popup. Sign-off text, verba
 - ☑ epic rollup currency: EPIC-024 current. ☑ epic coverage: EPIC-024 fully covered (3 open, 3 mapped); this sprint touches it, so no refusal applies. ☑ roadmap: none (no roadmap file). ☑ handoff ledger: none (no ledger file).
 Composition: TASK-625 (S), TASK-626 (M), TASK-624 (S); no `L`. TASK-626 depends on TASK-625, and both join, so it sits in the second wave; TASK-625 and TASK-624 are disjoint and start together. Single stream. Epic: `EPIC-024`, a § Member sprints row appended. Baseline gate on `main` at `9e6dfec8`, run off-host: QA_FULL qa-check 484 pass, 0 fail; `bun test` 589 pass, 0 fail. Status moves `5ed07a73`.
 G1 and G2 are not yet signed; `gates_signed` is recorded in the sprint frontmatter only after the owner's sign-off is relayed.
+
+### 2026-11-08 | G1 | batch scope signed for T1, T2 and T3
+Signed by the owner by popup, verbatim: "Sign G1 for all three". T1 (TASK-625) and T2 (TASK-626) took the fast path (`origin: decomposer`, scope unchanged since intake). T3 (TASK-624, `origin: close-retro`) took the full checklist: size S, git worktree admin only, rulings recorded in this Log; out of scope are `D:/Project/lean-flow-worktrees/*`, `lean-flow-rc1` and deleting any branch.
+
+### 2026-11-08 | scope-change | T3 also rules on three unregistered items in `.claude/worktrees/`
+What broke: `.claude/worktrees/` holds three items that are not registered worktrees (folder `agent-ae7411f8e8e641b52`, files `qa-t4.out` and `red.txt`), and TASK-624's Done-when names only the nine. Impact: T3 lists what each holds and the owner rules on each in the same pass, under the same Negative (nothing discarded without a ruling naming it). The Done-when text is unchanged, and the path sits inside T3's `Layers:`. Owner ruling by popup, verbatim: "Rule on them in T3 too (Recommended)". G2 re-confirms it.
+
+### 2026-11-08 | G2 | design signed for T1 and T3; T2's G2 waits on T1's API facts
+Signed by the owner by popup, verbatim: "Sign G2 for T1 and T3". T2's design rests on T1's API facts section (TASK-626 § Touches: "if it is unconfirmed, G2 stops"), so its G2 runs after T1 lands.
+- T1: one Sonnet worker (decision-class research; Codex has no web access) writes `docs/research/jev-use-cases.md` from the RESEARCH template, with no paid call. The API facts section also confirms or refutes A1 (Box fits both judgments at 0.7 and 0.3). Any of the four named uses whose delta is "none" stays in the shortlist, marked covered, naming the surface. `docs/knowledge-index.md` is regenerated; it is excluded from attribution (`isExcludedCommitted`), so `Layers:` is unchanged.
+- T3: inline, J2. A patch of each worktree's uncommitted changes is saved to the scratchpad before removal. Rulings are applied with `git worktree remove --force`, and branches are kept. "Salvage" means keep the worktree and file a close-Retro follow-up naming the files. The Results commit lands while the task sits in `in_progress/`, before the move to `done/`.
+- builder-check · T1 · 3 contradictions · 4 questions · settled by design fixes (A1 check added; the four named uses always placed; `knowledge-index` excluded by `isExcludedCommitted`, scripts/lib/check-layers-observed.ts:205); the rest factual, answered from the repo
+- builder-check · T3 · 0 contradictions · 4 questions · settled: Results commit precedes the `done/` move; salvage meaning stated; the unregistered folder is empty (4.0K, no entries); patch backup added
+- consequence · T1 · behaviour: none (docs) · governance: none → self-review plus coordinator read
+- consequence · T3 · behaviour: none (git admin) · governance: none → self-review
+
+### 2026-11-08 | scope-change | T3 `Layers:` moves to its own task file
+What broke: T3's only token, `.claude/worktrees/`, is git-ignored (`.gitignore:16`). The dead-token rule (TD-177, `check-layers-observed.ts` lines 458-475) FAILs a finished task whose token matches no path at HEAD or in `plan_commit..HEAD`, so the frozen Plan would redden at close. Impact: T3's `Layers:` becomes `docs/work/in_progress/TASK-624-review-the-nine-leftover-agent-worktrees.md`, the file its ruling commit touches. The `.claude/worktrees/` token is dropped. Done-when is unchanged. Re-confirmed in the G2 signed above.
