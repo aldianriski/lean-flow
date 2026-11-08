@@ -41,3 +41,10 @@ consequence · T1 · behaviour: a new maintainer-only script, no shipped behavio
 
 ### 2026-11-08 | progress | T1 builder dispatched (phase 1: build, fixture, dry run; the paid run waits for review)
 worker · T1 · a795df7b5128babea · sonnet · none
+
+### 2026-11-08 | progress | T1 built, reviewed and revised once; committed 32b8a8fb
+progress · T1 · `scripts/jev-ab-judge.ts` reuses `calibrate()` with a Jev `Judge` injected, has a 96-cell key pre-flight, keeps failed calls by task|kind|dimension as infra, dry-runs by default, and takes `--budget-usd` and `--replies`. Fixture `test/fixtures/jev-ab-judge/`: red scored the failed and empty cells as UNKNOWN; green keeps 2 infra outside the denominator and the unsure control scored (1/4); the `expected.txt` diff fails on the red output.
+Checks: fixture diff exit 0 · `emitter-column-fixtures: 9 pass, 0 fail` · `bun test` 589 pass, 0 fail · dry run: pre-flight 96 cells equal in all 3 runs, estimate 796718 tokens, 0.033462 USD · `git diff --stat -- evals/ab/` empty.
+Deviation: in a guard test the builder passed `--run` with the shell `jev_key` unset. Bun loaded the key from the repo's dotenv (the script never opened it), so one unapproved live pass of 96 calls ran: 0.036843 USD by reported usage, 0 infra, output not saved. Owner ruling, verbatim: "Re-run and save it (Recommended)". The builder is now told never to pass `--run` in a test.
+revise · T1 · Spec: judge-side blind-breach cells were scored, unlike the Jev side → fixed (fixture, review) · Standards: comma-expression one-liners and a double task scan → fixed (review). These were suggestions, so the loop did not fire on its own; owner, verbatim: "Fix all three first".
+review · T1 · scoped-reviewer · behaviour: a new maintainer-only script · governance: none · CLEAR after one round and one delta re-review; still-open suggestion: the "not sent" figure is a remainder, correct while the pre-flight holds.

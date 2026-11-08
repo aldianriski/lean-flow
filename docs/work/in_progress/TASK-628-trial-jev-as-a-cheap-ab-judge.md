@@ -23,8 +23,8 @@ Third use in the chain, in the TD-290 area where judge calls can fail. It needs 
 ## Done when
 
 - [ ] A replay compares Jev verdicts with the current judge's on the same recorded runs and states agreement and cost.
-- [ ] A failed Jev call is classed as infra and is not scored as a verdict.
-- [ ] Negative: a failed or empty Jev call is never scored as a not-passed slot, and the A/B harness default is unchanged until the owner rules.
+- [x] A failed Jev call is classed as infra and is not scored as a verdict. ✓ fixture run (test/fixtures/jev-ab-judge/, diff vs expected.txt exit 0): an HTTP 500 and an empty reply are infra, outside every count; 32b8a8fb
+- [x] Negative: a failed or empty Jev call is never scored as a not-passed slot, and the A/B harness default is unchanged until the owner rules. ✓ fixture: failed and empty calls never scored; git diff --stat e5219eef..HEAD -- evals/ab/ empty; lockProblems() clean (dry-run pre-flight passed); 32b8a8fb
 
 ## Assumes
 
