@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-169
 ---
 
 # TASK-628 — Trial Jev as a cheap judge for the A/B harness, and stop silent outage scoring

@@ -4,7 +4,7 @@ slug: agent-roles-one-by-one
 owner: Maintainer
 last_updated: 2026-11-08
 status: active
-member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168]
+member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168, SPRINT-169]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
 
@@ -79,6 +79,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | SPRINT-165 | A home for side-session handoffs, and the conformance line | closed `b63a9acc` | Ran row 1's worker contract and dispatch standard on real build work: 10 of 10 boxes, one planned `blocked` question returned to the same agent. Row 1's verdict: inconclusive, recorded by TASK-613 |
 | SPRINT-166 | Evidence-backed diagrams | closed `e13120d1` | Ran rows 1 to 3 bundled on real build work: decompose and promote each ran in one Sonnet worker with popups and same-id resumes, three Sonnet builds, 16 of 16 boxes. The first full gate failed on two conventions the coordinator missed by skipping CONTEXT.md's rules (L-294). Verdicts are recorded by TASK-616 and TASK-617 |
 | SPRINT-168 | First Jev use, and the D12 check | closed `e164151e` | The D12 check, run from a live checkout (D1): gate failures traced to rows 1 and 2: 0. The first close gate's 3 FAILs were all this sprint's own work; row 4 may start |
+| SPRINT-169 | Jev as a cheap A/B judge, built under the router | active | Step 1 of row 4's router trial (TASK-630): this sprint is built and closed with the router as main thread, and its cost, time and guards are recorded here at close. Also the third Jev use (TASK-628) |
 
 ## Closed when
 
