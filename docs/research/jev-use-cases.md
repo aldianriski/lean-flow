@@ -18,7 +18,9 @@ related: [ADR-001]
 The owner is bringing Jev in step by step, each use proven. Judged on standalone merit nearly every use sounds good. Judged on the delta over what lean-flow already has, most vanish.
 
 ## Options considered
-Sources: [use-case map](https://docs.typesafe.ai/concepts/use-case-map) and the [System One post](https://typesafe.ai/blog/introducing-system-one-models-and-jev). Both read without login. Businesses the map lists (recruiting, lead generation, insurance, finance, legal, e-commerce, advertising, gaming, support, demand forecasting, risk) touch no lean-flow stage, so they are one row. The post's Doom, Wikiracing and side-by-side items are demos, not uses.
+Sources: [use-case map](https://docs.typesafe.ai/concepts/use-case-map) and the [System One post](https://typesafe.ai/blog/introducing-system-one-models-and-jev). Both read without login.
+Businesses the map lists (recruiting, lead generation, insurance, finance, legal, e-commerce, advertising, gaming, support, demand forecasting, risk) touch no lean-flow stage, so they are one row.
+The post's Doom, Wikiracing and side-by-side items are demos, not uses.
 
 | Jev use (source) | lean-flow stage | Existing surface | Delta |
 |---|---|---|---|
@@ -43,7 +45,10 @@ Sources: [use-case map](https://docs.typesafe.ai/concepts/use-case-map) and the 
 - **Model param.** Request field `model`. `jev-1.14.0` is valid and `jev-latest` and `jev-preview` both alias it; pinning the version is advised. *Source:* [models](https://docs.typesafe.ai/go/models.md). So A2 holds on plain fetch (no SDK needed for this shape).
 - **Price and limits.** 0.042 USD per Mtok input, output free; 64k tokens per request, 32k per question. A4 holds. *Source:* models page.
 - **Box.** Box locates a region in an image: it needs header `TypeSafe-Danger-Zone-Images: true` and an `assets` image, and returns `box{top,bottom,left,right}` fractions plus `confidence`. *Source:* [HTTP API](https://docs.typesafe.ai/go/api.md), [primitives](https://docs.typesafe.ai/go/primitives.md).
-- **A1 verdict: refuted as worded, fixed by switching type.** Box cannot answer a yes/no judgment on text. The fitting type is **Noul**. Request `{"model":"jev-1.14.0","state":"<text>","questions":{"id":{"type":"noul","instructions":"<question>"}}}`; response `answers.id.noul` is the probability of yes, 0 to 1. *Source:* HTTP API page. The 0.7/0.3 thresholds with a "not settled" band are the vendor's suggested start, from the installed `typesafe:typesafe-ai` skill (0.6.2); the primitives page gives no numeric cutoff, only "near 0.5 uncertain". The thresholds are unconfirmed on a docs page and need tuning in the trial. Pair each question as its own Noul, one judgment each.
+- **A1 verdict: refuted as worded, fixed by switching type.** Box cannot answer a yes/no judgment on text. The fitting type is **Noul**.
+  Request `{"model":"jev-1.14.0","state":"<text>","questions":{"id":{"type":"noul","instructions":"<question>"}}}`; response `answers.id.noul` is the probability of yes, 0 to 1. *Source:* HTTP API page.
+  The 0.7/0.3 thresholds with a "not settled" band are the vendor's suggested start, from the installed `typesafe:typesafe-ai` skill (0.6.2); the primitives page gives no numeric cutoff, only "near 0.5 uncertain".
+  The thresholds are unconfirmed on a docs page and need tuning in the trial. Pair each question as its own Noul, one judgment each.
 - **Not found.** The post names no endpoint, auth or model id; the map names no types. Both point to the docs. Neither page states a data-retention policy; A3 stays an owner ruling.
 
 ## Recommendation
