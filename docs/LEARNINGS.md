@@ -133,11 +133,11 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
-## L-294 [tags: process] [status: active]: **A stage that is told to read what it needs must do that read, or a rule the old full read carried is lost.** With `/prime` no longer reading CONTEXT.md in full, the orchestrator says to read its applicable rules before dispatch. The SPRINT-166 coordinator skipped it, and two machine-read conventions broke: `sprint(NNN) Tn:` commit subjects and the `consequence ·` vocabulary. Both surfaced only at the first full gate (5 fail), and the fix took a subject rewrite of 12 unpushed commits.
+## L-294 [tags: process] [status: promoted]: **A stage that is told to read what it needs must do that read, or a rule the old full read carried is lost.** With `/prime` no longer reading CONTEXT.md in full, the orchestrator says to read its applicable rules before dispatch. The SPRINT-166 coordinator skipped it, and two machine-read conventions broke: `sprint(NNN) Tn:` commit subjects and the `consequence ·` vocabulary. Both surfaced only at the first full gate (5 fail), and the fix took a subject rewrite of 12 unpushed commits.
 - seen: 2026-11-08 (SPRINT-166, EPIC-024 bundled trial)
 - seen again: 2026-11-08 (SPRINT-167, TASK-621's rerun with `/prime` reading § Gates: the coordinator read § Gates and § Model tiers but not § Sprint model, so a status move went out under `docs(task):`, two `consequence ·` lines used free text, and no `review ·` lines were logged; the first QA_FULL showed 4 fail, the second 2, before the third was green. The commit-subject and Log-line rules live outside § Gates, so reading only § Gates did not carry them)
 - count: 2
-- promoted: no
+- **L-294 → promoted: EPIC-024 row 3 finding (`docs/epic/EPIC-024-agent-roles-one-by-one.md`) and TASK-621, which made workers read decompose, promote and CONTEXT in full** · disposition: retain — the fix already sits in the skills those two changed, so no new rule is added; kept as the recorded cause. Owner ruling at the SPRINT-168 promote.
 - related: L-151 · L-130 · TASK-617 · TASK-621
 
 ---
