@@ -22,11 +22,11 @@ The owner is bringing Jev in step by step. Judged only by the delta over lean-fl
 
 ## Done when
 
-- [ ] `docs/research/jev-use-cases.md` exists and maps each Jev use case from the use-case map and the introducing-System-One post to the lean-flow stage it would touch.
-- [ ] Each mapped use names the lean-flow thing that already covers it and keeps only the remainder as the delta.
-- [ ] A ranked shortlist orders the remaining uses, placing concept match in `/triage` and `/insights`, a cheap A/B judge, and router and watcher uses, and names the first use (the Done-when judge).
-- [ ] An "API facts" section records endpoint, auth, model param and the Box request and response shape, each with its source URL.
-- [ ] Negative: no use is ranked without naming the existing lean-flow surface it was compared with, and no paid Jev call is made.
+- [x] `docs/research/jev-use-cases.md` exists and maps each Jev use case from the use-case map and the introducing-System-One post to the lean-flow stage it would touch. ✓ judgment tick, coordinator read of docs/research/jev-use-cases.md (977b8f72+1)
+- [x] Each mapped use names the lean-flow thing that already covers it and keeps only the remainder as the delta. ✓ judgment tick, coordinator read of docs/research/jev-use-cases.md (977b8f72+1)
+- [x] A ranked shortlist orders the remaining uses, placing concept match in `/triage` and `/insights`, a cheap A/B judge, and router and watcher uses, and names the first use (the Done-when judge). ✓ judgment tick, coordinator read of docs/research/jev-use-cases.md (977b8f72+1)
+- [x] An "API facts" section records endpoint, auth, model param and the Box request and response shape, each with its source URL. ✓ judgment tick, coordinator read of docs/research/jev-use-cases.md (977b8f72+1)
+- [x] Negative: no use is ranked without naming the existing lean-flow surface it was compared with, and no paid Jev call is made. ✓ judgment tick: every shortlist row names its compared surface; worker report and diff show no fetch or key use
 
 ## Touches
 
