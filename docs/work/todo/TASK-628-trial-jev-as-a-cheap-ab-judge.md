@@ -7,7 +7,7 @@ size: M
 risk: med
 autonomy: HITL
 class: decision
-tier: P
+tier: G
 authority: J1
 origin: decomposer
 state: ready
