@@ -40,7 +40,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | **Inconclusive alone** (owner ruling, 2026-11-07). Bundled with rows 2 and 3 it read drop twice; by owner exception (D12) it **landed on `main`, unreleased**, 2026-11-08. TASK-613 § Results |
 | 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive alone, thin case** (2026-11-07); bundled, drop twice. By owner exception (D12) it **landed on `main`, unreleased**, 2026-11-08. TASK-616 § Results |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | **Drop twice, bundled (D11)**: SPRINT-166 then SPRINT-167. Cost, time and context read keep both times (about 0.70 USD/box, 2.9 and 3.4 min/box); each first gate failed on CONTEXT.md rules a stage skipped (L-294). Skipping CONTEXT is reverted; only the architecture-map deferral landed with rows 1 and 2 (D12). TASK-617, TASK-621 |
-| 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started: waits until a fixed bundle reruns and reads keep (owner popup, 2026-11-08) |
+| 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started. Owner popup, 2026-11-08: runs after one check sprint on `main` (D12) shows no gate failure traced to rows 1 and 2; hard cap 100 USD for the task and the replay |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started |
 | 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Waiting on evidence |
@@ -66,7 +66,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 
 ## Open questions
 
-- How would a passing router be released: a funded arm or an exception? → owner ruling, before row 4.
+- How would a passing router be released: a funded arm or an exception? → owner ruling, 2026-11-08: decided when it passes, on its numbers.
 - Does a return-and-resume grill keep its quality, and does it cost less than reading in the main thread? → in part: on SPRINT-166 both rounds resumed the same worker with 0 owner corrections, and context after decompose fell to 115k. Its cost is not separable from the bundle's (TASK-617).
 - Is "compiler" a role the owner wants apart from build and typecheck in a worker's checks? → owner, when row 8 comes up.
 
