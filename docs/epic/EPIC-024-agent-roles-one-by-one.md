@@ -38,9 +38,9 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 |---|---|---|---|---|---|
 | 0 | Context limit | This repo's data | One session at 200k | | **Closed: wrong test.** Fired near 170k with 60k of room; see the research doc |
 | 1 | **Worker contract and dispatch standard**: model by classification, isolation, the brief, which worker holds which task | DeepSeek's `worker.md` and Assignment, adapted | One sprint | Dispatches with the marker and a set model meet a share fixed at G2 (90 of 327 unset, research doc); a worker's question reaches the owner by popup and returns to that worker | **Inconclusive, direction only (D4), not shipped**, owner ruling 2026-11-07. The rule's numbers as written read keep; like for like, 1.09 to 1.14 USD/box and 4.9 min/box sit inside the baselines. Coverage 2 of 2, and the planned question returned to the same agent. Text stays on `trial/epic-024-row1` at `32ac2f42`. Measures → TASK-613 § Results |
-| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive, not shipped** (owner popup, 2026-11-07), thin case: the video kit held nothing that cleared the bar, so no sprint ran, no cost was measured, and promote and a question round went untested. Text stays on `trial/epic-024-row2` at `65ace762`; TASK-616 § Results. Row 1's text reaches `main` only after a later row reads keep, or by owner ruling |
-| 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | Ready to launch with rows 1 and 2 (D11): `trial/epic-024-bundle` at `e485a7cc`, rules in TASK-617 |
-| 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started |
+| 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive, not shipped** (owner popup, 2026-11-07), thin case: the video kit held nothing that cleared the bar, so no sprint ran, no cost was measured, and promote and a question round went untested. Text stays on `trial/epic-024-row2` at `65ace762`; TASK-616 § Results. Its open boxes were met on SPRINT-166, bundled with rows 1 and 3: drop, per row 3. Row 1's text reaches `main` only after a later row reads keep, or by owner ruling |
+| 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | **Drop, bundled with rows 1 and 2 (D11), not shipped** (owner popup, 2026-11-08), on SPRINT-166. Cost, time and context read keep: 0.68 to 0.71 USD/box, 2.9 min/box, 67k after `/prime`, 115k after decompose. The first gate failed because the orchestrator never read CONTEXT.md § Gates, which `/prime` used to load (L-294). Next: make that read one a stage cannot skip, then rerun. Text stays on `trial/epic-024-bundle` at `e485a7cc`; TASK-617 § Results |
+| 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | Not started: waits until a fixed bundle reruns and reads keep (owner popup, 2026-11-08) |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started |
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started |
 | 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Waiting on evidence |
@@ -66,7 +66,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 ## Open questions
 
 - How would a passing router be released: a funded arm or an exception? → owner ruling, before row 4.
-- Does a return-and-resume grill keep its quality, and does it cost less than reading in the main thread? → still open: row 2's thin case asked no questions and measured no cost (TASK-616).
+- Does a return-and-resume grill keep its quality, and does it cost less than reading in the main thread? → in part: on SPRINT-166 both rounds resumed the same worker with 0 owner corrections, and context after decompose fell to 115k. Its cost is not separable from the bundle's (TASK-617).
 - Is "compiler" a role the owner wants apart from build and typecheck in a worker's checks? → owner, when row 8 comes up.
 
 ## Member sprints
@@ -79,8 +79,8 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 ## Closed when
 
 - [x] Row 1 has a recorded verdict → inconclusive, on SPRINT-165, recorded by TASK-613
-- [ ] Row 2 has a recorded verdict (inconclusive, thin case, no member sprint, so no tick until the owner rules) → TASK-616
-- [ ] Row 3 has a recorded verdict → TASK-617
+- [x] Row 2 has a recorded verdict → inconclusive alone, thin case; then bundled with rows 1 and 3 on SPRINT-166, drop, recorded by TASK-616 and TASK-617
+- [x] Row 3 has a recorded verdict → drop, bundled with rows 1 and 2 on SPRINT-166, recorded by TASK-617
 - [ ] Row 4 has a recorded verdict, or a recorded reason it did not run → next slice: local router, one real task
 - [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
 - [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → next slice: release, if anything passes
