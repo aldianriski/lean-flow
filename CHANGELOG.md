@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Changed** — `/task-decomposer` and `/lean-doc-generator promote` do their reading in one worker on `sonnet`, which returns questions to the session as popups and resumes with the answers. Every build dispatch starts with a worker contract and names its model. `/prime` no longer reads the architecture map; the stage that needs it reads its section (EPIC-024 rows 1 and 2, TASK-621).
 - **Changed** — /diagram's Bash grant is scoped to `git rev-parse` and `git status`, so the harness enforces the read-only-git limit the skill only stated in prose; any other git command, such as `git commit`, now falls to your session's permission mode (TASK-622).
 - **Added** — `/diagram` draws architecture, workflow, sequence, data-flow, state and ERD diagrams as Mermaid with an evidence table that ties every box and arrow to a source line, each marked called, configured, proposed or unknown. The roster is now 16 skills; the data-flow and flows doc templates point to it (TASK-619).
 - **Added (maintainer-only)** — `scripts/session-cost.ts` reports where a repo's Claude Code spend goes; `docs/research/router-mode.md` plans how to test a router against it (TASK-609). No skill changed.

@@ -19,6 +19,8 @@ depends-on: []
 ## Why
 SPRINT-167 removed 8 leftover agent worktrees under `.claude/worktrees/` that were merged and clean. Nine more hold uncommitted changes, and two of those also hold commits not on `main`. SPRINT-166 already had to build on the shared tree because of the same leftovers. Each sprint-bulk fan-out checks `git worktree list` first, so the pile costs a ruling every sprint until someone reviews it.
 
+Debt row: TD-246, agent worktrees accumulate.
+
 ## Done when
 
 - [ ] Each of the nine worktrees has a recorded ruling (keep, salvage to a task, or remove), with its uncommitted files named.

@@ -35,14 +35,41 @@ Verdict rule, TASK-617's, unchanged:
 
 ## Done when
 - [x] The trial branch holds the fix and the off-host gate passes. ✓ `66292855`: `bun test` 589 pass, 0 fail; `QA-CHECK: 466 pass, 0 fail`.
-- [ ] The transcript shows the skills loaded from `e024-bundle`, the window unset, and `/prime` reading CONTEXT.md's Gates section and nothing else of CONTEXT.md or the architecture map.
-- [ ] Every sprint commit subject and `consequence ·` line passes the first full gate's checks for them. Any failure is named and traced to the bundle or not.
-- [ ] Decompose, promote and every build dispatch run through `sonnet` workers whose prompt starts `Worker contract (lean-flow):`, every miss named.
-- [ ] No stage misses a fact `/prime` used to load. Any miss is named, with the stage and the fact.
-- [ ] The measures are recorded on TASK-617's basis: context after `/prime`, after decompose and at the first build step, compactions, USD and minutes per box, close-time gate failures, blocking findings and owner corrections.
-- [ ] The verdict is recorded in EPIC-024 as direction (D4), by the rule in § Approved design.
-- [ ] On keep, rows 1 to 3 land on `main` in their own commit, then the clean-install and no-agent checks run before any release (D5), and the owner rules on the router's cap and release route.
-- [ ] Negative: `git diff main...trial/epic-024-bundle -- skills/orchestrator/references/night-run.md` is empty, and no trial text reaches `main` before the verdict.
+- [x] The transcript shows the skills loaded from `e024-bundle`, the window unset, and `/prime` reading CONTEXT.md's Gates section and nothing else of CONTEXT.md or the architecture map. ✓ Base dirs under `e024-bundle`, 0 compactions to a 262k peak, and `/prime` read CONTEXT.md lines 51 to 75 only, by `sed`.
+- [x] Every sprint commit subject and `consequence ·` line passes the first full gate's checks for them. Any failure is named and traced to the bundle or not. ✗ Not met, named in § Results: a `docs(task):` move subject (traced) and free-text `consequence ·` lines (not traced).
+- [x] Decompose, promote and every build dispatch run through `sonnet` workers whose prompt starts `Worker contract (lean-flow):`, every miss named. ✓ Intake `a5babfb62b6c8a928`, promote `ab7d922623cae16d2`, T1 `a842c9149db34edf4`, T2 `a0a00c7f79e1f53fc`, worktree-isolated. No miss; builder checks and reviews name `sonnet` and are not build dispatches.
+- [x] No stage misses a fact `/prime` used to load. Any miss is named, with the stage and the fact. ✗ Two, both § Sprint model: the coordinator's commit-subject rule, and the promote worker's `check-layers-completeness` run.
+- [x] The measures are recorded on TASK-617's basis: context after `/prime`, after decompose and at the first build step, compactions, USD and minutes per box, close-time gate failures, blocking findings and owner corrections. ✓ § Results.
+- [x] The verdict is recorded in EPIC-024 as direction (D4), by the rule in § Approved design. ✓ Drop, owner popup 2026-11-08.
+- [x] On keep, rows 1 to 3 land on `main` in their own commit, then the clean-install and no-agent checks run before any release (D5), and the owner rules on the router's cap and release route. ✓ Not keep. By owner exception (D12), rows 1 and 2 land on `main` in their own commit with the full CONTEXT.md read restored; nothing is released. The router stays not started.
+- [x] Negative: `git diff main...trial/epic-024-bundle -- skills/orchestrator/references/night-run.md` is empty, and no trial text reaches `main` before the verdict. ✓ Empty; the landing commit follows this record.
+
+## Results
+Session `9b9cd39e-ac08-410e-813a-bc1c12bf2f05`, 98 main-thread turns, eight Sonnet workers. Host: SPRINT-167, 11 of 11 boxes, closed `a64bde11`.
+
+**Verdict: drop**, owner popup 2026-11-08. Cost, time and context read keep again; a gate failure traced to the bundle fires drop again.
+**Owner ruling, same popup:** restore the full CONTEXT.md read, then land rows 1 and 2 on `main`, unreleased, as an exception to the rule (EPIC-024 D12). The next real sprints are the check; release only under D5.
+
+| Measure | SPRINT-167 | Keep if | SPRINT-166 | Baseline |
+|---|---|---|---|---|
+| Context after `/prime` | 71k | at most 75k | 67k | 83k |
+| Context after decompose, tasks written | 93k | at most 118k | 115k | 152k |
+| Context at the first build step, peak | 175k, 262k | | 170k, 313k | row 1: 241k, 340k |
+| USD/box, promote to last sprint commit | 0.71 to 0.72 | below 0.88 | 0.68 to 0.71 | 0.88 to 1.41 |
+| Min/box, merged activity | 3.4 | below 4.1 | 2.9 | 4.1 to 6.2 |
+| First full gate | 4 fail, then 2 | no guard worse | 5 fail | 3, 1, 2 |
+| Owner corrections | 1 of 9 popups, not traced | | 0 | |
+
+Cost: main 5.74 USD, workers 1.92 to 2.03 (two Sonnet price tables), plus about 0.18 for two headless probes. The correction: the owner chose to clean leftover worktrees before dispatch, not after; that is TD-246, not the bundle.
+
+**The misses.** `/prime` read § Gates, lines 51 to 75, as the fix said. The rules that broke sit in § Sprint model, which nothing read:
+- The coordinator committed the move to `in_progress/` under `docs(task):`, so `check-layers-observed` failed; the subject rule is § Sprint model. Traced.
+- The promote worker froze T2's Plan without running `check-layers-completeness`, which § Sprint model names at promote. Traced.
+- Free-text `consequence ·` lines and missing `review ·` lines: that vocabulary is in `skills/orchestrator/SKILL.md`, which was loaded. Not traced.
+
+**Why restore, not narrow again.** Two runs missed two different sections, and the old `/prime` loaded both. Skipping CONTEXT.md saves about 5k tokens a turn, mostly cache reads: roughly 0.01 USD per box. The savings come from rows 1 and 2, Sonnet workers reading and building.
+
+**Limits.** Two sprints of 16 and 11 boxes, different work from the baselines and from each other. Direction, not proof (D4).
 
 ## Touches
 Trial branch: `skills/prime/SKILL.md`. `main`: this file and `docs/epic/EPIC-024-agent-roles-one-by-one.md`.

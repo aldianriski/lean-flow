@@ -67,6 +67,8 @@ The whole session reads 0.82 to 0.86 USD/box. Codex and the gate host are in nei
 So it never saw the `sprint(NNN) Tn:` commit-subject rule or the review-depth vocabulary, both in § Gates, which the old `/prime` loaded in full. Row 1's sprint, with the full `/prime`, wrote both correctly.
 The fix cost a subject rewrite of 13 unpushed commits and three log lines, both by owner ruling (L-294). The gate's third finding, a 504-character description line, was the T1 worker's and does not trace to the bundle.
 
+**Correction (2026-11-08, TASK-621).** The commit-subject rule sits in CONTEXT.md § Sprint model, not § Gates, and the review-depth vocabulary is in `skills/orchestrator/SKILL.md`, which was loaded. Only the subject miss traces to the bundle. The verdict stands: one traced gate failure fires drop.
+
 **Not traced.** TASK-618's box 4 called `D:\Research\workdoo` git-less. The intake worker took that from the operator's memory index, which was out of date; the index is now fixed.
 T2 and T3 used the shared tree because 17 leftover agent worktrees stood; that is the protocol's fallback, not the bundle.
 
