@@ -27,7 +27,8 @@ Owner popups, 2026-11-08: G1 and G2 signed as designed; step 1 on TASK-628; the 
 - **Router.** `agents/router.md` on `trial/epic-024-router` (worktree `D:\Project\lean-flow-worktrees\e024-router`), loaded only by `--plugin-dir` with `--agent lean-flow:router`, never left in `.claude/agents/` (D1). Tools: Read, Glob, Grep, Agent, AskUserQuestion, SendMessage, Skill. No Bash, Edit or Write. The session model keeps gates and judgment (D6).
 - **Rules.** The router runs the loop through its skills. Every command, edit, commit, gate run, tick, move and Log entry goes to a worker. Builders get the worker contract. Bookkeeping goes to one clerk worker per sprint, reused by `SendMessage`, which does only what the router orders, word for word. Fixes go back to the worker that wrote the code.
 - **Step 1.** TASK-628 built under the router in an attended window, its sprint closed on `main`.
-- **Replay.** SPRINT-167 rebuilt from `6a7cadf2` (G1 and G2 signed, builder checks logged): two ordinary runs and two router runs. Both arms load the same `main` skills, so the router is the only difference. Each run is `claude -p` in its own scratch worktree with its own `LF_GATE_DIR`, one at a time, never merged or pushed. A HITL question takes the recommended option and is logged, the same in both arms.
+- **Replay.** SPRINT-167 rebuilt from `6a7cadf2` (G1 and G2 signed, builder checks logged): two ordinary runs and two router runs. Both arms load the same `main` skills, so the router is the only difference.
+  Each run is `claude -p` in its own scratch worktree with its own `LF_GATE_DIR`, one at a time, never merged or pushed. A HITL question takes the recommended option and is logged, the same in both arms.
 - **Cap.** 100 USD across step 1 and the four runs; stop at the cap and record what was measured.
 - Out: any release, pushing, `night-run`.
 
