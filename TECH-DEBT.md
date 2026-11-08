@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-07
+last_updated: 2026-11-08
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2078,12 +2078,12 @@ status: current
   - Evidence: SPRINT-165 Log, T1 entry.
   - Impact: low; the worst case is a `live` ledger row that promote's handoff line then shows.
   - Mitigation: run it the next time a real side handoff is resumed; no run planned.
-- **TD-301** severity: low | status: open | created: Sprint-166 (T2)
+- **TD-301** severity: low | status: resolved → TASK-622 | created: Sprint-166 (T2)
   - Summary: **`/diagram` grants plain `Bash` but needs only read-only git.** SKILL.md's `allowed-tools` lists `Bash`, and "read-only git only" is prose, so SECURITY.md lists it under unscoped Bash.
   - Evidence: SPRINT-166 Log, T2 entry; SECURITY.md's unscoped-Bash row.
   - Impact: low; the skill asks for no write and an adopter sees the grant before use.
   - Mitigation: scope the grant to the two git commands it names, then move its SECURITY.md row; check that a scoped grant still lets `git rev-parse` and `git status` run.
-- **TD-302** severity: low | status: open | created: Sprint-166 (T2)
+- **TD-302** severity: low | status: resolved → TASK-623 | created: Sprint-166 (T2)
   - Summary: **The always-loaded token budget has 3 tokens of headroom.** SPRINT-166 ended at about 12688 against 12691 after trimming CONTEXT.md, so the next roster or rule line in CLAUDE.md or CONTEXT.md fails doc-caps unless it trims as much.
   - Evidence: SPRINT-166 Log, T2 entry; `check-doc-caps.ts` token-budget line.
   - Impact: low; the check fails loudly, but each addition pays for a trim.

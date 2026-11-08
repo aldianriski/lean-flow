@@ -3,7 +3,7 @@ sprint: 167
 slug: grant-scope-and-token-room
 owner: Maintainer
 last_updated: 2026-11-08
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -48,3 +48,7 @@ What broke: merge-check's layers-completeness leg FAILed because T2's Done-when 
 - Merge-back: `--no-ff` per task, T1 then T2; the duplicate-id check printed nothing after each merge. The first merge-check showed 3 green and 2 FAIL (layers-completeness, fixed by the scope-change above; layers-observed, because the coordinator's in_progress move commit carried a `docs(task):` subject that the checker cannot attribute). Owner ruling by popup, verbatim: "Rebuild local history (Recommended)". Local, unpushed history was rebuilt from `6a7cadf2`: the move was re-committed under a `sprint(167):` subject and both builder commits were re-parented with identical trees, so content is unchanged (final tree equals the pre-rebuild tree, kept on `backup/sprint-167-pre-rebuild`). The first QA_FULL also FAILed both `consequence` lines in this Log for out-of-vocabulary tokens; they were rewritten in place to the checker's vocabulary.
 review · T1 · scoped outside review (sonnet, read-only, 1 round, no findings) · behaviour:low · governance:high
 review · T2 · scoped outside review (sonnet, read-only, 1 round, no findings; one optional wording nit not taken) · behaviour:low · governance:high
+
+### 2026-11-08 | close | 2 of 2 members in `done/`, 11/11 DoD
+run · 11 of 11 DoD ticked · PLAN_EXHAUSTED
+System verify: QA_FULL off-host `482 pass, 0 fail` at `aac43990`; merge-check 5 of 5 green; `check-sprint-by-reference --close` 6 pass, 0 fail. Retro written. Routed: `TD-301` and `TD-302` resolved → TASK-622, TASK-623. `CHANGELOG.md` `[Unreleased]` carries T1; T2 has no line (internal, by the decomposer ruling). L-294 seen again (count 2), L-238 (count 4), L-224 (count 10). Follow-up TASK-624 filed `origin: close-retro`. No handoff entry to reconcile. No release, no push (owner constraint).

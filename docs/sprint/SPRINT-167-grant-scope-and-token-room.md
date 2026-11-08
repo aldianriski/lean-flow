@@ -3,7 +3,7 @@ sprint: 167
 slug: grant-scope-and-token-room
 owner: Maintainer
 last_updated: 2026-11-08
-status: active
+status: closed
 plan_commit: 8fe3592b
 gates_signed: G1,G2 @ ea0e636d
 update_trigger: sprint execute/close events
@@ -63,7 +63,26 @@ none
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/diagram/SKILL.md` | T1 | grant scoped to `Bash(git rev-parse *), Bash(git status *)`; the prose limit is now enforced | low | headless probe, with and without the change; scoped review |
+| `SECURITY.md` · `CHANGELOG.md` | T1 | `diagram` moved to the scoped-Bash row; `[Unreleased]` bullet | low | row greps; scoped review |
+| `.claude/CONTEXT.md` | T2 | three passages its satellites hold became pointers; headroom 3 → 275 tokens | med | doc-caps `~12416 <= 12691`; fact-to-hit table; scoped review |
 
 ## Retro
 
-Written at close.
+**Retrieval check:** two misses, both this stage-misses-a-fact case. TASK-621 records them against the bundle.
+- Coordinator: `/prime` read § Gates, and the orchestrator read § Model tiers, but nobody opened § Sprint model. So the move to `in_progress/` went out under `docs(task):`, the `consequence ·` lines used free text, and no `review ·` lines were logged. The gate caught all three across two QA_FULL runs (4 fail, then 2).
+- Promote worker: it froze T2's Plan block without running `check-layers-completeness`, so `Cites:` lacked four files the Done-when names. That surfaced at the first merge-check.
+
+**Cost:** coordinator on Opus. Sonnet workers did intake, promote, two G2 builder checks, two builds and two reviews. There were two headless probe runs (~$0.18) and three off-host QA_FULL runs. USD per box is not available at close.
+
+**Worked**
+- The G2 builder checks found no contradictions, and their factual questions changed the design before the build: the probe isolates host settings, and the Authority pointer cites the heading that actually exists.
+- The T1 probe discriminates. The control arm with plain `Bash` made a real commit, and the change denied the same command.
+- Both builds ran in parallel, isolated worktrees and merged without conflict. Both reviews were clean in one round.
+- T2 won back 272 tokens with § Gates and the budget file untouched.
+
+**Friction**
+- The coordinator's commit subject cost a rebuild of unpushed history (owner ruling). Trees were identical, and the old history is kept on `backup/sprint-167-pre-rebuild`.
+- Nine leftover worktrees with uncommitted work stay; TASK-624 owns the review.
+
+**Pattern candidate:** L-294 now at count 2, and due a promotion ruling at the next promote. L-238 (count 4) and L-224 (count 10) recur despite being promoted.

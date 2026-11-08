@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-07
+last_updated: 2026-11-08
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -135,9 +135,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ## L-294 [tags: process] [status: active]: **A stage that is told to read what it needs must do that read, or a rule the old full read carried is lost.** With `/prime` no longer reading CONTEXT.md in full, the orchestrator says to read its applicable rules before dispatch. The SPRINT-166 coordinator skipped it, and two machine-read conventions broke: `sprint(NNN) Tn:` commit subjects and the `consequence ·` vocabulary. Both surfaced only at the first full gate (5 fail), and the fix took a subject rewrite of 12 unpushed commits.
 - seen: 2026-11-08 (SPRINT-166, EPIC-024 bundled trial)
-- count: 1
+- seen again: 2026-11-08 (SPRINT-167, TASK-621's rerun with `/prime` reading § Gates: the coordinator read § Gates and § Model tiers but not § Sprint model, so a status move went out under `docs(task):`, two `consequence ·` lines used free text, and no `review ·` lines were logged; the first QA_FULL showed 4 fail, the second 2, before the third was green. The commit-subject and Log-line rules live outside § Gates, so reading only § Gates did not carry them)
+- count: 2
 - promoted: no
-- related: L-151 · L-130 · TASK-617
+- related: L-151 · L-130 · TASK-617 · TASK-621
 
 ---
 
@@ -576,6 +577,7 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ## L-238 [tags: edit-safety] [status: promoted]: **A coordinator's commit subject is the attribution record, so a coordinator-owned write goes under `sprint(N):`, never under a task's `Tn:`.** SPRINT-131's system verify FAILed on two legs (`layers observed` · `dod-delta`) with no content defect. Four of the coordinator's own subjects could not be attributed: a combined `sprint(131) T3 + T4:` that no attribution arm reads, two `git revert --no-edit` subjects (`Revert "…"`) with no sprint at all, and a write to the coordinator-owned research doc under `sprint(131) T2:`, which T2's `Layers:` do not declare. The owner ruled fix-and-rerun, which cost a `filter-branch` message rewrite of 10 commits (trees byte-identical) and a second QA_FULL run. One task per subject; a write to a D1-owned shared file is `sprint(N):`; a revert gets a `sprint(N) Tn:` subject (`git revert --no-commit`, then commit).
 - **L-238 → promoted: `.claude/CONTEXT.md` § Sprint model, the commit-subject attribution bullet** · disposition: merge — a coordinator write (a status move the task's `Layers:` do not declare, a Log or sprint-file edit, a shared file) commits as bare `sprint(NNN):`, never under a task's `Tn:`. Count 2: SPRINT-131 close (298/2) and SPRINT-133 close (292/1). Body: git.
 - seen again: 2026-11-04 (SPRINT-162 T2: the member tick and the Log committed under `sprint(162) T2:`; `check-layers-observed` failed before close, re-split while unpushed) · count: 3
+- seen again: 2026-11-08 (SPRINT-167: the in-sprint move to `in_progress/` went out as `docs(task): …`, which the leg attributes to no task; caught by merge-check, history rebuilt while unpushed with identical trees) · count: 4
 
 ---
 
@@ -683,7 +685,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - seen: 2026-10-19 (SPRINT-128 T3: a scope-change entry named `conformance.sh`; the immediate `--scope-change` re-run caught it, the log-write path tick-box does not cover)
 - seen: 2026-10-24 (SPRINT-137 system verify: the 10-23 T3 scope-change entry named `check-layers-completeness.ts`, outside T3's
   `Cites:`; the entry was never re-run through `--scope-change`, so the leg FAILed only at close, a day later)
-- count: 9 (6 recorded in TASK-438's Why; SPRINT-127 close +1; SPRINT-128 close +1; SPRINT-137 close +1)
+- seen: 2026-11-08 (SPRINT-167 promote: the worker froze the Plan without running `check-layers-completeness`; T2's `Cites:` lacked four files its Done-when names, and the first merge-check FAILed on it; fixed by a scope-change)
+- count: 10 (6 recorded in TASK-438's Why; SPRINT-127 close +1; SPRINT-128 close +1; SPRINT-137 close +1; SPRINT-167 close +1)
 
 ## L-223 [tags: process] [status: promoted]: **Slimming an always-loaded rule to a pointer moves its history safely, but each imperative it carries has to stay always-loaded, because the reader that needs it is the one that never opens the pointer.** SPRINT-112 T2 moved five CLAUDE.md rules verbatim into LEARNINGS (byte-verified) and kept one-liners. Codex then found, over three rounds, actions the one-liners had dropped: verify the seed landed, parse with ±1 line and the assertion count, a sibling control, a checked-hash restore, `git add -p` then `git diff --cached`, re-reading the structure, scoping an env workaround, the cache read-before-edit rule, the Tier X/P bars and seeding the rejected design. Each was restored as a terse clause, and the always-loaded set still dropped ~16081 → ~13419 tokens. **Durable form: before slimming a rule, list its imperatives (what an agent must DO at the moment of action) and check each one against the kept text. History, sightings and examples may move; actions may not.**
 - seen: 2026-10-03 (SPRINT-112 T2, Codex rounds 1–3 on `.claude/CLAUDE.md`)
