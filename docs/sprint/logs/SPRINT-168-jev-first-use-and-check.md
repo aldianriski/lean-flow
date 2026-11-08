@@ -92,3 +92,6 @@ What broke: that harness's population scan requires every script to be scanned o
 
 ### 2026-11-08 | scope-change | T3 `Cites:` gains the four paths its Log entries named
 What broke: the T3 entries named `.gitignore`, `scripts/lib/check-layers-observed.ts`, `.claude/worktrees/qa-t4.out` and `.claude/worktrees/red.txt`, which were absent from T3's Plan lines. Impact: all four are added to T3's `Cites:` as read-only references. `Layers:` and Done-when are unchanged. Owner ruling as above.
+
+### 2026-11-08 | system-verify | gate green at close: qa-check 495 pass, 0 fail; bun test 589/0
+Off-host QA_FULL gate on 7b81c15e, after the three fixes (9cdd668e, de83e68c, 7b81c15e). D12 reading for the close: three close-time gate failures, all traced to this sprint's own work (a research doc's line length, a new script missing from a scan list, and Log entries naming undeclared paths). None traced to EPIC-024 rows 1 and 2.
