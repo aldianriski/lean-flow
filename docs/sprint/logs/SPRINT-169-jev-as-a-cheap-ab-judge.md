@@ -37,7 +37,8 @@ Design: `scripts/jev-ab-judge.ts` reuses `calibrate()` from `evals/ab/judges/cal
 A failed or empty Jev call, and a judge-side "judge call failed" cell, is infra and outside every agreement count. An unsure Jev score (0.3 to 0.7) is a scored UNKNOWN, reported both counted as a disagreement and left out, with the unsure rate. One pass of 96 calls, joined to all three runs, `--budget-usd 1`.
 Verify: box 1 is a judgment tick on the paid run's report · box 2 the by-hand fixture run (`test/fixtures/jev-ab-judge/`) · Negative the fixture run, plus `git diff --stat e5219eef..HEAD -- evals/ab/` empty, plus `lockProblems()` clean. Layers unchanged, nothing pruned. Tier G (other): a must-FAIL fixture plus one run on the real artifact.
 builder-check · T1 · 4 contradictions · 6 questions · settled in the design (key pre-flight, judge-side infra, harness-unchanged check, unsure reported both ways, one pass joined to three runs); the intent questions went to the owner above.
-consequence · T1 · behaviour: a new maintainer-only script, no shipped behaviour changed · governance: none (not a gate leg, no spec or ADR) → one scoped sonnet reviewer, at most 2 rounds.
+consequence · T1 · behaviour:low · governance:low
+Consequence reasoning: a new maintainer-only script, no shipped behaviour changed (behaviour low); not a gate leg, no spec or ADR (governance low); depth chosen: one scoped sonnet reviewer, at most 2 rounds.
 
 ### 2026-11-08 | progress | T1 builder dispatched (phase 1: build, fixture, dry run; the paid run waits for review)
 worker · T1 · a795df7b5128babea · sonnet · none
@@ -52,3 +53,6 @@ review · T1 · scoped-reviewer · behaviour: a new maintainer-only script · go
 ### 2026-11-08 | progress | T1 paid replay run; TASK-628 box 1 ticked
 progress · T1 · the one approved paid pass, `bun scripts/jev-ab-judge.ts --run --budget-usd 1` on `32b8a8fb`, exit 0, by the same builder: 96 calls, 0 infra, unsure 36/96 = 37.5%; Jev agrees with `calibration.md` 56/96 (93.3% unsure left out), run1 46/96 (66.7%), run2 31/54 (93.9%); Jev against the expectation 45/64 (93.8% unsure left out).
 Cost: Jev 0.036843 USD for 96 calls against the judge's 0.0783 USD per call (7.52 USD for 96). Cumulative Jev spend 0.080737632 of 5 USD. Full figures in TASK-628 `## Results`; the run's complete output was checked line by line against the builder's report. No verdict is recorded here: whether Jev replaces the judge is the owner's ruling, and the harness default is unchanged.
+
+### 2026-11-08 | surprise | system verify red on one coordinator miss in the Log, fixed in place per L-176
+Off-host gate on `05c9fcbe`: `bun test` 589 pass, 0 fail; `QA-CHECK: 495 pass, 1 fail`. The one FAIL was `review-depth-consequence-vocab`: the T1 consequence line in the `g1-g2` entry carried prose in place of the `behaviour:(low|material) · governance:(low|high)` tokens. It now reads `behaviour:low · governance:low`, and the reasoning moved to the plain prose line after it. This is a structured field a guard reads, so it was corrected in place, not by a new entry (L-176). No defect in T1.
