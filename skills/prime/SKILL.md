@@ -1,6 +1,6 @@
 ---
 name: prime
-description: Use when starting a new session and want to load project context in a deterministic order — CLAUDE.md, CONTEXT.md, README, MEMORY index, active sprint, ARCHITECTURE map. Emits a health check showing which files were found versus missing. Everything degrades gracefully; nothing aborts. Do not use for mid-session orientation — re-read the specific file instead.
+description: Use at session start for a light health report and next step. Check project instructions, context, README, memory, work and architecture sources; read CONTEXT in full and defer the architecture map to the stage that needs it. Missing files never abort. Do not use for mid-session orientation — read the needed source instead.
 argument-hint: ""
 allowed-tools: Read, Glob, Grep
 user-invocable: true
@@ -9,7 +9,7 @@ version: "0.3.0"
 
 # prime
 
-Ordered context loader + health check. One-shot session priming. Read-only — never writes.
+Ordered presence/status check + next step. One-shot session priming. Read-only — never writes.
 
 ## When to invoke
 
@@ -17,27 +17,27 @@ Ordered context loader + health check. One-shot session priming. Read-only — n
 - After `/clear` to reload context without restarting.
 - When the session feels stale and you want to confirm what state you are operating against.
 
-## Read order
+## Check order
 
-Read each that exists, in order. Mark `[OK]` / `[MISSING]` per item. All are optional —
+Check each slot in order; read only as specified below. `[OK]` means found; slots 1, 2 and 4 are also loaded. All are optional —
 absence is reported, never fatal. Canonical placement (STANDARD §2) is listed first; legacy
 locations second. Adapt the globs to the host project's layout.
 
 | # | Path (first match wins) | Purpose |
 |---|---|---|
-| 1 | `.claude/CLAUDE.md`, `CLAUDE.md` | Project instructions, anti-patterns, conventions |
-| 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Vocabulary · gates · modes (if the project uses one) |
+| 1 | `.claude/CLAUDE.md`, `CLAUDE.md` | Read project instructions unless already loaded by the host |
+| 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Read in full: vocabulary · gates · sprint rules · modes, which every stage obeys (if the project uses one) |
 | 3 | `README.md` — *presence-check by default* | Front-door (humans); overlaps 1·2·6 → **full read deferred** (note below) |
-| 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
+| 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Read the index for sprint state, feedback, references |
 | 5 | `docs/work/`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Work-item store (incl. `type:`) + debt ledger — frontmatter + open `- [ ]` items only |
-| 6 | `docs/architecture/overview.md`, `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
+| 6 | `docs/architecture/overview.md`, `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Presence + narrow `## Stack` heading search only; defer the module map |
 | 7 | active `docs/epic/EPIC-*.md` (not `archive/`) § Closed when · `docs/product/roadmap.md` (or `docs/roadmap.md`) Delivery-sequence rows | Coverage count (below) |
 
 **README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +
 CONTEXT.md (2) + ARCHITECTURE.md (6). Stat its presence for the health line, but **read its full
 content only when CLAUDE.md *or* CONTEXT.md is MISSING** (then it is the best available overview).
-Why: the README duplicates CLAUDE.md/CONTEXT.md/ARCHITECTURE.md content, so reading it in full doubles
-the priming token cost for near-zero new signal.
+Why: when both instruction/context files exist, this health report needs no additional overview;
+stages read the facts they need themselves, even when invoked without `/prime`.
 
 **Resolution** (v2 store): backlog = `docs/work/backlog/`. Active sprint = each `docs/sprint/SPRINT-NNN-<slug>.md`
 with `status: active` (a multi-stream repo has one per stream) — read only its frontmatter + `## Members`. Open bugs = `type: bug` items outside `done/`·`cancel/`, oldest = lowest id.
@@ -82,7 +82,7 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
 
 ## Steps
 
-1. Read each path in order; track found/missing.
+1. Check each slot in order; track found/missing. Read slot 2 in full. Never full-read the architecture map for priming; use Grep for the slot-6 `^## Stack\b` heading check.
 2. From the active task list, count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check).
 3. Compare the base-dir version against the plugin manifest — or, with no version segment, the live-checkout row (above).
 4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
@@ -97,14 +97,14 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - uncovered epic conditions or roadmap rows > 0 → also name `/triage` (it lists them)
-   - **unprofiled** (slots already read, never a new file: none of slots 1·2·6 exists → `/lean-doc-generator init`; else no `## Stack` heading in the slot-6 file, or no slot-6 file → `migrate`) → with work tracked, also name that command;
+   - **unprofiled** (slots already checked, never a new file: none of slots 1·2·6 exists → `/lean-doc-generator init`; else the heading search finds no `## Stack` in slot 6, or no slot-6 file → `migrate`) → with work tracked, also name that command;
      with nothing tracked, it is the `Next:` instead of `/task-decomposer`. Name it, never run it; on a v1/mixed layout skip this bullet and the next (the `Layout:` row's migrate is the `Next:`)
    - nothing tracked yet, profiled → `/task-decomposer "<intent>"`
 
 ## Output format
 
 ```
-=== PRIME HEALTH: ready — context current; continue the active sprint with /orchestrator ===
+=== PRIME HEALTH: ready — sources found; continue the active sprint with /orchestrator ===
 [OK]      CLAUDE.md
 [OK]      CONTEXT.md
 [OK]      README.md
@@ -133,7 +133,7 @@ base dir; otherwise report it, including `n/a`, so its absence is never mistaken
    freshness row compares against, and the Execution Log / `HANDOFF-LEDGER.md` the Handoff row reads, and the active epics' § Closed when / the roadmap the Coverage row reads)
    — adds noise; not this skill's job.
 ❌ **Aborting on a missing file** — everything is optional; `[MISSING]` is the correct response.
-❌ **Summarizing file contents inline** — emit the health check only; files are already in context for downstream skills.
+❌ **Treating presence as loaded context** — emit the health check only; each downstream stage reads its own required sources, including when invoked without `/prime`.
 ❌ **Reading a full sprint file** — frontmatter + active section is enough for priming.
 ❌ **Running mid-task** — this is for session priming; mid-task use signals context drift.
 ❌ **Writing a `handoff-status:` transition** — priming only reports the latest one; `/handoff` and

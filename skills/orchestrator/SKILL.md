@@ -9,11 +9,11 @@ version: "0.2.0"
 
 # orchestrator
 
-Gate-driven execution loop. Coordinate the work; restate intent as a verifiable goal first. Humans approve gates — never
-self-approve. No specialist agents: gates are inline checklists and review is a structured self-pass.
+Gate-driven execution loop. Coordinate the work; restate intent as a verifiable goal first. Humans approve gates — never self-approve. No specialist agents: gates are inline checklists and review is a structured self-pass.
+Before routing/dispatch, read `.claude/CONTEXT.md` (else `CONTEXT.md`, or the host equivalent) in full unless `/prime` loaded it this session: its gates, sprint rules and model tiers bind every commit; missing file → report and use this skill's defaults.
+Before recon/design, read only the affected area's section of `docs/architecture/overview.md` (else `docs/ARCHITECTURE.md`, `ARCHITECTURE.md`, or the host equivalent); if absent, report it and locate the area from code and existing docs.
 
 ## Mode dispatch
-
 | Mode | Gates | Use when |
 |---|---|---|
 | `quick` | G1 | single task, small, low risk |
@@ -74,9 +74,9 @@ this changes *when* a run stops, never *who* records it. Full contract → `refe
 
 ## Phases
 
-> **Every Implement step dispatches.** The orchestrator is the `decision` tier — it **coordinates** (gates · grill · design · synthesis · merge) and does not execute inline: `execution`→Sonnet · `mechanical-ingest`→Haiku go **by default** to a `general-purpose` sub-agent handed its **procedure skill** (new behaviour→`/tdd` test-first · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/config/spikes→direct; a change to working behaviour adds a pin first, whatever its route, inside the declared layers); a `decision`/trivial step stays inline only with a stated reason. Drive the task with `/goal` (its done-when), clear it at the end. Escalate by hand to Fable / `/council` for an ADR-grade fork.
->
-> **Routing table · `/goal` · dispatch + parallel/sequential rules · uncertain-write readback → `${CLAUDE_SKILL_DIR}/references/dispatch.md`**; role map → `.claude/CONTEXT.md` · ADR-010.
+> **Every Implement step dispatches.** The `decision`-tier orchestrator coordinates gates, grill, design, synthesis and merge. Dispatch `execution`→Sonnet · `mechanical-ingest`→Haiku by default to a `general-purpose` sub-agent with its procedure skill: new behaviour→`/tdd` test-first · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/config/spikes→direct. Pin changes to working behaviour first, within declared layers. Only `decision`/trivial steps stay inline, with a stated reason. Drive `/goal` from the task's done-when; clear at task end. Escalate ADR-grade forks by hand to Fable / `/council`.
+> Every dispatch names its model from its own classification and follows the parallel preflight, both in `dispatch.md`; every build dispatch pastes `${CLAUDE_SKILL_DIR}/references/worker-brief.md` verbatim. Keep which worker holds which task, so a question or fix returns to it. Read reports and run gates; never investigate a worker's blocker or redo its work.
+> Relay a worker's `blocked` question and recommendation as an **AskUserQuestion popup**; send the answer to that same worker via `SendMessage`, never a new agent (a host with no resume → `dispatch.md`). Unattended: park per `night-run.md`. Routing · `/goal` · parallel/sequential · uncertain-write readback → `${CLAUDE_SKILL_DIR}/references/dispatch.md`; roles → `.claude/CONTEXT.md` · ADR-010.
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.

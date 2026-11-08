@@ -2,7 +2,7 @@
 name: lean-doc-generator
 description: Use when creating, updating, or reviewing technical documentation, ADRs, sprint files, or AI-context files; running the sprint lifecycle (promote / execute / close); or **migrating existing docs** (dev-flow / adlc-flow / any layout) into the lean-flow standard. Follows the LEAN DOCUMENTATION STANDARD — WHY and WHERE only, never HOW. Bundles its own templates and cites the versioned standard at `spec/STANDARD.md`, so generated docs match a canonical format. Do not use to document HOW something works; redirect to code comments instead.
 argument-hint: "[ | <type> <subject> | promote | close | epic \"<outcome>\" | prd | migrate | init]"
-allowed-tools: Read, Write, Edit, Bash(git *), Glob, Grep
+allowed-tools: Read, Write, Edit, Bash(git *), Glob, Grep, Agent, SendMessage, AskUserQuestion
 user-invocable: true
 version: "0.4.0"
 ---
@@ -12,6 +12,7 @@ version: "0.4.0"
 Generate high-signal docs against a canonical format. Every template ships inside this skill under
 `${CLAUDE_SKILL_DIR}/`; the standard itself is cited from the versioned `spec/STANDARD.md` — the
 SSOT for every standard-owned rule (ADR-023).
+**Worker route** — attended `promote` with Agent + resumable subagents: before source reads, follow `${CLAUDE_SKILL_DIR}/references/promote-brief.md`. Otherwise (including unattended), read inline as below; unattended promote still parks. Workers do not redispatch promote.
 
 ## Golden Rule
 
@@ -68,7 +69,7 @@ parks to `/handoff`.** Procedure · tier table · allowlist → `${CLAUDE_SKILL_
 
 1. **Load the standard** — read `spec/STANDARD.md`. It defines the Core Files, line caps, and the template-load protocol.
 2. **Date check** — compare today's date to any `last_updated:` you are about to write; if it would drift ≥1 day, ask before correcting. Never silently fix.
-3. **Staleness scan** — read existing docs; flag any with a stale/missing ownership header before using them as a source.
+3. **Staleness scan** — read `.claude/CONTEXT.md` (else `CONTEXT.md`) in full (its sprint rules bind promote), only the needed sections of `docs/architecture/overview.md` (else `docs/ARCHITECTURE.md`), and the mode's source docs; adapt host paths. Missing → report, use what exists; flag stale/missing ownership headers. Promote's worker does this read.
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `STANDARD.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.

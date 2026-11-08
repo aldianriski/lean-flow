@@ -21,7 +21,18 @@ classification stays authoritative:
 judgment call) stays inline — but only with a *stated reason*. The failure this prevents: the coordinator
 doing `execution`/`mechanical` work itself instead of dispatching it (the observed "orchestrator never spawns" bug).
 
+**Name the model on the dispatch** where the host takes one, so it never silently inherits the session's; a host with no
+model parameter dispatches without it. Classify each dispatch itself: the task's `class:` is the default, a recon or review
+pass inside a task is classified on its own, and a dispatch with no task or no `class:` is classified at that moment.
+
 ## Hand the sub-agent its procedure skill (not a re-described brief)
+
+Every build dispatch pastes the worker contract, [worker-brief.md](worker-brief.md). Recon, builder-check and review passes
+do not: the contract is written for a builder, and `Explore` and `Plan` cannot be resumed. For each build dispatch, the
+coordinator appends its own `progress` Execution Log entry naming that `Tn`, holding one line,
+`worker · Tn · <agent id> · <model> · <isolation or none>`, so the holder survives compaction and `/handoff`; outside a sprint
+it stays in the conversation. A host that cannot resume a worker hands a new worker the question, the owner's answer and the
+first worker's report, and records that it did.
 
 Dispatch on a `general-purpose` sub-agent (NOT `Explore`/`Plan` — those skip CLAUDE.md, losing project
 context) with the relevant **procedure skill** invoked at runtime via the Skill tool: new behaviour →

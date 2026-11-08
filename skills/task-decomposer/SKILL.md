@@ -2,7 +2,7 @@
 name: task-decomposer
 description: Use when converting a freeform feature request, ticket URL, PRD, or epic into structured TASK-NNN task files in docs/work/backlog/ (one file per task). Enforces an assumption registry, risk scoring, vertical-slice granularity, and validation before writing. Self-contained, no specialist agents. Do not use when a task already exists and is ready to build — use /orchestrator instead.
 argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\" | --roadmap P2a | --fog \"foggy goal\"]"
-allowed-tools: Read, Write, Edit, Glob, Grep
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion
 user-invocable: true
 version: "0.2.0"
 ---
@@ -12,6 +12,7 @@ version: "0.2.0"
 Translate any form of human intent into fully-formed `TASK-NNN` task files. The approved output
 serves as the scope gate — `/orchestrator` G1 then runs as a fast-path confirm (scope unchanged?),
 not a re-grill.
+**Worker route** — attended intake with Agent + resumable subagents: before source reads, follow `${CLAUDE_SKILL_DIR}/references/intake-brief.md`. Otherwise (including unattended), read inline as below. Workers follow the procedure inline without redispatching intake.
 `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
 On v1 or mixed, name it and refuse to write — point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree.
 
@@ -46,6 +47,8 @@ ids): the decomposer never edits the roadmap — the coverage mark is the owner'
 row → say so and offer `/lean-doc-generator roadmap` (create) or plain decomposition.
 
 ## Procedure
+
+Before the grill or PRD synthesis, the worker (inline on fallback) reads `.claude/CONTEXT.md` (else `CONTEXT.md`) in full and relevant map sections in `docs/architecture/overview.md` (else `docs/ARCHITECTURE.md` or `ARCHITECTURE.md`); adapt host paths. Missing file/section → report, use tier defaults below and derive facts from input/code.
 
 1. **Clarify — the grill** *(freeform / ticket only)* — ambiguity is cheapest to kill at intake. Decisions form a dependency tree; work it in **rounds by frontier**. The frontier is every decision whose prerequisites are already settled — ask **all of it at once** as one **AskUserQuestion popup** (each option with a recommended answer), then recompute the frontier from the answers. **The discriminator is dependency, not count:** batching *dependent* questions is what produces vague answers, because the user must guess at inputs they have not given yet; batching *independent* ones costs nothing and saves a round-trip. Stop when the frontier is empty — every branch visited, nothing silently assumed. **Finding *facts* is your job, never the user's:** an unresolved fact is a prerequisite in the tree, not a question — resolve it yourself (for mature / unfamiliar code, **recon via the `Explore` agent** — existing impl + tests + deps → a tight brief in its own context, a cheap-tier `sonnet` pass whose brief says: never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; report and ask, or read a non-secret record; the grill itself stays on the session model. Tier map → `CONTEXT.md`). Only the branch *downstream* of an open exploration waits; the rest of the frontier proceeds. Moves:
    - **Challenge the glossary** — a term conflicts with `CONTEXT.md`? Surface it: "your glossary says X, you seem to mean Y — which?"
