@@ -68,3 +68,14 @@ Signed by the owner by popup, verbatim: "Sign; one retune allowed (Recommended)"
 Backlog ruling, verbatim: "Leave it for /triage (Recommended)". The research ranks TASK-628 above TASK-627; this goes to the close Retro, and /triage re-orders it.
 - builder-check · T2 · 3 contradictions · 4 questions · settled: the Layers wording is fixed (files are new); the control box now names the dry-run `estimate:` line instead of an undefined `--help`; one table row per box is accepted; the retune owner is ruled; spend falls back to `(estimated)`; the exit 1 on real files is expected; `--no-env-file` is confirmed at scripts/gate-remote.ts:245
 - consequence · T2 · behaviour: new maintainer script, advisory · governance: none (outside the gate) → one scoped Sonnet reviewer
+
+### 2026-11-08 | T2 done | Jev judge built, fixture proven, real run recorded
+Codex built it in worktree `s168-t2` (no network). Codex used one build pass plus one retry; the reviewer used two rounds, within the cap of 2.
+- Review round 1 had no High or Medium findings. The two worst Lows were a run failure sharing exit 1 with a finding, and an untrimmed key. One builder retry fixed both: a run failure now exits 3 and is never scored, and the key is trimmed.
+- Round 2 was clean. Landed in 66d4be0f, with blob hashes equal to the worktree's. The worktree and its branch were removed.
+- Paid fixture run: exit 1, `UNOBSERVABLE=2; NEGATIVE-VAGUE=1`, control box pass (0.97); no retune needed. The summary line prints both finding names even at 0, so the counts are the proof.
+- Real run: 108 files, 0 skipped, 395 boxes: 166 pass, 229 unsure, 9 UNOBSERVABLE, 0 NEGATIVE-VAGUE; exit 1, as expected.
+- Spend: 0.000046 + 0.007005 = 0.007052 USD cumulative, of the 5 USD cap.
+- Finding for the Retro: 58% of real boxes land in the 0.3-0.7 band at the vendor default thresholds, so the judge is mostly undecided on this corpus. That is a measurement for TASK-627's design.
+- Results and ticks: 943e5680; moved to done in d3bd1c9d.
+- consequence · T2 · behaviour: new advisory maintainer script · governance: none (outside the gate) → one scoped Sonnet reviewer, 2 rounds
