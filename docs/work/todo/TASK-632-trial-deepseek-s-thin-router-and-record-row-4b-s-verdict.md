@@ -3,6 +3,7 @@ id: TASK-632
 title: "Build DeepSeek's thin router and one-Executor-per-task files on a trial branch, and probe the shared harness (row 4b, build half)"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med

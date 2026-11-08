@@ -2,6 +2,7 @@
 id: TASK-636
 title: "Trial a checker on a planted defect against the gate and scoped review, and record row 8's verdict"
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med

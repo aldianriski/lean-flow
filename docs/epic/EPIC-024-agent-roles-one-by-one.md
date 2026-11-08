@@ -4,7 +4,7 @@ slug: agent-roles-one-by-one
 owner: Maintainer
 last_updated: 2026-11-08
 status: active
-member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168, SPRINT-169]
+member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168, SPRINT-169, SPRINT-170]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
 
@@ -41,7 +41,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive alone, thin case** (2026-11-07); bundled, drop twice. By owner exception (D12) it **landed on `main`, unreleased**, 2026-11-08. TASK-616 § Results |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | **Drop twice, bundled (D11)**: SPRINT-166 then SPRINT-167. Cost, time and context read keep both times (about 0.70 USD/box, 2.9 and 3.4 min/box); each first gate failed on CONTEXT.md rules a stage skipped (L-294). Skipping CONTEXT is reverted; only the architecture-map deferral landed with rows 1 and 2 (D12). TASK-617, TASK-621 |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | **No-go** (TASK-630, 2026-11-08). Ordinary 3.37 and 4.37 USD, 19 and 28 min; the one completed router run 4.94 USD, 40 min, against a 2.90 bar. It tested a thick router, not DeepSeek's (D14). TASK-630 § Results |
-| 4b | Thin router, as DeepSeek built it: a limited shell, no technical judgment, G1 and G2 relayed; one Executor per task owns design, build and verify | DeepSeek's prototype docs and prompts | The same matched replay | At least 25% cheaper, time no worse, quality held | Not started. Owner popup, 2026-11-08, after Codex review of row 4. TASK-632 |
+| 4b | Thin router, as DeepSeek built it: a limited shell, no technical judgment, G1 and G2 relayed; one Executor per task owns design, build and verify | DeepSeek's prototype docs and prompts | The same matched replay | At least 25% cheaper, time no worse, quality held | Not started. Owner popup, 2026-11-08, after Codex review of row 4. TASK-632, TASK-638 |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started. Owner popup, 2026-11-08: trial against plain subagents after row 4. Already seen unprompted: 4 of 4 review and gate fixes in SPRINT-165 to 167 went back to the same builder |
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started. Owner popup, 2026-11-08: trial after row 4, on a sprint with parallel builds. SPRINT-167's merge-back: 11 main-thread commands, 0 bad merges |
 | 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Not started. Owner popup, 2026-11-08: a planted-failure trial, a hung worker, after rows 4 to 6. No real hang in 18 workers so far |
@@ -66,7 +66,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - **D12** — Rows 1 and 2 land on `main` unreleased, with CONTEXT.md read in full, although the bundle read drop: an exception to D4, by owner ruling on 2026-11-08. Both drops traced to the CONTEXT skip, which saved about 0.01 USD per box. The next real sprints are the check; release only under D5.
   **Check run:** SPRINT-168 (14 boxes), 0 gate failures traced to rows 1 and 2; 0.68 to 0.71 USD/box (Codex build excluded), 3.4 min/box, 0 compactions.
 
-- **D13** — Rows 7 to 9 are standard safeguards to prove, not wait for: each runs against a planted failure (a hung worker, a defect past the gate and review, a seeded bug report) and ships only if it catches its case and leaves a clean run alone. Owner ruling, 2026-11-08. Order after the D12 check sprint: rows 4, 5, 6, 7, 8, 9, one at a time (D2).
+- **D13** — Rows 7 to 9 are standard safeguards to prove, not wait for: each runs against a planted failure (a hung worker, a defect past the gate and review, a seeded bug report) and ships only if it catches its case and leaves a clean run alone. Owner ruling, 2026-11-08. Rows 4b to 9 run together as one sprint (SPRINT-170) under one 60 USD all-in cap, one change per trial (D2 stands). Owner ruling, 2026-11-08.
 - **D14** — Row 4 recorded no-go, 2026-11-08, with its deviations in TASK-630 § Results. Codex found it tested a thick router: DeepSeek's keeps a limited shell, makes no technical decisions, and its benchmark traded tokens for time. By owner popup the faithful shape gets its own trial, row 4b, held to the same cost bar.
 ## Open questions
 
@@ -82,6 +82,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | SPRINT-166 | Evidence-backed diagrams | closed `e13120d1` | Ran rows 1 to 3 bundled on real build work: decompose and promote each ran in one Sonnet worker with popups and same-id resumes, three Sonnet builds, 16 of 16 boxes. The first full gate failed on two conventions the coordinator missed by skipping CONTEXT.md's rules (L-294). Verdicts are recorded by TASK-616 and TASK-617 |
 | SPRINT-168 | First Jev use, and the D12 check | closed `e164151e` | The D12 check, run from a live checkout (D1): gate failures traced to rows 1 and 2: 0. The first close gate's 3 FAILs were all this sprint's own work; row 4 may start |
 | SPRINT-169 | Jev as a cheap A/B judge, built under the router | closed `121b89a8` | Router-trial step 1 (TASK-630): 0 shell, edit or write calls on the main thread, 10 popups, 0 compactions. On this epic's basis 12.3 to 13.6 USD, 4.1 to 4.5 USD/box, 19.4 min/box (TASK-630 § Results). Guards: first verify 495/1 on a coordinator Log line, 1 unapproved Jev pass. Jev use 3: pre-screen trial (TASK-631) |
+| SPRINT-170 | Agent roles, rows 4b to 9, trialled together | active | Runs rows 4b to 9 in one sprint under one 60 USD cap (TASK-632 to 638); each row keeps its own verdict (D2, D13). Completed at close |
 
 ## Closed when
 
@@ -89,6 +90,6 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - [x] Row 2 has a recorded verdict → inconclusive alone, thin case; then bundled with rows 1 and 3 on SPRINT-166, drop, recorded by TASK-616 and TASK-617
 - [x] Row 3 has a recorded verdict → drop, bundled with rows 1 and 2 on SPRINT-166, recorded by TASK-617
 - [x] Row 4 has a recorded verdict → no-go, step 1 on SPRINT-169 and the matched replay, recorded by TASK-630
-- [ ] Row 4b has a recorded verdict, or a recorded reason it did not run → TASK-632
-- [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → next slice: per the ladder
+- [ ] Row 4b has a recorded verdict, or a recorded reason it did not run → TASK-632, TASK-638
+- [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → TASK-633, TASK-634, TASK-635, TASK-636, TASK-637
 - [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → next slice: release, if anything passes

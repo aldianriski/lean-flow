@@ -2,6 +2,7 @@
 id: TASK-633
 title: "Trial same-builder fix rounds against fresh subagents on planted review findings, and record row 5's verdict"
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-635
 title: "Trial a watcher on a planted hung worker against what lean-flow has today, and record row 7's verdict"
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-637
 title: "Trial a reproducer on a seeded bug report against /diagnose's feedback loop and reproduce phases, and record row 9's verdict"
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med

@@ -2,6 +2,7 @@
 id: TASK-634
 title: "Trial a merger worker on the merge-back queue against the coordinator, on the matched replay, and record row 6's verdict"
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med

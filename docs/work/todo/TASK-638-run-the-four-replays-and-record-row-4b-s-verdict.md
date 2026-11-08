@@ -3,6 +3,7 @@ id: TASK-638
 title: "Run the four SPRINT-167 replays, two ordinary and two thin-router, and record row 4b's verdict"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-170
 priority: P1
 size: M
 risk: med
