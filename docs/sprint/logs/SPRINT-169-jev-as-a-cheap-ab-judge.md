@@ -56,3 +56,22 @@ Cost: Jev 0.036843 USD for 96 calls against the judge's 0.0783 USD per call (7.5
 
 ### 2026-11-08 | surprise | system verify red on one coordinator miss in the Log, fixed in place per L-176
 Off-host gate on `05c9fcbe`: `bun test` 589 pass, 0 fail; `QA-CHECK: 495 pass, 1 fail`. The one FAIL was `review-depth-consequence-vocab`: the T1 consequence line in the `g1-g2` entry carried prose in place of the `behaviour:(low|material) · governance:(low|high)` tokens. It now reads `behaviour:low · governance:low`, and the reasoning moved to the plain prose line after it. This is a structured field a guard reads, so it was corrected in place, not by a new entry (L-176). No defect in T1.
+
+### 2026-11-08 | progress | system verify, the owner's rulings, and the sprint-bulk exit rollup
+system-verify · FAIL(review-depth-consequence-vocab) · bun --no-env-file scripts/gate-remote.ts
+owner-ruling: system-verify — fixed-and-rerun: a coordinator Log line was out of the checker's vocabulary; fixed in place (L-176), rerun PASS
+system-verify · PASS · bun --no-env-file scripts/gate-remote.ts
+The rerun on `ceca166b`: `bun test: 589 pass, 0 fail`; `QA-CHECK: 496 pass, 0 fail`. `check-sprint-by-reference --close`: 4 pass, 0 fail. Owner, verbatim, on the gate: "Fixed-and-rerun (Recommended)".
+Owner verdict on Jev as the A/B judge (use 3), verbatim: "Trial as pre-screen now" (option text: "File a follow-up task to use Jev's decided calls in place of the judge's, sending unsure cells on to the judge."). The follow-up is filed at close. The harness default is unchanged until that task's own ruling.
+
+```
+run · 3 of 3 DoD ticked
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED
+terminal · PLAN_EXHAUSTED · TASK-628's three boxes ticked, the member is in done/, and system verify passed after one fix-and-rerun
+tasks · 1 attempted / 1 completed / 1 total
+parks · 0
+repair-cycles · 1
+verification · system-verify · PASS
+warnings · one unapproved live Jev pass (0.036843 USD) during a guard test, logged as a deviation; the first system verify was red on a coordinator Log line
+T1 · done · close the sprint with /lean-doc-generator close
+```
