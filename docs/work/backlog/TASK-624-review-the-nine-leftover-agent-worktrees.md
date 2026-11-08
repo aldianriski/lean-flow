@@ -2,7 +2,7 @@
 id: TASK-624
 title: "Review the nine leftover agent worktrees that hold uncommitted work, and keep or remove each"
 type: debt
-priority: P3
+priority: P2
 size: S
 risk: low
 autonomy: HITL
