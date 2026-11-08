@@ -36,7 +36,7 @@ A prose "read-only git only" is not a grant, and SECURITY.md lists the skill as 
 ### T2 — Replace CONTEXT.md duplicates with pointers `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `.claude/CONTEXT.md`
 Depends-on: none
-Cites: TASK-623 · TD-302 · TD-006 · L-008
+Cites: TASK-623 · TD-302 · TD-006 · L-008 · `orchestrator/SKILL.md` · `night-run.md` · `check-doc-caps.ts` · `scripts/lib/token-budget.txt`
 Three passages (`overnight` name, Continuation contract, Authority) restate facts that `orchestrator/SKILL.md` and `night-run.md` already hold. Pointers return room without touching the budget file or § Gates, which keeps TASK-621's measuring basis stable.
 
 **Acceptance:** `check-doc-caps.ts` prints token-budget N ≤ 12440 against 12691, the budget file is unchanged, § Gates has no diff, and each removed passage's phrase greps to the section its pointer cites.
