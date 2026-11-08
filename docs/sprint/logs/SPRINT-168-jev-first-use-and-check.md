@@ -79,3 +79,16 @@ Codex built it in worktree `s168-t2` (no network). Codex used one build pass plu
 - Finding for the Retro: 58% of real boxes land in the 0.3-0.7 band at the vendor default thresholds, so the judge is mostly undecided on this corpus. That is a measurement for TASK-627's design.
 - Results and ticks: 943e5680; moved to done in d3bd1c9d.
 - consequence · T2 · behaviour: new advisory maintainer script · governance: none (outside the gate) → one scoped Sonnet reviewer, 2 rounds
+
+### 2026-11-08 | system-verify | gate red at close: 493 pass, 3 fail; bun test 589/0
+Off-host QA_FULL gate on f90c90f8. All three FAILs trace to this sprint's own work, none to EPIC-024 rows 1 and 2:
+- prose-density on the T1 research doc: two lines over 400 characters.
+- emitter-column POPULATION-scope: the T2 script is in neither the scan nor the out-of-scope list. The G2 claim that no leg inventories the scripts folder was wrong; it grepped only the gate shell script.
+- scope-change-outside-layers: two of this Log's T3 entries named paths missing from T3's Plan lines.
+Owner ruling by popup, verbatim: "Apply all three, rerun gate (Recommended)". The fixes follow in the next entries and commits, then the gate reruns.
+
+### 2026-11-08 | scope-change | T2 `Layers:` gains `evals/run-emitter-column-fixtures.ts`
+What broke: that harness's population scan requires every script to be scanned or listed out-of-scope, and `scripts/jev-done-when.ts` is neither. Impact: one OUT_OF_SCOPE row is added (maintainer-only, run by hand, never a gate checker), mirroring the existing spend-report row. The T2 Done-when is unchanged. Owner ruling as above.
+
+### 2026-11-08 | scope-change | T3 `Cites:` gains the four paths its Log entries named
+What broke: the T3 entries named `.gitignore`, `scripts/lib/check-layers-observed.ts`, `.claude/worktrees/qa-t4.out` and `.claude/worktrees/red.txt`, which were absent from T3's Plan lines. Impact: all four are added to T3's `Cites:` as read-only references. `Layers:` and Done-when are unchanged. Owner ruling as above.

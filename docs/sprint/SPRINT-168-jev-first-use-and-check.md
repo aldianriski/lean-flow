@@ -36,7 +36,7 @@ The first Jev use needs its call facts confirmed and a ranked shortlist judged b
 **Acceptance:** the research doc maps every use to a stage and an existing surface, ranks the remainder, and records the API facts with a source URL each.
 
 ### T2 — Add the Done-when judge script `[size: M · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/jev-done-when.ts`, `test/fixtures/`
+Layers: `scripts/jev-done-when.ts`, `test/fixtures/`, `evals/run-emitter-column-fixtures.ts`
 Depends-on: T1
 Cites: TASK-626, TASK-625, `docs/research/jev-use-cases.md`
 An advisory maintainer instrument outside the gate. Tier G (other): one must-FAIL fixture plus one run on the real task files; G2 review-round cap 2.
@@ -46,7 +46,7 @@ An advisory maintainer instrument outside the gate. Tier G (other): one must-FAI
 ### T3 — Rule on the nine leftover worktrees `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `docs/work/in_progress/TASK-624-review-the-nine-leftover-agent-worktrees.md`
 Depends-on: none
-Cites: TASK-624
+Cites: TASK-624, `.gitignore`, `scripts/lib/check-layers-observed.ts`, `.claude/worktrees/qa-t4.out`, `.claude/worktrees/red.txt`
 Nine agent worktrees hold uncommitted work; each sprint fan-out pays a ruling until someone reviews them. No tracked file changes.
 
 **Acceptance:** each worktree has a recorded ruling and nothing uncommitted is discarded without one naming it.
