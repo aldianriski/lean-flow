@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-10-25
+last_updated: 2026-11-08
 update_trigger: A skill's tool grant changes, the git boundary changes, or the reporting process changes
 status: current
 ---
@@ -24,8 +24,8 @@ Skills declare their own tool grants. Of the 16:
 
 | Grant | Skills |
 |---|---|
-| **Unscoped `Bash`** | `diagnose` · `diagram` (instructed read-only git only) · `flow` · `handoff` · `orchestrator` · `prototype` · `tdd` |
-| Scoped `Bash(git *)` etc. | `lean-doc-generator` · `release-patch` · `triage` |
+| **Unscoped `Bash`** | `diagnose` · `flow` · `handoff` · `orchestrator` · `prototype` · `tdd` |
+| Scoped `Bash(git *)` etc. | `diagram` · `lean-doc-generator` · `release-patch` · `triage` |
 | No shell at all | `council` · `humanizer` · `insights` · `prime` · `refactor-advisor` · `task-decomposer` |
 
 Unscoped is deliberate where arbitrary commands are inherent to the job — a test runner or build tool

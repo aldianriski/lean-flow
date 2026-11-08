@@ -2,7 +2,7 @@
 name: diagram
 description: Use to draw how a system fits together (architecture, workflow, sequence, data flow, state, ERD) as Mermaid plus an evidence table tying each box and arrow to a source line. Triggers - "diagram", "draw the architecture", "map how X calls Y", "show the data flow", "ERD of this schema". Not for decorative pictures or charts of numbers.
 argument-hint: "[what to draw - e.g. the request path, the loop, the schema]"
-allowed-tools: Read, Glob, Grep, Write, Edit, Bash
+allowed-tools: Read, Glob, Grep, Write, Edit, Bash(git rev-parse *), Bash(git status *)
 user-invocable: true
 version: "0.1.0"
 ---
