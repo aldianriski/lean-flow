@@ -125,6 +125,22 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-295 [tags: tooling] [status: active]: **A worker's scripted edit can leave a non-UTF-8 byte; check the file's encoding before committing it.** SPRINT-166 T3's builder wrote SKILL.md's `§` as a lone Latin-1 byte, so the file read as ISO-8859 and the reference rendered as `�`. Its own checks were greps and line counts, which pass on a broken byte. `file` on the edited path showed it.
+- seen: 2026-11-08 (SPRINT-166 T3)
+- count: 1
+- promoted: no
+- related: L-182 · TASK-620
+
+---
+
+## L-294 [tags: process] [status: active]: **A stage that is told to read what it needs must do that read, or a rule the old full read carried is lost.** With `/prime` no longer reading CONTEXT.md in full, the orchestrator says to read its applicable rules before dispatch. The SPRINT-166 coordinator skipped it, and two machine-read conventions broke: `sprint(NNN) Tn:` commit subjects and the `consequence ·` vocabulary. Both surfaced only at the first full gate (5 fail), and the fix took a subject rewrite of 12 unpushed commits.
+- seen: 2026-11-08 (SPRINT-166, EPIC-024 bundled trial)
+- count: 1
+- promoted: no
+- related: L-151 · L-130 · TASK-617
+
+---
+
 ## L-293 [tags: process] [status: active]: **Who launches a headless proof is a G2 decision: a worker's nested `claude -p` can be denied by the host's classifier.** SPRINT-165 T1's design gave the proof to the builder. The classifier denied its launch as "Create Unsafe Agents", so the builder returned `blocked` with the work done and the box open, and the owner had to approve the runs in a second popup. Name the launcher and get the approval at G2, and have the builder stage the proof only.
 - seen: 2026-11-07 (SPRINT-165 T1, consumer proof)
 - count: 1
@@ -1307,7 +1323,7 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-130 [tags: process] [status: promoted]: a value written into a frozen artifact is a query result — an assumption, a DoD or an acceptance threshold earns the same cross-check as a live search, once when written and again at execution.
-- **L-130 → promoted: `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check clause** (§11 collapse, SPRINT-076 promote; promoted at SPRINT-075 promote). Body: git. Seen Sprint-071 · Sprint-074 (**count 2**); later sighting SPRINT-126 (a frozen DoD named example row `P2b`, never checked against the real roadmap's row tokens — reworded by scope-change). Both grains are named in the durable rule: a **figure** (`~121` sites frozen into an assumption where the real count was 39, making the DoD unsatisfiable the moment it froze) and a **structural claim about another document** (L-136's grain). The clause exists because *authoring* feels like planning rather than querying, so the guard does not fire on its own.
+- **L-130 → promoted: `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check clause** (§11 collapse, SPRINT-076 promote; promoted at SPRINT-075 promote). Body: git. Seen Sprint-071 · Sprint-074 (**count 2**); later sighting SPRINT-166 (TASK-618 box 4 froze "workdoo is git-less" from memory; it has a `.git`; reworded by scope-change) · SPRINT-126 (a frozen DoD named example row `P2b`, never checked against the real roadmap's row tokens — reworded by scope-change). Both grains are named in the durable rule: a **figure** (`~121` sites frozen into an assumption where the real count was 39, making the DoD unsatisfiable the moment it froze) and a **structural claim about another document** (L-136's grain). The clause exists because *authoring* feels like planning rather than querying, so the guard does not fire on its own.
 ---
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-230: SPRINT-115, SPRINT-114)
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-204: SPRINT-101)

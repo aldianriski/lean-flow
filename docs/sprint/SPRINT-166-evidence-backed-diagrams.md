@@ -4,7 +4,7 @@ slug: evidence-backed-diagrams
 epic: EPIC-024
 owner: Maintainer
 last_updated: 2026-11-07
-status: active
+status: closed
 gates_signed: G1,G2 @ 4118690b
 plan_commit: 3b2c5170
 update_trigger: sprint execute/close events
@@ -75,6 +75,27 @@ none
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/diagram/SKILL.md` | T1 · T3 | new skill: Mermaid with a source and status per id; update path | med | hand runs on lean-flow, a fixture and workdoo; Codex 2 rounds |
+| `skills/diagram/references/evidence-record.md` | T1 · T3 | evidence row, status rules, self-check, updating | med | same runs; update fixture diffs |
+| `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` · `docs/architecture/overview.md` · `SECURITY.md` | T2 | roster 15 → 16, CONTEXT trimmed to fit the token budget | low | stale-count and roster greps; doc-caps |
+| `evals/run-layout-fixtures.ts` · `CHANGELOG.md` · 2 templates | T2 | eval list, Unreleased entry, pointers to /diagram | low | layout fixtures 41 pass; gate green on `7bfe5fca` |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check** — one miss, the coordinator's. The orchestrator says to read CONTEXT.md's applicable rules before dispatch; the coordinator never opened it, so commit subjects broke the `sprint(NNN) Tn:` rule (CONTEXT.md § Gates, the L-151 family) and three `consequence ·` lines broke the review-depth vocabulary. The first full gate caught both: 5 fail. This is the stage-misses-a-fact case TASK-617 asks about; the owner rules on it in the verdict. L-130 was also in reach and missed: box 4 froze "workdoo is git-less" from memory.
+
+**Cost** — coordinator on Opus; Sonnet workers for intake, promote and three builds; two Codex rounds on T1; two off-host gate runs. USD per box is not available at close; the operator reads it from the transcript for TASK-617.
+
+**Worked**
+- Decompose and promote each ran in one Sonnet worker. Their questions came back `blocked`, reached the owner by popup, and resumed the same agent id; the coordinator's draft review caught a wrong delta, a Mermaid line-style rule that cannot render, and five roster files the draft missed.
+- Codex round 1 found three real defects in shipped text, including a close paraphrase of the kit; every 5-word run of the kit is now absent from the skill.
+- Coordinator review caught what the workers' self-checks could not: an edge outranking its end, a wrong source on an edge into a vanished node, a lone non-UTF-8 byte, and status wording in README and CHANGELOG.
+- The token budget held at 12688 of 12691 by trimming CONTEXT.md, with the budget file untouched.
+
+**Friction**
+- The gate failure above cost a history rewrite of 12 unpushed subjects (owner ruling) and an in-place fix of three log lines.
+- 17 leftover agent worktrees forced T2 and T3 onto the shared tree instead of isolated worktrees.
+- Codex round 2 left one item open, closed inline without a third round.
+- G2 was signed at promote without the builder check.
+
+**Pattern candidate** — L-294 (a stage that defers reading must still do the read); L-295 (check the encoding of a worker's scripted edit).
