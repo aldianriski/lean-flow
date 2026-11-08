@@ -10,8 +10,8 @@ class: decision
 tier: P
 authority: J1
 origin: decomposer
-state: blocked
-depends-on: [TASK-627]
+state: ready
+depends-on: []
 ---
 
 # TASK-628 — Trial Jev as a cheap judge for the A/B harness, and stop silent outage scoring
@@ -27,11 +27,10 @@ Third use in the chain, in the TD-290 area where judge calls can fail. It needs 
 
 ## Assumes
 
-- A1: Jev Box fits both judgments, thresholds 0.7/0.3; a score from 0.3 to 0.7 is "unsure" (confirmed in TASK-625).
+- A1: Jev Noul (P(yes)) fits both judgments, thresholds 0.7/0.3; a score from 0.3 to 0.7 is "unsure". TASK-625 refuted Box, which is image-only.
 - A2: Plain fetch to api.typesafe.ai works with `jev-1.14.0` pinned; the SDK only if the API facts show fetch cannot.
 - A3: Task files may be sent to api.typesafe.ai; `.env` and secrets may not (owner ruling).
 - A4: Price is 0.042 USD per Mtok input, output free; one run is cents.
-- **blocked-by:** TASK-627 is done and the owner has ruled on its Results.
 
 ## Tracker
 
