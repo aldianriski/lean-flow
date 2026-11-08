@@ -39,7 +39,7 @@ Verdict rule, set before the run:
 ## Done when
 - [x] The router is built on the trial branch, Codex reviews it (at most 2 rounds), and the off-host gate passes on its head. ✓ `c234911e`: Codex R1 NOT CLEAR (two High, one Med, all fixed), R2 CLEAR; `bun test` 589 pass, 0 fail; `QA-CHECK: 487 pass, 0 fail`.
 - [x] A probe shows the router refusing a shell command and a file write while a worker it dispatches does both. ✓ Headless on a scratch repo, `f898802d`, 0.16 USD: `NO_SHELL` and `NO_WRITE`, no `a.txt` or `b.txt`; a `haiku` worker wrote `c.txt` and `d.txt`. R2 only added plan-mode tools, which write nothing.
-- [ ] Step 1: TASK-628's sprint closes under the router, every command run by a worker, with the measures recorded.
+- [x] Step 1: TASK-628's sprint closes under the router, every command run by a worker, with the measures recorded. ✓ SPRINT-169 closed under the router at 121b89a8 (record a4140fd0): main thread 0 shell, edit or write calls; measures in EPIC-024's SPRINT-169 row and the archived Retro
 - [ ] The four replay runs finish within the cap, each with USD, elapsed minutes, boxes ticked, gate verdict and review result recorded.
 - [ ] The verdict is recorded in EPIC-024 row 4 by the rule above.
 - [ ] Negative: no router file reaches `main` or `.claude/agents/` before a go, and no replay run merges, pushes or writes outside its scratch worktree.
