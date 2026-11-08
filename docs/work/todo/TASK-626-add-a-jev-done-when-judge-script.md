@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: [TASK-625]
+sprint: SPRINT-168
 ---
 
 # TASK-626 — Add a Bun script that asks Jev whether each Done-when box is observable and each Negative names a concrete case

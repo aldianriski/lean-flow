@@ -12,6 +12,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-168
 ---
 
 # TASK-625 — Map TypeSafe's Jev use-case map against each lean-flow stage, and rank what is worth trying

@@ -12,6 +12,7 @@ authority: J2
 origin: close-retro
 state: ready
 depends-on: []
+sprint: SPRINT-168
 ---
 
 # TASK-624 — Review the nine leftover agent worktrees that hold uncommitted work, and keep or remove each
