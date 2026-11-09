@@ -588,3 +588,8 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - S13 by-name gate: arm A pair 3 and arm B pair 2 each renamed "cli fails on invalid input" to a stricter exit-64 test, so one snapshot name is missing in each.
 - **Row 5: no-go** under either reading of the renamed test: arm A cheaper but slower on mean time, and its pair-3 fix fails the by-name gate. EPIC-024 row 5 and TASK-633 § Results updated.
 - Spend so far: about 29.7 USD of 60 (T3 row: 3.03 of 6.5).
+
+### 2026-11-09 | execute | T6 review R1 catches the seed; row 8 verdict no-go; T6 done
+- R1 (scoped review, Sonnet, frozen brief with TD-232 quoted as of the parent, read-only tools; fresh clone holding only the seeded branch renamed `main`), 0.143 USD, 35 s: `findings: 1` at `check-sprint-by-reference.ts:174` (`REAPED_TAG_RE` unanchored), input `terminal · PLAN_EXHAUSTED · all [derived] done`, wrong result `--close` passes with no reaper run. Reader (coordinator) ruling against the materiality rule: names the symbol ✓, concrete input and wrong result ✓, caused by the diff ✓, reproduces (M2 probe) ✓, so it finds the seed. Path audit: 0 hits for the host clone, the main repo and the branch names; 0 Edit/Write; clone clean, HEAD unchanged.
+- **Row 8: no-go, no gap shown.** The checker does not run (TASK-636's own condition). R2 not needed. EPIC-024 row 8 and TASK-636 § Results updated.
+- Spend so far: about 29.8 USD of 60 plus T7 in progress (T6 row: 0.14 of 3.5).
