@@ -564,3 +564,9 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - M1' (merger arm, fixed treatment prompt sha256 bf3ea6ff…, `lf-gate-o1`), launched 06:51:57Z: exit 0 · **3.759 USD** · **24.0 min** · boxes 11/11 · SPRINT-167 closed · both merges run by the merger (`afc540ea` T1, `457596e0` T2; the coordinator ran no merge) · two separate inspectors ran merge-check · merge oracle PASS · in-run gate before close read 481/1, the operator rerun on final HEAD `9f2657fe` reads `bun test` 589/0, qa-check 472/0, rc 0 · no denials, no outside writes, snapshot unchanged. **Valid.**
 - Against T4's bar (readings against a pass): cost 3.76 against the 4.05 ordinary mean, time 24.0 against 47.85 min. Both within, so the early stop does not fire; M2 runs.
 - Spend so far: about 22.3 USD of 60 (T4 row: 5.68 of 10.5).
+
+### 2026-11-09 | execute | T4 merger run M2; row 6 verdict go; T4 done
+- The M2 job was stopped by Claude Code's low-memory reaper during its pre-launch wait (no run started, 0 USD). Owner popup, verbatim: "Relaunch M2 now (Recommended)".
+- M2 (merger arm, `lf-gate-o2`), launched 07:44:01Z: exit 0 · **3.854 USD** (rows 3.9) · **27.4 min** · boxes 11/11 · SPRINT-167 closed · both merges run by the merger (`93dec10f` T1, `f612d2f1` T2; each coordinator Bash call checked, its "merge" hits are Log-text edits; its one `TaskStop` stopped the idle T1 builder) · two inspectors · merge oracle PASS · operator gate rerun on final HEAD `81e6066a`: `bun test` 589/0, qa-check 472/0, rc 0 · snapshot unchanged. **Valid.**
+- **Row 6: go.** 0 bad merges (M1', M2 oracle PASS; M-U refused); both merger runs 11/11 with gate and review; cost 3.8 and 3.9 against the 4.05 ordinary mean, time 24.0 and 27.4 against 47.85 min. Caveat recorded in TASK-634 § Results: n = 2 per side, so part of the time gap is likely variance. Shipping still needs D5 and an owner ruling.
+- Spend so far: about 26.2 USD of 60 (T4 row: 9.54 of 10.5).
