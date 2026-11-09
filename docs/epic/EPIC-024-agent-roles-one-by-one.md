@@ -2,7 +2,7 @@
 epic: 024
 slug: agent-roles-one-by-one
 owner: Maintainer
-last_updated: 2026-11-08
+last_updated: 2026-11-09
 status: active
 member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168, SPRINT-169, SPRINT-170]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
@@ -41,7 +41,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 2 | **Decompose and promote read in workers**, each with an intake brief | DeepSeek's router | One sprint, with row 1 in place, through repeated question-and-resume rounds | Context after decompose well below 152k; the dispatch carries conversation-only intent, constraints and approvals; task quality no worse | **Inconclusive alone, thin case** (2026-11-07); bundled, drop twice. By owner exception (D12) it **landed on `main`, unreleased**, 2026-11-08. TASK-616 § Results |
 | 3 | **Light `/prime`**: status without loading full docs, after each stage names and loads what it needs | Owner's reading | One whole sprint, plus a clean install and a session with no agent | Full-sprint cost and context fall, not only `/prime`'s; no downstream skill or adopter breaks for a doc it assumed loaded | **Drop twice, bundled (D11)**: SPRINT-166 then SPRINT-167. Cost, time and context read keep both times (about 0.70 USD/box, 2.9 and 3.4 min/box); each first gate failed on CONTEXT.md rules a stage skipped (L-294). Skipping CONTEXT is reverted; only the architecture-map deferral landed with rows 1 and 2 (D12). TASK-617, TASK-621 |
 | 4 | Router: main thread with no write or shell tools | DeepSeek | One real task, then the matched replay, both inside one cap the owner sets first | The replay's bar in the research doc | **No-go** (TASK-630, 2026-11-08). Ordinary 3.37 and 4.37 USD, 19 and 28 min; the one completed router run 4.94 USD, 40 min, against a 2.90 bar. It tested a thick router, not DeepSeek's (D14). TASK-630 § Results |
-| 4b | Thin router, as DeepSeek built it: a limited shell, no technical judgment, G1 and G2 relayed; one Executor per task owns design, build and verify | DeepSeek's prototype docs and prompts | The same matched replay | At least 25% cheaper, time no worse, quality held | Not started. Owner popup, 2026-11-08, after Codex review of row 4. TASK-632, TASK-638 |
+| 4b | Thin router, as DeepSeek built it: a limited shell, no technical judgment, G1 and G2 relayed; one Executor per task owns design, build and verify | DeepSeek's prototype docs and prompts | The same matched replay | At least 25% cheaper, time no worse, quality held | **No-go** (SPRINT-170, 2026-11-09). Ordinary 3.85 and 4.32 USD, 42.0 and 53.7 min; thin router 2.66 USD, under the 3.04 bar, but 72.7 min against a 47.9 mean. R2 skipped by owner exception. TASK-638 § Results |
 | 5 | Named worker with its model set, reused through `SendMessage` | DeepSeek | Against plain subagents | | Not started. Owner popup, 2026-11-08: trial against plain subagents after row 4. Already seen unprompted: 4 of 4 review and gate fixes in SPRINT-165 to 167 went back to the same builder |
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | Not started. Owner popup, 2026-11-08: trial after row 4, on a sprint with parallel builds. SPRINT-167's merge-back: 11 main-thread commands, 0 bad merges |
 | 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Not started. Owner popup, 2026-11-08: a planted-failure trial, a hung worker, after rows 4 to 6. No real hang in 18 workers so far |
@@ -91,6 +91,6 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - [x] Row 2 has a recorded verdict → inconclusive alone, thin case; then bundled with rows 1 and 3 on SPRINT-166, drop, recorded by TASK-616 and TASK-617
 - [x] Row 3 has a recorded verdict → drop, bundled with rows 1 and 2 on SPRINT-166, recorded by TASK-617
 - [x] Row 4 has a recorded verdict → no-go, step 1 on SPRINT-169 and the matched replay, recorded by TASK-630
-- [ ] Row 4b has a recorded verdict, or a recorded reason it did not run → TASK-632, TASK-638
+- [x] Row 4b has a recorded verdict → no-go, on SPRINT-170 (cheaper but slower), recorded by TASK-638
 - [ ] Rows 5 to 9 each have a recorded verdict, or a recorded reason they did not run → TASK-633, TASK-634, TASK-635, TASK-636, TASK-637
 - [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → next slice: release, if anything passes
