@@ -599,3 +599,9 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - M4 reruns: d1, r1, r2, d2 repro commands each exit 1 ×5 on their bug tree and 0 ×5 on a twin copy, so all four are valid.
 - **Row 9: go.** Both arms reproduce; reproducer mean 0.039 USD against /diagnose 0.114, bar 0.086; the twin control reads no. Caveats in TASK-637 § Results (one seed, n = 2, /diagnose stopped after Phase 2). Ships only by owner exception (ADR-053).
 - Spend so far: about 30.2 USD of 60 (T7 row: 0.36 of 4.5).
+
+### 2026-11-09 | review | owner recap and Codex review of the sprint so far
+- Owner asked for a full recap reviewed by Codex. Codex (`gpt-6-astra`, read-only, recap plus S0-S36 pasted): `VERDICT: 2 challenges (0 High)`. 4b SOUND · 5 SOUND · 9 SOUND (reviewed while its twin was pending) · **6 CHALLENGE Med**: n = 2, later-day runs and 4-6% cost headroom support a provisional go, not a reliable savings claim · **8 CHALLENGE Med**: representative only if ordinary scoped review receives the governing text. Coordinator answer on 8: lean-flow's scoped review takes the governing decision on its Spec axis, and TD-232's text ("carrying" the tag) agrees with the seeded code rather than hinting at the anchor, so the catch is representative; recorded, not settled by the owner.
+- Codex also found a spend arithmetic slip: the listed items sum to 29.5 USD, not the 30.2 reported. Corrected: spend so far **29.5 USD of 60**.
+- Codex's ranked improvements (keep/change/drop on the coordinator's six, plus two new: fewer owner interruptions by gate packets, and cost comparability before any new resume trial) are kept in operator scratch `codex-recap-review.out` and go to the close Retro.
+- Owner rulings by popup, verbatim: "Run T5, then close (Recommended)"; implement after close: "Worker-brief rules (#6), Host findings as learnings (#8), Trial harness to scripts/ (#2)".
