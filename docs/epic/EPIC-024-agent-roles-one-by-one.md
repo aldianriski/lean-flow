@@ -46,7 +46,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | **Go** (SPRINT-170, 2026-11-09). 0 bad merges, unsafe merge refused; merger runs 3.8 and 3.9 USD, 24.0 and 27.4 min, against the 4.05 USD and 47.85 min ordinary mean. Two runs each side, so part of the time gap is likely variance. TASK-634 § Results |
 | 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | Not started. Owner popup, 2026-11-08: a planted-failure trial, a hung worker, after rows 4 to 6. No real hang in 18 workers so far |
 | 8 | Checker | Video | Only with a named miss by the gate and review | Finds what they missed | **No-go, no gap shown** (SPRINT-170, 2026-11-09). A real change seeded with a dropped regex anchor passed the gate, but the scoped review caught it in 35 s for 0.14 USD, so the checker did not run. TASK-636 § Results |
-| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | Not started. Owner popup, 2026-11-08: a planted-failure trial, a seeded bug report, after row 8; it must add to `/diagnose`'s own reproduce step |
+| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | **Go** (SPRINT-170, 2026-11-09). On one seeded bug both arms reproduced 2/2; reproducer 0.039 USD mean against /diagnose's 0.114, clean twin read no. Ships only by owner exception (ADR-053). TASK-637 § Results |
 
 ## Decisions
 
