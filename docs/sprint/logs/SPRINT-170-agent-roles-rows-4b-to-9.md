@@ -559,3 +559,8 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - Merge oracle (operator scratch `merge-oracle.ts`) calibrated before M1 ended: O1, O2 and R1 PASS; must-FAIL fixture (O1 with the expected file sets swapped) reads BAD MERGE with both mismatches named.
 - Owner ruling by popup, verbatim: "Fix + M1', early-stop M2 (Recommended)". The treatment paragraph now bars only git merges, conflict resolution and merge repair; the coordinator keeps its own record fixes and acts on a merge-check fail as it would without a merger. M1' reruns on a fresh clone; if M1' already misses the bar (cost at most the 4.05 ordinary mean, time at most 47.85 min), M2 is skipped and row 6 reads no-go. Up to about 2 USD may come from the reserve.
 - Spend so far: about 18.5 USD of 60 (T4 row: 1.92 of 10.5).
+
+### 2026-11-09 | execute | T4 merger run M1' valid; meets the bar, so M2 runs
+- M1' (merger arm, fixed treatment prompt sha256 bf3ea6ff…, `lf-gate-o1`), launched 06:51:57Z: exit 0 · **3.759 USD** · **24.0 min** · boxes 11/11 · SPRINT-167 closed · both merges run by the merger (`afc540ea` T1, `457596e0` T2; the coordinator ran no merge) · two separate inspectors ran merge-check · merge oracle PASS · in-run gate before close read 481/1, the operator rerun on final HEAD `9f2657fe` reads `bun test` 589/0, qa-check 472/0, rc 0 · no denials, no outside writes, snapshot unchanged. **Valid.**
+- Against T4's bar (readings against a pass): cost 3.76 against the 4.05 ordinary mean, time 24.0 against 47.85 min. Both within, so the early stop does not fire; M2 runs.
+- Spend so far: about 22.3 USD of 60 (T4 row: 5.68 of 10.5).
