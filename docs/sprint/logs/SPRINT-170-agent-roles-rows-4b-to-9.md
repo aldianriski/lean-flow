@@ -593,3 +593,9 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - R1 (scoped review, Sonnet, frozen brief with TD-232 quoted as of the parent, read-only tools; fresh clone holding only the seeded branch renamed `main`), 0.143 USD, 35 s: `findings: 1` at `check-sprint-by-reference.ts:174` (`REAPED_TAG_RE` unanchored), input `terminal · PLAN_EXHAUSTED · all [derived] done`, wrong result `--close` passes with no reaper run. Reader (coordinator) ruling against the materiality rule: names the symbol ✓, concrete input and wrong result ✓, caused by the diff ✓, reproduces (M2 probe) ✓, so it finds the seed. Path audit: 0 hits for the host clone, the main repo and the branch names; 0 Edit/Write; clone clean, HEAD unchanged.
 - **Row 8: no-go, no gap shown.** The checker does not run (TASK-636's own condition). R2 not needed. EPIC-024 row 8 and TASK-636 § Results updated.
 - Spend so far: about 29.8 USD of 60 plus T7 in progress (T6 row: 0.14 of 3.5).
+
+### 2026-11-09 | execute | T7 runs; row 9 verdict go; T7 done
+- ABBA runs, Sonnet, own folder each: D1 /diagnose 0.128 USD 29 s `reproduced: yes` · R1 reproducer 0.048 17 s yes · R2 0.031 28 s yes · D2 /diagnose 0.101 26 s yes · R-twin reproducer on the clean twin 0.050 739 s `reproduced: no`. No run changed a file outside `repro/`; path audit 0 hits for the keys folder, the seed check and the cause (R-twin's "twin" hits are its own folder name, checked).
+- M4 reruns: d1, r1, r2, d2 repro commands each exit 1 ×5 on their bug tree and 0 ×5 on a twin copy, so all four are valid.
+- **Row 9: go.** Both arms reproduce; reproducer mean 0.039 USD against /diagnose 0.114, bar 0.086; the twin control reads no. Caveats in TASK-637 § Results (one seed, n = 2, /diagnose stopped after Phase 2). Ships only by owner exception (ADR-053).
+- Spend so far: about 30.2 USD of 60 (T7 row: 0.36 of 4.5).
