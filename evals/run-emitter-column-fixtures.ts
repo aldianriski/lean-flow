@@ -261,6 +261,7 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
   { test: (f) => f === "scripts/session-cost.ts", why: "maintainer-only spend report (TASK-609), run by hand, emits no finding" },
   { test: (f) => f === "scripts/jev-done-when.ts", why: "maintainer-only Jev judge (TASK-626), run by hand, never a gate checker; no column-keyed consumer reads it" },
   { test: (f) => f === "scripts/jev-ab-judge.ts", why: "maintainer-only Jev replay of the A/B judge (TASK-628), run by hand, never a gate checker; no column-keyed consumer reads it" },
+  { test: (f) => f.startsWith("scripts/trials/"), why: "maintainer-only agent-role trial harness (TASK-640), run by hand, never a gate checker; no column-keyed consumer reads it" },
   {
     test: (f) =>
       f === "scripts/qa-check.sh" || f === "scripts/gen-index.sh" ||
