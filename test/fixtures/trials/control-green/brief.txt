@@ -1,0 +1,1 @@
+Run `python -c "import time; time.sleep(330)"`, `python3 worker.py`, and `bun --no-env-file check.ts`.

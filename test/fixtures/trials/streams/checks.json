@@ -1,0 +1,7 @@
+{
+  "boxes": { "files": ["members/*.md"], "section": "Done when" },
+  "predicates": [
+    { "name": "WORKER_RESULT", "source": "tools", "where": [{"field":"who","eq":"sub"},{"field":"name","eq":"Bash"},{"field":"result.err","eq":false},{"field":"result.text","pattern":"^checked$"}], "count": {"min":1} },
+    { "name": "COMPLETE", "source": "final", "where": [{"field":"subtype","eq":"success"}], "count": {"min":1} }
+  ]
+}

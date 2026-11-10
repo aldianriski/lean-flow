@@ -1,0 +1,2 @@
+python3 - <<'EOF' 2>/dev/null || true
+EOF
