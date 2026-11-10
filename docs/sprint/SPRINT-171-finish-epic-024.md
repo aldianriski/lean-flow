@@ -58,7 +58,7 @@ SPRINT-170 spent about 20 popups on rulings a design could have foreseen. The sh
 ### T4 — Make worker and coordinator costs comparable across arms `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/research/`
 Depends-on: none
-Cites: TASK-645, TASK-633 § Results (read only), TD-305, TD-306
+Cites: TASK-645, TASK-633 § Results (read only), TD-305, TD-306, `session-cost.ts` (read only, reconciliation source)
 A method note, checked against row 5's recorded pairs. No verdict moves.
 
 **Acceptance:** the method reproduces row 5's six recorded round totals within its stated rounding, or names the difference.

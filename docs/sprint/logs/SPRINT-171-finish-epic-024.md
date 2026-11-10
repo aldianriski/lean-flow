@@ -59,3 +59,7 @@ Preserved by the coordinator on 2026-11-10: SPRINT-170's run transcripts, from v
 ### 2026-11-10 | scope-change | T3 T4: Layers pruned at G2-A
 What broke: T3's and T4's `Layers:` each declared two candidate homes, and G2-A chose one (L-240: an unused token fails `layers observed` at close).
 Impact: T3 drops `skills/orchestrator/references/`, because the rule is trial-specific, so nothing ships and no consumer check is needed. T4 drops `scripts/session-cost.ts`, because the method is a note and no script changes. Neither Done-when changes. Re-confirm G2: covered by the G2-A sign-off above, whose question named both prunes.
+
+### 2026-11-10 | scope-change | T4: cite session-cost.ts after the prune
+What broke: `984e5b2f` pruned `scripts/session-cost.ts` from T4's `Layers:` but did not move it to `Cites:`. TASK-645's Done-when names it as a reconciliation source, so promote-check printed `member-layers-incomplete` for T4. That commit went in with the FAIL unread, because the command chain did not stop on it.
+Impact: T4's `Cites:` now declares `session-cost.ts` (read only). No Layers change, no Done-when change. promote-check: PASS, 22 pass, 0 fail. Re-confirm G2: not needed, because a citation adds no file to the build.
