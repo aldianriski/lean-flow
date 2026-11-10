@@ -31,7 +31,8 @@ Replays of an 11-box sprint cost about 4 USD and 40 minutes each and were most o
 
 ## Assumes
 - A1: the harness is in `scripts/trials/` (TASK-640).
-- **blocked-by:** TASK-640, and the owner's choice of the next row to trial.
+- A2: the next row is 4b (owner ruling, 2026-11-10, EPIC-024 D15). Its design uses at least 3 fresh runs per arm, in balanced order, with local `qa-check.sh` denied in every arm and the off-host gate kept (L-310). A slowdown margin and a stop rule are frozen first, and SPRINT-170's runs are not pooled.
+- **blocked-by:** TASK-640.
 
 ## Tracker
 SPRINT-170 close Retro · Codex recap review, candidate 4 (CHANGE, ranked 1)

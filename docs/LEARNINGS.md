@@ -127,6 +127,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-310 [tags: tooling] [status: active]: **A headless worker's local `qa-check.sh` on this Windows host can hang or end truncated, and the run's time then measures the stall, not the treatment.** In SPRINT-170 one R1 Executor waited 41 min on `bash scripts/qa-check.sh`, and both O2 builders lost long stretches on the same command. An M1' worker reported ready, then retracted it: the truncated check had read 453 pass, 11 fail. The replay prompt said how to run the off-host gate but did not forbid the local one. The sprint record missed it; the operator found it from transcript gaps after close, and Codex corrected the operator's first claim that the merger runs were clean. Before a timed trial, deny local `sh` and `bash scripts/qa-check.sh` in every arm (in every path form, L-299), keep the off-host gate, and read each run's largest transcript gaps before recording a time verdict.
+- seen: 2026-11-10 (SPRINT-170 R1, O2, M1'; operator check after close, EPIC-024 D15)
+- count: 1
+- promoted: no
+- related: L-306 (bare `python` REPL stall) · L-299 · L-303
+
+---
+
 ## L-309 [tags: process] [status: active]: **A treatment prompt may change only the treatment: any extra instruction changes the coordinator, and the run stops measuring the role.** SPRINT-170's first merger run (M1) told the coordinator "merge, resolve and repair nothing yourself … on a fail, stop the queue". The inspector's check failed on SPRINT-167's own mid-sprint records, the coordinator stopped the queue as told, and the run ended at 0 of 11 boxes. The ordinary arm's coordinator had fixed those records itself, so the two arms differed in more than the one change (EPIC-024 D2). The run was voided and rerun on an owner ruling. Write the treatment as the role's own file plus the hand-off message, then diff the two arms' prompts: the only difference allowed is the role.
 - seen: 2026-11-09 (SPRINT-170 T4, TASK-634, M1 voided; Log "T4 merger run M1 invalid")
 - count: 1
