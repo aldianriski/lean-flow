@@ -473,7 +473,7 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-266 [tags: edit-safety] [status: promoted]: **A regex written through an escaping layer can lose its backslash and still look right in review: `\b` became a literal backspace byte.** SPRINT-151 T8's retry classifier had U+0008 bytes where word boundaries were meant, so a terminal `HTTP 503` never matched and would have been scored a task failure. Selftest passed, because no fixture used an HTTP status at a word boundary. Codex found it only by reading the bytes. A later fix written with the edit tool, plus a check that the file holds no control byte, closed it. Write regex and escape-heavy source with the edit tool, not a shell heredoc or an inline interpreter, and give a classifier a fixture for each pattern it claims to match.
-- seen: 2026-10-30 (SPRINT-151 wave review R2, `evals/ab/lib/retry.ts`; fixed in `a0b61b70`, S36) · 2026-11-09 (SPRINT-170 operator scripts: a Python `\\n` became a real newline in a TS regex twice, `t3.ts` and the watcher debug copy; caught before any paid run)
+- seen: 2026-10-30 (SPRINT-151 wave review R2, `evals/ab/lib/retry.ts`; fixed in `a0b61b70`, S36) · 2026-11-09 (SPRINT-170 operator scripts: a Python `\n` became a real newline in a TS regex twice, `t3.ts` and the watcher debug copy; caught before any paid run)
 - count: 2
 - **L-266 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — a new ❌ line in the edit-safety block (Edit tool for escape-heavy source; `chr(92)`/`chr(10)` plus a match count when a script must); owner ruling 2026-11-10 "Bump + promote now (Recommended)"
 - related: memory "seed edits ship as a script file" · L-189
