@@ -32,7 +32,7 @@ Owner ruling at the SPRINT-170 close, verbatim: "Trial harness to scripts/ (#2)"
 `scripts/trials/` (new), `test/` fixtures for the preflight, `CHANGELOG.md` (maintainer-only line).
 
 ## Assumes
-- A1: the SPRINT-170 harness files are still in the operator's scratch folder (`scratchpad/s170/`: `harness.ts`, `merge-oracle.ts`, `replay-check.ts`, `probe-check.ts`, `agent-cost.ts`, `snap.ts`). Copy them before the folder is cleared; their content is not in the repository.
+- A1: the SPRINT-170 harness files were copied out of the session scratch on 2026-11-10 to `D:\Project\lean-flow-worktrees\s170-harness-keep\` (outside the repo: `harness.ts`, `merge-oracle.ts`, `replay-check.ts`, `probe-check.ts`, `agent-cost.ts`, `snap.ts`, `t3.ts`, `t5.ts`, `t67.ts`, prompts, and `fixtures/` with the answer keys). Their content is not in the repository; the keys must stay out of it.
 - A2: tier G is "other G" (maintainer-only legs); re-tier at G2 if a shipped skill names the harness as an adopter-run step.
 
 ## Tracker
