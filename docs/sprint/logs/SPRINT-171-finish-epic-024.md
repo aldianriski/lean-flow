@@ -233,3 +233,7 @@ Close gate, `layers observed` on `7407e49c` (no task in its subject; history rew
 ### 2026-11-10 | scope-change | T6 Cites: the oracle keys named by R2
 What broke: the second system-verify (`9aa5a98c`, `QA-CHECK: 508 pass, 2 fail`) named `keys/s130.json` in T6's R2 entry. The leg run locally lists all three tokens: `keys/s130.json`, `s130.json` and `s130-swapped.json`.
 Impact: T6's `Cites:` declares them (oracle keys outside the repo, read only). No Layers change, no Done-when change. Re-confirm G2: not needed, because a citation adds no file to the build.
+
+### 2026-11-10 | gate | system-verify before close
+Off-host gate on `8a695d27`: `bun test: 618 pass, 0 fail`; `QA-CHECK: 509 pass, 1 fail`. The one FAIL is `layers observed` on `7407e49c`, closed under the owner's ruling (TD-307, ADR-021). Path from the first run at `da6c4dbd` (504 pass, 12 fail): 11 findings fixed in the commits listed in the T5 review entry and `8a695d27`.
+run · 22 of 23 DoD ticked · PLAN_EXHAUSTED · TASK-644 box 2 ticks from this sprint's Retro (popup count and the owner's active minutes beside SPRINT-170's about 20)
