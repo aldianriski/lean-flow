@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-11-10
 status: active
 plan_commit: 18148168
+gates_signed: G1,G2 @ 1533e423
 update_trigger: sprint execute/close events
 ---
 
@@ -58,13 +59,13 @@ SPRINT-170 spent about 20 popups on rulings a design could have foreseen. The sh
 ### T4 — Make worker and coordinator costs comparable across arms `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/research/`
 Depends-on: none
-Cites: TASK-645, TASK-633 § Results (read only), TD-305, TD-306, `session-cost.ts` (read only, reconciliation source)
+Cites: TASK-645, TASK-633 § Results (read only), TD-305, TD-306, `session-cost.ts` (read only, reconciliation source), `t3-measure2-preserved.ts` and `t4-buckets.ts` (method scripts outside the repo)
 A method note, checked against row 5's recorded pairs. No verdict moves.
 
 **Acceptance:** the method reproduces row 5's six recorded round totals within its stated rounding, or names the difference.
 
 ### T5 — Freeze the replication and stop protocol for agent-role trials `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `docs/research/` · `scripts/trials/` · `docs/epic/EPIC-024-agent-roles-one-by-one.md`
+Layers: `docs/research/` · `docs/epic/EPIC-024-agent-roles-one-by-one.md`
 Depends-on: T1
 Cites: TASK-643, EPIC-024 D15, L-310
 On paper only: applied to row 4b's design with no paid run unless the owner approves one.
@@ -89,7 +90,8 @@ The epic's last Closed-when box. On a ship ruling, the agent files, a clean inst
 
 ## Decisions (pre-locked)
 
-- **D1** — One 35 USD all-in cap for the sprint's paid runs, warning at 28 USD. It counts every headless replay, probe, seed run, dispatched worker and retry, each measured from its own session. The operator session is reported separately and is not capped (as SPRINT-170). Owner popup, 2026-11-10.
+- **D1** — One 40 USD all-in cap for the sprint's paid runs, warning at 32 USD. Split: T6 26, T2 4, workers, probes and review 8, reserve 2. Raised from 35 and 28 by owner popup on 2026-11-10, after the workers line overran (Log, G2-B).
+  It counts every headless replay, probe, seed run, dispatched worker and retry, each measured from its own session. The operator session is reported separately and is not capped (as SPRINT-170). Owner popup, 2026-11-10.
 - **D2** — T5 stays on paper. A paid row 4b run needs its own owner approval and does not draw on D1's cap without it.
 - **D3** — Nothing from a trial branch lands on `main` or in `.claude/agents/` before T7's ruling. Shipping then needs EPIC-024 D5 in full.
 
