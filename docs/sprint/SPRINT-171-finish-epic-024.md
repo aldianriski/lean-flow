@@ -75,7 +75,7 @@ On paper only: applied to row 4b's design with no paid run unless the owner appr
 ### T6 — Confirm the merger result on a different sprint `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/epic/EPIC-024-agent-roles-one-by-one.md` · `docs/work/`
 Depends-on: T1
-Cites: TASK-641, TASK-634 § Results, EPIC-024 D15, `agents/merger.md` (trial branch, read only), `scripts/gate-remote.ts` (read only, run by path)
+Cites: TASK-641, TASK-634 § Results, EPIC-024 D15, `agents/merger.md` (trial branch, read only), `scripts/gate-remote.ts` (read only, run by path), `keys/s130.json`, `s130.json`, `s130-swapped.json` (oracle keys outside the repo, read only)
 Row 6 is a provisional go on n = 2 per side. This is a second look that shares nothing with the first: a different replay, fresh ordinary controls in the same session, interleaved order, at least three runs per side.
 
 **Acceptance:** row 6 records confirmed, not confirmed or inconclusive, with each side's cost, time and merge-oracle result.
