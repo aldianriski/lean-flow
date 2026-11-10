@@ -35,7 +35,7 @@ Also in, by owner ruling: a frozen replication and stop protocol (TASK-643), a g
 ### T1 — Move the trial harness into scripts/trials/ with a clean-clone check `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/trials/` · `test/` · `CHANGELOG.md`
 Depends-on: none
-Cites: TASK-640, L-298 to L-307, `D:\Project\lean-flow-worktrees\s170-harness-keep\` (A1), `jev-ab-judge.ts` (its dry-run-by-default shape, cited not touched)
+Cites: TASK-640, L-298 to L-307, `D:\Project\lean-flow-worktrees\s170-harness-keep\` (A1), `jev-ab-judge.ts` (its dry-run-by-default shape, cited not touched), `base-gate.log` (a kit record outside the repo, read only)
 Every SPRINT-170 trial rebuilt its harness from operator scratch. The merger confirmation and the protocol note both assume it is in the repository. Tier G (other G): a must-FAIL fixture per preflight fault and one run on SPRINT-170's real inputs.
 
 **Acceptance:** a fresh clone of `main` runs the harness dry run to a printed pass, and the preflight names each of the three seeded faults.
@@ -75,13 +75,13 @@ On paper only: applied to row 4b's design with no paid run unless the owner appr
 ### T6 — Confirm the merger result on a different sprint `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/epic/EPIC-024-agent-roles-one-by-one.md` · `docs/work/`
 Depends-on: T1
-Cites: TASK-641, TASK-634 § Results, EPIC-024 D15
+Cites: TASK-641, TASK-634 § Results, EPIC-024 D15, `agents/merger.md` (trial branch, read only)
 Row 6 is a provisional go on n = 2 per side. This is a second look that shares nothing with the first: a different replay, fresh ordinary controls in the same session, interleaved order, at least three runs per side.
 
 **Acceptance:** row 6 records confirmed, not confirmed or inconclusive, with each side's cost, time and merge-oracle result.
 
 ### T7 — Bring the ship ruling on rows 6 and 9 to the owner `[size: S · risk: med · class: decision · HITL · J2]`
-Layers: `docs/epic/EPIC-024-agent-roles-one-by-one.md` · `README.md` · `CHANGELOG.md`
+Layers: `docs/epic/EPIC-024-agent-roles-one-by-one.md`
 Depends-on: T2, T6
 Cites: TASK-646, EPIC-024 D5, ADR-053, `agents/merger.md` (trial branch; must not land before the ruling)
 The epic's last Closed-when box. On a ship ruling, the agent files, a clean install and a no-agent fallback follow, and Layers is widened by a `scope-change` entry first.

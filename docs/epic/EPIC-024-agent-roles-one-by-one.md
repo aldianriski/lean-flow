@@ -88,6 +88,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - **D20** — Row 6 confirmation on SPRINT-130, 2026-11-10 (TASK-641): **inconclusive**. The futility stop ended it with 1 valid ordinary run and 0 valid merger runs, so neither confirmed nor not confirmed applies. Spend 7.45 of 26 USD. TASK-641 § Results.
   Ordinary N1: 1.79 USD, 10.2 min, oracle PASS, gate green. Merger K1: 2.61 USD, 12.7 min; K2R: 2.70 USD, 13.2 min. Both oracle PASS with each task's files preserved, both void: off-host gate red twice on `layers observed`, and workers wrote to `/tmp`.
   K2 (0.35 USD) was host-killed and relaunched as K2R. The red gate came from builder commits no task owns: N1's coordinator rebuilt that history, and the merger arm's prompt forbids it. The queue is as easy as SPRINT-167's.
+- **D21** — Ship ruling on rows 6 and 9, 2026-11-10 (TASK-646): **neither ships**; both stay trial results. Owner popup, verbatim: row 6 "Do not ship (Recommended)" after its inconclusive confirmation (D20); row 9 "Do not ship (Recommended)" after its no-go inside `/diagnose` (D19). A merger that can repair commit attribution would be a new design and a new row, not a rerun of this one.
 
 ## Open questions
 
@@ -114,4 +115,4 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - [x] Row 4 has a recorded verdict → no-go, step 1 on SPRINT-169 and the matched replay, recorded by TASK-630
 - [x] Row 4b has a recorded verdict → no-go, on SPRINT-170 (cheaper; time effect unresolved, amended 2026-11-10), recorded by TASK-638
 - [x] Rows 5 to 9 each have a recorded verdict → on SPRINT-170: 5 no-go, 6 go, 7 no-go (overhead), 8 no-go (no gap shown), 9 go; recorded by TASK-633 to TASK-637
-- [ ] Whatever passed has shipped under D5, or the owner ruled not to ship it → TASK-646
+- [x] Whatever passed has shipped under D5, or the owner ruled not to ship it → TASK-646 → owner ruled not to ship rows 6 and 9, 2026-11-10 (D21)

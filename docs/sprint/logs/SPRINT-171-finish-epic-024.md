@@ -191,3 +191,17 @@ Resume order: (1) build the `agent-cost.ts` fix on `main` with its test, then re
 - The futility stop fired before any further launch: `FUTILITY STOP: K can reach at most 2 valid runs, 3 required; inconclusive`. N2, N3, K3 and K4 were not run. T6 row: 7.453 of 26 USD.
 consequence · T6 · behaviour: none on `main` (a trial verdict; the merger stays on its trial branch) · governance: none (records a verdict, no rule change) → coordinator read-through at tier P; no separate reviewer.
 Recorded: EPIC-024 D20 and the row 6 amendment, TASK-641 § Results (`74243807`). prose-density 27 pass, 0 fail; doc caps PASS (EPIC-024 117 ≤ 200). Ticked: TASK-641, all three boxes; moved to `done/` (`6f0811a4`).
+
+### 2026-11-10 | scope-change | T7: README and CHANGELOG pruned from Layers
+What broke: nothing. T7's `Layers:` named `README.md` and `CHANGELOG.md` for a ship ruling, and neither row ships, so neither file is touched.
+Impact: T7's `Layers:` becomes `docs/epic/EPIC-024-agent-roles-one-by-one.md` alone (design S5, L-100, L-240). No Done-when changes. Re-confirm G2: not needed; the G2-B sign-off named this prune as the no-ship branch.
+
+### 2026-11-10 | scope-change | T1 and T6 Cites: two files the Done-when evidence names
+What broke: promote-check printed 2 `member-layers-incomplete` findings. T6's (`agents/merger.md`) came from TASK-641's box 3 evidence in `74243807`, written this session without promote-check run on it. T1's (`base-gate.log`) was already there at `a0292850` (1 finding, 21 pass), from TASK-640's tick evidence.
+Impact: T6's `Cites:` declares `agents/merger.md` (trial branch, read only) and T1's declares `base-gate.log` (a kit record outside the repo, read only). No Layers change, no Done-when change. Re-confirm G2: not needed, because a citation adds no file to the build (as T4's on 2026-11-10).
+
+### 2026-11-10 | progress | T7: neither row ships; EPIC-024's last condition ticked
+Owner popup, verbatim: row 6 "Do not ship (Recommended)" · row 9 "Do not ship (Recommended)". Options per design S1: ship, do not ship, or another confirmation, each with its verdict (D20 inconclusive, D19 no-go) and limits.
+consequence · T7 · behaviour: none (no shipped file changes) · governance: none (records an owner ruling) → coordinator read-through at tier P.
+Recorded in EPIC-024 D21, and its last Closed-when box ticked "owner ruled not to ship rows 6 and 9, 2026-11-10 (D21)". EPIC-024 now has 0 open boxes. Box 3 at the ruling: `git log --oneline 18148168..main -- agents/ .claude/agents/` and `git diff 18148168 main -- skills/diagnose` both empty. prose-density 27 pass, 0 fail; doc caps PASS (EPIC-024 118 ≤ 200); promote-check PASS, 22 pass, 0 fail.
+Ticked: TASK-646 boxes 2 and 3 (box 1 at the SPRINT-170 close).

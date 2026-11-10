@@ -24,8 +24,8 @@ SPRINT-170 ended with two passes: row 6 (merger) and row 9 (reproducer). Nothing
 ## Done when
 
 - [x] The owner has ruled for each of rows 6 and 9: ship under D5, ship after a named confirmation (TASK-641 or TASK-642), or do not ship, and the ruling is recorded in EPIC-024 with its date. ✓ owner popup 2026-11-10 "Hold both": ship after TASK-641 (row 6) and TASK-642 (row 9); EPIC-024 D15
-- [ ] If any row ships: a clean install shows it works, a fallback exists for hosts without agents, and README and CHANGELOG say so; if none ships, the epic's last Closed-when box is ticked with "owner ruled not to ship".
-- [ ] Negative: nothing from a trial branch (`agents/merger.md`, the reproducer) lands on `main` or in `.claude/agents/` before that ruling.
+- [x] If any row ships: a clean install shows it works, a fallback exists for hosts without agents, and README and CHANGELOG say so; if none ships, the epic's last Closed-when box is ticked with "owner ruled not to ship". ✓ none ships, owner popup 2026-11-10: row 6 "Do not ship (Recommended)", row 9 "Do not ship (Recommended)"; EPIC-024's last Closed-when box reads `[x]` with "owner ruled not to ship rows 6 and 9, 2026-11-10 (D21)"
+- [x] Negative: nothing from a trial branch (`agents/merger.md`, the reproducer) lands on `main` or in `.claude/agents/` before that ruling. ✓ at the ruling: `git log --oneline 18148168..main -- agents/ .claude/agents/` empty and `git diff 18148168 main -- skills/diagnose` empty (design S4, history not a snapshot)
 
 ## Touches
 `docs/epic/EPIC-024-agent-roles-one-by-one.md`; on a "ship" ruling, the agent files, README and CHANGELOG.
