@@ -223,3 +223,9 @@ The strict lines expose what the free-text ones hid: T1 (behaviour:material) and
 review · T1 · scoped-reviewer · behaviour:material · governance:low
 review · T3 · scoped-reviewer · behaviour:low · governance:high
 T5 had only the coordinator's read-through, so its independent pass is owed. One scoped Sonnet reviewer was dispatched on the note and D17 against TASK-643's Done-when and the G2-B rulings.
+
+### 2026-11-10 | review | T5 owed pass; close-gate rulings
+review · T5 · scoped-reviewer · behaviour:low · governance:high
+One scoped Sonnet reviewer checked the protocol note and D17 against TASK-643's Done-when, the signed design and D15/D16. Spec met: no, with 2 High, 3 Med and 2 Low. Real drift (High): the note had dropped the design's "in both of its runs" screen-out condition, so one noisy run could stop a trial. One bounded retry (`f2aef5da`) restored P3's wording, scoped the 1.15 margin to row 4b's retest (design S6) and printed the unrounded means. Re-review: all three fixed, with one new Med: "hard bar" at n = 1 is undefined, a phrase from the signed design itself.
+Open, each a new rule because the note matches the signed design there: the void test and the per-run or per-arm cap, a general unreachable-3 stop, raw or gap-adjusted time, D17 against D4's n = 1, and "hard bar". Owner popup, verbatim: "Carry as one TD row (Recommended)" → TD-308.
+Close gate, `layers observed` on `7407e49c` (no task in its subject; history rewrite would churn every later SHA the Log and the kit cite). Owner popup, verbatim: "Rule it a known FAIL + TD (Recommended)" → TD-307. Fixed meanwhile: `epic-state` (`8104875e`), the research `related:` lists (`99644033`, `870e68cc`), T1's Layers and T6's Cites (`b88a4b18`), the emitter-column rule (`034b65f5`), and the consequence lines with T1 and T3 review records (`a42ca21c`).
