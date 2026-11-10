@@ -77,9 +77,9 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - **D16** — Trial-sprint gate packet. Owner ruling, 2026-11-10 (TASK-644). SPRINT-170 took 32 owner answers in about 23 popups, and 10 of them were foreseeable.
   A paid trial's G2 packet bundles the design rulings it can foresee into one popup, each with a recommendation, and lists the trial's treatment, oracle, answer-key and prompt paths. Signing the packet pre-authorises three recoveries, each logged as `recovery: case n, cap used k of m`:
   1. A host kill (low-memory reaper, process exit): one relaunch per run, with the same prompt, arm and budget line.
-  2. A run voided by a host suspend: one rerun per run.
-  3. A harness fault: one fix and re-probe per fault, at most 2 per task, and only if the fix's diff touches none of the listed paths.
-  Recovery spend counts against the sprint cap and must fit within its row's remaining limit. These always go to the owner: scope, verdict meaning, budget, treatment, a second failure of a capped case, a new kind of fault, and any fix that touches a listed path.
+  2. A run voided by a host suspend: one rerun per run, after restoring the keep-awake setting the packet names.
+  3. A harness fault: one fix and re-probe per fault, at most 2 per task, and only if the fix's diff touches none of the listed paths. The coordinator applies that path test mechanically and logs it, never judging by reading the change. A packet with no path list pre-authorises no case-3 fix.
+  Recovery spend counts against the sprint cap and must fit within the task's remaining budget line in the sprint's G1 split (the sprint cap, where there is no split). A recovery that would breach it goes to the owner as budget. These always go to the owner: scope, verdict meaning, budget, treatment, a second failure of a capped case, a new kind of fault, and any fix that touches a listed path.
   A pre-authorisation never covers a change to a frozen verdict rule, a budget cap or a treatment, and never lets a run pass its own checklist: the coordinator never ticks a box from its own recovery run. Each owner answer is logged as `Owner popup, verbatim: "…"`, so the Retro can count them beside the owner's estimate of active minutes.
 
 ## Open questions
