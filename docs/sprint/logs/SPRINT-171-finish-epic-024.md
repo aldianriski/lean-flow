@@ -65,12 +65,14 @@ What broke: `984e5b2f` pruned `scripts/session-cost.ts` from T4's `Layers:` but 
 Impact: T4's `Cites:` now declares `session-cost.ts` (read only). No Layers change, no Done-when change. promote-check: PASS, 22 pass, 0 fail. Re-confirm G2: not needed, because a citation adds no file to the build.
 
 ### 2026-11-10 | progress | T3 built and reviewed: EPIC-024 D16
-consequence · T3 · behaviour: none (a docs rule, nothing executes) · governance: yes (a trial-sprint protocol rule) → one scoped `sonnet` reviewer.
+consequence · T3 · behaviour:low · governance:high
+Reading: behaviour: none (a docs rule, nothing executes) · governance: yes (a trial-sprint protocol rule) → one scoped `sonnet` reviewer.
 Built by the coordinator from the signed design (`e8f76ae0`). Review: no High, 2 Med, 3 Low. Spec: boxes 1 and 3 met. Med 1: case-3 membership was not stated as mechanical. Med 2: "row's remaining limit" was ambiguous, because EPIC-024 uses "rows" for trial rows. Both were fixed in one bounded retry (`efefbd78`), along with one Low (case 2's keep-awake restore). Two Lows are kept as noted: the listed paths do not name verdict-rule or budget files, which the Negative clause covers in text; and signing the packet triggers the pre-authorisation. No re-review, because both fixes only tighten wording the reviewer itself proposed.
 Ticked: TASK-644 boxes 1 and 3. Box 2 ticks at SPRINT-171's close, from its Retro (design S1), so TASK-644 waits in `review/` until then.
 
 ### 2026-11-10 | progress | T4 built: trial cost-allocation note
-consequence · T4 · behaviour: none (a research note) · governance: none (changes no rule, verdict or contract) → self-review only (coordinator read-through, tier P).
+consequence · T4 · behaviour:low · governance:low
+Reading: behaviour: none (a research note) · governance: none (changes no rule, verdict or contract) → self-review only (coordinator read-through, tier P).
 Built by a Sonnet worker in the main tree (`792897e1`), with the index regenerated in `4245d5c0`. Method scripts stay outside the repo in `D:\Project\lean-flow-worktrees\s170-harness-keep\`: `t4-buckets.ts`, `t3-measure2-preserved.ts` (only `OPS` repointed to the preserved runs), and `out-t4.txt`.
 Evidence: the six recorded round totals reproduce at 3 dp ("match" ×6); buckets sum to each window with diff 0.0000; `cost-state` = `total_cost_usd` at 3 dp in all six runs; `check-doc-caps.ts` PASS (96 ≤ 130); `check-prose-density.ts` 27 pass, 0 fail.
 Read-through: the arm means recompute from the table. One coordinator edit: the last line's claim that the raw files "hold trial answer keys" was unverified, so it now says only where they are.
@@ -97,7 +99,8 @@ What broke: D1's 35 USD cap and its G1 split (T6 26, T2 4, workers 3, reserve 2)
 Impact: D1 becomes 40 USD all-in, warn at 32: T6 26, T2 4, workers, probes and review 8, reserve 2 (owner ruling above). T5's `Layers:` drops `scripts/trials/` (L-240). No Done-when changes. Re-confirm G2: covered by the G2-B sign-off and the budget ruling in the entry above.
 
 ### 2026-11-10 | progress | T1 built, reviewed and landed: scripts/trials
-consequence · T1 · behaviour: yes (new maintainer tooling and a preflight check) · governance: none shipped (nothing under `skills/`) → one scoped `sonnet` reviewer, plus the Tier G other-G bar (must-FAIL fixture per preflight check, one real run).
+consequence · T1 · behaviour:material · governance:low
+Reading: behaviour: yes (new maintainer tooling and a preflight check) · governance: none shipped (nothing under `skills/`) → one scoped `sonnet` reviewer, plus the Tier G other-G bar (must-FAIL fixture per preflight check, one real run).
 Rounds (cap 2 retries, both used):
 - R0: Codex built it in worktree `s171-t1`.
 - R1: the coordinator's own selftest run failed (exit 2, `launch: --repo must be a repository root`). Cause: Windows 8.3 short temp paths from `realpathSync` against git's long form. Fixed, with a regression test shown red on the old code and green on the fix, at an identical `git hash-object`.
@@ -108,7 +111,8 @@ For the owner: `launch.ts --run` starts headless `claude` with `bypassPermission
 Ticked: TASK-640, all five boxes. Plan edit, logged here: T4's `Cites:` names `t3-measure2-preserved.ts` and `t4-buckets.ts` (outside the repo), added in `9a6e8fa3` after promote-check read them in TASK-645's tick evidence.
 
 ### 2026-11-10 | progress | T5 built: trial replication protocol and EPIC-024 D17
-consequence · T5 · behaviour: none (a research note) · governance: yes (D17 governs future trial designs) → coordinator read-through at tier P; no separate reviewer, because the note's rules are the owner's G2-B rulings verbatim.
+consequence · T5 · behaviour:low · governance:high
+Reading: behaviour: none (a research note) · governance: yes (D17 governs future trial designs) → coordinator read-through at tier P; no separate reviewer, because the note's rules are the owner's G2-B rulings verbatim.
 Built by a Sonnet worker (`247a492c`). Read-through fixes (`18676703`): one per-run rule the owner never ruled was removed (no treatment run above the slowest ordinary × 1.15), and "35 USD cap" became 40. Index regenerated in `51c38aae`. Worker checks: doc caps PASS (85 ≤ 130), 0 lines over 400, and the S8 figures re-derived by two queries that agree.
 Coordinator regression, found by the worker and fixed: `a278dcf1`'s row 5 note pushed EPIC-024 line 45 past 400 characters, with no baseline row, so prose-density failed (27 pass, 1 fail). The text moved into D18 (`ae1e7e88`), and row 5 now ends `*Amended: D18*` (`9f08a0d3`, 390 bytes). prose-density: 27 pass, 0 fail.
 Ticked: TASK-643, all three boxes.
@@ -133,7 +137,8 @@ Owner popup, verbatim: "No overlay, gate by path (Recommended)".
 Impact: both prompts name `bun --no-env-file D:/Project/lean-flow/scripts/gate-remote.ts` and drop the overlay. They still differ only in the treatment paragraph (diff: 2 lines), and preflight passes on each. `keys/s130.json` and `s130-swapped.json` re-base to `2305da0a` with the overlay exclude removed, edited by a script file after a `sed` pass broke the JSON. Recalibrated on the no-overlay reference: PASS with `s130.json`, BAD MERGE with both file-set mismatches named with `s130-swapped.json`. No paid run had happened. No Done-when changes.
 
 ### 2026-11-10 | progress | T2 run: row 9 inside /diagnose, no-go
-consequence · T2 · behaviour: none on `main` (the treatment lives on a trial branch) · governance: none (a trial verdict) → coordinator audit of each run through the kit, plus a read-through; no separate reviewer.
+consequence · T2 · behaviour:low · governance:low
+Reading: behaviour: none on `main` (the treatment lives on a trial branch) · governance: none (a trial verdict) → coordinator audit of each run through the kit, plus a read-through; no separate reviewer.
 Runs (one paid run at a time, each through `scripts/trials/launch.ts`, each audited before the next):
 - probe1: void, 0 USD. `launch.ts` redirected `CLAUDE_CONFIG_DIR` to a fresh folder, so the child failed with `authentication_failed`. recovery: case 3, cap used 1 of 2. Fixed on `main` in `c9fad5df`, with a regression test (red on the old code, green on the fix; `tsc` 0; trials 27/0); the kit's audit was pointed at the inherited transcripts.
 - probe2: 0.099 USD, void. The skill loaded (the transcript holds the Phase 2 text), but the model built the repro itself; kit audit `BLOCKED HELPER_DISPATCH_MISSING`. Owner popup, verbatim: "Strengthen wording, re-probe once (Recommended)". Phase 2 now opens "Do not build or run the repro yourself …" (trial branch only).
@@ -189,7 +194,8 @@ Resume order: (1) build the `agent-cost.ts` fix on `main` with its test, then re
 - K2R (merger, the D16 case 1 relaunch of K2): 2.649 USD headless, 2.704 transcript, 13.2 min, 7/7 boxes, oracle PASS, each task's files preserved at the merge and the replay tip. The launcher's post-run snapshot timed out (`ETIMEDOUT`) as in K1 and K2, and the audit took it.
   VOID: the off-host gate was red, and the S5 rerun red again (`QA-CHECK: 298 pass, 1 fail` both times, `layers observed`, builder commits attributable to no task; `bun test` 440/0). 8 Bash writes went to `/tmp`, from 4 read-only inspectors or reviewers and the T2 builder, none from the merger. The three `LOCAL_FULL_GATE` flags were the builder's `bash -n scripts/qa-check.sh`, a syntax check rather than a gate run, and moot here.
 - The futility stop fired before any further launch: `FUTILITY STOP: K can reach at most 2 valid runs, 3 required; inconclusive`. N2, N3, K3 and K4 were not run. T6 row: 7.453 of 26 USD.
-consequence · T6 · behaviour: none on `main` (a trial verdict; the merger stays on its trial branch) · governance: none (records a verdict, no rule change) → coordinator read-through at tier P; no separate reviewer.
+consequence · T6 · behaviour:low · governance:low
+Reading: behaviour: none on `main` (a trial verdict; the merger stays on its trial branch) · governance: none (records a verdict, no rule change) → coordinator read-through at tier P; no separate reviewer.
 Recorded: EPIC-024 D20 and the row 6 amendment, TASK-641 § Results (`74243807`). prose-density 27 pass, 0 fail; doc caps PASS (EPIC-024 117 ≤ 200). Ticked: TASK-641, all three boxes; moved to `done/` (`6f0811a4`).
 
 ### 2026-11-10 | scope-change | T7: README and CHANGELOG pruned from Layers
@@ -202,10 +208,18 @@ Impact: T6's `Cites:` declares `agents/merger.md` (trial branch, read only) and 
 
 ### 2026-11-10 | progress | T7: neither row ships; EPIC-024's last condition ticked
 Owner popup, verbatim: row 6 "Do not ship (Recommended)" · row 9 "Do not ship (Recommended)". Options per design S1: ship, do not ship, or another confirmation, each with its verdict (D20 inconclusive, D19 no-go) and limits.
-consequence · T7 · behaviour: none (no shipped file changes) · governance: none (records an owner ruling) → coordinator read-through at tier P.
+consequence · T7 · behaviour:low · governance:low
+Reading: behaviour: none (no shipped file changes) · governance: none (records an owner ruling) → coordinator read-through at tier P.
 Recorded in EPIC-024 D21, and its last Closed-when box ticked "owner ruled not to ship rows 6 and 9, 2026-11-10 (D21)". EPIC-024 now has 0 open boxes. Box 3 at the ruling: `git log --oneline 18148168..main -- agents/ .claude/agents/` and `git diff 18148168 main -- skills/diagnose` both empty. prose-density 27 pass, 0 fail; doc caps PASS (EPIC-024 118 ≤ 200); promote-check PASS, 22 pass, 0 fail.
 Ticked: TASK-646 boxes 2 and 3 (box 1 at the SPRINT-170 close).
 
 ### 2026-11-10 | scope-change | T1 and T6: close-gate findings on undeclared paths
 What broke: system-verify at `da6c4dbd` read `QA-CHECK: 504 pass, 12 fail`. Two of the findings are undeclared paths. `emitter-column(POPULATION-scope)` names T1's 11 `scripts/trials/*.ts` files as neither scanned nor covered by an out-of-scope rule, so T1's landing never passed the full gate. `scope-change layers` names `scripts/gate-remote.ts` in T6's R2 entry, absent from T6's Layers and Cites.
 Impact: T1's `Layers:` adds `evals/run-emitter-column-fixtures.ts`, for one out-of-scope rule beside `jev-ab-judge.ts`'s: the trial harness is maintainer-only, run by hand, and never a gate checker. T6's `Cites:` adds `scripts/gate-remote.ts` (read only, run by absolute path from the replay clones). No Done-when changes. Re-confirm G2: not needed. The rule restates T1's signed design (no gate leg), and the citation adds no file to the build.
+
+### 2026-11-10 | correction | consequence lines in the strict vocabulary
+System-verify flagged all 7 consequence lines (`review-depth-consequence-vocab`): each carried its reasons inline, and the check reads only the exact form `consequence · Tn · behaviour:(low|material) · governance:(low|high)`. Each line now holds that form, and its reasons follow verbatim on a `Reading:` line. Classes: "none" → low; "yes" → material for behaviour (T1) and high for governance (T3, T5). No depth chosen changes.
+The strict lines expose what the free-text ones hid: T1 (behaviour:material) and T3 and T5 (governance:high) owe a `review ·` record. T1 and T3 had their independent pass at the time (T1: one scoped reviewer, 0 High, 2 Med, 5 Low, Meds to TD; T3: one scoped Sonnet reviewer, Spec met, 2 Med fixed in `efefbd78`), but no record line was written. They are recorded now:
+review · T1 · scoped-reviewer · behaviour:material · governance:low
+review · T3 · scoped-reviewer · behaviour:low · governance:high
+T5 had only the coordinator's read-through, so its independent pass is owed. One scoped Sonnet reviewer was dispatched on the note and D17 against TASK-643's Done-when and the G2-B rulings.
