@@ -81,6 +81,8 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
   3. A harness fault: one fix and re-probe per fault, at most 2 per task, and only if the fix's diff touches none of the listed paths. The coordinator applies that path test mechanically and logs it, never judging by reading the change. A packet with no path list pre-authorises no case-3 fix.
   Recovery spend counts against the sprint cap and must fit within the task's remaining budget line in the sprint's G1 split (the sprint cap, where there is no split). A recovery that would breach it goes to the owner as budget. These always go to the owner: scope, verdict meaning, budget, treatment, a second failure of a capped case, a new kind of fault, and any fix that touches a listed path.
   A pre-authorisation never covers a change to a frozen verdict rule, a budget cap or a treatment, and never lets a run pass its own checklist: the coordinator never ticks a box from its own recovery run. Each owner answer is logged as `Owner popup, verbatim: "…"`, so the Retro can count them beside the owner's estimate of active minutes.
+- **D17** — Trial replication protocol, 2026-11-10 (TASK-643): [`trial-replication-protocol.md`](../research/trial-replication-protocol.md) governs any trial designed after this date. It fixes when a cheaper coordinator is allowed, what a smaller fixture must keep, and the replication and stop rules.
+  A go needs 3 runs per arm. A screen-out may stop at 1 or 2 and is recorded "screened out (n = k)" (owner ruling, 2026-11-10, amending D15 for screen-outs only). It was applied on paper to row 4b's retest design only: no verdict above is changed or re-read, and a paid retest needs its own G2 and budget ruling.
 
 ## Open questions
 
