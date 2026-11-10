@@ -112,3 +112,16 @@ consequence · T5 · behaviour: none (a research note) · governance: yes (D17 g
 Built by a Sonnet worker (`247a492c`). Read-through fixes (`18676703`): one per-run rule the owner never ruled was removed (no treatment run above the slowest ordinary × 1.15), and "35 USD cap" became 40. Index regenerated in `51c38aae`. Worker checks: doc caps PASS (85 ≤ 130), 0 lines over 400, and the S8 figures re-derived by two queries that agree.
 Coordinator regression, found by the worker and fixed: `a278dcf1`'s row 5 note pushed EPIC-024 line 45 past 400 characters, with no baseline row, so prose-density failed (27 pass, 1 fail). The text moved into D18 (`ae1e7e88`), and row 5 now ends `*Amended: D18*` (`9f08a0d3`, 390 bytes). prose-density: 27 pass, 0 fail.
 Ticked: TASK-643, all three boxes.
+
+### 2026-11-10 | progress | T2 and T6 free prep
+T2: Codex built the treatment and seed 2.
+- Seed 2 is `fixtures/hosts/t7b-host/` with `keys/t7b/` (outside the repo): an off-by-one boundary defect, with the twin changing `<` to `<=`. Its seed check PASSes; the must-FAIL control (twin broken by one line) FAILs with 3 named failures; a grep for the fixed line in the host gives 0 hits; rerun gives 5× exit 1 on the host and 5× exit 0 on the twin.
+- The treatment is committed on trial branch `trial/epic-024-row9-inside` (`aa6acaa0`, rebased onto `main`): exactly `agents/reproducer.md` (byte-identical to row 9's) and a 6-line Phase 2 edit in `skills/diagnose/SKILL.md`. Never merged.
+- Treatment change, owner popup, verbatim: "Drop 'last' in the skill edit (Recommended)" (question: the skill asked for "last line `reproduced: yes|no`", while the unchanged helper prints that line and then a state line). The edit now reads "the line `reproduced: yes|no`". No paid run had happened yet.
+- Codex is building T2's run kit.
+T6: Codex built the M1 local half, M2's keys and M3.
+- M1: `prep` clone at `2305da0a` with neither merge commit present, plus the overlay `376aafe7` (`scripts/gate-remote.ts` from `main`).
+- M2: `keys/s130.json` and `s130-swapped.json`. M3: `replay-prompt-130.txt` and `merger-prompt-130.txt` (differing only in the treatment paragraph), `keys/deny-t6.json`, preflight PASS on both prompts, and both dry launches at 0 spend.
+- Calibration, settled by the coordinator. The literal historical tips predate the overlay, so the oracle read BAD MERGE on ancestry. The faithful reference replays each task's two commits onto the overlay and merges T1 then T2. On it, merge-oracle reads PASS with `s130.json`, and BAD MERGE with both file-set mismatches named with `s130-swapped.json`. The reference clone holds the answer commits and is calibration-only.
+- Base check: `bun test test/gate-discovery/` at the overlay gives 9 pass, 1 fail, as expected (T1's target). The off-host gate on the reference's merged end state is running.
+Coordinator slip, caught and reverted: a failed `git clone` left my next commands running in the main repo. The checkout, fetch and cherry-pick there all failed, but two `git config user.*` lines set a local identity ("lean-flow calibration"). It was removed at once (`git config --local --list` shows no `user.*`; `git config user.name` is Aldian Rizki), and no commit was made under it. Every command since names its repo with `git -C <path>`.
