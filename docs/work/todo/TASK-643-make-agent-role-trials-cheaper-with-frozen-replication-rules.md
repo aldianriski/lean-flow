@@ -3,6 +3,7 @@ id: TASK-643
 title: "Make agent-role trials cheaper: same coordinator across arms, a smaller replay fixture, and frozen replication and stop rules"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P2
 size: M
 risk: med

@@ -3,6 +3,7 @@ id: TASK-645
 title: "Make worker and coordinator costs comparable across arms before any new resume trial"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P3
 size: S
 risk: low

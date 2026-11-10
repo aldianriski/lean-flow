@@ -3,6 +3,7 @@ id: TASK-644
 title: "Cut owner popups in trial sprints: gate packets that bundle foreseeable rulings, and pre-authorised routine recovery"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P3
 size: S
 risk: low

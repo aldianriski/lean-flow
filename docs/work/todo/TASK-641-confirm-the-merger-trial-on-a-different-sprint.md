@@ -3,6 +3,7 @@ id: TASK-641
 title: "Confirm the row 6 merger result on a different sprint with fresh ordinary controls and a balanced run order"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P3
 size: M
 risk: med

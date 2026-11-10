@@ -3,6 +3,7 @@ id: TASK-642
 title: "Measure a reproducer helper for /diagnose Phase 2 inside /diagnose, not as a separate role"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P3
 size: M
 risk: med

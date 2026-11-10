@@ -3,6 +3,7 @@ id: TASK-640
 title: "Promote the trial harness from operator scratch to scripts/trials/ with a clean-clone check"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P2
 size: M
 risk: med

@@ -3,6 +3,7 @@ id: TASK-646
 title: "Owner ruling: ship the row 6 merger and the row 9 reproducer under D5, or record that they stay trial results"
 type: feature
 epic: EPIC-024
+sprint: SPRINT-171
 priority: P2
 size: S
 risk: med
