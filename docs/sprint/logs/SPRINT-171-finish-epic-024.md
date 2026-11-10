@@ -76,3 +76,22 @@ Evidence: the six recorded round totals reproduce at 3 dp ("match" ×6); buckets
 Read-through: the arm means recompute from the table. One coordinator edit: the last line's claim that the raw files "hold trial answer keys" was unverified, so it now says only where they are.
 Finding for the owner: cold start is about 0.057 USD in both arms, so EPIC-024 row 5's "same builder 31% cheaper per fix (0.061 against 0.088 USD)" comes from charging B's cold start and not A's. Under one rule A is above B. Row 5's no-go stands (by-name gate). Whether to annotate row 5 goes into the G2-B packet as an owner question, because T4's Touches exclude the epic.
 Ticked: TASK-645, all three boxes.
+
+### 2026-11-10 | gate | G2-B signed, T2 T5 T6 T7
+Owner popup, verbatim: "Sign all as recommended (Recommended)" (question: "Do you sign G2-B for SPRINT-171 (T2, T5, T6, T7) with every recommended ruling? …"). The rulings it carries, as recommended:
+- T2: full `/diagnose` pass to Phase 6; stopping at Phase 5 only by a scope ruling. Planted seed 2 (an off-by-one host, built free by Codex). Go only if the helper is cheaper on both seeds, at most 0.75× cost and 1.10× time. Helper as a subagent; the Agent tool allowed in both arms.
+- T5: slowdown margin 1.15× the ordinary time mean.
+- T6: replay SPRINT-130 (2 merges; 7 of its 10 boxes, its T3 out of scope). `gate-remote.ts` as one identical overlay commit. Local QA denied in every arm. 6 runs, O M M O O M. Confirmed only if the merger's means are at or below the ordinary's; not confirmed above +10%. Row 6 always records that the queue is easy. An optional 0.3 USD unsafe-merge probe if the budget allows.
+- T7: after T2 and T6, the owner rules per row: ship, don't ship, or another confirmation.
+Owner rulings by popup, verbatim: budget "Raise cap to 40, workers 8 (Recommended)" · futility "Allow futility stop at 2 (Recommended)" (screen-outs only; a go still needs 3 per arm) · row 5 "Amend row 5 (Recommended)".
+Designs and settlements are recorded verbatim in the operator scratch (`g2-T2-design.md`, `g2-T5-design.md`, `g2-T6-design.md`, `g2-T7-design.md`); each Settlements section binds the build.
+- builder-check · T2 · 6 contradictions · 6 questions · settled in design (S1 to S9); R1 to R5 ruled by owner
+- builder-check · T5 · 6 contradictions · 7 questions · settled in design (S1 to S8); margin and futility ruled by owner
+- builder-check · T6 · 6 contradictions · 6 questions · settled in design (S1 to S9); R1 to R6 ruled by owner
+- builder-check · T7 · 5 contradictions · 6 questions · settled in design (S1 to S5)
+G2 is now complete for all seven tasks, so `gates_signed` is written to the sprint frontmatter in the next commit.
+Budget at this point: the workers line had spent 4.96 USD against its 3 USD (15 Sonnet workers, priced from their transcripts with `agent-cost.ts`). That is a budget overrun, and per D16 it went to the owner, who ruled as above. The T6 and T2 rows were untouched.
+
+### 2026-11-10 | scope-change | D1 cap 35 → 40; T5: Layers pruned
+What broke: D1's 35 USD cap and its G1 split (T6 26, T2 4, workers 3, reserve 2) could not hold. The workers line spent 4.96 USD before any paid trial run. Separately, T5's G2 chose a note over a `scripts/trials/` README.
+Impact: D1 becomes 40 USD all-in, warn at 32: T6 26, T2 4, workers, probes and review 8, reserve 2 (owner ruling above). T5's `Layers:` drops `scripts/trials/` (L-240). No Done-when changes. Re-confirm G2: covered by the G2-B sign-off and the budget ruling in the entry above.
