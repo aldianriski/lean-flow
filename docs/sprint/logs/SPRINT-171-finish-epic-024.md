@@ -237,3 +237,10 @@ Impact: T6's `Cites:` declares them (oracle keys outside the repo, read only). N
 ### 2026-11-10 | gate | system-verify before close
 Off-host gate on `8a695d27`: `bun test: 618 pass, 0 fail`; `QA-CHECK: 509 pass, 1 fail`. The one FAIL is `layers observed` on `7407e49c`, closed under the owner's ruling (TD-307, ADR-021). Path from the first run at `da6c4dbd` (504 pass, 12 fail): 11 findings fixed in the commits listed in the T5 review entry and `8a695d27`.
 run · 22 of 23 DoD ticked · PLAN_EXHAUSTED · TASK-644 box 2 ticks from this sprint's Retro (popup count and the owner's active minutes beside SPRINT-170's about 20)
+
+### 2026-11-11 | close | Retro written, buckets routed, retention applied
+- Handoff reconciliation: swept the whole Log; no `handoff` entry exists, so nothing is `live` or `consumed`.
+- Members: all 7 in `done/`; `check-sprint-by-reference --close` 16 pass, 0 fail; 23 of 23 DoD ticked (TASK-644 box 2 from this Retro: 21 popups, 36 answers, owner under 30 min).
+- Retro in the sprint file. Filed: TD-307 to TD-309; L-311 to L-313, and L-261's sixth sighting (count 6); one `[Unreleased]` line. Follow-ups: none (TD-308 holds the protocol work; the owner ruled no ship).
+- Close pass, owner popup, verbatim: "Approve all three (Recommended)": the sprint and its log to `docs/sprint/archive/`, EPIC-024 closed and moved to `docs/epic/archive/` with its INDEX row kept, and `trials/` added to the overview's `scripts/` line. Release, verbatim: "No release now (Recommended)".
+- EPIC-024 rollup: the SPRINT-171 row completed with `ea460465`; every § Closed-when box `[x]` and every member sprint closed, so the epic closes.

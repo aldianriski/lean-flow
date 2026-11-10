@@ -2,8 +2,8 @@
 epic: 024
 slug: agent-roles-one-by-one
 owner: Maintainer
-last_updated: 2026-11-10
-status: active
+last_updated: 2026-11-11
+status: closed
 member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168, SPRINT-169, SPRINT-170, SPRINT-171]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
@@ -105,7 +105,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | SPRINT-168 | First Jev use, and the D12 check | closed `e164151e` | The D12 check, run from a live checkout (D1): gate failures traced to rows 1 and 2: 0. The first close gate's 3 FAILs were all this sprint's own work; row 4 may start |
 | SPRINT-169 | Jev as a cheap A/B judge, built under the router | closed `121b89a8` | Router-trial step 1 (TASK-630): 0 shell, edit or write calls on the main thread, 10 popups, 0 compactions. On this epic's basis 12.3 to 13.6 USD, 4.1 to 4.5 USD/box, 19.4 min/box (TASK-630 § Results). Guards: first verify 495/1 on a coordinator Log line, 1 unapproved Jev pass. Jev use 3: pre-screen trial (TASK-631) |
 | SPRINT-170 | Agent roles, rows 4b to 9, trialled together | closed `ed530d27` | Six trials under one 60 USD cap (31.4 spent): 4b, 5, 7 and 8 no-go; 6 (merger) and 9 (reproducer) go, shipping neither without a D5 ruling (TASK-646). Host findings filed as L-298 to L-309; follow-ups TASK-639 to 645 |
-| SPRINT-171 | Finish EPIC-024: confirm rows 6 and 9, then rule on shipping | active | |
+| SPRINT-171 | Finish EPIC-024: confirm rows 6 and 9, then rule on shipping | closed `ea460465` | Ruled the last two rows and closed the last condition: row 9 no-go inside `/diagnose` (D19), row 6's confirmation inconclusive by the futility stop (D20), neither ships (D21). Left the harness in `scripts/trials/`, the gate packet (D16) and the protocol (D17, TD-308) |
 
 ## Closed when
 
