@@ -44,6 +44,7 @@ test("launch spends nothing by default; budget required; fake run receives expli
     expect(record.keyPath).toBe("/nonexistent/private.key");
     expect(record.tmp).toBe(join(repo, ".git/trial-run/tmp"));
     expect(record.dotenvLoaded).toBeNull();
+    expect(record.config ?? null).toBe(process.env.CLAUDE_CONFIG_DIR ?? null); // inherited, not a credential-less fresh dir
     expect(record.args).toContain("--max-budget-usd");
     const after = invoke("snap", ["--repo", repo, "--watch-dir", sentinel]);
     expect(after.code).toBe(0);

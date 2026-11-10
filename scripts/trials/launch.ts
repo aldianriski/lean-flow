@@ -33,7 +33,9 @@ export function launch(a: Args) {
   const tmp = join(output, "tmp"); mkdirSync(tmp);
   const env: NodeJS.ProcessEnv = { ...process.env,
     TMP: tmp, TEMP: tmp, TMPDIR: tmp, BUN_INSTALL_CACHE_DIR: join(output, "bun-cache"),
-    CLAUDE_CONFIG_DIR: join(output, "claude"), XDG_CACHE_HOME: join(output, "cache"),
+    // CLAUDE_CONFIG_DIR is inherited, never redirected: a fresh config dir holds no credentials, so the child fails
+    // `authentication_failed` (SPRINT-171 T2 probe). Each scratch repo's own path already keeps its transcripts apart.
+    XDG_CACHE_HOME: join(output, "cache"),
     CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS: "0", DISABLE_AUTOUPDATER: "1" };
   for (const [flag, variable] of [["--host", "LF_GATE_HOST"], ["--key-path", "LF_GATE_KEY"], ["--gate-dir", "LF_GATE_DIR"]] as const)
     if (a[flag]) env[variable] = required(a, flag); // The credential path is passed, never opened.
