@@ -6,7 +6,7 @@ status: current
 id: trial-replication-protocol
 tags: [process, tooling]
 domain: governance
-related: [trial-cost-allocation, TASK-643, EPIC-024]
+related: [trial-cost-allocation]
 ---
 
 # Research — How can an agent-role trial cost less without letting noise buy a verdict?
