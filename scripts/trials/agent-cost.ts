@@ -14,7 +14,9 @@ export function cost(file: string) {
     if (r.type === "assistant" && m?.id && m.usage) seen.set(m.id, { model: m.model, usage: m.usage });
   }
   let usd = 0;
-  for (const { model, usage: u } of seen.values()) {
+  for (const [id, { model, usage: u }] of seen) {
+    // An API-error turn is a <synthetic> message with zero usage: nothing was billed, so skip it.
+    if (model === "<synthetic>" && Object.values(u).every(v => typeof v !== "number" || v === 0)) { seen.delete(id); continue; }
     const family = Object.keys(prices).find(k => model?.includes(k)) as keyof typeof prices | undefined;
     if (!family) throw new Error(`no fitted price for model ${model}`);
     const p = prices[family];

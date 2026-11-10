@@ -1,0 +1,4 @@
+{"type":"assistant","message":{"id":"a","model":"fixture-sonnet","usage":{"output_tokens":1}}}
+{"type":"assistant","message":{"id":"a","model":"fixture-sonnet","usage":{"cache_read_input_tokens":1000000,"cache_creation_input_tokens":1000000,"output_tokens":1000000,"input_tokens":1000000}}}
+{"type":"assistant","message":{"id":"b","model":"fixture-opus","usage":{"cache_read_input_tokens":1000000,"cache_creation_input_tokens":1000000,"output_tokens":1000000,"input_tokens":1000000}}}
+{"type":"assistant","message":{"id":"s","model":"<synthetic>","usage":{"input_tokens":0,"output_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"server_tool_use":{"web_search_requests":0}}}}
