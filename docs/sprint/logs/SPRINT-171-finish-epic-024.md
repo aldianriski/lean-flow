@@ -36,3 +36,8 @@ Composition: 7 members, none `L`. Edges: T5 (TASK-643) and T6 (TASK-641) on T1 (
 Budget: one 35 USD all-in cap, warn at 28 (D1).
 Baseline gate on `main` at `62651d80`, run off-host: `QA_FULL=1` via `bun --no-env-file scripts/gate-remote.ts`, exit 0: qa-check 495 pass, 0 fail; `bun test` 589 pass, 0 fail.
 G1 and G2 are not yet signed; `gates_signed` is recorded in the sprint frontmatter only after the owner's sign-off is relayed verbatim. T1 is declared `tier: G`; T2 to T7 `tier: P`.
+
+### 2026-11-10 | gate | G1 batch signed, T1 to T7
+Owner popup, verbatim: "Approve G1 (Recommended)" (question: "Do you approve batch G1 for SPRINT-171, with the scope of the 7 tasks (T1 to T7, TASK-640 to 646) as listed: sizes M,M,S,S,M,M,S, out-of-scope as named, full checklist for each (all are close-retro, so no fast-path)?"). All seven took the full checklist; none is `L`.
+Frontier answers, verbatim: T6 replay pick "Operator picks at G2 (Recommended)" (a closed sprint other than SPRINT-167, with at least 2 worktree merge-backs and at most 11 boxes, approved in the G2 packet) · budget "Split as proposed (Recommended)": T6 26 USD, T2 4 USD, workers, probes and review 3 USD, reserve 2 · popups "Yes, fewer, 644 first (Recommended)": T3's rule is ruled before T2's and T6's G2, and both use it (A4 confirmed).
+Open for G2: T2 A3 (TASK-637's seed and twin reusable) and T4 A1 (row 5 transcripts readable) are facts to check, not owner questions.
