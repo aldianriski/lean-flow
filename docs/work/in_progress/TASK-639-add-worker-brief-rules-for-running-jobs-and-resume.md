@@ -13,6 +13,7 @@ authority: J1
 origin: close-retro
 state: ready
 depends-on: []
+gates_signed: G1 @ 4c09c9e6
 ---
 
 # TASK-639 — Add two rules to the worker brief and dispatch standard: never end a turn while a needed job runs, and resume a worker in-process only
