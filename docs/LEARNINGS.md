@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-08
+last_updated: 2026-11-10
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -122,6 +122,102 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **cross-check → moved: docs/LEARNINGS.md` § Durable rules › cross-check** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Behavioral Guidelines · learnings: L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198
 
 - **Cross-check a query before acting on it** — a search/count/grep whose result you will act on *immediately* gets a **second query that must agree**: an inverse whose sum is the known total, a count reconciled against a census, or a seeded gap the query must detect. Run it before the conclusion, not after it surprises you. **Why an action and not a caution:** the "match by shape, not substring" rule was promoted, correctly placed and *loaded in context* for all eleven sightings, and reached none — 8 of them ad-hoc queries inside a governance pass, where a wrong answer is acted on with no review between query and conclusion. Every one that was caught was caught by a *disagreeing second number*, never by recalling the rule. A negative control alone is not enough: it proves the query fires on rows it reaches, never that it reached them all (SPRINT-064 T1 — a nested `getline` silently examined 20 of 31 and returned "clean"). **A value entering a *frozen artifact* — an assumption, a DoD, an acceptance threshold — is a query result and gets the same treatment at the moment it is written, then again at execution.** Both grains count: a **figure** (SPRINT-071 wrote `~121` sites into A1; the real number was 39, so the DoD built on it was unsatisfiable the moment it froze) and a **structural claim about another document** (SPRINT-074 froze "the checker reads §14's tables" into three artifacts; §14 has no per-rule table). The guard does not fire on its own because *authoring* feels like planning, not querying — but the number is acted on later, by someone who cannot re-derive it, against a Plan nobody can amend cheaply. A **third grain: an identifier for a new row** — a `TD-NNN`, `TASK-NNN` or `L-NNN` — is a query result too, so **derive the maximum in use; never increment the one you remember**. Twice in one sprint the assumed id was wrong: a register cited `TASK-241`, which was that task's own twin, and a debt row filed as `TD-066` collided with an existing row whose subject was the very bug another task was fixing. Nothing rejects a duplicate id, and a second row with the same number reads as an edit to the first (L-143 ×2). **And derive it with the worktrees excluded** — `.claude/worktrees/` holds complete repo copies during isolated dispatch, so a bare `grep -r` over this repo counts them as content and returns a maximum that is not a row. It has now returned `L-999` (SPRINT-013's deliberate dangling-reference *negative-test token*) twice: once against a real max of `L-168`, once against `L-180` — the second time inside a close Retro, in a session that had already derived two `TD-NNN` correctly minutes earlier, because id-derivation feels like bookkeeping rather than querying. Treat a suspiciously high maximum as contamination before treating it as a row (L-170 ×2). **And the second query must vary the SELECTION rule, not the direction of the count.** An inverse whose two halves sum to the known total proves only that the rows were *partitioned* — both halves run the same selector, so they agree perfectly on the wrong population. SPRINT-098 got `37 open + 60 closed = 97` against a real figure of **5**; SPRINT-099 derived ten archive-exclusion call sites by grepping one predicate SHAPE and cross-checked by grepping the same shape, while an eleventh site written as `grep -v` sat outside what either query could reach — on a live gate leg, failing silently. Both were caught only by a number derived through a *different route*. The cheap tell: would both halves of your check break identically if the selector were wrong? (L-198 ×2). Full family → CONTEXT.md § Gates (L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198).
+
+---
+
+## L-309 [tags: process] [status: active]: **A treatment prompt may change only the treatment: any extra instruction changes the coordinator, and the run stops measuring the role.** SPRINT-170's first merger run (M1) told the coordinator "merge, resolve and repair nothing yourself … on a fail, stop the queue". The inspector's check failed on SPRINT-167's own mid-sprint records, the coordinator stopped the queue as told, and the run ended at 0 of 11 boxes. The ordinary arm's coordinator had fixed those records itself, so the two arms differed in more than the one change (EPIC-024 D2). The run was voided and rerun on an owner ruling. Write the treatment as the role's own file plus the hand-off message, then diff the two arms' prompts: the only difference allowed is the role.
+- seen: 2026-11-09 (SPRINT-170 T4, TASK-634, M1 voided; Log "T4 merger run M1 invalid")
+- count: 1
+- promoted: no
+- related: L-259 (the brief's author is the wrong judge of its runs) · L-292
+
+---
+
+## L-308 [tags: edit-safety] [status: active]: **Backticks inside a double-quoted `echo` are command substitution: the shell ran the text between them.** SPRINT-170's coordinator wrote a fixture brief with a double-quoted `echo` holding a backticked `bun test`; the shell ran lean-flow's 589 tests in the main repo for about 125 s while replay R1 was timing its first minutes. The repo stayed clean and the extra load could only slow R1, the direction that cannot give a false go, so the run stood and the deviation was logged. Any text with backticks goes through a quoted heredoc (`<<'EOF'`) or a file written with the Write tool, never through a double-quoted argument.
+- seen: 2026-11-09 (SPRINT-170 T2, TASK-638, replay R1; Log "T2 replay O1" deviation line)
+- count: 1
+- promoted: no
+- related: L-211 (shell message strings are code) · L-070
+
+---
+
+## L-307 [tags: tooling] [status: active]: **An older revision lacks the scripts a newer gate needs, so a trial on an old commit runs the current script against the clone.** SPRINT-170 T6 seeded a real fix, commit `5ca2c00e`, and cloned its parent to check the gate; `scripts/gate-remote.ts` does not exist at `5ca2c00e^`. Main's copy ran against the clone, with its settings passed in the environment. Say in the Plan which tool comes from where (T6 names `gate-remote.ts` on its `Cites:` line), and check the control gate on today's VPS before relying on the old baseline: S30 made a green control the precondition and the owner ruled to proceed when the baseline reproduced.
+- seen: 2026-11-09 (SPRINT-170 T6, TASK-636, CLI 2.1.319; Log "T6 gates on control and seeded")
+- count: 1
+- promoted: no
+- related: L-254 (pin what a sub-agent reads) · L-215
+
+---
+
+## L-306 [tags: tooling] [status: active]: **A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s.** Three of SPRINT-170 T3's six timed rounds (arm A twice, arm B once) lost 120 s each to a command that began with plain `python`, which skewed the time comparison. Row 5 was a no-go under either reading, but the time figures carry that noise. Tell a worker the interpreter to use (`bun`, or `python -c` with a script) in its brief, and screen a timed round's transcript for a 120 s gap before reading its minutes. CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T3, TASK-633; Log "T3 pairs q1-q3")
+- count: 1
+- promoted: no
+- related: L-300
+
+---
+
+## L-305 [tags: tooling] [status: active]: **Git Bash rewrites path-looking environment values when it launches a child, and an untrusted scratch workspace ignores the repo's allow list.** SPRINT-170's harness could not pass `LF_GATE_DIR` and similar settings through the shell; a Bun spawn with an explicit env object reaches the run unchanged (the probes show `/home/ubuntu/lf-gate-o1` in main and in the worker). The scratch clones are untrusted, so the 68 `permissions.allow` entries in `.claude/settings.json` were ignored in every arm; `--allowedTools` carried the grants, and the effect was equal across arms. Launch trial runs from a spawn with an env object, and record that allow entries do not apply in a scratch clone. CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T1, TASK-632, probes P-ord2 and P-thin3)
+- count: 1
+- promoted: no
+- related: L-067 · L-081
+
+---
+
+## L-304 [tags: tooling] [status: active]: **A PC suspend freezes a timed `sleep`, so a wait must poll the wall clock, and a suspend in a run's first minutes voids it.** SPRINT-170's O1 launch waited 2.5 h because the machine suspended during a timed cold-start wait. Run 2b of the watcher trial was voided when Windows entered sleep one minute in (Kernel-Power event 42) and the run's stop fired after the resume. The fix was AC standby set to never (`powercfg /change standby-timeout-ac 0`, undo with `300`) and waits that compare the clock to a deadline. Check the power plan before a long unattended run.
+- seen: 2026-11-09 (SPRINT-170 T2, TASK-638, O1) · 2026-11-10 (T5, TASK-635, run 2b)
+- count: 1
+- promoted: no
+- related: L-300 · L-303
+
+---
+
+## L-303 [tags: tooling] [status: active]: **Claude Code's low-memory reaper stops background jobs on this host, and a second paid run or an idle session is enough to trigger it.** The operator counted three reaper kills in SPRINT-170; the Log records two: the P-thin probe together with a Codex build, and the M2 job during its pre-launch wait. The host had 1.8 to 3.8 GB free, and older idle sessions held about 380 MB each. Running one paid job at a time avoided it. It is an observation, not a guarantee. A reaped job counts as an abort (S11 allows one reserve rerun), so budget for it, close idle sessions first, and relaunch alone. CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T1, TASK-632, P-thin; T4, M2 wait)
+- count: 1
+- promoted: no
+- related: L-216 · L-304
+
+---
+
+## L-302 [tags: tooling] [status: active]: **Resuming a worker from a later process is unreliable on this CLI: a forked session never finds the worker transcript, and a plain resume opened a new session in real pairs.** SPRINT-170 T3's probe forked the build session (`--resume <id> --fork-session`) and `SendMessage` failed with "No transcript found for agent ID"; a plain `--resume` worked in a probe, then opened a new session twice in real pair 1 although the transcript sat under the build session's `subagents/` folder. The cause was not found. In-process `SendMessage` resume worked every time (R1: 8 resumes; T3 pairs q1 to q3). Call it unreliable on CLI 2.1.319, not impossible. Resume within one process; across processes hand a fresh worker the context. TD-305 tracks the open cause.
+- seen: 2026-11-09 (SPRINT-170 T3, TASK-633; Log "T3 M0 probes" and "arm A moves in-process")
+- count: 1
+- promoted: no
+- related: L-293 · TASK-639
+
+---
+
+## L-301 [tags: process] [status: active]: **In headless mode an agent that ends its turn while its own background job runs is never resumed, and its report is lost.** SPRINT-170's thin-router probe P-thin2 had the Executor end its turn with a needed gate job still running; nothing woke it, so there was no report and no merge. Every router replay would have stalled at its first gate. The fix was in the agent files: wait in the foreground and never end a turn while a needed job runs (Executor L13, L15; router L28). The same rule belongs in the worker brief (TASK-639). CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T1, TASK-632, P-thin2; Log "thin-arm probes")
+- count: 1
+- promoted: no
+- related: L-216 · L-302
+
+---
+
+## L-300 [tags: tooling] [status: active]: **The CLI blocks a bare `sleep N`, so a wait needs another command.** SPRINT-170's probe could not hold a worker past the old 10-minute cutoff: both `sleep 330` calls were blocked, so the first probe produced no survival time. The probe wait became `python -c "import time; time.sleep(330)"`, and later waits poll the wall clock (L-304). Name the waiting command in a brief and test it once before a paid probe depends on it. CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T1, TASK-632, P-ord; "probe wait fixed")
+- count: 1
+- promoted: no
+- related: L-304 · L-306
+
+---
+
+## L-299 [tags: tooling] [status: active]: **A deny rule written as `//D:/…` matches nothing on Windows; only `//d/…` or `D:/…` matches, and the failure is silent.** SPRINT-170 T1 tested a main-repo deny with the non-matching form, and the test appended a line to the main repo's README. It was reverted at once (`git checkout -- README.md`, status clean), and later tests used a throwaway folder. Test a deny rule against a path outside the repo first, and take a before/after snapshot of the main repo around any permission test, since Bash writes are not covered by deny rules at all. CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T1, TASK-632; Log "build, review and first probe")
+- count: 1
+- promoted: no
+- related: L-298 · L-271
+
+---
+
+## L-298 [tags: tooling] [status: active]: **A worker's edit to `.claude/` is denied in every permission mode except `bypassPermissions`: allow rules, absolute paths and `acceptEdits` all fail.** SPRINT-170's probe P-ord could not make the permitted `.claude/CONTEXT.md` edit in `dontAsk`, inside `.claude/worktrees/` too. Four Haiku calls (about 0.05 USD) showed only bypass lets it land. The owner chose bypass plus a deny list (git push, branch delete, remote, and Edit or Write on the main repo and the trial worktrees), with snapshots as the check on Bash writes. Plan for it before a run whose worker must edit `.claude/`: the grant cannot come from settings. CLI 2.1.319.
+- seen: 2026-11-09 (SPRINT-170 T1, TASK-632, P-ord; owner ruling "bypass + deny list")
+- count: 1
+- promoted: no
+- related: L-299 · L-293
 
 ---
 
@@ -413,8 +509,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - related: L-218 (coordinator-side legs after each merge) · L-251 (run every check that reads a touched file)
 
 ## L-261 [tags: edit-safety] [status: promoted]: **Prose that a guard parses is a structured field: a path-shaped token written into it is a claim the guard will check.** At SPRINT-147's system verify, two of three FAILs were the coordinator's own words. Tick evidence on TASK-533 named the bare `run-trial.ts` and a dotted `result.…` token, which the member-layers check reads as undeclared files. A scope-change entry backticked two directory names, which the scope-change check reads as paths the entry claims, though T1's `Layers:` did not hold them. Both guards were right; the author wrote file-shaped tokens where plain words were meant. L-108 is the guard's side of this (match by shape, not substring); this is the writer's side. Inside a governed artifact (tick evidence, a log entry's paths, Plan lines), write a token in backticks with a path shape only when it names a file the task touches or cites; otherwise use words.
-- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0) · 2026-11-08 (SPRINT-169 system verify on `05c9fcbe`: the coordinator's T1 `consequence ·` line carried prose where the checker reads `behaviour:(low|material) · governance:(low|high)`; `review-depth-consequence-vocab` FAIL, QA-CHECK 495/1; fixed in place per L-176, then 496/0)
-- count: 4
+- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0) · 2026-11-08 (SPRINT-169 system verify on `05c9fcbe`: the coordinator's T1 `consequence ·` line carried prose where the checker reads `behaviour:(low|material) · governance:(low|high)`; `review-depth-consequence-vocab` FAIL, QA-CHECK 495/1; fixed in place per L-176, then 496/0) · 2026-11-10 (SPRINT-170 system verify: the T1 `consequence ·` line again carried a trailing explanation; tick evidence on TASK-633 and TASK-634 sat on a continuation line, read as a Done-when edit; T6's `Cites:` named `gate-remote.ts` by a path-shaped token. Fixed in `65a32709`, `26d1bfd7`, `f00521ea`, `aa80826f`, `c4a4a7a0`, then 493/0: tick evidence goes on the box's FIRST line, a `Cites:` token is the bare file name)
+- count: 5
 - **L-261 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — into L-257's scope-change line, widened from a scope-change body to every governed field a guard parses (tick evidence, log paths, Plan lines) (SPRINT-149 promote)
 - related: L-108 (the guard's side) · L-176 (structured fields in a narrative file) · L-251 (run every check that reads a touched file)
 
@@ -618,8 +714,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **L-235 → promoted: merged into L-224** · disposition: merge — L-224's rule (check with the checker the gate actually runs, after every write) already covers a whole-tree leg a diff review cannot see; both sightings are counted on L-224, this entry's text stays as the record.
 
 ## L-234 [tags: sprint-model] [status: promoted]: **A scope-change entry is attributed by its HEADING, so the heading must name every `Tn` whose files the body lists.** SPRINT-125's Plan-meta entry named TASK-434 in its heading and then listed paths for T3, T7 and D1; the scope-change-layers check charged them all to T1 and system verify reddened. The log is append-only, so the fix cost a `Cites:` note on T1 rather than an edit. Write one entry per task, or a heading listing every `Tn`.
-- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0) · 2026-11-07 (SPRINT-165 T1: the entry named `HANDOFF-LEDGER.md`, red at `4d97cb53`, fixed by a `Cites:` addition in `cce0ce67`)
-- count: 3
+- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0) · 2026-11-07 (SPRINT-165 T1: the entry named `HANDOFF-LEDGER.md`, red at `4d97cb53`, fixed by a `Cites:` addition in `cce0ce67`) · 2026-11-10 (SPRINT-170 system verify on `67d3e5cd`: T3's entry named `subagents/`, the CLI's transcript folder, and T4's records named `agents/merger.md` and `merge-oracle.ts`; none declared, so `scope-change-outside-layers` and `layers completeness` FAILed; fixed by `Cites:` additions in `65a32709`, then 493/0)
+- count: 4
 - **L-234 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: move-to-reference — a scope-change heading names every `Tn` its body touches, and the scope-change leg runs before the entry is committed.
 - related: L-229 · L-151
 

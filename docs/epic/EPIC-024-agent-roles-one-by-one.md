@@ -2,7 +2,7 @@
 epic: 024
 slug: agent-roles-one-by-one
 owner: Maintainer
-last_updated: 2026-11-09
+last_updated: 2026-11-10
 status: active
 member_sprints: [SPRINT-165, SPRINT-166, SPRINT-168, SPRINT-169, SPRINT-170]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
@@ -83,7 +83,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | SPRINT-166 | Evidence-backed diagrams | closed `e13120d1` | Ran rows 1 to 3 bundled on real build work: decompose and promote each ran in one Sonnet worker with popups and same-id resumes, three Sonnet builds, 16 of 16 boxes. The first full gate failed on two conventions the coordinator missed by skipping CONTEXT.md's rules (L-294). Verdicts are recorded by TASK-616 and TASK-617 |
 | SPRINT-168 | First Jev use, and the D12 check | closed `e164151e` | The D12 check, run from a live checkout (D1): gate failures traced to rows 1 and 2: 0. The first close gate's 3 FAILs were all this sprint's own work; row 4 may start |
 | SPRINT-169 | Jev as a cheap A/B judge, built under the router | closed `121b89a8` | Router-trial step 1 (TASK-630): 0 shell, edit or write calls on the main thread, 10 popups, 0 compactions. On this epic's basis 12.3 to 13.6 USD, 4.1 to 4.5 USD/box, 19.4 min/box (TASK-630 § Results). Guards: first verify 495/1 on a coordinator Log line, 1 unapproved Jev pass. Jev use 3: pre-screen trial (TASK-631) |
-| SPRINT-170 | Agent roles, rows 4b to 9, trialled together | active | Runs rows 4b to 9 in one sprint under one 60 USD cap (TASK-632 to 638); each row keeps its own verdict (D2, D13). Completed at close |
+| SPRINT-170 | Agent roles, rows 4b to 9, trialled together | closed | Six trials under one 60 USD cap (31.4 spent): 4b, 5, 7 and 8 no-go; 6 (merger) and 9 (reproducer) go, shipping neither without a D5 ruling (TASK-646). Host findings filed as L-298 to L-309; follow-ups TASK-639 to 645 |
 
 ## Closed when
 

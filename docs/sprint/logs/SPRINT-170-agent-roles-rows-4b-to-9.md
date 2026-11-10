@@ -630,3 +630,9 @@ run · 30 of 30 DoD ticked
 terminal · PLAN_EXHAUSTED
 ```
 Members: TASK-632, 638, 633, 634, 635, 636, 637 all in `done/`. Verdicts: 4b no-go · 5 no-go · 6 go · 7 no-go (overhead) · 8 no-go (no gap shown) · 9 go. Spend about 31.4 USD of 60 (trial runs and workers; Codex outside; operator session uncapped).
+
+### 2026-11-10 | close | Retro written and four buckets routed
+- Handoff reconciliation: swept the whole Log; no `handoff` entry exists (the only matches are the promote entry's "no handoff ledger" lines), so nothing is `live` or `consumed`.
+- Retro written in the sprint file. Filed: TD-304 to TD-306; TASK-639 to TASK-646 (`origin: close-retro`); L-298 to L-309 plus sightings on L-234 (count 4) and L-261 (count 5). CHANGELOG: no entry, since nothing user-visible landed on `main` (trial files stay on trial branches).
+- EPIC-024 row for SPRINT-170 completed; the epic stays `active` (last Closed-when box open, TASK-646).
+- Not applied, awaiting owner approval: §11 retention and the doc-freshness refreshes.

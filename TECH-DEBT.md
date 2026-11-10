@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-08
+last_updated: 2026-11-10
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2008,3 +2008,18 @@ status: current
   - Evidence: SPRINT-169 Log, T1 review entry; `scripts/jev-ab-judge.ts`, the Infra line.
   - Impact: low; an informational infra count could be off, and no scored figure moves.
   - Mitigation: count not-sent cells where a prompt is skipped. Census-zero today, so no run planned.
+- **TD-304** severity: low | status: open | created: Sprint-170 (close)
+  - Summary: **The row 7 watcher's `--exclude` accepts only the `agent-` prefixed worker id.** Given a bare id it excluded nothing, the coordinator relaunched it, and that retry cost 0.033 USD of the 0.120 USD overhead that failed S23's 0.10 limit. The script lives on `trial/epic-024-row7` (f5cf1963) and the row is a no-go, so nothing on `main` carries it.
+  - Evidence: SPRINT-170 Log, "T5 runs; row 7 verdict no-go on overhead"; TASK-635 § Results.
+  - Impact: low; only matters if row 7 is retried. Overhead was the only failed bar, so this is part of the cost, not the cause.
+  - Mitigation: if row 7 is retried, accept the bare id or print the accepted form on a miss. Re-derive from the transcripts first; one run is one sighting.
+- **TD-305** severity: medium | status: open | created: Sprint-170 (close)
+  - Summary: **Cross-process resume of a worker is unreliable on Claude Code 2.1.319, and its cause is not found.** A forked session fails with "No transcript found for agent ID"; a plain `--resume` worked in a probe and opened a new session in real pairs, although the worker's transcript sat in the build session's `subagents/` folder. Restoring the original folder did not help.
+  - Evidence: SPRINT-170 Log, "T3 M0 probes" and "arm A moves in-process"; TASK-633 § Results; L-302.
+  - Impact: medium for trials and any design that resumes a worker from a later process; none for in-process `SendMessage`, which worked every time. It cost row 5 its counterbalanced order and a redesign.
+  - Mitigation: hypothesis only: the worker lookup keys on something that a new process or session id changes. Re-check on the next CLI version before any new resume trial (TASK-645), and keep the rule "resume in-process, else hand a fresh worker the context" (TASK-639) until then.
+- **TD-306** severity: low | status: open | created: Sprint-170 (close)
+  - Summary: **In-session subagents leave no transcript, so their cost cannot be measured and SPRINT-170 carries an estimate.** The G2 workers (builder checks, recon) are booked at about 3.5 USD of the 31.4 USD; the rest of the figure is measured from `total_cost_usd` and `session-cost.ts`. Codex runs are recorded as tokens, outside the cap.
+  - Evidence: SPRINT-170 Log, settlement S0 and the running tallies; Codex's recap review found a 0.7 USD slip in the tally, since corrected.
+  - Impact: low; about 11 percent of the sprint's spend is an estimate, so a cost bar that close to it would not be trustworthy.
+  - Mitigation: run G2 workers as headless sessions with a session id when their cost matters, or book a per-worker figure from the parent's usage. Not needed until a bar sits within that margin.
