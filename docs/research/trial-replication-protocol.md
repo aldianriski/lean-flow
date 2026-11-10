@@ -41,12 +41,12 @@ It drops nothing the treatment touches. No candidate is claimed to meet this lis
 Frozen before any run and logged with the plan.
 - A go needs at least 3 fresh runs per arm, in balanced interleaved order, with the same prompt and host settings, and no pooling with earlier runs (D15).
 - A go is read only at 3 per arm. There is no early success stop.
-- A screen-out may stop the trial after 1 or 2 runs per arm: the treatment fails the cost bar, exceeds the slowdown margin, or fails the oracle. The owner allowed the stop at 2; a go still needs 3.
+- A screen-out may stop the trial after 1 run per arm only on a failed hard bar or a failed oracle. After the first 2 runs per arm it may stop if the treatment fails the cost bar in both of its runs, exceeds the slowdown margin in both, or fails the oracle once. The owner allowed the stop at 2; a go still needs 3.
 - Any early stop is recorded as "screened out (n = k)". It is never "go" and never "no-go".
 - "Within about 20 percent of the bar" is not a trigger for an extra run. Distance from a noisy threshold says nothing about variance.
 - An extra run is allowed only for a void (host kill, suspend, harness fault), under D16's one-rerun cap.
 - The cost bar and the slowdown margin are frozen numbers set at G2, never read from the result.
-- The slowdown margin is 1.15 times the ordinary mean time (owner ruling, 2026-11-10).
+- For row 4b's retest, the slowdown margin is 1.15 times the ordinary mean time (owner ruling, 2026-11-10). Other trials set their own at G2.
 - Cost is priced from Claude Code transcripts, with cold start reported in both arms (`trial-cost-allocation`). Time is read only after the largest transcript gaps of each run are read (L-310).
 
 ## Applied on paper: row 4b's retest design
@@ -57,8 +57,8 @@ The fixture stays SPRINT-167's 11-box replay: the time effect is the open questi
 
 | Item | SPRINT-170 figure | Planned (USD) |
 |---|---|---|
-| O per run | 3.849 and 4.319, mean 4.084 | 4.1 x 3 = 12.3 |
-| R per run | 2.658 (R2 not run) | 2.7 x 3 = 8.0 |
+| O per run | 3.849 and 4.319, mean 4.084 | 4.084 x 3 = 12.3 |
+| R per run | 2.658 (R2 not run) | 2.658 x 3 = 8.0 |
 | Six runs | row spend 10.83 of 20 (three runs) | 20.2 |
 | Stage 1 only (2 O + 2 R) | none | 13.5 |
 | Two probes of changed settings | 0.51 to 0.67 each, first probes 0.51 and 0.43 | 1.0 |
