@@ -63,3 +63,8 @@ Impact: T3 drops `skills/orchestrator/references/`, because the rule is trial-sp
 ### 2026-11-10 | scope-change | T4: cite session-cost.ts after the prune
 What broke: `984e5b2f` pruned `scripts/session-cost.ts` from T4's `Layers:` but did not move it to `Cites:`. TASK-645's Done-when names it as a reconciliation source, so promote-check printed `member-layers-incomplete` for T4. That commit went in with the FAIL unread, because the command chain did not stop on it.
 Impact: T4's `Cites:` now declares `session-cost.ts` (read only). No Layers change, no Done-when change. promote-check: PASS, 22 pass, 0 fail. Re-confirm G2: not needed, because a citation adds no file to the build.
+
+### 2026-11-10 | progress | T3 built and reviewed: EPIC-024 D16
+consequence · T3 · behaviour: none (a docs rule, nothing executes) · governance: yes (a trial-sprint protocol rule) → one scoped `sonnet` reviewer.
+Built by the coordinator from the signed design (`e8f76ae0`). Review: no High, 2 Med, 3 Low. Spec: boxes 1 and 3 met. Med 1: case-3 membership was not stated as mechanical. Med 2: "row's remaining limit" was ambiguous, because EPIC-024 uses "rows" for trial rows. Both were fixed in one bounded retry (`efefbd78`), along with one Low (case 2's keep-awake restore). Two Lows are kept as noted: the listed paths do not name verdict-rule or budget files, which the Negative clause covers in text; and signing the packet triggers the pre-authorisation. No re-review, because both fixes only tighten wording the reviewer itself proposed.
+Ticked: TASK-644 boxes 1 and 3. Box 2 ticks at SPRINT-171's close, from its Retro (design S1), so TASK-644 waits in `review/` until then.
