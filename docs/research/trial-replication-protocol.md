@@ -46,7 +46,7 @@ Frozen before any run and logged with the plan.
 - "Within about 20 percent of the bar" is not a trigger for an extra run. Distance from a noisy threshold says nothing about variance.
 - An extra run is allowed only for a void (host kill, suspend, harness fault), under D16's one-rerun cap.
 - The cost bar and the slowdown margin are frozen numbers set at G2, never read from the result.
-- The margin is 1.15 times the ordinary mean time. No treatment run may exceed the slowest ordinary run times 1.15.
+- The slowdown margin is 1.15 times the ordinary mean time (owner ruling, 2026-11-10).
 - Cost is priced from Claude Code transcripts, with cold start reported in both arms (`trial-cost-allocation`). Time is read only after the largest transcript gaps of each run are read (L-310).
 
 ## Applied on paper: row 4b's retest design
@@ -67,7 +67,7 @@ The fixture stays SPRINT-167's 11-box replay: the time effect is the open questi
 | Screened-out path | row limit 20 | 18.6 |
 | Whole sprint, for scale | 31.4 of 60 | not drawn |
 
-The go path, 25.3 USD, exceeds SPRINT-170's row 4b limit of 20 USD. A paid retest therefore needs its own budget ruling. It is not drawn from SPRINT-171's 35 USD cap (D1, D2). The reserve is a full run, the probes are small, so the two lines are not like for like.
+The go path, 25.3 USD, exceeds SPRINT-170's row 4b limit of 20 USD. A paid retest therefore needs its own budget ruling. It is not drawn from SPRINT-171's 40 USD cap (D1, D2). The reserve is a full run, the probes are small, so the two lines are not like for like.
 
 The protocol does not cut a go path: six runs cost 20.2 against 10.83 for three. Its saving is the screen-out path, about 6.7 USD (33%) less than running all six. This retest is a design on paper. A real one is a separate trial with its own G2 and budget, and nothing here decides it.
 
