@@ -3,8 +3,8 @@ sprint: 171
 slug: finish-epic-024
 epic: EPIC-024
 owner: Maintainer
-last_updated: 2026-11-10
-status: active
+last_updated: 2026-11-11
+status: closed
 plan_commit: 18148168
 gates_signed: G1,G2 @ 1533e423
 update_trigger: sprint execute/close events
@@ -110,6 +110,40 @@ The epic's last Closed-when box. On a ship ruling, the agent files, a clean inst
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/trials/` (11 files) | T1 | Trial harness moved out of operator scratch so every trial reuses one tested kit; `agent-cost.ts` later skips zero-usage API-error turns (T6) | med | `test/trials/` 29/0; selftest PASS; fresh-clone dry run |
+| `test/trials/`, `test/fixtures/trials/` | T1 | Fixtures and must-FAIL cases for the harness, plus the synthetic-turn regression | low | red then green on each fix |
+| `evals/run-emitter-column-fixtures.ts` | T1 | Declares the maintainer-only harness out of the emitter-column census | low | PASS with the rule; FAIL (11 files) without |
+| `docs/epic/EPIC-024-agent-roles-one-by-one.md` | T2 T3 T5 T6 T7 | D16 to D21: gate packet, protocol, row 9 no-go, row 6 inconclusive, no-ship ruling | low | prose-density 27/0; doc caps PASS |
+| `docs/research/trial-cost-allocation.md`, `trial-replication-protocol.md` | T4 T5 | Cost method note; replication and stop protocol, review drift fixed | low | doc caps PASS; scoped review re-checked |
+| `TECH-DEBT.md`, `CHANGELOG.md`, `docs/LEARNINGS.md` | close | TD-307 to TD-309, one Unreleased line, L-311 to L-313 | low | gate at close |
 
 ## Retro
-<!-- Written at close (STANDARD §10). -->
+
+**Verdicts.** EPIC-024's last two rows are ruled, and the epic closes.
+- Row 9 inside `/diagnose`: **no-go** (D19). The helper fired and reproduced correctly, but a full pass cost 1.58× and took 1.65× the unchanged skill on both seeds (bars 0.75× and 1.10×).
+- Row 6 confirmed on SPRINT-130: **inconclusive** (D20). The futility stop ended it at 1 valid ordinary run and 0 valid merger runs.
+  Both completed merger runs merged correctly (oracle PASS, files preserved) but were void: a red `layers observed` gate twice each, from builder commits no task owns, which only the ordinary coordinator repairs; and helper writes to `/tmp`. K2 was host-killed and relaunched.
+- Neither row ships (D21, owner popup). Also delivered: the harness in `scripts/trials/` (T1), the D16 gate packet (T3), the cost method note (T4) and the replication protocol D17 (T5).
+
+**Owner load (TASK-644).** 21 popups and 36 answers over two sessions, promote included, against SPRINT-170's about 23 and 32. The owner's active time: under 30 min. D16 recoveries ran without a popup inside their caps (case 1 for K2, case 3 for T2 and T6 harness faults). Faults beyond a cap still went to the owner, as did host memory, verdict and validity questions.
+
+**Cost.** Measured trial runs 8.56 USD: T2 1.10 of its 4, T6 7.45 of its 26. Workers had spent 4.96 USD by G2-B, which overran their 3 USD line and raised D1 to 40. Later in-session workers and the T5 review left no transcript (TD-306). Codex builds ran outside the cap. About 13.5 USD measured of 40.
+
+**System verify.** The first close gate at `da6c4dbd` read `QA-CHECK: 504 pass, 12 fail`. Eleven were fixed, in eight commits. At `8a695d27`: `bun test` 618/0 and `QA-CHECK: 509 pass, 1 fail`, the one being `7407e49c`'s attribution, closed under the owner's ruling (TD-307).
+
+**Retrieval check.** L-261 (a field a guard parses is not prose) missed a sixth time. All seven `consequence ·` lines carried their reasons inline, so `check-review-depth` could not read them, and T5's owed independent review stayed hidden until close. Run, it found real drift: the note had dropped the signed design's "in both of its runs" screen-out condition.
+
+**Worked**
+- The futility stop skipped four runs that could not change the verdict.
+- Oracles were calibrated free before use: the merge-preservation rule read PASS on the reference, FAIL on the swapped key, FAIL on a merge that dropped or altered one T2 line.
+- Every kit or harness fix carried a control that must fail: the `agent-cost` regression red then green, the futility controls red with the throw disabled.
+- The next session rebuilt the unlogged K1, K2 and three verbatim owner rulings from the previous transcript before any further spend.
+
+**Friction**
+- Host memory: K2 stalled 1 h 52 min at about 1.5 GB free and then lost its launcher to the reaper. Three `test/trials/` tests timed out at bun's 5000 ms default at 1.07 GB free (TD-309).
+- A session ended with two paid runs and three owner rulings missing from the Log (L-311).
+- Helper agents' `/tmp` scratch writes voided both completed merger runs; "no write leaves the clone" never reached a worker brief (L-312).
+- A harness fix committed under a non-sprint subject cannot be attributed later (TD-307, L-313).
+
+**Pattern candidate**
+- L-261 gains its sixth sighting (count 5 → 6, already promoted). Placement held, retrieval did not: the rule sits in § Durable rules, but nothing in the flow puts it in front of the coordinator while it writes a consequence line.

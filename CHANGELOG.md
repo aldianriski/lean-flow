@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-11
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Fixed (maintainer-only)** — `scripts/trials/agent-cost.ts` skips a zero-usage `<synthetic>` API-error turn instead of stopping, so a host-killed run can still be priced; a synthetic turn with any usage still stops it. The emitter-column census declares `scripts/trials/` maintainer-only. EPIC-024 closed with no role shipped (SPRINT-171).
 - **Added (maintainer-only)** — `scripts/trials/` provides a Bun trial harness with local prep, dry-run launch, snapshots, caller-supplied checks, a merge oracle, preflight and cost reader; synthetic fixtures and an offline selftest cover the reusable tools (TASK-640).
 - **Changed** — the worker contract tells a worker never to end its turn while a job it needs still runs, and `/orchestrator`'s dispatch rule resumes a worker with `SendMessage` from the session that dispatched it; on Claude Code 2.1.319 and 2.1.321 a later process could not reliably reach the worker, so it hands a fresh worker the context instead. Both came from paid trial runs that lost a report or a fix (SPRINT-170, TASK-639).
 - **Added (maintainer-only)** — `scripts/jev-ab-judge.ts` replays TypeSafe's Jev against the A/B harness judge's three recorded calibration runs (96 cells each) and prints agreement, the unsure rate and cost; it is a dry run by default, and `--run` needs a budget and a key. A failed or empty Jev call is infra, never a not-passed slot. On the three runs Jev agrees with the judge on 56/96, 46/96 and 31/54 cells (93.3%, 66.7% and 93.9% with unsure scores left out; 37.5% are unsure), at 0.037 USD for 96 calls against the judge's 7.52 USD. The harness default is unchanged and the script is outside the gate (TASK-628).

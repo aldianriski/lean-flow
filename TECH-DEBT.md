@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-10
+last_updated: 2026-11-11
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2033,3 +2033,8 @@ status: current
   - Evidence: SPRINT-171 Log, T5 review entry (scoped Sonnet reviewer, one bounded retry fixed the dropped "in both runs" screen-out condition, the margin scope and the rounding); owner popup "Carry as one TD row (Recommended)".
   - Impact: medium for the next paid trial, none until one is designed. Each item is a new rule, not drift, because the note matches the signed design there.
   - Mitigation: settle all five at the next trial's G2, before any spend, and amend `docs/research/trial-replication-protocol.md` and D17 with the rulings.
+- **TD-309** severity: low | status: open | created: Sprint-171 (close)
+  - Summary: **The trial harness carries four review gaps from T1, and two timeouts seen in T6.** Most `merge-oracle` sub-checks have no must-FAIL fixture; the stream checker's built-in FAIL paths and operators are untested; the in-tree `.scratch` stays; three `test/trials/` tests time out at bun's 5000 ms default on a memory-starved host (29/0 at `--timeout 60000`). The T6 kit's post-run snapshot timed out (`ETIMEDOUT`) after every merger run.
+  - Evidence: SPRINT-171 Log, T1 entry (review 0 High, 2 Med, 5 Low; retry cap reached) and the T6 resume and K2R entries.
+  - Impact: low. The harness is maintainer-only. A sub-check without a must-FAIL fixture can pass while broken, and a timeout reads as a failure.
+  - Mitigation: add must-FAIL fixtures per oracle sub-check and per stream-checker operator; set an explicit timeout on the slow `test/trials/` cases; give the snapshot step the same timeout as the audit.

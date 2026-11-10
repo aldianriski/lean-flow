@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-08
+last_updated: 2026-11-11
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -57,7 +57,7 @@ docs/             architecture/ · development/ · deployment/ · adr/ · DECISI
                     generated index, marked (§11)
 conformance.sh    the CONSUMER entry point — `sh conformance.sh <repo-dir>` reports any repo's
                   conformance level + named findings (ADR-027; delegates to scripts/lib/)
-scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · promote-check.ts (pre-`plan locked`) · gate-remote.ts (off-host gate) · merge-check.ts (merge-back legs) · session-cost.ts (spend report) · lib/ (extracted
+scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · promote-check.ts (pre-`plan locked`) · gate-remote.ts (off-host gate) · merge-check.ts (merge-back legs) · session-cost.ts (spend report) · trials/ (agent-role trial harness, maintainer-only) · lib/ (extracted
                   checkers + conformance-engine.sh + read-spec-rules.sh)          (ADR-008 · ADR-027)
                   jev-done-when.ts (Done-when boxes, TASK-626) · jev-ab-judge.ts (replay of the A/B judge's recorded runs, TASK-628) — maintainer-only Jev scripts, by hand, never a gate leg
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's

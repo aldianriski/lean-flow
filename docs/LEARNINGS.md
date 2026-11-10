@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-10
+last_updated: 2026-11-11
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -124,6 +124,30 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **cross-check → moved: docs/LEARNINGS.md` § Durable rules › cross-check** · disposition: move-to-reference — one-liner kept in `.claude/CLAUDE.md` § Behavioral Guidelines · learnings: L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198
 
 - **Cross-check a query before acting on it** — a search/count/grep whose result you will act on *immediately* gets a **second query that must agree**: an inverse whose sum is the known total, a count reconciled against a census, or a seeded gap the query must detect. Run it before the conclusion, not after it surprises you. **Why an action and not a caution:** the "match by shape, not substring" rule was promoted, correctly placed and *loaded in context* for all eleven sightings, and reached none — 8 of them ad-hoc queries inside a governance pass, where a wrong answer is acted on with no review between query and conclusion. Every one that was caught was caught by a *disagreeing second number*, never by recalling the rule. A negative control alone is not enough: it proves the query fires on rows it reaches, never that it reached them all (SPRINT-064 T1 — a nested `getline` silently examined 20 of 31 and returned "clean"). **A value entering a *frozen artifact* — an assumption, a DoD, an acceptance threshold — is a query result and gets the same treatment at the moment it is written, then again at execution.** Both grains count: a **figure** (SPRINT-071 wrote `~121` sites into A1; the real number was 39, so the DoD built on it was unsatisfiable the moment it froze) and a **structural claim about another document** (SPRINT-074 froze "the checker reads §14's tables" into three artifacts; §14 has no per-rule table). The guard does not fire on its own because *authoring* feels like planning, not querying — but the number is acted on later, by someone who cannot re-derive it, against a Plan nobody can amend cheaply. A **third grain: an identifier for a new row** — a `TD-NNN`, `TASK-NNN` or `L-NNN` — is a query result too, so **derive the maximum in use; never increment the one you remember**. Twice in one sprint the assumed id was wrong: a register cited `TASK-241`, which was that task's own twin, and a debt row filed as `TD-066` collided with an existing row whose subject was the very bug another task was fixing. Nothing rejects a duplicate id, and a second row with the same number reads as an edit to the first (L-143 ×2). **And derive it with the worktrees excluded** — `.claude/worktrees/` holds complete repo copies during isolated dispatch, so a bare `grep -r` over this repo counts them as content and returns a maximum that is not a row. It has now returned `L-999` (SPRINT-013's deliberate dangling-reference *negative-test token*) twice: once against a real max of `L-168`, once against `L-180` — the second time inside a close Retro, in a session that had already derived two `TD-NNN` correctly minutes earlier, because id-derivation feels like bookkeeping rather than querying. Treat a suspiciously high maximum as contamination before treating it as a row (L-170 ×2). **And the second query must vary the SELECTION rule, not the direction of the count.** An inverse whose two halves sum to the known total proves only that the rows were *partitioned* — both halves run the same selector, so they agree perfectly on the wrong population. SPRINT-098 got `37 open + 60 closed = 97` against a real figure of **5**; SPRINT-099 derived ten archive-exclusion call sites by grepping one predicate SHAPE and cross-checked by grepping the same shape, while an eleventh site written as `grep -v` sat outside what either query could reach — on a live gate leg, failing silently. Both were caught only by a number derived through a *different route*. The cheap tell: would both halves of your check break identically if the selector were wrong? (L-198 ×2). Full family → CONTEXT.md § Gates (L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198).
+
+---
+
+## L-313 [tags: sprint-model] [status: active]: **A fix made while another task's run is open still belongs to the task that owns its path, so commit it as `sprint(N) Tn:` for that task.** In SPRINT-171, the `agent-cost.ts` fix came up during T6 and went in as `fix(trials): …`. `layers observed` reads only a commit's own subject and `Task:` trailer, so no later record could attribute it, and close took a FAIL under an owner ruling.
+- seen: 2026-11-10 (SPRINT-171 close gate, `7407e49c`)
+- count: 1
+- promoted: no
+- related: L-258 (ticks outside Layers) · TD-307
+
+---
+
+## L-312 [tags: tooling] [status: active]: **A validity rule a worker can break must be written into the worker's brief, or helpers both arms share will void runs at random.** SPRINT-171's T6 voided any run that wrote outside its clone. Read-only inspectors and a builder piped check output to `/tmp` in both completed merger runs, while the one ordinary run happened not to. The rule lived only in the audit.
+- seen: 2026-11-10 (SPRINT-171 T6, K1 and K2R)
+- count: 1
+- promoted: no
+- related: L-310 (deny what a run must not do) · TD-308
+
+---
+
+## L-311 [tags: sprint-model] [status: active]: **An owner ruling answered in a session that then ends is lost unless the Log already holds it, so write it before the next launch.** SPRINT-171's T6 session ran K1 and K2 and took three rulings (a replacement per arm, two kit fixes), then ended on a network error. The Log held none of it. The next session rebuilt them from the transcript before spending again.
+- seen: 2026-11-10 (SPRINT-171 T6, reconciled in the next session)
+- count: 1
+- promoted: no
+- related: L-099 (state an unattended run reads) · L-301
 
 ---
 
@@ -259,7 +283,7 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - seen: 2026-11-08 (SPRINT-166, EPIC-024 bundled trial)
 - seen again: 2026-11-08 (SPRINT-167, TASK-621's rerun with `/prime` reading § Gates: the coordinator read § Gates and § Model tiers but not § Sprint model, so a status move went out under `docs(task):`, two `consequence ·` lines used free text, and no `review ·` lines were logged; the first QA_FULL showed 4 fail, the second 2, before the third was green. The commit-subject and Log-line rules live outside § Gates, so reading only § Gates did not carry them)
 - count: 2
-- **L-294 → promoted: EPIC-024 row 3 finding (`docs/epic/EPIC-024-agent-roles-one-by-one.md`) and TASK-621, which made workers read decompose, promote and CONTEXT in full** · disposition: retain — the fix already sits in the skills those two changed, so no new rule is added; kept as the recorded cause. Owner ruling at the SPRINT-168 promote.
+- **L-294 → promoted: EPIC-024 row 3 finding (`docs/epic/archive/EPIC-024-agent-roles-one-by-one.md`) and TASK-621, which made workers read decompose, promote and CONTEXT in full** · disposition: retain — the fix already sits in the skills those two changed, so no new rule is added; kept as the recorded cause. Owner ruling at the SPRINT-168 promote.
 - related: L-151 · L-130 · TASK-617 · TASK-621
 
 ---
@@ -519,8 +543,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - related: L-218 (coordinator-side legs after each merge) · L-251 (run every check that reads a touched file)
 
 ## L-261 [tags: edit-safety] [status: promoted]: **Prose that a guard parses is a structured field: a path-shaped token written into it is a claim the guard will check.** At SPRINT-147's system verify, two of three FAILs were the coordinator's own words. Tick evidence on TASK-533 named the bare `run-trial.ts` and a dotted `result.…` token, which the member-layers check reads as undeclared files. A scope-change entry backticked two directory names, which the scope-change check reads as paths the entry claims, though T1's `Layers:` did not hold them. Both guards were right; the author wrote file-shaped tokens where plain words were meant. L-108 is the guard's side of this (match by shape, not substring); this is the writer's side. Inside a governed artifact (tick evidence, a log entry's paths, Plan lines), write a token in backticks with a path shape only when it names a file the task touches or cites; otherwise use words.
-- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0) · 2026-11-08 (SPRINT-169 system verify on `05c9fcbe`: the coordinator's T1 `consequence ·` line carried prose where the checker reads `behaviour:(low|material) · governance:(low|high)`; `review-depth-consequence-vocab` FAIL, QA-CHECK 495/1; fixed in place per L-176, then 496/0) · 2026-11-10 (SPRINT-170 system verify: the T1 `consequence ·` line again carried a trailing explanation; tick evidence on TASK-633 and TASK-634 sat on a continuation line, read as a Done-when edit; T6's `Cites:` named `gate-remote.ts` by a path-shaped token. Fixed in `65a32709`, `26d1bfd7`, `f00521ea`, `aa80826f`, `c4a4a7a0`, then 493/0: tick evidence goes on the box's FIRST line, a `Cites:` token is the bare file name)
-- count: 5
+- seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0) · 2026-11-08 (SPRINT-169 system verify on `05c9fcbe`: the coordinator's T1 `consequence ·` line carried prose where the checker reads `behaviour:(low|material) · governance:(low|high)`; `review-depth-consequence-vocab` FAIL, QA-CHECK 495/1; fixed in place per L-176, then 496/0) · 2026-11-10 (SPRINT-170 system verify: the T1 `consequence ·` line again carried a trailing explanation; tick evidence on TASK-633 and TASK-634 sat on a continuation line, read as a Done-when edit; T6's `Cites:` named `gate-remote.ts` by a path-shaped token. Fixed in `65a32709`, `26d1bfd7`, `f00521ea`, `aa80826f`, `c4a4a7a0`, then 493/0: tick evidence goes on the box's FIRST line, a `Cites:` token is the bare file name) · 2026-11-10 (SPRINT-171 close: seven `consequence ·` lines with inline reasons, unreadable to `check-review-depth`, hid T5's owed independent review until the close gate)
+- count: 6
 - **L-261 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — into L-257's scope-change line, widened from a scope-change body to every governed field a guard parses (tick evidence, log paths, Plan lines) (SPRINT-149 promote)
 - related: L-108 (the guard's side) · L-176 (structured fields in a narrative file) · L-251 (run every check that reads a touched file)
 

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-07
+last_updated: 2026-11-11
 update_trigger: A trial in EPIC-024 reports, or its stop rule fires
 status: current
 id: router-mode
@@ -101,7 +101,7 @@ Session `f0e86365`, Opus, `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000`, 42 turns, in
 - **Subagents cannot use `AskUserQuestion`** (documented), and a resumed subagent keeps its history. So a stage run in a worker must return its question to the coordinator. `context: fork` skills exist, but do not see the conversation.
 
 ### Plan
-Tracked in `docs/epic/EPIC-024-agent-roles-one-by-one.md`, one change per trial, each landing a sprint apart:
+Tracked in `docs/epic/archive/EPIC-024-agent-roles-one-by-one.md`, one change per trial, each landing a sprint apart:
 1. A worker contract and coordinator rules.
 2. Decompose and promote doing their reading in workers, with an intake brief that carries conversation-only intent, constraints and approvals.
 3. A light `/prime`, only after each stage names and loads what it needs, since it removes context downstream skills assume is there.
