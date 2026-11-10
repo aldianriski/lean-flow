@@ -505,7 +505,8 @@ Every run also gets `--max-budget-usd` (in CLI 2.1.319) as a per-run hard stop. 
 - T1's frozen settings (do not exist yet).
 
 ### 2026-11-09 | execute | T1 (TASK-632) build, review and first probe
-consequence · T1 · behaviour:low · governance:low (trial-branch agent files only; nothing reaches `main` but this Log and TASK-632's evidence).
+consequence · T1 · behaviour:low · governance:low
+Why low: trial-branch agent files only; nothing reaches `main` but this Log and TASK-632's evidence.
 - Build: Codex (`codex exec`, workspace-write) in `e024-thin`, from the G2 design and settlements with DeepSeek's files @8c32a9dc pasted in. `router.md` 31 lines, `executor.md` 38; worker contract byte-identical to `worker-brief.md`. Coordinator review: router L21 parked headless questions, a second difference between arms; fixed to relay the Executor's own recommendation unchanged. Codex fidelity review R1 (read-only, separate run): all row groups OK but rows 6-10 (Med, that same line), `VERDICT: CLEAR`; no R2. Committed on `trial/epic-024-thin-router` at 83193f9c. Codex usage: 82,177 tokens build, outside the cap (owner ruling).
 - Probe P-ord (ordinary arm, `lf-gate-o1`), 0.51 USD: `LF_GATE_DIR` unchanged in main and worker ✓; push permission-denied ✓; `$TMP` file inside `.git/lf-tmp` ✓; gate reached the VPS (exit 1, the base's 3 SPRINT-167 record fails, see below) ✓. Failed: the worker's Edit of `.claude/CONTEXT.md` was denied in `dontAsk`, inside `.claude/worktrees/` too; and both `sleep 330` calls were blocked by the CLI, so no survival time. S1 stop: brought to the owner.
 - Permission tests, about 0.05 USD (Haiku, one call each): an `Edit(.claude/**)` allow, an absolute-path allow, `acceptEdits`, and a bare `Edit` allow are all denied on `.claude/`. Under `bypassPermissions` the edit lands. Deny rules on Windows match only in the `//d/Project/...` (or `D:/...`) form; `//D:/...` silently matches nothing. Incident: one test meant to prove a main-repo deny used the non-matching form and appended a line to `D:/Project/lean-flow/README.md`; reverted at once (`git checkout -- README.md`, status clean), later tests used a throwaway folder.
@@ -614,3 +615,10 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - Run 2c (0.751 USD, 13.8 min): H `ALERT HUNG silent` 6.1 min after last progress; C4 `ALERT HUNG chatty` 6.3 min after; C1 `exited (ready)`, C2 `waiting`, C3 `exited (failed)`, no false alarm; CPU 0.36% of a core; 0 TaskStop, 0 kill commands, H ended on its own 600 s timeout. Coordinator turns triggered by the watcher (its 4 background tasks plus the launch turn, S23): 9 turns, **0.120 USD against the 0.10 limit**, 0.033 of it a relaunch retry because `--exclude` accepts only the `agent-` prefixed id.
 - **Row 7: no-go, on overhead.** EPIC-024 row 7, its rows 5-9 Closed-when (now ticked) and TASK-635 § Results updated.
 - Spend so far: about 31.4 USD of 60 (T5 row: about 1.9 of 4.0).
+
+### 2026-11-10 | scope-change | close-time record fixes: T1 consequence line, T3 and T4 Cites
+System verify (QA_FULL off-host on `main` 67d3e5cd): `bun test` 589/0, qa-check 491 pass, 3 fail, all in this sprint's own records:
+- `review-depth-consequence-vocab`: the T1 consequence line carried a trailing explanation. Edited in place to the exact form, with the explanation moved to its own line (`Why low: …`).
+- `layers completeness` on T4: TASK-634's Done-when and Results name `agents/merger.md` (trial branch) and the operator's `merge-oracle.ts` (operator scratch); neither lands on `main`, so they go on T4's `Cites:` line, not `Layers:`.
+- `scope-change-outside-layers` on T3: the T3 scope-change entry names `subagents/` (the CLI's transcript folder, not a repo path); it goes on T3's `Cites:` line.
+What broke: the Plan's `Cites:` lines did not name what the members cite. Impact: none on any verdict or Done-when; the Plan's `Layers:` are unchanged. Re-confirm G2: not needed (citations only).

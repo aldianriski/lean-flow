@@ -50,7 +50,7 @@ Two ordinary and two thin-router runs, alternated, on the settings the build hal
 ### T3 — Trial same-builder fix rounds against fresh subagents `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/work/` · `docs/epic/EPIC-024-agent-roles-one-by-one.md`
 Depends-on: none
-Cites: TASK-633, SD5, TASK-632 (harness settings)
+Cites: TASK-633, SD5, TASK-632 (harness settings), `subagents/` (CLI transcript folder)
 Starts after the harness settings freeze (SD5), a settings dependency, not a wait on the row 4b verdict.
 
 **Acceptance:** a row 5 verdict, with each round's cost, time and oracle result recorded.
@@ -58,7 +58,7 @@ Starts after the harness settings freeze (SD5), a settings dependency, not a wai
 ### T4 — Trial a merger worker on the merge-back queue `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/work/` · `docs/epic/EPIC-024-agent-roles-one-by-one.md`
 Depends-on: T2
-Cites: TASK-634, SD3, TASK-638 (ordinary baseline)
+Cites: TASK-634, SD3, TASK-638 (ordinary baseline), `agents/merger.md` (trial branch), `merge-oracle.ts` (operator scratch)
 Consumes T2's two ordinary runs as its baseline; an invalid baseline run voids both verdicts.
 
 **Acceptance:** a row 6 verdict against a merge oracle frozen at G2, including the unsafe-merge case.
