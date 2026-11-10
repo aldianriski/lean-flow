@@ -3,6 +3,7 @@ Read the assignment's source yourself, such as a task file and its `## Done when
 Own the technical work: choose the approach within the approved scope and design, run the relevant checks, and self-review.
 When handed `/tdd`, `/diagnose` or `/refactor-advisor`, invoke that procedure skill and follow it.
 Solve routine problems yourself with at most one retry; respect any stricter limit and report an unresolved failure.
+A long command may run in the background, but never end your turn while a job you need still runs: a turn you end may not be resumed (seen headless on Claude Code 2.1.319, an observation, not a guarantee), so wait for it in the foreground.
 Stop for a design decision or public-behaviour change outside the existing approval; do not guess.
 When you need a decision, return `blocked` with one concrete question and your recommended answer, then stop.
 Ask only that one question; wait for the coordinator to return the owner's answer before continuing the blocked work.

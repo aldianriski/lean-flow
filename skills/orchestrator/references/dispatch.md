@@ -31,8 +31,10 @@ Every build dispatch pastes the worker contract, [worker-brief.md](worker-brief.
 do not: the contract is written for a builder, and `Explore` and `Plan` cannot be resumed. For each build dispatch, the
 coordinator appends its own `progress` Execution Log entry naming that `Tn`, holding one line,
 `worker · Tn · <agent id> · <model> · <isolation or none>`, so the holder survives compaction and `/handoff`; outside a sprint
-it stays in the conversation. A host that cannot resume a worker hands a new worker the question, the owner's answer and the
-first worker's report, and records that it did.
+it stays in the conversation. Resume a worker with `SendMessage` from the live session that dispatched it. On Claude Code
+2.1.319 and 2.1.321 a later process is unreliable: a forked session never found the worker, and a plain `--resume` found it in a
+probe but opened a new session in real runs (L-302 · TD-305). A host that cannot resume a worker, or a later process, hands a new
+worker the question, the owner's answer and the first worker's report, and records that it did.
 
 Dispatch on a `general-purpose` sub-agent (NOT `Explore`/`Plan` — those skip CLAUDE.md, losing project
 context) with the relevant **procedure skill** invoked at runtime via the Skill tool: new behaviour →
