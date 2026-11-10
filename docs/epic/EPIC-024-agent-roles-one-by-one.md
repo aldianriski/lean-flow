@@ -46,7 +46,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 | 6 | Merger running the merge-back queue | Video | Against the coordinator doing it | No bad merge | **Go** (SPRINT-170, 2026-11-09). 0 bad merges, unsafe merge refused; merger runs 3.8 and 3.9 USD, 24.0 and 27.4 min, against the 4.05 USD and 47.85 min ordinary mean. Two runs each side, so part of the time gap is likely variance. TASK-634 § Results. *Amended 2026-11-10:* provisional go (D15) |
 | 7 | Watcher | Video; DeepSeek's essay | Only if a trial records a hung worker | Catches a real hang | **No-go, on overhead** (SPRINT-170, 2026-11-10). On planted workers it flagged the hang and the chatty worker at 6.1 and 6.3 min with no false alarm, but the coordinator's watcher turns cost 0.120 USD against a 0.10 limit. TASK-635 § Results |
 | 8 | Checker | Video | Only with a named miss by the gate and review | Finds what they missed | **No-go, no gap shown** (SPRINT-170, 2026-11-09). A real change seeded with a dropped regex anchor passed the gate, but the scoped review caught it in 35 s for 0.14 USD, so the checker did not run. TASK-636 § Results |
-| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | **Go** (SPRINT-170, 2026-11-09). On one seeded bug both arms reproduced 2/2; reproducer 0.039 USD mean against /diagnose's 0.114, clean twin read no. Ships only by owner exception (ADR-053). TASK-637 § Results |
+| 9 | Reproducer | Video | Only with a named gap in `/diagnose` | Reproduces real reports; no unasked change lands | **Go** (SPRINT-170, 2026-11-09). On one seeded bug both arms reproduced 2/2; reproducer 0.039 USD mean against /diagnose's 0.114, clean twin read no. Ships only by owner exception (ADR-053). TASK-637 § Results. *Amended: D19* |
 
 ## Decisions
 
@@ -84,6 +84,7 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - **D17** — Trial replication protocol, 2026-11-10 (TASK-643): [`trial-replication-protocol.md`](../research/trial-replication-protocol.md) governs any trial designed after this date. It fixes when a cheaper coordinator is allowed, what a smaller fixture must keep, and the replication and stop rules.
   A go needs 3 runs per arm. A screen-out may stop at 1 or 2 and is recorded "screened out (n = k)" (owner ruling, 2026-11-10, amending D15 for screen-outs only). It was applied on paper to row 4b's retest design only: no verdict above is changed or re-read, and a paid retest needs its own G2 and budget ruling.
 - **D18** — Row 5's cost reading, amended 2026-11-10 by owner ruling (G2-B). Its "same builder 31% cheaper per fix (0.061 against 0.088 USD)" comes from charging the cold start to the fresh arm only. Measured the same way in both arms, the same-builder arm costs more ([`trial-cost-allocation.md`](../research/trial-cost-allocation.md)). Row 5's no-go stands: its gate is the by-name test.
+- **D19** — Row 9 measured inside `/diagnose`, 2026-11-10 (TASK-642): **no-go**. With the helper dispatched from Phase 2, a full pass costs 1.58× and takes 1.65× the unchanged skill (bars 0.75× and 1.10×). The helper was dearer on both seeds (+0.081 and +0.053 USD). Every run fixed the bug and both twin controls were clean. n = 1 per seed per arm (D4). TASK-642 § Results.
 
 ## Open questions
 
