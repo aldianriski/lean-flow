@@ -74,6 +74,13 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
   Row 6 is a provisional go: no bad merges were seen, but safety and savings are not established, since delays and recovery differed across runs.
   Row 4b's retest folds into TASK-643: at least 3 fresh runs per arm, local QA denied in every arm, a slowdown margin frozen first, no pooling with SPRINT-170's runs.
   Rows 6 and 9 ship only after a named confirmation, TASK-641 and TASK-642 (TASK-646).
+- **D16** — Trial-sprint gate packet. Owner ruling, 2026-11-10 (TASK-644). SPRINT-170 took 32 owner answers in about 23 popups, and 10 of them were foreseeable.
+  A paid trial's G2 packet bundles the design rulings it can foresee into one popup, each with a recommendation, and lists the trial's treatment, oracle, answer-key and prompt paths. Signing the packet pre-authorises three recoveries, each logged as `recovery: case n, cap used k of m`:
+  1. A host kill (low-memory reaper, process exit): one relaunch per run, with the same prompt, arm and budget line.
+  2. A run voided by a host suspend: one rerun per run.
+  3. A harness fault: one fix and re-probe per fault, at most 2 per task, and only if the fix's diff touches none of the listed paths.
+  Recovery spend counts against the sprint cap and must fit within its row's remaining limit. These always go to the owner: scope, verdict meaning, budget, treatment, a second failure of a capped case, a new kind of fault, and any fix that touches a listed path.
+  A pre-authorisation never covers a change to a frozen verdict rule, a budget cap or a treatment, and never lets a run pass its own checklist: the coordinator never ticks a box from its own recovery run. Each owner answer is logged as `Owner popup, verbatim: "…"`, so the Retro can count them beside the owner's estimate of active minutes.
 
 ## Open questions
 
