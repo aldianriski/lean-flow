@@ -23,9 +23,9 @@ Row 9 passed: both arms reproduced the seeded bug in 2 of 2 runs, the reproducer
 
 ## Done when
 
-- [ ] A design note states what the helper takes and returns, which `/diagnose` Phase 1 and 2 duties stay with the skill, and the frozen verdict rule (cost and reproduction, a clean-twin control, at least two seeds).
-- [ ] The helper is run inside a full `/diagnose` pass on the seeds, and the marginal cost and time against the unchanged skill are recorded in EPIC-024 row 9.
-- [ ] Negative: the helper never edits `src/` (a run that does is void), and `skills/diagnose/` is unchanged on `main` until the owner rules to ship (D5).
+- [x] A design note states what the helper takes and returns, which `/diagnose` Phase 1 and 2 duties stay with the skill, and the frozen verdict rule (cost and reproduction, a clean-twin control, at least two seeds). ✓ judgment tick: § Design note (takes, returns, what stays with the skill, the frozen verdict rule with a clean-twin control on 2 seeds), frozen in the Log at `1533e423` before the first paid run (05:02 UTC); written into this file afterwards, a coordinator miss noted in the note
+- [x] The helper is run inside a full `/diagnose` pass on the seeds, and the marginal cost and time against the unchanged skill are recorded in EPIC-024 row 9. ✓ four valid full `/diagnose` passes, 2 seeds × 2 arms (kit audit PASS on each); EPIC-024 D19 and row 9 record the marginal cost and time per seed (+0.081 and +0.053 USD, +0.43 and +0.38 min), with a ratio of 1.58× cost and 1.65× time: no-go (`f1348e36`)
+- [x] Negative: the helper never edits `src/` (a run that does is void), and `skills/diagnose/` is unchanged on `main` until the owner rules to ship (D5). ✓ the kit helper-write audit gives 0 findings on every H run (a shell write voids only outside `repro/`, 45 controls); `git diff --stat 18148168 main -- skills/diagnose` is empty, and `git log 18148168..main -- agents/ .claude/agents/` has 0 commits; the treatment lives only on `trial/epic-024-row9-inside`
 
 ## Touches
 `docs/epic/EPIC-024-agent-roles-one-by-one.md`, `docs/work/`; the helper and any `/diagnose` edit live on a trial branch.
