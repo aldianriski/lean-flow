@@ -255,12 +255,8 @@ const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly w
   // Both classes were outside the census and nothing said so until SPRINT-113 T1 cut them (ADR-050).
   { test: (f) => f.endsWith("-differential.ts"), why: "differential harness (cut SPRINT-113 T1), emitted no FAIL findings" },
   { test: (f) => f.includes("/fixtures/"), why: "fixture data, never run as a checker" },
-  // SPRINT-147 T1 (TASK-533): the A/B measurement harness runs by hand and is never a gate leg; its
-  // selftest PASS/FAIL lines are read by its own exit code, and no column-keyed consumer reads them.
-  { test: (f) => f.startsWith("evals/ab/"), why: "maintainer-only A/B measurement harness, run by hand, never a gate checker" },
   { test: (f) => f === "scripts/session-cost.ts", why: "maintainer-only spend report (TASK-609), run by hand, emits no finding" },
   { test: (f) => f === "scripts/jev-done-when.ts", why: "maintainer-only Jev judge (TASK-626), run by hand, never a gate checker; no column-keyed consumer reads it" },
-  { test: (f) => f === "scripts/jev-ab-judge.ts", why: "maintainer-only Jev replay of the A/B judge (TASK-628), run by hand, never a gate checker; no column-keyed consumer reads it" },
   { test: (f) => f.startsWith("scripts/trials/"), why: "maintainer-only agent-role trial harness (TASK-640), run by hand, never a gate checker; no column-keyed consumer reads it" },
   {
     test: (f) =>

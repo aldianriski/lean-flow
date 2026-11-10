@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Removed (maintainer-only)** — the A/B measurement system: `evals/ab/` (harness, arms, judges, task corpus) and `scripts/jev-ab-judge.ts`, with their config entries. Releases ship on a Codex review of the shipped change plus the repo gate, as 2.21.0 and 2.22.0 did; EPIC-023 D19's pre-release arm is retired. TASK-631 is cancelled; seven A/B-only TD rows close. Measurement logs stay in `docs/research/logs/` as records.
 ## v2.22.0 — workers do the reading, briefed and resumable, and `/diagram` ties every arrow to a source line (2026-11-11)
 
 **MINOR** — one new skill, `/diagram`; the roster grows from 15 to 16, and the standard is spec 0.20.0. Restart the session after installing.

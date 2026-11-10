@@ -59,11 +59,10 @@ conformance.sh    the CONSUMER entry point — `sh conformance.sh <repo-dir>` re
                   conformance level + named findings (ADR-027; delegates to scripts/lib/)
 scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · promote-check.ts (pre-`plan locked`) · gate-remote.ts (off-host gate) · merge-check.ts (merge-back legs) · session-cost.ts (spend report) · trials/ (agent-role trial harness, maintainer-only) · lib/ (extracted
                   checkers + conformance-engine.sh + read-spec-rules.sh)          (ADR-008 · ADR-027)
-                  jev-done-when.ts (Done-when boxes, TASK-626) · jev-ab-judge.ts (replay of the A/B judge's recorded runs, TASK-628) — maintainer-only Jev scripts, by hand, never a gate leg
+                  jev-done-when.ts (Done-when boxes, TASK-626) — maintainer-only Jev script, by hand, never a gate leg
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)
                   fixtures/compat/ — the frozen rule-ID snapshot (ADR-034)
-                  ab/ — EPIC-023's A/B harness: paid, by hand (`bun evals/ab/run-baseline.ts`), never a gate leg
 
   ── TypeScript tooling on Bun (scripts/ and evals/ run on it; ADR-035 · ADR-051) ────
 package.json      root manifest. Bun runs TypeScript directly: the manifest has no dependencies

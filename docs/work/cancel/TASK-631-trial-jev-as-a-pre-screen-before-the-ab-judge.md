@@ -39,3 +39,6 @@ Owner verdict at the SPRINT-169 close, verbatim: "Trial as pre-screen now". TASK
 ## Tracker
 
 Owner verdict 2026-11-08 at the SPRINT-169 close (Jev use 3) · TASK-628 `## Results` · TD-290
+
+## Cancelled
+2026-11-11, owner ruling: the A/B measurement system was removed, so a cheaper A/B judge has no use. Jev continues through TASK-627.
