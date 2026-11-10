@@ -6,7 +6,7 @@ status: current
 id: trial-cost-allocation
 tags: [process, tooling]
 domain: governance
-related: [night-run-cost, TASK-645, TASK-633, EPIC-024]
+related: [night-run-cost]
 ---
 
 # Research — How do worker, coordinator and cold-start costs compare across the two arms of a resume trial?
