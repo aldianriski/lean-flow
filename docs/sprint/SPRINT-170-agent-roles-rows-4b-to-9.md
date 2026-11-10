@@ -163,7 +163,8 @@ System verify passed off-host at `c4a4a7a0` (bun test 589/0, qa-check 493/0); on
 - Popup rulings kept the owner in control from a train; T6 and T7 ran side by side because neither verdict uses time.
 
 **Friction**
-- Host facts cost runs and hours: edits to `.claude/` denied outside bypass mode (L-298), a silent deny-rule path form (L-299), a blocked `sleep` (L-300), headless turns that end on a running job (L-301), unreliable cross-process resume (L-302, TD-305), the low-memory reaper (L-303), a PC suspend that cost 2.5 h and voided run 2b (L-304), path rewriting and ignored allow lists (L-305), a bare `python` REPL (L-306) and an old revision with no gate script (L-307).
+- Host facts cost runs and hours: edits to `.claude/` denied outside bypass mode (L-298), a silent deny-rule path form (L-299), a blocked `sleep` (L-300), headless turns that end on a running job (L-301), unreliable cross-process resume (L-302, TD-305),
+  the low-memory reaper (L-303), a PC suspend that cost 2.5 h and voided run 2b (L-304), path rewriting and ignored allow lists (L-305), a bare `python` REPL (L-306) and an old revision with no gate script (L-307).
 - Operator errors: a backticked `echo` ran the test suite in the main repo during R1 (L-308); the first merger prompt changed the coordinator beyond the treatment and voided M1 (L-309); a settlement's wording contradicted its stated reason (S30) and went to the owner; one T1 commit mixed the Log into a `Tn:` commit and was split.
 - About 20 owner popups, many foreseeable (TASK-644).
 - The harness lived in operator scratch and was rebuilt or copied per trial (TASK-640).
