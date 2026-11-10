@@ -23,9 +23,9 @@ Row 5 priced each round from tokens inside S15's dispatch-to-report window. Arm 
 
 ## Done when
 
-- [ ] A costing note states how worker, coordinator and cold-start charges are separated and allocated in each arm, and how the result reconciles with `total_cost_usd` and `session-cost.ts` for the same run.
-- [ ] Run on real input: the method is applied to row 5's three pairs and reproduces the recorded round totals (A 0.069, 0.058, 0.055; B 0.091, 0.091, 0.081 USD) within the stated rounding, or names the difference.
-- [ ] Negative: the method does not change the recorded row 5 verdict, and does not count a cost that falls outside an arm's own window into the other arm.
+- [x] A costing note states how worker, coordinator and cold-start charges are separated and allocated in each arm, and how the result reconciles with `total_cost_usd` and `session-cost.ts` for the same run. ✓ `docs/research/trial-cost-allocation.md` (`792897e1`) § Method: three buckets (cold start in both arms, worker, coordinator), one allocation rule, the window rule; § Reconciliation: cost-state = total_cost_usd at 3 dp in all six runs, session-cost.ts agrees at its 1-dp print; read-through by the coordinator (tier P)
+- [x] Run on real input: the method is applied to row 5's three pairs and reproduces the recorded round totals (A 0.069, 0.058, 0.055; B 0.091, 0.091, 0.081 USD) within the stated rounding, or names the difference. ✓ all six reproduce at 3 dp (`t3-measure2-preserved.ts` and `t4-buckets.ts` against the preserved runs, "match" ×6), buckets sum to each window with diff 0.0000; the named difference: stream-json under-counts output tokens, so re-priced windows rise 0.015 to 0.026
+- [x] Negative: the method does not change the recorded row 5 verdict, and does not count a cost that falls outside an arm's own window into the other arm. ✓ judgment tick: row 5 stays no-go (its gate is the by-name test, no USD input); each message is assigned to one run and one bucket, and arm A's build phase is not charged to B; the "B above A either way" premise was withdrawn at G2 (S3) and the computed result reported: A is above B under the symmetric rule
 
 ## Touches
 `docs/research/` (a costing note) or `scripts/session-cost.ts` if the method needs a flag; the TASK-633 `## Results` section is read, not edited.
