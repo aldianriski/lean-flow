@@ -48,7 +48,7 @@ Row 9's saving came from a run stopped after Phase 2. This measures the marginal
 **Acceptance:** row 9 carries the integrated run's marginal cost and time on at least two seeds, with a clean-twin control.
 
 ### T3 — Write the trial-sprint gate-packet rule `[size: S · risk: low · class: decision · HITL · J2]`
-Layers: `docs/epic/EPIC-024-agent-roles-one-by-one.md` · `skills/orchestrator/references/`
+Layers: `docs/epic/EPIC-024-agent-roles-one-by-one.md`
 Depends-on: none
 Cites: TASK-644, SPRINT-170 Log (about 20 popups)
 SPRINT-170 spent about 20 popups on rulings a design could have foreseen. The shipped reference changes only if the rule turns out general (a G2 call, with the consumer check).
@@ -56,7 +56,7 @@ SPRINT-170 spent about 20 popups on rulings a design could have foreseen. The sh
 **Acceptance:** a rule lists the pre-authorised recovery cases with their caps and the rulings that always escalate.
 
 ### T4 — Make worker and coordinator costs comparable across arms `[size: S · risk: low · class: decision · HITL · J1]`
-Layers: `docs/research/` · `scripts/session-cost.ts`
+Layers: `docs/research/`
 Depends-on: none
 Cites: TASK-645, TASK-633 § Results (read only), TD-305, TD-306
 A method note, checked against row 5's recorded pairs. No verdict moves.
