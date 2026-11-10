@@ -622,3 +622,11 @@ System verify (QA_FULL off-host on `main` 67d3e5cd): `bun test` 589/0, qa-check 
 - `layers completeness` on T4: TASK-634's Done-when and Results name `agents/merger.md` (trial branch) and the operator's `merge-oracle.ts` (operator scratch); neither lands on `main`, so they go on T4's `Cites:` line, not `Layers:`.
 - `scope-change-outside-layers` on T3: the T3 scope-change entry names `subagents/` (the CLI's transcript folder, not a repo path); it goes on T3's `Cites:` line.
 What broke: the Plan's `Cites:` lines did not name what the members cite. Impact: none on any verdict or Done-when; the Plan's `Layers:` are unchanged. Re-confirm G2: not needed (citations only).
+
+### 2026-11-10 | gate | system verify PASS; sprint-bulk exit
+system-verify · PASS · QA_FULL=1 via `bun --no-env-file scripts/gate-remote.ts` on `main` c4a4a7a0: `bun test` 589/0, qa-check 493 pass, 0 fail, rc 0. The earlier reds on this sprint's own records (T1 consequence line; T3, T4 and T6 `Cites:`; TASK-634 and TASK-633 tick evidence written on a continuation line, read as a Done-when edit) were fixed in 65a32709, 26d1bfd7, f00521ea, aa80826f and c4a4a7a0; one run in between was a transport failure (connection reset during `scp bundle`), not a gate result.
+```
+run · 30 of 30 DoD ticked
+terminal · PLAN_EXHAUSTED
+```
+Members: TASK-632, 638, 633, 634, 635, 636, 637 all in `done/`. Verdicts: 4b no-go · 5 no-go · 6 go · 7 no-go (overhead) · 8 no-go (no gap shown) · 9 go. Spend about 31.4 USD of 60 (trial runs and workers; Codex outside; operator session uncapped).
