@@ -74,7 +74,7 @@ A planted failure with a control run that leaves a healthy worker alone.
 ### T6 — Trial a checker on a planted defect `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `docs/work/` · `docs/epic/EPIC-024-agent-roles-one-by-one.md`
 Depends-on: none
-Cites: TASK-636, EPIC-024 D13
+Cites: TASK-636, EPIC-024 D13, `scripts/gate-remote.ts` (run from main against the T6 clone)
 A defect that passes the gate and review, with a clean control.
 
 **Acceptance:** a row 8 verdict, with the controls run.
