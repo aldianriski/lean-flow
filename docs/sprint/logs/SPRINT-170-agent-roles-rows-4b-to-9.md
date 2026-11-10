@@ -605,3 +605,12 @@ What broke: TASK-638's first box asks for four replay runs; after O1, R1 and O2,
 - Codex also found a spend arithmetic slip: the listed items sum to 29.5 USD, not the 30.2 reported. Corrected: spend so far **29.5 USD of 60**.
 - Codex's ranked improvements (keep/change/drop on the coordinator's six, plus two new: fewer owner interruptions by gate packets, and cost comparability before any new resume trial) are kept in operator scratch `codex-recap-review.out` and go to the close Retro.
 - Owner rulings by popup, verbatim: "Run T5, then close (Recommended)"; implement after close: "Worker-brief rules (#6), Host findings as learnings (#8), Trial harness to scripts/ (#2)".
+
+### 2026-11-10 | execute | T5 runs; row 7 verdict no-go on overhead; T5 done
+- M0 (0.090 USD): a background `timer.ts 60` exit woke the headless coordinator (turns 09:11:03, then 09:12:04), so watcher alerts can reach it.
+- Run 1 (Opus coordinator + H, no watcher, 0.325 USD, 11.6 min): H's last progress 09:12:25Z; the coordinator saw "no change" at 09:17:36 but did not call it a hang; the host's Bash 600 s timeout fired at 09:22:28, after the 7-min deadline.
+- Run 2 (0.664 USD): the watcher crashed on every launch (`telemetry unavailable`): real meta files carry `finished` only once a worker finishes, and real transcripts have timestamp-less `api-request-blob` rows. Owner ruling by popup, verbatim: "Fix + rerun run 2 (Recommended)". Fix on `trial/epic-024-row7` f5cf1963; fixtures now seed both real shapes (old code 8 pass / 15 fail, fixed 23 / 0; kill grep 0); the fixed watcher read run 2's real transcripts correctly.
+- Run 2b voided: Windows "entering sleep — Reason: Button or Lid" one minute in (Kernel-Power event 42, 16:46 local), resumed 08:22 local; the run's stop fired after resume. Owner ruling by popup, verbatim: "Rerun run 2 now (Recommended)".
+- Run 2c (0.751 USD, 13.8 min): H `ALERT HUNG silent` 6.1 min after last progress; C4 `ALERT HUNG chatty` 6.3 min after; C1 `exited (ready)`, C2 `waiting`, C3 `exited (failed)`, no false alarm; CPU 0.36% of a core; 0 TaskStop, 0 kill commands, H ended on its own 600 s timeout. Coordinator turns triggered by the watcher (its 4 background tasks plus the launch turn, S23): 9 turns, **0.120 USD against the 0.10 limit**, 0.033 of it a relaunch retry because `--exclude` accepts only the `agent-` prefixed id.
+- **Row 7: no-go, on overhead.** EPIC-024 row 7, its rows 5-9 Closed-when (now ticked) and TASK-635 § Results updated.
+- Spend so far: about 31.4 USD of 60 (T5 row: about 1.9 of 4.0).
