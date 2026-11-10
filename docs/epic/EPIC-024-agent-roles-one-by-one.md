@@ -115,4 +115,4 @@ On this basis the baselines are 0.88 to 1.41 USD/box and 4.1 to 6.2 min/box (SPR
 - [x] Row 4 has a recorded verdict → no-go, step 1 on SPRINT-169 and the matched replay, recorded by TASK-630
 - [x] Row 4b has a recorded verdict → no-go, on SPRINT-170 (cheaper; time effect unresolved, amended 2026-11-10), recorded by TASK-638
 - [x] Rows 5 to 9 each have a recorded verdict → on SPRINT-170: 5 no-go, 6 go, 7 no-go (overhead), 8 no-go (no gap shown), 9 go; recorded by TASK-633 to TASK-637
-- [x] Whatever passed has shipped under D5, or the owner ruled not to ship it → TASK-646 → owner ruled not to ship rows 6 and 9, 2026-11-10 (D21)
+- [x] Whatever passed has shipped under D5, or the owner ruled not to ship it → TASK-646 → owner ruled not to ship rows 6 and 9, 2026-11-10, on SPRINT-171 (D21)
