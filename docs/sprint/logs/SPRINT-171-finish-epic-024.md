@@ -145,3 +145,11 @@ Runs (one paid run at a time, each through `scripts/trials/launch.ts`, each audi
 Verdict by the frozen rule: no-go. H was dearer on both seeds: means 0.183 against 0.116 USD (1.58×, bar 0.75×) and 1.03 against 0.62 min (1.65×, bar 1.10×). Recorded in TASK-642 § Results and EPIC-024 D19 (`f1348e36`), with row 9 now ending `*Amended: D19*`.
 Spend: 1.104 USD of the 4 USD row; the per-run list and the sum over all 9 run streams agree. Kit audit controls: 45 PASS. Coordinator miss: design M1's note in TASK-642 before the runs. The rules were frozen in the Log at `1533e423` (04:26 UTC), before the first paid run (05:02 UTC), but the task file got its note only after.
 Ticked: TASK-642, all three boxes.
+
+### 2026-11-10 | progress | T6 run kit ready; baseline re-ruled
+- Kit: Codex built it at `D:\Project\lean-flow-worktrees\s171-t6-kit\` (outside the repo; entry `s170-harness-keep\t6-run.ts`), modelled on T2's kit with its lessons carried over: 70 controls pass. It enforces the order N1 K1 K2 N2 N3 K3, S1's pre-launch projection against 26 USD, a 4.30 USD per-run cap and S2's stop. The arm checks run before each launch.
+- Arms: N = `main`'s tip (`s171-t2-u`); K = trial branch `trial/epic-024-merger-s171`, which is `main` plus `agents/merger.md`, byte-identical to `b2c71d34` (`s171-t6-k`).
+- The Codex-made N1 and K1 clones were owned by the sandbox user, so git refused them as dubious ownership. They held no paid record, so the coordinator deleted them and re-prepared N1 as the operator.
+- Baseline, owner popup, verbatim: "Accept: red only on T1's target (Recommended)". The off-host gate at `2305da0a`: `QA-CHECK: 298 pass, 0 fail`; `bun test: 435 pass, 1 fail`. The one local failure is `gate discovery — this repository > the rung-1 command still runs the gate .gate-command declares`, which TASK-455 (the replay's T1) fixes; the reference replay is green after both merges (298/0, 441/0).
+  The kit's precondition is now exactly that: the base fails only this test and qa-check is green. Its controls pass 6/6 (the real base is accepted; two failures, a different failure, a red qa-check and a wrong SHA are each refused). Every valid run still needs a green gate after both merges.
+- Dry launch of N1: every check PASS, spend 0.
