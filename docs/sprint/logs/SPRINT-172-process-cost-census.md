@@ -57,3 +57,14 @@ Reading: one scoped Sonnet reviewer, one round, CLEAR. It re-measured every figu
 What broke: T2's 103-row inventory made `docs/research/process-cost-census.md` 333 lines, over its §2 cap of 130 (soft, ADR-020), and the doc-caps leg reports it as OVER-CAP (soft). T3 and T4 add more columns and rows.
 Impact: the tables move to `docs/research/logs/process-cost-census.md`, the §2 home for a research question's measurement rounds. The decision doc keeps the question, the baseline summary and the verdict under 130 lines. T2, T3 and T4 each gain that appendix in `Layers:`; no Done-when changes, since each names "the census", not a file.
 Re-confirm G2: owner popup, verbatim: "Appendix in research/logs (Recommended)".
+
+### 2026-11-11 | execute | T2 built, reviewed and ticked (TASK-648)
+Pin `e29815a9`: `git diff --stat ec4ee660..e29815a9 -- scripts evals skills spec test` is empty. The coordinator ran the off-host gate there (`bun test` 618/0, QA-CHECK 509/0), then `QA_FULL=1 sh scripts/qa-check.sh` on the same VPS checkout, and handed the 683-line log to the builder as untracked input.
+Codex built the inventory in worktree `s172-t2` (about 464k tokens, then one retry of about 129k). Result: 103 rows (41 sections and blocks, 62 harnesses). 570 printed names and 236 source templates reconcile with zero gaps. Committed `8b58c573`.
+Review round 1, scoped Sonnet: no High; two Medium (consumer-guard flags inconsistent; G1447's basis weak) and two Low (fixture notes).
+The coordinator ruled the consumer-guard rule: yes only when the conformance engine runs the check, a shipped skill tells the adopter to run the script, or it is the README footer or manifest lockstep. A skill naming a checker only as the reader of a record is not a mechanism. The retry applied it to every row: 36 yes became 23.
+Placement: the doc reached 333 lines against its cap of 130 (soft), so the tables moved to `docs/research/logs/process-cost-census.md` by owner ruling (scope-change above); the decision doc is 99 lines.
+consequence · T2 · behaviour:low · governance:low
+review · T2 · scoped · behaviour:low · governance:low
+Reading: round 2 CLEAR, within the cap of 2. The reviewer's own matcher mapped 566 of 570 lines to exactly one row; the other 4 were its own placeholder misses, belonging to G1015.
+Census evidence for T4: my first scope-change draft above FAILed `--scope-change` only because its prose named a checker file declared on no task. Rewording fixed it, so it was a wording-only FAIL.

@@ -80,3 +80,4 @@ Most of SPRINT-171's 43 non-work commits come from these steps. The summary is w
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `docs/research/process-cost-census.md`, `docs/knowledge-index.md` | T1 | Census doc with the Baseline section: SPRINT-169 to 171 measured, the owner's median baseline recorded | low | scoped review re-measured; prose-density 1/0 |
+| `docs/research/logs/process-cost-census.md`, `docs/research/process-cost-census.md` | T2 | 103-row gate check inventory at pin `e29815a9` in the appendix; decision doc trimmed to 99 lines | low | 570 names and 236 templates reconciled; review CLEAR at round 2 |
