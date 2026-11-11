@@ -23,9 +23,9 @@ EPIC-025 D2: a check with no real defect in its history is cut, one with a real 
 
 ## Done when
 
-- [ ] Each row gets its FAIL count from the archived sprint logs and how many of those were real defects, each real defect citing its log entry. A history that cannot be read is `unknown`.
-- [ ] Each row gets a proposed keep, merge or cut per EPIC-025 D2. SPRINT-171's consequence-line FAILs are classed as real defects: T1 and T3 had no recorded completed review, and T5 was never reviewed, and its review then found a dropped screen-out rule.
-- [ ] Negative: no row proposed for a cut has a real defect or an `unknown` history, and no consumer guard is proposed for a cut.
+- [x] Each row gets its FAIL count from the archived sprint logs and how many of those were real defects, each real defect citing its log entry. A history that cannot be read is `unknown`. ✓ appendix § FAIL history: 103 rows, 1,800 dated log entries searched (124 logs + 46 embedded), each real defect cites its entry (188 headings verified); unreadable history = unknown; 13fc4285
+- [x] Each row gets a proposed keep, merge or cut per EPIC-025 D2. SPRINT-171's consequence-line FAILs are classed as real defects: T1 and T3 had no recorded completed review, and T5 was never reviewed, and its review then found a dropped screen-out rule. ✓ every row ruled per D2 (25/19/17/21/8/6/7 + 0 merge); SPRINT-171 consequence-line FAILs real under G0636 (T1/T3 no recorded review, T5 unreviewed, dropped screen-out rule); 13fc4285
+- [x] Negative: no row proposed for a cut has a real defect or an `unknown` history, and no consumer guard is proposed for a cut. ✓ negative predicate over the written table returns [] (cut AND real>0 / unknown / consumer yes / fixture of a kept check); coordinator recount agrees, 0 violations; 13fc4285
 
 ## Touches
 

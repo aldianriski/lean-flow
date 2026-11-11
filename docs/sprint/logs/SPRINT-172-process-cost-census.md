@@ -68,3 +68,14 @@ consequence · T2 · behaviour:low · governance:low
 review · T2 · scoped · behaviour:low · governance:low
 Reading: round 2 CLEAR, within the cap of 2. The reviewer's own matcher mapped 566 of 570 lines to exactly one row; the other 4 were its own placeholder misses, belonging to G1015.
 Census evidence for T4: my first scope-change draft above FAILed `--scope-change` only because its prose named a checker file declared on no task. Rewording fixed it, so it was a wording-only FAIL.
+
+### 2026-11-11 | execute | T3 built, reviewed and ticked (TASK-649)
+Codex classified all 103 rows in worktree `s172-t3` (about 465k tokens, then one retry of about 112k), searching 1,800 dated entries in 124 archived logs and 46 older sprint files. Committed `13fc4285`.
+First draft: 35 keep, 0 merge, 57 cut, 11 keep-unknown. The coordinator found 9 proposed cuts that were the must-FAIL fixtures of kept checks (H03, H07, H10, H16, H26, H32, H35, H38, H54); cutting them would break EPIC-025 condition 2.
+Review round 1, scoped Sonnet, found one High and three Medium. The High: G1015, G0947, G0708 and G1384 predate SPRINT-045, so the owner's history ruling makes them keep-unknown. The Medium: G1597 is borderline; 7 rows print no check; the negative command was not recorded.
+Coordinator rulings for the retry: a fixture harness takes its check's ruling; the history ruling applies by age; no-check rows are n/a; G1597 is cut (borderline, owner rules). The retry applied all of them, and the negative predicate returned [].
+Review round 2: CLEAR on round 1, plus two new items. The cap was reached, so the coordinator settled them. H52 is kept as the only test of the conformance summary line. H01, H02, H22, H45 and H46 become cut (borderline, owner rules): each is the only proof of a rule shipped skills state, which ADR-050's definition covers but its listed examples do not.
+Final: 25 keep · 19 keep (fixture) · 17 keep (unknown) · 21 cut · 8 cut (with) · 6 cut (borderline) · 7 n/a = 103. The coordinator's own recount agrees, with 0 violations. All 10 cut G rows were introduced at SPRINT-055 or later.
+consequence · T3 · behaviour:low · governance:low
+review · T3 · scoped · behaviour:low · governance:low
+Reading: two review rounds, within the cap of 2; one builder retry.
