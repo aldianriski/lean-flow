@@ -34,9 +34,9 @@ Ranges include the plan commit. Work subjects match `^sprint\(N\) T[0-9]+:|^fix\
 
 | Sprint | plan_commit | close_commit | Members | Total | Work | Non-work | Non-work/member | First-run close-gate FAILs |
 |---|---|---|---:|---:|---:|---:|---:|---|
-| 169 | e5219eef | 121b89a8 | 1 | 13 | 1 | 12 | 12.0 | 1 |
-| 170 | 25fa20ac | ed530d27 | 7 | 48 | 10 | 38 | 5.4 | 3 |
-| 171 | 18148168 | ea460465 | 7 | 59 | 16 | 43 | 6.1 | unknown under the approved timing rule; observed close-time reading 12 |
+| 169 | e5219eef (`Get-Content -Encoding UTF8 $file \| Select-Object -First 12`) | 121b89a8 (`Get-Content -Encoding UTF8 $file \| Select-Object -First 12`) | 1 (`$m`) | 13 (`$subjects.Count`) | 1 (`$work`) | 12 (`$nonWork`) | 12.0 (`'{0:F1}' -f ($nonWork/$m)`) | 1 (`Get-Content -Encoding UTF8 $log \| Select-Object -Skip 56 -First 22`) |
+| 170 | 25fa20ac (`Get-Content -Encoding UTF8 $file \| Select-Object -First 12`) | ed530d27 (`Get-Content -Encoding UTF8 $file \| Select-Object -First 12`) | 7 (`$m`) | 48 (`$subjects.Count`) | 10 (`$work`) | 38 (`$nonWork`) | 5.4 (`'{0:F1}' -f ($nonWork/$m)`) | 3 (`Get-Content -Encoding UTF8 $log \| Select-Object -Skip 552`) |
+| 171 | 18148168 (`Get-Content -Encoding UTF8 $file \| Select-Object -First 12`) | ea460465 (`Get-Content -Encoding UTF8 $file \| Select-Object -First 12`) | 7 (`$m`) | 59 (`$subjects.Count`) | 16 (`$work`) | 43 (`$nonWork`) | 6.1 (`'{0:F1}' -f ($nonWork/$m)`) | unknown under the approved timing rule; observed close-time reading 12 (`Get-Content -Encoding UTF8 $log \| Select-Object -Skip 215`) |
 
 ### Source reads and count commands
 
@@ -64,25 +64,8 @@ Cross-checks PASS: `1 + 12 = 13`, `10 + 38 = 48`, `16 + 43 = 59`; git's own ERE 
 
 ### Close-gate evidence and the SPRINT-171 mismatch
 
-The approved timing rule selects the first close-time system-verify or gate entry on the integrated tree after the last member reached `done/`. Trial, replay and control results are excluded. Read these excerpts alongside the tree queries:
-
-```powershell
-Get-Content -Encoding UTF8 docs/sprint/archive/logs/SPRINT-169-jev-as-a-cheap-ab-judge.md | Select-Object -Skip 56 -First 22
-Get-Content -Encoding UTF8 docs/sprint/archive/logs/SPRINT-170-agent-roles-rows-4b-to-9.md | Select-Object -Skip 552
-Get-Content -Encoding UTF8 docs/sprint/archive/logs/SPRINT-171-finish-epic-024.md | Select-Object -Skip 215
-git ls-tree -r --name-only 05c9fcbe -- docs/work/done | Select-String '/TASK-628-'
-git ls-tree -r --name-only 67d3e5cd -- docs/work/done | Select-String '/TASK-(632|638|633|634|635|636|637)-'
-git ls-tree -r --name-only da6c4dbd -- docs/work | Select-String '/TASK-(640|642|644|645|643|641|646)-'
-git ls-tree -r --name-only 8a695d27 -- docs/work | Select-String '/TASK-644-'
-git log --format='%h %s' --name-status '18148168^..ea460465' -- 'docs/work/*/TASK-644-*'
-```
-
-- **169:** the 2026-11-08 `surprise` entry names `05c9fcbe`, `QA-CHECK: 495 pass, 1 fail`. The sole member is in `done/` at that tree. The later `ceca166b` rerun is 496/0; `--close` is 4/0. First-run FAILs: **1**, a consequence-vocabulary record error.
-- **170:** the 2026-11-10 `close-time record fixes` entry names `67d3e5cd`, qa-check **491 pass, 3 fail**; all seven members are in `done/`. The later `c4a4a7a0` rerun is 493/0. The earlier 299/1 at log line 553 belongs to T6's control/seed trial and is excluded.
-- **171:** log line 217 states `da6c4dbd`, **504 pass, 12 fail**. Its tree contains six members in `done/` and TASK-644 in `review/`. TASK-644 is still in `review/` at the final system-verify tree `8a695d27` (509/1); its move to `done/` is `1a157d41`, after both runs.
-- The 171 close entry reports all seven in `done/` and `check-sprint-by-reference --close` **16 pass, 0 fail**, but no system-verify after that move. This narrower check does not establish the full close-gate metric. The approved post-`done/` FAIL count is **unknown**, not zero; selecting a different timing or gate scope requires a ruling.
-
-**Negative check:** 171's **59 total / 43 non-work** reproduce exactly, and **12 FAILs** reproduce as a logged close-time observation. The mismatch is eligibility: that run fails the approved post-`done/` condition. Neither the original 12 nor the missing qualifying result is silently replaced.
+The timing rule selects the first close-time integrated gate after the last member reached `done/`, excluding trials and controls. Set `$log = $file -replace 'archive/', 'archive/logs/'`; the table names each log-read command. [Full excerpts and tree queries](logs/process-cost-census.md#baseline-evidence-task-647) are in the appendix.
+SPRINT-171 has no qualifying full gate after TASK-644 moved from `review/` to `done/`: its post-`done/` **16 pass, 0 fail** is only `--close`, so that metric is **unknown**, not zero. **Re-measure:** 59 total / 43 non-work reproduce exactly; the logged 12 FAILs reproduce but precede that move. The owner accepted that timing exception below.
 
 ### Differences and PROPOSAL
 
@@ -94,22 +77,18 @@ Difference is `100 * abs(x - x171) / x171`; compare the unrounded fraction with 
 | 170 | 11.63% | no | 75.00% | yes, conditional |
 | 171 | 0.00% | no | 0.00% | no, conditional |
 
-```powershell
-100 * [math]::Abs(12/1 - 43/7) / (43/7) # 95.3488372093023
-100 * [math]::Abs(38/7 - 43/7) / (43/7) # 11.6279069767442
-100 * [math]::Abs(1 - 12) / 12 # 91.6666666666667, conditional
-100 * [math]::Abs(3 - 12) / 12 # 75, conditional
-$medianWork = ((12/1), (38/7), (43/7) | Sort-Object)[1]
-$medianWork # 6.14285714285714 = 43/7
-$medianWork / 2 # 3.07142857142857 = 43/14
-$medianFails = (1, 3, 12 | Sort-Object)[1] # conditional on accepting the observed 12
-$medianFails # 3
-$medianFails / 2 # 1.5
-```
+[Arithmetic commands](logs/process-cost-census.md#baseline-arithmetic) retain the exact percentage and median calculations.
+
 
 **PROPOSAL, not a ruling:** adopt the per-metric medians: **43/7 non-work commits/member** (6.1 displayed), half-target **43/14** (about 3.0714); and, only if the owner accepts 171's pre-`done/` close-time observation, **3 FAILs**, half-target **1.5 FAILs** (an integer result must be at most 1). Without that exception the three-sprint FAIL median remains unknown.
 **Owner ruling, 2026-11-11, by popup, verbatim:** "Median of three (Recommended)". The option read: "D4 as frozen: the median of each measure across the three sprints. Non-work 6.1 per member gives a target of at most 3.1, and FAILs 3 gives at most 1. Stricter on FAILs; SPRINT-171's run counts as its first close run."
 So the baseline is **43/7 non-work commits per member** (target: at most 43/14, about 3.07, per member) and **3 first-run close-gate FAILs** (target: at most 1). SPRINT-171's close-time 12 counts as its first run, with the timing exception visible above; SPRINT-169 stays in with its one-member warning.
+
+## Gate check inventory
+
+Pin: `e29815a9ad0cbd660fd80d3d2d9c827c4dd03215`, docs-only after `ec4ee660`; protected source trees are unchanged. **103 rows**: 41 gate blocks and 62 harnesses (52 always-on, 10 opt-in); all 37 headers and 21 checkpoints covered.
+**570 observed names**, **620 source expressions / 236 templates** reconcile: **0 unmapped, 0 double-mapped, 0 extra, 0 unseen-not-conditional**. Consumer guards: **23 yes / 80 no**, including the engine and manifest lockstep.
+The [measurement appendix](logs/process-cost-census.md#gate-check-inventory) holds all rows, fixtures, consumer evidence, reconciliation commands/results and helper rules. FAIL history and rulings await T3.
 
 ## Recommendation
 
