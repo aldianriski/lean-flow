@@ -35,3 +35,12 @@ Composition: 4 members, none `L`. Edges: T2 (TASK-648) on T1 (TASK-647), T3 (TAS
 Budget: no paid API call (D3).
 Baseline gate on `main` at `b564a7e7`, run off-host: `QA_FULL=1` via `bun --no-env-file scripts/gate-remote.ts`, exit 0: qa-check 503 pass, 0 fail; `bun test` 618 pass, 0 fail.
 G1 and G2 are not yet signed; `gates_signed` goes in the sprint frontmatter only after the owner's sign-off is relayed verbatim. All four tasks are `tier: P`.
+
+### 2026-11-11 | g1-g2 | G1 and G2 batch signed, T1 to T4
+Owner popup, verbatim: "Sign G1+G2, run it (Recommended)". G1 took the fast path for all four (`origin: decomposer`, scope unchanged since the intake approval; promote only stamped `sprint:`).
+G2: shared file `docs/research/process-cost-census.md`, owned in order T1, T2, T3, T4, each on the previous commit; the coordinator owns the Log, ticks, moves and the knowledge-index regeneration. Builder Codex in a worktree, one scoped Sonnet reviewer, cap 2 rounds (D2). No `Layers:` pruning.
+Residual grill, owner popup, verbatim: "Unknown, you rule (Recommended)". A check that existed before SPRINT-045 (no archived log covers its earlier history) with no real defect since is proposed `keep (unknown, owner rules)`; one added at SPRINT-045 or later with zero real defects is proposed `cut`.
+builder-check · T1 · 0 contradictions · 6 questions · all factual, settled in the design: first-run rule (first close-time gate on the sprint's own tree, trial arms excluded), |x-171|/171 per metric, per-metric median, members under 5 flagged, one pattern for both queries, Verdict line document-level
+builder-check · T2 · 2 contradictions · 6 questions · design fixed: every `# ---` section is a row (suffixed, duplicate labels by line number, retired, unnumbered); two independent enumerations (printed lines to templates; source templates seen or conditional); consumer guard = ADR-050 consequential; fixture search recorded; a non-empty diff blocks the pin
+builder-check · T3 · 3 contradictions · 5 questions · design fixed: Negative check reworded, unknown sits inside keep, counting unit stated, real defect defined as the artifact being wrong; one intent question ruled by the owner (history window, above)
+builder-check · T4 · 0 contradictions · 6 questions · all factual, settled: check-row columns kept identical with extras after, one row per step kind, all archived logs for entry types, each non-work commit attributed to one step so costs sum to T1's totals, Negative widened to spec and test
