@@ -88,7 +88,16 @@ So the baseline is **43/7 non-work commits per member** (target: at most 43/14, 
 
 Pin: `e29815a9ad0cbd660fd80d3d2d9c827c4dd03215`, docs-only after `ec4ee660`; protected source trees are unchanged. **103 rows**: 41 gate blocks and 62 harnesses (52 always-on, 10 opt-in); all 37 headers and 21 checkpoints covered.
 **570 observed names**, **620 source expressions / 236 templates** reconcile: **0 unmapped, 0 double-mapped, 0 extra, 0 unseen-not-conditional**. Consumer guards: **23 yes / 80 no**, including the engine and manifest lockstep.
-The [measurement appendix](logs/process-cost-census.md#gate-check-inventory) holds all rows, fixtures, consumer evidence, reconciliation commands/results and helper rules. FAIL history and rulings await T3.
+The [measurement appendix](logs/process-cost-census.md#gate-check-inventory) holds all rows, fixtures, consumer evidence, reconciliation commands/results and helper rules. [FAIL history and proposed rulings](logs/process-cost-census.md#fail-history-and-proposed-rulings-task-649) are recorded by T3.
+
+## FAIL history summary
+
+T3 proposes **25 keep / 19 keep (fixture) / 17 keep (unknown) / 21 cut / 8 cut (with) / 6 cut (borderline) / 7 n/a** across 103 rows (61 kept, 35 proposed cuts, 7 without a ruling); 0 merge.
+All 23 consumer guards stay. No check is changed.
+Fixture rulings follow their checks; pre-SPRINT-045 zero-defect checks stay unknown by the owner's age ruling, including those with embedded logs. The seven n/a rows print no check verdict and carry no ruling.
+H01, H02, H22, H45 and H46 are also **cut (borderline, owner rules)**: each is the only proof of a rule shipped skills state, and whether that makes it a consumer guard is for the owner (appendix, coordinator rulings). G1597 is **cut (borderline, owner rules)** for T4: SPRINT-102 claimed 2 ticks against 3 actual in a commit subject, a misstated record line rather than a wrong artifact.
+SPRINT-171's consequence-line failure is real: it exposed missing review records and an unreviewed T5 whose review found a dropped screen-out rule.
+The [appendix](logs/process-cost-census.md#fail-history-and-proposed-rulings-task-649) holds all row searches, introductions, fixture mapping, cited judgments and the empty negative check. These are judgment ticks; the coordinator reviews every cut before T4's ruling.
 
 ## Recommendation
 
