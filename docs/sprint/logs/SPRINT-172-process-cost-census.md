@@ -44,3 +44,11 @@ builder-check · T1 · 0 contradictions · 6 questions · all factual, settled i
 builder-check · T2 · 2 contradictions · 6 questions · design fixed: every `# ---` section is a row (suffixed, duplicate labels by line number, retired, unnumbered); two independent enumerations (printed lines to templates; source templates seen or conditional); consumer guard = ADR-050 consequential; fixture search recorded; a non-empty diff blocks the pin
 builder-check · T3 · 3 contradictions · 5 questions · design fixed: Negative check reworded, unknown sits inside keep, counting unit stated, real defect defined as the artifact being wrong; one intent question ruled by the owner (history window, above)
 builder-check · T4 · 0 contradictions · 6 questions · all factual, settled: check-row columns kept identical with extras after, one row per step kind, all archived logs for entry types, each non-work commit attributed to one step so costs sum to T1's totals, Negative widened to spec and test
+
+### 2026-11-11 | execute | T1 built, reviewed and ticked (TASK-647)
+Codex built `docs/research/process-cost-census.md` § Baseline in worktree `s172-t1` (one pass, about 113k tokens), uncommitted; the coordinator committed it as `6d6f36e2` with the knowledge index regenerated.
+Figures: SPRINT-169 13 total, 12 non-work, 1 member (12.0 per member, flagged under 5 members); SPRINT-170 48, 38, 7 (5.4); SPRINT-171 59, 43, 7 (6.1). First close-gate run FAILs: 1, 3, 12. SPRINT-169's non-work per member is 95.35% off SPRINT-171's, above one third.
+Blocker relayed by popup. Owner ruling, verbatim: "Median of three (Recommended)". The baseline is 43/7 non-work commits per member (target at most 43/14) and 3 FAILs (target at most 1); SPRINT-171's 12, run before TASK-644 reached `done/`, counts as its first close run.
+consequence · T1 · behaviour:low · governance:low
+review · T1 · scoped · behaviour:low · governance:low
+Reading: one scoped Sonnet reviewer, one round, CLEAR. It re-measured every figure in bash from the archived frontmatter and logs and found one Low (the branch name), which is moot: the worktree was created as branch `s172-t1`.

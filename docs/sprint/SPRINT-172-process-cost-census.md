@@ -79,3 +79,4 @@ Most of SPRINT-171's 43 non-work commits come from these steps. The summary is w
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/process-cost-census.md`, `docs/knowledge-index.md` | T1 | Census doc with the Baseline section: SPRINT-169 to 171 measured, the owner's median baseline recorded | low | scoped review re-measured; prose-density 1/0 |
