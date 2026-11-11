@@ -52,3 +52,8 @@ Blocker relayed by popup. Owner ruling, verbatim: "Median of three (Recommended)
 consequence · T1 · behaviour:low · governance:low
 review · T1 · scoped · behaviour:low · governance:low
 Reading: one scoped Sonnet reviewer, one round, CLEAR. It re-measured every figure in bash from the archived frontmatter and logs and found one Low (the branch name), which is moot: the worktree was created as branch `s172-t1`.
+
+### 2026-11-11 | scope-change | T2, T3 and T4: the census tables move to a research appendix
+What broke: T2's 103-row inventory made `docs/research/process-cost-census.md` 333 lines, over its §2 cap of 130 (soft, ADR-020), and the doc-caps leg reports it as OVER-CAP (soft). T3 and T4 add more columns and rows.
+Impact: the tables move to `docs/research/logs/process-cost-census.md`, the §2 home for a research question's measurement rounds. The decision doc keeps the question, the baseline summary and the verdict under 130 lines. T2, T3 and T4 each gain that appendix in `Layers:`; no Done-when changes, since each names "the census", not a file.
+Re-confirm G2: owner popup, verbatim: "Appendix in research/logs (Recommended)".

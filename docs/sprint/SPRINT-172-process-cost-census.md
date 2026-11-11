@@ -37,7 +37,7 @@ D4's targets are half of SPRINT-171's figures, so they are only as good as that 
 **Acceptance:** the census's Baseline section gives each sprint's figures with commands, and either keeps SPRINT-171 or carries the owner's median ruling.
 
 ### T2 — List every gate check at a pinned revision `[size: M · risk: low · class: execution · HITL · J1]`
-Layers: `docs/research/process-cost-census.md`
+Layers: `docs/research/process-cost-census.md` · `docs/research/logs/process-cost-census.md`
 Depends-on: T1
 Cites: TASK-648, `scripts/qa-check.sh`, `scripts/lib/`, `evals/` (all read only), `scripts/gate-remote.ts` (read only, run by path)
 Rows are per checker or harness, never per printed name; every printed name maps to exactly one row. The real gate run is the coordinator's, off-host.
@@ -45,7 +45,7 @@ Rows are per checker or harness, never per printed name; every printed name maps
 **Acceptance:** the names a real gate run prints and the names read from source each map to exactly one row, with zero missing and zero extra.
 
 ### T3 — Classify each check's FAIL history and propose a ruling `[size: M · risk: med · class: decision · HITL · J1]`
-Layers: `docs/research/process-cost-census.md`
+Layers: `docs/research/process-cost-census.md` · `docs/research/logs/process-cost-census.md`
 Depends-on: T2
 Cites: TASK-649, EPIC-025 D2, `docs/sprint/archive/logs/` (read only)
 The bar is EPIC-025 D2. Every real defect cites its log entry, and an unreadable history is `unknown`, never zero.
@@ -53,7 +53,7 @@ The bar is EPIC-025 D2. Every real defect cites its log entry, and an unreadable
 **Acceptance:** every check row carries its FAIL count, real defects with log evidence and a proposed ruling, and no proposed cut has a real defect or an unknown history.
 
 ### T4 — Census the skill-required record steps and summarise the rulings `[size: M · risk: low · class: execution · HITL · J1]`
-Layers: `docs/research/process-cost-census.md`
+Layers: `docs/research/process-cost-census.md` · `docs/research/logs/process-cost-census.md`
 Depends-on: T3
 Cites: TASK-650, `skills/orchestrator/`, `skills/lean-doc-generator/` (read only, the sprint-log template included), `docs/sprint/archive/logs/` (read only)
 Most of SPRINT-171's 43 non-work commits come from these steps. The summary is what the owner rules on before the cutting sprint.
