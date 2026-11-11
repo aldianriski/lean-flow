@@ -2,6 +2,7 @@
 id: TASK-650
 title: "Census the skill-required record steps and summarise the rulings for the owner"
 epic: EPIC-025
+sprint: SPRINT-172
 priority: P1
 size: M
 risk: low

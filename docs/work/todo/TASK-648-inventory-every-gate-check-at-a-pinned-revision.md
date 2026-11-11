@@ -2,6 +2,7 @@
 id: TASK-648
 title: "Inventory every gate check at a pinned revision with its fixture and consumer-guard flag"
 epic: EPIC-025
+sprint: SPRINT-172
 priority: P1
 size: M
 risk: low

@@ -2,6 +2,7 @@
 id: TASK-647
 title: "Measure SPRINT-169 and SPRINT-170 under EPIC-025 D4 and test the SPRINT-171 baseline"
 epic: EPIC-025
+sprint: SPRINT-172
 priority: P1
 size: S
 risk: low

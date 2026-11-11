@@ -2,6 +2,7 @@
 id: TASK-649
 title: "Classify each gate check's FAIL history and propose keep merge or cut"
 epic: EPIC-025
+sprint: SPRINT-172
 priority: P1
 size: M
 risk: med
