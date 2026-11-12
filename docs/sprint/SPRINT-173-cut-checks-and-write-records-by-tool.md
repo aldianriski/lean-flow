@@ -38,6 +38,7 @@ Layers: `scripts/qa-check.sh` · `scripts/lib/check-qa-budget-default.sh` · `sc
   `evals/run-prose-density-fixtures.ts` · `evals/run-qa-budget-default-fixtures.sh` · `evals/run-task-origin-fixtures.sh` · `evals/run-work-type-fixtures.sh` · `evals/run-research-archive-fixtures.sh` · `evals/run-approval-envelope-fixtures.sh` · `evals/run-handoff-state-fixtures.sh`
   `evals/fixtures/prose-density/` · `evals/fixtures/handoff-state/` · `evals/fixtures/research-archive/` · `evals/fixtures/task-origin/` · `evals/fixtures/work-type/` · `evals/fixtures/approval-envelope/` · `evals/README.md` · `evals/run-emitter-column-fixtures.ts` · `skills/lean-doc-generator/references/handoff-reconciliation.md` · `docs/QA.md`
   `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` · `evals/run-qa-budget-fixtures.sh`
+  `scripts/merge-check.ts` · `evals/merge-check.test.ts` · `skills/orchestrator/references/dispatch.md`
 Depends-on: none
 Cites: TASK-651, EPIC-025 D2 and D7, `docs/research/logs/process-cost-census.md` (read only), `check-prose-density.ts` (kept under `scripts/lib/`, read only)
 The census appendix names each row's script, harness and fixture. A script stays when a kept caller still imports it, so `check-prose-density.ts` stays and only G0268's leg goes.
@@ -112,7 +113,7 @@ A release is a Codex review of the shipped diff plus the off-host gate, never an
 
 ## Decisions (pre-locked)
 
-- **D1** — Shared files, one owner each in order: `scripts/qa-check.sh` T1 → T3 → T5, `evals/README.md` and `docs/QA.md` T1 → T5, and `skills/orchestrator/references/night-run.md` T1 → T6 (scope-change, 2026-11-12). Each later task builds on the earlier one's commit. T6 and T7 are disjoint. The coordinator owns the Log, ticks, moves, the epic and the knowledge index.
+- **D1** — Shared files, one owner each in order: `scripts/qa-check.sh` T1 → T3 → T5, `evals/README.md` and `docs/QA.md` T1 → T5, and `skills/orchestrator/references/night-run.md` and `dispatch.md` T1 → T6 (scope-changes, 2026-11-12). Each later task builds on the earlier one's commit. T6 and T7 are disjoint. The coordinator owns the Log, ticks, moves, the epic and the knowledge index.
 - **D2** — Codex builds each task in a worktree, a scoped Sonnet reviewer reviews, and the coordinator commits (memory ruling, 2026-11-02). At most two builders run at once while the host has about 1.5 GB free. Review cap: 2 rounds per task.
 - **D3** — Moves and ticks stay bare `sprint(173):` commits for this whole sprint. TASK-652's amendment ships with the release, so Sprint B is the first sprint under it, and the measuring sprint counts it.
 - **D4** — The only paid API call is T4's Jev run, capped at 1.00 USD (EPIC-025 D7). Push and tag are owner-reserved; T8 stops at the gate.

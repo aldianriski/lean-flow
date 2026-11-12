@@ -63,3 +63,8 @@ consequence · T2 · behaviour:material · governance:high
 review · T2 · scoped-reviewer · behaviour:material · governance:high
 Reading: one scoped Sonnet reviewer, one round, CLEAR; it re-ran `layers-observed.test.ts` (47 pass, 0 fail, 112 expects). Three Lows kept by coordinator ruling: other `Tn` subject shapes also get the own-file exemption, still bounded by `Cites:` and membership; the folder segment is any one directory; the ADR's SPRINT-173 carve-out restates D3.
 Ticked boxes 1, 2 and 4. Box 3 waits for the off-host full gate.
+
+### 2026-11-12 | scope-change | T1 (TASK-651): merge-check drops its prose-density leg with the gate's
+What broke: the off-host gate at `8fe2123a` (T1 committed) went red on one test. `evals/merge-check.test.ts` pins each of `scripts/merge-check.ts`'s legs to the gate's own block, and T1 cut the gate's prose-density leg (G0268). The workflow-command harness failed on the same test.
+Impact: T1 Layers gain `scripts/merge-check.ts`, `evals/merge-check.test.ts` and `skills/orchestrator/references/dispatch.md` (owned T1 → T6 through T3). merge-check runs four legs and keeps mirroring the gate; the cases that used prose-density as their example leg move to layers-completeness; dispatch.md says four legs. No Done-when changes.
+Re-confirm G2: owner popup, verbatim: "Drop it from merge-check too (Recommended)". Prose density is now a manual check (`scripts/lib/check-prose-density.ts` stays).
