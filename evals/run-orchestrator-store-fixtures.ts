@@ -496,8 +496,8 @@ const skill = (rel: string) => readFileSync(join(SKILLS, rel), "utf8").replace(/
 const CONTRACT: Record<string, string[]> = {
   "orchestrator/SKILL.md": [
     "**members by reference** (ADR-047)", "the `## Members` paths ∪ every `docs/work/*/TASK-*.md` stamped `sprint: SPRINT-NNN`",
-    "or not yet in `done/`/`cancel/`. No active sprint → halt", "tick the **member file's** `## Done when` box",
-    "each move in its own commit (ADR-045 D6)", "counted over the members' `## Done when` boxes",
+    "or not yet in `done/`/`cancel/`. No active sprint → halt", "run each Plan task's implement, review, tick, move and commit sequence in `references/dispatch.md` § Members by reference",
+    "From the release containing ADR-045's 2026-11-12 amendment, all of its moves and ticks ride in the task's own work commits", "counted over the members' `## Done when` boxes",
     "every member in `docs/work/done/` or `cancel/`", "`check-sprint-by-reference.ts <sprint> --close`",
     "never edit § Plan",
   ],
@@ -505,7 +505,7 @@ const CONTRACT: Record<string, string[]> = {
     "## Members by reference", "`TODO.md` is never read", "never\n   `logs/` or `archive/`",
     "resolved **by its TASK id**", "A unit (`### Tn`)\n   is **delivered** when every member its `Cites:` names has no open `## Done when` box",
     "names no current member (all scoped out) is not counted", "appending\n   ` ✓ <evidence>`",
-    "in **its own commit**, never\n   sharing one with a content edit", "**Coordinator-owned**",
+    "all of a task's moves and ticks ride in its own work commits from the release containing ADR-045's 2026-11-12 D6 amendment", "the coordinator ticks the member file's box", "**Coordinator-owned**",
     "Plain-git fallback", "the task's own content is read from\nthe member file its `Cites:` names",
     "dispatched agent never `git mv`s a task file or ticks a box", "find docs/work -name 'TASK-*.md'",
     "`.claude/worktrees/`\nare excluded by construction", "`DUPLICATE-ID`",
