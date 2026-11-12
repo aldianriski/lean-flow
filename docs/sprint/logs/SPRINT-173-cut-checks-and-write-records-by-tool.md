@@ -92,3 +92,10 @@ Ruling by the keep rule (EPIC-025 D7): dropped. The script is deleted at `de9b2d
 ### 2026-11-12 | progress | gate green after wave 1 (T1, T2, T4)
 Off-host QA_FULL at `de9b2d35`: `QA-CHECK: 247 pass, 0 fail`; `bun test` 621 pass, 0 fail. Earlier runs at `8fe2123a` and `694c4564` were red on merge-check's pinned prose-density leg, then on its case floor; both fixed under the scope-changes above.
 Ticked: TASK-651 5/5, TASK-652 4/4, TASK-654 4/4.
+
+### 2026-11-12 | execute | T3 built, reviewed and committed (TASK-653)
+Codex built `scripts/lib/record-line.ts` and its harness in worktree `s173-t3` (one pass, about 109k tokens). The coordinator applied the review fixes and committed it as `84e938d1`.
+consequence · T3 · behaviour:material · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:high
+Reading: one scoped Sonnet reviewer, one round. No High; the threat checks held (no default path, realpath containment, exact regex match, real replay). Fixed: the Medium, a default `--root` at the script's own repo (the plugin cache for a consumer), now `process.cwd()` as in `tick-box.ts`; two Lows, refusal cases now assert the `record-line: <field>:` prefix (or `tick-box:` for the delegated tick) and `Tn` refuses a leading zero. Kept: the `tick-box.ts` child spawn with `--no-env-file`.
+Gate: off-host QA_FULL at `84e938d1`: `QA-CHECK: 248 pass, 0 fail`; `bun test` 621 pass, 0 fail. Ticked TASK-653 4/4.
