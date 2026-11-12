@@ -23,10 +23,10 @@ EPIC-025 condition 4 and D3, owner ruling "One small task in Sprint A". Advisory
 
 ## Done when
 
-- [ ] A dry run (the default, as `scripts/jev-done-when.ts`) prints the cost estimate for the sample: past sprints' consequence lines plus SPRINT-171 T5. A `--run` needs a budget argument (at most 1.00 USD) and reads `jev_key` from the environment only.
-- [ ] One `--run` over that sample. Spend and the result (does Jev flag SPRINT-171 T5's owed review; does it ever downgrade a review) are recorded in the task's tick evidence and the sprint Log.
-- [ ] Keep or drop, recorded: kept means the script stays with a header "advisory beside check-review-depth, never a gate leg"; dropped means the script is deleted.
-- [ ] Negative: with `jev_key` unset or no budget, the script stops with a guard exit (2) before any call, printing "spend: 0 USD". No `.env` file is opened. The gate never invokes it.
+- [x] A dry run (the default, as `scripts/jev-done-when.ts`) prints the cost estimate for the sample: past sprints' consequence lines plus SPRINT-171 T5. A `--run` needs a budget argument (at most 1.00 USD) and reads `jev_key` from the environment only. ✓ dry run: 370 records in 75 logs, 280 material/high, estimate 39,715 tokens / 0.001668 USD; 8 records without Plan text excluded and counted
+- [x] One `--run` over that sample. Spend and the result (does Jev flag SPRINT-171 T5's owed review; does it ever downgrade a review) are recorded in the task's tick evidence and the sprint Log. ✓ one --run (budget 0.01): 362 judged, spend 0.005391 USD; T5 scored 0.65 (abstain, not flagged); 52 downgrades; review 48 / abstain 224 / self-review 90
+- [x] Keep or drop, recorded: kept means the script stays with a header "advisory beside check-review-depth, never a gate leg"; dropped means the script is deleted. ✓ dropped: T5 not flagged and 52 downgrades, so scripts/jev-consequence.ts deleted (de9b2d35)
+- [x] Negative: with `jev_key` unset or no budget, the script stops with a guard exit (2) before any call, printing "spend: 0 USD". No `.env` file is opened. The gate never invokes it. ✓ no key and no budget each exit 2 printing 'spend: 0 USD (no call made)'; the script never opened .env; qa-check.sh never named it
 
 ## Touches
 

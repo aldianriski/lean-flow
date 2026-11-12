@@ -73,3 +73,22 @@ Re-confirm G2: owner popup, verbatim: "Drop it from merge-check too (Recommended
 What broke: the gate rerun at `694c4564` is red on one leg: `evals/run-workflow-command-fixtures.ts` holds a live-case floor of 24 for `evals/merge-check.test.ts`, and dropping the prose-density leg removed two cases (its red row and its wiring row), leaving 22. `bun test` is green (621 pass, 0 fail).
 Impact: T1 Layers gain `evals/run-workflow-command-fixtures.ts` (also T5's, which deletes it; owned T1 → T5). The floor moves to 22 with the reason in a comment. No Done-when changes.
 Re-confirm G2: not needed; this follows the owner's ruling "Drop it from merge-check too (Recommended)", whose removed cases the floor counted.
+
+### 2026-11-12 | execute | T1 built, reviewed and committed (TASK-651)
+Codex built it in worktree `s173-t1` (one pass, about 125k tokens): 9 legs and 7 harnesses out, 6 scripts and 120 fixture files deleted. The coordinator committed it as `8fe2123a`, then two gate follow-ups under scope-changes: `694c4564` (merge-check four legs) and `606a7ec1` (its live-case floor 24 → 22).
+consequence · T1 · behaviour:low · governance:high
+review · T1 · scoped-reviewer · behaviour:low · governance:high
+Reading: one scoped Sonnet reviewer, one round. No High. One Medium fixed by the coordinator: the night-run reference and `night-run.sh` still implied a checker names the missing envelope dimension; both reworded. One Low fixed: a `sprint-members.ts` comment still named `check-task-origin`. The emitter-column control repoint was judged not vacuous.
+Census: query A, the pre-cut log (`f7c152af`, 538 names) against the green log: only cut-row names vanish (120 task-origin, 120 work-type, 27 prose-density, 4 research-archive, 2 handoff-state, 1 qa-budget-default, 1 archive-predicate, 7 harness lines) plus count drift. Query B, the registry diff: exactly the 7 harnesses.
+Negative: throwaway commit `71c2f8e6` re-adding `run-task-origin-fixtures.sh` made the gate FAIL `eval harness run-task-origin-fixtures.sh: script not found at evals/run-task-origin-fixtures.sh`; the worktree and branch were deleted.
+
+### 2026-11-12 | execute | T4 built, run once and dropped (TASK-654)
+Codex built `scripts/jev-consequence.ts` in worktree `s173-t4` (about 79k tokens). The coordinator excluded the 8 records whose sprint Plan has no matching block (SPRINT-091 and 103 `T0`), counted rather than judged, and committed it as `c2385c74`.
+consequence · T4 · behaviour:low · governance:low
+review · T4 · self-review · behaviour:low · governance:low
+Paid run, once, `--budget-usd 0.01`: 362 judged, spend 0.005391204 USD (reported input usage). SPRINT-171 T5 scored 0.65, an abstain, so it was not flagged; 52 material or governance-high records scored at or below 0.3. Verdicts: review 48, abstain 224, self-review 90.
+Ruling by the keep rule (EPIC-025 D7): dropped. The script is deleted at `de9b2d35`; Jev stays out of review classification. Total Jev spend for EPIC-025: 0.0054 USD.
+
+### 2026-11-12 | progress | gate green after wave 1 (T1, T2, T4)
+Off-host QA_FULL at `de9b2d35`: `QA-CHECK: 247 pass, 0 fail`; `bun test` 621 pass, 0 fail. Earlier runs at `8fe2123a` and `694c4564` were red on merge-check's pinned prose-density leg, then on its case floor; both fixed under the scope-changes above.
+Ticked: TASK-651 5/5, TASK-652 4/4, TASK-654 4/4.
