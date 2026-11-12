@@ -38,7 +38,7 @@ Layers: `scripts/qa-check.sh` · `scripts/lib/check-qa-budget-default.sh` · `sc
   `evals/run-prose-density-fixtures.ts` · `evals/run-qa-budget-default-fixtures.sh` · `evals/run-task-origin-fixtures.sh` · `evals/run-work-type-fixtures.sh` · `evals/run-research-archive-fixtures.sh` · `evals/run-approval-envelope-fixtures.sh` · `evals/run-handoff-state-fixtures.sh`
   `evals/fixtures/prose-density/` · `evals/fixtures/handoff-state/` · `evals/fixtures/research-archive/` · `evals/fixtures/task-origin/` · `evals/fixtures/work-type/` · `evals/fixtures/approval-envelope/` · `evals/README.md` · `evals/run-emitter-column-fixtures.ts` · `skills/lean-doc-generator/references/handoff-reconciliation.md` · `docs/QA.md`
   `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` · `evals/run-qa-budget-fixtures.sh`
-  `scripts/merge-check.ts` · `evals/merge-check.test.ts` · `skills/orchestrator/references/dispatch.md`
+  `scripts/merge-check.ts` · `evals/merge-check.test.ts` · `skills/orchestrator/references/dispatch.md` · `evals/run-workflow-command-fixtures.ts`
 Depends-on: none
 Cites: TASK-651, EPIC-025 D2 and D7, `docs/research/logs/process-cost-census.md` (read only), `check-prose-density.ts` (kept under `scripts/lib/`, read only)
 The census appendix names each row's script, harness and fixture. A script stays when a kept caller still imports it, so `check-prose-density.ts` stays and only G0268's leg goes.

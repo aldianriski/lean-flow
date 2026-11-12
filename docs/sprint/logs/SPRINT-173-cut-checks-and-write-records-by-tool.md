@@ -68,3 +68,8 @@ Ticked boxes 1, 2 and 4. Box 3 waits for the off-host full gate.
 What broke: the off-host gate at `8fe2123a` (T1 committed) went red on one test. `evals/merge-check.test.ts` pins each of `scripts/merge-check.ts`'s legs to the gate's own block, and T1 cut the gate's prose-density leg (G0268). The workflow-command harness failed on the same test.
 Impact: T1 Layers gain `scripts/merge-check.ts`, `evals/merge-check.test.ts` and `skills/orchestrator/references/dispatch.md` (owned T1 → T6 through T3). merge-check runs four legs and keeps mirroring the gate; the cases that used prose-density as their example leg move to layers-completeness; dispatch.md says four legs. No Done-when changes.
 Re-confirm G2: owner popup, verbatim: "Drop it from merge-check too (Recommended)". Prose density is now a manual check (`scripts/lib/check-prose-density.ts` stays).
+
+### 2026-11-12 | scope-change | T1 (TASK-651): the workflow-command harness's merge-check floor follows the four legs
+What broke: the gate rerun at `694c4564` is red on one leg: `evals/run-workflow-command-fixtures.ts` holds a live-case floor of 24 for `evals/merge-check.test.ts`, and dropping the prose-density leg removed two cases (its red row and its wiring row), leaving 22. `bun test` is green (621 pass, 0 fail).
+Impact: T1 Layers gain `evals/run-workflow-command-fixtures.ts` (also T5's, which deletes it; owned T1 → T5). The floor moves to 22 with the reason in a comment. No Done-when changes.
+Re-confirm G2: not needed; this follows the owner's ruling "Drop it from merge-check too (Recommended)", whose removed cases the floor counted.
