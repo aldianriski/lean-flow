@@ -226,7 +226,7 @@ const STEP_WIRING: Record<string, string[]> = {
   "task-decomposer": ["7. **Write** — after the layout check above (v1/mixed stops here)"],
   "lean-doc-generator": [
     "**Layout check gates entry (v1/mixed stops here, § above).** **Governance review first**",
-    "**Layout check gates entry (v1/mixed stops here, § above).** Verify every member",
+    "**Layout check gates entry (v1/mixed stops here, § above).** Follow `references/sprint-by-reference.md` § Close by reference",
   ],
   // Wired the same way this revise round, though not named in the MED finding's 3:
   prime: ["count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check)."],
