@@ -139,3 +139,12 @@ Ticked: TASK-655 3/3, TASK-656 4/4, TASK-657 4/4. Seven of eight members are com
 What broke: the Codex review of the shipped diff since `6444f83e` found two Mediums. `spec/STANDARD.md` §2's work-item row still says a status move is a `git mv` in its own commit, contradicting ADR-045's amendment and the shipped orchestrator text. And `record-line.ts` resolves a symlinked task file to its target, so `move TASK-904` could move TASK-903.
 Impact: T8 Layers gain `spec/STANDARD.md`, `spec/CHANGELOG.md`, `scripts/lib/record-line.ts` and `evals/run-record-line-fixtures.ts`. The standard's row follows ADR-045's amendment, and the spec goes 0.20.0 → 0.21.0 (§15 MINOR: a rule's meaning moves on paper, and no conformance check reads it, so no verdict moves). The writer refuses a symlinked task file, with a must-FAIL case. No Done-when changes.
 Re-confirm G2: not needed; both fixes bring shipped text and the tool in line with rulings the owner already made (R14 via ADR-045, and the writer's refusal contract).
+
+### 2026-11-12 | execute | T8 release v2.23.0 prepared, reviewed and gated, not pushed (TASK-658)
+Owner popup, verbatim: "Prepare 2.23.0 now (Recommended)". The coordinator prepared it inline (mechanical version and CHANGELOG edits) at `3d89ce8a`: four manifests and the README footer 2.22.0 → 2.23.0, skills badge 15 → 16, v2.21.x rotated to `docs/changelog/CHANGELOG-2.21.0.md`.
+consequence · T8 · behaviour:material · governance:high
+review · T8 · scoped-reviewer · behaviour:material · governance:high
+Codex review of the shipped surface since `6444f83e`, round 1: two Mediums, fixed at `9771b4de` under the scope-change above. `spec/STANDARD.md` §2 follows ADR-045's amended D6 (spec 0.21.0, §15 MINOR); record-line refuses a symlinked task file.
+Round 2: both fixed and the bump follows §15; one Low (the fixture's symlink target was untracked, so the old code also refused the move) fixed at `90493f46`.
+Seed on the Linux gate host: with both task-identity guards removed, the move case FAILs (`moved TASK-904 to docs/work/done/`); restored, `git hash-object` equals HEAD's `d07871ce`.
+Gate: off-host QA_FULL at `90493f46`: `QA-CHECK: 236 pass, 0 fail`; `bun test` 621 pass, 0 fail; manifest lockstep and its must-FAIL harness PASS. Not pushed and not tagged: main is 366 ahead of origin, no tag at HEAD. Ticked TASK-658 4/4.
