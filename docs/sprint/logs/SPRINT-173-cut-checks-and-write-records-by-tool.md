@@ -99,3 +99,27 @@ consequence · T3 · behaviour:material · governance:high
 review · T3 · scoped-reviewer · behaviour:material · governance:high
 Reading: one scoped Sonnet reviewer, one round. No High; the threat checks held (no default path, realpath containment, exact regex match, real replay). Fixed: the Medium, a default `--root` at the script's own repo (the plugin cache for a consumer), now `process.cwd()` as in `tick-box.ts`; two Lows, refusal cases now assert the `record-line: <field>:` prefix (or `tick-box:` for the delegated tick) and `Tn` refuses a leading zero. Kept: the `tick-box.ts` child spawn with `--no-env-file`.
 Gate: off-host QA_FULL at `84e938d1`: `QA-CHECK: 248 pass, 0 fail`; `bun test` 621 pass, 0 fail. Ticked TASK-653 4/4.
+
+### 2026-11-12 | execute | T7 built, reviewed twice and committed (TASK-657)
+Codex built it in worktree `s173-t7` (about 97k tokens), then one bounded retry (about 65k). The coordinator committed it as `50eacdc1`.
+consequence · T7 · behaviour:material · governance:high
+review · T7 · scoped-reviewer · behaviour:material · governance:high
+Round 1: one High. The first pass redefined `close_commit` as the commit the close gate ran on, but `scripts/lib/conformance-engine.sh` S10.FOURBUCKETS reads `close_commit` and needs that commit to carry the routed buckets. Plus one Medium (the standard never stated the new meaning) and one Low (consumer wording).
+G2 correction: the G2 popup told the owner that no check depends on what `close_commit` names. That was wrong: the grep behind it was cut at 12 lines and missed the engine.
+Owner popup, verbatim: "Pin in the archive commit (Recommended)". `close_commit` keeps naming the close commit; it and the epic row's sha go in the archive commit close already makes, or a follow-up commit right away when archival is not approved in the same pass.
+Retry: that ruling, the SKILL.md table row back under 400 characters (SKILL.md 140 lines, lines over 400 down from 10 to 8), consumer wording, and the template reduced to one pointer. The coordinator added: a parked retention never leaves the pin waiting, and the pin commit follows the close commit before any gate run.
+Round 2: no High; every `close_commit` reader in `scripts/` (S10.FOURBUCKETS, S11.WHENITRUNS, check-epic-archive) is satisfied. Two Lows kept: SKILL.md's unattended line does not repeat the pin rule (no room under the cap; the reference states it), and `SPRINT.md.template`'s "set at close" sits outside T7's Layers and still holds for the close pass.
+
+### 2026-11-12 | execute | T5 built, reviewed and committed (TASK-655)
+Codex built it in worktree `s173-t5` (one pass, about 116k tokens): 12 harnesses and 58 fixture files deleted, comment sites reworded. The coordinator committed it as `ad7833cc`.
+consequence · T5 · behaviour:low · governance:high
+review · T5 · scoped-reviewer · behaviour:low · governance:high
+Reading: one scoped Sonnet reviewer, one round, CLEAR on the qa-check.sh hunks, the comment-only edits to kept files and dangling reads. One Medium noted, not fixed (owner-approved cut): `run-workflow-command-fixtures.ts` held live-case floors for `evals/gate-remote.test.ts` (38) and `evals/merge-check.test.ts` (22).
+Without it, a vanished or emptied file among those two passes the gate's `bun test` stage. Raised at close; adding a floor elsewhere would be new machinery under ADR-053.
+The record-line harness's wrong-box tick case still passes on T5's tree (93 pass, 0 fail).
+
+### 2026-11-12 | scope-change | T6 and T7 (TASK-656, TASK-657): two text-contract harnesses follow the merged skill text
+What broke: the off-host gate at `1dea19a9` (T5 to T7 committed) is red on two kept text-contract harnesses. `evals/run-orchestrator-store-fixtures.ts` pins the old D6 phrases ("each move in its own commit", "in **its own commit**, never sharing one with a content edit") and the member-file tick phrase, which T6 moved to `dispatch.md` rule 5.
+`evals/run-layout-fixtures.ts` pins the close row's "Verify every member" after the layout check; T7 moved that step into `sprint-by-reference.md`, and the row now reads "Follow `references/sprint-by-reference.md` § Close by reference".
+Impact: T6 Layers gain `evals/run-orchestrator-store-fixtures.ts`; T7 Layers gain `evals/run-layout-fixtures.ts`. Each contract string moves to the approved new text where it now lives; no contract is dropped, and the layout check is still wired to the executed close step. No Done-when changes.
+Re-confirm G2: not needed; the new text is what the owner approved (R14 via ADR-045's amendment, and the T7 merges).

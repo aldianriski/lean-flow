@@ -83,6 +83,7 @@ H50 goes only because T3's `tick` fixture replaces it. A fixture directory is de
 
 ### T6 — Merge 8 record steps in the orchestrator skill `[size: M · risk: med · class: execution · AFK · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/references/builder-check.md` · `skills/orchestrator/references/night-run.md`
+  `evals/run-orchestrator-store-fixtures.ts`
 Depends-on: T2, T3
 Cites: TASK-656, `references/dispatch.md` (the Done-when's short name for the Layers file), EPIC-025 D7, `docs/research/logs/process-cost-census.md` (R02, R06, R14, R19, R21, R27, R37, R64; read only)
 A merge keeps every record's content; only its separate step or commit goes. The writer is named as "lean-flow's own:", so consumers keep a self-contained procedure.
@@ -91,6 +92,7 @@ A merge keeps every record's content; only its separate step or commit goes. The
 
 ### T7 — Merge 5 record steps in the lean-doc-generator skill `[size: S · risk: med · class: execution · AFK · J1]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/sprint-by-reference.md` · `skills/lean-doc-generator/templates/sprint-log.md.template`
+  `evals/run-layout-fixtures.ts`
 Depends-on: T2, T3
 Cites: TASK-657, `references/sprint-by-reference.md` and `templates/sprint-log.md.template` (the Layers files under `skills/lean-doc-generator/`), EPIC-025 D7, `docs/research/logs/process-cost-census.md` (R03, R08, R16, R45, R51; read only)
 R45 and R51 are where most close-time bookkeeping commits come from. The freeze and the close pin stay.
