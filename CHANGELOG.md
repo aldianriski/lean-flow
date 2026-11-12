@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **Added (maintainer-only)** — `docs/research/process-cost-census.md` and its appendix list every gate check and every skill-required record step with its FAIL history, real defects and a proposed keep, merge or cut, for EPIC-025's owner rulings. Nothing is cut yet (SPRINT-172).
 - **Removed (maintainer-only)** — the A/B measurement system: `evals/ab/` (harness, arms, judges, task corpus) and `scripts/jev-ab-judge.ts`, with their config entries. Releases ship on a Codex review of the shipped change plus the repo gate, as 2.21.0 and 2.22.0 did; EPIC-023 D19's pre-release arm is retired. TASK-631 is cancelled; seven A/B-only TD rows close. Measurement logs stay in `docs/research/logs/` as records.
 ## v2.22.0 — workers do the reading, briefed and resumable, and `/diagram` ties every arrow to a source line (2026-11-11)
 

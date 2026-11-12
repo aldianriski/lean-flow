@@ -3,8 +3,8 @@ sprint: 172
 slug: process-cost-census
 epic: EPIC-025
 owner: Maintainer
-last_updated: 2026-11-11
-status: active
+last_updated: 2026-11-12
+status: closed
 plan_commit: abb3297d
 gates_signed: G1,G2 @ 7b0205cc
 update_trigger: sprint execute/close events
@@ -83,3 +83,31 @@ Most of SPRINT-171's 43 non-work commits come from these steps. The summary is w
 | `docs/research/logs/process-cost-census.md`, `docs/research/process-cost-census.md` | T2 | 103-row gate check inventory at pin `e29815a9` in the appendix; decision doc trimmed to 99 lines | low | 570 names and 236 templates reconciled; review CLEAR at round 2 |
 | `docs/research/logs/process-cost-census.md`, `docs/research/process-cost-census.md` | T3 | FAIL history, real defects and a proposed ruling for all 103 rows; 35 proposed cuts, 6 of them borderline for the owner | med | negative predicate []; coordinator recount 0 violations; 2 review rounds |
 | `docs/research/logs/process-cost-census.md`, `docs/research/process-cost-census.md` | T4 | Record-step census (64 kinds) and the owner packet; verdict filled, no cut made | low | 48 entry types and 12/38/43 commits reconciled; review CLEAR at round 2 |
+
+## Retro
+
+**Verdict.** The census is built and nothing is cut. All 103 gate check rows and 64 record-step kinds carry FAILs, real defects, fixtures and a proposed ruling, reconciled by identity. EPIC-025's Closed-when #1 is met; the owner's rulings on the T4 packet open the next slice.
+- Checks: 25 keep · 19 keep (fixture) · 17 keep (unknown) · 21 cut · 8 cut (with) · 6 cut (borderline) · 7 n/a. Records: 7 keep · 44 keep (unknown) · 13 merge · 0 cut.
+- Baseline (T1, owner ruling "Median of three"): 43/7 non-work commits per member, target at most 43/14; 3 first-run close FAILs, target at most 1.
+
+**Owner load.** Seven recorded answers, all on the recommended option: three at promote, two at G1/G2 (the sign-off and the history window), one each for the T1 baseline and the T2 placement. Two more at close (archive, no release).
+
+**Cost.** No paid API call (D3). Shape: coordinator plus one Codex builder per task and one scoped Sonnet reviewer. Codex used about 1.5M tokens: T1 113k, T2 464k + 129k retry, T3 465k + 112k retry, T4 223k. Reviews: T2 and T3 two rounds each, T1 and T4 one and two.
+
+**System verify.** The first close gate at `552a551f`, off-host: `bun test` 618/0 and `QA-CHECK: 509 pass, 0 fail`. First-run close FAILs: 0. Through that commit the sprint made 16 non-work commits for 4 members (4.0 per member, before the close commits). This is not D4's measuring sprint (five or more members, after the cuts) and claims nothing toward it.
+
+**Retrieval check.** Yes, L-049 missed. Claude Code's low-memory reaper stopped T4's Codex process, and I first reported the run lost with the census unchanged. The output file already ended `ready`, with the work on disk. Reading it found the run complete and no rerun was spent.
+
+**Worked**
+- The coordinator recounted each census with its own parser before review: T3's 9 proposed cuts of must-FAIL fixtures came from that, not from the builder or the reviewer.
+- Each scoped reviewer re-derived its population independently (T4: the 48 archived entry types by `comm`, 0 missing and 0 extra; commit sums 12/38/43).
+- The appendix split (owner ruling) kept the decision doc at 113 of its 130-line cap while the tables grew to about 2,600 lines.
+
+**Friction**
+- Rules the builder could not derive from the task were settled at review instead of G2: the consumer-guard rule (T2), fixture coupling and the history window by age (T3), and R09's evidence source (T4). Each cost a retry or a coordinator ruling.
+- A scope-change entry FAILed only because its prose named a checker file declared on no task; rewording fixed it. Recorded as census evidence for the writers slice.
+- Host memory: T4's Codex process was reaped at about 1.5 GB free of 13.7 GB, after it had finished (TD-309 holds the memory-starved timeouts).
+
+**Pattern candidate**
+- L-314: a census row's ruling must say whose evidence it rests on. T3 judged fixtures on their own history and T4 judged a record on its check's history, opposite errors of the same kind.
+- L-049 sighting (already promoted): a killed worker's output file, not the kill notice, is the signal.

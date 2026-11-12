@@ -2,7 +2,7 @@
 epic: 025
 slug: half-the-bookkeeping
 owner: Maintainer
-last_updated: 2026-11-11
+last_updated: 2026-11-12
 status: active
 member_sprints: [SPRINT-172]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -50,7 +50,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-172](../sprint/SPRINT-172-process-cost-census.md) | Census every check and record step | active | filled at close |
+| [SPRINT-172](../sprint/SPRINT-172-process-cost-census.md) | Census every check and record step | closed | The evidence for every cut: 103 check rows and 64 record steps, each with its FAIL history, real defects and a proposed ruling; the median baseline 43/7 and 3 FAILs; and the owner packet for the next slice. Nothing cut. |
 
 ## Decisions
 - **D1** — Owner rulings, 2026-11-11, by popup. Slim and optimize, without reducing quality: "both, not only slim, but optimize, dont reduce quality". Slim now, before the workdoo work: "Slim now, before workdoo". The scope covers both shipped skills and lean-flow's own checks.
@@ -69,8 +69,8 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 - **Which Jev question type and sample?** → Fixed in the trial sprint's G2: Noul per question, the 0.7/0.3 thresholds, past sprints' consequence lines as the sample, and the 5 USD cap shared with every Jev spend so far.
 
 ## Closed when
-- [ ] `docs/research/process-cost-census.md` holds one row per check and per skill-required record step, taken at a pinned revision before any cut.
-  Each row has its FAILs, real defects, fixture and ruling, and an unreadable history is recorded as unknown. The population is reconciled by identity, not by count: every PASS/FAIL check name `qa-check.sh` prints at that revision, every harness in leg 12 and every leg without a checkpoint has its row. → TASK-648, TASK-649, TASK-650
+- [x] `docs/research/process-cost-census.md` holds one row per check and per skill-required record step, taken at a pinned revision before any cut.
+  Each row has its FAILs, real defects, fixture and ruling, and an unreadable history is recorded as unknown. The population is reconciled by identity, not by count: every PASS/FAIL check name `qa-check.sh` prints at that revision, every harness in leg 12 and every leg without a checkpoint has its row. → TASK-648, TASK-649, TASK-650 · closed by SPRINT-172
 - [ ] Every cut has zero real defects in the census, and nothing marked unknown is cut without a recorded owner ruling. Every check with one or more still runs, and its must-FAIL fixture still fails with its named finding. Manifest lockstep and the conformance engine still run. → next slice: cuts and skill edits
 - [ ] Every record line a gate check parses is written by a tool. A fixture replays the census's real-defect cases (SPRINT-171 T5 among them) through the writer and then the gate, and the gate still demands the review. Given a missing or ambiguous input, the writer refuses and never writes a default. → next slice: record writers
 - [ ] The Jev trial's result and spend are recorded. Jev is either kept as advisory beside `check-review-depth.sh` or dropped, and it is never a gate leg. → next slice: Jev trial

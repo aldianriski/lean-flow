@@ -88,3 +88,14 @@ Final record rulings: 7 keep · 44 keep (unknown) · 13 merge · 0 cut = 64. Own
 consequence · T4 · behaviour:low · governance:low
 review · T4 · scoped · behaviour:low · governance:low
 Reading: round 2 CLEAR, within the cap of 2; no builder retry.
+
+### 2026-11-12 | system-verify | close gate on the integrated tree
+Off-host at `552a551f` via `scripts/gate-remote.ts` (QA_FULL): `bun test` 618 pass, 0 fail; `QA-CHECK: 509 pass, 0 fail`. First run, no FAIL to repair. `check-sprint-by-reference.ts --close` 10 pass, 0 fail. The T4 worktree was removed after `git hash-object` matched both files to `83b54141`.
+
+### 2026-11-12 | close | Retro written, buckets routed, retention applied
+- Handoff reconciliation: swept the whole Log; no `handoff` entry exists, so nothing is `live` or `consumed`.
+- Members: all 4 in `done/`; 14 of 14 DoD ticked (TASK-647 5, TASK-648 to 650 3 each).
+- Retro in the sprint file. Filed: L-314 and an L-049 sighting; one `[Unreleased]` line. TD: none (TD-309 already holds the host-memory timeouts). Follow-ups: none; EPIC-025 conditions 2 to 6 stay on `next slice:` marks, and the owner's rulings on the T4 packet are that slice's intake.
+- Close pass, owner popup, verbatim: "Approve archive (Recommended)": the sprint and its log to `docs/sprint/archive/` with an INDEX line, and EPIC-025 stays active. Release, verbatim: "No release now (Recommended)".
+- EPIC-025 rollup: the SPRINT-172 row completed; Closed-when #1 ticked, closed by SPRINT-172 (TASK-648 to 650). Conditions 2 to 6 stay open, so the epic stays active.
+- Doc freshness: only the two census docs changed; the knowledge index was regenerated with each. No §2 trigger fired.

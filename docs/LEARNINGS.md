@@ -127,6 +127,15 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-314 [tags: process] [status: active]: **Before a census row is ruled, state whose evidence it is judged on; a fixture takes its check's ruling, and a record step has its own history, never the history of the check that reads it.**
+SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixtures on their own FAIL history and proposed cutting them, though their checks were kept. T4 proposed cutting R09, the handoff-status stub, on G0297's check history, though close step 1 reads the stub. The coordinator's recount caught the first and the scoped review the second.
+- seen: 2026-11-11 (SPRINT-172 T3), 2026-11-12 (SPRINT-172 T4)
+- count: 1
+- promoted: no
+- related: L-049 · EPIC-025 D2 · `docs/research/logs/process-cost-census.md`
+
+---
+
 ## L-313 [tags: sprint-model] [status: active]: **A fix made while another task's run is open still belongs to the task that owns its path, so commit it as `sprint(N) Tn:` for that task.** In SPRINT-171, the `agent-cost.ts` fix came up during T6 and went in as `fix(trials): …`. `layers observed` reads only a commit's own subject and `Task:` trailer, so no later record could attribute it, and close took a FAIL under an owner ruling.
 - seen: 2026-11-10 (SPRINT-171 close gate, `7407e49c`)
 - count: 1
@@ -1934,7 +1943,8 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 ---
 
 ## L-049 [tags: process] [status: promoted]: in a fan-out the per-unit output FILE is the success signal — a killed subagent can report failure over valid work already on disk.
-- **L-049 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c), fan-out leg** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; part of the 5-entry cluster (4 sprints). Related surface: dispatch.md § Merge-back queue · night-run.md per-task commit checkpoint.
+- **L-049 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c), fan-out leg** — the durable rule is the record now (§11 collapse, SPRINT-047 promote).
+- sighting 2026-11-12 (SPRINT-172 T4): the low-memory reaper's kill notice was first read as a lost Codex run; its output file already ended `ready` with the census on disk. Body: git; part of the 5-entry cluster (4 sprints). Related surface: dispatch.md § Merge-back queue · night-run.md per-task commit checkpoint.
 
 ---
 
