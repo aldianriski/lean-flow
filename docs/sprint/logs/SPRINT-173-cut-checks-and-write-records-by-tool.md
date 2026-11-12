@@ -123,3 +123,14 @@ What broke: the off-host gate at `1dea19a9` (T5 to T7 committed) is red on two k
 `evals/run-layout-fixtures.ts` pins the close row's "Verify every member" after the layout check; T7 moved that step into `sprint-by-reference.md`, and the row now reads "Follow `references/sprint-by-reference.md` § Close by reference".
 Impact: T6 Layers gain `evals/run-orchestrator-store-fixtures.ts`; T7 Layers gain `evals/run-layout-fixtures.ts`. Each contract string moves to the approved new text where it now lives; no contract is dropped, and the layout check is still wired to the executed close step. No Done-when changes.
 Re-confirm G2: not needed; the new text is what the owner approved (R14 via ADR-045's amendment, and the T7 merges).
+
+### 2026-11-12 | execute | T6 built, reviewed and committed (TASK-656)
+Codex built it in worktree `s173-t6` (about 119k tokens), then one bounded retry (about 73k). The coordinator committed it as `1dea19a9`, and the text contract at `47883588` under the scope-change above.
+consequence · T6 · behaviour:material · governance:high
+review · T6 · scoped-reviewer · behaviour:material · governance:high
+Reading: one scoped Sonnet reviewer, one round, CLEAR. It swept every `scripts/` parser of a changed record, untruncated, and found none broken. The retry fixed two SKILL.md lines pushed past 400 characters and two Lows: when R14 applies (from the release carrying ADR-045's amendment; a backlog revert stays bare) and which commit a dispatched task's tick rides in (the merge-back commit). Kept: one Low on night-run Part 4's evidence block.
+
+### 2026-11-12 | progress | gate green after wave 2 (T5, T6, T7)
+Off-host QA_FULL at `25284d82`: `QA-CHECK: 236 pass, 0 fail`; `bun test` 621 pass, 0 fail. The run at `1dea19a9` was red on the two text contracts, fixed under the scope-change above.
+T5 census: the log at `84e938d1` against `25284d82` loses exactly the 12 harness verdicts plus count drift; the registry diff is exactly the 12. Negative: throwaway `9db0489d` re-adding `run-tick-box-fixtures.ts` FAILs `script not found at evals/run-tick-box-fixtures.ts`; dropped.
+Ticked: TASK-655 3/3, TASK-656 4/4, TASK-657 4/4. Seven of eight members are complete; T8, the release, is J2 and waits for the owner.

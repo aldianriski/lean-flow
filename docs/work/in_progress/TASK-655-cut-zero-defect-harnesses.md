@@ -23,9 +23,9 @@ EPIC-025 condition 2, owner ruling "Accept all"; each row had 0 real defects (D2
 
 ## Done when
 
-- [ ] The 12 harnesses no longer run, and their files and orphan fixture dirs (revise-loop-ceiling, night-run-outcome, promote-check fixtures) are deleted. Scripts that stay (`promote-check.ts`, `tick-box.ts`) stay, and each has no dangling reference.
-- [ ] The same two-query census as TASK-651 agrees (names diff, registry diff). Every census-kept check still runs with its must-FAIL fixture, H57's mention of H15 is resolved, and the full gate ends with 0 FAIL.
-- [ ] Negative: re-adding one deleted harness name to the registry makes the gate FAIL it by name. TASK-653's `tick` fixture still fails a wrong-box tick.
+- [x] The 12 harnesses no longer run, and their files and orphan fixture dirs (revise-loop-ceiling, night-run-outcome, promote-check fixtures) are deleted. Scripts that stay (`promote-check.ts`, `tick-box.ts`) stay, and each has no dangling reference. ✓ 12 harnesses out of the registry and deleted with 58 orphan fixture files; tick-box.ts, promote-check.ts and night-run-reaper fixtures kept (ad7833cc); scoped review CLEAR
+- [x] The same two-query census as TASK-651 agrees (names diff, registry diff). Every census-kept check still runs with its must-FAIL fixture, H57's mention of H15 is resolved, and the full gate ends with 0 FAIL. ✓ query A: log at 84e938d1 vs 25284d82, only the 12 harness verdicts vanish plus count drift; query B: registry diff is exactly the 12; H57's H15 mention resolved; off-host QA_FULL 236 pass 0 fail
+- [x] Negative: re-adding one deleted harness name to the registry makes the gate FAIL it by name. TASK-653's `tick` fixture still fails a wrong-box tick. ✓ throwaway 9db0489d re-adding run-tick-box-fixtures.ts: gate FAIL 'script not found at evals/run-tick-box-fixtures.ts', dropped; record-line wrong-box tick case passes on T5's tree
 
 ## Touches
 
