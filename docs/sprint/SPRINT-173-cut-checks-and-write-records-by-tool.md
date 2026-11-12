@@ -5,6 +5,7 @@ epic: EPIC-025
 owner: Maintainer
 last_updated: 2026-11-12
 status: active
+gates_signed: G1,G2 @ b1ed060b
 plan_commit: 7503d39d
 update_trigger: sprint execute/close events
 ---
@@ -36,6 +37,7 @@ update_trigger: sprint execute/close events
 Layers: `scripts/qa-check.sh` · `scripts/lib/check-qa-budget-default.sh` · `scripts/lib/check-handoff-state.sh` · `scripts/lib/check-research-archive.sh` · `scripts/lib/check-task-origin.sh` · `scripts/lib/check-work-type.ts` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/qa-budget-check.sh` · `scripts/lib/sprint-members.ts`
   `evals/run-prose-density-fixtures.ts` · `evals/run-qa-budget-default-fixtures.sh` · `evals/run-task-origin-fixtures.sh` · `evals/run-work-type-fixtures.sh` · `evals/run-research-archive-fixtures.sh` · `evals/run-approval-envelope-fixtures.sh` · `evals/run-handoff-state-fixtures.sh`
   `evals/fixtures/prose-density/` · `evals/fixtures/handoff-state/` · `evals/fixtures/research-archive/` · `evals/fixtures/task-origin/` · `evals/fixtures/work-type/` · `evals/fixtures/approval-envelope/` · `evals/README.md` · `evals/run-emitter-column-fixtures.ts` · `skills/lean-doc-generator/references/handoff-reconciliation.md` · `docs/QA.md`
+  `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` · `evals/run-qa-budget-fixtures.sh`
 Depends-on: none
 Cites: TASK-651, EPIC-025 D2 and D7, `docs/research/logs/process-cost-census.md` (read only), `check-prose-density.ts` (kept under `scripts/lib/`, read only)
 The census appendix names each row's script, harness and fixture. A script stays when a kept caller still imports it, so `check-prose-density.ts` stays and only G0268's leg goes.
@@ -56,7 +58,7 @@ Depends-on: T1 (shared `scripts/qa-check.sh`, D1)
 Cites: TASK-653, EPIC-025 D6, `check-review-depth.sh` and `check-sprint-by-reference.ts` (under `scripts/lib/`, read only, run by path), SPRINT-171 T5 (that sprint's T5, not this Plan's), TASK-655 (consumes the `tick` fixture), `docs/sprint/archive/logs/SPRINT-171-*.md` (read only)
 The writer refuses missing or ambiguous input and never writes a default, so a slimmer process cannot turn a visible FAIL into a silent pass. The bar is the owner's "Fixtures + real replay".
 
-**Acceptance:** the replay of SPRINT-171 T5, T1 and T3 still FAILs `review-depth-material-absent`, and every refusal case writes nothing and names its field.
+**Acceptance:** the replay of SPRINT-171 still FAILs, T5 and T3 with `review-depth-governance-absent` and T1 with `review-depth-material-absent`, and every refusal case writes nothing and names its field.
 
 ### T4 — Trial Jev on consequence classification `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/jev-consequence.ts` · `scripts/jev-done-when.ts`
@@ -69,8 +71,9 @@ One paid run, capped at 1.00 USD, with the key read from `jev_key` only. Jev is 
 ### T5 — Cut 12 zero-defect harnesses `[size: M · risk: low · class: mechanical-ingest · AFK · J0]`
 Layers: `evals/run-sprint-family-spec-reduction-fixtures.ts` · `evals/run-sprint-close-fixtures.sh` · `evals/run-revise-loop-ceiling-fixtures.sh` · `evals/run-system-verify-fixtures.sh` · `evals/run-reap-terminal-fixtures.sh` · `evals/run-night-run-gate-exception-fixtures.sh` · `evals/run-night-run-outcome-fixtures.sh`
   `evals/run-promote-check-fixtures.ts` · `evals/run-tick-box-fixtures.ts` · `evals/run-workflow-command-fixtures.ts` · `evals/run-doc-caps-differential.ts` · `evals/run-night-run-rollup-differential-parity.ts`
-  `evals/fixtures/sprint-close/` · `evals/fixtures/revise-loop-ceiling/` · `evals/fixtures/system-verify/` · `evals/fixtures/night-run-outcome/` · `evals/fixtures/promote-check/` · `evals/fixtures/night-run-gate-exceptions/` · `evals/fixtures/night-run-reaper/`
+  `evals/fixtures/sprint-close/` · `evals/fixtures/revise-loop-ceiling/` · `evals/fixtures/system-verify/` · `evals/fixtures/night-run-outcome/` · `evals/fixtures/promote-check/` · `evals/fixtures/night-run-gate-exceptions/`
   `scripts/qa-check.sh` · `evals/README.md` · `evals/run-sprint-family-fixtures.sh` · `docs/QA.md`
+  `evals/doc-caps.test.ts` · `evals/run-doc-caps-fixtures.sh` · `scripts/lib/check-night-run-rollup.ts` · `scripts/lib/check-night-run-rollup.sh` · `evals/run-night-run-rollup-fixtures.sh`
 Depends-on: T1, T3
 Cites: TASK-655, EPIC-025 D7, `docs/research/logs/process-cost-census.md` (read only), `promote-check.ts` and `tick-box.ts` (kept under `scripts/lib/`, read only)
 H50 goes only because T3's `tick` fixture replaces it. A fixture directory is deleted only when no kept harness reads it.
@@ -109,7 +112,7 @@ A release is a Codex review of the shipped diff plus the off-host gate, never an
 
 ## Decisions (pre-locked)
 
-- **D1** — Shared files, one owner each in order: `scripts/qa-check.sh` T1 → T3 → T5, and `evals/README.md` and `docs/QA.md` T1 → T5. Each later task builds on the earlier one's commit. T6 and T7 are disjoint. The coordinator owns the Log, ticks, moves, the epic and the knowledge index.
+- **D1** — Shared files, one owner each in order: `scripts/qa-check.sh` T1 → T3 → T5, `evals/README.md` and `docs/QA.md` T1 → T5, and `skills/orchestrator/references/night-run.md` T1 → T6 (scope-change, 2026-11-12). Each later task builds on the earlier one's commit. T6 and T7 are disjoint. The coordinator owns the Log, ticks, moves, the epic and the knowledge index.
 - **D2** — Codex builds each task in a worktree, a scoped Sonnet reviewer reviews, and the coordinator commits (memory ruling, 2026-11-02). At most two builders run at once while the host has about 1.5 GB free. Review cap: 2 rounds per task.
 - **D3** — Moves and ticks stay bare `sprint(173):` commits for this whole sprint. TASK-652's amendment ships with the release, so Sprint B is the first sprint under it, and the measuring sprint counts it.
 - **D4** — The only paid API call is T4's Jev run, capped at 1.00 USD (EPIC-025 D7). Push and tag are owner-reserved; T8 stops at the gate.
