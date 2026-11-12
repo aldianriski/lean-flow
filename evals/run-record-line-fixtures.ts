@@ -210,6 +210,21 @@ try {
     check("realpath: outside target hashes unchanged", snapshot(outside) === before);
   });
 
+  scenario("task file symlink", () => {
+    // Release review: todo/TASK-904 symlinked to backlog/TASK-903 must not move or tick TASK-903 under TASK-904.
+    const root = fixture("tasklink", true);
+    put(root, "docs/work/backlog/TASK-903-real.md", "## Done when\n- [ ] real box\n");
+    try {
+      symlinkSync(join(root, "docs/work/backlog/TASK-903-real.md"), join(root, "docs/work/todo/TASK-904-alias.md"), "file");
+    } catch (e) {
+      if (process.platform !== "win32") throw e;
+      console.log("NOTE  task file symlink: this Windows host cannot create a file symlink; the case runs on the off-host gate");
+      return;
+    }
+    refusal(root, "move through a task file symlink", ["move", "TASK-904", "done"], "task");
+    refusal(root, "tick through a task file symlink", ["tick", "TASK-904", "1", "checked"], "task");
+  });
+
   scenario("append context", () => {
     const root = fixture("append");
     const args = ["scope-change", "--log", LOG, "--date", "2026-11-12", "--summary", "TASK-901 amended scope"];

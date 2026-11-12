@@ -9,7 +9,7 @@
 // check-sprint-by-reference.ts. Exit 2 refuses before writing; tick-box exit 1 means
 // the tick WAS written but a downstream gate failed, and is passed through unchanged.
 import { spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmdirSync, statSync } from "node:fs";
+import { appendFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmdirSync, statSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FOLDERS, scanBlocks } from "./sprint-members.ts";
@@ -64,7 +64,11 @@ function task(root: string, id: string): string {
     for (const name of readdirSync(dir)) if (name.startsWith(`${id}-`) && name.endsWith(".md")) found.push(join(dir, name));
   }
   if (found.length !== 1) refuse("task", `${id} resolves to ${found.length} files; expected exactly one`);
-  return contained(root, "docs/work", found[0]!, "task");
+  // A symlinked task file could resolve to ANOTHER task and move or tick it under this id (release review).
+  if (lstatSync(found[0]!).isSymbolicLink()) refuse("task", `${id} is a symlink; a task file must be a regular file`);
+  const canonical = contained(root, "docs/work", found[0]!, "task");
+  if (!basename(canonical).startsWith(`${id}-`)) refuse("task", `${id} resolves to ${basename(canonical)}`);
+  return canonical;
 }
 function main(argv: string[]): number {
   const command = choice("command", argv.shift(), ["consequence", "review", "scope-change", "builder-check", "tick", "move"]);

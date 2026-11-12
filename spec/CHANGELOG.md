@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-07
+last_updated: 2026-11-12
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,13 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.21.0 — 2026-11-12
+
+**MINOR (§15): §2's work-item row lets a status move ride in the task's own work commit (ADR-045 D6 amended, EPIC-025 R14).**
+A `git mv` between status folders now travels with the task's work; it keeps its own commit only when no work commit carries it
+(cancel, de-scope, promote, a backlog revert). §15's test: no conformance check reads which commit carries a move, so no verdict
+moves and MAJOR is ruled out. It is not PATCH: the rule's meaning moves on paper. Owner ruling 2026-11-12 ("All of its moves").
 
 ## 0.20.0 — 2026-11-07
 

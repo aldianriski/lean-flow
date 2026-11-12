@@ -18,7 +18,7 @@ status: current
 
 ## v2.23.0 — half the bookkeeping: zero-defect checks cut, record lines written by a tool (2026-11-12)
 
-**MINOR** — no new skill; the roster stays at 16 and the standard stays at spec 0.20.0. Restart the session after installing.
+**MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0 (§2's work-item row follows ADR-045's amended D6). Restart the session after installing.
 Released on a Codex review of the shipped diff since v2.22.0 and the off-host gate (EPIC-025). The cuts follow a census of every gate
 check and record step: only rows with no real defect in the archived sprint logs went, and every kept check still fails its must-FAIL
 fixture by name. Sprint B, a workdoo sprint on this release, is the measuring sprint for EPIC-025's halving target.
