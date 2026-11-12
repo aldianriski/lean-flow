@@ -5,6 +5,7 @@ epic: EPIC-025
 owner: Maintainer
 last_updated: 2026-11-12
 status: closed
+close_commit: b114943b
 gates_signed: G1,G2 @ b1ed060b
 plan_commit: 7503d39d
 update_trigger: sprint execute/close events

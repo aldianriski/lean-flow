@@ -3,7 +3,7 @@ sprint: 173
 slug: cut-checks-and-write-records-by-tool
 owner: Maintainer
 last_updated: 2026-11-12
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -158,3 +158,6 @@ Off-host at `917538fc` via `scripts/gate-remote.ts` (QA_FULL): `QA-CHECK: 236 pa
 - Buckets: CHANGELOG holds the v2.23.0 entry already written at T8. TD-310 (the live-case floors lost with H51) and TD-311 (prose density unenforced). Learnings L-315 and L-316. Follow-ups: none filed; the owner's `/triage` retargets TASK-489, folds TASK-627 into the dropped T4 trial and cancels TASK-629.
 - EPIC-025 rollup: the SPRINT-173 row filled; conditions 2, 3 and 4 ticked, closed by SPRINT-173. Condition 5 stays open until the owner pushes v2.23.0 and `/triage` retargets TASK-489; condition 6 is Sprint B.
 - Under the T7 sequence, `close_commit` and the epic row's sha are written in the archive commit once the owner approves retention.
+
+### 2026-11-12 | close | retention approved, archived with the pin
+Close pass, owner popup, verbatim: "Approve archive (Recommended)". The sprint and this log move to `docs/sprint/archive/` with an INDEX line; `close_commit: b114943b` (the close commit) and the EPIC-025 row's same sha are written in this archive commit, per the T7 close sequence. EPIC-025 stays active.
