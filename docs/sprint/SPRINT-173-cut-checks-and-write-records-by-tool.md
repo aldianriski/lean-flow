@@ -101,6 +101,7 @@ R45 and R51 are where most close-time bookkeeping commits come from. The freeze 
 
 ### T8 — Release the MINOR, stopped before push `[size: S · risk: med · class: execution · HITL · J2]`
 Layers: `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `README.md` · `CHANGELOG.md` · `docs/changelog/`
+  `spec/STANDARD.md` · `spec/CHANGELOG.md` · `scripts/lib/record-line.ts` · `evals/run-record-line-fixtures.ts`
 Depends-on: T1, T2, T3, T4, T5, T6, T7
 Cites: TASK-658, EPIC-025 condition 5, TASK-489, `scripts/gate-remote.ts` (read only, run by path)
 A release is a Codex review of the shipped diff plus the off-host gate, never an arm.

@@ -134,3 +134,8 @@ Reading: one scoped Sonnet reviewer, one round, CLEAR. It swept every `scripts/`
 Off-host QA_FULL at `25284d82`: `QA-CHECK: 236 pass, 0 fail`; `bun test` 621 pass, 0 fail. The run at `1dea19a9` was red on the two text contracts, fixed under the scope-change above.
 T5 census: the log at `84e938d1` against `25284d82` loses exactly the 12 harness verdicts plus count drift; the registry diff is exactly the 12. Negative: throwaway `9db0489d` re-adding `run-tick-box-fixtures.ts` FAILs `script not found at evals/run-tick-box-fixtures.ts`; dropped.
 Ticked: TASK-655 3/3, TASK-656 4/4, TASK-657 4/4. Seven of eight members are complete; T8, the release, is J2 and waits for the owner.
+
+### 2026-11-12 | scope-change | T8 (TASK-658): the Codex release review's two Mediums are fixed before release
+What broke: the Codex review of the shipped diff since `6444f83e` found two Mediums. `spec/STANDARD.md` §2's work-item row still says a status move is a `git mv` in its own commit, contradicting ADR-045's amendment and the shipped orchestrator text. And `record-line.ts` resolves a symlinked task file to its target, so `move TASK-904` could move TASK-903.
+Impact: T8 Layers gain `spec/STANDARD.md`, `spec/CHANGELOG.md`, `scripts/lib/record-line.ts` and `evals/run-record-line-fixtures.ts`. The standard's row follows ADR-045's amendment, and the spec goes 0.20.0 → 0.21.0 (§15 MINOR: a rule's meaning moves on paper, and no conformance check reads it, so no verdict moves). The writer refuses a symlinked task file, with a must-FAIL case. No Done-when changes.
+Re-confirm G2: not needed; both fixes bring shipped text and the tool in line with rulings the owner already made (R14 via ADR-045, and the writer's refusal contract).
