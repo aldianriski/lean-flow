@@ -12,7 +12,7 @@ related: [ADR-053]
 # Research — Which process checks and record steps can be cut or merged?
 
 > **Question.** Which lean-flow gate checks and skill record steps can be cut or merged without losing a check that has caught a real defect?
-> **Verdict.** pending T4
+> **Verdict.** Keep checks that caught real defects and their required records; propose 35 check cuts and 13 record merges (no record cut), subject to the owner decisions below.
 
 ## Why this matters
 
@@ -25,7 +25,7 @@ related: [ADR-053]
 
 ## Findings
 
-The commit census reconciles for all three sprints. SPRINT-169 exceeds the one-third difference trigger, so the baseline is the per-metric median of the three sprints, by owner ruling (below). SPRINT-171's close-time 12 counts as its first run under that ruling. No check or record step is ruled on by T1.
+The census covers 103 check rows and 64 record-step kinds. Non-work commit costs reconcile to 12/38/43; 48 event spellings in 124 archived logs map to record rows. The owner chose per-metric medians, accepting SPRINT-171's close-time 12 despite its timing exception. Proposed rulings retain unknowns and consumer guards.
 
 ## Baseline
 
@@ -101,8 +101,13 @@ The [appendix](logs/process-cost-census.md#fail-history-and-proposed-rulings-tas
 
 ## Recommendation
 
-For T1, option B, ruled by the owner: per-metric medians, with SPRINT-171's recorded close-time 12 accepted although TASK-644 still awaited its Retro evidence. The document-level keep/merge/cut recommendation remains pending T4.
+Keep the 61 check rows T3 retains (17 unknown), and review its 35 proposed cuts (six borderline); seven rows have no verdict. No check merge is proposed. For records: **7 keep / 44 keep (unknown) / 13 merge / 0 cut**, independently judged in the [record-step census and owner packet](logs/process-cost-census.md#record-step-census-task-650).
+Start with status-move commits (26), routine progress commits (25), and index-only commits (2). These are consolidation candidates, not promised savings. Preserve the records needed to detect missing reviews: SPRINT-171 T5's owed review caught a dropped screen-out rule. A kept check alone does not justify each record or a separate commit for it.
+In the next slice, write consequence, review, scope-change, ticks and moves from explicit validated inputs; missing or ambiguous inputs must stop the writer. The [SPRINT-172 Log](../sprint/logs/SPRINT-172-process-cost-census.md) adds a wording-only scope-change FAIL caused by a checker filename in prose, distinct from a changed artifact.
+Owner decisions: G1597's record-truth borderline; H01, H02, H22, H45, H46 as sole proofs of shipped rules; all 17 keep-unknown check rows listed in the appendix; all record merges, especially R14 against ADR-045 D6.
+Also for the owner: whether R09's handoff-status stub retires with G0297, which needs a replacement for close step 1's read. The 44 unknown record rows remain kept pending evidence or an explicit owner ruling.
+Keep the approved baseline: 43/7 non-work commits/member (target at most 43/14) and 3 first-run close FAILs (target at most 1). **No cut has been made in this sprint.**
 
 ## Out of scope / open questions
 
-- Gate inventory, defect classification and skill-record rulings belong to TASK-648, TASK-649 and TASK-650. The coordinator owns index regeneration, review and the full gate after commit.
+- Implementing cuts, writers and skill changes belongs to later EPIC-025 slices. The coordinator owns index regeneration, review, the T4 commit-stat check and the integrated gate after commit.

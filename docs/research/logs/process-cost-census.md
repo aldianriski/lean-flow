@@ -2165,3 +2165,460 @@ Literal result:
 Appendix: 2,307 → 2,159 lines after review corrections and compaction. Decision doc: 105 → 108 lines. The 41 ruling-label changes are reflected in the inventory and every history destination.
 
 Coordinator owns review, index regeneration, integrated gate, scratch removal and commit. This worker changed only the two tracked census documents; no sprint file, Execution Log, member tick or task status was written.
+
+## Record-step census (TASK-650)
+
+Measured 2026-11-11 at worktree HEAD `d25c1aa6ad2ef1f43f518c64fc190ee92c8af0f7`, source pin `e29815a9ad0cbd660fd80d3d2d9c827c4dd03215`. Protected trees match the T2 pin. The two SKILL.md files, their references and the sprint-log vocabulary define the population.
+**64 step kinds**, not one row per occurrence. Repeated requirements share a row. The source manifest below supplies an identity and literal anchor for every row; a read-through reconciles repetitions across references. Event aliases are measured separately, not invented as new requirements.
+Rows retain the ten check columns, then enforcing check and cost. For records, the location is a lifecycle step, names are source section/step identities, and checkpoint is n/a. Fixtures are tests of the named reader/contract, not proof that the record itself prevented a defect.
+All consumer-guard cells say no because a record is an input, not an executable check. The enforcing column identifies consumers; it grants no automatic keep. Each ruling weighs the record's evidence, measured cost and what the consumer actually needs.
+**C = non-work commits; E = dated Log entries**, each in SPRINT-169/170/171 order. A structured line inside an entry adds no E; its containing event is counted once. Zero means no separately attributed commit/heading, not that no field was written. Work commits and costs outside T1's ranges are excluded from C.
+Rulings: **44 keep (unknown) / 13 merge / 7 keep / 0 cut**. All are proposals. Coordinator ruling after review round 1: R09 moves from cut to keep (unknown), because its only FAIL evidence is G0297's check history (E4). Merge preserves information and changes packaging; unknown means no complete step-specific failure history, including pre-SPRINT-045 gaps. No unknown is proposed cut.
+
+### Record-step rows
+
+| Id | Leg / location | Checkpoint | Source | Names | Must-FAIL fixture | Consumer guard | FAILs | Real defects | Ruling | Enforcing check row id | Cost (169/170/171) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| R01 | Promote event and signed governance checklist | n/a (record) | [L:118](../../../skills/lean-doc-generator/SKILL.md) | L:Governance review at promote | `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Approval is readable at the freeze; early history is incomplete. | G0435 | C 0/0/0; E 1/1/1 |
+| R02 | Progress event (execution, correction and completion aliases) | n/a (record) | [O:102](../../../skills/orchestrator/SKILL.md) | O:sprint-bulk step 4 | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Batch routine progress with the accepted task result; retain every decision and named failure. | none | C 2/16/7; E 4/14/13 |
+| R03 | Surprise event | n/a (record) | [T:24](../../../skills/lean-doc-generator/templates/sprint-log.md.template) | T:Event vocabulary | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Fold the separate event wrapper into R02; retain its finding. | none | C 0/0/0; E 1/0/0 |
+| R04 | Scope-change event, including pruning and membership changes | n/a (record) | [S:17](../../../skills/lean-doc-generator/references/sprint-by-reference.md) | S:Freeze | `evals/run-by-reference-fixtures.ts`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (>=20; E1) | >=2 (E1) | keep — The record authorizes a changed baseline; retain order and task identity, automate its spelling. | G1447, G0435 | C 0/2/6; E 0/3/8 |
+| R05 | Park event and unblock record | n/a (record) | [N:126](../../../skills/orchestrator/references/night-run.md) | N:Part 0 park protocol | `evals/run-night-run-rollup-fixtures.sh`; `evals/run-authority-fixtures.sh` | no: record input, not an executable guard | unknown (shared E2) | >=1 shared (E2) | keep — Non-green task lines are needed to expose incomplete runs; the R07 catch supports this content. | G0567, G1474, G1384 | C 0/0/0; E 0/0/0 |
+| R06 | Blocker event | n/a (record) | [O:103](../../../skills/orchestrator/SKILL.md) | O:sprint-bulk step 5 | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Use R05 for the blocker and unblock condition; no second wrapper needed. | none | C 0/0/0; E 0/0/1 |
+| R07 | Run-complete event and rollup (count, task states, terminal, outcome, provenance) | n/a (record) | [N:671](../../../skills/orchestrator/references/night-run.md) | N:Part 4 | `evals/run-night-run-rollup-fixtures.sh`; `evals/run-authority-fixtures.sh` | no: record input, not an executable guard | >=1 (E2) | >=1 (E2) | keep — A missing parked-task line produced a false run summary (SPRINT-122); preserve all fields. | G0567, G1474 | C 0/0/0; E 0/0/0 |
+| R08 | Close event | n/a (record) | [T:25](../../../skills/lean-doc-generator/templates/sprint-log.md.template) | T:Event vocabulary | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Keep the close record with R39/R45; avoid a separate narrative duplicating the Retro. | none | C 0/0/0; E 0/1/1 |
+| R09 | Handoff event/status stub, including spent and root ledger | n/a (record) | [H:57](../../../skills/lean-doc-generator/references/handoff-reconciliation.md) | H:Close-time sweep step 3 | `evals/run-handoff-state-fixtures.sh` | no: record input, not an executable guard | unknown (U; G0297 check: 1 FAIL, 0 real, E4) | unknown (U) | keep (unknown) — Close step 1 reads this stub to find outstanding handoffs, so it stays unless the owner names a replacement discovery input; tied to G0297's proposed cut. | G0297 | C 0/0/0; E 0/0/0 |
+| R10 | Render Plan/Log, stamp membership, stream and epic | n/a (record) | [S:21](../../../skills/lean-doc-generator/references/sprint-by-reference.md) | S:Promote step 3 | `evals/run-conformance-engine-fixtures.sh`; `evals/run-sprint-log-layout-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The Plan is the dispatch input; preserve identity and the separate Log. Earlier history incomplete. | G1015, G0435, H06 | C 0/0/0; E 0/0/0 |
+| R11 | Plan-locked commit | n/a (record) | [S:30](../../../skills/lean-doc-generator/references/sprint-by-reference.md) | S:Promote step 4 | `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The baseline must exist before work; no evidence separates the commit ceremony from the freeze requirement. | G0435 | C 1/1/1; E 0/0/0 |
+| R12 | plan_commit field (or no-git snapshot) | n/a (record) | [S:31](../../../skills/lean-doc-generator/references/sprint-by-reference.md) | S:Promote step 4; Without git | `evals/run-conformance-engine-fixtures.sh`; `evals/run-by-reference-fixtures.ts` | no: record input, not an executable guard | unknown (>=1; E1) | >=1 shared (E1) | keep — The baseline checker consumes this exact pin; a wrong-log baseline caused a real false rewrite finding. | G0435, G1447 | C 1/1/1; E 0/0/0 |
+| R13 | gates_signed field (task or sprint) | n/a (record) | [O:83](../../../skills/orchestrator/SKILL.md) | O:quick step 2; G2; L:promote | `evals/run-conformance-engine-fixtures.sh`; `evals/run-gates-signed-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The run reads this grant from the file; L-099 records a lost transcript-only approval, not a counted gate FAIL. | G0435, H29 | C 1/1/2; E 0/0/0 |
+| R14 | Status move in its own commit (plain move without git) | n/a (record) | [D:95](../../../skills/orchestrator/references/dispatch.md) | D:Members rule 6; S:Promote step 2 | `evals/run-store-writers-fixtures.ts`; `evals/run-work-store-fixtures.ts` | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Combine moves with the task acceptance record while preserving folder identity; ADR-045 D6 needs owner amendment. | H46, H53 | C 2/13/11; E 0/0/0 |
+| R15 | Done-when tick and first-line evidence suffix | n/a (record) | [D:87](../../../skills/orchestrator/references/dispatch.md) | D:Members rule 5 | `evals/run-conformance-engine-fixtures.sh`; `evals/run-dod-delta-fixtures.sh`; `evals/run-tick-box-fixtures.ts` | no: record input, not an executable guard | unknown (E6) | unknown (E6) | keep (unknown) — Evidence and completion remain required; tick-count subject errors alone do not prove work was unfinished. | G0435, G1597, H50 | C 0/0/6; E 0/0/0 |
+| R16 | Files Changed table update | n/a (record) | [L:108](../../../skills/lean-doc-generator/SKILL.md) | L:Sprint lifecycle executing | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Derive this view from the accepted diff alongside R02 instead of maintaining a separate narrative. | none | C 0/0/0; E 0/0/0 |
+| R17 | Consequence classification line | n/a (record) | [V:206](../../../skills/orchestrator/references/review-scoping.md) | V:Two dimensions | `evals/run-review-depth-fixtures.sh`; `evals/run-authority-fixtures.sh` | no: record input, not an executable guard | >=1 (E3) | >=1 shared (E3) | keep — The classification made T5's missing review detectable in SPRINT-171; write it from explicit inputs. | G0636, G1474 | C 1/1/1; E 0/0/0 |
+| R18 | Review line and review report (axes, evidence, declined judgments) | n/a (record) | [V:116](../../../skills/orchestrator/references/review-scoping.md) | V:Revise loop; Two axes | `evals/run-review-depth-fixtures.sh` | no: record input, not an executable guard | >=1 (E3) | >=1 shared (E3) | keep — T5's owed review caught the dropped screen-out rule; completion must be recorded independently of classification. | G0636 | C 0/0/1; E 0/1/1 |
+| R19 | Revise progress entry and retry outcome line | n/a (record) | [V:110](../../../skills/orchestrator/references/review-scoping.md) | V:Revise loop; N:Part 4 | `evals/run-revise-loop-ceiling-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Carry outcomes in R18 and retain machine-readable retry lines; remove the extra progress wrapper only. | H27 | C 0/0/0; E 0/0/0 |
+| R20 | Worker identity/resumption line | n/a (record) | [D:33](../../../skills/orchestrator/references/dispatch.md) | D:Hand the sub-agent | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — A holder record supports resumption; no independent FAIL census establishes its benefit or absence. | none | C 1/0/0; E 0/0/0 |
+| R21 | Builder-check design packet file | n/a (record) | [B:16](../../../skills/orchestrator/references/builder-check.md) | B:Procedure step 2 | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Use R23's approved design as the reader packet; preserve the verbatim criterion and touched paths. | none | C 0/0/0; E 0/0/0 |
+| R22 | Builder-check result line | n/a (record) | [B:22](../../../skills/orchestrator/references/builder-check.md) | B:Procedure step 4 | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — New procedure; contradictions are useful, but a separate record-line catch has not been established. | none | C 0/0/0; E 0/0/0 |
+| R23 | Gate/design decision record (Approved design, overlap map, abuse case) | n/a (record) | [O:46](../../../skills/orchestrator/SKILL.md) | O:G2 and sprint-bulk step 2 | `evals/run-layers-completeness-fixtures.sh`; `evals/run-layers-observed-test-fixtures.ts` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Freeze decisions and ownership in one reachable place; broad Layers histories do not quantify this step alone. | G1407, G1544 | C 0/0/0; E 1/3/4 |
+| R24 | Authority class declaration in task/Plan meta | n/a (record) | [O:53](../../../skills/orchestrator/SKILL.md) | O:G2 | `evals/run-authority-fixtures.sh` | no: record input, not an executable guard | >=1 (E5) | >=1 (E5) | keep — SPRINT-093 exposed a mode-dependent false J2 park; the class remains an input to the corrected check. | G1474 | C 0/0/0; E 0/0/0 |
+| R25 | Verify method, reachability or judgment notation | n/a (record) | [O:50](../../../skills/orchestrator/SKILL.md) | O:G2 | `evals/run-verify-reaches-fixtures.sh`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — A method must reach its target; the checker history mixes invocation and pairing faults. | G0672, G0435 | C 0/0/0; E 0/0/0 |
+| R26 | Qualifying ADR and decision-index record | n/a (record) | [L:24](../../../skills/lean-doc-generator/SKILL.md) | L:Golden Rule | `evals/run-conformance-engine-fixtures.sh`; `evals/run-adr-family-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Durable decision intent is a consumer artifact; no isolated record-step failure total is recoverable. | G0435, H39 | C 0/0/0; E 0/0/0 |
+| R27 | Worktree-base result in Log | n/a (record) | [D:625](../../../skills/orchestrator/references/dispatch.md) | D:Worktree-base guard | `evals/run-worktree-base-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Attach the result to R20's dispatch record; running the base guard remains required. | H55 | C 0/0/0; E 0/0/0 |
+| R28 | Merge-back commit per task and conflict trade-off | n/a (record) | [D:642](../../../skills/orchestrator/references/dispatch.md) | D:Merge-back queue | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Per-task revertability is the stated consumer need; no counted record-only defect decides its replacement. | none | C 0/0/0; E 0/0/0 |
+| R29 | System-verify line | n/a (record) | [D:775](../../../skills/orchestrator/references/dispatch.md) | D:System verify; N:Part 4 | `evals/run-system-verify-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The final gate is needed; the exact line's independent benefit is unknown. H33 tests the procedure, not live logs. | H33 | C 1/1/1; E 0/0/0 |
+| R30 | Owner-ruling record for a failed check or unproven close | n/a (record) | [D:779](../../../skills/orchestrator/references/dispatch.md) | D:System verify; V:Evidence boundary | `evals/run-system-verify-fixtures.sh`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — An override must remain explicit; no step-specific complete history justifies deletion. | H33, G0435 | C 0/0/0; E 0/0/0 |
+| R31 | approval_envelope field | n/a (record) | [N:223](../../../skills/orchestrator/references/night-run.md) | N:Part 1a step 4b | `evals/run-approval-envelope-fixtures.sh`; `evals/run-authority-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — G1474 also reads this grant as a fallback mode signal; cutting G1511 does not remove that need. | G1511, G1474 | C 0/0/0; E 0/0/0 |
+| R32 | gate_exceptions list and pin | n/a (record) | [N:254](../../../skills/orchestrator/references/night-run.md) | N:Part 1a step 4c | `evals/run-night-run-gate-exception-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Specific exceptions authorize a repair run; fixtures test the launcher, not an independent live record gate. | H40 | C 0/0/0; E 0/0/0 |
+| R33 | Scoped permissions settings record | n/a (record) | [N:330](../../../skills/orchestrator/references/night-run.md) | N:Part 1 pre-flight | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The runtime consumes settings; preserve measured least-authority inputs. No record FAIL total isolated. | none | C 0/0/0; E 0/0/0 |
+| R34 | Expected run-cost line | n/a (record) | [N:462](../../../skills/orchestrator/references/night-run.md) | N:Part 1 pre-flight | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Owner budget input is separate from fixture spend; no complete failure history for the line itself. | none | C 0/0/0; E 0/0/0 |
+| R35 | Pre-flight capability/probe findings and degraded shape | n/a (record) | [N:293](../../../skills/orchestrator/references/night-run.md) | N:Part 1; C:Capability checks | `evals/run-worktree-usability-fixtures.sh`; `evals/run-skill-freshness-fixtures.sh`; `evals/run-dispatch-preflight-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Measured host readiness determines launch shape; fixture survival alone cannot decide record necessity. | H13, H14, H43 | C 0/0/0; E 0/0/0 |
+| R36 | fired line before launch | n/a (record) | [N:547](../../../skills/orchestrator/references/night-run.md) | N:Part 2 reaper | `evals/run-authority-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Records a run even when it dies before rollup; this is an authority-reader input, not a gate by itself. | G1474 | C 0/0/0; E 0/0/0 |
+| R37 | Per-criterion rollup evidence lines | n/a (record) | [N:825](../../../skills/orchestrator/references/night-run.md) | N:Part 4 | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Read R15's evidence into the rollup; remove the second hand-written copy, preserve override pointers. | none | C 0/0/0; E 0/0/0 |
+| R38 | Calibration row | n/a (record) | [N:859](../../../skills/orchestrator/references/night-run.md) | N:Part 4 calibration | `evals/run-night-run-rollup-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The rollup reader requires it, but no independent real catch is established for calibration alone. | G0567 | C 0/0/0; E 0/0/0 |
+| R39 | Retro record and full-session sweep | n/a (record) | [L:111](../../../skills/lean-doc-generator/SKILL.md) | L:Retro at close | `evals/run-conformance-engine-fixtures.sh`; `evals/run-sprint-family-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The sweep routes unfinished work; early history does not isolate the record's catches. | G0435, H57 | C 0/0/0; E 0/0/0 |
+| R40 | Shipped bucket to CHANGELOG (bug root cause included) | n/a (record) | [L:112](../../../skills/lean-doc-generator/SKILL.md) | L:Retro at close | `evals/run-conformance-engine-fixtures.sh`; `evals/run-sprint-family-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — User-facing release history is consumed directly; no independent step total. | G0435, H57 | C 0/0/0; E 0/0/0 |
+| R41 | Tech-debt bucket to TD record | n/a (record) | [L:112](../../../skills/lean-doc-generator/SKILL.md) | L:Retro at close | `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Keeps an unresolved issue discoverable; retain until owner evaluates evidence beyond the FAIL corpus. | G0435 | C 0/0/0; E 0/0/0 |
+| R42 | Follow-up task with origin close-retro | n/a (record) | [L:112](../../../skills/lean-doc-generator/SKILL.md) | L:Retro at close; H:Sweep | `evals/run-task-origin-fixtures.sh`; `evals/run-store-writers-fixtures.ts` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The source reports lost follow-ups; the origin check's zero does not prove durable routing is dispensable. | G0372, H46 | C 0/0/0; E 0/0/0 |
+| R43 | Learning record/count update | n/a (record) | [L:112](../../../skills/lean-doc-generator/SKILL.md) | L:Retro at close | `evals/run-learnings-metadata-fixtures.ts`; `evals/run-gen-index-locale-fixtures.ts`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Preserves repeated failure evidence; broad metadata failures do not quantify this step alone. | G0733, G0435 | C 0/0/0; E 0/0/0 |
+| R44 | closed status and close_commit field | n/a (record) | [L:109](../../../skills/lean-doc-generator/SKILL.md) | L:Sprint lifecycle close | `evals/run-epic-archive-fixtures.sh`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The epic reader consumes the close pin; complete independent record history is unavailable. | G0234, G0435 | C 0/0/0; E 0/0/0 |
+| R45 | Sprint close summary commit | n/a (record) | [L:109](../../../skills/lean-doc-generator/SKILL.md) | L:Sprint lifecycle close | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Commit the Retro, routed buckets and R44 together; retain the close pin rather than add a record-only follow-up. | none | C 1/1/1; E 0/0/0 |
+| R46 | Archive sprint and Log together plus INDEX line | n/a (record) | [L:109](../../../skills/lean-doc-generator/SKILL.md) | L:Sprint lifecycle close | `evals/run-conformance-engine-fixtures.sh`; `evals/run-sprint-log-layout-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Keep paired paths readable to history consumers; their exact archive-step catches are not separated. | G0435, H06 | C 0/0/0; E 0/0/0 |
+| R47 | Retention prune/compact/archive and measured delta | n/a (record) | [L:109](../../../skills/lean-doc-generator/SKILL.md) | L:Sprint lifecycle close | `evals/run-research-archive-fixtures.sh`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Owner-approved retention covers tasks, debt, learnings, research and changelog; no new loss is authorized by this census. | G0324, G0435 | C 1/0/0; E 0/0/0 |
+| R48 | Doc freshness/header update and prose pass | n/a (record) | [L:76](../../../skills/lean-doc-generator/SKILL.md) | L:Execution flow 7; close; U | `evals/run-doc-caps-fixtures.sh`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Existing docs remain owned and current; field-shape and content defects cannot be assigned one complete total. | G0708, G0169, G0435 | C 0/1/3; E 0/0/0 |
+| R49 | Epic record, index, member rollup, ticks and closure | n/a (record) | [L:94](../../../skills/lean-doc-generator/SKILL.md) | L:Epic and close | `evals/run-epic-archive-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Preserve outcome evidence and member contributions; T3 flags an unresolved epic-state classification. | G0234 | C 0/0/0; E 0/0/0 |
+| R50 | Epic coverage marks and activation report (roadmap checklist too) | n/a (record) | [E:63](../../../skills/lean-doc-generator/references/epic-coverage.md) | E:Where each caller uses it | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The owner resolves uncovered outcomes; overrides map to R04. No independent record FAIL history. | none | C 0/0/0; E 0/0/0 |
+| R51 | Knowledge-index regeneration | n/a (record) | [L:76](../../../skills/lean-doc-generator/SKILL.md) | L:Execution flow 7 | `evals/run-learnings-metadata-fixtures.ts`; `evals/run-gen-index-locale-fixtures.ts` | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Regenerate once with the indexed doc's content commit; the kept check needs a current index, not another commit. | G0733 | C 0/0/2; E 0/0/0 |
+| R52 | Learning promotion disposition and cap-disposition row | n/a (record) | [L:130](../../../skills/lean-doc-generator/SKILL.md) | L:Governance review | `evals/run-doc-caps-fixtures.sh`; `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Disposition records may be necessary; the checker histories do not establish a separable zero. | G0169, G0435 | C 0/0/0; E 0/0/0 |
+| R53 | Aged TD re-review/escalation record | n/a (record) | [L:130](../../../skills/lean-doc-generator/SKILL.md) | L:Governance review | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Promotion chooses scope; no isolated catch or complete early history supports cutting it. | none | C 0/0/0; E 0/0/0 |
+| R54 | Init/core-doc scaffold, profile and cited owner answers | n/a (record) | [I:49](../../../skills/lean-doc-generator/references/init.md) | I:Steps 2-6; L:Execution flow | `evals/run-conformance-engine-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — These are adopter deliverables, not just ceremony; optional standards and safe-scaffold skips remain explicit. | G0435 | C 0/0/0; E 0/0/0 |
+| R55 | Migration per-file approval plan and unresolved dispositions | n/a (record) | [M:25](../../../skills/lean-doc-generator/references/migration-map.md) | M:Procedure step 2 | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The plan bounds edits and exposes conflicts; no independent record failure total. | none | C 0/0/0; E 0/0/0 |
+| R56 | Migration apply: relocate, reformat, links and v1 conversion | n/a (record) | [M:45](../../../skills/lean-doc-generator/references/migration-map.md) | M:Procedure step 3; v1 mapping | `evals/run-conformance-engine-fixtures.sh`; `evals/run-v1-to-v2-fixtures.ts` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Content preservation is the purpose; H02's environment failure says nothing about removing this step. | G0435, H02 | C 0/0/0; E 0/0/0 |
+| R57 | Migration preservation inventory and no-git backup | n/a (record) | [M:98](../../../skills/lean-doc-generator/references/migration-map.md) | M:Preserve inventory | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Protects existing adopter content; zero baseline cost is no evidence that the backup is dispensable. | none | C 0/0/0; E 0/0/0 |
+| R58 | Migration verification report (ids, ticks, hashes, pending) | n/a (record) | [M:411](../../../skills/lean-doc-generator/references/migration-map.md) | M:Verification | `evals/run-v1-to-v2-fixtures.ts` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — A report identifies withheld and changed items; no record-specific complete history. | H02 | C 0/0/0; E 0/0/0 |
+| R59 | Draft-review round count and deferred findings | n/a (record) | [V:142](../../../skills/orchestrator/references/review-scoping.md) | V:Draft reviews | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The cap bounds review work; no separate FAIL history for recording it. | none | C 0/0/0; E 0/0/0 |
+| R60 | UI verification evidence or unavailable report | n/a (record) | [V:249](../../../skills/orchestrator/references/review-scoping.md) | V:UI floor | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — The report carries observable UI checks; no UI work in the three baseline sprints. | none | C 0/0/0; E 0/0/0 |
+| R61 | Working-behaviour before/after pin | n/a (record) | [D:57](../../../skills/orchestrator/references/dispatch.md) | D:Implement routing | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Protects behavior through change; zero separately attributed commits is not zero value. | none | C 0/0/0; E 0/0/0 |
+| R62 | Temporary handoff and durable reconciliation routing | n/a (record) | [H:44](../../../skills/lean-doc-generator/references/handoff-reconciliation.md) | H:Sweep; N:Park; M:Headless; I:Headless | none | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Retain actionable handoff contents and route them at close; R09's status stub is how close finds them (handoff-reconciliation.md, close step 1). | none | C 0/0/0; E 0/0/0 |
+| R63 | Task work commit, subject/trailers and humanize pass | n/a (record) | [O:86](../../../skills/orchestrator/SKILL.md) | O:quick step 5; D:Commit messages | `evals/run-layers-observed-test-fixtures.ts`; `evals/run-dod-delta-fixtures.sh` | no: record input, not an executable guard | unknown (U) | unknown (U) | keep (unknown) — Work commits are excluded from C by D4; their record conventions still appear in the procedure. | G1544, G1597 | C 0/0/0; E 0/0/0 |
+| R64 | Boundary/worker report and uncertain-write carry-forward | n/a (record) | [O:124](../../../skills/orchestrator/SKILL.md) | O:Report shape; W; D:Uncertain writes | none | no: record input, not an executable guard | unknown (U) | unknown (U) | merge — Generate progress/count/evidence once from accepted records; retain blockers and uncertainty in the worker return. | none | C 0/0/0; E 0/0/0 |
+
+### Record evidence and limits
+
+**U — unknown, not zero.** T3 classifies check failures, not every procedural write. A broad checker total cannot be assigned to every input it reads. These rows retain unknown even when the three-sprint cost is zero. No complete-history claim or automatic keep follows from a fixture or consumer association.
+For U rows, the source identity is the search key: search its anchor plus the record's field/event synonyms through all archived logs, then inspect its T2/T3 reader history. Missing, aggregate or mixed attribution remains U. This is a conservative limit on a ruling, not an assertion that the step has never failed.
+**E1 — R04/R12.** [G1447 history](#history-g1447) has 19 FAIL episodes, two real: an actual omitted path (SPRINT-154:189) and the wrong-log baseline reader (SPRINT-155:150). The latter also bears on R12. Scope-change predates this window, so lifetime history remains unknown; these are lower bounds, not independent row totals.
+The live [SPRINT-172 Log](../../sprint/logs/SPRINT-172-process-cost-census.md), 2026-11-11 scope-change and T2 execute entries, adds one wording-only episode: naming a checker file in prose failed the path check; rewording passed. Thus R04 has at least 20 observed episodes, still only two established real cases in this cited set.
+**E2 — R05/R07.** [SPRINT-122:159](#entry-sprint-122-159) caught an AUTHORITY_BOUNDARY rollup missing its parked-task line; the producer changed. Preserve the non-green task state and run summary. This is one shared defect, not two additive catches; the other G0567 episodes do not establish an independent calibration defect.
+**E3 — R17/R18.** [SPRINT-171:220](#entry-sprint-171-220) first exposed absent review records for T1/T3 and an unreviewed T5. [SPRINT-171:227](#entry-sprint-171-227) records the review and repair of the dropped both-runs screen-out rule. One shared episode supports keeping both classification and completion records; do not copy all 28 G0636 FAILs into both rows.
+**E4 — R09.** [G0297 history](#history-g0297): one FAIL, zero real defects. SPRINT-114:355 moved the status fields under the expected heading; it discovered no unfinished handoff action.
+That is the check's history, not the record's, so R09 is keep (unknown) by the D2 bar (coordinator ruling after review round 1). Retiring the stub with G0297 is the owner's call, and it must name what close step 1 reads instead, amend STANDARD §2/§11 and the skill contract, and keep §12(b)'s conversion duty.
+**E5 — R24.** [SPRINT-093:163](#entry-sprint-093-163) caused a mode-aware repair to the J2 authority reader. The explicit class is needed to distinguish reserved work; this finding supports the input, not every other field that G1474 reads.
+**E6 — R15/R63.** [G1597 history](#history-g1597): two subject/tick-count record episodes, zero proved unfinished-work catches. The SPRINT-102 two-versus-three claim is borderline for the owner. These are not evidence to delete ticks or evidence suffixes; the frozen baseline reader also consumes them.
+
+### Record-history search audit
+
+Command: `bun --no-env-file census-input/t4-history.ts`. Each case-insensitive expression below searches whole dated entries in all 124 archived logs. Candidates are not FAIL counts: the last column merely co-occurs with FAIL, false-pass, missing, dropped, unrecorded, lost or absent. Seeded tests, quoted formats and unrelated findings can all match.
+The broad search does not manufacture attribution. T3's reader histories and E1–E6 supply the classified cases; other rows remain unknown where these records do not separate this step's failures from the surrounding work. In particular, an empty candidate set does not recover pre-archive history or prove that a procedural step has never found a defect.
+
+| Row | Entry search expression | Candidate entries | With failure vocabulary |
+|---|---|---:|---:|
+| R01 | `promote\|governance checklist` | 372 | 250 |
+| R02 | `progress\|execute\|task.done` | 796 | 545 |
+| R03 | `surprise` | 173 | 135 |
+| R04 | `scope.change\|LOG.REWRITTEN` | 440 | 278 |
+| R05 | `parked.hitl\|park record` | 29 | 23 |
+| R06 | `blocker\|blocked` | 137 | 89 |
+| R07 | `run.complete\|rollup\|terminal ·\|outcome ·` | 210 | 140 |
+| R08 | `close.*entry\|\\| close \\|` | 77 | 43 |
+| R09 | `handoff.status\|handoff.state\|HANDOFF.LEDGER` | 102 | 60 |
+| R10 | `plan locked\|sprint.*render\|member.*stamp` | 99 | 52 |
+| R11 | `plan locked` | 89 | 43 |
+| R12 | `plan_commit\|freeze.*pin` | 76 | 50 |
+| R13 | `gates_signed\|sign.off.*record` | 52 | 34 |
+| R14 | `status.move\|own commit\|TASK-.*to (done\|review\|in_progress)` | 54 | 35 |
+| R15 | `tick.*evidence\|evidence.*tick\|dod.delta` | 79 | 59 |
+| R16 | `Files Changed` | 11 | 8 |
+| R17 | `consequence` | 423 | 309 |
+| R18 | `review.depth\|review ·` | 267 | 198 |
+| R19 | `revise\|retry ·` | 103 | 74 |
+| R20 | `worker ·\|worker.*resum` | 8 | 2 |
+| R21 | `builder.check.*design\|design.*packet` | 25 | 15 |
+| R22 | `builder.check` | 69 | 40 |
+| R23 | `G2\|Approved design\|overlap\|abuse.case` | 549 | 327 |
+| R24 | `authority\|J2\|J.class` | 118 | 79 |
+| R25 | `verify.reach\|Verify:\|judgment tick` | 98 | 76 |
+| R26 | `ADR.*index\|DECISIONS` | 81 | 66 |
+| R27 | `worktree.base\|base.*guard` | 24 | 19 |
+| R28 | `merge.back\|no.ff` | 42 | 31 |
+| R29 | `system.verify\|no.gate.discovered` | 194 | 158 |
+| R30 | `owner.ruling\|overrid` | 424 | 274 |
+| R31 | `approval_envelope\|approval.envelope` | 19 | 16 |
+| R32 | `gate_exceptions\|gate.exception` | 4 | 4 |
+| R33 | `allowlist\|permissions.allow` | 21 | 17 |
+| R34 | `expected.*cost\|run.*budget` | 56 | 50 |
+| R35 | `pre.flight\|capability\|probe` | 134 | 93 |
+| R36 | `fired ·\|fired.line` | 10 | 8 |
+| R37 | `per.criterion\|Tn.k` | 6 | 2 |
+| R38 | `calibration` | 45 | 31 |
+| R39 | `Retro\|four.bucket` | 202 | 130 |
+| R40 | `CHANGELOG\|Shipped` | 383 | 259 |
+| R41 | `TD-[0-9]+\|tech.debt` | 583 | 419 |
+| R42 | `close.retro\|follow.up` | 163 | 92 |
+| R43 | `L-[0-9]+\|learning` | 745 | 542 |
+| R44 | `close_commit\|status: closed` | 36 | 25 |
+| R45 | `sprint.*close.*commit\|squash.commit` | 24 | 16 |
+| R46 | `archive.*log\|log.*archive\|sprint/INDEX` | 65 | 42 |
+| R47 | `retention\|compact\|prun` | 139 | 85 |
+| R48 | `last_updated\|doc.freshness\|humaniz` | 77 | 39 |
+| R49 | `epic.*rollup\|epic.state\|Member sprints` | 91 | 59 |
+| R50 | `epic.coverage\|roadmap.coverage\|uncovered.*condition` | 55 | 32 |
+| R51 | `knowledge.index\|gen.index` | 86 | 66 |
+| R52 | `disposition\|promoted: yes` | 88 | 64 |
+| R53 | `TD.*aging\|aged.*TD\|auto.escalat` | 85 | 54 |
+| R54 | `scaffold\|profile\|Conventions in use` | 97 | 62 |
+| R55 | `migration.*plan\|migrate.*plan\|per.file` | 34 | 21 |
+| R56 | `migrat\|v1.*v2` | 137 | 84 |
+| R57 | `preserv.*inventory\|item.*sha256\|backup point` | 3 | 1 |
+| R58 | `meant.*output\|pending.*withheld\|id set\|tick.*count` | 24 | 18 |
+| R59 | `draft.review\|round.count\|two rounds` | 14 | 9 |
+| R60 | `UI floor\|contrast\|click.through\|UNVERIFIED` | 21 | 18 |
+| R61 | `before/after\|characterization\|pin.*behaviour` | 25 | 21 |
+| R62 | `handoff\|reconcil` | 262 | 188 |
+| R63 | `commit.*subject\|subject.*commit\|trailer` | 64 | 51 |
+| R64 | `Progress:\|Next:\|uncertain.write\|worker.*report` | 31 | 16 |
+
+### Source identity manifest
+
+The alias table resolves every locator. Line numbers are at the pin. Each manifest anchor is checked against its source, then the manifest row-id set is diffed both ways against the written record table. This checks the transcription; semantic completeness is the source read-through judgment, not a claim that a keyword search discovers every obligation.
+
+| Alias | Source |
+|---|---|
+| O | [skills/orchestrator/SKILL.md](../../../skills/orchestrator/SKILL.md) |
+| D | [skills/orchestrator/references/dispatch.md](../../../skills/orchestrator/references/dispatch.md) |
+| V | [skills/orchestrator/references/review-scoping.md](../../../skills/orchestrator/references/review-scoping.md) |
+| B | [skills/orchestrator/references/builder-check.md](../../../skills/orchestrator/references/builder-check.md) |
+| N | [skills/orchestrator/references/night-run.md](../../../skills/orchestrator/references/night-run.md) |
+| C | [skills/orchestrator/references/night-run-checks.md](../../../skills/orchestrator/references/night-run-checks.md) |
+| W | [skills/orchestrator/references/worker-brief.md](../../../skills/orchestrator/references/worker-brief.md) |
+| L | [skills/lean-doc-generator/SKILL.md](../../../skills/lean-doc-generator/SKILL.md) |
+| S | [skills/lean-doc-generator/references/sprint-by-reference.md](../../../skills/lean-doc-generator/references/sprint-by-reference.md) |
+| H | [skills/lean-doc-generator/references/handoff-reconciliation.md](../../../skills/lean-doc-generator/references/handoff-reconciliation.md) |
+| E | [skills/lean-doc-generator/references/epic-coverage.md](../../../skills/lean-doc-generator/references/epic-coverage.md) |
+| P | [skills/lean-doc-generator/references/promote-brief.md](../../../skills/lean-doc-generator/references/promote-brief.md) |
+| I | [skills/lean-doc-generator/references/init.md](../../../skills/lean-doc-generator/references/init.md) |
+| M | [skills/lean-doc-generator/references/migration-map.md](../../../skills/lean-doc-generator/references/migration-map.md) |
+| U | [skills/lean-doc-generator/references/humanize-pass.md](../../../skills/lean-doc-generator/references/humanize-pass.md) |
+| T | [skills/lean-doc-generator/templates/sprint-log.md.template](../../../skills/lean-doc-generator/templates/sprint-log.md.template) |
+
+| Source identity | Literal anchor | Record row |
+|---|---|---|
+| L:118 — Governance review at promote | `Governance review at promote` | R01 |
+| O:102 — sprint-bulk step 4 | `append to the sprint Execution Log` | R02 |
+| T:24 — Event vocabulary | `surprise` | R03 |
+| S:17 — Freeze | `scope-change` | R04 |
+| N:126 — Part 0 park protocol | `Write the park record` | R05 |
+| O:103 — sprint-bulk step 5 | `First-blocker halt` | R06 |
+| N:671 — Part 4 | `The rollup goes under the entry header` | R07 |
+| T:25 — Event vocabulary | `run-complete · close · handoff` | R08 |
+| H:57 — Close-time sweep step 3 | `Append one closing` | R09 |
+| S:21 — Promote step 3 | `Stamp` | R10 |
+| S:30 — Promote step 4 | `plan locked` | R11 |
+| S:31 — Promote step 4; Without git | `plan_commit:` | R12 |
+| O:83 — quick step 2; G2; L:promote | `gates_signed: G1 @` | R13 |
+| D:95 — Members rule 6; S:Promote step 2 | `Each is` | R14 |
+| D:87 — Members rule 5 | `Tick` | R15 |
+| L:108 — Sprint lifecycle executing | `keep Files Changed current` | R16 |
+| V:206 — Two dimensions | `consequence · Tn · behaviour:low` | R17 |
+| V:116 — Revise loop; Two axes | `Close the loop with its review line` | R18 |
+| V:110 — Revise loop; N:Part 4 | `Log the outcome` | R19 |
+| D:33 — Hand the sub-agent | `worker · Tn` | R20 |
+| B:16 — Procedure step 2 | `Write them to one file` | R21 |
+| B:22 — Procedure step 4 | `Record one line per task` | R22 |
+| O:46 — G2 and sprint-bulk step 2 | `Approved design` | R23 |
+| O:53 — G2 | `Authority class declared per task` | R24 |
+| O:50 — G2 | `verification method` | R25 |
+| L:24 — Golden Rule | `a rich ADR` | R26 |
+| D:625 — Worktree-base guard | `Record the result in the Execution Log either way` | R27 |
+| D:642 — Merge-back queue | `--no-ff` | R28 |
+| D:775 — System verify; N:Part 4 | `system-verify` | R29 |
+| D:779 — System verify; V:Evidence boundary | `owner-ruling: system-verify` | R30 |
+| N:223 — Part 1a step 4b | `approval_envelope: goal` | R31 |
+| N:254 — Part 1a step 4c | `gate_exceptions_pin:` | R32 |
+| N:330 — Part 1 pre-flight | `settings permissions` | R33 |
+| N:462 — Part 1 pre-flight | `run's own expected cost is stated` | R34 |
+| N:293 — Part 1; C:Capability checks | `All items must pass` | R35 |
+| N:547 — Part 2 reaper | `fired · <ISO-8601 UTC>` | R36 |
+| N:825 — Part 4 | `Per-criterion evidence` | R37 |
+| N:859 — Part 4 calibration | `Append it beside them` | R38 |
+| L:111 — Retro at close | `Retro at close` | R39 |
+| L:112 — Retro at close | `Shipped →` | R40 |
+| L:112 — Retro at close | `Tech debt →` | R41 |
+| L:112 — Retro at close; H:Sweep | `origin: close-retro` | R42 |
+| L:112 — Retro at close | `Learnings →` | R43 |
+| L:109 — Sprint lifecycle close | `close_commit` | R44 |
+| L:109 — Sprint lifecycle close | `squash-commit` | R45 |
+| L:109 — Sprint lifecycle close | `its log` | R46 |
+| L:109 — Sprint lifecycle close | `compaction sweep` | R47 |
+| L:76 — Execution flow 7; close; U | `then enforce the line cap` | R48 |
+| L:94 — Epic and close | `Member sprints` | R49 |
+| E:63 — Where each caller uses it | `owner override` | R50 |
+| L:76 — Execution flow 7 | `regenerate it after writing` | R51 |
+| L:130 — Governance review | `with a stated` | R52 |
+| L:130 — Governance review | `auto-escalate Backlog P1` | R53 |
+| I:49 — Steps 2-6; L:Execution flow | `Scaffold the base tier` | R54 |
+| M:25 — Procedure step 2 | `2. **Plan**` | R55 |
+| M:45 — Procedure step 3; v1 mapping | `Apply incrementally` | R56 |
+| M:98 — Preserve inventory | `item → sha256` | R57 |
+| M:411 — Verification | `Id set, diffed both ways` | R58 |
+| V:142 — Draft reviews | `Record the round count` | R59 |
+| V:249 — UI floor | `each one is recorded as evidence` | R60 |
+| D:57 — Implement routing | `before/after record` | R61 |
+| H:44 — Sweep; N:Park; M:Headless; I:Headless | `Route every item` | R62 |
+| O:86 — quick step 5; D:Commit messages | `structured message` | R63 |
+| O:124 — Report shape; W; D:Uncertain writes | `Report shape` | R64 |
+
+Secondary source reconciliation: O's quick/mvp/sprint-bulk lists map to R10–R15, R17–R26, R29–R31, R63–R64; D's member, dispatch, merge and exit lists map to R02, R04, R14–R15, R20, R23, R27–R30, R61–R64. B's packet/result/pruning writes map to R21/R22/R04; V's review, retry, draft and UI records to R17–R19/R25/R30/R59/R60.
+N's boundary, launch and Part 4 records map to R05–R07, R13, R17–R19, R24, R29–R38, R62. C adds capability results to R35. W/P are worker contracts: report-only boundaries map to R64; authorized promote writes repeat L/S, with no new record kind.
+L/S lifecycle writes map to R01/R04/R08–R16/R39–R53; S's no-git snapshots are R12, date grants R13 and date close pins R44. H's live/consumed/spent stubs are R09; routing is R41–R43/R62. E's marks/reports are R50, its override R04. T supplies all nine event kinds plus R17's consequence line.
+I's scaffold, safe-scaffold, profile/citation and file/skip report are R54/R64. M's plan, profile, preservation, conversion, links, conflict/pending and verification writes are R54–R58/R62/R64. U transforms existing R48 prose. Profiles only supply questions for R54; ADR-example only supplies the R26 example. Neither adds a record kind.
+
+### Archived event identities
+
+All **124 archived Log files**, **1581 dated entries**, **48 distinct event spellings** are covered, case-sensitively. The scan accepts only H3 date/pipe headings, not prose mentions. Template kinds all appear. Legacy task/complete/execute names map to R02; gate is the general decision-record wrapper R23, even when its body contains R29's system-verify line.
+These are accounting aliases, not an approval to use them. In particular, the template reserves run-complete for a whole run; an old complete heading does not establish a finished Plan. No archived text is rewritten.
+
+| Exact event type | Row | All-archive entries | Entries 169/170/171 | First occurrence |
+|---|---|---:|---|---|
+| `G1` | R23 | 1 | 0/0/0 | [SPRINT-168:32](../../sprint/archive/logs/SPRINT-168-jev-first-use-and-check.md) |
+| `G2` | R23 | 7 | 0/0/0 | [SPRINT-048:21](../../sprint/archive/logs/SPRINT-048-epic-layer.md) |
+| `T1` | R02 | 6 | 0/0/0 | [SPRINT-092:61](../../sprint/archive/logs/SPRINT-092-the-conversions-measured-delta.md) |
+| `T1 done` | R02 | 1 | 0/0/0 | [SPRINT-168:54](../../sprint/archive/logs/SPRINT-168-jev-first-use-and-check.md) |
+| `T1 landed` | R02 | 1 | 0/0/0 | [SPRINT-045:109](../../sprint/archive/logs/SPRINT-045-gate-precision.md) |
+| `T2` | R02 | 6 | 0/0/0 | [SPRINT-092:132](../../sprint/archive/logs/SPRINT-092-the-conversions-measured-delta.md) |
+| `T2 done` | R02 | 1 | 0/0/0 | [SPRINT-168:72](../../sprint/archive/logs/SPRINT-168-jev-first-use-and-check.md) |
+| `T2 landed` | R02 | 1 | 0/0/0 | [SPRINT-045:73](../../sprint/archive/logs/SPRINT-045-gate-precision.md) |
+| `T3` | R02 | 7 | 0/0/0 | [SPRINT-092:226](../../sprint/archive/logs/SPRINT-092-the-conversions-measured-delta.md) |
+| `T3 done` | R02 | 1 | 0/0/0 | [SPRINT-168:50](../../sprint/archive/logs/SPRINT-168-jev-first-use-and-check.md) |
+| `T4` | R02 | 5 | 0/0/0 | [SPRINT-092:283](../../sprint/archive/logs/SPRINT-092-the-conversions-measured-delta.md) |
+| `T5` | R02 | 4 | 0/0/0 | [SPRINT-097:535](../../sprint/archive/logs/SPRINT-097-guards-that-run-over-the-wrong-set.md) |
+| `T6` | R02 | 1 | 0/0/0 | [SPRINT-125:120](../../sprint/archive/logs/SPRINT-125-consumer-maturity-and-cleanup.md) |
+| `T7` | R02 | 1 | 0/0/0 | [SPRINT-125:198](../../sprint/archive/logs/SPRINT-125-consumer-maturity-and-cleanup.md) |
+| `T8` | R02 | 1 | 0/0/0 | [SPRINT-125:126](../../sprint/archive/logs/SPRINT-125-consumer-maturity-and-cleanup.md) |
+| `T9` | R02 | 1 | 0/0/0 | [SPRINT-125:218](../../sprint/archive/logs/SPRINT-125-consumer-maturity-and-cleanup.md) |
+| `blocker` | R06 | 15 | 0/0/1 | [SPRINT-058:69](../../sprint/archive/logs/SPRINT-058-measure-before-moving.md) |
+| `build` | R02 | 1 | 0/0/0 | [SPRINT-167:44](../../sprint/archive/logs/SPRINT-167-grant-scope-and-token-room.md) |
+| `close` | R08 | 59 | 0/1/1 | [SPRINT-052:69](../../sprint/archive/logs/SPRINT-052-rule-placement.md) |
+| `close-prep` | R39 | 1 | 0/0/0 | [SPRINT-125:224](../../sprint/archive/logs/SPRINT-125-consumer-maturity-and-cleanup.md) |
+| `complete` | R02 | 45 | 0/0/0 | [SPRINT-048:80](../../sprint/archive/logs/SPRINT-048-epic-layer.md) |
+| `consequence` | R17 | 3 | 0/0/0 | [SPRINT-098:134](../../sprint/archive/logs/SPRINT-098-prove-the-run-then-report-it.md) |
+| `correction` | R02 | 3 | 0/0/1 | [SPRINT-102:270](../../sprint/archive/logs/SPRINT-102-make-the-gate-green.md) |
+| `decision` | R23 | 4 | 0/0/0 | [SPRINT-075:248](../../sprint/archive/logs/SPRINT-075-the-conformance-engine.md) |
+| `dispatch` | R20 | 3 | 0/0/0 | [SPRINT-122:66](../../sprint/archive/logs/SPRINT-122-finish-epic-015.md) |
+| `execute` | R02 | 19 | 0/14/0 | [SPRINT-090:173](../../sprint/archive/logs/SPRINT-090-run-evidence-vehicle.md) |
+| `g1-g2` | R23 | 1 | 1/0/0 | [SPRINT-169:32](../../sprint/archive/logs/SPRINT-169-jev-as-a-cheap-ab-judge.md) |
+| `g2` | R23 | 6 | 0/0/0 | [SPRINT-118:61](../../sprint/archive/logs/SPRINT-118-prove-the-run.md) |
+| `gate` | R23 | 67 | 0/3/4 | [SPRINT-107:32](../../sprint/archive/logs/SPRINT-107-retarget-the-loop.md) |
+| `gates` | R23 | 1 | 0/0/0 | [SPRINT-167:32](../../sprint/archive/logs/SPRINT-167-grant-scope-and-token-room.md) |
+| `handoff` | R09 | 5 | 0/0/0 | [SPRINT-114:316](../../sprint/archive/logs/SPRINT-114-prove-adopt-release-2-0.md) |
+| `merge` | R28 | 2 | 0/0/0 | [SPRINT-125:98](../../sprint/archive/logs/SPRINT-125-consumer-maturity-and-cleanup.md) |
+| `note` | R02 | 4 | 0/0/0 | [SPRINT-075:277](../../sprint/archive/logs/SPRINT-075-the-conformance-engine.md) |
+| `owner-ruling` | R30 | 2 | 0/0/0 | [SPRINT-097:478](../../sprint/archive/logs/SPRINT-097-guards-that-run-over-the-wrong-set.md) |
+| `park` | R05 | 8 | 0/0/0 | [SPRINT-060:192](../../sprint/archive/logs/SPRINT-060-make-room.md) |
+| `park-resolved` | R05 | 1 | 0/0/0 | [SPRINT-123:152](../../sprint/archive/logs/SPRINT-123-repair-and-park-vehicle.md) |
+| `pre-flight` | R35 | 1 | 0/0/0 | [SPRINT-045:20](../../sprint/archive/logs/SPRINT-045-gate-precision.md) |
+| `progress` | R02 | 707 | 4/0/12 | [SPRINT-049:122](../../sprint/archive/logs/SPRINT-049-layer-check-redesign.md) |
+| `promote` | R01 | 92 | 1/1/1 | [SPRINT-055:24](../../sprint/archive/logs/SPRINT-055-wiring-the-standard.md) |
+| `review` | R18 | 32 | 0/1/1 | [SPRINT-092:348](../../sprint/archive/logs/SPRINT-092-the-conversions-measured-delta.md) |
+| `rollup` | R07 | 2 | 0/0/0 | [SPRINT-045:152](../../sprint/archive/logs/SPRINT-045-gate-precision.md) |
+| `run-complete` | R07 | 13 | 0/0/0 | [SPRINT-068:97](../../sprint/archive/logs/SPRINT-068-open-the-standard.md) |
+| `scope-change` | R04 | 270 | 0/3/8 | [SPRINT-045:169](../../sprint/archive/logs/SPRINT-045-gate-precision.md) |
+| `surprise` | R03 | 154 | 1/0/0 | [SPRINT-049:23](../../sprint/archive/logs/SPRINT-049-layer-check-redesign.md) |
+| `system-verify` | R29 | 10 | 0/0/0 | [SPRINT-122:237](../../sprint/archive/logs/SPRINT-122-finish-epic-015.md) |
+| `task-done` | R02 | 3 | 0/0/0 | [SPRINT-124:72](../../sprint/archive/logs/SPRINT-124-close-epic-015-and-cut-the-engine.md) |
+| `verify` | R29 | 1 | 0/0/0 | [SPRINT-090:296](../../sprint/archive/logs/SPRINT-090-run-evidence-vehicle.md) |
+| `wave 1 dispatched` | R20 | 1 | 0/0/0 | [SPRINT-045:50](../../sprint/archive/logs/SPRINT-045-gate-precision.md) |
+
+### Exclusive commit attribution
+
+The ledger assigns each of T1's 93 non-work subjects exactly once. A named status move, field write, tick, index regeneration, scope amendment or vocabulary repair wins over a co-mentioned log append. Otherwise a log-of-work/review/ruling subject goes to R02; explicit system-verify goes to R29. The explicit ledger resolves mixed subjects reproducibly.
+Examples: ac1b641c starts with logging build/review, so R02 owns it despite the co-mentioned ticks; a49c5765 starts with ticking, so R15 owns it. 65a32709's consequence-and-Cites repair is R17; 984e5b2f's G2/prune is R04. 16ae5b99's density repair and the three EPIC-024 row-5 edits are R48.
+This is D4's subject proxy, not a causal time study: a coordinator subject can contain substantive evidence. The ledger does not claim all 93 commits are waste or that each merge proposal saves its entire cost.
+
+| Sprint | Commit | Row | Subject after sprint prefix |
+|---|---|---|---|
+| 169 | `e5219eef` | R11 | plan locked |
+| 169 | `89fd891c` | R12 | record plan_commit e5219eef |
+| 169 | `dbf37642` | R13 | sign G1 and G2 for T1, re-tier TASK-628 to G |
+| 169 | `271ce510` | R14 | TASK-628 to in_progress |
+| 169 | `034c1945` | R20 | log the T1 builder |
+| 169 | `ac1b641c` | R02 | log T1's build and review, tick TASK-628 boxes 2 and 3 |
+| 169 | `e663d648` | R02 | record T1's paid replay, tick TASK-628 box 1 |
+| 169 | `05c9fcbe` | R14 | TASK-628 to done |
+| 169 | `ceca166b` | R17 | fix T1's consequence line to the checker's vocabulary |
+| 169 | `2bdea5fb` | R29 | log system verify, the owner's rulings and the exit rollup |
+| 169 | `832fb2e2` | R47 | prune ten closed task files past three sprints (§11) |
+| 169 | `121b89a8` | R45 | close: Jev as a cheap A/B judge, and router step 1 measured |
+| 170 | `25fa20ac` | R11 | plan locked |
+| 170 | `ff75504e` | R12 | record plan_commit |
+| 170 | `16ae5b99` | R48 | split epic D13 so no line runs over the density cap |
+| 170 | `2b47ccc0` | R13 | sign G1 and G2, record the design and settlements |
+| 170 | `c77fad9c` | R14 | move TASK-632 to in_progress |
+| 170 | `2e969cbf` | R02 | log T1 build, review, permission ruling and probe P-ord2 |
+| 170 | `a83d21d0` | R02 | log the thin-arm probes and T1 done |
+| 170 | `e7c6a908` | R14 | move TASK-632 to done |
+| 170 | `d5ad10fe` | R14 | move TASK-638 to in_progress |
+| 170 | `d2852465` | R02 | log replay O1 and the pause and parallel rulings |
+| 170 | `a3258b03` | R02 | log replay R1 and the free prep checks |
+| 170 | `2b32b046` | R02 | log replay O2, the R2 early stop and the row 4b verdict |
+| 170 | `47c9bd01` | R14 | move TASK-638 to done |
+| 170 | `fb033c19` | R02 | log T6 gates, the S30 ruling and T4's unsafe-merge case |
+| 170 | `332e42e1` | R14 | move TASK-634 to in_progress |
+| 170 | `929404de` | R02 | log merger run M1 as invalid and the M1' ruling |
+| 170 | `bac019c6` | R02 | log merger run M1' and the decision to run M2 |
+| 170 | `62a9824e` | R02 | log merger run M2 and the row 6 verdict |
+| 170 | `44fcd0dc` | R14 | move TASK-634 to done |
+| 170 | `130b16f3` | R14 | move TASK-633 to in_progress |
+| 170 | `ed1fe6d1` | R02 | log T3's resume probes and the fallback order |
+| 170 | `f99e2505` | R02 | log T3's resume failures and the in-process ruling |
+| 170 | `a8c30eff` | R02 | log T3's pairs and the row 5 verdict |
+| 170 | `cb5a7807` | R14 | move TASK-633 to done |
+| 170 | `30160d64` | R14 | move TASK-636 and TASK-637 to in_progress |
+| 170 | `2fa6cca1` | R02 | log T6's review catching the seed |
+| 170 | `b1ab00e1` | R14 | move TASK-636 to done |
+| 170 | `be66192a` | R02 | log T7's runs and the row 9 verdict |
+| 170 | `fade3c3d` | R14 | move TASK-637 to done |
+| 170 | `f0985753` | R02 | log the recap review and the finish rulings |
+| 170 | `ab87766d` | R14 | move TASK-635 to in_progress |
+| 170 | `23921202` | R02 | log T5's runs and the row 7 verdict |
+| 170 | `67d3e5cd` | R14 | move TASK-635 to done |
+| 170 | `65a32709` | R17 | fix the consequence line and Cites lines system verify flagged |
+| 170 | `aa80826f` | R04 | cite gate-remote.ts on T6 |
+| 170 | `c4a4a7a0` | R04 | cite gate-remote.ts on T6 by its bare name |
+| 170 | `3f057182` | R29 | log system verify and the sprint-bulk exit rollup |
+| 170 | `ed530d27` | R45 | close: six role trials, rows 6 and 9 pass, nothing ships yet |
+| 171 | `18148168` | R11 | plan locked |
+| 171 | `4067a4a8` | R12 | record plan_commit |
+| 171 | `57f76a2d` | R13 | log the G1 batch sign-off |
+| 171 | `984e5b2f` | R04 | log G2-A and prune T3 and T4 layers |
+| 171 | `dec5edc8` | R04 | cite session-cost.ts on T4 after the layers prune |
+| 171 | `1f6c2ea2` | R14 | move TASK-640, 644 and 645 to in_progress |
+| 171 | `a49c5765` | R15 | tick TASK-644 boxes 1 and 3, log the T3 review |
+| 171 | `cd606dca` | R14 | move TASK-644 to review |
+| 171 | `4245d5c0` | R51 | regenerate the knowledge index for the cost-allocation note |
+| 171 | `35abb2af` | R15 | tick TASK-645, log the T4 build |
+| 171 | `098f5f5a` | R14 | move TASK-645 to done |
+| 171 | `1533e423` | R04 | log G2-B, the budget ruling and the T5 layers prune |
+| 171 | `9a6e8fa3` | R13 | record gates_signed, raise D1 to 40 USD, prune T5 layers |
+| 171 | `a278dcf1` | R48 | amend EPIC-024 row 5 with the cold-start finding |
+| 171 | `e4a391ca` | R15 | tick TASK-640, log the T1 build and review |
+| 171 | `307f03e7` | R14 | move TASK-640 to done |
+| 171 | `5244b66f` | R14 | move TASK-641, 642 and 643 to in_progress |
+| 171 | `ae1e7e88` | R48 | move the row 5 amendment into EPIC-024 D18 |
+| 171 | `9f08a0d3` | R48 | shorten the row 5 pointer to D18 |
+| 171 | `51c38aae` | R51 | regenerate the knowledge index for the replication protocol |
+| 171 | `485705af` | R15 | tick TASK-643, log the T5 build |
+| 171 | `5207a64c` | R14 | move TASK-643 to done |
+| 171 | `731c89b2` | R02 | log the T2 and T6 free prep |
+| 171 | `9e8da90d` | R04 | log the T6 R2 re-ruling, no overlay, the gate by path |
+| 171 | `0abc168d` | R15 | tick TASK-642, log the T2 runs |
+| 171 | `08351b50` | R14 | move TASK-642 to done |
+| 171 | `892dc155` | R02 | log the T6 run kit and the baseline ruling |
+| 171 | `a0292850` | R02 | log T6 N1 and the oracle and review rulings |
+| 171 | `b5611341` | R02 | log T6 K1 void, K2 host kill and three owner rulings |
+| 171 | `dca1e490` | R02 | log the T6 pause and the cost-fix and futility rulings |
+| 171 | `bcf8fde1` | R02 | log the T6 cost fix, futility stop and K2 relaunch slot |
+| 171 | `6f0811a4` | R14 | move TASK-641 to done |
+| 171 | `2924dc55` | R02 | log T6 K2R, the futility stop and the row 6 verdict |
+| 171 | `a8fa7c7d` | R14 | move TASK-646 to in_progress |
+| 171 | `da6c4dbd` | R14 | move TASK-646 to done |
+| 171 | `b88a4b18` | R04 | widen T1 Layers and T6 Cites for two close-gate findings |
+| 171 | `a42ca21c` | R17 | strict consequence lines, T1 and T3 review records |
+| 171 | `9aa5a98c` | R18 | T5 review record, TD-307 and TD-308 |
+| 171 | `8a695d27` | R04 | declare T6's oracle keys on its Cites |
+| 171 | `d9e4405b` | R29 | log system-verify before close |
+| 171 | `0913d6d3` | R15 | tick TASK-644 from the SPRINT-171 Retro |
+| 171 | `1a157d41` | R14 | move TASK-644 to done |
+| 171 | `ea460465` | R45 | close, EPIC-024 ruled and finished |
+
+**Commit sums: 12 = 12; 38 = 38; 43 = 43; total 93.** Independently, all commits minus T1's work regex gives 13−1, 48−10, 59−16. E sums: **7/23/29** dated entries. The event table and the R-row E totals agree; structured lines are never added to those totals.
+
+### Owner decision packet
+
+| Population | Proposed disposition | Owner decision |
+|---|---|---|
+| Checks: 25 keep + 19 fixture keeps | Keep these 44; all 23 consumer guards remain | Preserve named real-case fixtures; a later implementation must replay them. |
+| Checks: 17 keep (unknown) | Keep pending evidence/ruling | G0147, G0169, G0234, G0435, G0672, G0708, G0733, G0917, G0947, G1015, G1094, G1384, G1407, G1544, H13, H14, H43. Unknown is never a zero-defect cut. |
+| Checks: 21 cut + 8 cut (with) | Propose 29 cuts | Approve the T3 zero-defect set and its fixture coupling before changing rules. |
+| Checks: six borderline cuts | Owner rules | G1597: record-truth bar. H01, H02, H22, H45, H46: whether sole proof of a shipped rule is a consumer guard. H18 follows the eventual G1597 ruling. |
+| Checks: seven n/a | No independent verdict/ruling | These are inventory blocks, not seven additional removable checks. No check merge proposed. |
+| Records: keep | R04, R05, R07, R12, R17, R18, R24 | Preserve baseline, scope, class, review and run-state evidence because named consumers need it. |
+| Records: tied to a check cut | R09 (keep, unknown) | If G0297 is cut, decide whether the status stub retires with it; a retirement must name the replacement for close step 1's discovery read. No record cut is proposed. |
+| Records: merge | R02, R03, R06, R08, R14, R16, R19, R21, R27, R37, R45, R51, R64 | Approve packaging changes, especially R14 versus ADR-045 D6; retain information and kept-reader inputs. |
+| Records: unknown | R01, R09, R10, R11, R13, R15, R20, R22, R23, R25, R26, R28, R29, R30, R31, R32, R33, R34, R35, R36, R38, R39, R40, R41, R42, R43, R44, R46, R47, R48, R49, R50, R52, R53, R54, R55, R56, R57, R58, R59, R60, R61, R62, R63 | Retain unless the owner rules on the evidence gap. Keep R31/R38 while G1474/G0567 still consume them, regardless of other check cuts. |
+
+R14 owns **2/13/11 = 26** status-move commits; R02 owns **2/16/7 = 25** progress commits; R51 owns **0/0/2 = 2** index-only commits. These are the first consolidation candidates, not promised savings. Scope amendments, review evidence and owner decisions must remain visible at the moment their consumers read them.
+Contract checks: ADR-045 D6 explicitly rejects bundling moves with content edits; R14 therefore requires a new owner ruling, including the history-tracing trade-off. ADR-047's member freeze, ADR-014's separate Log, ADR-016's launcher-owned rollup, ADR-021's evidence/override boundary and ADR-022's retry line remain constraints on every merge proposal.
+The next slice should write consequence, review, scope-change, ticks and moves from explicit validated inputs. Missing or ambiguous input must stop the writer; it must never invent low consequence. The SPRINT-171 T5 case is the required regression evidence. A kept check does not automatically justify a separate commit or duplicate narrative.
+**No cut has been made in this sprint.** The baseline stays owner-ruled: 43/7 non-work commits/member, target at most 43/14; 3 first-run close FAILs, target at most 1. Implementing these proposals belongs to later EPIC-025 slices, not this research change.
+
+### T4 scratch rules and verification
+
+Only scratch Bun TypeScript helpers under census-input/ were used; no .sh or paid/network call. Commands: `bun --no-env-file census-input/t4-inspect.ts events`; `bun --no-env-file census-input/t4-census.ts write`; `bun --no-env-file census-input/t4-census.ts verify`. Helpers are deleted before the builder report; this appendix retains source identities, alias rules and every attributed commit.
+The helper reads only the named skill/reference files, archived Markdown logs, this appendix and git subjects. It uses no env file. Independent checks select all H3 headings and split their pipe fields, and select all git range commits before subtracting the work set; they do not rely on the row counts under test.
+Self-review found the scratch fixture lookup also reading later T3 tables with reused ids. One correction restricted it to the original 103-row inventory; `bun --no-env-file census-input/t4-census.ts refresh` rebuilt only the record rows. Fixture paths were then checked against that inventory and for existence. No protected source changed.
+Source anchors resolve; required-row ↔ written-row differences are empty. Archive-heading selection differences are empty; event-type ↔ alias differences are empty; template events ↔ mapped kinds differences are empty. Non-work commit identities ↔ ledger identities are empty in both directions, with no duplicate assignment. Summary rulings are judgment, not mechanical proof.
+Negative, committed history: `git diff --stat e29815a9ad0cbd660fd80d3d2d9c827c4dd03215..HEAD -- skills scripts evals spec test` prints nothing. Working-tree scope is checked separately after scratch cleanup. The builder makes no commit; the coordinator must run `git show --stat <T4-commit>` after committing and verify only the two owner-approved census paths.
+Required local checks: `bun --no-env-file scripts/lib/check-prose-density.ts docs/research/process-cost-census.md`; the same command separately on `docs/research/logs/process-cost-census.md`; `bun --no-env-file scripts/lib/check-doc-caps.ts`. The coordinator owns index regeneration and integrated validation after commit.
+
+| T4 verification | Result |
+|---|---|
+| Source manifest / row identities | 64 unique rows, 12 columns; all literal anchors resolve; missing/extra []/[]; deletion and duplicate controls detected. |
+| Archive event identities | 124 logs, 1,581 dated entries, 48 exact types; independent H3/pipe selection and written alias table differences []/[]; all nine template types mapped. |
+| Commit identities / cost cells | 93 unique non-work commits; written ledger and independent git invert-grep differences []/[]; C sums 12/38/43; E sums 7/23/29. |
+| Prose density, each file separately | 1 pass, 0 fail for each; no prose line or data cell reaches 400 characters. |
+| Doc caps | Exit 0, no FAIL; decision doc 112/130 lines. Existing retained/FROZEN dispositions unchanged. |
+| Protected history and working diff | Empty for skills/, scripts/, evals/, spec/, test/; only the two census documents changed. |
+| Whitespace and local references | git diff --check clean; newly added local file links and fixtures resolve. |
+| Own-commit stat | Not run: builder forbidden to commit. Coordinator checks the two approved census paths after creating T4's commit. |
