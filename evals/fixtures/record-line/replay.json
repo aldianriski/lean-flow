@@ -1,0 +1,8 @@
+{
+  "source": "docs/sprint/archive/logs/SPRINT-171-finish-epic-024.md",
+  "cases": [
+    { "tn": "T5", "line": "consequence · T5 · behaviour:low · governance:high", "finding": "review-depth-governance-absent" },
+    { "tn": "T1", "line": "consequence · T1 · behaviour:material · governance:low", "finding": "review-depth-material-absent" },
+    { "tn": "T3", "line": "consequence · T3 · behaviour:low · governance:high", "finding": "review-depth-governance-absent" }
+  ]
+}

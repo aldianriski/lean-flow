@@ -88,7 +88,7 @@ const sprint = join(sprintDir, sprints[0]!);
 
 let failed = false;
 for (const [name, script] of [["freeze", FREEZE], ["layers-completeness", LAYERS]] as const) {
-  const r = spawnSync("bun", [script, sprint], { encoding: "utf8", cwd: root });
+  const r = spawnSync(process.execPath, ["--no-env-file", script, sprint], { encoding: "utf8", cwd: root });
   const lines = (r.stdout ?? "").split(/\r?\n/).filter((l) => l.length > 0);
   const fails = lines.filter((l) => /^FAIL/.test(l));
   for (const l of fails) console.log(l);
