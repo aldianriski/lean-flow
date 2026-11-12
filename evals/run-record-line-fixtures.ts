@@ -214,6 +214,7 @@ try {
     // Release review: todo/TASK-904 symlinked to backlog/TASK-903 must not move or tick TASK-903 under TASK-904.
     const root = fixture("tasklink", true);
     put(root, "docs/work/backlog/TASK-903-real.md", "## Done when\n- [ ] real box\n");
+    git(root, "add", "--", "docs/work/backlog/TASK-903-real.md"); // tracked, so only the symlink guard can refuse the move
     try {
       symlinkSync(join(root, "docs/work/backlog/TASK-903-real.md"), join(root, "docs/work/todo/TASK-904-alias.md"), "file");
     } catch (e) {
