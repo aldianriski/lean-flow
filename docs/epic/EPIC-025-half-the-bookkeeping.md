@@ -51,7 +51,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-172](../sprint/archive/SPRINT-172-process-cost-census.md) | Census every check and record step | closed · `51b651fd` | The evidence for every cut: 103 check rows and 64 record steps, each with its FAIL history, real defects and a proposed ruling; the median baseline 43/7 and 3 FAILs; and the owner packet for the next slice. Nothing cut. |
-| [SPRINT-173](../sprint/SPRINT-173-cut-checks-and-write-records-by-tool.md) | Sprint A: cut the zero-defect checks, write the record lines by tool, Jev trial, MINOR release | active | filled at close |
+| [SPRINT-173](../sprint/SPRINT-173-cut-checks-and-write-records-by-tool.md) | Sprint A: cut the zero-defect checks, write the record lines by tool, Jev trial, MINOR release | closed | 28 zero-defect checks and harnesses cut with every kept check still failing its fixture; 13 record steps merged; the record-line writer with the SPRINT-171 replay; the Jev trial run and dropped (0.0054 USD); v2.23.0 prepared and gated, not pushed. |
 
 ## Decisions
 - **D1** — Owner rulings, 2026-11-11, by popup. Slim and optimize, without reducing quality: "both, not only slim, but optimize, dont reduce quality". Slim now, before the workdoo work: "Slim now, before workdoo". The scope covers both shipped skills and lean-flow's own checks.
@@ -80,9 +80,9 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 ## Closed when
 - [x] `docs/research/process-cost-census.md` holds one row per check and per skill-required record step, taken at a pinned revision before any cut.
   Each row has its FAILs, real defects, fixture and ruling, and an unreadable history is recorded as unknown. The population is reconciled by identity, not by count: every PASS/FAIL check name `qa-check.sh` prints at that revision, every harness in leg 12 and every leg without a checkpoint has its row. → TASK-648, TASK-649, TASK-650 · closed by SPRINT-172
-- [ ] Every cut has zero real defects in the census, and nothing marked unknown is cut without a recorded owner ruling. Every check with one or more still runs, and its must-FAIL fixture still fails with its named finding. Manifest lockstep and the conformance engine still run. → TASK-651, TASK-655, TASK-656, TASK-657
-- [ ] Every record line a gate check parses is written by a tool. A fixture replays the census's real-defect cases (SPRINT-171 T5 among them) through the writer and then the gate, and the gate still demands the review. Given a missing or ambiguous input, the writer refuses and never writes a default. → TASK-652, TASK-653, TASK-656, TASK-657
-- [ ] The Jev trial's result and spend are recorded. Jev is either kept as advisory beside `check-review-depth.sh` or dropped, and it is never a gate leg. → TASK-654
-- [ ] Released as a MINOR on a Codex review plus the off-host gate. TASK-489 is retargeted from 2.16.0 to this release. → TASK-658
+- [x] Every cut has zero real defects in the census, and nothing marked unknown is cut without a recorded owner ruling. Every check with one or more still runs, and its must-FAIL fixture still fails with its named finding. Manifest lockstep and the conformance engine still run. → TASK-651, TASK-655, TASK-656, TASK-657 · closed by SPRINT-173
+- [x] Every record line a gate check parses is written by a tool. A fixture replays the census's real-defect cases (SPRINT-171 T5 among them) through the writer and then the gate, and the gate still demands the review. Given a missing or ambiguous input, the writer refuses and never writes a default. → TASK-652, TASK-653, TASK-656, TASK-657 · closed by SPRINT-173
+- [x] The Jev trial's result and spend are recorded. Jev is either kept as advisory beside `check-review-depth.sh` or dropped, and it is never a gate leg. → TASK-654 · closed by SPRINT-173 (dropped)
+- [ ] Released as a MINOR on a Codex review plus the off-host gate. TASK-489 is retargeted from 2.16.0 to this release. → TASK-658 (prepared and gated at SPRINT-173; open until the owner pushes v2.23.0 and `/triage` retargets TASK-489)
 - [ ] A workdoo sprint of five or more members, run on this release, is the measuring sprint (D8). It meets D4's targets under D4's counting rules, and no census-kept check was skipped.
   Its run record shows it promoted and closed with `/prime`'s `Skills:` row naming this release, and workdoo's own gate green. → next slice: workdoo sprint (Sprint B)

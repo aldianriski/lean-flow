@@ -148,3 +148,13 @@ Codex review of the shipped surface since `6444f83e`, round 1: two Mediums, fixe
 Round 2: both fixed and the bump follows §15; one Low (the fixture's symlink target was untracked, so the old code also refused the move) fixed at `90493f46`.
 Seed on the Linux gate host: with both task-identity guards removed, the move case FAILs (`moved TASK-904 to docs/work/done/`); restored, `git hash-object` equals HEAD's `d07871ce`.
 Gate: off-host QA_FULL at `90493f46`: `QA-CHECK: 236 pass, 0 fail`; `bun test` 621 pass, 0 fail; manifest lockstep and its must-FAIL harness PASS. Not pushed and not tagged: main is 366 ahead of origin, no tag at HEAD. Ticked TASK-658 4/4.
+
+### 2026-11-12 | system-verify | close gate on the integrated tree
+Off-host at `917538fc` via `scripts/gate-remote.ts` (QA_FULL): `QA-CHECK: 236 pass, 0 fail`; `bun test` 621 pass, 0 fail. First run, no FAIL to repair. `check-sprint-by-reference.ts --close` 18 pass, 0 fail.
+
+### 2026-11-12 | close | Retro written, buckets routed, retention proposed
+- Handoff reconciliation: swept the whole Log; no `handoff` entry exists, so nothing is `live` or `consumed`.
+- Members: all 8 in `done/`; 32 of 32 Done-when boxes ticked.
+- Buckets: CHANGELOG holds the v2.23.0 entry already written at T8. TD-310 (the live-case floors lost with H51) and TD-311 (prose density unenforced). Learnings L-315 and L-316. Follow-ups: none filed; the owner's `/triage` retargets TASK-489, folds TASK-627 into the dropped T4 trial and cancels TASK-629.
+- EPIC-025 rollup: the SPRINT-173 row filled; conditions 2, 3 and 4 ticked, closed by SPRINT-173. Condition 5 stays open until the owner pushes v2.23.0 and `/triage` retargets TASK-489; condition 6 is Sprint B.
+- Under the T7 sequence, `close_commit` and the epic row's sha are written in the archive commit once the owner approves retention.

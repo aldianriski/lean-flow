@@ -2038,3 +2038,13 @@ status: current
   - Evidence: SPRINT-171 Log, T1 entry (review 0 High, 2 Med, 5 Low; retry cap reached) and the T6 resume and K2R entries.
   - Impact: low. The harness is maintainer-only. A sub-check without a must-FAIL fixture can pass while broken, and a timeout reads as a failure.
   - Mitigation: add must-FAIL fixtures per oracle sub-check and per stream-checker operator; set an explicit timeout on the slow `test/trials/` cases; give the snapshot step the same timeout as the audit.
+- **TD-310** severity: low | status: open | created: Sprint-173 (close)
+  - Summary: **Cutting `run-workflow-command-fixtures.ts` (H51) removed the live-case floors for `evals/gate-remote.test.ts` (38) and `evals/merge-check.test.ts` (22).** The gate's `bun test` stage needs only one live test across the whole suite, so either file can vanish or lose cases unseen.
+  - Evidence: SPRINT-173 Log, T5 entry (scoped review Medium, owner-approved cut).
+  - Impact: low. Both files guard maintainer tools; a vanished suite reads as green.
+  - Mitigation: none proposed; a per-file floor in `scripts/gate-remote.ts` would be new governance machinery under ADR-053, so it waits for a measured miss.
+- **TD-311** severity: low | status: open | created: Sprint-173 (close)
+  - Summary: **Prose density (no line over 400 characters) is a manual check since G0268 left the gate and merge-check.** In SPRINT-173 three Execution Log lines over 400 landed unnoticed, and both shipped SKILL.md files sit at their 140-line cap, which invites squeezing.
+  - Evidence: SPRINT-173 Log lines 100, 131 and 140; T6 and T7 first passes each pushed a SKILL.md line past 400.
+  - Impact: low. Wording only; no verdict depends on it.
+  - Mitigation: count lines over 400 at EPIC-025's measuring sprint (Sprint B); restore a leg only if the count grows.

@@ -4,7 +4,7 @@ slug: cut-checks-and-write-records-by-tool
 epic: EPIC-025
 owner: Maintainer
 last_updated: 2026-11-12
-status: active
+status: closed
 gates_signed: G1,G2 @ b1ed060b
 plan_commit: 7503d39d
 update_trigger: sprint execute/close events
@@ -136,3 +136,37 @@ A release is a Codex review of the shipped diff plus the off-host gate, never an
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/qa-check.sh`, 6 checker scripts, 7 harnesses and their fixtures, comment sites, `scripts/merge-check.ts` and its test | T1 | 9 zero-defect checks and 7 harnesses cut; merge-check mirrors the gate's four legs | med | off-host gate green; census queries A and B agree; registry negative FAILs by name |
+| `docs/adr/ADR-045-the-work-item-store.md`, `scripts/lib/check-layers-observed.ts`, its tests and fixture | T2 | D6 amended: a task's moves and ticks ride in its own work commits; the checker admits a member's own file | med | 47 pass; seeded old rule reddens only L-258 |
+| `scripts/lib/record-line.ts`, `evals/run-record-line-fixtures.ts`, `evals/fixtures/record-line/` | T3 | the record-line writer, which refuses rather than guesses | high | 95 pass on Linux; SPRINT-171 replay; symlink seed reddens the move case |
+| `scripts/jev-consequence.ts` (added, then deleted) | T4 | one paid Jev trial, dropped by the keep rule | low | spend 0.0054 USD recorded |
+| 12 harnesses and 58 fixture files under `evals/`, comment sites | T5 | 12 zero-defect harnesses cut | low | census queries agree; registry negative FAILs by name |
+| `skills/orchestrator/SKILL.md` and four references, `evals/run-orchestrator-store-fixtures.ts` | T6 | 8 record merges; writer named as lean-flow's own | med | scoped review CLEAR; text contract updated |
+| `skills/lean-doc-generator/` SKILL.md, sprint-by-reference.md, sprint-log template, `evals/run-layout-fixtures.ts` | T7 | 5 record merges; one close commit, pin in the archive commit | med | two review rounds; every `close_commit` reader satisfied |
+| manifests, README, `CHANGELOG.md`, `docs/changelog/CHANGELOG-2.21.0.md`, `spec/STANDARD.md`, `spec/CHANGELOG.md` | T8 | v2.23.0 prepared, spec 0.21.0; not pushed | med | Codex review two rounds; off-host gate green |
+
+## Retro
+
+**Verdict.** Sprint A is built and v2.23.0 is prepared, gated and not pushed. 28 zero-defect checks and harnesses are cut, 13 record steps merge, and a writer produces the record lines the gate parses. The Jev trial was dropped. EPIC-025's conditions 2, 3 and 4 are met; condition 5 waits for the owner's push and TASK-489's retarget.
+
+**Owner load.** Ten recorded answers, all on the recommended option: two at promote, three at G2 (the sign-off and two Done-when rewordings), one on merge-check's prose-density leg, one correcting the `close_commit` settlement, one to prepare the release, plus the intake `approve` and the two-sprint shape before promote.
+
+**Cost.** One paid call: Jev, 0.0054 USD. Codex used about 1.0M tokens: T1 125k, T2 115k, T3 109k, T4 79k, T5 116k, T6 119k + 73k retry, T7 97k + 65k retry, release review 72k + 43k. Scoped Sonnet reviews: one round each for T1 to T6, two for T7.
+
+**System verify.** The close gate at `917538fc`, off-host: `QA-CHECK: 236 pass, 0 fail` and `bun test` 621 pass, 0 fail, on the first run. First-run close FAILs: 0. From `plan_commit^` to that commit: 43 commits, 15 work, 28 non-work for 8 members (3.5 per member). Under D3 every move and tick was still its own commit; Sprint B is the measuring sprint under the new rule.
+
+**Retrieval check.** Yes, L-198 missed. The G2 popup told the owner that no check reads `close_commit`, from a grep cut at 12 lines that never showed the conformance engine. T7's round-1 reviewer caught it as a High, and the owner re-ruled. Filed as L-315.
+
+**Worked**
+- Eight fresh readers before G2 found two frozen Done-when boxes that could not pass (TASK-653 and TASK-651) while they were still sentences.
+- Every cut was checked twice by different selectors: the gate's printed names before and after, and the registry diff. Both agreed for T1 and T5.
+- Reviewers briefed with a threat model found real defects: the night-run text promising a deleted checker, the writer's default root, the `close_commit` reader, and a symlink that moved the wrong task.
+
+**Friction**
+- The gate went red four times on kept harnesses that pinned what a cut or merge changed: merge-check's wiring test, its case floor, and two skill text contracts. No builder or reviewer brief asked for the contracts pinning a changed file.
+- With the prose-density leg cut, three Log lines over 400 characters landed unnoticed (lines 100, 131 and 140), and both skills sit at their 140-line cap, so new text gets squeezed.
+- Host memory stayed near 0.8 GB, so builders ran two at a time.
+
+**Pattern candidate**
+- L-315: a claim that nothing depends on X is a census, and a truncated query cannot back it.
+- L-316: before a builder edits shipped skill wording, grep `evals/` for text contracts that pin it, and hand the hits to the builder and the reviewer.

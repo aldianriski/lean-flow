@@ -127,6 +127,24 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-316 [tags: process] [status: active]: **Before a builder edits shipped skill wording, grep `evals/` for text contracts that pin it, and hand the hits to the builder and the reviewer.**
+SPRINT-173 T6 and T7 each passed a scoped review, then the gate failed on `run-orchestrator-store-fixtures.ts` and `run-layout-fixtures.ts`, which pin exact skill phrases. T1's cut failed on merge-check's wiring test the same way. No brief named the contracts pinning a changed file.
+- seen: 2026-11-12 (SPRINT-173 T1, T6, T7)
+- count: 1
+- promoted: no
+- related: L-020 · L-172
+
+---
+
+## L-315 [tags: process] [status: active]: **A claim that nothing depends on X is a census, and a truncated query cannot back it; run the dependency grep untruncated, or say the result is partial.**
+At SPRINT-173's G2 the coordinator told the owner that no check reads `close_commit`, from a grep piped through `head -12` that cut off `scripts/lib/conformance-engine.sh`. The owner signed on that claim. T7's round-1 reviewer, briefed to grep the whole tree, found S10.FOURBUCKETS reading it, and the owner re-ruled.
+- seen: 2026-11-12 (SPRINT-173 G2 and T7)
+- count: 1
+- promoted: no
+- related: L-198 · L-130 · EPIC-025
+
+---
+
 ## L-314 [tags: process] [status: active]: **Before a census row is ruled, state whose evidence it is judged on; a fixture takes its check's ruling, and a record step has its own history, never the history of the check that reads it.**
 SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixtures on their own FAIL history and proposed cutting them, though their checks were kept. T4 proposed cutting R09, the handoff-status stub, on G0297's check history, though close step 1 reads the stub. The coordinator's recount caught the first and the scoped review the second.
 - seen: 2026-11-11 (SPRINT-172 T3), 2026-11-12 (SPRINT-172 T4)
