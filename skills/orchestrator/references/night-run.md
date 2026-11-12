@@ -226,7 +226,7 @@ approval_envelope: goal · scope · … · stop-conditions @ <sha>
 **Why ten named dimensions and not `approved: yes`.** The failure is an envelope that *silently
 widens*: a run exceeds an approval it never re-read, and nothing reports having done so. A bare yes
 records no boundary, so it cannot detect that. A named list makes each boundary explicit and makes a
-gap **nameable** — `check-approval-envelope.sh` reports *which* dimension is missing, because "your
+gap **nameable** by the human who signs it, because "your
 approval is incomplete" is not actionable at 3am and "your approval does not state a budget" is.
 **And it is pinned**: an approval with no sha approves a moving target.
 

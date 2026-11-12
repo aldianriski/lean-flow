@@ -1,3 +1,0 @@
-# skill
-
-short line

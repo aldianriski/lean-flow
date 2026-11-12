@@ -135,7 +135,7 @@ else
 fi
 
 # --- case 8 (TD-128's missing READER): the ACTUAL runtime is asserted against the command ceiling.
-# check-qa-budget-default.sh asserts the CONFIGURED budget and is correct within that scope; it is
+# A configured budget below the ceiling says nothing about elapsed time; the budget mechanism is
 # deliberately NOT widened (T2 DoD 3). This is the assertion that can go red when a run is genuinely
 # too slow, rather than one that restates its own configuration -- the shape that let
 # `PASS 520s < 600s command ceiling` print for a run that took 1450s.

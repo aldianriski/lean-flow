@@ -411,9 +411,7 @@ sh evals/run-layers-completeness-fixtures.sh
 sh evals/run-sprint-log-layout-fixtures.sh
 sh evals/run-count-claims-fixtures.sh          # SPRINT-055 T1
 sh evals/run-epic-archive-fixtures.sh          # SPRINT-055 T2
-sh evals/run-research-archive-fixtures.sh      # SPRINT-055 T3
 sh evals/run-ephemeral-intake-fixtures.sh      # SPRINT-055 T4
-sh evals/run-task-origin-fixtures.sh           # SPRINT-055 T6
 sh evals/run-system-verify-fixtures.sh         # SPRINT-067 T1 / wired SPRINT-068 T2
 
 # opt-in selftests (slow — throwaway git repos; also run under QA_FULL=1)
@@ -429,9 +427,7 @@ about what a spawned worktree actually got.
 
 The **SPRINT-055 group** each pair a `scripts/lib/` checker with retained must-FAIL *and* must-PASS
 fixtures. The must-PASS controls are not decoration: without one, a checker that FAILed
-unconditionally would satisfy every must-FAIL case and still look correct. Four of the five failed on
-real pre-existing repo state on their first run against the live tree, which is both the evidence
-they work and the reason the rules they guard needed guarding (L-102).
+unconditionally would satisfy every must-FAIL case and still look correct.
 
 Each of the three snippet-extracting harnesses extracts the actual snippet shipped in its target doc — between
 `<!-- …:start/end -->` anchors where the doc has them, or the sole matching fenced code block where

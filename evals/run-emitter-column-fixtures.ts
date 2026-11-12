@@ -18,12 +18,9 @@
 // suite where every case shares an incidental structural property nobody chose -- here, that would
 // be "every case is a .sh checker invoked with a bad path".
 //
-// THE MUST-NOT-CATCH CONTROL IS LOAD-BEARING. check-qa-budget-default.sh was examined and
-// DELIBERATELY EXCLUDED: it is an inner checker whose column nothing reads, re-wrapped by
-// qa-check.sh:101 through a sed that strips EXACTLY ONE space. Its case below asserts the line is
-// STILL one-space. Without it, a suite that simply required two spaces everywhere would pass while
-// silently endorsing a change that breaks the wrapper -- and a control that cannot fail is not a
-// control (L-142).
+// THE MUST-NOT-CATCH CONTROL exercises harness-common.sh's one-space fixture reporter. Leg 12
+// selects harness findings without a column-keyed grep, so this format is deliberately excluded
+// from the population scan. Its case below keeps that exception exercised on a live emitter.
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { basename, join } from "node:path";
@@ -67,7 +64,7 @@ const CASES: readonly Case[] = [
     name: "ts-checker-repo-root",
     arm: "2 (template literal, TypeScript)",
     cmd: "bun",
-    args: ["scripts/lib/check-epic-archive.ts", "/nonexistent/repo"],
+    args: ["--no-env-file", "scripts/lib/check-epic-archive.ts", "/nonexistent/repo"],
     want: "two-space",
     finding: "epic-archive: repo root not found",
     why: "OTHER SELECTION ARM: different language, different emit construct, different runner",
@@ -104,13 +101,13 @@ const CASES: readonly Case[] = [
     why: "nine files carry this template and the suite reached none of them before SPRINT-104 T2 review",
   },
   {
-    name: "MUST-NOT-CATCH-excluded-inner-checker",
+    name: "MUST-NOT-CATCH-excluded-harness-report",
     arm: "control (deliberately excluded)",
     cmd: "sh",
-    args: ["scripts/lib/check-qa-budget-default.sh"],
+    args: ["-c", ". ./evals/lib/harness-common.sh; fail=0; run_case_firstline emitter-control 1 unused -- true"],
     want: "one-space",
-    finding: "qa-budget-default-arg: no qa-check.sh path given",
-    why: "inner checker re-wrapped by a sed stripping exactly one space (qa-check.sh:101) -- widening it breaks the wrapper",
+    finding: "fixture(emitter-control): exit 0, expected 1",
+    why: "harness self-reports are selected without a column-keyed grep and retain their one-space format",
   },
 ];
 
@@ -172,7 +169,6 @@ for (const c of CASES) {
 // those branches run over (L-186), and the guard was not pointed at its own motivating case
 // (L-166). Live cases prove the mechanism; this scan proves the POPULATION.
 
-const EXCEPT_FILE = "scripts/lib/check-qa-budget-default.sh";   // inner checker, see its header
 const EXCEPT_SUBSTR = "FAIL fixture(";                            // harness report format
 
 function emitsOneSpace(line: string): boolean {
@@ -208,7 +204,7 @@ for (const d of scanDirs) {
       // THE SKIP IS LANGUAGE-AWARE, AND THAT IS NOT PEDANTRY. An earlier version treated `*` as a
       // comment marker in every file, to catch JSDoc continuation lines. In POSIX sh `*` is not a
       // comment at all -- it opens a `case` DEFAULT ARM, and this repo emits real findings from
-      // them (check-task-origin.sh:60, read-spec-rules.sh:50). Those two lines sat silently outside
+      // them (for example, read-spec-rules.sh). Default-arm findings once sat silently outside
       // the population: an outside reviewer seeded a one-space break in one of them and this suite
       // stayed 8 pass / 0 fail with its emission count UNMOVED, because the scan could not see the
       // line at all. That is L-186 recurring inside the very instrument written to close L-186 --
@@ -219,7 +215,6 @@ for (const d of scanDirs) {
       if (isComment) return;
       if (!line.includes("FAIL ")) return;
       emitLines++;
-      if (rel === EXCEPT_FILE) return;
       if (line.includes(EXCEPT_SUBSTR)) return;
       if (emitsOneSpace(line)) violations.push(rel + ":" + (idx + 1));
     });

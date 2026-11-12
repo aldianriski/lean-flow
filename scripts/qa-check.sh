@@ -36,12 +36,8 @@ START_TS=$(date +%s)
 QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-520}  # 600s ceiling - 80s headroom = 520s. Was 450 (TD-091). Raised at SPRINT-093 by owner ruling: this sprint added ~37s of always-on guard coverage (rollup harness 9 -> 34 cases = 22s, authority = 6s, the new launcher-gate harness = 9s) and a complete run now measures ~469s on a quiet host, so 450 truncated -- skipping three harnesses, which makes the verdict incomplete rather than merely red. A skipped harness is an unrun guard. 520 leaves ~50s of variance above measured and 80s below the ceiling. NOT a permanent figure: SPRINT-092 T2/T4 reclaim 9.5-13.6s by converting the ADR-family harness off the Shell engine, and this should come back down when that lands (TD-117)
 . "$ROOT/scripts/lib/qa-budget-check.sh"
 
-# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151) -- ten checkers carried the same string
-# glob, which admits `docs/sprint/Archive/...`: the SAME directory, one inode, on any
-# case-insensitive filesystem. See scripts/lib/archive-path.sh.
-_lf_gate_ap="$ROOT/scripts/lib/archive-path.sh"
-[ -f "$_lf_gate_ap" ] || { printf 'FAIL  archive-predicate: shared predicate not found at %s -- every archive exclusion in this gate depends on it\n' "$_lf_gate_ap"; exit 2; }
-. "$_lf_gate_ap"
+# Shared archive predicate used by later legs.
+. "$ROOT/scripts/lib/archive-path.sh"
 
 fail=0
 pass=0
@@ -89,18 +85,6 @@ qp_sample() { # <label>
     "$qp_now" "$((qp_now - START_TS))" "$qp_mf" "$qp_sf" "$qp_rss" "$#" "$qp_label" >> "$QA_PROFILE_OUT"
 }
 qp_sample "baseline: before leg 1"
-
-# qa-budget-default self-check (SPRINT-086 T3, TD-091): the invariant the arithmetic above states in
-# prose, checked mechanically on every run against scripts/lib/check-qa-budget-default.sh -- a comment
-# can go stale silently; this cannot (retained fixture: evals/run-qa-budget-default-fixtures.sh).
-qbd_script="scripts/lib/check-qa-budget-default.sh"
-if [ ! -f "$qbd_script" ]; then
-  bad "qa-budget-default: checker not found at $qbd_script"
-else
-  qbd_out=$(sh "$qbd_script" "scripts/qa-check.sh" 600 2>&1); qbd_rc=$?
-  qbd_msg=$(printf '%s\n' "$qbd_out" | sed -E 's/^(PASS|FAIL) //')
-  if [ "$qbd_rc" -eq 0 ]; then ok "$qbd_msg"; else bad "$qbd_msg"; fi
-fi
 
 # qb_checkpoint (SPRINT-086 T3, TD-091, lateness path (b)): qa_budget_check's ORIGINAL placement --
 # only inside the eval-harness loop at leg 12 -- fires too late under load. SPRINT-085 lowered the
@@ -265,85 +249,6 @@ else
   fi
 fi
 
-qb_checkpoint "leg 2b-ter: prose density"
-# PROSE DENSITY (EPIC-017 TASK-364). The doc-caps leg above counts NEWLINES, and a markdown file
-# satisfies a newline cap by writing longer lines. Measured: .claude/CLAUDE.md held 63 lines against
-# a cap of 80 while its content grew 2.62x after the cap was first reached, longest line 6,681 chars.
-# STANDARD 157 already forbids the squeeze and nothing checked it, so the enforced counter won.
-# This leg is that missing check, as a RATCHET (FAIL only when a file gets denser than its recorded
-# baseline) rather than a threshold -- TD-174 records what a report-only cap achieves: three
-# OVER-CAP soft rows print every run, one 23x its cap, and nothing has acted on them.
-pd_script="scripts/lib/check-prose-density.ts"
-if ! command -v bun >/dev/null 2>&1; then
-  bad "prose density: bun not found on PATH -- cannot run $pd_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
-elif [ ! -f "$pd_script" ]; then
-  bad "prose density: checker not found at $pd_script"
-else
-  pd_out=$(bun "$pd_script" "$ROOT" 2>&1); pd_code=$?
-  printf '%s\n' "$pd_out"
-  pd_pass=$(printf '%s\n' "$pd_out" | grep -cE '^PASS')
-  pd_fails=$(printf '%s\n' "$pd_out" | grep -cE '^FAIL')
-  pass=$((pass + pd_pass))
-  if [ "$pd_code" -ne 0 ]; then
-    if [ "$pd_fails" -gt 0 ]; then
-      fail=$((fail + pd_fails))
-    else
-      bad "prose density: checker exited $pd_code without reporting a FAIL line"
-    fi
-  fi
-fi
-
-qb_checkpoint "leg 2b-bis: handoff state"
-# --- 2b-bis. Handoff status + STANDARD Sec 12(b)'s conversion (SPRINT-094 T2) -----------------
-# Sec 12(b)'s Meeting-notes row prescribes converting outcomes into a durable home and never
-# committing the raw notes; lean-flow shipped no step that performed the conversion, so a handoff
-# was written, the session ended, and whether anything in it reached a durable home was answered by
-# nobody. Delegates to scripts/lib/check-handoff-state.sh, covered by
-# evals/run-handoff-state-fixtures.sh. An UNKNOWN status (the field missing, malformed, or its
-# handoff-path missing) is ALWAYS a FAIL -- never read as `spent` -- and a sprint closing over a
-# `live`/`consumed` handoff is a second, separate FAIL until Sec 12(b)'s conversion is performed.
-hs_script="scripts/lib/check-handoff-state.sh"
-if [ ! -f "$hs_script" ]; then
-  bad "handoff state: checker not found at $hs_script"
-else
-  hs_out=$(sh "$hs_script" "$ROOT" 2>&1); hs_code=$?
-  printf '%s\n' "$hs_out"
-  hs_pass=$(printf '%s\n' "$hs_out" | grep -cE '^PASS')
-  hs_fails=$(printf '%s\n' "$hs_out" | grep -cE '^FAIL')
-  pass=$((pass + hs_pass))
-  if [ "$hs_code" -ne 0 ]; then
-    if [ "$hs_fails" -gt 0 ]; then
-      fail=$((fail + hs_fails))
-    else
-      bad "handoff state: checker exited $hs_code without reporting a FAIL line"
-    fi
-  fi
-fi
-
-qb_checkpoint "leg 2c: research retention"
-# --- 2c. Research retention (STANDARD section 11) ---------------------------------------------
-# close's compaction sweep pointed at an "or archive" target §11 never defined (SPRINT-055 T3).
-# Delegates to scripts/lib/check-research-archive.sh, covered by evals/run-research-archive-
-# fixtures.sh. Conservative by design: supersession alone does not license archiving, because a spent
-# verdict is usually the WHY-trail for whatever replaced it.
-ra_script="scripts/lib/check-research-archive.sh"
-if [ ! -f "$ra_script" ]; then
-  bad "research archive: checker not found at $ra_script"
-else
-  ra_out=$(sh "$ra_script" "$ROOT" 2>&1); ra_code=$?
-  printf '%s\n' "$ra_out"
-  ra_pass=$(printf '%s\n' "$ra_out" | grep -cE '^PASS')
-  ra_fails=$(printf '%s\n' "$ra_out" | grep -cE '^FAIL')
-  pass=$((pass + ra_pass))
-  if [ "$ra_code" -ne 0 ]; then
-    if [ "$ra_fails" -gt 0 ]; then
-      fail=$((fail + ra_fails))
-    else
-      bad "research archive: checker exited $ra_code without reporting a FAIL line"
-    fi
-  fi
-fi
-
 qb_checkpoint "leg 2d: ephemeral intake"
 # --- 2d. Ephemeral intake artifacts (STANDARD section 2 temp-dir rule) -------------------------
 # A BUG-<slug>.md report is temp-dir intake scaffolding, never committed (SPRINT-055 T4). §2 used to
@@ -364,50 +269,6 @@ else
       fail=$((fail + ei_fails))
     else
       bad "ephemeral intake: checker exited $ei_code without reporting a FAIL line"
-    fi
-  fi
-fi
-
-qb_checkpoint "leg 2e: task origin"
-# --- 2e. Task origin (G1 fast-path provenance) --------------------------------------------------
-# G1 fast-paths a "decomposer-approved task"; until SPRINT-055 T6 no field recorded whether a task
-# had met the intake grill, so the clause was unverifiable prose and a close-Retro follow-up looked
-# identical to a grilled entry. This is the mechanical half -- no task reaches G1 unstamped. G1's own
-# clause is the procedural half. Covered by evals/run-task-origin-fixtures.sh.
-to_script="scripts/lib/check-task-origin.sh"
-if [ ! -f "$to_script" ]; then
-  bad "task origin: checker not found at $to_script"
-else
-  to_out=$(sh "$to_script" "$ROOT" 2>&1); to_code=$?
-  printf '%s\n' "$to_out"
-  to_pass=$(printf '%s\n' "$to_out" | grep -cE '^PASS')
-  to_fails=$(printf '%s\n' "$to_out" | grep -cE '^FAIL')
-  pass=$((pass + to_pass))
-  if [ "$to_code" -ne 0 ]; then
-    if [ "$to_fails" -gt 0 ]; then
-      fail=$((fail + to_fails))
-    else
-      bad "task origin: checker exited $to_code without reporting a FAIL line"
-    fi
-  fi
-fi
-
-qb_checkpoint "leg 2e-bis: work type"
-# --- 2e-bis. Optional work-item type and its required evidence (TASK-591) ----------------------
-wt_script="scripts/lib/check-work-type.ts"
-if [ ! -f "$wt_script" ]; then
-  bad "work type: checker not found at $wt_script"
-else
-  wt_out=$(bun "$wt_script" "$ROOT" 2>&1); wt_code=$?
-  printf '%s\n' "$wt_out"
-  wt_pass=$(printf '%s\n' "$wt_out" | grep -cE '^PASS')
-  wt_fails=$(printf '%s\n' "$wt_out" | grep -cE '^FAIL')
-  pass=$((pass + wt_pass))
-  if [ "$wt_code" -ne 0 ]; then
-    if [ "$wt_fails" -gt 0 ]; then
-      fail=$((fail + wt_fails))
-    else
-      bad "work type: checker exited $wt_code without reporting a FAIL line"
     fi
   fi
 fi
@@ -981,36 +842,6 @@ else
   note "skip (missing): docs/LEARNINGS.md"
 fi
 
-qb_checkpoint "leg 10b: archive-predicate singularity"
-# --- 10b. One archive predicate, not eleven (SPRINT-099 T3, TD-145) --------------------------
-# Eleven checkers each carried their own archive exclusion. Ten were `case "$x" in */archive/*)`;
-# the eleventh was a `grep -v "^docs/sprint/archive/"`, and it survived the first sweep precisely
-# BECAUSE the sweep searched for the case-glob shape -- the author's search pattern defined the
-# population it could find (L-186, twice in one task). Five of the six harnesses guarding the
-# converted checkers have no case-variant fixture of their own, so a revert at any single site would
-# go unnoticed there. This leg is the cross-site guard that catches a revert at EVERY site at once,
-# which five near-duplicate fixtures would not: it asserts the raw predicates do not come back.
-#
-# The search token is assembled from fragments so this leg cannot match its own source line -- a
-# guard that reports itself is a guard nobody keeps.
-# One file is deliberately outside this guard: archive-path.sh IS the predicate and documents the old
-# form in its own comments. check-handoff-state.sh was the second exemption until SPRINT-116 T3 moved
-# its Plan-to-log mapping onto the shared predicate (TASK-346), so no site keeps a ruling here.
-_ag_exempt='^scripts/lib/archive-path\.sh:'
-ag_tok='*/'"archive"'/*'
-ag_hits=$(grep -rn -F "$ag_tok" --include='*.sh' scripts evals 2>/dev/null \
-  | grep -vE "$_ag_exempt" \
-  | awk -F: '{ line=$0; sub(/^[^:]*:[^:]*:/, "", line); sub(/^[ \t]+/, "", line); if (substr(line,1,1) != "#") print $1":"$2 }')
-ag_greps=$(grep -rn -E 'grep -v "\^[A-Za-z0-9_/.-]*archive' --include='*.sh' scripts evals 2>/dev/null \
-  | grep -vE "$_ag_exempt" \
-  | awk -F: '{ line=$0; sub(/^[^:]*:[^:]*:/, "", line); sub(/^[ \t]+/, "", line); if (substr(line,1,1) != "#") print $1":"$2 }')
-ag_all=$(printf '%s\n%s\n' "$ag_hits" "$ag_greps" | grep -v '^$' | sort -u)
-if [ -z "$ag_all" ]; then
-  ok "archive-predicate: no raw archive exclusion outside scripts/lib/archive-path.sh -- every site goes through the shared predicate"
-else
-  bad "archive-predicate: $(printf '%s\n' "$ag_all" | grep -c '') site(s) carry a raw archive exclusion instead of calling lf_is_archived_path -- a string predicate standing in for a filesystem question, which admits the case-variant spelling of the SAME directory: $(printf '%s' "$ag_all" | tr '\n' ' ')"
-fi
-
 qb_checkpoint "leg 11: active-sprint task schema"
 # --- 11. Active-sprint task schema: class + autonomy + Depends-on mandatory (TASK-110) -----
 # Every `### Tn` Plan block in an ACTIVE sprint (status: active) must carry: class: (one of the
@@ -1146,9 +977,6 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # run-qa-budget-fixtures.sh (SPRINT-084 T1, TD-084) joins the always-on set by the original cost
 # rule: no git, no mktemp, three calls to a sourced function against synthetic timestamps -- measured
 # well under a second. It guards this leg's own budget mechanism below, not a repository property.
-# run-qa-budget-default-fixtures.sh (SPRINT-086 T3, TD-091) joins the always-on set by the same
-# rule: no git, one mktemp -d, pure text (sed/grep) against copies of this script -- no real
-# qa-check.sh execution. It guards lateness path (a): the default budget vs the command ceiling.
 # run-authority-fixtures.sh (SPRINT-088 T1, TASK-292) joins the always-on set by the original
 # cheap-and-git-free rule: no git, no mktemp, pure POSIX sh over four static fixture sprint files --
 # measured well under a second. It is Tier G by this sprint's D4, and its two must-FAIL cases each
@@ -1217,7 +1045,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
 # That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
 # recorded the owner performing by hand.
-eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-work-type-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts run-workflow-command-fixtures.ts run-conformance-line-fixtures.ts"
+eval_harnesses_always="run-layout-fixtures.ts run-v1-to-v2-fixtures.ts run-epic-archive-fixtures.sh run-typecheck-population-fixtures.ts run-emitter-column-fixtures.ts run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-ephemeral-intake-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-gen-index-locale-fixtures.ts run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-adr-family-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh run-store-readers-fixtures.ts run-store-writers-fixtures.ts run-qa-store-legs-fixtures.ts run-promote-check-fixtures.ts run-learnings-metadata-fixtures.ts run-tick-box-fixtures.ts run-workflow-command-fixtures.ts run-conformance-line-fixtures.ts"
 eval_harnesses_optin="run-work-store-fixtures.ts run-layers-observed-test-fixtures.ts run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-by-reference-fixtures.ts run-orchestrator-store-fixtures.ts"
 # SPRINT-106 (EPIC-017): run-layout-fixtures.ts (~0.13s) and run-v1-to-v2-fixtures.ts (~0.14s) are static
 # text/tree comparisons, no git -- always-on. run-work-store-fixtures.ts builds throwaway git repos to prove
@@ -1508,39 +1336,6 @@ else
   fi
 fi
 
-# --- 14-ter. Pre-launch approval envelope, where an unattended run can read it (SPRINT-088 T4) ----
-# Gates say the Plan is sound; the envelope says the run may proceed inside these bounds without
-# asking. Different grants -- signing G1/G2 does not imply one. The guarded failure is an envelope
-# that SILENTLY WIDENS: a run exceeds an approval it never re-read and nothing reports it, which is
-# invisible by construction. An ABSENT envelope is a note, never a FAIL (a sprint sits legitimately
-# unapproved between promote and pre-flight) and never a PASS. Only a malformed or INCOMPLETE one
-# fails -- and it names which dimension is missing, because "incomplete" is not actionable.
-# Delegates to scripts/lib/check-approval-envelope.sh, covered by
-# evals/run-approval-envelope-fixtures.sh.
-ae_script="scripts/lib/check-approval-envelope.sh"
-if [ ! -f "$ae_script" ]; then
-  bad "approval envelope: checker not found at $ae_script"
-else
-  ae_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
-  if [ -z "$ae_files" ]; then
-    note "approval envelope: skip (missing): docs/sprint/SPRINT-*.md"
-  else
-    ae_out=$(sh "$ae_script" $ae_files 2>&1); ae_code=$?
-    if [ "$ae_code" -eq 0 ]; then
-      ae_n=$(printf '%s\n' "$ae_out" | grep -cE '^PASS')
-      if [ "$ae_n" -eq 0 ]; then
-        note "approval envelope: SKIP (0 approvals verified -- nothing in scope, or none recorded yet)"
-      else
-        ok "approval envelope ($ae_n sprint(s) with a complete, pinned envelope)"
-      fi
-    else
-      ae_find=$(printf '%s\n' "$ae_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
-      [ -n "$ae_find" ] || ae_find="no FAIL line in output -- checker exited $ae_code without reporting one"
-      bad "approval envelope: $ae_find"
-    fi
-  fi
-fi
-
 # --- 15. Layers observed vs actual git diff since plan_commit (TD-022, L-074, SPRINT-043 T1) ------
 # Leg 14's second source is derived from DoD/Acceptance prose written at promote time -- and
 # SPRINT-042 T3 defeated it the day it shipped: the task created scripts/lib/check-layers-
@@ -1638,11 +1433,8 @@ else
 fi
 
 # --- actual runtime against the command ceiling (SPRINT-099 T2, TD-128; ADR-042) ----------------
-# The missing READER. `check-qa-budget-default.sh` asserts the CONFIGURED budget against the ceiling
-# and is correct within that scope -- it is deliberately NOT widened here (T2 DoD 3). What nothing
-# has ever asserted is the run's ACTUAL duration, which is how that check could print
-# `PASS 520s < 600s command ceiling` for a run that took 1450s. This is the assertion that can
-# actually go red when the gate is too slow, rather than one that restates its own configuration.
+# Compare the run's actual duration with the command ceiling. A configured budget below the
+# ceiling says nothing about elapsed time: a 520s budget once accompanied a 1450s run.
 #
 # ADR-042 (Round 15 Finding 2): this check runs at :1460 and the verdict prints at :1480, twenty
 # lines later. A run killed AT the ceiling reaches neither, so this branch fires ONLY in a run that

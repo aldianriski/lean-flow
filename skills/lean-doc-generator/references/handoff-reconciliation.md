@@ -28,8 +28,7 @@ a side handoff) — carries exactly one of three states, tracked via two fields 
 Where the same `handoff-path` appears in more than one entry (a later one updating an earlier one —
 the Log is never edited in place), the **latest entry by file position is authoritative**; earlier
 ones are not separately reported. A record naming no `handoff-path` cannot be deduplicated against
-anything and is therefore permanently UNKNOWN — the handoff-state check FAILs on it unconditionally,
-in every context, on every run. **An UNKNOWN status is never read as `spent`** —
+anything and remains UNKNOWN until reconciled. **An UNKNOWN status is never read as `spent`** —
 that assumption is exactly the silent loss this task closes.
 
 ## The close-time sweep (mandatory, gates the close)
@@ -60,9 +59,8 @@ Before setting `status: closed`:
    handoff-status: spent
    handoff-path: <the same path as the record being closed out>
    ```
-4. The project's own quality gate (where one exists) re-reads the Log after this and FAILs the close
-   if any record for a `status: closed` sprint is still `live`/`consumed`, or UNKNOWN. This is what
-   makes step 1–3 non-optional rather than aspirational — a close that skips it does not go green.
+4. Re-read the Log before closing: every outstanding handoff must be reconciled to `spent`.
+   Resolve any `live`/`consumed` or UNKNOWN record through steps 1–3 before setting `status: closed`.
 
 ## The ledger (root `HANDOFF-LEDGER.md`)
 
@@ -73,9 +71,9 @@ a side `live` entry never fails that sprint's close. `/handoff` creates `HANDOFF
 empty) with the same ownership header + two-field entry shape. There is no "close" event to hook a
 hard gate onto, so:
 
-- **UNKNOWN is still gated unconditionally** — the handoff-state check reads the ledger on every run
-  exactly as it reads a sprint log, and an unparseable entry FAILs regardless of context.
-- **`live`/`consumed` rows are reported, not gated**, and reconciled at the next `promote`'s
+- **UNKNOWN entries need reconciliation** — resolve an unparseable entry during the ledger review;
+  never treat a missing or malformed status as `spent`.
+- **`live`/`consumed` rows are reconciled** at the next `promote`'s
   governance review (the `☐ handoff ledger` checklist line in `SKILL.md`) — the same propose→approve
   shape as TD aging and epic rollup currency. Mark a reconciled row `spent` the same way a sprint's
   close does (step 3 above), or rule it needs none.

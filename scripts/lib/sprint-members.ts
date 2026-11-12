@@ -7,8 +7,8 @@
 // `TASK-NNN-`, trailing hyphen so `TASK-81` never matches `TASK-810`) -- and until this task that
 // rule lived as private, unexported machinery inside scripts/lib/check-sprint-by-reference.ts
 // (~621 lines, exports nothing). Two guards now need the SAME "current members" answer that file
-// already computes for its `current` set (check-authority.ts's member-authority cross-check,
-// check-task-origin's future store population), and T4 needs it again next -- so this file is the
+// already computes for its `current` set (check-authority.ts's member-authority cross-check
+// among them), and T4 needs it again next -- so this file is the
 // one place that answer lives, moved here verbatim rather than re-derived.
 //
 // WHAT MOVED AND WHAT DID NOT. `resolveId` (the exact by-filename-prefix match) and the pure
@@ -190,7 +190,7 @@ export interface Tree {
 
 /** Every `TASK-*.md` under docs/work/ in the live working tree, walked recursively (a nested subfolder
  * is not a different population -- matches check-sprint-by-reference.ts's commit-tree `ls-tree -r`
- * behaviour). This is the SAME population check-task-origin.sh counts (TD-190); a file that is not at
+ * behaviour). The population includes misplaced files (TD-190): a file that is not at
  * `docs/work/<folder>/TASK-NNN-<slug>.md` is returned here and NAMED by `placementProblem`, never
  * dropped. `[]` when `root` has no docs/work/ store at all. */
 export function nowTree(root: string): Tree {

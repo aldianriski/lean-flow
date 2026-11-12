@@ -897,7 +897,7 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
         { collecting=0 }
       ')
       # An unfilled template placeholder item counts as absent -- same rule
-      # check-approval-envelope.sh already applies to `approval_envelope:`, so the shipped
+      # the approval-envelope template follows for `approval_envelope:`, so the shipped
       # template blesses nothing. A blank line (no items at all) is dropped the same way.
       qa_exc_items=$(printf '%s\n' "$qa_exc_raw" | grep -v '^\[' | grep -v '^$')
 

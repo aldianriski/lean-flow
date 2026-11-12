@@ -127,10 +127,8 @@ QTEOF
 }
 
 # qa_ceiling_check <start-epoch-seconds> <ceiling-seconds>
-#   TD-128's missing READER. check-qa-budget-default.sh asserts the CONFIGURED budget against the
-#   ceiling and is correct within that scope -- it is deliberately NOT widened (T2 DoD 3). What has
-#   never been asserted anywhere is the ACTUAL runtime against that same ceiling, which is why the
-#   check could print `PASS 520s < 600s` on a run that took 1450s.
+#   Compare ACTUAL runtime with the ceiling (TD-128). A configured budget below the ceiling
+#   says nothing about elapsed time: a 520s budget once accompanied a 1450s run.
 qa_ceiling_check() {
   _qc_ceiling=$2
   _qc_now=$(date +%s)

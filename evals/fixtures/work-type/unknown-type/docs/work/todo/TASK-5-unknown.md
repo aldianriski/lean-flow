@@ -1,4 +1,0 @@
----
-type: chore
----
-# Unknown type
