@@ -567,14 +567,14 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-11-11 · status: current · v2.22.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-11-12 · status: current · v2.23.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge
 [license-url]: LICENSE
 [claude-shield]: https://img.shields.io/badge/Claude_Code-plugin-8A63D2?style=for-the-badge
 [claude-url]: https://claude.com/claude-code
-[skills-shield]: https://img.shields.io/badge/skills-15-blue?style=for-the-badge
+[skills-shield]: https://img.shields.io/badge/skills-16-blue?style=for-the-badge
 [skills-url]: #the-skills
 [website-shield]: https://img.shields.io/badge/website-aldianrizki.com-orange?style=for-the-badge
 [website-url]: https://aldianrizki.com/
