@@ -63,16 +63,25 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
   - If the open question below swaps the baseline, both targets are re-derived as half of the new one.
 - **D5** — The A/B system stays removed. Codex review, 2026-11-11: cheap judging does not remove the cost of the arm runs.
 - **D6** — Most format FAILs are fixed by a tool writing the line, not by Jev judging it (Codex review, 2026-11-11). The plan's biggest risk is a slimmer process that turns visible, fixable FAILs into confident wrong passes that silently skip review. That risk is why the writer refuses a missing or ambiguous input and never defaults to `low`.
+- **D7** — Census rulings by owner popup, all on the recommended option: the baseline at SPRINT-172 T1, the rest on the T4 packet on 2026-11-12.
+  - Baseline: "Median of three". SPRINT-169 to 171 give 43/7 non-work commits per member and 3 first-run close FAILs, so the targets are at most 43/14 per member and at most 1 FAIL. They replace D4's SPRINT-171 figures.
+  - Cuts: "Accept all" and "Keep H18, 28 cuts". The 28 zero-defect checks and harnesses are cut. The 6 borderline rows (G1597, H01, H02, H22, H45, H46), the 17 unknown-history rows and R09 stay.
+  - Merges: all 13 record merges, R14 included. R14 amends ADR-045 D6 ("All of its moves"): a task's moves and ticks ride in its own work commits, and only cancel, de-scope and promote moves stay bare.
+  - Writers: "Fixtures + real replay". Jev: "One small task in Sprint A", capped at 1 USD, advisory only, kept only if it flags SPRINT-171 T5's missed review.
+- **D8** — Shape: "Two sprints" (owner popup 2026-11-12, after "take to many time" on one sprint per condition).
+  - Sprint A builds the cuts, merges, writers and the Jev trial in parallel worktrees where Layers are disjoint, then the MINOR release (TASK-651 to TASK-658).
+  - Sprint B is the workdoo sprint on that release and is also the measuring sprint, so the old measuring and workdoo conditions are one.
 
 ## Open questions
-- **Is SPRINT-171 a fair baseline?** Its T6 trial ran long. → The census sprint measures SPRINT-169 and SPRINT-170 under D4's rules. If they differ from SPRINT-171 by more than a third, the baseline becomes the median of the three, by recorded owner ruling, and D4's targets are re-derived.
+- ~~**Is SPRINT-171 a fair baseline?**~~ Resolved by D7 (median of three). Its T6 trial ran long. → The census sprint measures SPRINT-169 and SPRINT-170 under D4's rules. If they differ from SPRINT-171 by more than a third, the baseline becomes the median of the three, by recorded owner ruling, and D4's targets are re-derived.
 - **Which Jev question type and sample?** → Fixed in the trial sprint's G2: Noul per question, the 0.7/0.3 thresholds, past sprints' consequence lines as the sample, and the 5 USD cap shared with every Jev spend so far.
 
 ## Closed when
 - [x] `docs/research/process-cost-census.md` holds one row per check and per skill-required record step, taken at a pinned revision before any cut.
   Each row has its FAILs, real defects, fixture and ruling, and an unreadable history is recorded as unknown. The population is reconciled by identity, not by count: every PASS/FAIL check name `qa-check.sh` prints at that revision, every harness in leg 12 and every leg without a checkpoint has its row. → TASK-648, TASK-649, TASK-650 · closed by SPRINT-172
-- [ ] Every cut has zero real defects in the census, and nothing marked unknown is cut without a recorded owner ruling. Every check with one or more still runs, and its must-FAIL fixture still fails with its named finding. Manifest lockstep and the conformance engine still run. → next slice: cuts and skill edits
-- [ ] Every record line a gate check parses is written by a tool. A fixture replays the census's real-defect cases (SPRINT-171 T5 among them) through the writer and then the gate, and the gate still demands the review. Given a missing or ambiguous input, the writer refuses and never writes a default. → next slice: record writers
-- [ ] The Jev trial's result and spend are recorded. Jev is either kept as advisory beside `check-review-depth.sh` or dropped, and it is never a gate leg. → next slice: Jev trial
-- [ ] A measuring sprint of five or more members meets D4's targets under D4's counting rules, and no census-kept check was skipped. → next slice: measuring sprint
-- [ ] Released as a MINOR on a Codex review plus the off-host gate. TASK-489 is retargeted from 2.16.0 to this release. A workdoo run record shows a workdoo sprint promoted and closed with `/prime`'s `Skills:` row naming this release, and workdoo's own gate green. → next slice: release and workdoo run
+- [ ] Every cut has zero real defects in the census, and nothing marked unknown is cut without a recorded owner ruling. Every check with one or more still runs, and its must-FAIL fixture still fails with its named finding. Manifest lockstep and the conformance engine still run. → TASK-651, TASK-655, TASK-656, TASK-657
+- [ ] Every record line a gate check parses is written by a tool. A fixture replays the census's real-defect cases (SPRINT-171 T5 among them) through the writer and then the gate, and the gate still demands the review. Given a missing or ambiguous input, the writer refuses and never writes a default. → TASK-652, TASK-653, TASK-656, TASK-657
+- [ ] The Jev trial's result and spend are recorded. Jev is either kept as advisory beside `check-review-depth.sh` or dropped, and it is never a gate leg. → TASK-654
+- [ ] Released as a MINOR on a Codex review plus the off-host gate. TASK-489 is retargeted from 2.16.0 to this release. → TASK-658
+- [ ] A workdoo sprint of five or more members, run on this release, is the measuring sprint (D8). It meets D4's targets under D4's counting rules, and no census-kept check was skipped.
+  Its run record shows it promoted and closed with `/prime`'s `Skills:` row naming this release, and workdoo's own gate green. → next slice: workdoo sprint (Sprint B)
