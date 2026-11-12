@@ -2,6 +2,7 @@
 id: TASK-658
 title: "Release the EPIC-025 slimming as a MINOR on a Codex review and the off-host gate; stop before push"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: S
 risk: med
@@ -18,7 +19,7 @@ depends-on: [TASK-651, TASK-652, TASK-653, TASK-654, TASK-655, TASK-656, TASK-65
 
 ## Why
 
-EPIC-025 condition 6 (release half), owner ruling 2026-11-12. Sprint B (workdoo and measuring) runs on this release. Push is owner-reserved.
+EPIC-025 condition 5 (the release), owner ruling 2026-11-12. Sprint B (workdoo and measuring) runs on this release. Push is owner-reserved.
 
 ## Done when
 
@@ -37,4 +38,4 @@ EPIC-025 condition 6 (release half), owner ruling 2026-11-12. Sprint B (workdoo 
 
 ## Tracker
 
-EPIC-025 condition 6; owner popup "Two sprints", 2026-11-12.
+EPIC-025 condition 5; owner popup "Two sprints", 2026-11-12.

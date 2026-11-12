@@ -2,6 +2,7 @@
 id: TASK-651
 title: "Cut the zero-defect gate checks G0043 G0093 G0268 G0297 G0324 G0372 G0396 G0985 G1511 and their harnesses, keeping every census-kept check running"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: M
 risk: med

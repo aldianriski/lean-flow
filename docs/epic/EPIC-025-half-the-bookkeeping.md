@@ -4,7 +4,7 @@ slug: half-the-bookkeeping
 owner: Maintainer
 last_updated: 2026-11-12
 status: active
-member_sprints: [SPRINT-172]
+member_sprints: [SPRINT-172, SPRINT-173]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -51,6 +51,7 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-172](../sprint/archive/SPRINT-172-process-cost-census.md) | Census every check and record step | closed · `51b651fd` | The evidence for every cut: 103 check rows and 64 record steps, each with its FAIL history, real defects and a proposed ruling; the median baseline 43/7 and 3 FAILs; and the owner packet for the next slice. Nothing cut. |
+| [SPRINT-173](../sprint/SPRINT-173-cut-checks-and-write-records-by-tool.md) | Sprint A: cut the zero-defect checks, write the record lines by tool, Jev trial, MINOR release | active | filled at close |
 
 ## Decisions
 - **D1** — Owner rulings, 2026-11-11, by popup. Slim and optimize, without reducing quality: "both, not only slim, but optimize, dont reduce quality". Slim now, before the workdoo work: "Slim now, before workdoo". The scope covers both shipped skills and lean-flow's own checks.

@@ -2,6 +2,7 @@
 id: TASK-653
 title: "Write consequence, review, scope-change, builder-check, tick and move lines with one tool that refuses missing or ambiguous input"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: M
 risk: high

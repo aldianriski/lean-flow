@@ -2,6 +2,7 @@
 id: TASK-654
 title: "Trial Jev on consequence classification once, capped at 1 USD, and keep or drop it"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P2
 size: S
 risk: low

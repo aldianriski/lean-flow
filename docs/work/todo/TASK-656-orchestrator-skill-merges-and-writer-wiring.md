@@ -2,6 +2,7 @@
 id: TASK-656
 title: "Shorten the orchestrator skill: merge R02 R06 R14 R19 R21 R27 R37 R64 and name the record writer at each record step"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: M
 risk: med

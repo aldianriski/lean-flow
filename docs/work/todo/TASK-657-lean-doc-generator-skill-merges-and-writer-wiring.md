@@ -2,6 +2,7 @@
 id: TASK-657
 title: "Shorten the lean-doc-generator skill: merge R03 R08 R16 R45 R51 and name the scope-change writer"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: S
 risk: med

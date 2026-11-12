@@ -2,6 +2,7 @@
 id: TASK-652
 title: "Let a task's own work commit carry its tick and status move: amend ADR-045 D6 and teach layers-observed the member's own task file"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: S
 risk: med

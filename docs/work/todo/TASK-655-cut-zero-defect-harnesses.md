@@ -2,6 +2,7 @@
 id: TASK-655
 title: "Cut the zero-defect harnesses H15 H19 H27 H33 H36 H40 H41 H48 H50 H51 H59 H60"
 epic: EPIC-025
+sprint: SPRINT-173
 priority: P1
 size: M
 risk: low
