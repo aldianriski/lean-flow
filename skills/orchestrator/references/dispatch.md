@@ -88,12 +88,14 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    ` ✓ <evidence>` at the end of the box's FIRST line (the `- [ ]` line itself) — never on a wrapped continuation line, never as a separate line. Nothing else in `## Done when` changes: any other edit
    first needs a `scope-change` Log entry naming the TASK id (the ADR-047 freeze; with no git the frozen text is the promote entry's snapshot, and the entry must come after it). Then re-run the
    checker **the gate itself runs** over every file just written: the evidence suffix is content that
-   checker reads, and a sibling implementation's PASS or a pre-write PASS is not its verdict (L-224). A host may make tick and re-check one step with a tick tool that runs the gate's own checkers right after the write, where the host has one (lean-flow's own: `scripts/lib/tick-box.ts`); without one, the re-run above is the step.
+   checker reads, and a sibling implementation's PASS or a pre-write PASS is not its verdict (L-224). Use the host's tick writer where provided (lean-flow's own: `bun scripts/lib/record-line.ts tick`, which runs the gate's own checkers after writing); without one, tick and re-run as above.
    Verified boxes are ticked at merge-back acceptance, in the same session, so a handoff inherits current records.
 6. **Transitions** — `todo/` → `in_progress/` when the task starts · → `review/` when its work is
    committed and awaits review or merge-back · → `done/` once every box is ticked and review accepted.
-   Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/` in **its own commit**, never
-   sharing one with a content edit (ADR-045 D6) — the git case; with no git it is a plain file move. **Coordinator-owned** — § Merge-back queue.
+   Each is `git mv docs/work/<from>/TASK-NNN-<slug>.md docs/work/<to>/`; all of a task's moves and ticks ride in its own work commits from the release containing ADR-045's 2026-11-12 D6 amendment. Earlier sprints' bare move commits stand; SPRINT-173 keeps bare move and tick commits per its D3.
+   A dispatched task's tick and move ride in the coordinator's merge-back commit for that task.
+   Per Plan task (`### Tn`, delivering the member(s) its `Cites:` names): move `todo/` → `in_progress/` → Implement (route by type — new behaviour → `/tdd`) → Self-review → accept and tick the member's `## Done when` with ` ✓ <evidence>` → move to `review/`/`done/` → Commit.
+   Use the host's move writer where provided (lean-flow's own: `bun scripts/lib/record-line.ts move`); with no git, use a plain file move. **Coordinator-owned** — § Merge-back queue. Only moves without a work commit (cancel, de-scope, promote's `backlog/` → `todo/`, revert to `backlog/`) stay bare commits.
 7. **Close precondition (step 6)** — every member sits in `docs/work/done/` or `docs/work/cancel/`;
    Plan boxes are never counted. Where the host keeps a sprint-close checker, run
    it (lean-flow's own: `bun scripts/lib/check-sprint-by-reference.ts <sprint-file> --close`; it also re-runs the freeze
@@ -503,8 +505,10 @@ which the map can see:
   `docs/sprint/*` on exactly this reasoning and already calls it coordinator-owned — the protection
   exists in the checker and was missing from the brief.
 
-**A dispatched agent returns its Execution Log entry inside its report; the coordinator appends it at
-merge-back.** The agent does not create or edit the Log, tick a DoD box, `git mv` a task file, or
+**A dispatched agent returns its result and evidence, decisions, named failures, blockers and uncertain writes in its report;
+the coordinator appends the accepted task result at merge-back, batching routine progress with it.** Record every decision and named failure when it occurs.
+Generate progress, count and evidence once from accepted records (§ Members by reference; night-run.md Part 4), reusing them in boundary reports.
+The agent does not create or edit the Log, tick a DoD box, `git mv` a task file, or
 touch § Plan — it reports its evidence, and the coordinator ticks and moves (§ Merge-back queue).
 Evidence for a checkout-sensitive property (line endings · generated or filtered files) comes from a
 forced fresh checkout — `git checkout -- <path>` at minimum, a throwaway clone for anything line-ending
@@ -622,7 +626,7 @@ exit 0
 ```
 <!-- worktree-base-guard:end -->
 
-**Record the result in the Execution Log either way.** A PASS is the observation that keeps TD-054
+**Attach the guard's result, PASS or named FAIL, to the worker's dispatch entry in the Execution Log (§ Hand the sub-agent).** A PASS is the observation that keeps TD-054
 closed; a silent PASS is indistinguishable from never having run the guard, which is the state the
 row spent six sprints in.
 

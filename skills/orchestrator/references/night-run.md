@@ -123,7 +123,7 @@ not decide what the Plan should be, and it does not dispose of what the Plan pro
 **Park protocol.** On reaching a ⛔ step:
 
 1. **Don't ask** (there is no channel) and — the harder half — **don't decide**.
-2. **Write the park record** — one rollup line (Part 4) in the sprint Execution Log. No sprint file to
+2. **Write the park record** — one rollup line (Part 4) in the sprint Execution Log naming the blocker and unblock condition. Attended blockers use this same record once before waiting. No sprint file to
    write into (e.g. parked at `promote`) → the record goes in the `/handoff` doc instead.
 3. **Continue disjoint AFK work** — anything with no shared file and no `depends-on` against the
    parked unit, per the G2 overlap map. Same-owner, shared-file, or dependent work parks *with* it.
@@ -822,7 +822,7 @@ recorded against `governance:high` or `behaviour:material` is a finding; an **un
 followed by `self-review` is `review-depth-unclassified`, on the same reasoning as
 `no-gate-risk-unmarked` — a missing marker is not a claim that the change was trivial.
 
-**Per-criterion evidence (TASK-209) adds one block of lines, once, after the per-task state lines**
+**Generate per-criterion evidence (TASK-209) once from the members' accepted ` ✓ <evidence>` suffixes**, carrying their evidence and owner-ruling pointers verbatim into one block after the per-task state lines
 — supplementary to the header count above, extending the N-of-M the same way the retry and
 system-verify lines do, never a new task state. Grouped by task in Plan order; the `Tn.k` prefix
 itself carries the task identity, so this reconciles with "`done` tasks need no per-task line" above

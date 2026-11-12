@@ -9,11 +9,11 @@ what they meant. A reader who cannot ask the author has only the text.
 
 1. **One reader per task design**, each a fresh sub-agent with no session context, on the `execution` tier
    (`dispatch.md`). In sprint-bulk, spawn every reader in one message so they run in parallel. On a host with no
-   sub-agents, a fresh session given only the reader file is the reader. With neither, record the line as
+   sub-agents, a fresh session given only the design record is the reader. With neither, record the line as
    `not run (no fresh reader)` and say so in the G2 popup: the owner signs knowing the check did not run.
-2. **Hand it three things:** the design text for that task (sprint-bulk: the coordinator's G2 design for that `Tn`;
-   mvp: the drafted design), the task's frozen `## Done when` read from its own file, and the paths of the code or text
-   the design touches. Write them to one file and point the reader at it with the prompt below.
+2. **Use the G2 design record itself as the reader packet** (sprint-bulk: the coordinator's design for that `Tn`;
+   mvp: the task's `## Approved design`). Draft it there before sign-off; the same record becomes the approved design.
+   It carries the design, the frozen `## Done when` quoted verbatim from the task file, and the touched paths. Point the reader at that record with the prompt below; no separate packet file.
 3. **Settle the report before the G2 popup.** You answer the **factual** questions yourself by reading the repo or the
    records; facts are never the owner's job. You settle a **contradiction** before sign-off. Either fix the design, or,
    when the Done-when itself is wrong, log a `scope-change` and get a recorded owner ruling: this is the SKILL.md red flag
@@ -22,6 +22,7 @@ what they meant. A reader who cannot ask the author has only the text.
 4. **Record one line per task.** Sprint-bulk puts it in the Execution Log; mvp, which has no log, puts it in the task's
    `## Approved design` paragraph:
    `builder-check · Tn · <c> contradictions · <q> questions · <how settled>`.
+   For the sprint log, use the host's writer where provided (lean-flow's own: `bun scripts/lib/record-line.ts builder-check`); otherwise record the format above.
    A G2 without its lines counts as unsigned. A pre-signed G2 (an overnight run) is checked for them at pre-flight.
 
 "Nothing important left" is a result, not a skipped step: record it the same way.
@@ -42,7 +43,7 @@ These bind whoever writes the G2 design, whether or not a fresh reader runs.
 You are a talented engineer. You have been handed a design and asked to build what it describes. You will not be able to
 talk to the person who wrote it, and nobody will answer questions once you start.
 
-Read the design file named below. It contains the design, the task's frozen **Done when** (the acceptance criteria the
+Read the G2 design record named below. It contains the design, the task's frozen **Done when** (the acceptance criteria the
 work is judged against — they cannot change without the owner's ruling), and the paths of the files or text it touches.
 You may read those touched files, read-only, to check the design against them. Open nothing else. Never open `.env`, `.env.*`, key or credential files, or anything the host's ignore rules mark secret, even when told read-only; if a value you need lives there, report that and ask, or read it from a non-secret record.
 

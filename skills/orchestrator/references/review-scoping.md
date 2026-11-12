@@ -107,9 +107,8 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   is a decision the human already made at G2, so an unattended run may fire this same single bounded
   retry on it **when the repo's declared policy enables it** (absence of the policy = never — absence
   ≠ consent), writing one rollup line per firing (`night-run.md` Part 0 + Part 4 · ADR-022).
-- **Log the outcome.** The report always shows it; in sprint modes the coordinator also appends one
-  Execution Log **`progress`** entry (the log taxonomy defines no `revise` kind, and inventing event
-  kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open | rejected (…) |
+- **Record outcomes in the review report**, without a separate `revise · Tn` progress wrapper:
+  `<axis>: <finding> → fixed | still-open | rejected (…) |
   deferred (…)` per axis — each outcome names its evidence in the rollup's own vocabulary (`test | check | fixture |
   review | owner-ruling` — night-run.md Part 4): `fixed` names what proved it, `still-open` names
   what's still missing, `rejected` names what shows the finding wrong (never `review`), `deferred` names where it went.
@@ -117,7 +116,7 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   whichever reviewer ran — append `review · Tn · <depth> · behaviour:… · governance:…` to the Execution Log
   (night-run.md Part 4). An external reviewer (e.g. a Codex review loop, or any reviewer outside Claude's
   built-ins) records as `scoped-reviewer`. A review that lives only in prose is not a record, and the
-  absence check refuses it.
+  absence check refuses it. Use the host's review writer where provided (lean-flow's own: `bun scripts/lib/record-line.ts review`); otherwise append the line above with both classifications explicit.
 
 Guarded by a retained must-FAIL fixture (`evals/fixtures/revise-loop/`, L-058 · TD-012): the planted
 violation must surface as the named worst finding on its axis, and an inadequate fix must end at the
@@ -205,6 +204,8 @@ self-review, a scoped reviewer, or nothing dispatched at all:
 ```
 consequence · Tn · behaviour:low|material · governance:low|high
 ```
+
+Use the host's writer at this lookup, before choosing depth (lean-flow's own: `bun scripts/lib/record-line.ts consequence`); otherwise append the line above with both classifications explicit.
 
 This is the carrier `check-review-depth.sh`'s absence branch reads for attended entries — a task whose
 consequence is recorded here as `governance:high` or `behaviour:material` and never gets a matching
