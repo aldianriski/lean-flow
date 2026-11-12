@@ -17,7 +17,9 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 // [test file, minimum live cases]. Losing cases is not fine; adding them is.
 const FILES: ReadonlyArray<readonly [string, number]> = [
   ["evals/gate-remote.test.ts", 38],
-  ["evals/merge-check.test.ts", 24],
+  // 24 -> 22 at SPRINT-173 T1: the prose-density leg left merge-check with the gate's (owner ruling),
+  // taking its red-leg row and its wiring row with it.
+  ["evals/merge-check.test.ts", 22],
 ];
 
 let pass = 0;
