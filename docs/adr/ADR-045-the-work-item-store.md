@@ -58,6 +58,21 @@ content-similarity heuristics to recover the rename; bundling a move with a cont
 that reliability and leaves a `--follow`/bisect walk to untangle "moved" from "changed" out of one
 commit instead of reading them as two clean ones.
 
+*D6 is superseded in part by the 2026-11-12 amendment below.*
+
+**Amendment 2026-11-12 (EPIC-025 D7, R14)**
+
+All of a task's moves (`in_progress`, `done`) and its ticks ride in that task's own work commits.
+The owner ruled "All of its moves" to reduce separate bookkeeping commits. Bare `sprint(N):`
+commits remain only for moves without a work commit: cancel, de-scope, and promote's `backlog` →
+`todo`. A task's work commit may carry its own task file; another task's file still needs declared
+Layers coverage.
+
+This accepts the bisect cost the original D6 named: a `git bisect`/`--follow` walk may have to
+untangle "moved" from "changed" within one commit. The reduced bookkeeping is worth that cost.
+The rule applies from the release containing this amendment. SPRINT-173 keeps bare move and tick
+commits throughout, per its D3; the following sprint is the first under this rule.
+
 ## Consequences
 
 **Positive:** one glob answers a cross-sprint status query; `git log --follow` recovers a task's
@@ -89,5 +104,5 @@ reaching for a raw byte diff instead of `git diff`/`git hash-object`.
 |---|---|
 | Nest membership under status (`<status>/<sprint>/TASK-NNN.md`) | Forecloses the cross-sprint "what's in review" query to a multi-directory scan; membership already needs a frontmatter read for epic anyway, so the folder buys nothing |
 | Move + `git add -A` instead of `git mv` | Produces the same tree but relies on content-similarity heuristics to recover the rename; `git mv` states the rename outright and keeps `--follow` reliable without tuning similarity thresholds |
-| Bundle the transition with the content edit that motivated it | Cheaper (one commit) but makes a `git bisect`/`--follow` walk conflate "moved" with "changed", and D6 rules them apart specifically so a move's own commit is a pure, reviewable no-op on content |
+| Bundle the transition with the content edit that motivated it | Cheaper (one commit) but makes a `git bisect`/`--follow` walk conflate "moved" with "changed", and D6 rules them apart specifically so a move's own commit is a pure, reviewable no-op on content. **Superseded in part by the 2026-11-12 amendment.** |
 | Encode ordering in the folder (kerjaan's shape, no `order.md`) | Folders cannot sequence; EPIC-017 keeps ordering explicit via `priority:` + a per-status order file owned by `/triage`, out of this ADR's scope |

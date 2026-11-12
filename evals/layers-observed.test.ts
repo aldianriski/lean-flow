@@ -15,6 +15,7 @@ import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import { runLayersObserved } from "../scripts/lib/check-layers-observed.ts";
 import { commitAll, gitInit, lockPlan, writeFile } from "./fixtures/layers-observed/git-fixtures.ts";
+import { commitTaskMove } from "./fixtures/layers-observed/task-moves.ts";
 
 // Fixtures spawn real git (slow on Windows fork emulation); the 5s default flakes.
 setDefaultTimeout(120_000);
@@ -71,6 +72,77 @@ function run(dir: string, args: string[] = [SPRINT]): { out: string; fail: boole
 
 const M1 = "docs/work/todo/TASK-901-one.md";
 const M2 = "docs/work/todo/TASK-902-two.md";
+
+describe("own task moves and ticks (L-258, ADR-045 D6 amendment)", () => {
+  const M1P = M1.replace("/todo/", "/in_progress/");
+  const M2D = M2.replace("/todo/", "/done/");
+  const plan = `${T1("`TASK-901`")}\n${T1("`TASK-902`").replace("### T1", "### T2")}`;
+  const tasks = [{ path: M1, id: "TASK-901" }, { path: M2, id: "TASK-902" }];
+
+  test("L-258 MUST-FAIL under the old rule: subject and trailer commits carry their own move and tick", () => {
+    const d = build("own-task-moves", { members: [M1, M2], plan }, tasks);
+    // Both commits also change declared work. Assert the real diff-tree population, so admitting
+    // only the source or destination cannot pass just because Git hid one side of the move.
+    expect(commitTaskMove(d, M1, M1P, "sprint(901) T1: work with its own in_progress move and tick"))
+      .toEqual([M1, M1P, "src/a.ts"].sort());
+    expect(commitTaskMove(d, M2, M2D, "work with its own done move and tick\n\nTask: TASK-902"))
+      .toEqual([M2, M2D, "src/a.ts"].sort());
+    for (const p of [M1P, M2D]) {
+      const content = execFileSync("git", ["-C", d, "show", `HEAD:${p}`], { encoding: "utf8" });
+      expect(content).toContain("- [x] it is done");
+    }
+    const r = run(d);
+    expect(r.out).not.toMatch(/^FAIL /m);
+    expect(r.fail).toBe(false);
+    expect(r.out).toContain("PASS");
+  });
+
+  test("sibling control: both attribution shapes touching only declared work stay green", () => {
+    const d = build("own-task-work-only", { members: [M1, M2], plan }, tasks);
+    writeFile(d, "src/a.ts", "subject work\n");
+    commitAll(d, "sprint(901) T1: work only");
+    writeFile(d, "src/a.ts", "trailer work\n");
+    commitAll(d, "work only\n\nTask: TASK-902");
+    const r = run(d);
+    expect(r.fail).toBe(false);
+    expect(r.out).toContain("PASS");
+  });
+
+  test("MUST-FAIL: a subject commit moving and ticking a DIFFERENT member is named on both paths", () => {
+    const d = build("other-task-subject", { members: [M1, M2], plan }, tasks);
+    commitTaskMove(d, M2, M2D, "sprint(901) T1: work with another member's move and tick");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("changed by a task that never declared it:");
+    expect(r.out).toContain(`T1:${M2}`);
+    expect(r.out).toContain(`T1:${M2D}`);
+    expect(r.out).not.toContain("src/a.ts");
+  });
+
+  test("MUST-FAIL: a trailer commit moving and ticking another member is member-out-of-layers", () => {
+    // Even two members governed by the SAME Tn do not share the trailer's own-file exemption.
+    const d = build("other-task-trailer", { members: [M1, M2], plan: T1("`TASK-901` · `TASK-902`") }, tasks);
+    commitTaskMove(d, M2, M2D, "work with another member's move and tick\n\nTask: TASK-901");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("member-out-of-layers:");
+    expect(r.out).toContain(`TASK-901(T1):${M2}`);
+    expect(r.out).toContain(`TASK-901(T1):${M2D}`);
+    expect(r.out).not.toContain("src/a.ts");
+  });
+
+  test("MUST-FAIL: a subject commit moving and ticking a NON-member stays outside Layers", () => {
+    // Citing it is insufficient: it must also resolve to a member of this sprint.
+    const d = build("nonmember-task", { members: [M1], plan: T1("`TASK-901` · `TASK-902`") }, tasks);
+    commitTaskMove(d, M2, M2D, "sprint(901) T1: work with a non-member's move and tick");
+    const r = run(d);
+    expect(r.fail).toBe(true);
+    expect(r.out).toContain("changed by a task that never declared it:");
+    expect(r.out).toContain(`T1:${M2}`);
+    expect(r.out).toContain(`T1:${M2D}`);
+    expect(r.out).not.toContain("src/a.ts");
+  });
+});
 
 describe("member out-of-layers (Task: TASK-NNN trailer attribution)", () => {
   const d = build("out-of-layers", { members: [M1], plan: T1("`TASK-901`") }, [{ path: M1, id: "TASK-901" }]);

@@ -434,6 +434,12 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
     const { members, anomalies: memberAnomalies } = noMembers ? { members: [], anomalies: [] } : resolveMembersChecked(root, sp);
     const governing = (id: string): string[] => [...cites].filter(([, ids]) => ids.includes(id)).map(([t]) => t);
     const memberIds = new Set(members.map((m) => m.id));
+    // ADR-045 D6 amendment (L-258): a member's own moves and ticks travel with its work.
+    // Match by id in any status folder, covering BOTH rename paths without exempting docs/work/.
+    const ownsTaskFile = (f: string, ids: readonly string[]): boolean => {
+      const id = /^docs\/work\/[^/]+\/(TASK-[0-9]+)-[^/]+\.md$/.exec(f)?.[1];
+      return id !== undefined && memberIds.has(id) && ids.includes(id);
+    };
     let earlyHit = false;
     // A column-0 wrap of a declaration (TD-138) was read as nothing here while check-layers-completeness
     // FAILed it: the wrapped paths silently left the declared set. Named now, never dropped.
@@ -494,7 +500,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
         const toks = gov.flatMap((t) => declsByTask.get(t) ?? []).join(" ");
         for (const f of files) {
           if (isExcludedCommitted(f) || gov.length === 0) continue;
-          if (!covers(toks, f)) missMember += ` ${trailerTask}(${gov.join("+")}):${f}`;
+          if (!covers(toks, f) && !ownsTaskFile(f, [trailerTask])) missMember += ` ${trailerTask}(${gov.join("+")}):${f}`;
         }
         continue;
       }
@@ -507,7 +513,7 @@ export function runLayersObserved(argv: readonly string[]): RunResult {
         if (who === "COORD" || who === "GOVERNANCE") continue;
         if (who === "UNATTRIBUTED") {
           unattr += ` ${shortSha}:${f}`;
-        } else if (!covers(whoToks, f)) {
+        } else if (!covers(whoToks, f) && !ownsTaskFile(f, cites.get(who) ?? [])) {
           missAttr += ` ${who}:${f}`;
         }
       }
