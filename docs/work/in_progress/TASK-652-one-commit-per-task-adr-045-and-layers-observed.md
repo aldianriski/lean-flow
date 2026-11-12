@@ -24,10 +24,10 @@ the deletion side of the epic is unfrozen. G2 review-round cap: 2. Other G (main
 
 ## Done when
 
-- [ ] ADR-045 D6 carries a dated amendment that all of a task's moves (`in_progress`, `done`) and its ticks ride in that task's own work commits. Bare `sprint(N):` commits remain only for moves without a work commit (cancel, de-scope, promote's backlog to todo). The bisect cost the original D6 named is acknowledged.
-- [ ] `check-layers-observed.ts` admits `docs/work/<folder>/TASK-N-*.md` in a commit whose subject or `Task:` trailer names TASK-N or its `Tn`. A retained must-FAIL fixture for the L-258 case (a `sprint(N) Tn:` commit with its own move and tick) passes, and its assertion count and sibling controls are unchanged.
+- [x] ADR-045 D6 carries a dated amendment that all of a task's moves (`in_progress`, `done`) and its ticks ride in that task's own work commits. Bare `sprint(N):` commits remain only for moves without a work commit (cancel, de-scope, promote's backlog to todo). The bisect cost the original D6 named is acknowledged. ✓ ADR-045 amendment 2026-11-12 under D6, original text and Alternatives row annotated (2ce2d615); scoped review CLEAR
+- [x] `check-layers-observed.ts` admits `docs/work/<folder>/TASK-N-*.md` in a commit whose subject or `Task:` trailer names TASK-N or its `Tn`. A retained must-FAIL fixture for the L-258 case (a `sprint(N) Tn:` commit with its own move and tick) passes, and its assertion count and sibling controls are unchanged. ✓ both attribution branches admit the member's own file, both rename sides; bun test layers-observed 47 pass 0 fail 112 expects, floor raised 42 to 47 (2ce2d615)
 - [ ] `evals/layers-observed.test.ts` and the layers-observed fixture harness are green on the full gate.
-- [ ] Negative: a `sprint(N) Tn:` commit that touches a **different** task's file, or a `docs/work` file belonging to no member, still fails `layers observed` by name (`member-out-of-layers` or the unattributed finding). Seeding the old narrow rule back reddens exactly the L-258 case while the sibling control stays green.
+- [x] Negative: a `sprint(N) Tn:` commit that touches a **different** task's file, or a `docs/work` file belonging to no member, still fails `layers observed` by name (`member-out-of-layers` or the unattributed finding). Seeding the old narrow rule back reddens exactly the L-258 case while the sibling control stays green. ✓ subject/trailer/no-member negatives assert their findings; old rule seeded: 46 pass 1 fail, only L-258; checker hash ddf4846e restored
 
 ## Touches
 

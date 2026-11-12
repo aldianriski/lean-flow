@@ -56,3 +56,10 @@ Impact:
 - TASK-653 box 2: SPRINT-171's log records T5 and T3 as `governance:high` and only T1 as `behaviour:material`. The box now says T5 and T3 FAIL `review-depth-governance-absent` and T1 FAILs `review-depth-material-absent`. T3's Plan Acceptance follows.
 - TASK-651 box 3: the grep now excludes archives, logs, changelogs, fixture copies of old records, and test-input strings that name no file.
 Re-confirm G2: owner popup, verbatim: TASK-653 "Reword to match the log (Recommended)" · TASK-651 "Exclude those three (Recommended)" · G2 "Sign G1+G2, build (Recommended)".
+
+### 2026-11-12 | execute | T2 built, reviewed and committed (TASK-652)
+Codex built it in worktree `s173-t2` (one pass, about 115k tokens), uncommitted; the coordinator committed it as `2ce2d615` with the knowledge index regenerated. Checker hash `ddf4846e` matches the reviewed tree.
+consequence · T2 · behaviour:material · governance:high
+review · T2 · scoped-reviewer · behaviour:material · governance:high
+Reading: one scoped Sonnet reviewer, one round, CLEAR; it re-ran `layers-observed.test.ts` (47 pass, 0 fail, 112 expects). Three Lows kept by coordinator ruling: other `Tn` subject shapes also get the own-file exemption, still bounded by `Cites:` and membership; the folder segment is any one directory; the ADR's SPRINT-173 carve-out restates D3.
+Ticked boxes 1, 2 and 4. Box 3 waits for the off-host full gate.
