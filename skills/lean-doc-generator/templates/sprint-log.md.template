@@ -22,7 +22,11 @@ update_trigger: an Execution Log entry is appended
 
 <!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
      newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·
-     run-complete · close · handoff. `run-complete` is reserved for the run itself finishing (carries
+     run-complete · close · handoff. Keep `surprise` recognised for old logs; fold new surprise findings
+     into the task's `progress` entry, retaining the finding. At each progress entry, derive the
+     Files Changed table's rows from the accepted diff.
+     Close entry and commit sequence → `references/sprint-by-reference.md` § Close by reference.
+     `run-complete` is reserved for the run itself finishing (carries
      the Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`.
      A `run-complete` entry now also carries a typed `outcome · DELIVERED|PARTIAL|FAILED` line plus
      evidence fields (tasks · parks · repair-cycles · verification · warnings), each tagged

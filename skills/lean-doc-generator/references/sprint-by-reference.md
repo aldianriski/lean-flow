@@ -2,8 +2,21 @@
 
 A v2 sprint (`docs/work/` store) **references** its member task files; it never copies them. Each
 task's DoD lives in exactly one place — the member file's `## Done when` — so there is no second copy
-to tick, mirror or drift (ADR-047). This file is the procedure behind the `promote` and
-`close` rows of the Sprint lifecycle table.
+to tick, mirror or drift (ADR-047). This file is the procedure behind the Sprint lifecycle table
+and the Execution flow's writing step.
+
+## Writing docs and commits
+
+Use STANDARD §2's canonical placement. Pass generated prose through `/humanizer` embedded mode
+(template or existing doc = voice sample) → `${CLAUDE_SKILL_DIR}/references/humanize-pass.md`, then
+enforce the line cap and ownership header on every file touched. Every commit this skill composes
+(promote, close) passes the same way, format `plain` → the humanizer skill's `references/embedded.md`
+§ Commit messages and PR bodies.
+
+If the project maintains a generated knowledge index, regenerate it **once after writing
+metadata-carrying docs** (LEARNINGS · ADR · research), and include it **in the same commit as those
+docs' content**. It is a derived view, never hand-edited (lean-flow itself:
+`sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
 
 ## Promote by reference
 
@@ -43,13 +56,16 @@ member exactly as approved, at that commit. What is frozen is each member's `## 
   frontmatter changes · line endings.
 - **An edit:** any other change to the `## Done when` body — a box added, removed or reworded.
 
-An edit is legitimate only when the sprint's Execution Log (its `logs/` file, or the sprint file's own
-`## Execution Log`) carries a **`scope-change` entry** — the event field of its
-`### date | scope-change [| summary]` heading — that is **new since `plan_commit`** and names that
-TASK id, or a `Tn` **in its heading** whose frozen Plan block `Cites:` it. These do not count:
+**Before any edit to `## Done when`**, append a **`scope-change` entry** to the sprint's Execution Log
+(its `logs/` file, or the sprint file's own `## Execution Log`). Its
+`### date | scope-change [| summary]` heading uses `scope-change` as the event field. The entry must
+be **new since `plan_commit`** and name that TASK id, or name a `Tn` **in its heading** whose frozen
+Plan block `Cites:` it. These do not count:
 - a prose mention of the id under another event;
 - an entry inside an HTML comment;
 - an entry that was already in the log at the baseline.
+
+Use the host's writer when available; lean-flow's own: `bun scripts/lib/record-line.ts scope-change`.
 
 The log is append-only. "New" means **appended after** the baseline's text. If an old entry is
 reworded, or the baseline text is no longer a prefix of today's log, that is a finding
@@ -113,13 +129,57 @@ baseline is the first commit that stamps or lists it, so its later edits need a 
    above. Otherwise it is an **unlogged post-promote edit**, and the sprint cannot close on it.
 6. A member that resolves to no file (or to two) at its baseline or now is itself a finding.
 
+## During execution
+
+Tick the member file's `## Done when` `[x]` as each passes; rewording needs a `scope-change` entry
+**before** the edit, per the freeze above. Append `progress` to the Execution Log sibling
+(`docs/sprint/logs/`, exists since promote), never edit § Plan (the plan is frozen). Keep `surprise`
+recognised for old logs; fold new surprise findings into the task's `progress` entry, retaining the
+finding. At each progress entry, derive the Files Changed table's rows from the accepted diff.
+
 ## Close by reference
 
 `close` verifies **every member sits in `docs/work/done/` or `docs/work/cancel/`** — it never counts
 Plan boxes (there are none to count) — and re-runs the freeze check above. A member still in
 `todo/`, `in_progress/` or `review/` blocks close; first finish it, move it to `cancel/` (`git mv` in the git case), or
 scope it out (a `scope-change` entry, then its `sprint:` cleared and its `## Members` line removed).
-Then the Retro and the rest of the close row proceed as written.
+
+1. After your pre-close verification, **sweep the full session** (Execution Log + any TD/follow-up
+   surfaced mid-run but not yet filed). Write the **Retro**, route its buckets (STANDARD §10), and
+   append a `close` Log entry pointing to the Retro, without a second narrative. Set `status: closed`.
+2. If the sprint carries `epic:`, roll up before committing: complete its § Member sprints row's
+   status and *what it contributed*, not a restatement of the theme; re-check the epic's § Closed
+   when and close it only when **every** condition is `[x]`. A member sprint closing is not an epic
+   closing. The row's sha is filled in step 4.
+3. Commit the Retro, routed buckets, `close` entry and `status: closed` together as
+   `sprint(N): <summary>` — **one close commit**. Regenerate any knowledge index with its source
+   docs in this commit (§ Writing docs and commits).
+   **`close_commit` is the sha of this close commit itself**, the commit carrying those four things.
+4. **Run §11 retention as one propose→approve pass.** Apply only on owner approval:
+   - **Archive:** move the closed sprint → `docs/sprint/archive/` **and its log →
+     `docs/sprint/archive/logs/` in the same commit**, adding a line in `docs/sprint/INDEX.md`.
+     Write `close_commit` and the epic rollup row's **same sha** in this archive commit, alongside
+     the moves and INDEX line. This uses the archive commit close already makes; no record-only
+     commit is added. **If archival is not approved in this same pass** (declined, still pending, or
+     parked by an unattended run), record the same pin and the epic row's sha right away in their own
+     small follow-up commit, so a closed sprint never sits without its pin. Either way the pin commit
+     follows the close commit in the same pass, before any gate run.
+   - If the rolled-up epic has every member sprint closed **and** every § Closed when `[x]`, move
+     it → `docs/epic/archive/`, keep its `INDEX.md` row, and re-base relative links one level deeper.
+     Never archive on member-sprint count alone. Verify CHANGELOG rotation links resolve.
+   - **Compaction sweep** (periodic, same gate): promoted `L-NNN` bodies → one-line pointers;
+     superseded/duplicated research → set `status: superseded`, then move → `docs/research/archive/`
+     **only once nothing live still cites it** (§11). Report the measured line delta.
+5. **Doc-freshness check:** map Files Changed against §2 update triggers and propose refreshes for
+   affected docs (propose→approve, never silent).
+6. Then **fixes-only → `/release-patch` (PATCH) · feature sprint → MINOR by hand** (release-patch is
+   PATCH-only).
+
+**The rollup is checked, not trusted:** an active epic whose member closed without a row, whose row
+carries no `close_commit`, or whose header now predates that close is drift reported by the
+promote-time governance review. With no git, there is no commit to make; retain
+`close_commit: none (no git) · closed <YYYY-MM-DD>`, and use that date for the archive moves and
+INDEX line (§ Without git).
 
 ## Without git — the snapshot (ADR-054)
 
