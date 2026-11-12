@@ -79,3 +79,12 @@ Final: 25 keep · 19 keep (fixture) · 17 keep (unknown) · 21 cut · 8 cut (wit
 consequence · T3 · behaviour:low · governance:low
 review · T3 · scoped · behaviour:low · governance:low
 Reading: two review rounds, within the cap of 2; one builder retry.
+
+### 2026-11-12 | execute | T4 built, reviewed and ticked (TASK-650)
+Codex built the record-step census in worktree `s172-t4` (one pass, about 223k tokens). It finished and reported `ready` before Claude Code's low-memory reaper stopped the process, so no rerun was needed. Committed `83b54141`.
+Result: 64 record-step kinds in the appendix, in the check rows' columns. They reconcile against the skill step lists, against the 48 entry types in 124 archived logs (0 missing, 0 extra), and against every non-work commit of SPRINT-169 to 171 (12/38/43, one step each).
+Review round 1, scoped Sonnet: one Medium. R09 (handoff-status stub) was proposed cut on G0297's check history, not its own, and close step 1 reads it to find outstanding handoffs. Coordinator ruling: R09 is keep (unknown), tied to G0297's proposed cut, and the owner packet asks what would replace that read.
+Final record rulings: 7 keep · 44 keep (unknown) · 13 merge · 0 cut = 64. Owner decisions: the six borderline check cuts, the 17 unknown checks, the 13 merges (R14 against ADR-045 D6) and R09 with G0297. No cut has been made.
+consequence · T4 · behaviour:low · governance:low
+review · T4 · scoped · behaviour:low · governance:low
+Reading: round 2 CLEAR, within the cap of 2; no builder retry.
