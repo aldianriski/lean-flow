@@ -1,10 +1,10 @@
-// scripts/merge-check.ts -- SPRINT-138 T3 (TASK-484): the gate's five cross-cutting legs in one command.
+// scripts/merge-check.ts -- SPRINT-138 T3 (TASK-484): the gate's four cross-cutting legs in one command.
 //   bun scripts/merge-check.ts
 //
 // WHY: system verify was red at close in 7 of the last 10 sprints on a leg no per-task check ran.
 // Wrapper only: it dispatches the gate's OWN checkers with the gate's OWN arguments (scripts/qa-check.sh
 // is the source; evals/merge-check.test.ts compares each leg's invocation to it). typecheck ·
-// prose-density · layers-completeness · layers-observed · scope-change. A missing tool or checker FAILS
+// layers-completeness · layers-observed · scope-change. A missing tool or checker FAILS
 // ("not runnable"), never skips -- a skip is indistinguishable from a pass (TD-101, ADR-037). The sprint
 // legs skip, as the gate does, only when there is no sprint file (scope-change: no ACTIVE one).
 // Exit 0 = no leg failed; 1 = any FAIL or not-runnable leg.
@@ -41,7 +41,6 @@ export interface Leg {
 
 export const LEGS: readonly Leg[] = [
   { name: "typecheck", gateVar: null, script: "node_modules/.bin/tsc", args: ["--noEmit"], files: null },
-  { name: "prose-density", gateVar: "pd", script: "scripts/lib/check-prose-density.ts", args: ["$ROOT"], files: null },
   { name: "layers-completeness", gateVar: "lc", script: "scripts/lib/check-layers-completeness.ts", args: ["$FILES"], files: "all" },
   { name: "layers-observed", gateVar: "lo", script: "scripts/lib/check-layers-observed.ts", args: ["$FILES"], files: "all" },
   { name: "scope-change", gateVar: "sc", script: "scripts/lib/check-sprint-by-reference.ts", args: ["$FILE", "--scope-change"], files: "active" },

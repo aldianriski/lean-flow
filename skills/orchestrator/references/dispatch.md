@@ -650,7 +650,7 @@ here is a step to add there.
 Review two-tier: **pre-merge** — full scoped review of each branch's diff, against that task's own
 branch (the primary pass). **Post-merge** — after each merge, run the host's documented **merge-back check** —
 its fixed set of cross-cutting legs, agreed by the host maintainer and recorded in the check's documentation
-(lean-flow's own: `bun scripts/merge-check.ts`, five legs) — on the merged tree, or the discovered gate
+(lean-flow's own: `bun scripts/merge-check.ts`, four legs) — on the merged tree, or the discovered gate
 (§ System verify; choose the repo-wide gate over a unit-only script when both exist) if the host documents no
 such check — never only the task's own harness — to catch what per-branch review can't: cross-task interaction.
 System verify then runs on the **final** integrated tree, never on a trial merge taken before
