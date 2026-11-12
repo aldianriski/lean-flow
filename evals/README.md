@@ -87,32 +87,12 @@ green against the real shipped snippet. Not touched here: wiring this runner int
 until/unless a future task wires it in. TD-012's core risk (no retained regression guard) is closed;
 the "must run automatically" nice-to-have is not.
 
-`fixtures/system-verify/` — one fixture per outcome for `evals/lib/check-system-verify-block.sh`
-(SPRINT-067 T1), which guards ADR-021's silent-close boundary for the "System verify" pass shipped in
-`skills/orchestrator/references/dispatch.md` § Merge-back queue: a `system-verify · FAIL(...)` rollup
-line (night-run.md Part 4) must not be followed by a `| close |` event with no recorded owner ruling.
-**Placement note:** the checker itself still lives in `evals/lib/`, not `scripts/lib/` like its
-siblings (sprint-close, gates-signed, night-run-rollup) — that promotion stays out of scope for a
-checker covered only by an `evals/`-only harness. The harness that fixture-tests it, though, is now
-wired into `qa-check.sh` (SPRINT-068 T2): T1 nested it at `fixtures/system-verify/run-checks.sh`,
-deliberately outside qa-check.sh's `evals/run-*.sh` completeness glob since T1's own Plan marked
-`qa-check.sh` "run, never edited." T2's job was exactly that wiring, so the harness is promoted to the
-standard top-level `evals/run-system-verify-fixtures.sh` and registered in `qa-check.sh`'s
-`eval_harnesses_always` list (leg 12) — always-on, not `QA_FULL`-gated, per its measured ~0.66s runtime
-(dependency-free POSIX sh over 5 static fixture logs, no git/mktemp cost).
-
-| Fixture | Exercises |
-|---|---|
-| `silently-closed/` | FAIL line + `\| close \|` event + no owner ruling → `FAIL system-verify-fail-silently-closed` |
-| `owner-ruled/` | FAIL line + `\| close \|` event + a recorded `owner-ruling:` line → PASS (attended path) |
-| `parked-unattended/` | FAIL line, no `\| close \|` event at all → PASS (the unattended park shape: a genuinely parked close never runs `close`, so this — not a "close + park line" combo — is what a correctly-parked FAIL looks like in the log) |
-| `wellformed-pass/` | `system-verify · PASS` line + `\| close \|` event → PASS |
-| `archived/` | the `silently-closed` violation verbatim, under `docs/sprint/archive/` → skipped, exit 0, no output (closed history not re-litigated) |
-
-The recorded-ruling line the checker asserts on (`owner-ruling: system-verify — <ruling + reason>`) is
-a documented contract, not a private format — `skills/orchestrator/references/dispatch.md` § System
-verify defines it and `night-run.md` Part 4 references the same shape, so a genuinely owner-approved
-override phrased any other way is never mis-flagged once this checker is wired into qa-check.sh.
+SPRINT-173 T5 retires twelve harness-only rows from the
+[process-cost census](../docs/research/logs/process-cost-census.md) and their orphan fixtures.
+`run-record-line-fixtures.ts` retains tick coverage, including a wrong-box refusal;
+`run-dod-delta-fixtures.sh` stays registered. `fixtures/night-run-reaper/` stays because
+`run-night-run-rollup-fixtures.sh` still reads it. The registry in `scripts/qa-check.sh` is the
+current always-on/opt-in list.
 
 ## Real-run fixtures (live, on-demand, not part of the bare-run set)
 
@@ -412,7 +392,6 @@ sh evals/run-sprint-log-layout-fixtures.sh
 sh evals/run-count-claims-fixtures.sh          # SPRINT-055 T1
 sh evals/run-epic-archive-fixtures.sh          # SPRINT-055 T2
 sh evals/run-ephemeral-intake-fixtures.sh      # SPRINT-055 T4
-sh evals/run-system-verify-fixtures.sh         # SPRINT-067 T1 / wired SPRINT-068 T2
 
 # opt-in selftests (slow — throwaway git repos; also run under QA_FULL=1)
 sh evals/run-worktree-base-fixtures.sh         # SPRINT-070 T2 / TD-054

@@ -4,9 +4,8 @@
 // WHY THIS SHAPE: the shell harness ran `sh scripts/lib/check-doc-caps.sh ...` once per case --
 // each spawn costing ~2.75s under Windows fork() emulation for a checker that is milliseconds of
 // text matching. This file calls `runCheckDocCaps()` directly, in-process, the same shape
-// evals/dod-delta.test.ts already uses for check-dod-delta.ts. scripts/lib/check-doc-caps.sh is
-// UNCHANGED and remains the live oracle -- differential parity against it lives in
-// evals/run-doc-caps-differential.ts (opt-in, spawns the real shell checker), never here.
+// evals/dod-delta.test.ts already uses for check-dod-delta.ts. The retained cases below exercise
+// the TypeScript checker without spawning the shell implementation.
 //
 // Every case below is the SAME case evals/run-doc-caps-fixtures.sh asserted, same fixture files,
 // same named findings -- retained, not reinvented (TD-012).
@@ -345,8 +344,7 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
 
 // TASK-384 / ADR-048 amendment: `<root>/.cap-dispositions` closes a SOFT over-cap by a recorded
 // disposition. One must-FAIL per new check, each failing with its NAMED finding, plus the must-PASS
-// and the selection-varying case (L-186). Every fixture is also run through the Shell oracle by
-// evals/run-doc-caps-differential.ts.
+// and the selection-varying case (L-186).
 describe("check-doc-caps.ts -- .cap-dispositions (TASK-384)", () => {
   test("must-PASS: a valid retain row turns one soft OVER-CAP into a named `retained` line; the unrowed sibling still reports", () => {
     const r = run("disp-retained", "none.txt");

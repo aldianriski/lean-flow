@@ -69,11 +69,9 @@ trap 'chmod -R u+w "$work" 2>/dev/null; rm -rf "$work"' EXIT
 # testing nothing (L-186). The set below is derived from the ASSERTIONS by two independent routes --
 # case-name prefixes, and mapping each of the 23 distinct asserted finding slugs back to the engine
 # function that emits it. Both return exactly {§9, §10, §11, §12}.
-# >>> SPEC-REDUCTION-BEGIN -- evals/run-sprint-family-spec-reduction-fixtures.ts extracts between
-# these sentinels. Do not remove or duplicate them; the fixture FAILS loudly if either goes missing.
+# Reduce the shipped spec to the asserted families; the inline drift anchor below checks the result.
 spec_full="$spec"
 spec="$work/spec-s9s10s11s12.md"
-# >>> SPEC-REDUCTION-AWK (the fixture lifts the NEXT line verbatim)
 awk '/^\| `S(9|10|11|12)\./ { print; next } /^\| `S[0-9]/ { next } { print }' "$spec_full" > "$spec"
 
 # DRIFT ANCHOR. A reduction that silently loses rows turns 68 cases green against nothing, which is
@@ -99,7 +97,6 @@ if [ "$_nall" -ne "$_red_total" ]; then
   echo "FAIL harness: reduced spec holds $_nall rule rows but only $_red_total belong to §9/§10/§11/§12 -- another section leaked through the reduction"
   fail=1
 fi
-# <<< SPEC-REDUCTION-END
 
 commit_msg() {  # <dir> <subject>
   git -C "$1" add -A >/dev/null 2>&1

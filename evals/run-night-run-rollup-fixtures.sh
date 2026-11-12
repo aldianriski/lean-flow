@@ -14,11 +14,8 @@
 # how little text-matching work the checker does) into evals/night-run-rollup.test.ts, which calls the
 # TS port's exported functions directly in ONE Bun process. Every one of those cases still asserts on
 # the checker's OWN NAMED FINDING, not merely a non-zero exit (L-058); nothing about WHAT is checked
-# changed, only HOW it is invoked (a speed change, not a coverage change). scripts/lib/check-night-run-
-# rollup.sh remains the shipped oracle -- unchanged, still what qa-check.sh leg 2g calls -- and
-# evals/run-night-run-rollup-differential-parity.ts (opt-in, not part of this file) is what proves the
-# TS port stays bug-for-bug identical to it, over every fixture AND every real committed Execution Log
-# in this repo.
+# changed, only HOW it is invoked (a speed change, not a coverage change). The retained unit cases
+# exercise the TypeScript checker used by qa-check.sh leg 2g; the reaper cases below invoke the shell.
 #
 # What STAYS here, spawning subprocesses same as before: case 9 (the reaper family) drives
 # scripts/night-run.sh --reap directly -- a different script, out of this task's scope; case 12 (the

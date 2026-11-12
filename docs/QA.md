@@ -43,16 +43,13 @@ nothing runs it" gap TD-013 described.
 
 **Always-on vs opt-in split (TD-016).** Within the zero-API set, `qa-check.sh` further splits
 always-on from opt-in — a *different* boundary than the manual step above (that one is excluded
-entirely; this one is gated either way, just not both on every run). The 3 `selftest-assert-*.sh`
-harnesses, plus `run-layers-observed-fixtures.sh` (SPRINT-043 T1), each spin up throwaway git repos
-via `mktemp -d` + `git init` and account for most of the leg's runtime (measured 2026-08-09: ~19s for
-the 12 repos the layers-observed harness builds, on top of the selftests' own cost), so a bare run skips them;
-`QA_FULL=1 sh scripts/qa-check.sh` runs the full set, selftests + layers-observed included.
-Everything else — the snippet-runner harnesses (skill-freshness, worktree-usability,
-dispatch-preflight) that guard shipped `skills/**` text, and the layers-completeness harness
-(maintainer-facing but cheap and git-free, so it stays always-on rather than hiding a
-corrupted-merge false-negative behind a flag) — always runs. So nothing drops out silently: what a
-bare run skips is named right here, and `QA_FULL=1` recovers it.
+entirely; this one is gated either way, just not both on every run). The `eval_harnesses_always`
+and `eval_harnesses_optin` registries in `scripts/qa-check.sh` define the current split;
+`QA_FULL=1 sh scripts/qa-check.sh` runs both. SPRINT-173 T5 removes twelve harness-only rows
+selected by the [process-cost census](research/logs/process-cost-census.md), with their files and
+orphan fixtures. Tick coverage remains in `evals/run-record-line-fixtures.ts`, including a
+wrong-box refusal; the DoD-delta harness stays. The orphan check still rejects an unregistered
+harness, and a registered name with no script still FAILs by name.
 
 ## Judgment — manual / agent pass (a script can't decide these)
 

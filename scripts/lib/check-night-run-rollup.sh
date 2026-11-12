@@ -264,9 +264,7 @@ for lg in "$@"; do
   # atomic append; the Execution Log's own append-only rule (STANDARD §9 / ADR-014, restated in this
   # file's own header comment) means any later illustrative aside quoting the format inside the SAME
   # window can only be appended AFTER the real lines, never before. `head -n1` below always selects
-  # the genuine, reaper-authored occurrence -- proven by the `outcome-illustrative-aside-after-real`
-  # fixture (evals/fixtures/night-run-outcome/), which appends a contradicting illustrative example
-  # AFTER correct real evidence in the same window and asserts the verdict does not flip.
+  # the genuine, reaper-authored occurrence when illustrative examples follow the real evidence.
   # KNOWN GAP, recorded by the coordinator and routed to T3's outside review rather than patched
   # blind (SPRINT-098 T3). The emission-order argument above holds for an aside appended AFTER the
   # reaper's block, but the window is anchored at the LAST `run-complete` header, and a HAND-WRITTEN

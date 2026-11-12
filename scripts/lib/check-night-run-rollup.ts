@@ -3,14 +3,8 @@
 // WHY (SPRINT-059 T3, SPRINT-093 T1, SPRINT-098 T3) and is NOT duplicated here. This file only ports
 // the HOW, faithfully: every finding, every regex, every ordering rule, copied line for line.
 //
-// scripts/lib/check-night-run-rollup.sh REMAINS THE SHIPPED ORACLE. qa-check.sh leg 2g still invokes
-// it via `sh`, unchanged by this port (that file is out of scope for this task -- see the porting
-// agent's final report for the exact diff that would point leg 2g at this file instead, held for the
-// coordinator to apply centrally rather than applied here). This port's job is bug-for-bug parity
-// with the shell oracle, proven by evals/run-night-run-rollup-differential-parity.sh over every
-// fixture this checker has AND every real committed Execution Log in this repo, archived included.
-// A divergence found there is a defect in THIS file -- fix it here, never "improve" on the shell
-// behaviour (CLAUDE.md Anti-Patterns: bug-for-bug compatibility is the requirement).
+// qa-check.sh leg 2g uses this port. Preserve the shell checker's findings and selection rules;
+// retained coverage lives in evals/night-run-rollup.test.ts and evals/run-night-run-rollup-fixtures.sh.
 //
 // TypeScript run by Bun, per the SPRINT-101 T3 owner ruling this repo already applies to
 // check-dod-delta.ts -- not POSIX sh (2026-09's "no shell scripts" rule).
@@ -295,8 +289,7 @@ export function checkNightRunRollup(paths: readonly string[]): CheckOutcome {
     try {
       content = readFileSync(lg, "utf8");
     } catch {
-      // A regular file that exists but cannot be READ (permission denied, e.g. an ACL-denied file --
-      // outside-review-confirmed via the differential parity harness's unreadable-file edge case).
+      // A regular file that exists but cannot be READ (permission denied, e.g. an ACL-denied file).
       // The shell's own `grep -qE '^### ...' "$lg" 2>/dev/null` on an unreadable file exits non-zero
       // the SAME way "no match found" does, so the shell takes the exact "no completed-run entry
       // yet" branch a genuinely rollup-less file would -- never a FAIL, never an error. Bug-for-bug:

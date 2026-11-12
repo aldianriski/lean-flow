@@ -22,8 +22,7 @@
 #   the population that broke an earlier hand-rolled collation formula, retained so the class cannot
 #   recur silently), and empty-string CLI argument fallback (`${1:-default}` semantics).
 #
-# Differential parity against the shell oracle lives in evals/run-doc-caps-differential.ts (opt-in,
-# spawns the real `sh` checker) -- never here; this harness's whole point is that it does NOT spawn.
+# These retained cases exercise the TypeScript checker in-process, without shell checker spawns.
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
