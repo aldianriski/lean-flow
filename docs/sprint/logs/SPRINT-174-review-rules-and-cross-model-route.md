@@ -46,3 +46,5 @@ builder-check · T3 · 5 contradictions · 4 questions · the skip table gains a
 consequence · T1 · behaviour:low · governance:high
 review · T1 · scoped-reviewer · behaviour:low · governance:high
 review · T1 · scoped-reviewer · behaviour:low · governance:high
+consequence · T2 · behaviour:low · governance:high
+review · T2 · scoped-reviewer · behaviour:low · governance:high
