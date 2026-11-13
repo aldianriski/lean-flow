@@ -51,3 +51,11 @@ review · T2 · scoped-reviewer · behaviour:low · governance:high
 consequence · T3 · behaviour:low · governance:high
 review · T3 · scoped-reviewer · behaviour:low · governance:high
 review · T3 · scoped-reviewer · behaviour:low · governance:low
+review · T3 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-11-13 | progress | T1 to T3 built, reviewed and landed; all 19 Done-when boxes ticked
+Each step was built by Codex (gpt-6-astra) in a worktree, reviewed by a scoped Sonnet reviewer and landed by the coordinator: T1 `b63dd0d4`, T2 `d49fb0f5`, T3 `da8ab049` and `78a1a60b`. Two coordinator edits followed a review and each took a fresh review: T1's re-ask wording (`1c6a3798`, Sonnet) and T3's five gap fixes (`8229cb31`, Codex through the route).
+Coordinator slip: `936eb3e7` named T1's re-ask wording in its subject but carried only the task file, because a `git add` failed on a moved path; `1c6a3798` landed the two reviewed files and says so.
+Proof runs for TASK-660, two fresh agents holding only the shipped references and `.claude/CONTEXT.md`: a Codex design review and a Codex code review (both `VERDICT: CLEAR` with both statements), a delegated build after a real dirty-worktree refusal, and a diagnosis handoff on a seeded failed-twice case (owner ruling) whose answer the coordinator checked and refuted.
+Gaps the agents reported and this sprint did not close: the G2 design gate in `orchestrator/SKILL.md` names no cross-model route (the file is at its line cap; the route is reached through `review-scoping.md`); "pinning tests" for a prose-only change has no rule for which search hits are unrelated; the Spec comparand ladder has no rung for a prose-only change. `.claude/CONTEXT.md` is at its 150-line cap with no headroom, and a blank line under "Built-in leverage" was removed to fit the route's two lines.
+No build-critical permission was denied in any run, so TASK-660's permission negative rests on the text plus one low-stakes denial (the user's global git ignore file), reported each time and never worked around.
