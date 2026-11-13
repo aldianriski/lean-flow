@@ -56,6 +56,24 @@ review cap: 2 rounds at G2 (ADR-053).
 - [ ] TD-171's summary is corrected with Round 25's split (engine calls 83%, fixture construction 17% on Windows) and its
       second lever marked as done by this task.
 
+## Population (T1 step 1, fresh trace at `d491ba1a`)
+
+Every engine call in `evals/run-conformance-engine-fixtures.sh` that passes the full `--spec "$spec"`: **38**, matching Round 25.
+Selection: `grep -nE 'sh "\$(engine|_e)".*--spec "\$spec"'`, then calls expanded through the two helpers. Cross-checked against
+Round 25's prefix count (25 `s11-*` + 13 others = 38).
+
+- **Changed, retention family → `S11.BACKLOG` only (25):** `s11_check` ×23 (`s11-live-citation-in-open-task-keeps-it` ·
+  `s11-MUST-FAIL-ON-OLD-pre-change-engine-flags-it` · `s11-control-uncited-still-flagged` · `s11-live-citation-in-context-md-keeps-it` ·
+  `s11-zero-padded-citation-counts-by-number` · `s11-control-archive-citation-does-not-keep-it` · `s11-control-history-*` ×9 ·
+  `s11-control-whole-word-only-TASK-3570-does-not-keep-357` · `s11-control-worktree-copy-citation-ignored` · `s11-control-history-*` ×5 (indexes,
+  case variants) · `s11-live-citation-in-non-ascii-path-keeps-it`) and the fail-safe loop ×2 (`s11-failsafe-xargs-*` · `s11-failsafe-cat-*`).
+- **Changed, worktree family → `S2.R-PLACEMENT` + `S12.SECRETS` (6):** `wt_out` for `worktree-placement-ignored` ·
+  `worktree-placement-control-outside-still-fails` · `worktree-placement-ignored-bracketed-root` · `worktree-placement-bracketed-root-control-still-fails` ·
+  `worktree-s12-ignored` · `worktree-s12-control-outside-still-fails`.
+- **Kept on the full spec (7), reason beside each in the harness:** `rule-unimplemented-is-named` · `gap-is-labelled-gap-and-does-not-set-exit` ·
+  `real-finding-still-fails` · `judgment-and-impl-directed-never-verdicts` · `no-unrecognized-mark` · `no-score-grade-percentage-or-ratio` ·
+  `every-fail-names-its-rule` (+ `suffix-preserves-negations`, which reads the same output).
+
 ## Touches
 
 evals/run-conformance-engine-fixtures.sh · evals/fixtures/ (one retained fixture, if the Negative needs a file) ·
