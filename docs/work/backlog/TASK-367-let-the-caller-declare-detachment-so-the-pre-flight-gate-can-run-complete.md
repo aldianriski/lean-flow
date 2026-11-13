@@ -39,7 +39,7 @@ state note: the detachment signal's shape is the open question
 
 - that a complete pre-flight is worth its wall-clock at all. UNCONFIRMED — the alternative is that the launcher should keep refusing on a bounded gate and the completeness problem belongs to the gate's cost, not to the launcher. Rule that before building; `TD-090` and `TASK-357` (carried from SPRINT-104 T4) own the cost side.
 - **open:** the shape of the detachment signal (the open question — see Done when (a)).
-- **open:** is a complete pre-flight worth its wall-clock? Measured 2026-11-13 on this Windows host with 7.6 GB free: the default-profile gate ran 701 s against the 520 s budget and left 5 harnesses unrun, so the task is not moot. Small git and grep commands ran beside it.
+- **open:** is a complete pre-flight worth its wall-clock? Measured 2026-11-13 on this Windows host with 7.6 GB free: the default-profile gate ran 701 s against the 520 s budget and left 5 harnesses unrun, with small git and grep commands running beside it. A second run the same day, with less beside it, finished complete in 512 s (211 pass). The host sits at the budget line, so one run passes and the next is cut short.
 
 ## Tracker
 
