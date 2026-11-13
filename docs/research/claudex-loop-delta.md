@@ -6,7 +6,7 @@ status: current
 id: claudex-loop-delta
 tags: [process, docs]
 domain: skills
-related: [codex-run-project-pipeline, mattpocock, ADR-001, ADR-010, ADR-053]
+related: [codex-run-project-pipeline, ADR-001, ADR-010, ADR-053]
 ---
 
 # Research — what does claudex-loop carry that lean-flow lacks?
