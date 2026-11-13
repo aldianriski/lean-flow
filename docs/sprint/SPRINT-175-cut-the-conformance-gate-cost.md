@@ -4,6 +4,7 @@ slug: cut-the-conformance-gate-cost
 owner: Maintainer
 last_updated: 2026-11-13
 status: active
+plan_commit: 621e9f10
 update_trigger: sprint execute/close events
 ---
 
