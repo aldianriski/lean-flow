@@ -391,20 +391,6 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-289** severity: low | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-160 (T3 capacity check)
-  - Summary: **Two clinic A/B trials that provision at the same moment can fail to start Postgres.** In TASK-586's capacity check
-    both infra attempts were `provision-failed: pg_ctl start: exit 1`, each when two clinic slots began provisioning together
-    (N = 3: patient-cancel-all #2 beside confirmation-time #1; N = 4: confirmation-time #1 beside patient-cancel-all #2).
-  - Evidence: SPRINT-160 log, T3 entry; A4b at two workers had 0 provisioning failures in 32 slots; no Windows
-    resource-exhaustion event in the window, and free RAM was lower at N = 3 than at N = 4.
-  - Impact: low; it blocks more than two workers for release arms (Amendment 8's N = 2 stands), so an arm takes about 75 minutes.
-  - Mitigation (hypothesis, re-derive first): a port or startup race between concurrent clinic provisions; reproduce with two
-    clinic provisions in parallel before choosing a fix, then re-run the N = 3 check.
-  - Re-checked at SPRINT-162 T2 (TASK-603), after TASK-600's provisioning lock: N = 3 on A4a's arms and pin, 6 slots,
-    2026-11-04 02:41-03:02 UTC, 13.85 USD. 0 provisioning failures (three clinic starts overlapped), 0 infra attempts, 0 low-memory
-    kills, lowest free RAM 362 MB; all graders pass; two scored judge UNKNOWNs where A4a had PASS, ruled noise by the owner.
-    **Carry-forward (owner ruling):** the next release arm's amendment adopts N = 3 and resolves this row; until then it stays open.
-
 - **TD-288** severity: low | status: open | created: Sprint-159 (T3 outside review, round 2)
   - Summary: **The sprint checker follows a copy whose source path carries no `SPRINT-<n>` number.** TASK-596's fix stops at a
     copy from another sprint by comparing the `SPRINT-<n>` in the paths; a copy from an unnumbered path (e.g. `2026-09-01.md`)
@@ -423,24 +409,6 @@ status: current
     `outside`, `trial`.
   - Impact: low (disk only; D: had 64 GB free). Grows with workers and arm length.
   - Mitigation (hypothesis, re-derive first): clean each judge's isolation when the judge returns, as the trial's own is cleaned.
-- **TD-286** severity: low | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-156 (close retro)
-  - Summary: **The A/B harness's design scope check (G2) refuses a design that lists the task file, while its post-run breach check
-    exempts `docs/work/`.** The two checks disagree on the same path, so a design that names the task it ticks pays a revise round
-    for a file the run is allowed to touch.
-  - Evidence: A2's kept streams, 14 of 82 first-round G2 refusals were the task file alone (SPRINT-156 T2 diagnosis); TASK-575
-    worked around it in the skill text rather than the harness.
-  - Impact: low now (A4a's designs no longer list the task file); it biases any later arm whose skill text lists it.
-  - Mitigation (hypothesis, re-derive first): exempt `docs/work/` in the G2 scope check as the breach check does, in a later
-    owner-signed amendment (the rule is frozen), with a must-FAIL fixture for a design listing only the task file.
-- **TD-284** severity: medium | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-152 (close retro; Codex round 2 R4 on Amendment 5)
-  - Summary: **A finished A/B trial keeps no record of its post-run file list, so a changed manifest rule cannot be re-applied to it.**
-    `lib/isolate.ts` deletes the trial copy once the row is appended and keeps only the `stream*.jsonl` transcripts. When Amendment 5
-    narrowed the PowerShell exclusion after 13 rows had run, nothing retained could show whether those rows held another file in
-    that directory, and the rows were kept with a caveat.
-  - Evidence: Amendment 5's correction paragraph and its owner ruling (2026-11-01); `ps-evidence-2` found no trial copy left to list.
-  - Impact: med for later arms (A2 onward). Each rule change after a run can only be argued, not checked.
-  - Mitigation (hypothesis, re-derive first): write the trial's full post-run manifest (path to blob id) under `kept/<iso>/`
-    before the copy is deleted, and let `build-slots` re-derive the changed set from it.
 - **TD-283** severity: medium | status: open | created: Sprint-152 (close retro, S0 report)
   - Summary: **`analyze.ts` prints R-b's verdicts but no section 4 verdict (holds, inconclusive or regressed) and no per-symptom
     regression line.** The pre-registration leaves the +0.10 and -0.05 thresholds to the reader, so the report shows the rates and
@@ -459,18 +427,6 @@ status: current
   - Impact: trivial today, since a run that dies mid-flight usually exits non-zero.
   - Mitigation (hypothesis, re-derive first): have qa-check print an end-of-run marker and require the verdict to be the last
     `QA-CHECK:` line before it. A defect fix of an existing tool, unfrozen under ADR-053.
-
-- **TD-281** severity: low | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-148 (T2 scoped review round 1 + re-review, review-cap routed)
-  - Summary: **The D9 trial protocol in `evals/ab/lib/protocol.ts` has three gaps that the capped review routed here.** (1) The post-build
-    scope-breach diff exempts all of `docs/work/` and `.ab/`, not only the two files the harness writes. A build can edit the G1
-    task file, or add files there, without a `scope-breach`. (2) The post-build manifest can throw (a directory symlink, an unreadable
-    entry), and the exception escapes before the row is appended, so a paid trial can leave no row. (3) The judge run's init
-    plugins are never validated. Only its model set is pinned, and a plain-string (test-only) judge skips even that.
-  - Evidence: T2's scoped review round 1 (findings 4 and 6) and the re-review's residual notes, 2026-10-29. P6 hit none of them.
-  - Impact: low. The harness is maintainer-only and run by hand, but each gap weakens a trial's validity before TASK-544's real trials.
-  - Mitigation (hypothesis, re-derive first): exempt only the exact task file and `.ab/g2-design.md` (or hash them before and after);
-    wrap the post-build manifest and grade steps so a throw records `exit: manifest-error` as not-passed; run `checkInitPlugins` on
-    the judge's init event.
 
 - **TD-280** severity: low | status: open | created: Sprint-147 (close retro, measured)
   - Summary: **The member-layers check matches a bare filename against `Layers:` by basename but against `Cites:` only as the exact token, so the fix its own FAIL message recommends fails.** A Done-when naming the bare `lean-flow-3-foundation.md`, with `Cites:` carrying `docs/research/lean-flow-3-foundation.md`, stays a `member-layers-incomplete` FAIL whose text says "declare it on that block's Cites: line".
@@ -1932,21 +1888,6 @@ status: current
     SPRINT-073 (spec annotation, all HITL, no night run) is the wrong sprint for it. Recorded
     explicitly so the next reviewer starts from *"unblocked but unscheduled"* rather than re-deriving
     a block that has already lifted.
-- **TD-290** severity: medium | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-161 (T2 arm Release)
-  - Summary: **A failed A/B judge call is scored as an UNKNOWN verdict, so an outage lowers an arm's score silently.** Two judge
-    calls in arm Release failed with `api_error` during a login lapse and counted as not-passed slots; the agent phase stops on
-    the same fault (`usage-missing`), the judge phase did not.
-  - Evidence: `docs/research/logs/ab-measurements-release.md` (rows 09:21:20Z and 09:21:32Z, voided by owner ruling); no failed
-    judge call in any earlier arm.
-  - Impact: medium; an unnoticed outage can turn a passing arm into a no-ship (Release read 87.5% before the voids, 93.8% after).
-  - Mitigation: TASK-602 (classify a failed judge call as infra; retry or stop).
-  - Fixed in the harness at SPRINT-162 T1 (TASK-602; selftest S79): a thrown or empty judge call marks the attempt
-    `infra:judge-failed`, so it retries or counts toward the 3-infra abort, and a usage-limit judge failure pauses the run.
-    **Carry-forward (owner ruling, SPRINT-162 G2):** stays open until the next arm's amendment discloses this change, because
-    harness code is not hashed; the amendment's author resolves it.
-    The G2 signer took the same rule at SPRINT-163 T1 (TASK-604; selftest S80): a thrown or empty signer call in any round marks
-    the attempt `infra:judge-failed`; the same amendment discloses both.
-
 - **TD-291** severity: low | status: open | created: Sprint-162 (promote; EPIC-023 D20)
   - Summary: **Backend role watch: duplicated server logic keeps recurring in A/B runs, and no reviewer looks for it.** EPIC-023
     D20 deferred every role agent; backend is the one it marked **watched**. The trigger fires when the residual failures of two
@@ -1958,14 +1899,6 @@ status: current
   - Mitigation: re-check the trigger at each release arm (D19). If it fires, propose an epic for a backend reviewer, admitted
     under ADR-053 and measured by one arm against the shipped stack.
 
-- **TD-292** severity: trivial | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-162 (close; T1 review)
-  - Summary: **Two edges of TASK-602's judge-failure rule.** `run-trial.ts` exits 0 when its last attempt is a judge-infra failure
-    (`r.valid` reads the exit, which is `ok`), and an empty reply from a judge on the wrong model now counts as infra, not as a
-    model-pin UNKNOWN (the empty-reply check runs before the pin check in `runJudges`).
-  - Evidence: SPRINT-162 log, T1 review notes; `evals/ab/run-trial.ts` (exit line), `evals/ab/lib/judges.ts` (`runJudges`).
-  - Impact: trivial; `run-trial.ts` is a single-trial dev CLI the measured driver does not use, and a wrong-model empty reply has
-    not been seen.
-  - Mitigation: fold into TASK-604 if it touches the same paths; otherwise accept.
 - **TD-293** severity: low | status: open | created: Sprint-163 (close; T2 surprise)
   - Summary: **The operated migrate route stopped before the Standards question.** On a real-repo copy, an operated migrate halted at its
     first plan popup: four bundled questions the classifier has no answer for, with Bash and PowerShell reported blocked. The operator
@@ -2003,11 +1936,6 @@ status: current
   - Evidence: SPRINT-165 Log, T1 entry.
   - Impact: low; the worst case is a `live` ledger row that promote's handoff line then shows.
   - Mitigation: run it the next time a real side handoff is resumed; no run planned.
-- **TD-303** severity: low | status: resolved → removed (no task): the code it names was deleted with the A/B system, 2026-11-11; Re-file fresh if an A/B harness is rebuilt | created: Sprint-169 (T1 review)
-  - Summary: **`jev-ab-judge.ts` derives its "not sent" figure as a remainder.** The Infra line prints cells outside the scored set minus the failed calls. That is correct while the 96-cell key pre-flight holds, and wrong if any path other than a failed call or a blind-check skip ever drops a cell.
-  - Evidence: SPRINT-169 Log, T1 review entry; `scripts/jev-ab-judge.ts`, the Infra line.
-  - Impact: low; an informational infra count could be off, and no scored figure moves.
-  - Mitigation: count not-sent cells where a prompt is skipped. Census-zero today, so no run planned.
 - **TD-304** severity: low | status: open | created: Sprint-170 (close)
   - Summary: **The row 7 watcher's `--exclude` accepts only the `agent-` prefixed worker id.** Given a bare id it excluded nothing, the coordinator relaunched it, and that retry cost 0.033 USD of the 0.120 USD overhead that failed S23's 0.10 limit. The script lives on `trial/epic-024-row7` (f5cf1963) and the row is a no-go, so nothing on `main` carries it.
   - Evidence: SPRINT-170 Log, "T5 runs; row 7 verdict no-go on overhead"; TASK-635 § Results.
