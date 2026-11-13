@@ -47,7 +47,55 @@ awk '
   /^\| `S[0-9]/ { next }
   { print }
 ' "$spec" > "$spec_s2s6"
-grep -qE '^\| `S2\.F-TIER`' "$spec_s2s6" || { echo "FAIL harness: spec_s2s6 lost S2.F-TIER -- reduction anchor drifted from the shipped spec"; fail=1; }
+spec_keeps() {   # <label> <reduced-spec> <rule-id>... -- every asserted rule row must survive
+  _sk_label=$1; _sk_spec=$2; shift 2
+  _sk_rc=0
+  for _sk_id do
+    _sk_pattern=$(printf '%s\n' "$_sk_id" | sed 's/\./\\./g')
+    if ! grep -qE '^\| `'"$_sk_pattern"'`' "$_sk_spec"; then
+      echo "FAIL harness: $_sk_label lost $_sk_id -- reduction anchor drifted from the shipped spec, so its cases would pass with the rule absent"
+      _sk_rc=1
+    fi
+  done
+  return "$_sk_rc"
+}
+spec_keeps spec_s2s6 "$spec_s2s6" S2.F-TIER S2.R-README S6.BASE S6.BACKEND S6.MEDIUM S6.MULTISVC || fail=1
+
+# spec_s11/spec_wt (TASK-661): TD-171's second lever -- a spawn-count fix, not a coverage cut.
+# Single-family cases dispatch only the rules they assert. The §2 file-listing table is not a
+# rule row and survives, so write_core_set/write_base_tier are unaffected.
+spec_s11="$work/spec-s11.md"
+awk '
+  /^\| `S11\.BACKLOG`/ { print; next }
+  /^\| `S[0-9]/ { next }
+  { print }
+' "$spec" > "$spec_s11"
+spec_keeps spec_s11 "$spec_s11" S11.BACKLOG || fail=1
+
+spec_wt="$work/spec-wt.md"
+awk '
+  /^\| `(S2\.R-PLACEMENT|S12\.SECRETS)`/ { print; next }
+  /^\| `S[0-9]/ { next }
+  { print }
+' "$spec" > "$spec_wt"
+spec_keeps spec_wt "$spec_wt" S2.R-PLACEMENT S12.SECRETS || fail=1
+
+# Guard must-FAIL + sibling control: a dropped row fails; the intact copy is silent.
+awk '/^\| `S11\.BACKLOG`/ { next } { print }' "$spec_s11" > "$work/spec-s11-dropped.md"
+_g=$(spec_keeps spec-s11-dropped "$work/spec-s11-dropped.md" S11.BACKLOG); _grc=$?
+if [ "$_grc" -ne 0 ] && printf '%s\n' "$_g" | grep -qF 'lost S11.BACKLOG'; then
+  echo "PASS fixture(reduced-spec-guard-fires-on-a-dropped-row): the missing rule is named and the guard returns non-zero"
+else
+  echo "FAIL fixture(reduced-spec-guard-fires-on-a-dropped-row): exit $_grc -- expected the missing rule to be named"
+  printf '%s\n' "$_g"; fail=1
+fi
+_g=$(spec_keeps spec_s11 "$spec_s11" S11.BACKLOG); _grc=$?
+if [ "$_grc" -eq 0 ] && [ -z "$_g" ]; then
+  echo "PASS fixture(reduced-spec-guard-control-intact-spec-is-silent): intact spec returns 0 with no output"
+else
+  echo "FAIL fixture(reduced-spec-guard-control-intact-spec-is-silent): exit $_grc -- expected 0 with no output"
+  printf '%s\n' "$_g"; fail=1
+fi
 
 # A throwaway target repo-dir -- the engine takes a directory, not necessarily a git repo (nothing
 # T2 ships needs git). The point of every case here is the ENGINE's dispatch and report, never the
@@ -191,12 +239,14 @@ printf '# Architecture\n\nNo ownership header, no update trigger.\n' > "$target_
 # whole of L-058: a rule the spec states and the engine cannot answer must never be silently absent.
 # What changed is only where the fact is counted -- a GAP line says something about THIS ENGINE, so it
 # no longer sets the adopter's exit code or blocks the adopter's level.
+# full spec kept: dispatch spans the shipped spec; GAP needs an unimplemented mechanical rule a reduction could omit.
 run_case_anywhere "rule-unimplemented-is-named" 0 "rule-unimplemented" -- \
   sh "$engine" "$target" --spec "$spec"
 
 # ...and the line carries the GAP label, not a FAIL one. Asserted separately from the text above for
 # the reason T4 learned the hard way: a substring assertion cannot see a relabelled verdict, and the
 # label IS the contract here -- FAIL would put our missing work back on the adopter's report.
+# full spec kept: dispatch spans the shipped spec; GAP needs an unimplemented mechanical rule a reduction could omit.
 out=$(sh "$engine" "$target" --spec "$spec" 2>&1); rc=$?
 n_gap_lines=$(printf '%s\n' "$out" | grep -c '^GAP   ')
 n_fail_lines=$(printf '%s\n' "$out" | grep -c '^FAIL  ')
@@ -210,6 +260,7 @@ fi
 
 # A repo WITH a defect must still exit 1 and name it -- the separation must not have made the engine
 # quiet, which is the failure mode the Plan warned about ("do not tune the engine to look quiet").
+# full spec kept: the exit-code contract needs every rule riding along so no other output makes the engine quiet.
 run_case_anywhere "real-finding-still-fails" 1 "ownership-header-missing: docs/architecture.md" -- \
   sh "$engine" "$target_bad" --spec "$spec"
 
@@ -217,6 +268,7 @@ run_case_anywhere "real-finding-still-fails" 1 "ownership-header-missing: docs/a
 # DoD 2. S1.LAW1 (judgment-only) and S13.NOINFER (implementation-directed) are real rules in the
 # shipped spec. Neither may appear as a PASS or FAIL line -- only as an excluded/judgment-required
 # note -- because emitting either as a verdict is a finding no adopter could ever clear (§14).
+# full spec kept: classifies the shipped spec's marks across all sections.
 out=$(sh "$engine" "$target" --spec "$spec" 2>&1)
 if printf '%s\n' "$out" | grep -qE '^(PASS|FAIL)  S1\.LAW1' ||
    printf '%s\n' "$out" | grep -qE '^(PASS|FAIL)  S13\.NOINFER'; then
@@ -315,6 +367,7 @@ fi
 # an adopter's report then advertises our own inconsistency. This is the case that would have failed
 # the moment T1's eleven re-marks landed without the arms -- which is precisely the half-shipped
 # state the scope-change ruling refused (TD-001, L-007).
+# full spec kept: must see every shipped mark value; reducing that set is the defect this guards.
 out=$(sh "$engine" "$target" --spec "$spec" 2>&1)
 if ! printf '%s\n' "$out" | grep -qE 'unrecognized mark'; then
   echo "PASS fixture(no-unrecognized-mark): every mark value in the shipped spec has an engine arm"
@@ -406,6 +459,7 @@ fi
 # DoD 5. Checked on the LARGEST run this suite makes (the real spec, all 100 rules) rather than a
 # reduced one, so a stray literal introduced anywhere in the report has nowhere to hide. Grepped,
 # never trusted (L-058): the header comments say "never a score" -- this is what checks it.
+# full spec kept: deliberately the largest run, so a stray token anywhere in the report has nowhere to hide.
 full_out=$(sh "$engine" "$target" --spec "$spec" 2>&1)
 bad_tokens=0
 printf '%s\n' "$full_out" | grep -q '%'                              && { echo "FAIL fixture(no-percentage): a literal % appears in the output"; bad_tokens=1; }
@@ -893,6 +947,7 @@ printf '# r\n'                   > "$t_att/README.md"
 printf '# no frontmatter\n'      > "$t_att/docs/architecture/overview.md"
 printf -- '---\nid: ADR-001\n---\n# ADR-001\n' > "$t_att/docs/adr/ADR-001-d.md"
 printf '# stray\n'               > "$t_att/src/erd.md"
+# full spec kept: the invariant covers every assertion's FAIL line; a reduction narrows its population.
 out=$(sh "$engine" "$t_att" --spec "$spec" 2>&1)
 n_fail_att=$(printf '%s\n' "$out" | grep -c '^FAIL' || true)
 n_unattr=$(printf '%s\n' "$out" | grep '^FAIL' | grep -vE '^FAIL  S[0-9]' | grep -cE -v '\(S[0-9]+\.[A-Z0-9-]+\)$' || true)
@@ -1099,6 +1154,7 @@ if [ -n "$(PATH=$_nb command -v bun 2>/dev/null)" ]; then
 else
   spec_s9s11="$work/spec-s9s11.md"
   awk '/^\| `S(9|11)\./ { print; next } /^\| `S[0-9]/ { next } { print }' "$spec" > "$spec_s9s11"
+  spec_keeps spec_s9s11 "$spec_s9s11" S9.TWOFILES S9.VERIFYCLAUSE S11.BACKLOG || fail=1
   FXR="$repo_root/evals/fixtures/by-reference"
   mk_v2() {   # <dir> -- the by-reference fixture sprint (no git), one member ticked with no evidence, no log
     mkdir -p "$1/docs/sprint" "$1/docs/work/todo"
@@ -1177,7 +1233,7 @@ wt_mk() {   # <dir> -- a conformant tree
   mkdir -p "$1"; write_core_set "$1"; write_base_tier "$1"
 }
 wt_out() {  # <dir> -- the engine's report
-  sh "$engine" "$1" --spec "$spec" 2>&1
+  sh "$engine" "$1" --spec "$spec_wt" 2>&1
 }
 # site 1: _repo_files (S2.R-PLACEMENT's walk)
 d="$work/wt-place-only-in-worktree"; wt_mk "$d"
@@ -1242,7 +1298,7 @@ s11_put() {  # <dir> <relpath> <text> -- a file whose body carries <text>
 }
 S11_FIND='closed-task-past-retention: docs/work/done/TASK-357-old\.md'
 s11_check() {  # <name> <dir> <present|absent> [engine]
-  _e=${4:-$engine}; _o=$(sh "$_e" "$2" --spec "$spec" 2>&1)
+  _e=${4:-$engine}; _o=$(sh "$_e" "$2" --spec "$spec_s11" 2>&1)
   if printf '%s\n' "$_o" | grep -qE "^FAIL +$S11_FIND"; then _got=present; else _got=absent; fi
   if [ "$_got" = "$3" ]; then echo "PASS fixture($1): TASK-357 retention finding $_got as required"
   else echo "FAIL fixture($1): TASK-357 retention finding is $_got, wanted $3"; fail=1; fi
@@ -1284,7 +1340,7 @@ if command -v git >/dev/null 2>&1 && command -v bun >/dev/null 2>&1; then
   for bad_tool in xargs cat; do
     shim="$work/shim-$bad_tool"; mkdir -p "$shim"; printf '#!/bin/sh\nexit 1\n' > "$shim/$bad_tool"; chmod +x "$shim/$bad_tool"
     d="$work/s11-failsafe-$bad_tool"; s11_tree "$d"; s11_commit "$d"
-    _o=$(PATH="$shim:$PATH" sh "$engine" "$d" --spec "$spec" 2>&1)
+    _o=$(PATH="$shim:$PATH" sh "$engine" "$d" --spec "$spec_s11" 2>&1)
     if printf '%s\n' "$_o" | grep -qE 'S11\.BACKLOG +-- citation scan unavailable \(.*\) -- retention not judged; nothing proposed'; then echo "PASS fixture(s11-failsafe-$bad_tool-note): the unavailable-scan note is printed"
     else echo "FAIL fixture(s11-failsafe-$bad_tool-note): no 'citation scan unavailable' note"; fail=1; fi
     if printf '%s\n' "$_o" | grep -qE "^FAIL +closed-task-past-retention"; then echo "FAIL fixture(s11-failsafe-$bad_tool-proposes-nothing): a retention finding was raised on a failed scan"; fail=1
