@@ -132,8 +132,9 @@ ceiling as `still-open → owner` — never a second retry.
 - **Coverage and limitations.** Every code-review result and every intake or proposal draft-review result, whoever the
   reviewer is and whether cross-model routing is on or off, ends with two statements: what it read (the files and the
   criteria it judged against), and what it could not read or check. If either is missing, send the result back to the same
-  reviewer once, asking only for what is missing. Until it has both, do not record it as a passed review: no `review ·`
-  line and no CLEAR. If either is still missing after that one retry, the review counts as not run and the coordinator
+  reviewer once, asking only for what is missing. That re-ask is not a revise-loop retry: it changes no code, is logged
+  as no `Tn · retry ·` line and does not count against that loop's ceiling. Until it has both, do not record it as a passed review: no `review ·`
+  line and no CLEAR. If either is still missing after that one re-ask, the review counts as not run and the coordinator
   tells the owner. The coordinator's own self-review checklist is not a reviewer reply, so this rule does not apply to it.
 - **Replaced-behaviour sweep.** When a revision to a draft, a design or a plan replaces a behaviour, the reviser searches
   the whole document for the replaced condition and changes or marks every passage that still states it, acceptance

@@ -16,7 +16,7 @@ status: current
 
 ## [Unreleased]
 
-- **`/orchestrator`: review results now state coverage and limitations.** A result missing either gets one retry with the
+- **`/orchestrator`: review results now state coverage and limitations.** A result missing either is sent back once to the
   same reviewer and cannot pass without both. A coordinator who edits task work after review becomes a builder and needs
   a fresh scoped review; revisions that replace a behaviour sweep the whole draft, design or plan for old passages,
   acceptance criteria included. The builder-check reader prompt asks for both statements too (TASK-659).
