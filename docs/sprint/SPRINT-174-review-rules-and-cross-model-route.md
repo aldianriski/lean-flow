@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-11-13
 status: active
 plan_commit: 1296be50
+gates_signed: G1,G2 @ bd372167
 update_trigger: sprint execute/close events
 ---
 
@@ -42,7 +43,7 @@ Owner override of the size-L split rule, kept as one task with two plan steps; t
 **Acceptance:** the new file lets a Claude host hand a review to another provider's CLI, off by default, and an empty, timed-out or verdict-less result is never an approval.
 
 ### T3 — Cross-model route, build and diagnosis half `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `skills/orchestrator/references/cross-model-route.md` · `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/references/dispatch.md` · `README.md` · `CHANGELOG.md` · `.claude/CONTEXT.md`
+Layers: `skills/orchestrator/references/cross-model-route.md` · `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/references/dispatch.md` · `README.md` · `CHANGELOG.md` · `.claude/CONTEXT.md` · `docs/adr/ADR-010-model-dispatch-role-tiers.md`
 Depends-on: T2
 Cites: TASK-660 (Build and diagnosis, Opt-in and wiring, and the other Proof boxes), TASK-659, `docs/research/claudex-loop-delta.md` (read only)
 Reviewed on its own. It owns the opt-in and wiring boxes, the four real exercises (T2's two review runs are cited as evidence), the consumer check, the permission and dirty-checkout negative, and the README, CHANGELOG and CONTEXT box. G2 rules whether ADR-010 needs an amendment (TASK-660 A2).
