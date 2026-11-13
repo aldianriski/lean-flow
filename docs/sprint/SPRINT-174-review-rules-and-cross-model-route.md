@@ -4,6 +4,7 @@ slug: review-rules-and-cross-model-route
 owner: Maintainer
 last_updated: 2026-11-13
 status: active
+plan_commit: 1296be50
 update_trigger: sprint execute/close events
 ---
 
