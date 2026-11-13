@@ -48,3 +48,5 @@ review · T1 · scoped-reviewer · behaviour:low · governance:high
 review · T1 · scoped-reviewer · behaviour:low · governance:high
 consequence · T2 · behaviour:low · governance:high
 review · T2 · scoped-reviewer · behaviour:low · governance:high
+consequence · T3 · behaviour:low · governance:high
+review · T3 · scoped-reviewer · behaviour:low · governance:high
