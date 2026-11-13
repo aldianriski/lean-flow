@@ -1,6 +1,7 @@
 ---
 id: TASK-660
 title: "Ship the cross-model route: from a Claude host, another provider's CLI reviews, builds or diagnoses"
+sprint: SPRINT-174
 type: feature
 priority: P2
 size: L

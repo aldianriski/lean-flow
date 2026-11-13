@@ -1,6 +1,7 @@
 ---
 id: TASK-659
 title: "Add three review rules: coverage and limitations, fixer becomes builder, replaced-behaviour sweep"
+sprint: SPRINT-174
 type: feature
 priority: P2
 size: S
