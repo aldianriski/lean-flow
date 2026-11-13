@@ -67,7 +67,7 @@ codex also can execute or other help process".
       empty output, the review is recorded as failed, not CLEAR.
 - [ ] Negative: a permission the other CLI denies is reported and never answered by turning on a permission
       bypass; and a delegated build against a dirty checkout is refused.
-- [ ] README, CHANGELOG and `.claude/CONTEXT.md` § Built-in leverage name the route.
+- [x] README, CHANGELOG and `.claude/CONTEXT.md` § Built-in leverage name the route. ✓ README (built-in agents paragraph) and CHANGELOG (Unreleased) built by Codex through the route's delegated build, reviewed by a Claude reviewer CLEAR; .claude/CONTEXT.md § Built-in leverage names the route and carries the cross-model line (da8ab049)
 
 ## Touches
 

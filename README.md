@@ -231,6 +231,8 @@ A gated loop: you give intent → it becomes tasks → executes with human check
 gates are **inline checklists** (lean-flow ships no agent definitions of its own), and the loop dispatches Claude's
 **built-in** agents where they help — recon → `Explore`, review → `/code-review`, verify → `/verify`,
 security → `/security-review`. `/council` is the one skill that orchestrates sub-agents internally.
+A repo can opt in to the [cross-model route](skills/orchestrator/references/cross-model-route.md) to have another
+provider's CLI review, build or diagnose. The route is off by default.
 Every build dispatch carries a short worker contract ([`worker-brief.md`](skills/orchestrator/references/worker-brief.md)): the
 worker owns its checks, asks one question when blocked, and never ends its turn while a job it needs still runs; a blocked worker
 is resumed with `SendMessage` from the session that dispatched it, or a fresh worker gets the context when that session is gone.

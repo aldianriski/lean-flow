@@ -16,6 +16,11 @@ status: current
 
 ## [Unreleased]
 
+- **`/orchestrator`: adds an opt-in cross-model route.** Another provider's CLI reviews drafts, designs and code,
+  builds in an isolated worktree, or gives one read-only diagnosis after two failures. The route is off by default;
+  a `cross-model: <cases> via <cli>` line in the host repo's CONTEXT file or the owner's request enables it in attended
+  modes only. An empty, timed-out or verdict-less result is never an approval. ADR-010 is amended (TASK-660).
+
 - **`/orchestrator`: review results now state coverage and limitations.** A result missing either is sent back once to the
   same reviewer and cannot pass without both. A coordinator who edits task work after review becomes a builder and needs
   a fresh scoped review; revisions that replace a behaviour sweep the whole draft, design or plan for old passages,
