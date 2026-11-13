@@ -2,6 +2,7 @@
 id: TASK-661
 title: "Run the single-family conformance-harness cases on a reduced spec so the local gate fits its budget"
 type: debt
+sprint: SPRINT-175
 priority: P2
 size: M
 risk: med
