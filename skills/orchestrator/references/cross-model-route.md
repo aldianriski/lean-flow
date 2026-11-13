@@ -11,7 +11,8 @@ an unattended run never uses this route. A host that is not Claude is out of sco
 
 A host repo opts in with one line under any heading in its CONTEXT file: `cross-model: <cases> via <cli>`.
 Cases are any of `draft-review` (intake drafts), `design-review` (G2 designs), `code-review` (post-build),
-`build` or `diagnose`, comma-separated. A case not listed never fires from policy. With no such line, or no
+`build` or `diagnose`, comma-separated. A design review follows the same **Draft reviews** rhythm as an intake draft.
+A case not listed never fires from policy. With no such line, or no
 CONTEXT file, only an owner's request in the session turns a case on, for that session.
 
 ## Before any call
@@ -40,7 +41,8 @@ coordinator runs them into the review's **Pinning tests** section, as `review-sc
 Write the brief to a file outside the working tree. Pass it by stdin or as a file, never inside a shell
 command string. Set read-only project permissions with the CLI's own flag; a sentence in the prompt does
 not enforce them. Name the model explicitly. Run in the foreground to completion under a bounded timeout,
-with output and errors in separate files outside the working tree.
+with output and errors in separate files outside the working tree. If the host moves a long call to the
+background, wait for the call's exit code, not for its first output.
 
 Keep one launch line per provider proven on a real run in this block. Codex is the proven provider so far.
 Replace `<model>` with the requested model and `<outside-dir>` with a directory outside the working tree;
@@ -90,7 +92,7 @@ and is scoped to that worktree, never a permission bypass. For Codex:
 codex exec --model <model> -s workspace-write -C "<worktree>" - < "<outside-dir>/brief.txt" > "<outside-dir>/result.txt" 2> "<outside-dir>/err.txt"
 ```
 
-The coordinator reads the whole diff and runs the task's checks itself; the builder's own success report
+The coordinator confirms nothing was staged or committed, reads the whole diff and runs the task's checks itself; the builder's own success report
 is not verification. The coordinator then lands and commits the diff, because the other CLI may be unable
 to write `.git`. Report a permission the CLI denies to the owner as it is; the coordinator never answers
 a denial by turning on a bypass or a wider sandbox.
@@ -98,7 +100,8 @@ a denial by turning on a bypass or a wider sandbox.
 ## The builder never grades
 
 A diff built by the other provider is reviewed by a Claude reviewer under `review-scoping.md`, never by
-the provider that built it. Record authorship per commit: the commit body names who built it. A coordinator
+the provider that built it. Record authorship per commit: the commit body names who built it, as
+`Built by <provider> (<model>)`. A coordinator
 fix on top is its own commit, and the fixer-becomes-the-builder rule in `review-scoping.md` § The revise loop
 then applies to it.
 
@@ -109,5 +112,5 @@ like a review. The brief carries the reproduction, the evidence, and each approa
 ask for one testable alternative explanation and the check that would confirm or refute it.
 
 The answer is evidence for the coordinator, not a verdict; the coordinator runs the named check. There is
-no further automatic escalation. The answer ends with the same two statements as a review: what it read
+no further automatic escalation: if the check refutes the explanation, the work goes to the owner with that evidence. The answer ends with the same two statements as a review: what it read
 (files and criteria judged against), and what it could not read or check.

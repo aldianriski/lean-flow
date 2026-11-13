@@ -57,7 +57,7 @@ codex also can execute or other help process".
       `/task-decomposer` step 6 reaches it.
 
 **Proof**
-- [ ] Exercised with the opt-in on, by a fresh agent given only the shipped references: one real Codex
+- [x] Exercised with the opt-in on, by a fresh agent given only the shipped references: one real Codex ✓ 2026-11-13, opt-in on (the repo's cross-model line), two fresh agents holding only the shipped references and CONTEXT.md, Codex gpt-6-astra, every call exit 0: design review VERDICT CLEAR with both statements; code review of 1c6a3798 VERDICT CLEAR with both statements, pinning tests run by the coordinator; delegated build of the README and CHANGELOG lines in a worktree, reviewed by a Claude reviewer CLEAR, landed as 78a1a60b; diagnosis handoff from dispatch.md Escalation on a SEEDED failed-twice case (owner ruling), answer checked by the coordinator and refuted, so it goes to the owner. Outputs kept in the session scratchpad, not in the repo
       review of a real draft; one of a real diff; one real task built by Codex in a worktree, reviewed by
       Claude and landed by the coordinator; and one diagnosis handoff that starts from the failed-twice
       trigger and reaches the other provider. All four results are recorded in this task.
@@ -65,7 +65,7 @@ codex also can execute or other help process".
       declared policy sees no change in behaviour.
 - [x] Negative: with no policy and no request, no cross-model call is made; and when the other CLI returns ✓ judgment tick, no mechanical test reaches skill prose: a fresh agent given only the two references made no call with no policy and no request, and recorded an empty result and a timeout as failed with no review line and a declared same-provider fallback
       empty output, the review is recorded as failed, not CLEAR.
-- [ ] Negative: a permission the other CLI denies is reported and never answered by turning on a permission
+- [x] Negative: a permission the other CLI denies is reported and never answered by turning on a permission ✓ judgment tick: the dirty-checkout refusal was exercised for real (an untracked file made git status --porcelain print, and no CLI call was made); the only permission Codex was denied in five builds was reading the user's global git ignore file, which it reported each time and nobody answered with a bypass or wider sandbox. No denial of a build-critical permission occurred, so that half rests on the text plus this low-stakes case
       bypass; and a delegated build against a dirty checkout is refused.
 - [x] README, CHANGELOG and `.claude/CONTEXT.md` § Built-in leverage name the route. ✓ README (built-in agents paragraph) and CHANGELOG (Unreleased) built by Codex through the route's delegated build, reviewed by a Claude reviewer CLEAR; .claude/CONTEXT.md § Built-in leverage names the route and carries the cross-model line (da8ab049)
 
