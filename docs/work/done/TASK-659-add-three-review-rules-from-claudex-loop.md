@@ -36,10 +36,10 @@ read nothing, which happened on a Codex pass on 2026-10-06. Two smaller rules co
       reviser searches the whole document for the replaced condition and changes or marks every passage
       that still states it, acceptance criteria included. The rule sits where both the revise loop and
       draft reviews read it.
-- [ ] Each rule is exercised once on real input, with the result recorded in this task: one real scoped
+- [x] Each rule is exercised once on real input, with the result recorded in this task: one real scoped ✓ 2026-11-13: (a) the scoped Sonnet review of b63dd0d4 ended with what it read and what it could not check; (b) the coordinator's follow-up edit to review-scoping.md after that review got a fresh scoped Sonnet review, CLEAR with both statements; (c) that edit replaced the word retry for the re-ask, and the sweep found and fixed two passages still using it (the same section and the CHANGELOG entry)
       review whose result shows both statements; one real coordinator edit after a review that gets its
       fresh review; one real revision where the sweep is run and its hits listed.
-- [ ] Negative: a reviewer reply of "CLEAR" with no coverage statement is not recorded as a passed review.
+- [x] Negative: a reviewer reply of "CLEAR" with no coverage statement is not recorded as a passed review. ✓ judgment tick, no mechanical test reaches reviewer prose: a fresh agent given only review-scoping.md and a bare CLEAR sent it back once, wrote no review line, and counted a second incomplete reply as not run
 - [x] CHANGELOG line. ✓ entry under Unreleased
 
 ## Touches
