@@ -9,7 +9,8 @@ class: decision
 tier: G
 authority: J2
 origin: close-retro
-state: needs-info
+state: blocked
+depends-on: [TASK-661]
 ---
 
 # TASK-367 — Let the caller declare detachment, so the pre-flight gate can run complete
