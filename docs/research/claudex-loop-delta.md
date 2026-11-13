@@ -45,7 +45,7 @@ runner that launches one CLI turn and validates its structured result.
 | Tests assert the criteria, not the implementation | `/tdd` tautological-test rule | matched |
 | `claudex-route`: recommend a model and a role | ADR-010 tiers; the router role was no-go in EPIC-024 | matched, not adopted |
 | The other provider reviews plans and code; it can also build or diagnose | one line in `review-scoping.md` naming an external reviewer | **gap (1)** |
-| Review result states coverage (what was read) and limitations (what was not) | reviewer briefs ask for neither | **gap (2)** |
+| Review result states coverage (what was read) and limitations (what was not) | the code-review brief asks what the reviewer "declined to judge" but not what it read; the draft-review brief asks for neither | **gap (2)** |
 | A coordinator who takes over a fix has become a builder and needs a fresh review | the revise loop re-reviews a builder retry only | **gap (3)** |
 | When a revision replaces a behaviour, change every passage that still states the old one | no rule found in skills or learnings | **gap (4)** |
 | Inspection bound to a fingerprint of the inspected changes | the `review ·` line records no commit | gap, not adopted (below) |
