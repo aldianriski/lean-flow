@@ -27,15 +27,15 @@ codex also can execute or other help process".
 ## Done when
 
 **Review**
-- [ ] A new reference file in `skills/orchestrator/references/` tells a Claude-host coordinator how to hand
+- [x] A new reference file in `skills/orchestrator/references/` tells a Claude-host coordinator how to hand ✓ read-through of cross-model-route.md against the box; scoped Sonnet review CLEAR with coverage and limitations, 2026-11-13
       a review to another provider's CLI: the prompt goes in by stdin or a file, the reviewer runs with
       read-only project permissions, the model is named explicitly, the call runs to completion under a
       bounded timeout, and its output files sit outside the working tree.
-- [ ] The file says what counts as a result: a completed turn with a verdict line plus TASK-659's coverage
+- [x] The file says what counts as a result: a completed turn with a verdict line plus TASK-659's coverage ✓ read-through of cross-model-route.md against the box; scoped Sonnet review CLEAR with coverage and limitations, 2026-11-13
       and limitations. Empty output, a timeout, a permission failure, or exit 0 with no verdict is never an
       approval. There is no silent retry on another model or provider. When the other CLI is missing or
       fails, the review falls back to the same-provider scoped reviewer and is recorded as that.
-- [ ] Rounds follow the existing caps (drafts: two; code: one bounded retry), and the review is recorded
+- [x] Rounds follow the existing caps (drafts: two; code: one bounded retry), and the review is recorded ✓ read-through of cross-model-route.md against the box; scoped Sonnet review CLEAR with coverage and limitations, 2026-11-13
       as `scoped-reviewer`.
 
 **Build and diagnosis**
@@ -63,7 +63,7 @@ codex also can execute or other help process".
       trigger and reaches the other provider. All four results are recorded in this task.
 - [ ] Consumer check: the file names no lean-flow-only script or path, and a repo with no second CLI and no
       declared policy sees no change in behaviour.
-- [ ] Negative: with no policy and no request, no cross-model call is made; and when the other CLI returns
+- [x] Negative: with no policy and no request, no cross-model call is made; and when the other CLI returns ✓ judgment tick, no mechanical test reaches skill prose: a fresh agent given only the two references made no call with no policy and no request, and recorded an empty result and a timeout as failed with no review line and a declared same-provider fallback
       empty output, the review is recorded as failed, not CLEAR.
 - [ ] Negative: a permission the other CLI denies is reported and never answered by turning on a permission
       bypass; and a delegated build against a dirty checkout is refused.
