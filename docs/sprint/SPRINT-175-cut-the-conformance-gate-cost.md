@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-11-13
 status: active
 plan_commit: 621e9f10
+gates_signed: G1,G2 @ 1225b1cd
 update_trigger: sprint execute/close events
 ---
 
@@ -25,7 +26,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Run the single-family conformance cases on a reduced spec `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/` · `docs/research/logs/qa-gate-timing.md` · `TECH-DEBT.md`
+Layers: `evals/run-conformance-engine-fixtures.sh` · `docs/research/logs/qa-gate-timing.md` · `TECH-DEBT.md`
 Depends-on: none
 Cites: TASK-661, TD-171, ADR-043, ADR-050, ADR-053, `spec/STANDARD.md` · `scripts/lib/conformance-engine.sh` · `scripts/lib/read-spec-rules.sh` · `conformance.sh` (read, and proven byte-identical, never edited)
 The harness already derives reduced specs for other cases, so the change reuses that mechanism. The engine and the spec reader stay byte-identical. One step owns all eight Done-when boxes.
