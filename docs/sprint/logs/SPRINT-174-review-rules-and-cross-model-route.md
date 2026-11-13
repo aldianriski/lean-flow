@@ -3,7 +3,7 @@ sprint: 174
 slug: review-rules-and-cross-model-route
 owner: Maintainer
 last_updated: 2026-11-13
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -59,3 +59,9 @@ Coordinator slip: `936eb3e7` named T1's re-ask wording in its subject but carrie
 Proof runs for TASK-660, two fresh agents holding only the shipped references and `.claude/CONTEXT.md`: a Codex design review and a Codex code review (both `VERDICT: CLEAR` with both statements), a delegated build after a real dirty-worktree refusal, and a diagnosis handoff on a seeded failed-twice case (owner ruling) whose answer the coordinator checked and refuted.
 Gaps the agents reported and this sprint did not close: the G2 design gate in `orchestrator/SKILL.md` names no cross-model route (the file is at its line cap; the route is reached through `review-scoping.md`); "pinning tests" for a prose-only change has no rule for which search hits are unrelated; the Spec comparand ladder has no rung for a prose-only change. `.claude/CONTEXT.md` is at its 150-line cap with no headroom, and a blank line under "Built-in leverage" was removed to fit the route's two lines.
 No build-critical permission was denied in any run, so TASK-660's permission negative rests on the text plus one low-stakes denial (the user's global git ignore file), reported each time and never worked around.
+
+### 2026-11-13 | close | Retro written, buckets routed, retention proposed
+- Handoff reconciliation: swept the whole Log; no `handoff` entry exists, so nothing is `live` or `consumed`.
+- Members: both in `done/`; 19 of 19 Done-when boxes ticked. Retro in the sprint file.
+- Buckets: CHANGELOG already holds both `[Unreleased]` entries. TD-312, TD-313, TD-314. Learnings: no new entry; second sightings counted on L-315, L-045 and L-006. Follow-ups: none filed.
+- No `epic:` on this sprint, so no rollup. `close_commit` is written in the archive commit once the owner approves retention.

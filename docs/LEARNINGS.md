@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-11
+last_updated: 2026-11-13
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -138,8 +138,9 @@ SPRINT-173 T6 and T7 each passed a scoped review, then the gate failed on `run-o
 
 ## L-315 [tags: process] [status: active]: **A claim that nothing depends on X is a census, and a truncated query cannot back it; run the dependency grep untruncated, or say the result is partial.**
 At SPRINT-173's G2 the coordinator told the owner that no check reads `close_commit`, from a grep piped through `head -12` that cut off `scripts/lib/conformance-engine.sh`. The owner signed on that claim. T7's round-1 reviewer, briefed to grep the whole tree, found S10.FOURBUCKETS reading it, and the owner re-ruled.
-- seen: 2026-11-12 (SPRINT-173 G2 and T7)
-- count: 1
+Second sighting, a claim that a surface is missing: SPRINT-174's research note said reviewer briefs asked for neither coverage nor limitations, from one grep for those two words. The brief already asked what the reviewer "declined to judge". Reading the section for the G2 design caught it. An absence claim needs a second query that varies the wording, or a read of the section.
+- seen: 2026-11-12 (SPRINT-173 G2 and T7), 2026-11-13 (SPRINT-174 G2)
+- count: 2
 - promoted: no
 - related: L-198 · L-130 · EPIC-025
 
@@ -1993,7 +1994,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-200: SPRINT-100)
 - seen: 2026-10-11 (SPRINT-122 close: a gate log was read before its run finished and printed a stale verdict; the final `QA-CHECK` line, read after rc existed, said 288/0)
 - seen: 2026-10-12 (SPRINT-124 T2: Codex R2 claimed a fixture's octal escapes print plain ASCII; the pasted diff had lost its backslashes, and the VPS seed run had already shown the case reddens)
-- count: +8 (SPRINT-121 T4 consolidation of family B: 6 entries folded; base count is narrated above; SPRINT-122 close +1; SPRINT-124 close +1)
+- seen: 2026-11-13 (SPRINT-174 close: a `git add` naming a path that no longer existed failed as a whole and staged nothing, so `936eb3e7` carried only the task file under a subject naming T1's re-ask wording; found from `git status` afterwards, fixed forward in `1c6a3798`)
+- count: +9 (SPRINT-121 T4 consolidation of family B: 6 entries folded; base count is narrated above; SPRINT-122 close +1; SPRINT-124 close +1; SPRINT-174 close +1)
 
 ## L-044 [tags: tooling] [status: promoted]: leave a worktree directory before removing it, and retry from a fresh shell — the Windows handle-lock caveat.
 - **L-044 → promoted: dispatch.md § Merge-back queue** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-025 + Sprint-026.
@@ -2095,6 +2097,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ## L-006 [tags: process] [status: promoted]: cold-context review surfaces author-blind spec gaps the author cannot see — 7 in one fresh-install run.
 - **L-006 → promoted: orchestrator § Review (the fresh-context Review pass)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-003 + Sprint-007. It is what caught L-009's fused table rows.
+- seen: 2026-11-13 (SPRINT-174 T3: a cold agent holding only the shipped references found five gaps that three scoped reviews of the same text had passed: no commit-body format, no "confirm nothing staged", no rule for a host that backgrounds a long call, a design review not named as a draft review, no next step when a diagnosis check refutes; fixed in `8229cb31`. Following a procedure literally on real input finds what reading it for correctness does not; cf. L-007)
+- count: +1 (SPRINT-174 close; base count is narrated above)
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-11
+last_updated: 2026-11-13
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2048,3 +2048,18 @@ status: current
   - Evidence: SPRINT-173 Log lines 100, 131 and 140; T6 and T7 first passes each pushed a SKILL.md line past 400.
   - Impact: low. Wording only; no verdict depends on it.
   - Mitigation: count lines over 400 at EPIC-025's measuring sprint (Sprint B); restore a leg only if the count grows.
+- **TD-312** severity: low | status: open | created: Sprint-174 (close retro)
+  - Summary: **`.claude/CONTEXT.md` sits at its 150-line hard cap with no headroom.** SPRINT-174's two cross-model lines only fit because a blank line under "Built-in leverage" was removed.
+  - Evidence: commit `da8ab049`; `wc -l .claude/CONTEXT.md` prints 150.
+  - Impact: low. The next line a sprint must add to the SSOT fails the cap check, or is squeezed in by deleting something unreviewed.
+  - Mitigation: the periodic dedup pass CLAUDE.md already names (prose that duplicates CLAUDE.md or the README becomes a pointer), run at a promote doc-aging pass.
+- **TD-313** severity: low | status: open | created: Sprint-174 (close retro)
+  - Summary: **The G2 design gate in `skills/orchestrator/SKILL.md` names no cross-model route.** A cold reader reaches it only through `review-scoping.md` § Draft reviews. SKILL.md is at its 140-line cap, so the pointer was left out.
+  - Evidence: SPRINT-174 Log, progress entry (the proof-run agent's report).
+  - Impact: low. A host with the opt-in on can run a G2 design review without the route unless it reads the reference first.
+  - Mitigation: a one-clause pointer at the G2 step once SKILL.md has room, or by trading it for a line already there.
+- **TD-314** severity: low | status: open | created: Sprint-174 (close retro)
+  - Summary: **`review-scoping.md` has no rule for a prose-only change on two points.** Which search hits count as "pinning tests" when harnesses only mention the file name, and what the Spec comparand is when no mechanical rung exists.
+  - Evidence: SPRINT-174 Log, progress entry (the proof-run agents hit both).
+  - Impact: low. Each reviewer decides both points alone, so two reviews of one change can differ.
+  - Mitigation: add one line per point to the scoping ladder; no new check is needed.

@@ -3,7 +3,7 @@ sprint: 174
 slug: review-rules-and-cross-model-route
 owner: Maintainer
 last_updated: 2026-11-13
-status: active
+status: closed
 plan_commit: 1296be50
 gates_signed: G1,G2 @ bd372167
 update_trigger: sprint execute/close events
@@ -73,7 +73,37 @@ Reviewed on its own. It owns the opt-in and wiring boxes, the four real exercise
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/review-scoping.md` | T1, T3 | T1: a section on what every review result states (coverage, limitations, the replaced-behaviour sweep) and the fixer-becomes-builder bullet. T3: pointers to the cross-model route from draft reviews, the skip table and the pass trigger | med | scoped review CLEAR each step; both rules exercised on this sprint's own reviews |
+| `skills/orchestrator/references/builder-check.md` | T1 | the reader prompt asks for both statements, so a builder check cannot pass silently | low | scoped review CLEAR on the second pass |
+| `skills/orchestrator/references/cross-model-route.md` (new) | T2, T3 | the opt-in route: review (T2), then delegated build, builder-never-grades and diagnosis handoff (T3) | med | two real Codex reviews, a build after a real dirty-worktree refusal, a seeded diagnosis; five gaps fixed in `8229cb31` |
+| `skills/orchestrator/references/dispatch.md` | T3 | § Escalation points to the route after two failed attempts | low | scoped review CLEAR |
+| `.claude/CONTEXT.md`, `README.md` | T3 | the route and its `cross-model:` opt-in line named in the SSOT and the README | low | consumer check; CONTEXT held at 150 lines |
+| `docs/adr/ADR-010-model-dispatch-role-tiers.md` | T3 | Amendment: a declared-policy handoff to another provider's CLI sits beside Decision items 2 and 4 | med | G2 owner ruling; scoped review CLEAR |
+| `CHANGELOG.md` | T1, T3 | two `[Unreleased]` entries: the review rules and the cross-model route | low | read against the shipped text |
 
 ## Retro
 
-<!-- Written at close. -->
+**Verdict.** Both members are done and all 19 Done-when boxes are ticked. Three review rules shipped (coverage and limitations in every review result, the fixer becomes the builder, the replaced-behaviour sweep) and the opt-in cross-model route shipped (review, delegated build, diagnosis handoff), wired from `review-scoping.md` and `dispatch.md`, with ADR-010 amended. Not released: the next call is the owner's.
+
+**Delivery.** Every step was built by Codex in a worktree, reviewed by a scoped Sonnet reviewer and landed by the coordinator. The two entries sit under CHANGELOG `[Unreleased]`. A feature sprint is a MINOR by hand, and v2.23.0 itself is still unpushed.
+
+**Measured.** From `plan_commit^` to HEAD there are 16 commits: 7 are task work (`sprint(174) Tn:`) and 9 are coordinator bookkeeping (`sprint(174):`), for 2 members. System verify off-host on `e7521aff`: `QA-CHECK: 232 pass, 0 fail` and `bun test` 621 pass, 0 fail. The close check printed `check-sprint-by-reference: 6 pass, 0 fail`.
+
+**Retrieval check.** Yes, L-315 missed once. The research note said reviewer briefs asked for neither coverage nor limitations, from one keyword search; the brief already asked what the reviewer declined to judge. It was caught only when the section was read for the G2 design. Bumped on L-315.
+
+**Worked**
+- Builder checks before sign-off turned 11 contradictions into design fixes with no Done-when change (T1 4, T2 2, T3 5).
+- Each step's review was CLEAR on the first pass.
+- The new rules were exercised on this sprint's own reviews, so they were run on real input before they shipped.
+
+**Friction**
+- The slip in `936eb3e7`: a `git add` naming a moved path failed as a whole, so the commit carried only the task file under a subject that named more. `git status` showed it afterwards and `1c6a3798` fixed it forward. Bumped on L-045.
+- TASK-660's permission negative rests on the text plus one low-stakes denial (the user's global git ignore file). No build-critical permission was denied in five Codex builds.
+- The diagnosis exercise was seeded, by owner ruling at G2.
+- A cold agent holding only the shipped references found five gaps three scoped reviews had passed; fixed in `8229cb31`. Bumped on L-006.
+
+**Routing**
+- Shipped: both entries are already under CHANGELOG `[Unreleased]`; nothing added. The `/humanizer` entry there is from TASK-498 and was left alone.
+- Tech debt: TD-312 (CONTEXT at its 150-line cap), TD-313 (G2 gate names no cross-model route), TD-314 (no prose-only rule for pinning tests and the Spec comparand).
+- Follow-ups: none filed. The open items are owner actions (push, release) and the three TD rows. "Codex hosts, Claude reviews" stays out of scope by owner ruling at intake, recorded in TASK-660 A3 and the research note.
+- Learnings: no new entry. The three candidates were second sightings, counted on L-315 (count 2), L-045 and L-006.
