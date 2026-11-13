@@ -45,3 +45,4 @@ builder-check · T3 · 5 contradictions · 4 questions · the skip table gains a
 ### 2026-11-13 | scope-change | T3 (TASK-660): Layers gain docs/adr/ADR-010-model-dispatch-role-tiers.md. What broke: G2 found ADR-010 Decision items 2 and 4 in tension with a declared-policy handoff to another provider's CLI. Impact: T3 adds an Amendment section to ADR-010; no Done-when box changes. Re-confirm G2: owner popup, verbatim: Amend ADR-010 (Recommended) and Sign G1+G2, build.
 consequence · T1 · behaviour:low · governance:high
 review · T1 · scoped-reviewer · behaviour:low · governance:high
+review · T1 · scoped-reviewer · behaviour:low · governance:high
