@@ -158,6 +158,9 @@ review in this rhythm:
    the epic's `## Open questions`.
 6. **A fix states what must be true.** A fix that needs a new mechanism goes to that later gate, not into the draft.
 
+Route intake draft and G2 design reviews through [cross-model-route.md](cross-model-route.md) when the host repo
+declares it or the owner asks.
+
 Record the round count with the approval: in the commit that writes the approved tasks, or the one that activates the
 proposal.
 
@@ -174,6 +177,8 @@ Don't fire every pass on every change. Decide per diff:
 | files already read this session | skip `Explore` recon — context is already loaded |
 | small / medium diff | **one** scoped `sonnet` reviewer — not `/code-review`'s fan-out (§ Scale depth) |
 | rendered-UI behaviour change | `/run` + `/verify` with § UI floor |
+
+Use [cross-model-route.md](cross-model-route.md) for a review that fires when the host repo declares it or the owner asks.
 
 ### Two dimensions — why the first row is not `docs / config / trivial`
 
@@ -255,6 +260,7 @@ shrink the built-in command's internal fan-out — so the lever is reserving it 
 ## When a pass does fire
 
 - **Code review** — small/medium → one scoped `sonnet` reviewer · large/high-risk → **`/code-review`** (fan-out).
+  Use [cross-model-route.md](cross-model-route.md) when the host repo declares it or the owner asks.
 - **Real behaviour change → `/run`** to drive the app + **`/verify`** it does what the goal stated; a rendered-UI change adds § UI floor.
 - **Cleanup → `/simplify`** — reuse / simplification / efficiency (pairs with `/refactor-advisor`).
 - **Auth / input / secrets / data exposure → `/security-review`** as its own pass.

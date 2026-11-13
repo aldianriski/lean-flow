@@ -27,6 +27,9 @@ pass inside a task is classified on its own, and a dispatch with no task or no `
 
 ## Hand the sub-agent its procedure skill (not a re-described brief)
 
+When the host repo declares `build`, or the owner asks, the build may go to another provider's CLI per
+[cross-model-route.md](cross-model-route.md) § Delegated build, with the same worker brief.
+
 Every build dispatch pastes the worker contract, [worker-brief.md](worker-brief.md). Recon, builder-check and review passes
 do not: the contract is written for a builder, and `Explore` and `Plan` cannot be resumed. For each build dispatch, the
 coordinator appends its own `progress` Execution Log entry naming that `Tn`, holding one line,
@@ -817,6 +820,9 @@ Every commit the orchestrator composes (quick step 5, mvp step 7, the sprint-bul
 
 Execution fails twice, or a fork is genuinely ADR-grade → escalate by hand to your strongest model
 (optionally `/council`). No automated ladder — that's agent behaviour a no-hooks plugin can't own (ADR-010).
+
+When the host repo declares `diagnose`, or the owner asks, the failed-twice point may instead take one read-only
+diagnosis handoff per [cross-model-route.md](cross-model-route.md), a single second opinion, not a ladder.
 
 ## The ceiling (honest)
 

@@ -39,20 +39,20 @@ codex also can execute or other help process".
       as `scoped-reviewer`.
 
 **Build and diagnosis**
-- [ ] The file covers a delegated build: an isolated clean worktree, write permission scoped to it, the
+- [x] The file covers a delegated build: an isolated clean worktree, write permission scoped to it, the ✓ read-through of the landed text against the box; scoped Sonnet review of the Codex-built diff CLEAR with coverage and limitations, 2026-11-13
       worker brief pasted verbatim, and the coordinator landing and committing the diff. The builder's own
       success report is not verification; the coordinator runs the checks.
-- [ ] The builder never grades its own work: a diff built by the other provider is reviewed by a Claude
+- [x] The builder never grades its own work: a diff built by the other provider is reviewed by a Claude ✓ read-through of the landed text against the box; scoped Sonnet review of the Codex-built diff CLEAR with coverage and limitations, 2026-11-13
       reviewer, and mixed authorship is recorded per file or per commit.
-- [ ] The file covers a read-only diagnosis handoff for work that has failed twice: the other provider gets
+- [x] The file covers a read-only diagnosis handoff for work that has failed twice: the other provider gets ✓ read-through of the landed text against the box; scoped Sonnet review of the Codex-built diff CLEAR with coverage and limitations, 2026-11-13
       the reproduction, the evidence and the failed approaches, and is asked for a testable alternative
       explanation.
 
 **Opt-in and wiring**
-- [ ] The route is off by default. It fires for intake drafts, G2 designs, the post-build code review, a
+- [x] The route is off by default. It fires for intake drafts, G2 designs, the post-build code review, a ✓ read-through of the landed text against the box; scoped Sonnet review of the Codex-built diff CLEAR with coverage and limitations, 2026-11-13
       delegated build and a diagnosis handoff only when the host repo's CONTEXT file declares it or the
       owner asks in the session.
-- [ ] Wiring: the review routing in `review-scoping.md` (draft reviews and the skip table) and the dispatch
+- [x] Wiring: the review routing in `review-scoping.md` (draft reviews and the skip table) and the dispatch ✓ read-through of the landed text against the box; scoped Sonnet review of the Codex-built diff CLEAR with coverage and limitations, 2026-11-13
       routing in `dispatch.md` point at the file, and a cold reader starting from `/orchestrator` or
       `/task-decomposer` step 6 reaches it.
 
@@ -61,7 +61,7 @@ codex also can execute or other help process".
       review of a real draft; one of a real diff; one real task built by Codex in a worktree, reviewed by
       Claude and landed by the coordinator; and one diagnosis handoff that starts from the failed-twice
       trigger and reaches the other provider. All four results are recorded in this task.
-- [ ] Consumer check: the file names no lean-flow-only script or path, and a repo with no second CLI and no
+- [x] Consumer check: the file names no lean-flow-only script or path, and a repo with no second CLI and no ✓ grep of cross-model-route.md for TASK-, SPRINT-, ADR-, scripts/ and evals/ returns nothing; every wiring sentence is conditional on a declaration or an owner request; the no-policy exercise made no call
       declared policy sees no change in behaviour.
 - [x] Negative: with no policy and no request, no cross-model call is made; and when the other CLI returns ✓ judgment tick, no mechanical test reaches skill prose: a fresh agent given only the two references made no call with no policy and no request, and recorded an empty result and a timeout as failed with no review line and a declared same-provider fallback
       empty output, the review is recorded as failed, not CLEAR.

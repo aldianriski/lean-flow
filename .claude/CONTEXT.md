@@ -39,10 +39,10 @@ Every skill works standalone; the loop is just the order they reward most togeth
 new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct. `/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
 
 ## Built-in leverage
-
 lean-flow ships **no custom agent definitions and no hooks today** — both are *admissible* under ADR-044, held to ADR-001's bar, and the first hook candidate was withdrawn at review (TASK-366). It dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
 `/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately; the worst finding per axis feeds **one bounded builder retry** — attended auto; unattended only per ADR-022's mechanical carve-out, → `review-scoping.md` § The revise loop) · `/verify` · `/security-review` ·
-`/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → docs/architecture/overview.md § Key integration points.
+`/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → docs/architecture/overview.md § Key integration points. Cross-model route (opt-in): another provider's CLI may review, build or diagnose; see `orchestrator/references/cross-model-route.md`.
+cross-model: draft-review, design-review, code-review, build, diagnose via codex
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements; each completes its job
 invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole exception** — it *sequences* the stages, never

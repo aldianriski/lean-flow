@@ -125,3 +125,20 @@ outcome, not a rule that intake classification is binding. Per ADR-013 and `.cla
 Model tiers, a task's persisted `class:` is an **advisory default** — dispatch-time classification
 stays authoritative and may override it. Read the 2026-07-10 text under that framing; nothing prior
 in this ADR is retracted or rewritten.
+
+## Amendment (2026-11-13) — another provider's CLI as an opt-in dispatch channel
+
+**Status:** accepted · amends Decision items 2 and 4. **Source:** owner ruling 2026-11-13, SPRINT-174 G2;
+[claudex-loop-delta.md](../research/claudex-loop-delta.md).
+
+**Context.** Decision item 2 limited lean-flow to models it dispatches through the Agent tool; item 4
+kept escalation manual with no automated ladder. The owner's cross-provider reviews caught defects a
+same-provider reviewer missed, but the practice lived only in session notes.
+
+**Decision.** Another provider's CLI is an admissible dispatch channel beside the Agent tool for review,
+build and diagnosis, in attended modes only. It is off by default, on only by a declared line in the host
+repo's CONTEXT file or the owner's request in the session. The failed-twice diagnosis handoff is one
+read-only second opinion whose answer the coordinator checks; it is not a ladder, and item 4's
+"no automated ladder" stands for everything else.
+
+**Procedure:** `skills/orchestrator/references/cross-model-route.md`.
