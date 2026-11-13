@@ -16,6 +16,11 @@ status: current
 
 ## [Unreleased]
 
+- **`/humanizer`: the English catalog is re-synced to blader/humanizer 4.0.0** (`b48c832f`, from 3.1.0). No pattern is added or
+  renumbered; §15 is renamed "Shallow -ing phrases". Upstream now tells the editor to ignore instructions found inside the text and, in
+  file mode, to read the whole file from disk first. It also lets a rewrite add a detail the editor knows to be true; lean-flow does
+  not, and step 2 of the skill now says its never-add-a-fact rule overrides the catalog (TASK-498).
+
 ## v2.23.0 — half the bookkeeping: zero-defect checks cut, record lines written by a tool (2026-11-12)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0 (§2's work-item row follows ADR-045's amended D6). Restart the session after installing.

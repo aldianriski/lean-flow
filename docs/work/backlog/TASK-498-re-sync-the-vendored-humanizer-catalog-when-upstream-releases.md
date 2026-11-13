@@ -21,12 +21,12 @@ auto-sync (SPRINT-139, ADR-001 review). Keeping it verbatim is what makes a re-s
 someone notices a new upstream release.
 
 ## Done when
-- [ ] The catalog body is `cmp`-identical to the new upstream release's SKILL.md from `## Why AI text sounds the way it does`
-      to the end, and the header names the new version and full commit sha.
-- [ ] Every pattern that is new or changed upstream gets an ADR-001 review row (keep / adapt + reason), approved by the
-      owner before the catalog commit.
-- [ ] The Indonesian catalog's § mapping is re-checked against any renumbered upstream sections.
-- [ ] CHANGELOG line.
+- [x] The catalog body is `cmp`-identical to the new upstream release's SKILL.md from `## Why AI text sounds the way it does`
+      to the end, and the header names the new version and full commit sha. ✓ `cmp` against v4.0.0 from line 17, 2026-11-13; header names 4.0.0 and `b48c832f0f809c1b5658edbb838c2521b72f2413`
+- [x] Every pattern that is new or changed upstream gets an ADR-001 review row (keep / adapt + reason), approved by the
+      owner before the catalog commit. ✓ seven review rows, owner popup 2026-11-13: "Approve, keep our rule" (six keep, one adapt: SKILL.md step 2 overrides the catalog's draft step)
+- [x] The Indonesian catalog's § mapping is re-checked against any renumbered upstream sections. ✓ no section renumbered; §15 renamed only, `ID-7 (§15)` still maps
+- [x] CHANGELOG line. ✓ under Unreleased
 
 ## Assumes
 
