@@ -33,7 +33,8 @@ Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey 
 Report two independent axes — **Standards** (repo conventions) and **Spec** (builds the right thing) —
 separately, never merged or re-ranked. Name the standards docs you judged against, or say none were supplied.
 Spec silence is no licence: an implied input the change leaves unhandled is a Spec finding. Beside the axes, list
-what you **declined to judge**, each with a one-line reason ("none" if empty)."* A reviewer with a bounded brief is both cheaper and sharper.
+what you **declined to judge**, each with a one-line reason ("none" if empty). End with what you read and what you could not
+read or check (§ What every review result states)."* A reviewer with a bounded brief is both cheaper and sharper.
 (The two axes are defined below; injecting them here is what makes the split actually fire.)
 
 ## Two axes — Standards vs Spec (report separately)
@@ -112,6 +113,10 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   deferred (…)` per axis — each outcome names its evidence in the rollup's own vocabulary (`test | check | fixture |
   review | owner-ruling` — night-run.md Part 4): `fixed` names what proved it, `still-open` names
   what's still missing, `rejected` names what shows the finding wrong (never `review`), `deferred` names where it went.
+- **The fixer becomes the builder.** A coordinator who edits a task's work files after that task's review has become a
+  builder, and that edit needs a fresh scoped review before the tick. Coordinator bookkeeping (ticks, status moves,
+  Execution Log lines and sprint-file lines) is excluded. The fresh review is a new pass over a new author's change,
+  outside the one-retry ceiling; it follows the same skip table.
 - **Close the loop with its review line.** When a review loop closes — CLEAR, `fixed`, or `still-open`,
   whichever reviewer ran — append `review · Tn · <depth> · behaviour:… · governance:…` to the Execution Log
   (night-run.md Part 4). An external reviewer (e.g. a Codex review loop, or any reviewer outside Claude's
@@ -121,6 +126,18 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
 Guarded by a retained must-FAIL fixture (`evals/fixtures/revise-loop/`, L-058 · TD-012): the planted
 violation must surface as the named worst finding on its axis, and an inadequate fix must end at the
 ceiling as `still-open → owner` — never a second retry.
+
+## What every review result states
+
+- **Coverage and limitations.** Every code-review result and every intake or proposal draft-review result, whoever the
+  reviewer is and whether cross-model routing is on or off, ends with two statements: what it read (the files and the
+  criteria it judged against), and what it could not read or check. If either is missing, send the result back to the same
+  reviewer once, asking only for what is missing. Until it has both, do not record it as a passed review: no `review ·`
+  line and no CLEAR. If either is still missing after that one retry, the review counts as not run and the coordinator
+  tells the owner. The coordinator's own self-review checklist is not a reviewer reply, so this rule does not apply to it.
+- **Replaced-behaviour sweep.** When a revision to a draft, a design or a plan replaces a behaviour, the reviser searches
+  the whole document for the replaced condition and changes or marks every passage that still states it, acceptance
+  criteria included. An addendum alone leaves the old passages standing.
 
 ## Draft reviews — intake and proposal
 
@@ -133,10 +150,12 @@ review in this rhythm:
 1. **Self-check first.** Run the reviewer's threat model over the draft yourself before round 1.
 2. **Ask the owner's forks before round 1**, in one popup, so the reviewer reviews one draft, not its branches.
 3. **State the altitude in the brief.** Detail that the work's own later gate decides (a task's G2) is not a finding.
-4. **At most two rounds.** Round 2 blocks only on a high-severity finding that would change the outcome. Every other
+4. **Ask for coverage and limitations in the brief** (§ What every review result states). A revision between rounds runs
+   that section's replaced-behaviour sweep.
+5. **At most two rounds.** Round 2 blocks only on a high-severity finding that would change the outcome. Every other
    finding becomes a note for the gate that owns it: a line in the affected task's `## Assumes`, which its G2 reads, or in
    the epic's `## Open questions`.
-5. **A fix states what must be true.** A fix that needs a new mechanism goes to that later gate, not into the draft.
+6. **A fix states what must be true.** A fix that needs a new mechanism goes to that later gate, not into the draft.
 
 Record the round count with the approval: in the commit that writes the approved tasks, or the one that activates the
 proposal.

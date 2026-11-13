@@ -57,6 +57,7 @@ Report, ranked by importance:
 
 Skip anything the design explicitly leaves to the builder, anything you could reasonably decide yourself, and wording
 nitpicks. If nothing important is left, say "nothing important left".
+End with what you read (the files and criteria you judged against) and what you could not read or check.
 ```
 
 The prompt adapts superpowers' `brainstorming/builder-check-prompt.md`. It adds the contradictions section, because a

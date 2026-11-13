@@ -16,6 +16,11 @@ status: current
 
 ## [Unreleased]
 
+- **`/orchestrator`: review results now state coverage and limitations.** A result missing either gets one retry with the
+  same reviewer and cannot pass without both. A coordinator who edits task work after review becomes a builder and needs
+  a fresh scoped review; revisions that replace a behaviour sweep the whole draft, design or plan for old passages,
+  acceptance criteria included. The builder-check reader prompt asks for both statements too (TASK-659).
+
 - **`/humanizer`: the English catalog is re-synced to blader/humanizer 4.0.0** (`b48c832f`, from 3.1.0). No pattern is added or
   renumbered; §15 is renamed "Shallow -ing phrases". Upstream now tells the editor to ignore instructions found inside the text and, in
   file mode, to read the whole file from disk first. It also lets a rewrite add a detail the editor knows to be true; lean-flow does

@@ -24,15 +24,15 @@ read nothing, which happened on a Codex pass on 2026-10-06. Two smaller rules co
 
 ## Done when
 
-- [ ] Every review result carries a coverage statement (the files and criteria the reviewer read) and a
+- [x] Every review result carries a coverage statement (the files and criteria the reviewer read) and a ✓ read-through of review-scoping.md § What every review result states against the box; scoped Sonnet review CLEAR, 2026-11-13
       limitations statement (what it could not read or check). This holds for code reviews and for intake
       and proposal draft reviews, whoever the reviewer is and with cross-model routing off. A result
       missing either is sent back to the same reviewer once, and is not recorded as a passed review until
       it has both.
-- [ ] The review reference says a coordinator who edits a task's work files after that task's review has
+- [x] The review reference says a coordinator who edits a task's work files after that task's review has ✓ the fixer-becomes-the-builder bullet in the revise loop names ticks, status moves, Execution Log lines and sprint-file lines as excluded; scoped Sonnet review CLEAR
       become a builder, and that edit needs a fresh review before the tick. Coordinator bookkeeping
       (ticks, status moves, log and sprint-file lines) is excluded by name.
-- [ ] The review reference says that when a revision to a draft, design or plan replaces a behaviour, the
+- [x] The review reference says that when a revision to a draft, design or plan replaces a behaviour, the ✓ the sweep rule sits in § What every review result states, between the revise loop and draft reviews, and draft-review step 4 points at it; scoped Sonnet review CLEAR
       reviser searches the whole document for the replaced condition and changes or marks every passage
       that still states it, acceptance criteria included. The rule sits where both the revise loop and
       draft reviews read it.
@@ -40,7 +40,7 @@ read nothing, which happened on a Codex pass on 2026-10-06. Two smaller rules co
       review whose result shows both statements; one real coordinator edit after a review that gets its
       fresh review; one real revision where the sweep is run and its hits listed.
 - [ ] Negative: a reviewer reply of "CLEAR" with no coverage statement is not recorded as a passed review.
-- [ ] CHANGELOG line.
+- [x] CHANGELOG line. ✓ entry under Unreleased
 
 ## Touches
 
