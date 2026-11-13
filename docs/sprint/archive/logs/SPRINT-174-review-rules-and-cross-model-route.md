@@ -65,3 +65,6 @@ No build-critical permission was denied in any run, so TASK-660's permission neg
 - Members: both in `done/`; 19 of 19 Done-when boxes ticked. Retro in the sprint file.
 - Buckets: CHANGELOG already holds both `[Unreleased]` entries. TD-312, TD-313, TD-314. Learnings: no new entry; second sightings counted on L-315, L-045 and L-006. Follow-ups: none filed.
 - No `epic:` on this sprint, so no rollup. `close_commit` is written in the archive commit once the owner approves retention.
+
+### 2026-11-13 | close | retention approved, archived with the pin
+Close pass, owner popup, verbatim: "Approve archive (Recommended)". The sprint and this log move to `docs/sprint/archive/` with an INDEX line; `close_commit: d9d08158` (the close commit) is written in this archive commit. No epic row. Release, same popup, verbatim: "Leave Unreleased (Recommended)".
