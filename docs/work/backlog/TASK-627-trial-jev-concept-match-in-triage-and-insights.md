@@ -36,3 +36,7 @@ Second use in the chain, judged by its delta over the keyword and title checks `
 ## Tracker
 
 Owner ruling 2026-11-08 (Jev adoption, use 2 of 4)
+
+## Amended 2026-11-13
+
+Cancelled at /triage (owner approved). EPIC-025 D3 ended this use; reason and revisit-if are in `.out-of-scope/jev-judgments-in-the-loop.md`.

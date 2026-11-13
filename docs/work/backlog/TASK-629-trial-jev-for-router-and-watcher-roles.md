@@ -33,3 +33,7 @@ The router (row 4) and watcher (row 7) have no Jev use until a trial of each exi
 ## Tracker
 
 Owner ruling 2026-11-08 (Jev adoption, use 4 of 4) · EPIC-024 rows 4 and 7
+
+## Amended 2026-11-13
+
+Cancelled at /triage (owner approved). EPIC-025 D3 ended this use; reason and revisit-if are in `.out-of-scope/jev-judgments-in-the-loop.md`.
