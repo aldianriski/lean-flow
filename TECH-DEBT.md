@@ -918,6 +918,13 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
+  - **Corrected (Round 25, 2026-11-13, measured by trace on the Windows host):** engine calls are
+    **83%** of the harness (216.1 s over 75 invocations) and fixture construction **17%** (~44 s), so
+    the 56/50 split above, arithmetic and taken on Linux, overstates the portable half about threefold.
+  - **Second lever: done by TASK-661 (SPRINT-175 T1).** The fresh trace found 38 full-spec calls, not 7:
+    31 single-family ones (25 `s11-*` and 6 worktree) now run on specs derived at run time, guarded by
+    `spec_keeps`, and the 7 that test full-spec dispatch keep the full spec with their reason beside each.
+    What remains open here is the first lever, porting fixture construction, now worth about a sixth of the harness.
 - **TD-164** severity: medium | status: open | created: Sprint-101
   - Summary: **SPRINT-101's SIGNED `approval_envelope:` encodes a superseded reading of the rule it
     cites, and the record cannot be re-signed.** Its `design` dimension states *"the seeded Plan is
