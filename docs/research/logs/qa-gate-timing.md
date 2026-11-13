@@ -2310,3 +2310,30 @@ so it adds no spawns here.
 
 **Not measured:** `b4ee69a6` on Windows. The re-run was killed by the host's memory reaper; R1 changes no batched pass, and its parity was taken on
 the VPS. **Left per-row:** `S11.SPRINT` (~120 `grep`), `S11.BACKLOG`, `S11.TDDELETE`, `S4.SECTIONS`, the next sites in Round 23's table.
+
+## Round 25 — the default-profile gate sits on its budget, and 38 full-spec engine calls in one harness are a third of it (2026-11-13)
+
+Taken for TASK-367's blocking question, after EPIC-025's cuts. **Trees:** runs 1 to 3 at `0783dad2`, `af3151fe` and `4484b09e` (docs and task files only between them), runs 4 and 5 at `8f57b397`. **Host:** the Windows maintainer host, 7.6 GB free on C: throughout.
+
+| run | what | real | user | sys | verdict |
+|---|---|---:|---:|---:|---|
+| 1 | bare gate, small git and grep commands beside it | 703.3 s | 281.1 | 331.6 | truncated at 701 s, 5 harnesses unrun |
+| 2 | bare gate | 512.6 s | 194.3 | 235.0 | complete, 211 pass |
+| 3 | bare gate | 521.9 s | 199.2 | 245.4 | truncated at 521 s, 3 harnesses unrun |
+| 4 | bare gate, `QA_PROFILE=1`, budget raised to 1200 s | 483.4 s | 180.1 | 220.3 | complete, 212 pass |
+| 5 | `run-conformance-engine-fixtures.sh` alone, `bash -x` with a timestamped `PS4` | 261.6 s | 101.2 | 127.5 | all green |
+
+Run 4, by profile sample: `run-conformance-engine-fixtures.sh` **219 s** (45%) · leg 4 34 s · `run-adr-family-fixtures.sh` 33 s · `run-dispatch-preflight-fixtures.sh` 24 s ·
+`run-foreign-repo-fixtures.sh` 22 s · the remaining samples 151 s between them.
+
+Run 5 attributes each gap between two trace lines to the earlier command. **Engine calls: 216.1 s over 75 invocations (83%). Everything else: about 44 s (17%)**,
+led by `read` 7.4 s, `mkdir` 6.7 s, `awk` 6.2 s, `git` 5.8 s, `grep` 3.5 s. This replaces TD-171's 50/56 split, which was arithmetic and was taken on Linux:
+on this host the fixture construction that row proposes to port is a sixth of the harness, not half.
+
+By duration: 26 calls of 4 s or more total 135.5 s; 21 calls of 2 to 4 s total 52.3 s; 28 calls under 2 s total 28.3 s. **38 invocations name the full
+`spec/STANDARD.md` and total 164.8 s**, about 4.3 s each (a first count of 40 included two trace lines that only pass the engine path to a helper). By case prefix: `s11-*` 25 calls, 131.3 s · `wt-*` 6 calls, 17.0 s · `target-*` 6 calls, 13.8 s ·
+`attribution-*` 1 call, 2.7 s. TD-171 counted 7 full-spec calls at SPRINT-103.
+
+**Not measured:** any of those cases on a reduced spec. A saving of 100 to 120 s is an estimate from the per-call averages above (a small-spec call
+averages under 1 s here), not a result. The trace adds overhead: run 5 is 42 s over the same harness's 219 s inside run 4. Runs 1 to 3 show the
+spread on one day, so one run is not a figure to rule on.
