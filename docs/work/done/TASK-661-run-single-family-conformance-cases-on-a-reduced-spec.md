@@ -32,28 +32,28 @@ review cap: 2 rounds at G2 (ADR-053).
 
 ## Done when
 
-- [ ] Every harness case that tests one rule family and today runs the engine on the full `spec/STANDARD.md` runs it on a
+- [x] Every harness case that tests one rule family and today runs the engine on the full `spec/STANDARD.md` runs it on a ✓ population of 38 recorded above (81f6ca13); 31 re-pointed to run-time-derived specs, 7 kept with reasons in the harness (2bc1668a)
       spec reduced to the rules that case exercises. The reduced spec is derived from `spec/STANDARD.md` when the harness
       runs, never a hand-copied table. The task's first step lists the population from a fresh trace of the harness: every
       engine call that names the full spec, by case name, recorded in this task (Round 25 counted 38 by prefix and named
       none). Each listed case is either changed, or kept on the full spec with its reason written beside it in the harness.
-- [ ] Discrimination is kept, case by case: for every changed case, the break it guards (the rejected design, or its
+- [x] Discrimination is kept, case by case: for every changed case, the break it guards (the rejected design, or its ✓ 8 seeds, each found 1, cmp-landed, sh -n clean, lines ±1, PASS-echo count kept, restored by hash; red sets in the Log 2026-11-13 progress entry
       assertion broken) is seeded in turn and reddens exactly that case on the reduced spec while a sibling control stays
       green. Each seed is shown to have landed (`cmp` against pristine), the harness still parses, keeps its assertion
       count and stays within one line of its length, and the tree is restored under one hash convention (`git hash-object <p>` equals `git rev-parse <ref>:<p>`).
-- [ ] No assertion is lost: every PASS name the harness prints before the change is printed after it, compared by name,
+- [x] No assertion is lost: every PASS name the harness prints before the change is printed after it, compared by name, ✓ 98 → 100 PASS, every pre-change name present after, compared by name
       and the count of `PASS` lines does not drop.
-- [ ] The engine is unchanged: `scripts/lib/conformance-engine.sh`, `scripts/lib/read-spec-rules.sh` and `conformance.sh`
+- [x] The engine is unchanged: `scripts/lib/conformance-engine.sh`, `scripts/lib/read-spec-rules.sh` and `conformance.sh` ✓ engine 0ee64c8f · read-spec-rules 8e78faf3 · conformance.sh f43fbc62, equal to d491ba1a
       are byte-identical to their pre-task blobs.
-- [ ] Measured on the Windows host with at least 3 GB free and nothing else running: the harness alone, three runs before
+- [x] Measured on the Windows host with at least 3 GB free and nothing else running: the harness alone, three runs before ✓ Round 26 (5f772f6b): host split by owner ruling; both Windows gates truncated, figures recorded; owner ruled verbatim "Accept, close sprint (Recommended)"
       and three after, and the default-profile gate twice after. All figures are appended to the timing log as a new
       round. The gate completes un-truncated in both runs; if it does not, the figures are recorded and the owner rules.
-- [ ] The off-host `QA_FULL=1` gate passes, and a worktree-isolated outside review of the change is recorded.
-- [ ] Negative: a reduced spec that leaves out a rule a case depends on makes the harness FAIL by name; no case passes
+- [x] The off-host `QA_FULL=1` gate passes, and a worktree-isolated outside review of the change is recorded. ✓ off-host QA_FULL on 81f6ca13: QA-CHECK 229 pass, 0 fail; Codex worktree-isolated review R1 VERDICT: CLEAR
+- [x] Negative: a reduced spec that leaves out a rule a case depends on makes the harness FAIL by name; no case passes ✓ spec_keeps guards all four reduced specs; seeds s6/s7 FAIL it by name; retained fixture reduced-spec-guard-fires-on-a-dropped-row + silent control
       because its rule is absent, including the cases that assert a finding is not reported. Every reduced spec is guarded
       by an anchor check on the rule rows its cases assert, in the pattern the harness already uses for its existing
       reduced specs. One retained must-FAIL fixture shows the guard firing, with a sibling control that stays green.
-- [ ] TD-171's summary is corrected with Round 25's split (engine calls 83%, fixture construction 17% on Windows) and its
+- [x] TD-171's summary is corrected with Round 25's split (engine calls 83%, fixture construction 17% on Windows) and its ✓ TD-171 Corrected + Second lever lines (4d81520f)
       second lever marked as done by this task.
 
 ## Population (T1 step 1, fresh trace at `d491ba1a`)
