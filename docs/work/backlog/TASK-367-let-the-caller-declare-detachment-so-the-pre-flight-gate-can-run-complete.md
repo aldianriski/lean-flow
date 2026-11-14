@@ -9,7 +9,7 @@ class: decision
 tier: G
 authority: J2
 origin: close-retro
-state: needs-info
+state: ready
 depends-on: [TASK-661]
 ---
 
@@ -39,8 +39,13 @@ state note: the detachment signal's shape is the open question
 ## Assumes
 
 - that a complete pre-flight is worth its wall-clock at all. UNCONFIRMED — the alternative is that the launcher should keep refusing on a bounded gate and the completeness problem belongs to the gate's cost, not to the launcher. Rule that before building; `TD-090` and `TASK-357` (carried from SPRINT-104 T4) own the cost side.
-- **open:** the shape of the detachment signal (the open question — see Done when (a)).
-- **open:** is a complete pre-flight worth its wall-clock? Measured 2026-11-13 on this Windows host with 7.6 GB free: the default-profile gate ran 701 s against the 520 s budget and left 5 harnesses unrun, with small git and grep commands running beside it. A second run the same day, with less beside it, finished complete in 512 s (211 pass). The host sits at the budget line, so one run passes and the next is cut short.
+
+## Decision
+2026-11-14, the owner at triage, two popups after SPRINT-175 (Round 26: the Windows gate still 552–662 s against 520 s):
+- **A complete pre-flight is worth its wall-clock**, verbatim "Yes, raise when declared (Recommended)". This settles the first
+  assumption under § Assumes: build the launcher side as written; the cost side (TD-090, TD-171) stays separate.
+- **The signal is a `--detached` flag**, verbatim "--detached flag (Recommended)": scoped to the one `night-run.sh` invocation, the raise
+  set inline on the pre-flight gate call only and never exported, so the run's own later gate calls keep the default budget.
 
 ## Tracker
 
