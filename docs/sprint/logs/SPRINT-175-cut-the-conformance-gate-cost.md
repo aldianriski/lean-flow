@@ -52,3 +52,10 @@ Outside review: Codex `gpt-6-astra`, read-only, worktree-isolated input (diff an
 Gate: off-host `QA_FULL=1` on `81f6ca13`: `QA-CHECK: 229 pass, 0 fail`, `bun test` 621 pass, 0 fail.
 TD-171: summary corrected with Round 25's 83/17 split, second lever marked done by this task.
 Not yet done: the Windows timing box. The host had 1.97 GB and then 1.11 GB free with three other Claude sessions open, below the 3 GB the box requires, so the indicative pair (pristine 345 s, edited 196 s, run back to back on the loaded host) is not recorded as a round.
+
+### 2026-11-14 | progress | T1 (TASK-661): measured, owner ruled on box 5, done
+Host split by owner ruling, verbatim "Yes, split it (Recommended)": the owner kept their other Claude sessions open, so the quiet-host condition could not be met. VPS harness before/after, 3 runs each interleaved: median 11.48 s → 6.15 s (−46%), all green, 98 → 100 PASS. Windows default gate at `2fc9dce8`, twice: 552 s and 662 s, both truncated against 520 s at `run-store-readers-fixtures.ts`, 5 unrun each. Run 2 also FAILed doc-caps with no output, and that harness passed alone straight after (63 tests, 12 s). Round 26 (`5f772f6b`).
+Box 5's fallback, owner ruling verbatim: "Accept, close sprint (Recommended)". All 8 boxes ticked with evidence and the member moved to `done/` (`b22e858e`).
+
+### 2026-11-14 | close | SPRINT-175 closed, 1 of 1 member done
+Retro → the sprint file § Retro. Owner asked for the close verbatim: "ok continue, close the sprint after timing done". Handoff reconciliation: no `handoff` entry in this log, so nothing to make `spent`.

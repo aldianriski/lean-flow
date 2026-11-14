@@ -1210,6 +1210,7 @@ status: current
     owner (`TASK-349` was never filed; `TASK-329` left the Backlog) is gone, and `TASK-357` already re-measures the gate total.
   - **Round 22 (owner ruling, 2026-10-06, SPRINT-115): Windows-host-specific → `medium`.** `qa-gate-timing.md` Round 22: on an Ubuntu VPS the complete `QA_FULL=1` gate runs **105–109 s**, 3/3 green, eval-harness leg 81–84 s. This row's cost is the
     Windows/MSYS host's (forks, paging), not the gate's. It stays open for that host; the off-host route is the working mitigation.
+  - **Round 26 (SPRINT-175 close, 2026-11-14):** after TASK-661 halved the conformance harness, the Windows default gate still truncated twice with other Claude sessions open (552 s and 662 s, 1.65 and 2.83 GB free). One run also FAILed `run-doc-caps-fixtures.sh` with no output; it passed alone straight after. Load still decides the verdict on this host.
 
 - **TD-134** severity: medium | status: open | created: Sprint-094
   - Summary: **`check-handoff-state.sh` is forward-looking only: it cannot see roughly half the archived
