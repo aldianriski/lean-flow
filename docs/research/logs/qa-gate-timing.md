@@ -2337,3 +2337,28 @@ By duration: 26 calls of 4 s or more total 135.5 s; 21 calls of 2 to 4 s total 5
 **Not measured:** any of those cases on a reduced spec. A saving of 100 to 120 s is an estimate from the per-call averages above (a small-spec call
 averages under 1 s here), not a result. The trace adds overhead: run 5 is 42 s over the same harness's 219 s inside run 4. Runs 1 to 3 show the
 spread on one day, so one run is not a figure to rule on.
+
+## Round 26 — reduced specs halve the conformance harness; the Windows gate still overruns on a loaded host (SPRINT-175 T1, 2026-11-14)
+
+Taken for TASK-661's measurement box. **Host split by owner ruling** (2026-11-14, verbatim "Yes, split it (Recommended)"), because the box's quiet-host condition (at least 3 GB free, nothing else running) could not be met without closing the owner's other sessions: the before/after harness runs on the VPS, the default-profile gate on Windows as it was.
+
+**Harness alone, VPS** (2 vCPU, 6 GB available, load 0.01), interleaved, before at `d491ba1a` and after at `2bc1668a`:
+
+| run | before real / user / sys | after real / user / sys | PASS before → after |
+|---|---|---|---|
+| 1 | 11.44 / 6.40 / 6.45 s | 6.18 / 3.23 / 3.57 s | 98 → 100 |
+| 2 | 11.48 / 6.25 / 6.64 s | 6.12 / 3.17 / 3.55 s | 98 → 100 |
+| 3 | 11.63 / 6.37 / 6.58 s | 6.15 / 3.22 / 3.71 s | 98 → 100 |
+
+Median 11.48 s → 6.15 s, **−46%**, all six runs green. On Windows, an indicative pair run back to back on the loaded host (1.97 GB free, three other Claude sessions) gave 345 s → 196 s (−43%). It is one pair, not a figure to rule on.
+
+**Default-profile gate, Windows, at `2fc9dce8`**, three other Claude sessions open, browser closed:
+
+| run | free at start | real | verdict |
+|---|---|---:|---|
+| 1 | 1.65 GB | 552 s | truncated at 537 s against 520 s, 5 harnesses unrun · `QA-CHECK: 215 pass, 1 fail` (the budget FAIL) |
+| 2 | 2.83 GB | 662 s | truncated at 643 s, the same 5 unrun · `QA-CHECK: 213 pass, 2 fail`: the budget FAIL, plus `run-doc-caps-fixtures.sh` with `bun test exit 1` and no output |
+
+The doc-caps harness passed on its own straight after (63 tests, 12 s), passed in run 1 on the same tree, and passed in the off-host `QA_FULL=1` run (`QA-CHECK: 229 pass, 0 fail` at `81f6ca13`). That makes it a load failure in TD-117's family, not a defect. In both runs the cut fell at the same harness (`run-store-readers-fixtures.ts`), which is later in the order than Round 25's truncations.
+
+**Read:** the lever worked where it was aimed. The harness that was 45% of Round 25's profiled gate is now about half its old cost. But on this host, with other sessions resident, the gate's remaining load still exceeds 520 s, so this lever alone does not settle TASK-367's question. **Not measured:** the gate on a quiet Windows host after the change.
