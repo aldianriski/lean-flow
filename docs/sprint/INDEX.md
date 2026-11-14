@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-13
+last_updated: 2026-11-14
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -188,3 +188,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-172 — Census Every Check and Record Step, With Its Real-Defect History — closed 2026-11-12 · `51b651fd` · 14 of 14 DoD (no release: `[Unreleased]` entry) · `EPIC-025` · 103 gate check rows and 64 record steps censused with FAIL history, real defects and proposed rulings; median baseline 43/7 and 3 FAILs; nothing cut, the owner packet opens the next slice · `L-314` filed · `L-049` sighting
 - SPRINT-173 — Cut the Zero-Defect Checks and Write the Record Lines by Tool — closed 2026-11-12 · `b114943b` · 32 of 32 DoD (release v2.23.0 prepared, not pushed) · `EPIC-025` · 28 checks and harnesses cut, 13 record steps merged, record-line writer, Jev trial dropped
 - SPRINT-174 — Review Rules and the Cross-Model Route — closed 2026-11-13 · `d9d08158` · 19 of 19 DoD (not released) · three review rules, the opt-in cross-model route (review, delegated build, diagnosis), ADR-010 amended
+- SPRINT-175 — Cut the Conformance Gate Cost — closed 2026-11-14 · `bb7ea926` · 8 of 8 DoD (no release: maintainer-only) · TD-171's second lever: 31 single-family harness calls on run-time-derived reduced specs, guarded by name; harness −46% on the VPS; the loaded Windows gate still overruns 520 s (Round 26, owner accepted)

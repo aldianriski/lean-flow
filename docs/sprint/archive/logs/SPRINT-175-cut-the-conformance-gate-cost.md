@@ -2,8 +2,8 @@
 sprint: 175
 slug: cut-the-conformance-gate-cost
 owner: Maintainer
-last_updated: 2026-11-13
-status: active
+last_updated: 2026-11-14
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -59,3 +59,6 @@ Box 5's fallback, owner ruling verbatim: "Accept, close sprint (Recommended)". A
 
 ### 2026-11-14 | close | SPRINT-175 closed, 1 of 1 member done
 Retro → the sprint file § Retro. Owner asked for the close verbatim: "ok continue, close the sprint after timing done". Handoff reconciliation: no `handoff` entry in this log, so nothing to make `spent`.
+
+### 2026-11-14 | close | retention approved, archived with the pin
+Close pass, owner popup, verbatim: "Approve archive (Recommended)". The sprint and this log move to `docs/sprint/archive/` with an INDEX line; `close_commit: bb7ea926` (the close commit) is written in this archive commit. No epic, so no rollup row. Doc-freshness: no §2 trigger fired (no architecture, README or skill file changed). Release: none, maintainer-only.

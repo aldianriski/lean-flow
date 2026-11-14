@@ -2,9 +2,10 @@
 sprint: 175
 slug: cut-the-conformance-gate-cost
 owner: Maintainer
-last_updated: 2026-11-13
+last_updated: 2026-11-14
 status: closed
 plan_commit: 621e9f10
+close_commit: bb7ea926
 gates_signed: G1,G2 @ 1225b1cd
 update_trigger: sprint execute/close events
 ---
