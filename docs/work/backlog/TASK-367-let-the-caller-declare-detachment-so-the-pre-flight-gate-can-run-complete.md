@@ -1,7 +1,7 @@
 ---
 id: TASK-367
 title: "Let the caller declare detachment, so the pre-flight gate can run complete"
-priority: P3
+priority: P2
 size: M
 risk: high
 autonomy: HITL
@@ -9,7 +9,7 @@ class: decision
 tier: G
 authority: J2
 origin: close-retro
-state: blocked
+state: needs-info
 depends-on: [TASK-661]
 ---
 
