@@ -2,7 +2,7 @@
 epic: 025
 slug: half-the-bookkeeping
 owner: Maintainer
-last_updated: 2026-11-12
+last_updated: 2026-11-15
 status: active
 member_sprints: [SPRINT-172, SPRINT-173]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -72,6 +72,9 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 - **D8** — Shape: "Two sprints" (owner popup 2026-11-12, after "take to many time" on one sprint per condition).
   - Sprint A builds the cuts, merges, writers and the Jev trial in parallel worktrees where Layers are disjoint, then the MINOR release (TASK-651 to TASK-658).
   - Sprint B is the workdoo sprint on that release and is also the measuring sprint, so the old measuring and workdoo conditions are one.
+- **D9** — Sprint B content and source (owner popups, 2026-11-15).
+  - Content: "Dashboard is Sprint B". Sprint B is the first slice of a workdoo session dashboard. The dashboard owns the Claude sessions and runs them like a chat app. The reference for it is the bloodlines coordinator-and-lane run of 2026-11-14/15.
+  - Source: "Frozen 2.23.0 worktree". Sprint B loads lean-flow with `--plugin-dir` from a detached worktree at `3e70b5f4`, so lean-flow `main` may build in parallel (TASK-662 to TASK-664) without changing the procedure Sprint B measures.
 
 ## Open questions
 - ~~**Is SPRINT-171 a fair baseline?**~~ Resolved by D7 (median of three). Its T6 trial ran long. → The census sprint measures SPRINT-169 and SPRINT-170 under D4's rules. If they differ from SPRINT-171 by more than a third, the baseline becomes the median of the three, by recorded owner ruling, and D4's targets are re-derived.
@@ -83,6 +86,6 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 - [x] Every cut has zero real defects in the census, and nothing marked unknown is cut without a recorded owner ruling. Every check with one or more still runs, and its must-FAIL fixture still fails with its named finding. Manifest lockstep and the conformance engine still run. → TASK-651, TASK-655, TASK-656, TASK-657 · closed by SPRINT-173
 - [x] Every record line a gate check parses is written by a tool. A fixture replays the census's real-defect cases (SPRINT-171 T5 among them) through the writer and then the gate, and the gate still demands the review. Given a missing or ambiguous input, the writer refuses and never writes a default. → TASK-652, TASK-653, TASK-656, TASK-657 · closed by SPRINT-173
 - [x] The Jev trial's result and spend are recorded. Jev is either kept as advisory beside `check-review-depth.sh` or dropped, and it is never a gate leg. → TASK-654 · closed by SPRINT-173 (dropped)
-- [ ] Released as a MINOR on a Codex review plus the off-host gate. TASK-489 is retargeted from 2.16.0 to this release. → TASK-658 (prepared and gated at SPRINT-173; open until the owner pushes v2.23.0 and `/triage` retargets TASK-489)
+- [x] Released as a MINOR on a Codex review plus the off-host gate. TASK-489 is retargeted from 2.16.0 to this release. → TASK-658 · closed by SPRINT-173 (v2.23.0 pushed by the owner 2026-11-15 at `3e70b5f4`; TASK-489 retargeted at triage `bfb97919`)
 - [ ] A workdoo sprint of five or more members, run on this release, is the measuring sprint (D8). It meets D4's targets under D4's counting rules, and no census-kept check was skipped.
   Its run record shows it promoted and closed with `/prime`'s `Skills:` row naming this release, and workdoo's own gate green. → next slice: workdoo sprint (Sprint B)
