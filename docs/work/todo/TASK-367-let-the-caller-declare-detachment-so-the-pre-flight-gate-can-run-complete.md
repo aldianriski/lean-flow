@@ -5,6 +5,7 @@ priority: P2
 size: M
 risk: high
 autonomy: HITL
+sprint: SPRINT-177
 class: decision
 tier: G
 authority: J2
