@@ -51,3 +51,14 @@ consequence · T1 · behaviour:low · governance:low
   - Box (d) names a Bun TypeScript test (sprint D3).
   - No scope widens, and no other box changes.
 - **Re-confirm G2:** for T2, on the fixed text, before T2 builds (D6).
+
+### 2026-11-15 | progress | T1 (TASK-665) built and reviewed
+- **Build:** Claude, a Sonnet worker. It edited only TASK-367's file.
+  - Done-when preamble: the gate call is cited by symbol.
+  - Box (a): the `--detached` flag, set inline and never exported.
+  - Box (d): a Bun TypeScript test.
+  - Free edits: Touches, the state note, `depends-on: []`, Assumes and Tracker.
+- **Checks:** `check-sprint-by-reference --scope-change` 4 pass, 0 fail (`freeze TASK-367 -- ## Done when changed since 0ba7c90, covered by a scope-change entry`). `test -e` passes for every path in Touches.
+- **Codex R1:** NOT CLEAR, one Med. The coordinator's G2 settlement had exempted the new test path from box 1's "only paths that exist", which loosened a frozen criterion. Fixed by dropping the test from Touches; box (d) still specifies it.
+- **Codex R2:** CLEAR.
+review · T1 · scoped-reviewer · behaviour:low · governance:low
