@@ -45,7 +45,7 @@ workdoo's lean-flow pin (in workdoo; owner-run) · this task file · `docs/resea
 ## Assumes
 - The pin lives in workdoo's own configuration; reading or changing it is the owner's act in that repo. lean-flow's coordinator
   never opens workdoo's secret files (L-247).
-- **blocked-by:** the owner pastes workdoo's run record showing lean-flow ≥ 2.23.0 in effect (retargeted at triage 2026-11-14 per EPIC-025; the owner pushes v2.23.0 first) (unblock condition; an owner-supplied read, L-253).
+- **blocked-by:** the owner pastes workdoo's run record showing lean-flow ≥ 2.23.0 in effect. v2.23.0 was pushed 2026-11-15, so what remains is EPIC-025 Sprint B's `/prime` `Skills:` row in workdoo, launched with `--plugin-dir` on the frozen 2.23.0 worktree (triage 2026-11-15). (Unblock condition: an owner-supplied read, L-253.)
 
 ## Tracker
 - SPRINT-138 close Retro (follow-up), from T7 candidate C5
