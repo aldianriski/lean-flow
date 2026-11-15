@@ -1135,6 +1135,8 @@ status: current
   - **Route (SPRINT-130 promote, 2026-10-19, owner):** → `TASK-367`, beside TD-090 — the same Windows gate-cost question; its
     open line asks for the default-profile re-measure on this host. Not decomposed on its own: the off-host route is the working
     mitigation, and no fix is clear enough to slice.
+  - **Update (SPRINT-177 close, 2026-11-15):** `TASK-367` landed the `--detached` launcher flag. Its real exercise finished in about
+    490 s, inside the old 520 s budget, so completion past it under load is still unmeasured; this row and TD-090 keep that open.
   - Summary: **Under concurrent load the gate exceeds its own 450s budget, SKIPS six eval harnesses, and
     reports a FAIL — so the practice this repo mandates for Tier G review degrades the gate that
     validates it.** `scripts/qa-check.sh:27` sets `QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-450}` (600s

@@ -3,7 +3,7 @@ sprint: 177
 slug: spec-fix-and-detached-preflight
 owner: Maintainer
 last_updated: 2026-11-15
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -100,3 +100,6 @@ consequence · T2 · behaviour:material · governance:low
   - A follow-up check found the knob also controlled execution, so a wrapper could skip the bound. Owner popup: "Lookup-only fix (Recommended)". The knob is renamed NIGHT_RUN_TIMEOUT_LOOKUP, and a fixture shows it cannot change execution.
   - The review closes **owner-settled**, not CLEAR (the review rounds were used up; the revise loop says still-open findings go to the owner).
 review · T2 · scoped-reviewer · behaviour:material · governance:low
+
+### 2026-11-15 | close | SPRINT-177 closed, 2 of 2 members done
+Retro -> the sprint file § Retro. Filed: L-320 and L-321 new; L-237 bumped to count 3; a one-line route note on TD-117. No new TD (TD-090 and TD-117 own the gate-completion measurement), no follow-up task. Handoff reconciliation: no `handoff` entry in this log, so nothing to make `spent`. No epic. §11 retention and doc-freshness are proposals awaiting owner approval.

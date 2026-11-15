@@ -127,6 +127,24 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-321 [tags: tooling] [status: active]: **A test fixture must run on every host the gate runs on, so build it from what the test controls, never from the author's OS.**
+SPRINT-177 T2's builder wrote its no-timeout fixture on Windows: it copied Git-for-Windows' `/usr/bin`, called `pwd -W` and joined PATH with `;`. The off-host gate is Linux, where it would have thrown. Codex R2 caught it before commit, and the fix made the lookup overridable instead. Run the new test once on the other host, or read it for host-only calls, before it counts as green.
+- seen: 2026-11-15 (SPRINT-177 T2, Codex R2 High)
+- count: 1
+- promoted: no
+- related: L-215 (a fixture inherits the host's environment) · L-310 (this Windows host's local gate differs from the off-host one)
+
+---
+
+## L-320 [tags: process] [status: active]: **A test seam may change only what the test looks up, never what production executes.**
+SPRINT-177 T2 first added a test-only knob that controlled execution of the bound, so a wrapper setting it could skip the bound in a real run. The owner ruled it lookup-only: it is renamed `NIGHT_RUN_TIMEOUT_LOOKUP`, and a fixture shows it cannot change execution. For any seam added for a test, ask what a caller who sets it in production could now skip.
+- seen: 2026-11-15 (SPRINT-177 T2, follow-on check after Codex R2)
+- count: 1
+- promoted: no
+- related: L-081 (an override is inherited by children it was never meant to reach)
+
+---
+
 ## L-319 [tags: docs] [status: active]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.** SPRINT-176 T1 filed L-317 with `related: L-042`, copied from CONTEXT's Streams bullet, which still cites it. L-042 is retired (the ledger's retired-ids line), and the first system verify failed `learnings dangling refs`. Cite the durable rule's home or a live id; a citation in a live doc is not proof the id still resolves.
 - seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`)
 - count: 1
@@ -782,8 +800,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 ---
 
 ## L-237 [tags: process] [status: promoted]: **A G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.** SPRINT-130 T1: the Done-when said the declared command must be the segment's TRAILING argument list; the coordinator's G2 text said "ending the segment or followed by a space", the owner signed it, and the builder implemented the looser reading — an interior run counted as invoking the gate. Only the review, briefed with the Done-when as its Spec comparand, caught it. The frozen text governs; a design paraphrase of a criterion is a second copy that can drift from it in the same hour.
-- seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry) · 2026-10-25 (SPRINT-139 T5: the G2 design read the Indonesian catalog only for Indonesian text, the frozen Done when said both catalogs, the builder followed the design, and only the exercise caught it)
-- count: 2
+- seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry) · 2026-10-25 (SPRINT-139 T5: the G2 design read the Indonesian catalog only for Indonesian text, the frozen Done when said both catalogs, the builder followed the design, and only the exercise caught it) · 2026-11-15 (SPRINT-177 T1: the coordinator's G2 settlement exempted a new path from the frozen "only paths that exist"; Codex R1 caught it before commit)
+- count: 3
 - **L-237 → promoted: `skills/orchestrator/references/builder-check.md` § Two rules for the design itself** · disposition: move-to-reference — a design quotes a frozen Done-when verbatim where it relies on it.
 - related: L-122 (the comparand-briefed reviewer catches what the builder carried) · L-088 (do not reinterpret a frozen DoD)
 
