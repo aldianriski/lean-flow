@@ -25,6 +25,7 @@ The owner kept TASK-367 out of SPRINT-176 on 2026-11-15 ("Keep out (Recommended)
 - [ ] TASK-367's Done-when box (a) names the `--detached` flag the owner ruled ("--detached flag (Recommended)", 2026-11-14), not "a flag or an env var".
 - [ ] TASK-367's `## Why` state note ("the detachment signal's shape is the open question") and its `:589` line reference are corrected to the ruled shape and the current gate call site, and `depends-on: [TASK-661]` is cleared (TASK-661 is in `done/`, SPRINT-175).
 - [ ] The retained fixtures in box (d) say whether they are TypeScript tests or the existing `.sh` harness, per the no-new-shell-scripts ruling; the choice is recorded, not assumed.
+- [ ] TASK-367's `## Tracker` no longer cites the deleted TD-084 and TD-175 as live rows, and its `## Assumes` no longer says the detachment question is UNCONFIRMED: it points at the 2026-11-14 owner Decision (box added by owner popup 2026-11-15, "Add a box to TASK-665 (Recommended)").
 
 ## Touches
 
