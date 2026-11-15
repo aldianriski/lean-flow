@@ -101,3 +101,8 @@ consequence · T3 · behaviour:low · governance:low
   - the real mobile-47 TASK-126..139 sat below the max in use, 151;
   - an open-ended "TASK-160+" range preceded the 02:30 correction (an inference, not a measured fact).
 review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-11-15 | progress | system verify, first run red (230 pass, 2 fail), both fixed
+- `learnings dangling refs: L-042`: L-317 named a retired id; it now reads `related: L-318`.
+- `scope-change-outside-layers T1`: the knowledge-index scope-change names the generator it ran. That generator is read and run, not edited, so it is added to T1 Cites, not Layers.
+- bun test was 621/0 on the first run.
