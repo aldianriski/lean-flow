@@ -44,3 +44,34 @@ builder-check · T3 · 0 contradictions · 3 questions · gap TD id derived at w
 - Owner popup, verbatim. G1: "Scope confirmed". G2: "Sign G2". Builder: "Claude builds, Codex reviews (Recommended)".
 - The design record carries the frozen Done-when verbatim and the builder-check settlements. It is kept in the coordinator scratchpad as s176-g2-design.md, and the approved design is as listed in the G2 popup.
 - Waves run serially: W1 T1, then W2 T2, then W3 T3. Authority is J1 throughout. The run is attended, so no envelope is recorded.
+
+### 2026-11-15 | scope-change | T1 Layers gains `docs/knowledge-index.md`
+- **What broke:** T1 files L-317 and L-318, and the generated knowledge index (ADR-009, `sh scripts/gen-index.sh`, lint-checked by qa-check) must regenerate in the same commit. T1's Layers did not declare that file, so `layers observed` would redden at close.
+- **Impact:** the T1 Plan line gains one exact-path token. No Done-when box changes and no scope widens. The file is generated, not hand-written.
+- **Re-confirm G2:** not needed. Layers is a live declaration corrected per task (CONTEXT § Sprint model, L-100 · L-229).
+
+### 2026-11-15 | scope-change | T1 Layers drops `skills/prime/SKILL.md`, `skills/handoff/SKILL.md` and `skills/flow/SKILL.md`
+- **What broke:** the wiring read found that none of the three needs a change. `/prime` reports per stream (lines 43 and 46), `/handoff` resolves by `stream:` (line 59), and `/flow` says one sprint per stream (line 54). An unused Layers token fails `layers observed` at close (L-240).
+- **Impact:** three tokens are pruned from the T1 Plan line. The no-change reasons are kept in T1's progress entry, so box 6 still has its evidence.
+- **Re-confirm G2:** not needed (the design pre-declared these tokens as wiring-read candidates to prune).
+
+### 2026-11-15 | progress | T1 (TASK-662) built and reviewed
+- **Build:** Claude, Sonnet worker, per the owner's builder ruling.
+  - Added `skills/orchestrator/references/coordinator.md`, five generic sections.
+  - Added pointers: orchestrator SKILL.md line 79, the CONTEXT § Streams bullet (the scoped rule verbatim, then the pointer), the README, and a cross-reference opening `dispatch.md` § Worktree dispatch protocol.
+  - Added a CHANGELOG [Unreleased] entry, and L-317 and L-318 via `/insights`. The knowledge index was regenerated.
+- **Checks:** `check-doc-caps.ts` 0 FAIL; SKILL.md 140/140, CONTEXT 150/150, CLAUDE.md 79/80 (net-zero, D4); skill count 16 unchanged.
+- **Wiring evidence (box 6):**
+
+  | Job | Change or reason |
+  |---|---|
+  | `/prime` | no change: already reports per stream (`prime/SKILL.md` lines 43 and 46) |
+  | `/handoff` | no change: already resolves the sprint by `stream:` (line 59) |
+  | `/flow` | no change: "one sprint per stream" (line 54) and resolves by `stream:` (line 76) |
+  | `dispatch.md` | changed: a cross-reference line opens § Worktree dispatch protocol and points separate lane sessions to `coordinator.md` |
+
+  Both entry points reach the reference: the orchestrator SKILL.md pointer and CONTEXT § Streams.
+- **Codex R1:** NOT CLEAR, 3 High, all fixed in place.
+  - CONTEXT's rule is now verbatim, with the pointer after the full stop.
+  - This table is in the Log.
+  - An unattended lane parks at an unsigned gate (`night-run.md` Part 0).

@@ -28,7 +28,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Add the coordinator reference and scope the one-session rule `[size: M · risk: low · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/coordinator.md` · `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md` · `docs/LEARNINGS.md` · `skills/prime/SKILL.md` · `skills/handoff/SKILL.md` · `skills/flow/SKILL.md` · `skills/orchestrator/references/dispatch.md`
+Layers: `skills/orchestrator/references/coordinator.md` · `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md` · `README.md` · `CHANGELOG.md` · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `skills/orchestrator/references/dispatch.md`
 Depends-on: none
 Cites: TASK-662, `references/dispatch.md`
 Multi-session coordination has no shipped text and the one-session rule is in no shipped surface. The last four Layers are the wiring-check reads, each changed or recorded "no change needed"; prune unused tokens at G2. Per-task meta: its `## Assumes` line "Builds after EPIC-025 Sprint B closes" is superseded by D2.
