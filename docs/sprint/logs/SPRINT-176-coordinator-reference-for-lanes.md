@@ -75,3 +75,19 @@ builder-check · T3 · 0 contradictions · 3 questions · gap TD id derived at w
   - CONTEXT's rule is now verbatim, with the pointer after the full stop.
   - This table is in the Log.
   - An unattended lane parks at an unsigned gate (`night-run.md` Part 0).
+consequence · T1 · behaviour:low · governance:high
+review · T1 · scoped-reviewer · behaviour:low · governance:high
+- Note: the T1 consequence and review lines were recorded after the commit; the review itself was the Codex scoped reviewer, R1 and R2 above (a workflow/protocol contract, so governance is high).
+consequence · T2 · behaviour:low · governance:high
+
+### 2026-11-15 | progress | T2 (TASK-663) built and reviewed
+- **Build:** Claude, Sonnet worker.
+  - Added coordinator.md section 6 (shared files across lanes) and section 7 (id booking).
+  - Appended the L-143 clause to CONTEXT § Gates line 66 and to task-file.md rule 4; net-zero lines.
+  - Added a CHANGELOG entry. CLAUDE.md is untouched.
+- **Checks:** check-doc-caps 0 FAIL; token budget 12683 of 12691 (8 tokens of headroom left); CONTEXT 150, CLAUDE.md 79, SKILL.md 140.
+- **A1:** confirmed. `check-layers-observed.ts` and `sprint-members.ts` only parse ids. The conformance engine reads the highest TASK and SPRINT number for retention (lines 2855 and 2651) and derives no next id.
+- **Codex R1:** NOT CLEAR, one High: both maxima omitted the coordinator's own tree. Fixed.
+- **Codex R2:** CLEAR.
+review · T2 · scoped-reviewer · behaviour:low · governance:high
+consequence · T3 · behaviour:low · governance:low
