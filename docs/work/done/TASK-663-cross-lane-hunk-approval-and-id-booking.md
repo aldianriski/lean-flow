@@ -28,22 +28,22 @@ and L-042 `git add -p` cover one sprint and one tree; the cross-lane owner and t
 
 ## Done when
 
-- [ ] The coordinator reference gains a cross-lane shared-file section:
+- [x] The coordinator reference gains a cross-lane shared-file section:
   - the coordinator owns each named shared file;
   - a lane sends hunks or a diff;
   - the coordinator approves file by file, optionally after a review subagent;
   - the lane stages per hunk (`git add -p`);
   - a cherry-pick that turns out to be a whole-branch merge is backed out and logged.
-- [ ] The reference gains an id-booking section:
+- [x] The reference gains an id-booking section:
   - the coordinator books a TD, L and TASK range per lane at launch, recorded in the lane brief and the coordinator's sprint log;
   - every booking, first or revised, starts above the maximum in use across all lane worktrees and every outstanding booking, and the ranges are mutually disjoint;
   - a lane derives its next id inside its range;
   - a coordinator-side id takes the max across all lane worktrees plus the booked ranges;
   - a range change is sent as a message and logged;
   - no ledger field and no checker.
-- [ ] CONTEXT § Gates' L-143 grain and `skills/task-decomposer/references/task-file.md` rule 4 each state that the single-tree derivation is unchanged and that, in a multi-lane run, a lane derives inside its booked range. `.claude/CLAUDE.md` is untouched unless one pointer line fits at or under 80 lines.
-- [ ] Re-verified at G2, by reading the scripts that parse ids, that no script derives a next id. If one does, changing that script is out of this task's scope and is filed as a separate task; this task stays prose at Tier P.
-- [ ] Negative: a lane must not file a task, TD or L id outside its booked range, and a single-stream repo with no booking still derives the max exactly as before (L-143 unchanged).
+- [x] CONTEXT § Gates' L-143 grain and `skills/task-decomposer/references/task-file.md` rule 4 each state that the single-tree derivation is unchanged and that, in a multi-lane run, a lane derives inside its booked range. `.claude/CLAUDE.md` is untouched unless one pointer line fits at or under 80 lines.
+- [x] Re-verified at G2, by reading the scripts that parse ids, that no script derives a next id. If one does, changing that script is out of this task's scope and is filed as a separate task; this task stays prose at Tier P.
+- [x] Negative: a lane must not file a task, TD or L id outside its booked range, and a single-stream repo with no booking still derives the max exactly as before (L-143 unchanged).
 
 ## Touches
 

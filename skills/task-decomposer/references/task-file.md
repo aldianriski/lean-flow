@@ -26,7 +26,7 @@ no case-only renames — hazards on Windows checkouts and concurrent worktree co
 3. Next id = max + 1, zero-padded to at least 3 digits (`TASK-001` on an empty store).
 4. Root the listing at this repo's own `docs/work/`. A recursive search from the repo root also
    walks `.claude/worktrees/*/` — whole repo copies during isolated dispatch — and returns ids that
-   are not rows. A maximum far above the neighbours is contamination until shown otherwise.
+   are not rows. A maximum far above the neighbours is contamination until shown otherwise. This is unchanged for one tree; in a multi-lane run a lane derives inside its booked range and reads only its own `docs/work/`, and only the coordinator reads the named lane worktrees, as an exception to the exclusion (→ `/orchestrator` `references/coordinator.md`).
 5. A breakdown takes consecutive ids from there, **blockers first**, so ids read in dependency order.
 
 The layout check has already refused a tree with `TODO.md` in it, so `TODO.md` is never read here.

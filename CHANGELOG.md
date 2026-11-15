@@ -21,6 +21,11 @@ status: current
   re-requesting a lost report. CONTEXT's Streams rule now says one coordinator may run one lane session per stream, one session
   per stream runs its workers and never relays, and sessions split by stream, never by step (TASK-662).
 
+- **`/orchestrator`: the coordinator reference covers shared files and id booking across lanes.** The coordinator owns each
+  named shared file and approves a lane's hunks file by file; it books a `TD` / `L` / `TASK` id range per lane, above every
+  maximum in use and disjoint, and a lane never files outside its range. CONTEXT's L-143 grain and the task-file derivation
+  rule say single-tree derivation is unchanged and a lane derives inside its booked range (TASK-663).
+
 - **`/orchestrator`: adds an opt-in cross-model route.** Another provider's CLI reviews drafts, designs and code,
   builds in an isolated worktree, or gives one read-only diagnosis after two failures. The route is off by default;
   a `cross-model: <cases> via <cli>` line in the host repo's CONTEXT file or the owner's request enables it in attended

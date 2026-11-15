@@ -50,3 +50,32 @@ own answer, or a record of it, counts.
 
 When a subagent's or lane's final report did not arrive, re-request the full report. Never infer it from an interim
 hand-back or from the state of the worktree.
+
+## 6. Shared files across lanes
+
+The coordinator owns each named shared file, so a lane never edits one on its own authority.
+
+- The lane sends its hunks or a diff to the coordinator and does not stage them yet.
+- The coordinator approves file by file, optionally after a review subagent reads the diff first.
+- The lane then stages per hunk (`git add -p`) and reads `git diff --cached` before it commits.
+- A cherry-pick that turns out to be a whole-branch merge is backed out and logged in the coordinator's active sprint
+  Execution Log.
+
+## 7. Id booking
+
+One tree derives the next `TASK` / `TD` / `L` id from the maximum in use; separate lane worktrees each see only their own
+maximum, so two lanes can file the same number. The coordinator prevents that by booking ranges.
+
+- At launch the coordinator books a `TD`, an `L` and a `TASK` range per lane, recorded in the lane brief and in the
+  coordinator's sprint log (the coordinator's active sprint Execution Log).
+- **Invariant:** every booking, first or revised, starts above the maximum in use across the coordinator's own tree, all
+  lane worktrees and every outstanding booking, and the ranges are mutually disjoint.
+- Range size is the coordinator's call per lane, from its planned work. There is no default.
+- A lane derives its next id inside its range. A lane never files a `TASK`, `TD` or `L` id outside its booked range. When
+  the range runs out it stops and asks the coordinator for a revised booking; it never extends its own.
+- A coordinator-side id takes the maximum across the coordinator's own tree, all lane worktrees and the booked ranges. The coordinator deliberately
+  reads the named lane worktrees, an exception to the `.claude/worktrees/` exclusion in single-tree derivation; each lane
+  reads only its own `docs/work/`.
+- A range change is sent as a message and logged.
+- No ledger field and no checker: booking is prose. With no booking (a single stream), derivation is exactly the
+  maximum-in-use rule, unchanged.
