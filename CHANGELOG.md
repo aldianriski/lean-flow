@@ -16,15 +16,16 @@ status: current
 
 ## [Unreleased]
 
-- **`night-run.sh`: adds a `--detached` flag so the pre-flight gate runs to completion.** The caller declares detachment; both gate limits
-  are raised inline on that one call. An undeclared slow gate now refuses by name (`pre-flight-gate-foreground-limit`) instead of being
-  killed at the 600 s ceiling, and a gate that truncated itself is refused on either arm, ahead of any `gate_exceptions:` grant (TASK-367).
-
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.
 Released on a Codex review of the shipped diff since v2.23.0 (R1: one High and one Med, both fixed; R2 CLEAR) and the off-host gate.
 The coordinator reference comes from a real adopter run: one coordinator and one lane session per stream, across two repos (SPRINT-176).
+SPRINT-177's `--detached` flag was folded in before the push, on its own Codex reviews and a re-run of the release review over its shipped delta.
+
+- **`night-run.sh`: adds a `--detached` flag so the pre-flight gate runs to completion.** The caller declares detachment; both gate limits
+  are raised inline on that one call. An undeclared slow gate now refuses by name (`pre-flight-gate-foreground-limit`) instead of being
+  killed at the 600 s ceiling, and a gate that truncated itself is refused on either arm, ahead of any `gate_exceptions:` grant (TASK-367).
 
 - **`/orchestrator`: adds a coordinator reference for multi-session work.** `references/coordinator.md` gives the lane brief
   shape (including each gate's signed-or-unsigned status), the 3-line status check, relayed-ruling labelling and
