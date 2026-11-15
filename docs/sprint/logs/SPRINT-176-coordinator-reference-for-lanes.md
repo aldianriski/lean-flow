@@ -36,3 +36,11 @@ Sprint number: 176, the maximum in use plus one. Five queries varying the select
 Composition: 3 members, sizes M/M/S, serial edges T1 then T2 then T3, no epic, no stream. Status move at `e59a3f1d`.
 Baseline gate: off-host `QA_FULL=1` on `d170295e`: `QA-CHECK: 221 pass, 0 fail`; `bun test: 621 pass, 0 fail`; both rc 0. The commits since are the status move, the stamps and this sprint's files.
 G1 and G2 are not yet signed; `gates_signed` goes in the sprint frontmatter only after the owner's sign-off is relayed verbatim.
+builder-check · T1 · 4 contradictions · 4 questions · all factual, in the design: verbatim rule text, gate-status field in the brief, evidence table in T1 progress entry, dispatch.md cross-ref placement; none to owner
+builder-check · T2 · 2 contradictions · 5 questions · negative and no-booking stated in the reference, CLAUDE.md untouched, coordinator reads named lane worktrees as rule-4 exception, lane stops and asks on exhaustion, size per lane no default; none to owner
+builder-check · T3 · 0 contradictions · 3 questions · gap TD id derived at write, exclusions cite the 2026-11-15 Q2 popup, 0 gaps stated with no synthetic row, re-extract a message past the 900-char cut; none to owner
+
+### 2026-11-15 | gates | G1 and G2 signed
+- Owner popup, verbatim. G1: "Scope confirmed". G2: "Sign G2". Builder: "Claude builds, Codex reviews (Recommended)".
+- The design record carries the frozen Done-when verbatim and the builder-check settlements. It is kept in the coordinator scratchpad as s176-g2-design.md, and the approved design is as listed in the G2 popup.
+- Waves run serially: W1 T1, then W2 T2, then W3 T3. Authority is J1 throughout. The run is attended, so no envelope is recorded.
