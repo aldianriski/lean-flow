@@ -8,8 +8,9 @@ coordinator keeps the lanes aligned without ever standing in for the owner. In-s
 
 Multi-stream or multi-repo work may run one coordinator plus one lane session per stream. Inside a stream, one session runs its workers and never relays. Split sessions by stream, never by step.
 
-CONTEXT § Sprint model › Streams holds the stream rules (one active sprint per stream, overlap → coordinate); this file does
-not restate them. A single-stream repo needs none of it.
+The stream rules this relies on: each stream runs one active sprint (its `stream:` frontmatter names it), and a file two
+streams both touch is coordinated or sequenced, never built in parallel. Where the host's CONTEXT file has a streams
+section, it governs. A single-stream repo needs none of this.
 
 ## 2. Launching a lane
 

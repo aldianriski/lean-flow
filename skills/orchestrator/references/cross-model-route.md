@@ -19,7 +19,9 @@ CONTEXT file, only an owner's request in the session turns a case on, for that s
 
 Check that the CLI exists and is logged in using its own version and login-status commands. Read its own
 help for the flags below because flags drift. Never install, upgrade or reconfigure the CLI to make a call
-work; report the problem and use the fallback below.
+work; report the problem and fall back by operation: a review falls back as **What counts as a result** says;
+a delegated build returns to the ordinary same-provider build dispatch (`dispatch.md`); a diagnosis handoff is
+skipped, and `/diagnose` continues on the same provider.
 
 ## The review brief
 
