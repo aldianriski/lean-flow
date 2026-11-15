@@ -62,3 +62,18 @@ consequence · T1 · behaviour:low · governance:low
 - **Codex R1:** NOT CLEAR, one Med. The coordinator's G2 settlement had exempted the new test path from box 1's "only paths that exist", which loosened a frozen criterion. Fixed by dropping the test from Touches; box (d) still specifies it.
 - **Codex R2:** CLEAR.
 review · T1 · scoped-reviewer · behaviour:low · governance:low
+builder-check · T2 · 2 contradictions · 5 questions · guard applies to both arms, bound covers the whole foreground path incl. the wait, timeout wraps sh with verification by fixture and real run, doc does not claim harness-background counts as detached; three value questions to owner
+consequence · T2 · behaviour:material · governance:low
+
+### 2026-11-15 | gates | G2 signed for T2 on the fixed Done-when (both tasks are now signed)
+- Owner popup, verbatim:
+  - Raise value: "1800 s both (Recommended)".
+  - Bound: "570 s total (Recommended)". The gate bound is 570 minus `wait_seconds`, which is 420 s at the default wait.
+  - Test knob: "Accept the knob (Recommended)" (`NIGHT_RUN_GATE_BOUND_SECONDS`, a test-only override).
+  - G2 for T2: "Sign G2 for T2".
+- The design record and settlements are in the coordinator scratchpad (s177-t2-design.md). The settlements are:
+  - the truncated-gate guard covers both arms;
+  - the bound covers the whole foreground path;
+  - `timeout` wraps `sh`;
+  - the doc claim is held back until the real exercise.
+- `gates_signed` is recorded now that G1 and G2 are signed for both tasks.
