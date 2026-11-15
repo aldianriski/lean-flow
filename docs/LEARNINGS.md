@@ -141,7 +141,7 @@ bloodlines' lanes shared one scarce resource across sessions. A lane cannot see 
 - seen: 2026-11-15 (SPRINT-176 T1, bloodlines consumer evidence)
 - count: 1
 - promoted: no
-- related: L-042
+- related: L-318
 
 ---
 
