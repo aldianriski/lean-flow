@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-06
+last_updated: 2026-11-15
 update_trigger: An epic is opened, or closed and archived (STANDARD §11)
 status: current
 ---
@@ -26,6 +26,7 @@ are closed — superseded → workdoo** (EPIC-010 · 013 closed earlier, merged 
 EPIC-022 D1), closed in place with their Closed-when unticked: not delivered here. Still open on lean-flow's roadmap: **EPIC-005** (Fleet), `proposed`. **EPIC-007** (Workflow Packs) closed
 2026-10-20 (SPRINT-132 → SPRINT-134). The register, not the file, is the gate: a destination written down is not work admitted.
 
+- [EPIC-026](EPIC-026-token-cost-per-box.md) — Token Cost per Box: RTK, ponytail and graphify each get a recorded verdict from a first-hand read or a measured USD-per-box comparison; nothing ships without a separate ruling — **proposed** 2026-11-15 · starts after EPIC-025 Sprint B closes
 - [EPIC-025](EPIC-025-half-the-bookkeeping.md) — Half the Bookkeeping, Every Real Check Kept: a sprint of five or more members closes with at most half SPRINT-171's non-work commits per member and first-run close-gate FAILs, every check with a real-defect history kept — **active** 2026-11-11 · admitted on a measured cost (ADR-053 §4)
 - [EPIC-024](archive/EPIC-024-agent-roles-one-by-one.md) — A Small Coordinator, Then Agent Roles, One by One — closed 2026-11-11 · SPRINT-165 → SPRINT-171 (every Closed-when `[x]`) · rows 1 to 3 dropped, 4 and 4b no-go, 5, 7 and 8 no-go, 9 no-go inside `/diagnose`, 6 inconclusive on confirmation; no role ships (D21)
 - [EPIC-023](archive/EPIC-023-specific-not-short.md) — Specific, not short (lean-flow 3.0): ship only the discovery, carry-through and expertise components a staged A/B on two real repos proves — closed 2026-11-03 · SPRINT-147 → SPRINT-161 (all five Closed-when `[x]`) · S1 and S3 bundles 1-2 shipped as v2.20.0 (D21); S2 and the S3 roles not built (D2, D20); research → `docs/research/lean-flow-3-foundation.md`
