@@ -24,10 +24,10 @@ No new machinery is proposed; this is the proof run. G2 review-round cap: 2.
 
 ## Done when
 
-- [ ] The inputs are copied into a retained evidence record (not left in a session scratchpad): lane briefs 14:22, approvals 14:35/14:46, the status check 15:05, the id allocation 15:29 and correction 02:30, the relay labelling 15:42, and the lost-report re-request 15:42. No secret, env or key file is opened.
-- [ ] A table maps each message type to one of three outcomes: its named section in the coordinator reference, existing lean-flow coverage (named), or an owner-ruled exclusion (learning-only). Only an in-scope requirement with none of these is a gap, filed as a TD citing the message.
-- [ ] Given the retained scenario facts as input (the real stream names, sprints, worktrees, branch@sha, id maxima in use), one lane brief and one id allocation are produced by following the reference. Each of the reference's required fields is present, and the allocation meets the booking invariant (above the max in use, disjoint). The produced brief and allocation are compared with the real messages, with differences recorded.
-- [ ] Negative: an in-scope requirement covered neither by the reference nor by named existing lean-flow coverage, and not an owner-ruled exclusion, appears in the table as a gap with its TD id, never as a pass.
+- [x] The inputs are copied into a retained evidence record (not left in a session scratchpad): lane briefs 14:22, approvals 14:35/14:46, the status check 15:05, the id allocation 15:29 and correction 02:30, the relay labelling 15:42, and the lost-report re-request 15:42. No secret, env or key file is opened.
+- [x] A table maps each message type to one of three outcomes: its named section in the coordinator reference, existing lean-flow coverage (named), or an owner-ruled exclusion (learning-only). Only an in-scope requirement with none of these is a gap, filed as a TD citing the message.
+- [x] Given the retained scenario facts as input (the real stream names, sprints, worktrees, branch@sha, id maxima in use), one lane brief and one id allocation are produced by following the reference. Each of the reference's required fields is present, and the allocation meets the booking invariant (above the max in use, disjoint). The produced brief and allocation are compared with the real messages, with differences recorded.
+- [x] Negative: an in-scope requirement covered neither by the reference nor by named existing lean-flow coverage, and not an owner-ruled exclusion, appears in the table as a gap with its TD id, never as a pass.
 
 ## Touches
 
