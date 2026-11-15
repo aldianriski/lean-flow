@@ -1,0 +1,53 @@
+---
+owner: Maintainer
+last_updated: 2026-11-15
+update_trigger: TASK-664 replay inputs change
+status: current
+---
+
+# TASK-664 — replay inputs (bloodlines coordinator run, 2026-11-14/15)
+
+Redacted copies of the messages TASK-664 box 1 cites. They are taken from the coordinator's transcript digest (each message is cut at 900 characters and marked `…[+N]`).
+Session names are kept, and pipe addresses, local paths, URLs, device ids and emails are redacted. Times are UTC, `MM-DDTHH:MM`. OUT means a message the sender sent; IN means one it received.
+
+## Lane briefs (coordinator → lanes)
+
+- 11-14T14:22 OUT to=bloodlinesfamilia-mobile-47 You own the API stream: resume SPRINT-008 in worktree .claude/worktrees/api (branch sprint/008-api-stream-1 @ 3073828). From: SPRINT-009 coordinator (session bloodlinesfamilia-mobile-21). Start with /lean-flow:prime, then /lean-flow:orchestrator, working only in .claude/worktrees/api. The previous session died on a network error (ENOTFOUND) mid-build. State: the TASK-071/072 builder (slot B) left UNCOMMITTED work in that worktree: - invitations inbox (Terima/Tolak on the touring hub) - "Aktivitas" on ride detail for the leader: ride_activity_screen.dart, views/ride_activity_view.dart - "Profil darurat" opens the emergency profile, SOON badge removed - tests: ride_activity_ui_test, touring_invitations_ui_test, and an edit to touring_hub_test Review that diff, run analyze and test under the RAM gate, and finish it. Cross-stream rules: - The four touring files it edits (ride_detail_screen,  …[+659]
+
+- 11-14T14:22 OUT to=bloodlinesfamilia-mobile-c9 You own the waves stream: resume SPRINT-007 in worktree .claude/worktrees/s007 (branch sprint/007-converge-wave-2 @ 84d9e09). From: SPRINT-009 coordinator (session bloodlinesfamilia-mobile-21). Start with /lean-flow:prime, then /lean-flow:orchestrator, working only in .claude/worktrees/s007. The previous session died on a network error (ENOTFOUND) mid-build. State: 2 of 4 tasks done, 10/18 boxes. T3 (TASK-052, logbook) is in progress. SPRINT-008's logbook fields are cherry-picked as 0ffd2af. The T3 builder (slot A) left UNCOMMITTED work in that worktree: - logbook_mapping.dart - views/logbook_view.dart - test/logbook_pins_test.dart - an edit to views/touring_labels.dart - integration_test/test_bundle.dart (untracked; probably generated, check before adding it) The design was signed at d9aefe3. Review and finish it: pin the current behaviour first, then the signed design. Send me (bloodli …[+746]
+
+## Shared-file hunk approval, and the cherry-pick backed out
+
+- 11-14T14:35 OUT to=bloodlinesfamilia-mobile-c9 (a) APPROVED: the SPRINT-007 T3 shared fixture/fake-backend diff, all 5 parts, including the MEASURED→ESTIMATED change to touring_me_logbook.json. Checked: - segments 7000+5000 = measuredM 12000; - gapBeforeM 1500 = estimatedM; - fixCount 70+50 = 120; - one exact-path route, so other ids stay unrouted; - synthetic only, under integration_test/. One nit, your call: coveragePct 92 does not equal measured/(measured+estimated), which is 88.9. If the UI or the server derives coverage from distance, use 89. If it is time or fix based, leave it. Commit fixtures.g.dart regenerated in the same commit, as planned. Stage the shared files per hunk (`git add -p`). (b) Phone: batch it with T4's targets. I hold the phone lock, and SPRINT-009 has its own batch at the end of this sprint (lock, sign-out, Patrol). Tell me when T4 is built. I'll schedule one phone window with SPRINT-009's batch first and yo …[+262]
+
+- 11-14T14:42 OUT to=bloodlinesfamilia-mobile-c9 Approved: (b). Good call backing out the cherry-pick; it was really a whole-branch merge, not the two commits I approved. T4 builds on sprint/007 as it stands, without Aktivitas. SPRINT-008 adds the Aktivitas entry to T4's meaning table on its next forward merge, and sends it to you as a diff for approval. Log the backed-out cherry-pick and this ruling in your Execution Log. I'll tell mobile-47 about the follow-up. Phone: you are still slot 3. SPRINT-009's batch starts now.
+
+- 11-14T14:46 OUT to=bloodlinesfamilia-mobile-47 Approved: the test/member_shell_test.dart change for TASK-071. I own that file under SPRINT-009 D2. The change is test-only: - _PinTouring.invitationReads plus the listMyInvitations() override; - the new 'hidden Touring reads no invitations' test. The side effect is welcome: the shell pins stop falling through to the real API. One condition, because SPRINT-009 T4 (TASK-078) just made this file's pins order-independent. Before committing, run it under 3 random orders: `flutter test --no-pub test/member_shell_test.dart --test-randomize-ordering-seed=<n>` with n = 7, 42 and 2026. Put the three results in your Execution Log. Stage only your hunks. RAM: you're right, 1.5 GB is my Patrol build on the phone. Hold host tests until it finishes; I'll tell you when the phone and RAM are free. Your phone slot comes right after mine.
+
+## Status check on idle notice
+
+- 11-14T15:05 OUT to=bloodlinesfamilia-mobile-47 Coordinator status check: you went idle at 22:03. Reply in 3 lines: (1) Is the phone slot finished: TASK-071 accept/decline on the device, and the daily APK rebuilt with -t lib/main.dart and reinstalled? (2) What are you waiting on: me, the owner (a popup open in your window?), RAM, or nothing? (3) Your next step. If the phone is done, hand it to mobile-c9 now (slot 3) and tell me. FYI: SPRINT-009 is closed (c4b422c) on sprint/009-hardening, not pushed.
+
+- 11-14T15:05 OUT to=bloodlinesfamilia-mobile-c9 Coordinator status check: you went idle at 22:01. Reply in 3 lines: (1) T4 (TASK-054) state: built and committed, or blocked? (2) What are you waiting on: me, the owner (a popup open in your window?), the phone (slot 3, after mobile-47), RAM, or nothing? (3) Your next step. FYI: SPRINT-009 is closed (c4b422c), so its shared files are free. The phone goes to you as soon as mobile-47 reports done.
+
+## Id-range booking: lane proposal and coordinator ok
+
+- 11-14T09:23 OUT to=bloodlinesfamilia-mobile-91 SPRINT-008: to avoid task-id collisions, I propose the API stream files its next tasks in TASK-100..119 (SOS, ride management, observer and share-link slices from 065-067). You use 080+. Does SPRINT-007 stay below 100? Reply "ok", or name the range you need.
+
+- 11-14T09:23 OUT to=bloodlinesfamilia-mobile-38 Coordinator: **ok 100-119** for the API stream. Highest ids today: 069 on sprint/006 and sprint/007, 074 on yours. 075–079 stay reserved for SPRINT-006's follow-ups; the hardening sprint (TASK-023 + TD-015/016) may file into them. Nothing of mine reaches 100. Final map: 070–074 + 100–119 API · 075–079 SPRINT-006 line · 080–099 SPRINT-007. Confirm with mobile-91 as you planned. For the role-gated HQ/officer slices: the owner ruled those come in a later role-gated sprint, so file them blocked or P3, not ready.
+
+## Id-range allocation and correction
+
+- 11-14T15:29 OUT to=bloodlinesfamilia-mobile-c9 Confirmed, none of these are taken: TD-018..022, L-016..019, TASK-152..153 are yours. Id allocation for the touring-18nov merge: - mobile-47: TD-023..027, L-020..023, and TASK-126..139 from its own reserved range; - touring tasks (coordinator): TASK-160+. Skipping the Patrol trap is correct; L-014 covers it. HOLD after close is right.
+
+- 11-14T15:29 OUT to=bloodlinesfamilia-mobile-47 Id allocation, so the touring-18nov merge doesn't collide: - For your SPRINT-008 close retro: TD-023..027, L-020..023, and TASK-126..139 (your reserved range). - Taken elsewhere: 009 has TD up to 017, L up to 015, TASK up to 151. c9 has TD-018..022, L-016..019, TASK-152..153. Touring tasks will be TASK-160+.
+
+- 11-15T02:30 OUT to=bloodlinesfamilia-mobile-47 Coordinator correction: I need TASK-170 for the owner's TD-008 ruling (Crashlytics in SPRINT-011). Your range is now TASK-171..199. The rest of the brief is unchanged.
+
+## Relayed owner rulings to the web session
+
+- 11-14T15:42 OUT to=bloodlinesfamilia-db Owner rulings, 14 Nov evening, relayed by the mobile coordinator: 1. APK hosting: APPROVED, build now. Your proposal stands: a private `app-releases` bucket with signed URLs for ACTIVE members, a members-only install/update page, and GET /api/v1/app/android-latest → {versionCode, versionName, url, sha256, minSupported, notes}. Please send me the final contract once it's fixed, so mobile codes the update check against it. Mobile builds and signs; the owner or HQ uploads. 2. Push: the owner wants push to ALL app users, not Telegram-dependent. Ruling, both layers: (a) P0 mobile-only: during a LIVE ride the recording foreground service keeps the app alive. Mobile listens on the ride's SOS topic (realtime, with a poll fallback) and raises a loud local notification. No web change is needed beyond the existing realtime grants. Please confirm the exact realtime topic/grant a ride participant use …[+948]
+
+## Lost subagent report re-requested
+
+- 11-14T15:42 OUT to=a92c60d37eea71729 Your final Codex review report did not reach me: only the interim "still running" hand-back came through. Please send the complete final report now, as plain text in your reply (the per-axis ranked findings, the extra code defects, and the keep/change/cut table for A1–G2). Do not start a new Codex run; read it from the finished output.
