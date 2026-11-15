@@ -77,3 +77,26 @@ consequence · T2 · behaviour:material · governance:low
   - `timeout` wraps `sh`;
   - the doc claim is held back until the real exercise.
 - `gates_signed` is recorded now that G1 and G2 are signed for both tasks.
+
+### 2026-11-15 | progress | T2 (TASK-367) built test-first, owner-settled review, real exercise run
+- **Build:** Claude, a Sonnet worker under `/tdd`.
+  - The `--detached` flag raises QA_BUDGET_SECONDS and QA_CEILING_SECONDS to 1800, inline and never exported.
+  - The undeclared arm is bounded at 570 s minus `--wait-seconds` through the real `timeout`, and refuses by name.
+  - Both arms refuse a truncated or exit-124 gate before any `gate_exceptions:` grant.
+  - Two qa-check.sh messages, night-run.md Part 2 and CHANGELOG are updated.
+- **Tests:** evals/night-run-detached.test.ts, 17 pass, 0 fail. night-run-rollup.test.ts 46/0, run-mode fixtures green, caps 0 FAIL.
+- **Seed proofs:**
+  - Neutering the truncated-gate guard reddened the two truncated-gate cases; the sibling stayed green.
+  - Neutering the 124 guard reddened the detached-124 case; its sibling stayed green.
+  - Restores matched by `git hash-object`.
+  - These ran on earlier hashes, before the lookup-only knob change, which touched only the timeout lookup.
+- **Real exercise:** a `--detached` pre-flight on this Windows host, in a scratch worktree, with the round-1 code.
+  - Result: 513 s, exit 1, refused by name `review-depth-material-absent`, a real red check, because T2's review line was still owed.
+  - The gate completed with a verdict and no kill, and no gate processes were left behind.
+  - Limit: the gate finished inside the old 520 s budget this run, so completion past the budget under load is not shown. The fixtures cover the timeout path.
+- **Codex review:**
+  - R1 NOT CLEAR: 3 High (no-timeout host unbounded; wait check skipped without qa-check.sh; detached exit 124 bypassed the guard) and 1 Med (real-exercise evidence). All fixed in the builder's one retry.
+  - R2 confirmed those fixed, then raised 1 new High: the no-timeout fixture copied a Git-for-Windows /usr/bin and would throw on the Linux gate. Owner popup: "Overridable lookup (Recommended)".
+  - A follow-up check found the knob also controlled execution, so a wrapper could skip the bound. Owner popup: "Lookup-only fix (Recommended)". The knob is renamed NIGHT_RUN_TIMEOUT_LOOKUP, and a fixture shows it cannot change execution.
+  - The review closes **owner-settled**, not CLEAR (the review rounds were used up; the revise loop says still-open findings go to the owner).
+review · T2 · scoped-reviewer · behaviour:material · governance:low
