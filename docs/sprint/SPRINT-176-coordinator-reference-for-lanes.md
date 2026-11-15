@@ -4,7 +4,7 @@ slug: coordinator-reference-for-lanes
 owner: Maintainer
 last_updated: 2026-11-15
 status: active
-plan_commit: PENDING
+plan_commit: 411b135b
 update_trigger: sprint execute/close events
 ---
 
