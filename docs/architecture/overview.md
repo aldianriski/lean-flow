@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-11
+last_updated: 2026-11-15
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -41,6 +41,7 @@ skills/           16 skills (auto-discovered at root)
     task-decomposer/references/prd-and-slices.md  PRD template · tracer-bullet slices · breakdown quiz
     refactor-advisor/references/deepening.md      seam/depth vocab · dependency categories · design-it-twice
     prototype/references/{logic,ui,demo}.md       throwaway TUI over a portable module · web UI variants · customer-review demo
+    orchestrator/references/coordinator.md        multi-session work: a coordinator session + one lane session per stream or repo
   lean-doc-generator/templates/   34 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 36 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · development/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md
