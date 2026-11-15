@@ -487,6 +487,8 @@ out many trivial steps (ADR-010 addendum 2026-07-29).
 
 ## Worktree dispatch protocol (parallel fleet)
 
+This protocol covers in-session worktree agents; separate lane sessions per stream → `coordinator.md`.
+
 Fires at **sprint-bulk** when the G2 overlap map marks a batch's tasks disjoint (no shared file,
 no `depends-on`): dispatch one `Agent(isolation: "worktree")` call per disjoint task, all in a
 **single message**. Soft cap **3–5 concurrent** — no first-party concurrency limit is published

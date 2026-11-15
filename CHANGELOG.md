@@ -16,6 +16,11 @@ status: current
 
 ## [Unreleased]
 
+- **`/orchestrator`: adds a coordinator reference for multi-session work.** `references/coordinator.md` gives the lane brief
+  shape (including each gate's signed-or-unsigned status), the 3-line status check, relayed-ruling labelling and
+  re-requesting a lost report. CONTEXT's Streams rule now says one coordinator may run one lane session per stream, one session
+  per stream runs its workers and never relays, and sessions split by stream, never by step (TASK-662).
+
 - **`/orchestrator`: adds an opt-in cross-model route.** Another provider's CLI reviews drafts, designs and code,
   builds in an isolated worktree, or gives one read-only diagnosis after two failures. The route is off by default;
   a `cross-model: <cases> via <cli>` line in the host repo's CONTEXT file or the owner's request enables it in attended

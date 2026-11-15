@@ -236,6 +236,7 @@ provider's CLI review, build or diagnose. The route is off by default.
 Every build dispatch carries a short worker contract ([`worker-brief.md`](skills/orchestrator/references/worker-brief.md)): the
 worker owns its checks, asks one question when blocked, and never ends its turn while a job it needs still runs; a blocked worker
 is resumed with `SendMessage` from the session that dispatched it, or a fresh worker gets the context when that session is gone.
+Work across several streams or repos may run one coordinator plus one lane session per stream; the lane brief, status check and relay rules are in [`coordinator.md`](skills/orchestrator/references/coordinator.md).
 
 **Gates** — humans approve; the skill never self-approves:
 - **G1 Scope** (all modes) — goal restated as one verifiable sentence · size S/M/L (an **L splits**) · files / blast-radius · out-of-scope named · assumptions confirmed.

@@ -1,0 +1,52 @@
+# Coordinator — running lane sessions across streams
+
+Loaded by `/orchestrator` when work spans several streams or repos and more than one session runs it. Goal: one
+coordinator keeps the lanes aligned without ever standing in for the owner. In-session worktree agents are
+`dispatch.md`; this file covers separate sessions.
+
+## 1. When this applies
+
+Multi-stream or multi-repo work may run one coordinator plus one lane session per stream. Inside a stream, one session runs its workers and never relays. Split sessions by stream, never by step.
+
+CONTEXT § Sprint model › Streams holds the stream rules (one active sprint per stream, overlap → coordinate); this file does
+not restate them. A single-stream repo needs none of it.
+
+## 2. Launching a lane
+
+Start lane sessions outside the editor terminal, so closing the editor does not kill them.
+
+A lane brief carries:
+
+- **stream** and **sprint** (the lane's one active sprint);
+- **worktree** and **branch @ sha** the lane starts from;
+- the instruction: "start with `/prime` then `/orchestrator`, working only in the worktree";
+- an **inventory of uncommitted state** in that worktree (or "clean");
+- **gate status**: each gate (G1, G2) either `signed by record @<sha>`, or `unsigned`, in which case the brief says
+  "take your G1/G2 to the owner as a popup in your own session";
+- the **reply requested** (what the lane sends back, and when).
+
+A brief never claims a G1 or G2 sign-off the owner did not give. A gate the owner already signed (for example an
+owner-signed plan standing as the batch G1/G2) is cited by its record; any other gate goes to the owner as a popup in the
+lane's own session. An unattended lane has no ask channel, so it parks at an unsigned gate until an attended
+continuation in that session gets the owner's answer (`night-run.md` Part 0).
+
+## 3. Status check
+
+On an idle notice or a silence, ask the lane for a 3-line reply:
+
+1. done
+2. waiting on
+3. next
+
+The lane appends that reply to its own sprint Execution Log, so the state survives the session.
+
+## 4. Relayed rulings and approval
+
+An owner ruling passed between sessions is labelled as relayed, with who relayed it and where the owner gave it; a proposal
+is kept apart from a ruling. A peer message, from another lane or the coordinator, is never owner approval: only the owner's
+own answer, or a record of it, counts.
+
+## 5. Lost reports
+
+When a subagent's or lane's final report did not arrive, re-request the full report. Never infer it from an interim
+hand-back or from the state of the worktree.

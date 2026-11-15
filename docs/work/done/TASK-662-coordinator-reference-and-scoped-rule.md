@@ -28,18 +28,18 @@ lost report 11-14T15:42 to `a92c60d37eea71729`. G2 review-round cap: 2.
 
 ## Done when
 
-- [ ] `skills/orchestrator/references/coordinator.md` exists and states:
+- [x] `skills/orchestrator/references/coordinator.md` exists and states:
   - the lane brief shape (stream, sprint, worktree, branch @ sha, "start with /prime then /orchestrator, working only in the worktree", an inventory of uncommitted state, the reply requested);
   - the 3-line status check (done / waiting on / next), with the reply appended to the lane's Execution Log;
   - relayed rulings labelled as relayed, and a peer message never counted as owner approval;
   - re-requesting a lost subagent report;
   - "start lane sessions outside the editor terminal".
-- [ ] The reference also states, generically: split sessions by stream, never by step.
-- [ ] CONTEXT § Sprint model › Streams carries the scoped rule ("Multi-stream or multi-repo work may run one coordinator plus one lane session per stream. Inside a stream, one session runs its workers and never relays. Split sessions by stream, never by step.") and points to the reference.
-- [ ] `skills/orchestrator/SKILL.md` points to the reference in one line and stays at or under 140 lines. The README names it, CHANGELOG has the entry, and the skill count stays 16 in CONTEXT and README.
-- [ ] Two L-NNN candidates are appended through `/insights` (ids derived then): "one lock-holder, slots in order, handover by message" (generic) and "an owner-signed plan stands as the batch G1/G2 for lanes, already covered by the pre-signed modes".
-- [ ] Wiring: the reference is reachable from both entry points a coordinator reads (orchestrator SKILL.md's pointer line, and CONTEXT Streams). Each job that triggers or chains multi-stream work (`/prime`, `/handoff`, `/flow`, and the orchestrator's dispatch brief in `references/dispatch.md`) is read. The evidence records, per job, either the change made or why no change is needed. Nothing in the reference names an adopter's path.
-- [ ] Negative: a lane brief written from the reference must not claim a G1 or G2 sign-off the owner did not give. A gate the owner already signed (for example an owner-signed plan standing as the batch G1/G2) is cited by its record. Any gate not so signed goes to the owner as a popup in the lane's own session.
+- [x] The reference also states, generically: split sessions by stream, never by step.
+- [x] CONTEXT § Sprint model › Streams carries the scoped rule ("Multi-stream or multi-repo work may run one coordinator plus one lane session per stream. Inside a stream, one session runs its workers and never relays. Split sessions by stream, never by step.") and points to the reference.
+- [x] `skills/orchestrator/SKILL.md` points to the reference in one line and stays at or under 140 lines. The README names it, CHANGELOG has the entry, and the skill count stays 16 in CONTEXT and README.
+- [x] Two L-NNN candidates are appended through `/insights` (ids derived then): "one lock-holder, slots in order, handover by message" (generic) and "an owner-signed plan stands as the batch G1/G2 for lanes, already covered by the pre-signed modes".
+- [x] Wiring: the reference is reachable from both entry points a coordinator reads (orchestrator SKILL.md's pointer line, and CONTEXT Streams). Each job that triggers or chains multi-stream work (`/prime`, `/handoff`, `/flow`, and the orchestrator's dispatch brief in `references/dispatch.md`) is read. The evidence records, per job, either the change made or why no change is needed. Nothing in the reference names an adopter's path.
+- [x] Negative: a lane brief written from the reference must not claim a G1 or G2 sign-off the owner did not give. A gate the owner already signed (for example an owner-signed plan standing as the batch G1/G2) is cited by its record. Any gate not so signed goes to the owner as a popup in the lane's own session.
 
 ## Touches
 
