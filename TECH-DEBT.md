@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-13
+last_updated: 2026-11-15
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -1999,3 +1999,8 @@ status: current
   - Evidence: SPRINT-174 Log, progress entry (the proof-run agents hit both).
   - Impact: low. Each reviewer decides both points alone, so two reviews of one change can differ.
   - Mitigation: add one line per point to the scoping ladder; no new check is needed.
+- **TD-315** severity: low | status: open | created: Sprint-176 (close retro)
+  - Summary: **The always-loaded token budget has 8 tokens of headroom (12683 of 12691).** SPRINT-176 T2 spent the rest of about 170 tokens on two pointer clauses; the next addition to CONTEXT, CLAUDE.md or an always-read SKILL.md fails `check-doc-caps.ts`, or is squeezed in by deleting something unreviewed. TD-312 covers CONTEXT's 150-line cap and TD-313 the 140-line SKILL.md cap; neither covers the token budget.
+  - Evidence: SPRINT-176 Log, T2 progress entry ("token budget 12683 of 12691"); promote checklist, 12521 of 12691 at promote.
+  - Impact: low. Same as TD-312: the next added line is refused or traded away.
+  - Mitigation: the dedup pass TD-312 names (prose duplicating CLAUDE.md or the README becomes a pointer), measured in tokens this time; run at a promote doc-aging pass.

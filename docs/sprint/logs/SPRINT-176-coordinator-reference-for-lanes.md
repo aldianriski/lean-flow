@@ -3,7 +3,7 @@ sprint: 176
 slug: coordinator-reference-for-lanes
 owner: Maintainer
 last_updated: 2026-11-15
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -106,3 +106,6 @@ review · T3 · self-review · behaviour:low · governance:low
 - `learnings dangling refs: L-042`: L-317 named a retired id; it now reads `related: L-318`.
 - `scope-change-outside-layers T1`: the knowledge-index scope-change names the generator it ran. That generator is read and run, not edited, so it is added to T1 Cites, not Layers.
 - bun test was 621/0 on the first run.
+
+### 2026-11-15 | close | SPRINT-176 closed, 3 of 3 members done
+Retro -> the sprint file § Retro. Owner approved the close's additive steps ("approve", 2026-11-15); §11 retention and doc-freshness are proposals awaiting their own approval. Filed: TD-315, TASK-665, L-319, bumps on L-234 and L-266. Handoff reconciliation: no `handoff` entry in this log, so nothing to make `spent`. No epic.

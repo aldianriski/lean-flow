@@ -127,6 +127,14 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-319 [tags: docs] [status: active]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.** SPRINT-176 T1 filed L-317 with `related: L-042`, copied from CONTEXT's Streams bullet, which still cites it. L-042 is retired (the ledger's retired-ids line), and the first system verify failed `learnings dangling refs`. Cite the durable rule's home or a live id; a citation in a live doc is not proof the id still resolves.
+- seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`)
+- count: 1
+- promoted: no
+- related: L-234 (a check caught it only at system verify)
+
+---
+
 ## L-318 [tags: process] [status: active]: **An owner-signed plan stands as the batch G1/G2 for lanes: cite it by its record in the lane brief, and do not re-gate; the pre-signed modes already cover it.**
 bloodlines' coordinator launched lane sessions under a plan the owner had signed (2026-11-14/15). Re-asking G1/G2 per lane would repeat a signed gate; claiming a sign-off no record shows would invent one. The brief names the record `@<sha>`; an unsigned gate goes to the owner as a popup in the lane's own session (`orchestrator/references/coordinator.md`).
 - seen: 2026-11-15 (SPRINT-176 T1, bloodlines consumer evidence)
@@ -551,8 +559,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 ---
 
 ## L-266 [tags: edit-safety] [status: promoted]: **A regex written through an escaping layer can lose its backslash and still look right in review: `\b` became a literal backspace byte.** SPRINT-151 T8's retry classifier had U+0008 bytes where word boundaries were meant, so a terminal `HTTP 503` never matched and would have been scored a task failure. Selftest passed, because no fixture used an HTTP status at a word boundary. Codex found it only by reading the bytes. A later fix written with the edit tool, plus a check that the file holds no control byte, closed it. Write regex and escape-heavy source with the edit tool, not a shell heredoc or an inline interpreter, and give a classifier a fixture for each pattern it claims to match.
-- seen: 2026-10-30 (SPRINT-151 wave review R2, `evals/ab/lib/retry.ts`; fixed in `a0b61b70`, S36) · 2026-11-09 (SPRINT-170 operator scripts: a Python `\n` became a real newline in a TS regex twice, `t3.ts` and the watcher debug copy; caught before any paid run)
-- count: 2
+- seen: 2026-10-30 (SPRINT-151 wave review R2, `evals/ab/lib/retry.ts`; fixed in `a0b61b70`, S36) · 2026-11-09 (SPRINT-170 operator scripts: a Python `\n` became a real newline in a TS regex twice, `t3.ts` and the watcher debug copy; caught before any paid run) · 2026-11-15 (SPRINT-176 close: a printf `` escape in a `.cmd` launcher turned into a control byte, so the workdoo Sprint B session launched twice with a broken path before the third launch worked; found by reading the launcher, not its exit status)
+- count: 3
 - **L-266 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — a new ❌ line in the edit-safety block (Edit tool for escape-heavy source; `chr(92)`/`chr(10)` plus a match count when a script must); owner ruling 2026-11-10 "Bump + promote now (Recommended)"
 - related: memory "seed edits ship as a script file" · L-189
 
@@ -794,8 +802,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - **L-235 → promoted: merged into L-224** · disposition: merge — L-224's rule (check with the checker the gate actually runs, after every write) already covers a whole-tree leg a diff review cannot see; both sightings are counted on L-224, this entry's text stays as the record.
 
 ## L-234 [tags: sprint-model] [status: promoted]: **A scope-change entry is attributed by its HEADING, so the heading must name every `Tn` whose files the body lists.** SPRINT-125's Plan-meta entry named TASK-434 in its heading and then listed paths for T3, T7 and D1; the scope-change-layers check charged them all to T1 and system verify reddened. The log is append-only, so the fix cost a `Cites:` note on T1 rather than an edit. Write one entry per task, or a heading listing every `Tn`.
-- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0) · 2026-11-07 (SPRINT-165 T1: the entry named `HANDOFF-LEDGER.md`, red at `4d97cb53`, fixed by a `Cites:` addition in `cce0ce67`) · 2026-11-10 (SPRINT-170 system verify on `67d3e5cd`: T3's entry named `subagents/`, the CLI's transcript folder, and T4's records named `agents/merger.md` and `merge-oracle.ts`; none declared, so `scope-change-outside-layers` and `layers completeness` FAILed; fixed by `Cites:` additions in `65a32709`, then 493/0)
-- count: 4
+- seen: 2026-10-18 (SPRINT-125 system verify, `scope-change-outside-layers T1 …` ×7) · 2026-10-25 (SPRINT-141 system verify 315/1: a T1 entry named the two baseline rows by path and the T3 scope-out named `docs/work/backlog/` and `done/`, none declared; fixed by `Cites:` additions, second run 316/0) · 2026-11-07 (SPRINT-165 T1: the entry named `HANDOFF-LEDGER.md`, red at `4d97cb53`, fixed by a `Cites:` addition in `cce0ce67`) · 2026-11-10 (SPRINT-170 system verify on `67d3e5cd`: T3's entry named `subagents/`, the CLI's transcript folder, and T4's records named `agents/merger.md` and `merge-oracle.ts`; none declared, so `scope-change-outside-layers` and `layers completeness` FAILed; fixed by `Cites:` additions in `65a32709`, then 493/0) · 2026-11-15 (SPRINT-176 system verify on `994d643e`: the knowledge-index scope-change named `scripts/gen-index.sh`, a generator that is run and not edited; 2 FAIL with `scope-change-outside-layers T1`, fixed by a `Cites:` addition in `7e833382`, then 232/0)
+- count: 5
 - **L-234 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: move-to-reference — a scope-change heading names every `Tn` its body touches, and the scope-change leg runs before the entry is committed.
 - related: L-229 · L-151
 
