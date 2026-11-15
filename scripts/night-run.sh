@@ -58,6 +58,7 @@ logfile=""
 run_mode=""
 sprint_arg=""
 reap=1
+detached=0
 
 # --- the reaper -------------------------------------------------------------
 # Runs AFTER the fired command exits, re-entrantly (`sh "$0" --reap ...`) from inside the
@@ -642,8 +643,9 @@ while [ $# -gt 0 ]; do
     --mode) shift; run_mode=${1:-}; shift ;;
     --sprint) shift; sprint_arg=${1:-}; shift ;;
     --no-reap) reap=0; shift ;;
+    --detached) detached=1; shift ;;
     --) shift; break ;;
-    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--mode/--sprint/--no-reap, then -- <command>)" ;;
+    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--mode/--sprint/--no-reap/--detached, then -- <command>)" ;;
   esac
 done
 
@@ -777,6 +779,14 @@ if [ -z "$fired_doc" ] || [ ! -f "$fired_doc" ]; then
   die_doa "cannot record that this run fired: $fired_why. A run that dies before the reaper is indistinguishable from one that never happened unless it was recorded as fired first (TD-122), and its attendedness could only be inferred (TD-124); refusing rather than firing it unrecorded"
 fi
 
+# The undeclared foreground call is capped at ~600s and `--wait-seconds` runs inside it, so a wait that
+# already eats the 570s total (the ceiling less ~30s) is refused up front by name -- with or without a
+# gate, so the no-qa-check arm cannot bypass it. A declared-detached launcher has no such bound.
+gate_total=570
+if [ "$detached" != "1" ] && [ "$wait_seconds" -ge "$gate_total" ]; then
+  die_doa "pre-flight-gate-foreground-limit: --wait-seconds $wait_seconds leaves no time inside the ${gate_total}s foreground bound -- lower it, or re-launch from a detached caller with --detached (night-run.md Part 2)"
+fi
+
 if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   # Run the gate with MSYS_NO_PATHCONV cleared. On Git-Bash/MSYS hosts that variable is
   # commonly exported to stop a leading-slash argument (a `/skill` prompt) being rewritten
@@ -805,7 +815,47 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   #
   # A real fix needs the caller to DECLARE detachment (a flag or env signal), not an assumption
   # made inside a script that cannot see how it was invoked. Filed as TASK-367.
-  qa_out=$( unset MSYS_NO_PATHCONV; sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
+  if [ "$detached" = "1" ]; then
+    # DECLARED detachment (TASK-367, owner ruling 2026-11-14): the caller said this launcher runs
+    # detached, so the 600s foreground ceiling does not bind and the gate may run to completion.
+    # Both limits are raised -- the budget truncates, the ceiling only reports (ADR-042) -- and equal,
+    # so no qa-runtime-over-ceiling INFO. POSIX prefix assignment: this one command's environment
+    # only, never exported, so the fired command and the run's later gate calls keep the default.
+    qa_out=$( unset MSYS_NO_PATHCONV; QA_BUDGET_SECONDS=1800 QA_CEILING_SECONDS=1800 sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
+  else
+    # UNDECLARED: this call IS the blocking foreground invocation the harness caps at ~600s, and
+    # `--wait-seconds` runs after it in the same call, so the gate gets <total> minus the wait. A
+    # gate that outlives that is REFUSED BY NAME here, never left to be killed mid-pre-flight with no
+    # verdict (the reverted SPRINT-105 T3 regression, 955s). <total> is 570: the 600s ceiling less
+    # ~30s for the pre-gate steps (the wait-vs-total refusal runs earlier, before this branch).
+    gate_bound=${NIGHT_RUN_GATE_BOUND_SECONDS:-$((gate_total - wait_seconds))}  # the env knob is a TEST-ONLY override
+    case "$gate_bound" in ''|*[!0-9]*|0) die_doa "NIGHT_RUN_GATE_BOUND_SECONDS must be a positive integer, got: '$gate_bound'" ;; esac
+    # No `timeout` on the host would mean an UNBOUNDED gate -- the original overrun -- so it is refused
+    # by name and the gate is never run, rather than falling back to the old unbounded call.
+    # NIGHT_RUN_TIMEOUT_LOOKUP is a TEST-ONLY override of the name LOOKED UP (default `timeout`), so a fixture can
+    # simulate a host without one instead of rewriting PATH. It never changes what is EXECUTED: the real `timeout` is
+    # always the one that bounds the gate, or a wrapper that discards the duration could run it unbounded.
+    gate_timeout_lookup=${NIGHT_RUN_TIMEOUT_LOOKUP:-timeout}
+    command -v "$gate_timeout_lookup" >/dev/null 2>&1 \
+      || die_doa "pre-flight-gate-foreground-limit: no '$gate_timeout_lookup' on this host, so the gate cannot be bounded inside the foreground limit and is not run -- re-launch from a detached caller with --detached (night-run.md Part 2)"
+    qa_out=$( unset MSYS_NO_PATHCONV; timeout "$gate_bound" sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
+  fi
+  # Exit 124 is a timeout, on either arm (the timeout above, or a gate that itself timed out): an
+  # unfinished gate, refused before any summary/exception logic reads its partial output.
+  if [ "$qa_code" = "124" ]; then
+    if [ "$detached" = "1" ]; then
+      die_doa "pre-flight-gate-incomplete-detached: the gate exited 124 (a timeout) even with the raised limits -- an unfinished gate is refused, never read as a verdict, and no gate_exceptions: grant can bless it"
+    fi
+    die_doa "pre-flight-gate-foreground-limit: the gate did not complete inside the foreground bound (${gate_bound}s) -- an unfinished gate is refused, never read as a verdict. Re-launch from a detached caller with --detached (night-run.md Part 2)"
+  fi
+  # A gate that TRUNCATED ITSELF (its own budget guard) is an unfinished verdict on either arm. Refused
+  # here, ahead of the gate_exceptions: logic, so no grant can bless a gate that did not finish.
+  if printf '%s\n' "$qa_out" | grep -q '^FAIL  qa-check-budget-exceeded'; then
+    if [ "$detached" = "1" ]; then
+      die_doa "pre-flight-gate-incomplete-detached: the gate truncated itself even with the raised budget (qa-check-budget-exceeded) -- an unfinished gate is refused, never read as a verdict, and no gate_exceptions: grant can bless it"
+    fi
+    die_doa "pre-flight-gate-foreground-limit: the gate did not complete inside the foreground bound (truncated itself: qa-check-budget-exceeded) -- an unfinished gate is refused, never read as a verdict, and no gate_exceptions: grant can bless it. Re-launch from a detached caller with --detached (night-run.md Part 2)"
+  fi
 
   # Read the gate's OWN PRINTED VERDICT, never a bare $? (L-045/L-120) -- doubly so here, because
   # this code is using the answer to decide whether to FIRE an unattended run, which is the exact

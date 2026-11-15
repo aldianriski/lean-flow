@@ -28,10 +28,10 @@ state note: ruled: `--detached` flag, 2026-11-14 (see ## Decision)
 
 `night-run.sh` can run the pre-flight gate to COMPLETION without exceeding the foreground command ceiling, and does so only when the caller has **declared** detachment rather than a script assuming it. The reverted attempt raised `QA_BUDGET_SECONDS` unconditionally: the synchronous pre-flight gate call (the `qa_out=$( ... qa-check.sh ... )` call in `night-run.sh`) runs in the foreground (the only `nohup` is the later detached launch), so an unbounded gate took the launcher to ~955s in one foreground call against a 600s ceiling — killed mid-pre-flight with no verdict, strictly worse than the bounded refusal it replaced. Required:
 
-- [ ] (a) an explicit `--detached` launcher flag (owner ruling 2026-11-14, "--detached flag (Recommended)") — never inferred; the raise is set inline on the one pre-flight gate call and never exported.
-- [ ] (b) raise `QA_CEILING_SECONDS` alongside the budget, since that is the variable ADR-042 actually licensed a detached caller to raise and night-run.sh has **zero** hits for it.
-- [ ] (c) a bound on the un-raised path so a slow host gets a **named refusal** rather than a kill.
-- [ ] (d) retained fixtures, written as a Bun TypeScript test, `evals/night-run-detached.test.ts` (no new `.sh`), incl. a must-NOT-raise sibling and a selection-varying case (a repo with no `scripts/qa-check.sh`, the other arm of the `[ -f ... ]` test, which no fixture currently reaches).
+- [x] (a) an explicit `--detached` launcher flag (owner ruling 2026-11-14, "--detached flag (Recommended)") — never inferred; the raise is set inline on the one pre-flight gate call and never exported.
+- [x] (b) raise `QA_CEILING_SECONDS` alongside the budget, since that is the variable ADR-042 actually licensed a detached caller to raise and night-run.sh has **zero** hits for it.
+- [x] (c) a bound on the un-raised path so a slow host gets a **named refusal** rather than a kill.
+- [x] (d) retained fixtures, written as a Bun TypeScript test, `evals/night-run-detached.test.ts` (no new `.sh`), incl. a must-NOT-raise sibling and a selection-varying case (a repo with no `scripts/qa-check.sh`, the other arm of the `[ -f ... ]` test, which no fixture currently reaches).
 
 ## Touches
 

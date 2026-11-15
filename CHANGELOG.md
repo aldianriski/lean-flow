@@ -16,6 +16,10 @@ status: current
 
 ## [Unreleased]
 
+- **`night-run.sh`: adds a `--detached` flag so the pre-flight gate runs to completion.** The caller declares detachment; both gate limits
+  are raised inline on that one call. An undeclared slow gate now refuses by name (`pre-flight-gate-foreground-limit`) instead of being
+  killed at the 600 s ceiling, and a gate that truncated itself is refused on either arm, ahead of any `gate_exceptions:` grant (TASK-367).
+
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.

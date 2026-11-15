@@ -594,6 +594,13 @@ watches for a couple of minutes, and prints exactly one verdict. lean-flow ships
 sh scripts/night-run.sh -- claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk
 ```
 
+The pre-flight gate runs in the launcher's own foreground call, so by default it is bounded: 570 s minus `--wait-seconds`,
+and a gate that outlives that is refused by name (`pre-flight-gate-foreground-limit`) rather than killed at the command ceiling.
+Pass `--detached` only from a launcher that is itself detached (an OS scheduler or `nohup`): it declares that the ceiling does
+not bind, so the gate runs to completion (`QA_BUDGET_SECONDS` and `QA_CEILING_SECONDS` raised to 1800 on that one call, never
+exported). It is never inferred; a gate that still truncates itself is refused (`pre-flight-gate-incomplete-detached`) and no
+`gate_exceptions:` grant can bless it.
+
 | Verdict | Meaning |
 |---|---|
 | `ALIVE` | process is up **and** producing observable progress — a log line or a new commit. You can close the terminal. |
