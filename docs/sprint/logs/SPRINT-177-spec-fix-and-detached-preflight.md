@@ -35,3 +35,19 @@ Sprint number: 177, the maximum in use plus one. Five selections all gave 176: a
 Composition: 2 members, sizes S/M, serial T1 then T2, no epic, no stream. Status move at `115f4258`.
 Baseline gate: off-host `gate-remote.ts` on `5ad18c48`: `QA-CHECK: 223 pass, 0 fail` (rc 0); `bun test: 621 pass, 0 fail` (rc 0). The commits since are the status move, the stamps and this sprint's files.
 Not yet signed: G1 is signed for both members and G2 for T1 in the coordinator's session; T2's G2 follows T1 (D6). `gates_signed` is omitted until both are signed and relayed verbatim.
+builder-check · T1 · 3 contradictions · 3 questions · all factual: the log path is the logs/ file, the preamble drops the stale distance too, the new test path is exempt from test -e, TD-084/175 are confirmed deleted; none to owner
+consequence · T1 · behaviour:low · governance:low
+
+### 2026-11-15 | gates | G1 signed for T1 and T2, G2 signed for T1 only
+- Owner popup, verbatim. G1: "Scope confirmed". G2 for T1: "Sign G2 for T1".
+- G2 for T2 is signed after T1 lands, on the fixed Done-when (D6). `gates_signed` stays out of the frontmatter until both are signed.
+- The T1 design record and builder-check settlements are in the coordinator scratchpad (s177-t1-design.md).
+
+### 2026-11-15 | scope-change | T1 edits TASK-367's frozen Done-when (preamble, box (a), box (d))
+- **What broke:** TASK-367's `## Done when`, frozen at plan_commit 0ba7c901, still carries stale text. Its preamble cites the gate call by a line number and a distance (`:589`, "144 lines below") that no longer hold. Box (a) says "a flag or an env var", but the owner ruled the `--detached` flag on 2026-11-14 ("set inline, never exported"). Box (d) does not record whether its fixtures are TypeScript or `.sh`.
+- **Impact:** exactly three edits to TASK-367's Done-when, all made by T1 (TASK-665).
+  - The preamble cites the gate call by symbol, with no line number or distance.
+  - Box (a) names the `--detached` flag, set inline on the one pre-flight gate call and never exported.
+  - Box (d) names a Bun TypeScript test (sprint D3).
+  - No scope widens, and no other box changes.
+- **Re-confirm G2:** for T2, on the fixed text, before T2 builds (D6).
