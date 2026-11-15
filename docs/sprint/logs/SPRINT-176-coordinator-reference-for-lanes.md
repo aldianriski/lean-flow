@@ -91,3 +91,13 @@ consequence · T2 · behaviour:low · governance:high
 - **Codex R2:** CLEAR.
 review · T2 · scoped-reviewer · behaviour:low · governance:high
 consequence · T3 · behaviour:low · governance:low
+
+### 2026-11-15 | progress | T3 (TASK-664) built
+- **Build:** Claude, Sonnet worker. Its first pass stopped `blocked`, correctly: the reply-requested field of both 14:22 briefs fell past the 900-character digest cut. The coordinator re-extracted both briefs whole from the transcript, redacted them, swapped them into inputs.md and resumed the worker.
+- **replay.md:** a 20-row message→outcome table, a produced lane brief compared field by field, and a produced allocation checked against the §7 invariant and compared with 15:29 and 02:30. Result: **0 gaps**.
+- **Coordinator self-review fix:** two rows used an "out of scope" outcome, which is not one of the box's three. They now map the RAM gate to the L-317 owner exclusion and the web-session routing to §1 and §4.
+- **Recorded differences:**
+  - the real briefs had no gate status and no TD/L ranges;
+  - the real mobile-47 TASK-126..139 sat below the max in use, 151;
+  - an open-ended "TASK-160+" range preceded the 02:30 correction (an inference, not a measured fact).
+review · T3 · self-review · behaviour:low · governance:low
