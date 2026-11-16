@@ -281,3 +281,16 @@ Approved design (the G2 record, verbatim; its quoted Done when is omitted here b
 | # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
 |---|---|---|---|---|---|---|---|---|
 | 13 | 2026-11-16 | test runner (baseline runs) | haiku · low | 58,082 cumulative over 4 rounds (round 1 51,433; round 2 53,247 denied; round 3 55,757; round 4 58,082); baseline 51.5k; first round 1.00×, total 1.13× | 3 (harness rounds, not runner errors) | 0 misses: each verdict line matched the coordinator's own transcript read; no false "ready" | coordinator | yes |
+
+### 2026-11-16 | review | T1: blind pair round 1 (Fable then Codex, same frozen diff c8addd36..90081415)
+
+consequence · T1 · behaviour:low · governance:low. The skip table gives one scoped reviewer. The trial's Review cell ran the blind pair on this small diff.
+- Fable · high: 1H 6M 8L. Coordinator verified: S1 (the NOTES validity rule invalidates the baseline) is real. T3 (the leftover rule never reaches the inline paths, which read only the catalogs) is real. T1 (the glossary has no same-sense check; a business entry could rewrite "konsumen") is real and a consumer risk. T2 (the unggah verb line contradicts the Keep note) is real. S2 (the commit-inline input is not retained) and S4 (the second query skips rehearsal, dry run and kunci) are real. S5 (acceptance test vs penyerahan) is real but low. S3 (catalogs edited before any baseline was on record) is partly real: the baseline export was frozen before the edit, and the record landed later in 29766c39; the sample was strengthened with the edits known, which is disclosed here. S7 (pindai: only the noun moves) is real, and is fixed by following box 3 literally.
+- Codex: 1H 1M. Both duplicate Fable (T3 rated high, S1 rated medium). Codex found nothing Fable missed.
+- Pair verdict: the cell condition holds (Fable's T1, T2, S2 and S4 are real and missed by Codex). Cost 134,027 / 105,958 = 1.26× (cap 2×). Strongest-tier used: 4 of 6.
+- Revise loop: one bounded builder retry goes to Codex (worktree), with 9 fix conditions (T3, T1, T2, S7, S1, S2, S4, S5, T8). Then one re-review.
+
+| # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
+|---|---|---|---|---|---|---|---|---|
+| 14 | 2026-11-16 | review (T1 diff, blind pair 1 of 2) | fable · high | 134,027 | 0 | 1H 6M 8L; 4 real ones unique vs Codex | coordinator | yes |
+| 15 | 2026-11-16 | review (T1 diff, blind pair 2 of 2, comparator) | codex exec · default | 105,958 | 0 | 1H 1M, both shared with Fable | coordinator | yes |
