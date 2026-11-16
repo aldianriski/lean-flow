@@ -97,3 +97,15 @@ Coordinator's own G2 check, logged before any reviewer saw the design (trial pai
 - (a) 15 candidate rows plus 3 compound rows gives 18 rows, against Q2's "12-15" and box 1's "about 12 to 15". Move the compounds into the one-liner.
 - (b) The design does not pin the model for the headless runs. Baseline and after must run on the same model.
 - (c) The inline-fallback wiring run is the only non-child proof. The commit-inline path is not run; it reads the same catalog, so the proof holds by construction only.
+
+### 2026-11-16 | progress | T1 G2: builder check and the G2 design check (dispatch trial)
+
+builder-check · T1 · 4 contradictions · 5 questions · coordinator settled all of them in design revision 2: 15 table rows; `lapis` became a scoped row, so it is not in the one-liner (box 2); "inti data" is a seed; override at `.claude/CONTEXT.md`; "Queue worker" casing; one bounded eval retry.
+Dispatch-trial rows:
+
+| # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
+|---|---|---|---|---|---|---|---|---|
+| 11 | 2026-11-16 | builder-check reader (T1) | sonnet · low | 66,026 (baseline 62k → 1.06×; 20% bar not met, under the 1.25× cap) | 0 | 4C 5Q. C2 (`lapis` in the one-liner contradicts frozen box 2) was real and missed by the coordinator. The rest were real or factual and settled. | coordinator | yes |
+| 12 | 2026-11-16 | G2 design check (T1; no same-unit comparator; counts toward the cap) | fable · high | 141,419 | 0 | 1H 9M 9L. Confirmed the coordinator's (a), (b) and (c). Unique and real: H1 (the override proof could not tell "followed the glossary" from "missed the seed"; fixed with a third form, "dry run", plus a Read-call validity rule), M3 (the Keep-list note needed explicit precedence or the controls are at risk), M4 (the unrelated control was vacuous), M7 (Translate target), M8 (seeds unnamed; the di-fix affix was unreachable), M9 (run validity). M1 and M5 overlapped the builder check. | coordinator | yes |
+
+G2 design check pair verdict: the cell condition holds, since Fable produced real findings the coordinator's own check missed (H1, M3, M4, M7, M8, M9). No same-unit token comparator exists, so the count cap applies instead. Strongest-tier used: 3 of 6.
