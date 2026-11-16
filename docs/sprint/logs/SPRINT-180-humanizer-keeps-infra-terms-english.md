@@ -300,3 +300,17 @@ consequence · T1 · behaviour:low · governance:low. The skip table gives one s
 - worker · T1 retry · codex exec · gpt-6.1-sol · worktree s180-t1. The 9 fix conditions landed as 2767637f (Codex reported 99,447 tokens). The coordinator read the whole diff: all 9 are met, SKILL.md is 121 lines, the 20 rows are unchanged, and commit-message.txt is retained.
 - Re-review, Codex alone (revise-loop re-review, outside the measured pair): 0 blocking. One note: the after-run evidence is not yet recorded, and is due before the tick. 91,429 tokens. Review rounds: 2 of 2.
 - After arm: export of 2767637f at D:\Research\s180-evals\export-after. Prompts built from the export's `embedded.md` sections, per NOTES.md: child, inline fallback, commit-inline and term-of-art. The run folders sit outside any git repo, so discovery uses the working folder. The term-of-art folders hold no CONTEXT.md. 10 after-runs dispatched to a fresh test runner (haiku · low).
+
+### 2026-11-16 | progress | T1: after-runs round 1 (export 2767637f), eval miss on the glossary route, one catalog retry
+
+Validity: all 10 runs used claude-sonnet-5-5, read the after export, and read patterns-id.md with no offset. CONTEXT.md was read in only 1 of 7 runs that had one in the folder (after-override-child, which found it with a Glob). The other 6 fail the NOTES Read-call rule. That is the route not firing, not a harness fault.
+Mechanical grep (round 1, recorded as evidence; the blind judge runs on the final set):
+- Global rule: 8 of 8 seeds and both kunci seeds fixed in all 6 sample runs (none ×3, override-child, fallback, unrelated). Every control kept, except that override-child dropped "lapisan".
+- Override: the child run wrote "dry run" (pass). The inline fallback and the commit-inline runs wrote "rehearsal" and never read CONTEXT.md (fail).
+- Term-of-art re-run, 3 of 3: 5 of 5 terms in English, and pengguna, berkas, cadangan, mengunduh and laporan kept.
+- The commit-inline final appended a Co-Authored-By trailer. That comes from the headless harness's attribution guidance, not from the humanizer pass, and is stripped before judging.
+Eval miss → the design's one bounded catalog retry: d28b0a6f puts the glossary step at the top of patterns-id.md, the one file every path reads. Round-1 runs were archived to D:\Research\s180-evals\discarded\after-r1\. All 10 after-runs are being repeated on the d28b0a6f export.
+
+| # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
+|---|---|---|---|---|---|---|---|---|
+| 16 | 2026-11-16 | test runner (after-runs, round 1) | haiku · low | 55,557 (baseline 51.5k → 1.08×) | 0 | 0 misses: all 10 verdict lines matched the coordinator's transcript read | coordinator | yes |
