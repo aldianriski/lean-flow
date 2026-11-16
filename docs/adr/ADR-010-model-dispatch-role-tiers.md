@@ -142,3 +142,43 @@ read-only second opinion whose answer the coordinator checks; it is not a ladder
 "no automated ladder" stands for everything else.
 
 **Procedure:** `skills/orchestrator/references/cross-model-route.md`.
+
+## Amendment (2026-11-16) — opt-in trial cells for effort and the strongest tier
+
+**Status:** accepted · amends Decision item 3 only, and only where the host declares `dispatch-trial`.
+**Source:** owner ruling 2026-11-16, SPRINT-179 G2; TASK-670.
+
+**Context.** Workers ran at default effort regardless of role, and the strongest tier's manual-only
+status left its review value unmeasured. A bounded trial can compare cost and missed findings before
+any permanent change to the consumer defaults.
+
+**Decision.** A host may opt in to the role-and-effort cells in
+`skills/orchestrator/references/dispatch.md` § Trial cells. This reverses item 3's no-dispatch-row rule
+for the named trial sprint only; the cells stop at its close. A declaration without a named sprint,
+or after that sprint closes, is treated as absent. The strongest tier is the remappable `decision-escalation`
+role, whose default map is in `.claude/CONTEXT.md`. Its effort is high in every trial cell. The trial
+spans one sprint with at most six strongest-tier dispatches; cheaper cells are uncapped. Past the cap,
+remaining strongest-tier cells use defaults and are recorded unmeasured. The opt-in is off by default,
+so releases are not blocked.
+
+**Item 5 stands unamended.** Booking strongest-tier samples on small, light inputs is a spend bound
+on the trial's samples, not routing by size. Heavy inputs use default routing and are not measured.
+
+**Item 4 stands unamended.** The 2026-11-13 failed-twice exception now also admits a same-provider
+`decision-escalation` dispatch through the built-in `/diagnose`, inside that exception and under the
+same conditions: attended only, one read-only second opinion, coordinator checks the answer, no
+further rung. No trial cell grants G1/G2 approval to a worker. Codex cells retain the cross-model
+channel's host declaration and attended-only conditions.
+
+**Consequences.** Role-specific effort and blind comparisons can show which cells earn their cost;
+the accepted cost is a bounded set of stronger dispatches and per-dispatch records. This repo's
+CONTEXT declaration names the next sprint promoted after SPRINT-179 as the trial sprint and carries
+its record rule. TASK-671 owes that sprint's verdict. Dispatches made in SPRINT-179, the sprint that
+ships the table, are early data outside the trial's cap and verdict. Later sprint dispatches use the
+cells only during the named trial sprint, with strongest-tier cells subject to its cap. A dropped or
+never-fired strongest-tier cell reverts to item 3's manual-only rule. A cell fired fewer than twice is
+inconclusive and also reverts to manual-only.
+
+**Rejected:** a permanent strongest-tier default before measurement, or an automated escalation
+ladder. The trial establishes the cheaper cells' baselines and rules first; strongest-tier cells
+register comparison rules only, with no numeric baseline yet.

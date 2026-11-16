@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-15
+last_updated: 2026-11-16
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -16,6 +16,7 @@ status: current
 
 ## [Unreleased]
 
+- **`/orchestrator`: a host-declared `dispatch-trial` opts in to per-role model-tier and effort cells for one sprint, capped at six strongest-tier dispatches, with blind Codex comparisons where the cross-model channel is enabled; consumer defaults stay unchanged (ADR-010, TASK-670).**
 - The `LEARNINGS.md` template's `related:` comment now says to cite corpus ids only (learnings, ADRs, research), never a retired id or an epic, and to resolve each against the ledger first (L-319).
 
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)

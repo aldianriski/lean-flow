@@ -25,6 +25,56 @@ doing `execution`/`mechanical` work itself instead of dispatching it (the observ
 model parameter dispatches without it. Classify each dispatch itself: the task's `class:` is the default, a recon or review
 pass inside a task is classified on its own, and a dispatch with no task or no `class:` is classified at that moment.
 
+Where a cell or the host's own rule sets a level, name the effort on the dispatch where the host takes one, else dispatch without it.
+This includes the Agent tool's `effort` parameter. Outside a declared trial, only the host's own effort rule applies;
+if none sets a level, omit effort.
+
+### Trial cells (opt-in)
+
+The declaration lives in the host's CONTEXT, which every coordinator reads before dispatch; a `dispatch-trial` line
+directs it to this section. Format:
+`dispatch-trial: on · <named trial sprint> · <strongest-tier cap, at most 6> · <record location> per dispatch: <fields>`.
+The host names where each per-dispatch record goes and which fields it carries.
+
+These cells apply during the named sprint only and stop at its close. A declaration without a named sprint, or after
+it closes, is treated as absent. The trial is off by default, so releases are not blocked. Without an applicable
+declaration, the three class rows above remain the consumer default, including on hosts without model, effort,
+strongest-tier or Codex-channel parameters.
+
+Tiers are remappable roles from the host's model map. `decision-escalation` is the strongest tier; an undefined role
+uses the next-strongest defined role. A host without model or effort parameters dispatches without those parameters.
+"Codex" in these cells means the host's declared cross-model CLI (e.g. Codex), selected by `via <cli>` in
+[cross-model-route.md](cross-model-route.md).
+
+| Role | Tier | Effort | Pair or miss-revealing check | Measured? |
+|---|---|---|---|---|
+| Test runner, repo fetch | `mechanical-ingest` | low | Coordinator re-checks the verdict line or fetched source | yes |
+| Builder-check reader | `execution` | low | Later review or gate | yes |
+| Intake, promote, close workers | `execution` | medium | Coordinator reviews the draft, or the close gate | yes |
+| Review | `decision-escalation` | high | Blind Codex pairing on the same unmodified diff; each reviewer's findings recorded | yes |
+| Intake draft check | `decision-escalation` | high | Same blind Codex pairing on the same unmodified draft; each reviewer's findings recorded | yes |
+| G2 design check | `decision-escalation` | high | Coordinator's own G2 check | yes |
+| Diagnose escalation (`/diagnose`) | `decision-escalation` | high | Inside ADR-010's 2026-11-13 amendment's exception: one read-only second opinion after two failures, attended only; coordinator checks the answer, no further rung | yes |
+| Code build (Codex channel) | `execution` | Codex setting outside this trial | Review and gate | not measured |
+| Build fallback | `execution` | high | Review and gate | not measured |
+| Unlisted execution and mechanical roles (unchanged defaults) | `execution` / `mechanical-ingest` | host default | Existing review and checks | not measured |
+| Decision inline | `decision` (session) | host default | Human G1/G2 approval | not measured |
+
+The trial spans **one sprint**, with **at most 6 `decision-escalation` dispatches across all its cells**. Past the cap,
+remaining strongest-tier cells use defaults and are recorded unmeasured. Cheaper cells are uncapped.
+Book strongest-tier samples only on small, light inputs (S-size tasks, small diffs). This bounds trial spending,
+not routing: heavy inputs during the trial use default routing and are not measured.
+
+Codex cells apply only where the host declares the relevant cross-model case per
+[cross-model-route.md](cross-model-route.md), off by default and attended only. A declaration opts in that host alone.
+If the channel is absent or disabled, build falls back to `execution` high and paired reviews to `decision-escalation`
+alone, subject to the cap. For both blind pairs, the `decision-escalation` reviewer runs first, then Codex; neither sees
+the other's findings, and both receive the same unmodified diff or draft. Codex's reported token figure is the comparator.
+
+In an unattended run no `decision-escalation` trial cell and no cross-model cell fires; fail-twice parks as today.
+No cell lets a worker approve G1/G2 or escalate to another rung. The per-dispatch record follows the host's own rule
+named in its `dispatch-trial` line.
+
 ## Hand the sub-agent its procedure skill (not a re-described brief)
 
 When the host repo declares `build`, or the owner asks, the build may go to another provider's CLI per
@@ -828,6 +878,10 @@ Execution fails twice, or a fork is genuinely ADR-grade → escalate by hand to 
 
 When the host repo declares `diagnose`, or the owner asks, the failed-twice point may instead take one read-only
 diagnosis handoff per [cross-model-route.md](cross-model-route.md), a single second opinion, not a ladder.
+
+During the named trial sprint, subject to § Trial cells' sampling and cap limits, the failed-twice point may instead take
+one read-only `decision-escalation` second opinion through `/diagnose`, under the same cross-model diagnosis-handoff
+conditions (attended only, coordinator checks the answer, no further rung), inside ADR-010's 2026-11-13 amendment's exception.
 
 ## The ceiling (honest)
 

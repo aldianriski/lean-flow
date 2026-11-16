@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-08
+last_updated: 2026-11-16
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
@@ -86,7 +86,6 @@ A HITL step is **parked** (record → continue disjoint AFK → clean halt via `
 **Continuation contract** — a run does not pause between tasks the owner already approved, and ends at exactly one of five terminal states, named in the rollup by the launcher: `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` → `orchestrator/references/night-run.md` Part 0b.
 
 ## Model tiers (dispatch discipline · ADR-010)
-
 Route by **nature, not size — ambiguity & consequence up, volume & repetition down**. lean-flow controls only the models it **dispatches** (Agent-tool `model:`); the session model is advisory. **Role-based + remappable** — undefined role → next-strongest defined.
 
 | Role (default) | Fires on |
@@ -95,7 +94,8 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 | `execution` → **Sonnet** *(dispatched)* | implement · recon (`Explore`) · council advisors + review · research |
 | `mechanical-ingest` → **Haiku** *(dispatched)* | bulk extraction · validation · triage · high-volume reads |
 
-**Fable = manual escalation, no dispatch row** — invoke by hand when execution fails twice or a fork is ADR-grade (opt. `/council`); **no automated ladder** (a fail point may dispatch a built-in — never a hook). Contract: spawn-with-brief — execution dispatch hands the subagent its **procedure skill** (runtime Skill invocation on a `general-purpose` agent), not a re-described brief; G1/G2 + review guard quality. Full doctrine → ADR-010; dispatch-by-classification + parallel/sequential + the **pre-dispatch preflight** (cycle · ownership · base-ref · waves) → `orchestrator/references/dispatch.md`.
+**`decision-escalation` → Fable**: manual by default on two execution failures or ADR-grade fork (opt. `/council`); **no automated ladder** (fail-point built-in allowed, never hook). Spawn-with-brief: execution gets procedure skill (runtime Skill, `general-purpose`), not paraphrase; G1/G2 + review guard quality. Routing, preflight, § Trial cells → `orchestrator/references/dispatch.md`.
+dispatch-trial: on · the next sprint promoted after SPRINT-179 · ≤6 `decision-escalation` dispatches · sprint Log per dispatch: role · cell (model+effort) · reported tokens · retries · findings · who ruled them real
 
 ## Sprint model
 
