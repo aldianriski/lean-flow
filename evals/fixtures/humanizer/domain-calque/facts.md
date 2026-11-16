@@ -23,6 +23,8 @@ Facts:
 18. The team counts 64 users and sets a limit of 28 concurrent users.
 19. Approval of the reopening time awaits Friday's meeting; that decision has not been made.
 Fact 19 stays unresolved: a final that approves a reopening time has added a claim.
+Fact 16 is the handover test: writing "acceptance test" for "saat penyerahan" keeps that fact and adds no claim;
+keeping "penyerahan" is also fine.
 
 Expected terms, judged per run (the first eight seeds are scored separately from the two kunci seeds):
 
@@ -50,6 +52,11 @@ Controls, each kept unchanged: berkas · salinan · gelombang · keputusan kunci
 pengguna · concurrent user. The only "gelombang" is inside the NFS seed; changing "kunci" there must keep it. The
 unrelated glossary must not change "concurrent user" to "concurrent member". A glossary-less context does not disable
 the global term rules and must not produce UNAVAILABLE. First-use italics around a term are tolerated.
+
+Second query: search each final case-insensitively, whole word, for the eight rejected forms, both kunci rejected
+forms and their expected forms, and every control. Keputusan kunci is a kept phrase, not a leftover. In override runs,
+also search for rehearsal (must be absent) and dry run (must be present). Casing is not scored; sentence-initial
+capitalisation is acceptable.
 
 Not facts: paragraph breaks and the introductory links "Untuk persiapan" and "Pada tahap berikutnya". A rewrite may
 change those without losing a fact.

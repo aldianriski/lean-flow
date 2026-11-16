@@ -1,0 +1,3 @@
+sprint(180): catat persiapan migrasi sistem pesanan
+
+Dalam pemeriksaan Senin, seluruh VM sudah tersapu; gladi dijadwalkan Rabu dengan petugas Sabtu.

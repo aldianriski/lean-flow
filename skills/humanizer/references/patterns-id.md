@@ -148,21 +148,23 @@ These are ordinary Indonesian words, so the KBBI table above misses them. The te
 | inti data | core database | migration component |
 | lapis (lapis 2, lapis keamanan; infra terms only) | layer (layer 2, security layer) | lapisan stays Indonesian |
 
-In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → cleanup; tanda tangan → sign; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pemindaian → scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
+In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → cleanup; tanda tangan → sign; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pindai/pemindaian/memindai → scan, dipindai → di-scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
 
 For the intended audience, keep gelombang, layanan pendukung, keputusan kunci, berkas and salinan; lapisan and bare uji (including uji fio) also stay Indonesian.
 
 For kunci, use kunci API → API key and kunci meaning a critical dependency → dependency; keep keputusan kunci and a bare credential kunci; never turn a key-factor sense into API key.
 
+After a domain-term swap, search the draft and final text case-insensitively, whole word, for each rejected form swapped, in its rejected sense; fix any leftover. Words this catalog says to keep and zones the mode never touches are exempt.
+
 ### Keep Indonesian (common and natural)
 
-This list is general vocabulary. A domain row or a listed one-liner word in § Domain terms of art wins even where a word here would translate it (pengguna simultan → concurrent user). Every other Keep-list word stays Indonesian in infra text too, including basis data; in infra text pemindaian → scan and the noun unggahan → file upload.
+This list is general vocabulary. A domain row or a listed one-liner word in § Domain terms of art wins even where a word here would translate it (pengguna simultan → concurrent user). Every other Keep-list word stays Indonesian in infra text too, including basis data and the verb unggah; in infra text pindai/pemindaian/memindai → scan, dipindai → di-scan and the noun unggahan → file upload.
 
 unduh · unggah · kata sandi · pengguna · basis data · perangkat lunak · berkas · tautan · pindai · cadangan · akun · aplikasi · jaringan · layar · tangkapan layar · peringatan · pembaruan · pemrograman · antarmuka · pengembang · kode sumber · mesin pencari · tenggat
 
 ### Unggah versus unggah-ulang
 
-*Unggah* (upload) is established: people say it and read it without a second look, so it stays Indonesian in general text; the infra noun unggahan → file upload follows § Domain terms of art. *Unggah-ulang* is a mechanical compound built from it. Nobody says it, and "upload ulang" or *re-upload* is what appears in real text. The rule: keep the base coinage when the community uses it, but do not extend it by compounding. Prefer the English term for compounds ("re-upload", "re-run", "re-deploy").
+*Unggah* (upload) is established: people say it and read it without a second look, so the verb stays Indonesian in infra text too; only the noun unggahan → file upload follows § Domain terms of art in infra text. *Unggah-ulang* is a mechanical compound built from it. Nobody says it, and "upload ulang" or *re-upload* is what appears in real text. The rule: keep the base coinage when the community uses it, but do not extend it by compounding. Prefer the English term for compounds ("re-upload", "re-run", "re-deploy").
 
 ### Mixed-language forms
 
@@ -172,7 +174,7 @@ Attach Indonesian affixes to an English verb with a hyphen and keep the English 
 
 Apply this override when the text, or a Translate target, is Indonesian or mixed Indonesian-English. At the project root (the repo root), or the working folder when there is no repo, read `.claude/CONTEXT.md`, else `CONTEXT.md`, and find the section whose heading starts `## Domain Glossary`.
 
-An entry acts only where its term or one of its `_Avoid_` forms matches a full term from a row or a listed one-liner word in § Domain terms of art. There its canonical term wins, and its `_Avoid_` forms are the rejected forms; ignore every other entry.
+An entry acts only where its term or one of its `_Avoid_` forms matches a full term from a row or a listed one-liner word in § Domain terms of art and it defines the same infra or process sense as that catalog term. There its canonical term wins, and its `_Avoid_` forms are the rejected forms; ignore every other entry.
 
 If the file is absent, unreadable or has no such section, override nothing and silently continue with the catalog rules. The glossary is optional, so `embedded.md`'s UNAVAILABLE rule does not apply to it.
 

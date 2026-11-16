@@ -8,6 +8,8 @@ text. Like `../term-of-art/`, it is a manual model-call fixture, not a qa-check 
   headings, table cells, list labels and inline code.
 - `facts.md`: the numbered facts, expected forms per seed, controls and added-claim criteria. Timing, scope,
   obligations and the unresolved reopening decision must survive a rewrite.
+- `commit-message.txt`: the plain-text commit input, carrying seeds 1 and 4 in running prose consistent with the memo.
+  Retain it before the commit-inline run; use `sample.md` as the retained inline-fallback input.
 
 The eight seeds and their expected forms with no override:
 1. "seluruh VM sudah tersapu" → "seluruh VM sudah di-scan".
@@ -51,8 +53,16 @@ Run one separate headless process per run, in a trusted folder outside this repo
 claude -p --setting-sources local --plugin-dir <export> --add-dir <export> --output-format stream-json --verbose --model <pinned> < /dev/null
 ```
 
-For a document, use `embedded.md` § Child path verbatim, then format `markdown`, the text itself as the voice sample,
-and `sample.md` inline as the text. The run matrix is fixed in advance (13 runs):
+Build prompts from the run's pinned export of `skills/humanizer/references/embedded.md`, resolving skill and catalog
+paths to that export. Save each assembled prompt in its run folder before starting the process:
+- Child path: § Child path items 1 to 7 verbatim, then format `markdown` and the full contents of `sample.md` inline
+  as both text and voice sample.
+- Inline fallback: § Inline fallback, § Child path item 4 and § Never touched verbatim, then format `markdown` and
+  the full contents of `sample.md` inline as both text and voice sample. Use a runtime that cannot start a sub-agent.
+- Commit-inline: § Inline path, § Child path item 4, § Never touched and § Commit messages and PR bodies verbatim,
+  then format `plain` and the full contents of `commit-message.txt` inline as both text and voice sample.
+
+The run matrix is fixed in advance (13 runs):
 - Baseline: three child-path runs in glossary-none. At least six of eight seeds must remain unfixed in each run;
   otherwise strengthen the sample, record its new hash and repeat the baseline before editing the catalogs.
 - After: three child-path runs in glossary-none. Each must fix eight of eight seeds, including `di-scan` and `di-fix`,
@@ -61,22 +71,27 @@ and `sample.md` inline as the text. The run matrix is fixed in advance (13 runs)
 - After: one glossary-override run through `embedded.md` § Inline fallback, expecting dry run. It is valid only with
   no Agent dispatch and the fallback status line.
 - After: one glossary-override run through `embedded.md` § Inline path for a commit message, format `plain`, with an
-  Indonesian message carrying seeds 1 and 4. Expect `di-scan` and dry run; this is the commit-inline wiring proof.
+  Indonesian message from `commit-message.txt` carrying seeds 1 and 4. Expect `di-scan` and dry run; this is the
+  commit-inline wiring proof.
 - After: one child-path run in glossary-unrelated. Every scored field must match the glossary-none result;
   concurrent user stays unchanged.
 - After: three `../term-of-art/` runs in a folder with no CONTEXT.md at either discovery path, judged against its own
   `facts.md`: five of five terms of art in English, general words kept Indonesian, fifteen facts kept, nothing added.
 
 For every run, read the model back from the transcript's init line and confirm the same pin. Its Read calls must hit
-its own export and read `patterns-id.md` with no offset. Any run with a supplied context is valid only if its
-transcript contains a Read tool call on that folder's CONTEXT.md, including `.claude/` for the override; anchor this
-check on the tool call, not a text grep. Discard invalid runs, record the reason and rerun them.
+its own export and read `patterns-id.md` with no offset. An after-arm run with a CONTEXT.md at either discovery path
+(glossary-none, glossary-override and glossary-unrelated) is valid only if its transcript contains a Read tool call
+on that folder's CONTEXT.md, including `.claude/` for the override; anchor this check on the tool call, not a text grep.
+Baseline runs are valid without a CONTEXT.md Read because the baseline catalog has no glossary rule. Discard invalid
+runs, record the reason and rerun them.
 
 Judge each run from its own transcript's final result. Strip status lines, shuffle labels and give the finals to a
 fresh reader who did not write the brief. The judge reports the observed form per seed and per control, facts kept
 and anything added; the coordinator maps the arms afterwards. A second query mechanically searches each final
-case-insensitively, whole word, for the eight rejected forms and every control; first-use italics are tolerated. The
-judge and search must agree; the coordinator reads and records any disagreement.
+case-insensitively, whole word, for the eight rejected forms, both kunci rejected forms and their expected forms, and
+every control. Keputusan kunci is a kept phrase, not a leftover. In override runs, also search for rehearsal (must be
+absent) and dry run (must be present). First-use italics are tolerated; casing is not scored, and sentence-initial
+capitalisation is acceptable. The judge and search must agree; the coordinator reads and records any disagreement.
 
 Translate and standalone share the catalog route but are judgment ticks, not additional runs in this matrix. On an
 eval miss, allow one bounded catalog retry, then three fresh after-runs on the new commit; a further failure goes to
