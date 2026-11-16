@@ -118,10 +118,12 @@ Each pattern names the English section it shares. The English problem statements
 | peretas | hacker | news wording; hacker in dev text |
 | narahubung | contact person | rare outside formal letters |
 
+Domain calques → § Domain terms of art.
+
 ### Domain terms of art (keep English)
 
-In domain or technical text (sizing, infrastructure, specs, test plans), a term of art stays English even when a plain Indonesian phrase exists: a spec name, a column header, a capacity term or the name of a test.
-These are ordinary Indonesian words, not KBBI coinages, so the table above does not catch them. The tell is a word-by-word translation of a spec name; when you see one, write the English term.
+In domain or technical text (sizing, infrastructure, specs, test plans, runbooks, migration plans), a term of art stays English even when a plain Indonesian phrase exists: spec names, column headers, capacity terms, test names and the ordinary infra and process words below.
+These are ordinary Indonesian words, so the KBBI table above misses them. The tell is a word-by-word translation of an English term practitioners say in infra and process text; write the English term.
 
 | Indonesian form | Keep | Reason |
 |---|---|---|
@@ -130,20 +132,49 @@ These are ordinary Indonesian words, not KBBI coinages, so the table above does 
 | penalti tulis | write penalty | RAID term of art |
 | ruang kosong (minimal 25%) | free space | capacity-planning term |
 | toleransi drive rusak / drive boleh rusak | fault tolerance (drive) | RAID term of art |
+| gladi | rehearsal | migration practice run |
+| sinkron akhir | final sync | last sync before a cutover |
+| salin penuh | full copy | migration copy method |
+| pembekuan kode | code freeze | release restriction |
+| terminasi TLS | TLS termination | TLS endpoint operation |
+| reboot tertunda | pending reboot | system state |
+| sensor jebakan | deception sensor | security component |
+| kontainer | container | workload unit |
+| daftar periksa | checklist | operational checklist |
+| zona waktu | timezone | scheduling term |
+| worker antrean | queue worker | background job processor |
+| tutup temuan | fix findings | remediation; temuan sudah ditutup → findings sudah di-fix |
+| temuan kritis | critical findings | finding severity |
+| inti data | core database | migration component |
+| lapis (lapis 2, lapis keamanan; infra terms only) | layer (layer 2, security layer) | lapisan stays Indonesian |
+
+In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → clean up; tanda tangan → signature; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pemindaian → scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
+
+For the intended audience, keep gelombang, layanan pendukung, keputusan kunci, berkas and salinan; lapisan and bare uji (including uji fio) also stay Indonesian.
+
+For kunci, use kunci API → API key and kunci meaning a critical dependency → dependency; keep keputusan kunci and a bare credential kunci; never turn a key-factor sense into API key.
 
 ### Keep Indonesian (common and natural)
 
-This list is general vocabulary. A domain term of art follows the subsection above, even where a word here would translate it.
+This list is general vocabulary. A domain row or a listed one-liner word in § Domain terms of art wins even where a word here would translate it (pengguna simultan → concurrent user). Every other Keep-list word stays Indonesian in infra text too, including basis data; in infra text pemindaian → scan and the noun unggahan → file upload.
 
 unduh · unggah · kata sandi · pengguna · basis data · perangkat lunak · berkas · tautan · pindai · cadangan · akun · aplikasi · jaringan · layar · tangkapan layar · peringatan · pembaruan · pemrograman · antarmuka · pengembang · kode sumber · mesin pencari · tenggat
 
 ### Unggah versus unggah-ulang
 
-*Unggah* (upload) is established: people say it and read it without a second look, so it stays Indonesian. *Unggah-ulang* is a mechanical compound built from it. Nobody says it, and "upload ulang" or *re-upload* is what appears in real text. The rule: keep the base coinage when the community uses it, but do not extend it by compounding. Prefer the English term for compounds ("re-upload", "re-run", "re-deploy").
+*Unggah* (upload) is established: people say it and read it without a second look, so it stays Indonesian in general text; the infra noun unggahan → file upload follows § Domain terms of art. *Unggah-ulang* is a mechanical compound built from it. Nobody says it, and "upload ulang" or *re-upload* is what appears in real text. The rule: keep the base coinage when the community uses it, but do not extend it by compounding. Prefer the English term for compounds ("re-upload", "re-run", "re-deploy").
 
 ### Mixed-language forms
 
 Attach Indonesian affixes to an English verb with a hyphen and keep the English spelling: *di-deploy*, *men-cache*, *meng-commit*, *di-merge*. Do not respell to match Indonesian phonology ("di-depoi").
+
+### Host glossary (optional)
+
+Apply this override when the text, or a Translate target, is Indonesian or mixed Indonesian-English. At the project root (the repo root), or the working folder when there is no repo, read `.claude/CONTEXT.md`, else `CONTEXT.md`, and find the section whose heading starts `## Domain Glossary`.
+
+An entry acts only where it names a full term from a row or a listed one-liner word in § Domain terms of art. There its canonical term wins, and its `_Avoid_` forms are the rejected forms; ignore every other entry.
+
+If the file is absent, unreadable or has no such section, override nothing and silently continue with the catalog rules. The glossary is optional, so `embedded.md`'s UNAVAILABLE rule does not apply to it.
 
 ## C. Italics rule
 

@@ -48,6 +48,8 @@ Not for: code, data, config or logs · writing something new from scratch · tex
    only the dressing a pattern names (significance, sales language, a repeated closer, a chatbot
    wrapper) and keep the fact underneath. Search again for the tells that most often survive: contrasts,
    closers, triads, dashes, bold labels.
+   After a domain-term swap, search the draft case-insensitively, whole word, for every rejected form swapped, in its rejected sense; fix leftovers. Controls, kept phrases and zones the mode keeps (code, headings, table cells) are exempt.
+   Repeat this search on the final text in step 7.
    Then count four mechanical tells in the draft with Grep, as occurrences rather than lines: the em dash
    `—`, a spaced double hyphen used as a dash (` -- `), bold-label list items (`- **Label:**`) and curly
    quotes (“ ” ‘ ’). Subtract matches inside fenced code blocks and inline code. Write pasted text to a

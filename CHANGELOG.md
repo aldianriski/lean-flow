@@ -16,6 +16,8 @@ status: current
 
 ## [Unreleased]
 
+- **`/humanizer`: uses English terms for Indonesian infra calques, with an optional host-glossary override and a check for rejected forms left in the final text.**
+
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.
