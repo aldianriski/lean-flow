@@ -25,7 +25,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Dispatch names a worker's model tier and effort per role, as an opt-in trial `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/dispatch.md` · `.claude/CONTEXT.md` · `docs/adr/ADR-010-model-dispatch-role-tiers.md` · `docs/knowledge-index.md` · `CHANGELOG.md` · `README.md`
+Layers: `skills/orchestrator/references/dispatch.md` · `.claude/CONTEXT.md` · `docs/adr/ADR-010-model-dispatch-role-tiers.md` · `CHANGELOG.md` · `README.md`
 Depends-on: none
 Cites: TASK-670, `skills/orchestrator/references/cross-model-route.md`, TASK-671
 The default three class rows stay the consumer default, and a trial table applies only where the host declares `dispatch-trial`. Strongest-tier dispatches are capped at 6 and booked on small inputs only. The one real dispatch under a trial cell that the DoD asks for is exercised at G2 or build time, with the repo-local record.
