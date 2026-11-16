@@ -25,7 +25,7 @@ reported pairs appear in the skill today. ADR-053 does not apply (no new guard, 
 skill work. Consumer evidence applies. Delta judged over the existing surface (L-017).
 
 ## Done when
-- [ ] **Widen the rule in the one existing home, `patterns-id.md` § Domain terms of art.** L124's tell "a word-by-word
+- [x] **Widen the rule in the one existing home, `patterns-id.md` § Domain terms of art.** L124's tell "a word-by-word
   translation of a spec name" becomes "a word-by-word translation of an English term practitioners say in infra and process
   text". Wording drafted at build, settled at G2.
   - A table of about 12 to 15 low-ambiguity pairs (candidates in Assumes).
@@ -35,15 +35,15 @@ skill work. Consumer evidence applies. Delta judged over the existing surface (L
     "kunci" meaning a critical dependency becomes "dependency"; "keputusan kunci" is kept unchanged; a key-factor sense is
     never rewritten as "API key". The fixture control and the rule say the same thing.
   - One cross-reference line under the KBBI table: "domain calques → § Domain terms of art".
-- [ ] **Keep every existing after-example true.** The rule is scoped so existing examples stay: `uji fio` (`patterns-id.md`
+- [x] **Keep every existing after-example true.** The rule is scoped so existing examples stay: `uji fio` (`patterns-id.md`
   L58, `patterns-lf.md` L71 and L75) and `lapisan` (L29). Bare `uji` and `lapis` are not in the one-liner; `uji` is swapped
   only inside the named compounds, `lapis` only inside "N layer" phrases. Scoping choice is a G2 call (see Assumes).
-- [ ] **Amend the existing Keep-list note in place.** The note at `patterns-id.md` L136 is amended once, no second note. In
+- [x] **Amend the existing Keep-list note in place.** The note at `patterns-id.md` L136 is amended once, no second note. In
   infra text the domain rule wins for `pindai` and `unggah`. L140-142's unconditional "stays Indonesian" is reconciled to "in
   general text; the infra pair unggahan→file upload follows § Domain terms of art". `basis data` has no owner pair, so it
   stays unchanged everywhere; the rule applies only to the phrase "inti data" (→ core database). The infra "basis data"
   fixture element is dropped; a plain "basis data" appears only as a control.
-- [ ] **One host-glossary route.**
+- [x] **One host-glossary route.**
   - The rule lives only in `patterns-id.md` § Term policy, a short new subsection.
   - Every path that reads the catalogs gets it with no per-caller edit and no `embedded.md` change: child path, inline
     commit path, inline fallback, standalone use and Translate mode (EN→ID reads the ID catalog in full).
@@ -54,11 +54,14 @@ skill work. Consumer evidence applies. Delta judged over the existing surface (L
   - Nothing is "named by the user" in embedded mode.
   - An absent, unreadable or glossary-less `CONTEXT.md` is a silent no-op; the subsection says this is outside
     `embedded.md` item 7 and never returns UNAVAILABLE. A glossary is optional, not "needed".
-- [ ] **Bulk-swap rule where step 6 reads it.** `SKILL.md` step 6 gains 1 to 2 lines: after a term swap, grep the final
+  - Scope-change 2026-11-16 (owner: "Accept gap + TD (Recommended)", SPRINT-180 Log § scope-change): ticked for the child
+    and inline-fallback paths (run) and standalone / Translate (judgment, same catalog read); the inline commit path does
+    not fire the glossary in 2 of 2 runs, recorded as TD-317.
+- [x] **Bulk-swap rule where step 6 reads it.** `SKILL.md` step 6 gains 1 to 2 lines: after a term swap, grep the final
   text case-insensitively for each rejected form that was swapped, in its rejected sense; controls and kept phrases
   ("keputusan kunci") are not leftovers. Observable in every mode: zero leftovers in the final text. `SKILL.md` stays near
   122 lines, under the cap.
-- [ ] **Fixture.** New retained synthetic fixture under `evals/fixtures/humanizer/` (no bnpt text):
+- [x] **Fixture.** New retained synthetic fixture under `evals/fixtures/humanizer/` (no bnpt text):
   - Exactly 8 seeded calques (the two `kunci` seeds below are scored separately) not in the existing 5 rows (so L123-124 cannot fix them for free), including "tersapu", a
     sentence-initial capitalised "Worker antrean", and a multi-word calque with a casing mismatch.
   - Controls that must stay unchanged: berkas, salinan, gelombang, "keputusan kunci", a bare "basis data".
@@ -66,7 +69,7 @@ skill work. Consumer evidence applies. Delta judged over the existing surface (L
   - A fact list retained alongside it.
   - A host glossary file for one override run (it rejects one catalog row), and one unrelated glossary (domain synonyms
     only) for one control run.
-- [ ] **Baseline and pass criteria, fixed in advance.**
+- [x] **Baseline and pass criteria, fixed in advance.**
   - Baseline is commit `3e31706d` (HEAD now; derive at write time), exported with `git archive <sha> skills
     .claude-plugin`. There is no version tag.
   - Baseline passes the sample when at least 6 of the 8 seeds are left unfixed in each of 3 runs; otherwise the sample is
@@ -77,12 +80,12 @@ skill work. Consumer evidence applies. Delta judged over the existing surface (L
   - The override run uses a host glossary that rejects one row; the pass follows it through the same route (reading
     `CONTEXT.md`). The unrelated-glossary control run changes nothing beyond the no-glossary result.
   - Runs follow the `term-of-art/NOTES.md` protocol: trusted folder, pinned export, one export per folder.
-- [ ] **Existing fixture re-run.** `evals/fixtures/humanizer/term-of-art/` re-run 3 of 3 after the change still passes: 5 of
+- [x] **Existing fixture re-run.** `evals/fixtures/humanizer/term-of-art/` re-run 3 of 3 after the change still passes: 5 of
   5 terms of art in English, none of the general words (pengguna, berkas, cadangan, mengunduh, laporan) anglicized, 15 of 15
   facts kept, nothing added.
-- [ ] **README and CHANGELOG.** README `/humanizer` row (~L204): a clause for the domain-calque rule and the optional host
+- [x] **README and CHANGELOG.** README `/humanizer` row (~L204): a clause for the domain-calque rule and the optional host
   glossary override. CHANGELOG `[Unreleased]`: one line. No manifest bump (release-patch owns that).
-- [ ] Negative: General words are not anglicized (the controls above). With no host glossary, only the override is a
+- [x] Negative: General words are not anglicized (the controls above). With no host glossary, only the override is a
   no-op: the new global rules still apply, and the pass never returns UNAVAILABLE for a missing glossary. A glossary entry
   that names no catalog row changes nothing. The fixture fails on the baseline.
 

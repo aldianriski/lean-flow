@@ -100,4 +100,28 @@ discarded runs, judge results and mechanical searches.
 
 ## Recorded runs
 
-none yet
+SPRINT-180 T1, 2026-11-16. Model pinned to `--model sonnet` (claude-sonnet-5-5) on every run, read back from each init
+line. Runs in `D:\Research\s180-evals` (trusted, no git repo, so discovery uses the working folder). The prompt names
+the export's humanizer folder as an input: the headless Skill call is denied, so the child takes item 1's own
+fallback and reads `SKILL.md` from there (owner ruling; `--allowedTools` on the child was refused by the permission
+classifier and not worked around).
+
+- Baseline at `3e31706d` (catalogs identical to `plan_commit`). The first sample (`c843bd27`) let run 2 fix three
+  seeds through the existing infra rule (5 of 8 unfixed), so the sample was strengthened (`b2e4ef38`: seeds 5, 6, 8
+  became salin penuh, Daftar Periksa, sensor jebakan). Three runs on `b2e4ef38`: 8 of 8 seeds and both kunci seeds
+  unfixed in 3 of 3 (grep and judge agree). One run dropped two controls and added a heading.
+- After at `2767637f` (round 1): the global rule fixed 8 of 8 and both kunci seeds in every sample run, but only 1 of
+  7 runs with a CONTEXT.md read it. One bounded catalog retry, `d28b0a6f`, moved the glossary step to the top of
+  `patterns-id.md`.
+- After at `d28b0a6f`, ten runs, all valid:
+  - glossary-none, three child runs: CONTEXT.md read; 8 of 8 seeds with the right affix forms (di-scan, di-fix), both
+    kunci seeds (dependency, API key), 9 of 9 controls, 19 of 19 facts, nothing added, zero leftovers.
+  - glossary-override, child: CONTEXT.md read, "dry run". Inline fallback: glossary read with a shell `cat` on that
+    path, "dry run", fallback status line present, no Agent dispatch. Commit inline: catalogs read, CONTEXT.md never
+    read, "di-scan" but "rehearsal" (the override missed; owner accepted the gap, TD-317).
+  - glossary-unrelated, child: CONTEXT.md read; every scored field matches glossary-none; "concurrent user" kept.
+  - term-of-art, three runs (no CONTEXT.md): 5 of 5 terms in English, the five general words Indonesian, 15 of 15
+    facts by the coordinator; the judge read one run as 14 of 15 (fact 8 "fault tolerance dua drive", which this
+    sheet's own fact 8 accepts, and fact 14 recast as a request, the TASK-526 form). The stricter reading is kept here.
+- A fresh judge scored all thirteen finals blind (labels shuffled, status lines and a harness Co-Authored-By trailer
+  stripped). It agreed with the mechanical whole-word search on every seed and control.
