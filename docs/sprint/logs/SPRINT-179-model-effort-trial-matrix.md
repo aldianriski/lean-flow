@@ -1,9 +1,9 @@
 ---
-sprint: 178
+sprint: 179
 slug: model-effort-trial-matrix
 owner: Maintainer
 last_updated: 2026-11-16
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -61,3 +61,9 @@ Trial-cell record (box 13, the exercised dispatch; the cells apply only during t
 - role: review (paired) · cell: Codex `gpt-6-astra`, effort default · reported tokens: 60,216 (R1), 55,741 (R2) · retries: 0 · findings: 2 Med at R1, 0 at R2 · ruled real by: the coordinator (both).
 review · T1 · scoped-reviewer · behaviour:low · governance:high
 ### 2026-11-16 | scope-change | T1/TASK-670 Layers prune: docs/knowledge-index.md dropped, gen-index reported no content change after the ADR-010 edit (L-240); re-confirm G2 not needed, no design change
+
+### 2026-11-16 | progress | system verify green at c27667dc
+Off-host, run by the coordinator on HEAD `c27667dc`, verbatim: `gate-remote: ran c27667dc6b4f1c07efa2e3287e8c56391c1b3beb` · `bun test: 638 pass, 0 fail (rc 0)` · `qa-check: QA-CHECK: 234 pass, 0 fail (rc 0)`.
+
+### 2026-11-16 | close | SPRINT-179 closed, 1 of 1 members done
+Retro -> the sprint file § Retro. Filed: L-325 (a spending bound names its end) and L-326 (`record-line.ts tick` per-call checkers overrun a tool timeout) new; TASK-671 gained one Assumes bullet (record whether the intake, promote and close cells fired on a consumer host). No TD, no new task. CHANGELOG `[Unreleased]` and README already carry TASK-670's line. The Log's frontmatter read `sprint: 178` from promote; corrected to 179 here. Checks: `check-sprint-by-reference.ts --close` 4 pass, 0 fail. Handoff reconciliation: the live ledger row (model × effort routing matrix) is a side handoff; routed and set `spent` in `HANDOFF-LEDGER.md`. Release routing: owner ruled fold into v2.24.0, a separate coordinator action after close.

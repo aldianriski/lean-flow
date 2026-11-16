@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-324**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-326**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -130,6 +130,24 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 - **host-tooling → moved: docs/LEARNINGS.md` § Durable rules › host-tooling** · disposition: move-to-reference — no `.claude/CLAUDE.md` line (80-cap; the failure is specific to this Windows host) · learnings: L-306
 
 A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s (SPRINT-170 T3 lost three timed rounds to it; SPRINT-178's promote worker hung on a background `python` heredoc). Name the interpreter in a worker's brief (`bun`, or `python -c` with a script file), and screen a timed round's transcript for a 120 s gap before reading its minutes.
+
+---
+
+## L-326 [tags: tooling] [status: active]: **`record-line.ts tick` runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout: tick in batches, or run the loop in the background and read the verdict line.**
+SPRINT-179 ticked TASK-670's 17 boxes one call at a time in a single loop, and the loop outran a 120 s tool timeout because each tick re-ran the downstream checkers. The ticks written before the cut stayed written, so after a timeout read the member file for which boxes landed, not the loop's status.
+- seen: 2026-11-16 (SPRINT-179 close: the T1 ticks)
+- count: 1
+- promoted: no
+- related: L-224 (re-run the gate's own checker after a tick)
+
+---
+
+## L-325 [tags: process] [status: active]: **A spending bound that names no end is not a bound: name the trial's sprint and its expiry in the same sentence as the cap.**
+TASK-670's first draft capped strongest-tier dispatches at six but named no sprint and no end, so the cap would have applied forever. The intake draft review (Fable and Codex, both CLEAR at R2) passed it; at the code review Fable alone flagged it as a Med, Codex did not. The retry names the trial sprint and its expiry. At G2, read any new cap, budget or trial for the sentence that ends it.
+- seen: 2026-11-16 (SPRINT-179 review, Log "review" entry)
+- count: 1
+- promoted: no
+- related: L-324 (a claim in a brief needs checking)
 
 ---
 

@@ -53,6 +53,7 @@ dispatch.md § Route by classification and § Escalation, CONTEXT § Model tiers
 - Baselines for the repo fetch, promote and close workers have n=1 to 2, so those cells lean on the 1.25× cap more than on the 20% margin.
 - Its "before the trial starts" box is satisfied by TASK-670 (G2 to move or word it); strongest-tier cells carry rules, not baselines.
 - Each strongest-tier dispatch records its input size (small inputs give it less to find).
+- On a consumer host the intake, promote and close worker briefs name only the execution tier and do not load dispatch.md, so those trial cells reach a coordinator only through its CONTEXT pointer. Record in the trial's per-dispatch record whether each of those cells actually fired (Fable R2, SPRINT-179).
 
 ## Tracker
 
