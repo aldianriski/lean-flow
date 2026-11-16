@@ -323,3 +323,18 @@ Eval miss → the design's one bounded catalog retry: d28b0a6f puts the glossary
 - Owner ruling, verbatim: "Accept gap + TD (Recommended)", answering "Box 4 ticks for the document paths, and the commit path is recorded as not firing, with the 2 runs as evidence. The global rules still apply in commits (di-scan worked). File a TD for the commit-path glossary. No embedded.md edit."
 - Impact: box 4 is ticked for the child and inline-fallback paths, which were run, and for standalone and Translate, which are judgment ticks through the same catalog read. The commit-inline path is recorded as not firing, and the box gets a note line. TD-317 (the next free id: ledger max TD-316, cross-checked by the row census; TD-961 is a string inside an archived log) will be filed at close.
 - G2 re-confirm: not needed. The design is unchanged, and the gap is recorded rather than worked around.
+
+### 2026-11-16 | progress | T1 (TASK-672): after-run round 2, blind judge, 10 of 10 DoD ticked, moved to done (b84aab80)
+
+The after-runs at d28b0a6f were all valid. The judge (sonnet, the unlisted execution role, not measured) scored 13 finals blind, and its observed forms matched the mechanical search on every seed and control. Coordinator rulings on the judge's stricter reads: term-of-art fact 8 ("fault tolerance dua drive") is the sheet's own fact 8 form, and fact 14 recast as "Mohon tetapkan penanggung jawab" is the TASK-526 open-item form. Both are kept, and the judge's reading is recorded in NOTES.md.
+Box evidence:
+- Box 2: `git diff c8addd36 HEAD` shows no hunk at the "lapisan" or "uji fio" examples, which are byte-identical, shifted 2 lines by the top-of-file line, with an empty patterns-lf diff.
+- Box 4: the scope-change above.
+- Box 5: SKILL.md is 121 lines, and no after final has a leftover.
+- Box 9: one calque line each in README and CHANGELOG. `check-doc-caps` passes (token budget ~12680 of 12691).
+
+| # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
+|---|---|---|---|---|---|---|---|---|
+| 17 | 2026-11-16 | test runner (after-runs, round 2) | haiku · low | 59,848 cumulative (round delta ≈4.3k); cell total 59.8k vs 51.5k = 1.16× | 1 (eval retry, not runner error) | 0 misses: each verdict line matched the coordinator's transcript read | coordinator | yes |
+
+Strongest-tier used: 4 of 6.
