@@ -125,3 +125,8 @@ classifier and not worked around).
     sheet's own fact 8 accepts, and fact 14 recast as a request, the TASK-526 form). The stricter reading is kept here.
 - A fresh judge scored all thirteen finals blind (labels shuffled, status lines and a harness Co-Authored-By trailer
   stripped). It agreed with the mechanical whole-word search on every seed and control.
+
+Release fix `26739da2` (v2.25.0 release review, owner rulings "Fix only if remediated" and "List vs case"): seed 3 now
+expects "di-close", and fact 4 reads "closed". The after-runs above predate this change and wrote "di-fix". Three
+glossary-none confirmation runs on the `26739da2` export could not start: the account hit its weekly limit (resets
+2026-11-20). The change is covered by the release review only. Re-run those three when the limit resets.
