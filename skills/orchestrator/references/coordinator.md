@@ -37,13 +37,17 @@ continuation in that session gets the owner's answer (`night-run.md` Part 0).
 
 ## 3. Status check
 
+Send enabling messages (completion, blockers, approvals, lock release): another session acts on them.
+Pure acks and routine status go to the sender's own sprint Execution Log, which the receiver reads at its own checkpoints;
+do not send them as messages, because every cross-session message wakes its receiver at its whole context.
+
 On an idle notice or a silence, ask the lane for a 3-line reply:
 
 1. done
 2. waiting on
 3. next
 
-The lane appends that reply to its own sprint Execution Log, so the state survives the session.
+The lane sends that requested reply and appends it to its own sprint Execution Log, so the state survives the session.
 
 ## 4. Relayed rulings and approval
 
@@ -60,8 +64,8 @@ hand-back or from the state of the worktree.
 
 The coordinator owns each named shared file, so a lane never edits one on its own authority.
 
-- The lane sends its hunks or a diff to the coordinator and does not stage them yet.
-- The coordinator approves file by file, optionally after a review subagent reads the diff first.
+- The lane sends all of one task's shared-file hunks or a diff in one message to the coordinator and does not stage them yet.
+- The coordinator answers with one approval message per task batch, optionally after a review subagent reads the diff first.
 - The lane then stages per hunk (`git add -p`) and reads `git diff --cached` before it commits.
 - A cherry-pick that turns out to be a whole-branch merge is backed out and logged in the coordinator's active sprint
   Execution Log.
@@ -107,3 +111,12 @@ waits on a rotation.
 - Coordinator self-rotation is advisory, never a gate: at a checkpoint write `/handoff` and hand to a successor launched
   with `claude --bg` (a rotation, no popup), or tell the owner one line: `/clear`, then `/prime` and the handoff path.
 - No ledger field, checker or poller: rotation is prose.
+
+## 9. Lane cost
+
+- **Narrow delegation (owner-chosen):** only work whose output would bloat the lane's context goes to an execution-tier
+  worker (ADR-010), which returns a short report: device runs, full test suites, long log reads. Routine edits stay inline.
+  Preserve device and RAM limits and the single-device lock; a worker never runs a device job another lane holds.
+- **No polling from a large-context session:** a lane waiting on a device lock or free RAM uses a cheap background shell loop
+  that exits when the condition holds, so the session wakes once on completion. Never use `/loop` or repeated scheduled
+  turns from a large-context session for that wait.

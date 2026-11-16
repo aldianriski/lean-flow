@@ -17,6 +17,9 @@ status: current
 ## [Unreleased]
 
 - **`/orchestrator`: the coordinator can launch a new lane with one owner popup and rotate an existing lane to a fresh session at a task boundary with `claude --bg`, against a 200k target.** `/handoff` and `/flow` name the same 200k target.
+- **`/orchestrator`: lanes keep bulky outputs (device runs, full test suites, long logs) in a worker.** They send only messages
+  another session acts on, batch shared-file approvals per task, and wait on a lock or RAM in a background shell loop
+  instead of `/loop` turns.
 
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 

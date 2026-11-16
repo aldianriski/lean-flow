@@ -483,7 +483,10 @@ escalation for very large fan-out where scripted determinism matters.
 
 **Cost term** — fan-out cost scales with **branch-count × substrate-size, not call-count**: every branch
 re-pays the full base substrate (CLAUDE.md + tool context) before doing any work; weigh it before fanning
-out many trivial steps (ADR-010 addendum 2026-07-29).
+out many trivial steps (ADR-010 addendum 2026-07-29). Inline work re-pays the parent's whole context on every turn,
+so a bulky-output segment from a large-context session belongs in a worker. Routine edits stay inline, because at
+70-150k context moving shell and edit work to workers cut the router's own cost by about 4% while worker cost rose
+about 3.5 times (EPIC-024, see `docs/research/router-mode.md`).
 
 ## Worktree dispatch protocol (parallel fleet)
 
