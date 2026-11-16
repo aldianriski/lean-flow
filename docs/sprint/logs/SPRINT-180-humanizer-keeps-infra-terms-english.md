@@ -109,3 +109,161 @@ Dispatch-trial rows:
 | 12 | 2026-11-16 | G2 design check (T1; no same-unit comparator; counts toward the cap) | fable · high | 141,419 | 0 | 1H 9M 9L. Confirmed the coordinator's (a), (b) and (c). Unique and real: H1 (the override proof could not tell "followed the glossary" from "missed the seed"; fixed with a third form, "dry run", plus a Read-call validity rule), M3 (the Keep-list note needed explicit precedence or the controls are at risk), M4 (the unrelated control was vacuous), M7 (Translate target), M8 (seeds unnamed; the di-fix affix was unreachable), M9 (run validity). M1 and M5 overlapped the builder check. | coordinator | yes |
 
 G2 design check pair verdict: the cell condition holds, since Fable produced real findings the coordinator's own check missed (H1, M3, M4, M7, M8, M9). No same-unit token comparator exists, so the count cap applies instead. Strongest-tier used: 3 of 6.
+
+### 2026-11-16 | gate | G2 signed for T1 (TASK-672), design revision 2
+
+Owner, verbatim: "Sign G2 (Recommended)". The question covered design revision 2, including about 13 runs and 5-6 USD, plus the three wording rulings: unggah applies to the noun unggahan only, discovery uses the project root or the working folder, and UNAVAILABLE is cited by name.
+gates_signed: G1,G2 @ 374b0fca, set in the sprint frontmatter in this commit. The three rulings are also appended to the member file under `## G2 rulings`.
+
+Approved design (the G2 record, verbatim; its quoted Done when is omitted here because the member file holds it):
+
+> # G2 design — SPRINT-180 T1 (TASK-672), revision 2 (after builder check + G2 design check)
+> 
+> Repo: D:\Project\lean-flow · HEAD faa8af3d · plan_commit 4579e335 · member file
+> `docs/work/todo/TASK-672-indonesian-infra-text-uses-english-term-not-calque.md` (frozen DoD quoted at the end).
+> `git diff 3e31706d HEAD -- skills .claude-plugin` is empty (checked 2026-11-16).
+> 
+> ## Owner rulings at G1 (verbatim answers)
+> - G1: "Unchanged (Recommended)".
+> - Verb uji: "Compounds only (Recommended)".
+> - Lapis: "'lapis' only (Recommended)".
+> - Bare kunci: "Owner phrase only (Recommended)".
+> 
+> ## Approach (and WHY)
+> Fixture first and committed (frozen sample), baseline runs on the unchanged catalogs (the pin: the fixture must fail
+> there), then the text edits, then after-runs on the build commit, the term-of-art re-run, a blind judge plus a mechanical
+> second query. WHY: the claim is model behaviour (tier X); only runs prove it, and a baseline run before the edit keeps
+> "fails on the baseline" honest. Rejected: edit first and export an old commit later (wrong-export risk, the TASK-525
+> discard); a new glossary file or caller edits (owner Q1 + intake review: one route, no caller edits).
+> Builder: Codex in a worktree for the text and fixture files (owner rule: Codex default builder); coordinator reviews,
+> commits as `sprint(180) T1: …`. Runs: a test-runner worker (trial cell mechanical-ingest · low) launches them; the
+> coordinator reads every per-run transcript file itself (never the runner's summary). Judge: a fresh reader (execution).
+> 
+> ## Business facts touched
+> - "Curated, not copied" (requirements § Business goal): only the delta over the existing surface (L-017); the owner's
+>   pair list is the only source.
+> - Consumer side (CLAUDE.md DoD, L-015): shipped text names no lean-flow or bnpt path; discovery uses the shipped
+>   CONTEXT.md convention; a missing glossary is a no-op.
+> 
+> ## Files (all inside T1's Layers)
+> `skills/humanizer/references/patterns-id.md` — § B Term policy only:
+> 1. L123-124: widen the scope and the tell from "a spec name" to "an English term practitioners say in infra and process
+>    text" (sizing, infrastructure, specs, test plans, runbooks, migration plans). Existing 5 rows kept.
+> 2. Table, exactly 15 rows (box 1 "about 12 to 15"; Q2): 14 candidates — gladi→rehearsal, sinkron akhir→final sync,
+>    salin penuh→full copy, pembekuan kode→code freeze, terminasi TLS→TLS termination, reboot tertunda→pending reboot,
+>    sensor jebakan→deception sensor, kontainer→container, daftar periksa→checklist, zona waktu→timezone, worker
+>    antrean→queue worker, tutup temuan→fix findings, temuan kritis→critical findings, inti data→core database — plus one
+>    `lapis` row scoped to infra terms: "lapis (lapis 2, lapis keamanan) → layer (layer 2, security layer); `lapisan` stays
+>    Indonesian". (`riwayat` moves to the one-liner as ambiguous: riwayat login, riwayat insiden.)
+> 3. One-liner (English in infra or process text, Indonesian in general text): jendela, cabang, gerbang, rahasia, konsumen,
+>    bersihkan, tanda tangan, unggahan, dikeraskan (→ di-hardening, owner pair), sapuan/tersapu/pemindaian, berdiri
+>    sendiri, riwayat (only for repo history → git history), and the compounds pengujian→testing, daftar uji→test case,
+>    penguji UAT→UAT tester. No bare `uji`, no bare `lapis` (box 2).
+> 4. One audience-judgment sentence: kept words gelombang, layanan pendukung, keputusan kunci, berkas, salinan; `lapisan`
+>    and bare `uji` (incl. "uji fio") stay Indonesian.
+> 5. One kunci rule: "kunci API" → API key; "kunci" meaning a critical dependency → dependency; "keputusan kunci" kept;
+>    a bare credential "kunci" left alone; a key-factor sense never becomes "API key".
+> 6. One cross-reference line under the KBBI table: domain calques → § Domain terms of art.
+> 7. L136 note amended in place, additive (one note): a domain row or a listed one-liner word wins even where a Keep-list
+>    word would translate it (this keeps "pengguna simultan → concurrent user" working); every other Keep-list word stays
+>    Indonesian in infra text too — explicitly naming that `basis data` stays (box 3). In infra text pemindaian → scan and
+>    the noun unggahan → file upload.
+> 8. L140-142: "stays Indonesian" → "stays Indonesian in general text; the infra noun unggahan → file upload follows
+>    § Domain terms of art". Verb unggah/mengunggah untouched.
+> 9. New subsection "Host glossary (optional)": applies when the text, or a Translate target, is Indonesian or mixed.
+>    Discovery: the project root (the repo root), or the working folder when there is no repo; read `.claude/CONTEXT.md`,
+>    else `CONTEXT.md`; the section whose heading starts `## Domain Glossary`. An entry acts only where it names a row or a
+>    one-liner word of § Domain terms of art; there it wins and its `_Avoid_` forms are the rejected forms. Every other
+>    entry is ignored. No file, no section, or unreadable → nothing overridden, pass continues; a missing glossary is not
+>    something the pass needs, so `embedded.md`'s UNAVAILABLE rule (cited by name) does not apply.
+> 
+> `skills/humanizer/SKILL.md` — step 6, two lines max (120 → ≤122): after a domain-term swap, search the draft
+> case-insensitively, whole word, for each rejected form swapped, in its rejected sense; controls, kept phrases and
+> never-touched zones (code, headings or table cells the mode keeps) are not leftovers; fix any found; repeat on the final
+> in step 7. No fifth reported count — "four tells" (L59, L66, L70) and README unchanged on that point.
+> 
+> `README.md` L204 — one clause: Indonesian infra calques and an optional host-glossary override.
+> `CHANGELOG.md` `[Unreleased]` — one line.
+> 
+> `evals/fixtures/humanizer/domain-calque/`:
+> - `sample.md` — synthetic Indonesian infra memo (~200 words, invented org, no bnpt text). Every seed sits in running
+>   prose (no heading, table cell or inline code). The 8 seeds and expected forms:
+>   1. "seluruh VM sudah tersapu" → "sudah di-scan"
+>   2. sentence-initial "Worker antrean berjalan di …" → "Queue worker berjalan di …"
+>   3. "temuan tersebut sudah ditutup" → "findings tersebut sudah di-fix"
+>   4. "gladi dijadwalkan Rabu" → "rehearsal dijadwalkan Rabu"
+>   5. "sinkron akhir pukul 22.00" → "final sync pukul 22.00"
+>   6. mixed casing "Pembekuan Kode berlaku sejak …" (mid-paragraph) → "Code freeze berlaku sejak …"
+>   7. "inti data pindah ke host baru" → "core database pindah ke host baru"
+>   8. "terminasi TLS di load balancer" → "TLS termination di load balancer"
+>   kunci seeds (scored separately): "NFS menjadi kunci gelombang kedua" → "NFS menjadi dependency gelombang kedua";
+>   "kunci API layanan pembayaran" → "API key layanan pembayaran".
+>   Controls (must stay): berkas, salinan, gelombang, "keputusan kunci", "basis data", "lapisan", "uji fio", "pengguna",
+>   and the English "concurrent user" (the unrelated glossary's `_Avoid_: User` target).
+> - `facts.md` — facts, the expected form per seed, the controls, what counts as added.
+> - `glossary-none/CONTEXT.md` — a CONTEXT.md with no § Domain Glossary (lean-flow's own state).
+> - `glossary-override/.claude/CONTEXT.md` — § Domain Glossary with "**Dry run**: … _Avoid_: gladi, rehearsal" (a third
+>   form neither the catalog nor the sample produces; exercises the `.claude/` leg).
+> - `glossary-unrelated/CONTEXT.md` — § Domain Glossary with "**Member**: … _Avoid_: User, Seat" (the template's own
+>   example; must not turn "concurrent user" into "concurrent member").
+> - `NOTES.md` — protocol and the recorded runs (written by the coordinator after the runs, committed under T1).
+> 
+> Coordinator-owned (not design files): the member file's ticks and move, the sprint Log.
+> 
+> ## Micro-tasks and checks
+> - M1 Fixture files (Codex), committed before any run; record `sample.md`'s `git hash-object` for both arms.
+> - M2 Baseline: export `3e31706d` (`git archive 3e31706d skills .claude-plugin`, own folder); confirm
+>   `git diff --quiet 3e31706d <build parent> -- skills .claude-plugin`. 3 runs in glossary-none. Pin: ≥6 of 8 seeds left
+>   unfixed in each of 3 runs; else strengthen the sample (new hash recorded) and re-run before M3.
+> - M3 Text edits (Codex; one bounded builder retry after review).
+> - M4 After-runs on an export of the build commit (own folder):
+>   - 3 child-path runs in glossary-none (global rules apply with no glossary);
+>   - 1 child-path run in glossary-override (expect "dry run" for seed 4);
+>   - 1 inline-fallback run in glossary-override (`embedded.md` § Inline fallback; expect "dry run"; valid only with no
+>     Agent dispatch and the fallback status line);
+>   - 1 commit-inline run in glossary-override (`embedded.md` § Inline path, format `plain`, an Indonesian commit message
+>     carrying seeds 1 and 4; expect "di-scan" and "dry run") — the task Assumes' commit-inline wiring proof;
+>   - 1 child-path run in glossary-unrelated (expect the glossary-none result on every scored field; "concurrent user" kept);
+>   - 3 term-of-art re-runs in a folder with no CONTEXT.md (absent-file case).
+>   13 runs in total (with M2). Box 4's Translate and standalone paths are judgment ticks (same catalog read; not run).
+> - Run validity (every run): same `--model <pinned>` on every run, read back from each transcript's init line; the run's
+>   Read calls hit its own export and read `patterns-id.md` with no offset; a glossary run is valid only if its transcript
+>   holds a Read tool call on that folder's CONTEXT.md (anchored on the tool call, not a text grep). An invalid run is
+>   discarded and re-run, and the discard is recorded.
+> - M5 Judge: a fresh reader, labels shuffled, reports the observed form per seed and per control for each final (status
+>   lines stripped first); the coordinator maps arms afterwards. Second query: a mechanical whole-word grep of each final
+>   for the 8 rejected forms and the controls (first-use italics tolerated). Judge and grep must agree; a disagreement is
+>   read by the coordinator and recorded.
+> - Eval miss: one bounded catalog retry (M3 again), then 3 fresh after-runs on the new commit; still failing → owner.
+> 
+> Run protocol otherwise per `term-of-art/NOTES.md`: one headless `claude -p --setting-sources local --plugin-dir <export>
+> --add-dir <export> --output-format stream-json --verbose --model <pinned>` process per run, trusted folder outside the
+> repo, each export in its own folder, judged from each transcript's final result.
+> 
+> ## Verification per Done-when box (EXISTS · RUNS · REACHES · PROVES)
+> 1. Widened rule — judgment tick on the text; PROVED by M4's 3 glossary-none runs (8 of 8, both kunci).
+> 2. After-examples — mechanical: `git diff` shows no edit at patterns-id L29/L58, patterns-lf L71/L75; the controls
+>    "lapisan" and "uji fio" in every M4 final PROVE the rule leaves them.
+> 3. Keep-list note — `git diff` of L136-142 (one note, additive); "basis data" control in every final.
+> 4. Glossary route — `git diff --stat` shows no `embedded.md` or caller edit (mechanical); PROVED for child, inline
+>    fallback and commit-inline by the override runs ("dry run" + the Read-call validity rule), and for "ignored entries"
+>    by the unrelated run; Translate and standalone: judgment tick, said so.
+> 5. Step-6 rule — grep SKILL.md; `wc -l` ≤ 122; PROVED by zero leftovers in M4 finals (grep + judge).
+> 6. Fixture — files exist (mechanical); contents match this record (coordinator reads them against facts.md).
+> 7. Baseline and pass — M2/M4/M5 records: judge table + grep, per run.
+> 8. Term-of-art re-run — 3 runs judged against `term-of-art/facts.md`.
+> 9. README/CHANGELOG — grep (mechanical).
+> 10. Negative — controls in every final; glossary-none runs (global rules still apply); unrelated run; baseline failure.
+> Gate: off-host QA_FULL at close.
+> 
+> ## G2 rulings this design records against frozen wording (sign-off covers them; logged in the member file)
+> - Box 3 "the domain rule wins for `pindai` and `unggah`" is applied to the noun unggahan only (the box's next sentence
+>   names only unggahan→file upload; the verb unggah stays, protecting the "mengunduh"/upload controls).
+> - Box 4 "at the repo root" → "the project root (the repo root), or the working folder when there is no repo" (the
+>   fixture runs in a non-repo trusted folder).
+> - Box 4 "outside `embedded.md` item 7" → cited by name (the UNAVAILABLE rule), so a renumbering cannot strand it.
+> 
+> ## Authority, risk, ADR, cost
+> J1, HITL, risk low, tier X, size S. No ADR. No auth/input/secrets surface.
+> Cost: 13 headless runs + 1 judge + 1 Codex build; ~0.4 USD per run by `behavioral-eval-feasibility` → about 5-6 USD.
+> 

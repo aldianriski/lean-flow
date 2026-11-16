@@ -141,3 +141,8 @@ the term-of-art re-run and the Negative box.
 Owner intake request 2026-11-16 (bnpt-68 session /humanizer feature request; owner ruled "file it via intake later") ·
 owner rulings Q1 "Global + optional host", Q2 "~12-15 distinct + 1 line", Q3 "Domain rule wins in infra" · L-017 (delta
 over the existing surface) · TASK-525 (precedent) · ADR-053 (unfrozen skill work).
+
+## G2 rulings (2026-11-16, owner "Sign G2 (Recommended)", SPRINT-180 Log § gate)
+- Box 3 "the domain rule wins for `pindai` and `unggah`" applies to the noun unggahan only (unggahan → file upload); the verb unggah stays Indonesian.
+- Box 4 "at the repo root" reads as "the project root (the repo root), or the working folder when there is no repo".
+- Box 4 "outside `embedded.md` item 7" is cited by name (its UNAVAILABLE rule), not by item number.
