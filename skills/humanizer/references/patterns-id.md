@@ -148,7 +148,7 @@ These are ordinary Indonesian words, so the KBBI table above misses them. The te
 | inti data | core database | migration component |
 | lapis (lapis 2, lapis keamanan; infra terms only) | layer (layer 2, security layer) | lapisan stays Indonesian |
 
-In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → clean up; tanda tangan → signature; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pemindaian → scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
+In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → cleanup; tanda tangan → sign; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pemindaian → scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
 
 For the intended audience, keep gelombang, layanan pendukung, keputusan kunci, berkas and salinan; lapisan and bare uji (including uji fio) also stay Indonesian.
 
@@ -172,7 +172,7 @@ Attach Indonesian affixes to an English verb with a hyphen and keep the English 
 
 Apply this override when the text, or a Translate target, is Indonesian or mixed Indonesian-English. At the project root (the repo root), or the working folder when there is no repo, read `.claude/CONTEXT.md`, else `CONTEXT.md`, and find the section whose heading starts `## Domain Glossary`.
 
-An entry acts only where it names a full term from a row or a listed one-liner word in § Domain terms of art. There its canonical term wins, and its `_Avoid_` forms are the rejected forms; ignore every other entry.
+An entry acts only where its term or one of its `_Avoid_` forms matches a full term from a row or a listed one-liner word in § Domain terms of art. There its canonical term wins, and its `_Avoid_` forms are the rejected forms; ignore every other entry.
 
 If the file is absent, unreadable or has no such section, override nothing and silently continue with the catalog rules. The glossary is optional, so `embedded.md`'s UNAVAILABLE rule does not apply to it.
 
