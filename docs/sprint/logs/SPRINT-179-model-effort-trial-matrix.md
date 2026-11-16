@@ -38,3 +38,12 @@ Composition: 1 member, size M, no epic, no stream. Commits: filing `ce0a4078`, l
 Baseline gate (off-host, run by the coordinator on HEAD `a4d3e906`; the two untracked paths were TASK-670 and TASK-671): `gate-remote: ran a4d3e90603988cc90ff8f6ffbd059d7126eb9fcc` · `bun test: 638 pass, 0 fail (rc 0)` · `qa-check: QA-CHECK: 225 pass, 0 fail (rc 0)`.
 G1 and G2 are not yet signed; `gates_signed` is omitted from the frontmatter until both are signed and relayed verbatim.
 consequence · T1 · behaviour:low · governance:low
+
+### 2026-11-16 | gate | G1 + G2 signed for T1 (TASK-670)
+The owner signed by popup. Answers, verbatim: "Sign G1+G2 (Recommended)" · exercise box: "Yes, it ticks the box (Recommended)" (the review of T1's own diff, run under the shipped review cell with its record, ticks the exercised-on-real-input box; it is early data outside the next sprint's cap of 6) · build route: "Codex builds, Fable + fresh Codex review (Recommended)".
+G1: fast path, `origin: decomposer`, scope unchanged since the intake approve.
+G2 design: Codex builds the text in a worktree; the coordinator lands and commits. dispatch.md keeps the three class rows and gains an opt-in `### Trial cells` subsection keyed to ADR-010 role names (`mechanical-ingest` · `execution` · `decision-escalation`), plus the effort sentence and one § Escalation sentence. CONTEXT line 98 is rewritten to a pointer and a `dispatch-trial:` line is added, net-zero on lines and inside the token budget, or the build reports blocked. ADR-010 gets a 2026-11-16 amendment reversing item 3 only. CHANGELOG [Unreleased] and README get one line each.
+Builder-check settlements: the diagnose cell is item 4's existing fail-point dispatch on the `decision-escalation` tier, under the 2026-11-13 amendment's conditions unchanged, so it sits inside the exception and nothing widens · "Releases are not blocked" is met by the default-off opt-in (judgment tick) · a Codex build row is added outside the measured set, so the `execution`-high fallback has a source · review order: Fable first, then Codex, Codex never shown Fable's findings.
+Early-data records (pre-rule, default effort, harness-reported subagent_tokens): intake worker 102.5k over 4 passes · intake draft review Fable 75.5k (R1+R2) and Codex 7.2k + 16.0k · promote worker 161.8k · builder-check reader 61.4k.
+builder-check · T1 · 2 contradictions · 4 questions · facts settled by the coordinator; exercise-box and build-route intent answered by owner popup
+consequence · T1 · behaviour:low · governance:high
