@@ -16,9 +16,6 @@ status: current
 
 ## [Unreleased]
 
-- **`/orchestrator`: a host-declared `dispatch-trial` opts in to per-role model-tier and effort cells for one sprint, capped at six strongest-tier dispatches, with blind Codex comparisons where the cross-model channel is enabled; consumer defaults stay unchanged (ADR-010, TASK-670).**
-- The `LEARNINGS.md` template's `related:` comment now says to cite corpus ids only (learnings, ADRs, research), never a retired id or an epic, and to resolve each against the ledger first (L-319).
-
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.
@@ -26,6 +23,10 @@ Released on a Codex review of the shipped diff since v2.23.0 (R1: one High and o
 The coordinator reference comes from a real adopter run: one coordinator and one lane session per stream, across two repos (SPRINT-176).
 SPRINT-177's `--detached` flag was folded in before the push, on its own Codex reviews and a re-run of the release review over its shipped delta.
 SPRINT-178's lane rotation and lane-cost rules were folded in the same way (task reviews by Codex, then a release review of the shipped delta, CLEAR).
+SPRINT-179's opt-in trial cells were folded in the same way (blind Fable and Codex task reviews, then a release review of the shipped delta).
+
+- **`/orchestrator`: a host-declared `dispatch-trial` opts in to per-role model-tier and effort cells for one sprint, capped at six strongest-tier dispatches, with blind Codex comparisons where the cross-model channel is enabled; consumer defaults stay unchanged (ADR-010, TASK-670).**
+- The `LEARNINGS.md` template's `related:` comment now says to cite corpus ids only (learnings, ADRs, research), never a retired id or an epic, and to resolve each against the ledger first (L-319).
 
 - **`/orchestrator`: the coordinator can launch a new lane with one owner popup and rotate an existing lane to a fresh session at a task boundary with `claude --bg`, against a 200k target.** `/handoff` and `/flow` name the same 200k target.
 - **`/orchestrator`: lanes keep bulky outputs (device runs, full test suites, long logs) in a worker.** They send only messages
