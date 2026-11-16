@@ -6,7 +6,7 @@ status: current
 id: ponytail-delta-review
 tags: [tooling]
 domain: knowledge
-related: [ADR-001, EPIC-026]
+related: [ADR-001, graphify-daily-value]
 ---
 
 # Research — Does ponytail add anything lean-flow does not already have?
