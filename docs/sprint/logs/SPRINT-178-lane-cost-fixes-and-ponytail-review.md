@@ -72,3 +72,9 @@ builder-check · T3 · 0 contradictions · 4 questions · knowledge-index regene
 - **Exercise (i) bulky segment:** a Sonnet worker ran the full `bun --no-env-file test` in the main tree (109 s) and returned 4 lines: 637 pass, 1 fail, rc 1. The failing test is `evals/epic-archive-differential.test.ts` (fixture `epic-state/r-nonmember-attrib`, .ts vs .sh parity), outside T2's files; the off-host gate at 99f85bb6 had it green (638/0), so it reads as a Windows-host parity difference until system verify says otherwise.
 - **Exercise (ii) wait loop:** the coordinator held `.device-lock` in the probe worktree; probe-5 (`70b91b35`, haiku, auto) started one background loop and ended its turn; lock released 10:27:30; probe-5 reported "acquired the lock after one wake". Its transcript: 1 task-notification, 0 scheduled wakeups, 6 turns. Stopped.
 - **Build/review:** Codex in `lean-flow-worktrees/s178-t2`, 3 Layers files (23+/4-); Codex cross-model review R1 `VERDICT: CLEAR`, no findings. Blobs copied, hashes equal.
+
+### 2026-11-16 | progress | system verify green at e5236150 after one red run
+- **Run 1 at 99a8efe9 (off-host QA_FULL):** `bun test: 638 pass, 0 fail` · `QA-CHECK: 234 pass, 1 fail` — `FAIL corpus dangling refs: ponytail-delta-review.md:EPIC-026` (epics are not corpus ids in `related:`).
+- **Fix:** `sprint(178) T3:` e5236150 sets `related: [ADR-001, graphify-daily-value]`; the epic stays cited in the body.
+- **Run 2 at e5236150:** `gate-remote: ran e5236150f33105613e0a96d2ce776ec92dbbcf35` · `bun test: 638 pass, 0 fail (rc 0)` · `QA-CHECK: 235 pass, 0 fail (rc 0)`. The Windows-local `epic-archive-differential` failure seen in T2's exercise does not reproduce off-host: a host-only parity difference, a TD candidate for close.
+- **Rollup:** run · 18 of 18 DoD ticked (T1 7/7 · T2 6/6 · T3 5/5); terminal state PLAN_EXHAUSTED. Next: `/lean-doc-generator close`.
