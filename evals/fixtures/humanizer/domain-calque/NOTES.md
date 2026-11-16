@@ -14,7 +14,7 @@ text. Like `../term-of-art/`, it is a manual model-call fixture, not a qa-check 
 The eight seeds and their expected forms with no override:
 1. "seluruh VM sudah tersapu" → "seluruh VM sudah di-scan".
 2. Sentence-initial "Worker antrean berjalan di dua host lama" → "Queue worker berjalan di dua host lama".
-3. "temuan tersebut sudah ditutup" → "findings tersebut sudah di-fix".
+3. "temuan tersebut sudah ditutup" → "findings tersebut sudah di-close" (closed, not fixed: the memo states no remediation).
 4. "gladi dijadwalkan Rabu" → "rehearsal dijadwalkan Rabu".
 5. "salin penuh arsip pukul 22.00" → "full copy arsip pukul 22.00".
 6. Mid-sentence, mixed casing: "Pengisian Daftar Periksa dimulai Kamis" → "Pengisian checklist dimulai Kamis".
@@ -65,7 +65,7 @@ paths to that export. Save each assembled prompt in its run folder before starti
 The run matrix is fixed in advance (13 runs):
 - Baseline: three child-path runs in glossary-none. At least six of eight seeds must remain unfixed in each run;
   otherwise strengthen the sample, record its new hash and repeat the baseline before editing the catalogs.
-- After: three child-path runs in glossary-none. Each must fix eight of eight seeds, including `di-scan` and `di-fix`,
+- After: three child-path runs in glossary-none. Each must fix eight of eight seeds, including `di-scan` and `di-close`,
   get both kunci seeds right, keep every control and fact, add nothing and leave zero rejected-form leftovers.
 - After: one child-path run in glossary-override, expecting dry run for seed 4.
 - After: one glossary-override run through `embedded.md` § Inline fallback, expecting dry run. It is valid only with

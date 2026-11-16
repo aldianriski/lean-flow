@@ -145,12 +145,12 @@ These are ordinary Indonesian words, so the KBBI table above misses them. The te
 | daftar periksa | checklist | operational checklist |
 | zona waktu | timezone | scheduling term |
 | worker antrean | queue worker | background job processor |
-| tutup temuan | fix findings | remediation; temuan sudah ditutup → findings sudah di-fix |
+| tutup temuan | close findings; fix findings only when the text says they were remediated | closing is not fixing (risk accepted, false positive); temuan sudah ditutup → findings sudah di-close |
 | temuan kritis | critical findings | finding severity |
 | inti data | core database | migration component |
 | lapis (lapis 2, lapis keamanan; infra terms only) | layer (layer 2, security layer) | lapisan stays Indonesian |
 
-In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → cleanup; tanda tangan → sign; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pindai/pemindaian/memindai → scan, dipindai → di-scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
+In infra or process text, use jendela → window; cabang → branch; gerbang → gate; rahasia → secret; konsumen → consumer; bersihkan → cleanup; tanda tangan → sign; unggahan → file upload; dikeraskan → di-hardening; sapuan → scan, tersapu → di-scan, pindai/pemindaian/memindai → scan, dipindai → di-scan; berdiri sendiri → standalone; riwayat (repo history only) → git history; pengujian → testing; daftar uji → test list; kasus uji → test case; penguji UAT → UAT tester; keep these Indonesian forms in general text.
 
 For the intended audience, keep gelombang, layanan pendukung, keputusan kunci, berkas and salinan; lapisan and bare uji (including uji fio) also stay Indonesian.
 

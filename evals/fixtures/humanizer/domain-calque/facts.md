@@ -6,7 +6,7 @@ Facts:
 1. The memo records the order-system migration plan for Koperasi Niraloka Tujuh's operations team.
 2. The move covers 18 VMs on Saturday night, without adding capacity.
 3. Monday's inspection scanned all the VMs.
-4. The findings from that inspection have been fixed.
+4. The findings from that inspection have been closed (the memo does not say they were remediated).
 5. The team stores the inspection files together with a configuration copy so night staff use the same reference.
 6. The queue worker runs on two old hosts until the move is complete.
 7. The rehearsal is scheduled for Wednesday with the staff who will work on Saturday.
@@ -32,7 +32,7 @@ Expected terms, judged per run (the first eight seeds are scored separately from
 |---|---|---|
 | 1 | seluruh VM sudah tersapu | seluruh VM sudah di-scan |
 | 2 | Worker antrean berjalan di dua host lama | Queue worker berjalan di dua host lama |
-| 3 | temuan tersebut sudah ditutup | findings tersebut sudah di-fix |
+| 3 | temuan tersebut sudah ditutup | findings tersebut sudah di-close |
 | 4 | gladi dijadwalkan Rabu | rehearsal dijadwalkan Rabu |
 | 5 | salin penuh arsip pukul 22.00 | full copy arsip pukul 22.00 |
 | 6 | Pengisian Daftar Periksa dimulai Kamis | Pengisian checklist dimulai Kamis |
@@ -40,7 +40,7 @@ Expected terms, judged per run (the first eight seeds are scored separately from
 | 8 | sensor jebakan di jaringan yang ada | deception sensor di jaringan yang ada |
 
 Seed 2 begins a sentence; seed 6 is mid-paragraph with mixed casing. Both exercise case-insensitive cleanup. Seeds 1
-and 3 require the affixed forms `di-scan` and `di-fix`, respectively. In a glossary-override run, seed 4 instead becomes
+and 3 require the affixed forms `di-scan` and `di-close`, respectively; `di-fix` for seed 3 claims a remediation the memo does not state. In a glossary-override run, seed 4 instead becomes
 "dry run dijadwalkan Rabu"; neither "gladi" nor "rehearsal" may remain in that sense.
 
 Kunci seeds, scored separately:
