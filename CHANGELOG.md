@@ -16,6 +16,8 @@ status: current
 
 ## [Unreleased]
 
+- The `LEARNINGS.md` template's `related:` comment now says to cite corpus ids only (learnings, ADRs, research), never a retired id or an epic, and to resolve each against the ledger first (L-319).
+
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.

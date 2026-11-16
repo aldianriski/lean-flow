@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-15
+last_updated: 2026-11-16
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -125,6 +125,12 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 - **Cross-check a query before acting on it** — a search/count/grep whose result you will act on *immediately* gets a **second query that must agree**: an inverse whose sum is the known total, a count reconciled against a census, or a seeded gap the query must detect. Run it before the conclusion, not after it surprises you. **Why an action and not a caution:** the "match by shape, not substring" rule was promoted, correctly placed and *loaded in context* for all eleven sightings, and reached none — 8 of them ad-hoc queries inside a governance pass, where a wrong answer is acted on with no review between query and conclusion. Every one that was caught was caught by a *disagreeing second number*, never by recalling the rule. A negative control alone is not enough: it proves the query fires on rows it reaches, never that it reached them all (SPRINT-064 T1 — a nested `getline` silently examined 20 of 31 and returned "clean"). **A capped output is not the population, and an absence claim is a census** (L-315, a second sighting of L-198's capped-output case): a `head`- or `tail`-cut result, or one grep for one wording, cannot back "nothing reads X" or "no brief asks for Y" — run it untruncated, vary the wording, or call the result partial. **A value entering a *frozen artifact* — an assumption, a DoD, an acceptance threshold — is a query result and gets the same treatment at the moment it is written, then again at execution.** Both grains count: a **figure** (SPRINT-071 wrote `~121` sites into A1; the real number was 39, so the DoD built on it was unsatisfiable the moment it froze) and a **structural claim about another document** (SPRINT-074 froze "the checker reads §14's tables" into three artifacts; §14 has no per-rule table). The guard does not fire on its own because *authoring* feels like planning, not querying — but the number is acted on later, by someone who cannot re-derive it, against a Plan nobody can amend cheaply. A **third grain: an identifier for a new row** — a `TD-NNN`, `TASK-NNN` or `L-NNN` — is a query result too, so **derive the maximum in use; never increment the one you remember**. Twice in one sprint the assumed id was wrong: a register cited `TASK-241`, which was that task's own twin, and a debt row filed as `TD-066` collided with an existing row whose subject was the very bug another task was fixing. Nothing rejects a duplicate id, and a second row with the same number reads as an edit to the first (L-143 ×2). **And derive it with the worktrees excluded** — `.claude/worktrees/` holds complete repo copies during isolated dispatch, so a bare `grep -r` over this repo counts them as content and returns a maximum that is not a row. It has now returned `L-999` (SPRINT-013's deliberate dangling-reference *negative-test token*) twice: once against a real max of `L-168`, once against `L-180` — the second time inside a close Retro, in a session that had already derived two `TD-NNN` correctly minutes earlier, because id-derivation feels like bookkeeping rather than querying. Treat a suspiciously high maximum as contamination before treating it as a row (L-170 ×2). **And the second query must vary the SELECTION rule, not the direction of the count.** An inverse whose two halves sum to the known total proves only that the rows were *partitioned* — both halves run the same selector, so they agree perfectly on the wrong population. SPRINT-098 got `37 open + 60 closed = 97` against a real figure of **5**; SPRINT-099 derived ten archive-exclusion call sites by grepping one predicate SHAPE and cross-checked by grepping the same shape, while an eleventh site written as `grep -v` sat outside what either query could reach — on a live gate leg, failing silently. Both were caught only by a number derived through a *different route*. The cheap tell: would both halves of your check break identically if the selector were wrong? (L-198 ×2). Full family → CONTEXT.md § Gates (L-105 · L-108 · L-130 · L-136 · L-143 · L-170 · L-198).
 
+### host-tooling
+
+- **host-tooling → moved: docs/LEARNINGS.md` § Durable rules › host-tooling** · disposition: move-to-reference — no `.claude/CLAUDE.md` line (80-cap; the failure is specific to this Windows host) · learnings: L-306
+
+A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s (SPRINT-170 T3 lost three timed rounds to it; SPRINT-178's promote worker hung on a background `python` heredoc). Name the interpreter in a worker's brief (`bun`, or `python -c` with a script file), and screen a timed round's transcript for a 120 s gap before reading its minutes.
+
 ---
 
 ## L-324 [tags: process] [status: active]: **A brief that states what the environment holds is a claim about the world: check it before sending, or tell the worker how to supply it.**
@@ -172,10 +178,10 @@ SPRINT-177 T2 first added a test-only knob that controlled execution of the boun
 
 ---
 
-## L-319 [tags: docs] [status: active]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.** SPRINT-176 T1 filed L-317 with `related: L-042`, copied from CONTEXT's Streams bullet, which still cites it. L-042 is retired (the ledger's retired-ids line), and the first system verify failed `learnings dangling refs`. Cite the durable rule's home or a live id; a citation in a live doc is not proof the id still resolves.
+## L-319 [tags: docs] [status: promoted]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.** SPRINT-176 T1 filed L-317 with `related: L-042`, copied from CONTEXT's Streams bullet, which still cites it. L-042 is retired (the ledger's retired-ids line), and the first system verify failed `learnings dangling refs`. Cite the durable rule's home or a live id; a citation in a live doc is not proof the id still resolves.
 - seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`) · 2026-11-16 (SPRINT-178 system verify, first run: `related: [EPIC-026]` in a research file, because `related:` takes corpus ids only (ADR, research, L ids), never epics; fixed in `e5236150`, one extra gate run)
 - count: 2
-- promoted: no
+- **L-319 → promoted: `skills/lean-doc-generator/templates/LEARNINGS.md.template` (the `related:` comment)** · disposition: merge — one clause added: corpus ids only, never a retired id or an epic; the dangling-ref check stays the backstop.
 - related: L-234 (a check caught it only at system verify)
 
 ---
@@ -282,10 +288,10 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ---
 
-## L-306 [tags: tooling] [status: active]: **A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s.** Three of SPRINT-170 T3's six timed rounds (arm A twice, arm B once) lost 120 s each to a command that began with plain `python`, which skewed the time comparison. Row 5 was a no-go under either reading, but the time figures carry that noise. Tell a worker the interpreter to use (`bun`, or `python -c` with a script) in its brief, and screen a timed round's transcript for a 120 s gap before reading its minutes. CLI 2.1.319.
-- seen: 2026-11-09 (SPRINT-170 T3, TASK-633; Log "T3 pairs q1-q3") · 2026-11-16 (SPRINT-178 promote: a worker's background `python` heredoc hung and the coordinator stopped it; same family, a python call that never returns on this host)
+## L-306 [tags: tooling] [status: promoted]: **A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s.**
+- seen: 2026-11-09 (SPRINT-170 T3, TASK-633) · 2026-11-16 (SPRINT-178 promote: a worker's background `python` heredoc hung)
 - count: 2
-- promoted: no
+- **L-306 → promoted: `docs/LEARNINGS.md` § Durable rules › host-tooling** · disposition: move-to-reference — host-specific, so no CLAUDE.md line; the body is collapsed to this pointer.
 - related: L-300
 
 ---

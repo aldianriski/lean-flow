@@ -15,7 +15,8 @@ fires inside that skill's flow alone (the placement test, STANDARD §10). Review
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count`, set `promoted`, or
      add/extend `related:` — an optional cross-link to sibling learnings (`L-NNN (one-line why)`)
-     that sharpens recall and surfaces recurring clusters, but is never required.
+     that sharpens recall and surfaces recurring clusters, but is never required. Cite corpus ids only
+     (learnings, ADRs, research), never a retired id or an epic — resolve each against the ledger first.
      Once an entry reaches promoted: yes, collapse it to a pointer line at the next promote (§11):
      "L-NNN → promoted: <where>" — the durable rule is the record from then on. -->
 
