@@ -16,17 +16,18 @@ status: current
 
 ## [Unreleased]
 
-- **`/orchestrator`: the coordinator can launch a new lane with one owner popup and rotate an existing lane to a fresh session at a task boundary with `claude --bg`, against a 200k target.** `/handoff` and `/flow` name the same 200k target.
-- **`/orchestrator`: lanes keep bulky outputs (device runs, full test suites, long logs) in a worker.** They send only messages
-  another session acts on, batch shared-file approvals per task, and wait on a lock or RAM in a background shell loop
-  instead of `/loop` turns.
-
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.
 Released on a Codex review of the shipped diff since v2.23.0 (R1: one High and one Med, both fixed; R2 CLEAR) and the off-host gate.
 The coordinator reference comes from a real adopter run: one coordinator and one lane session per stream, across two repos (SPRINT-176).
 SPRINT-177's `--detached` flag was folded in before the push, on its own Codex reviews and a re-run of the release review over its shipped delta.
+SPRINT-178's lane rotation and lane-cost rules were folded in the same way (task reviews by Codex, then a release review of the shipped delta, CLEAR).
+
+- **`/orchestrator`: the coordinator can launch a new lane with one owner popup and rotate an existing lane to a fresh session at a task boundary with `claude --bg`, against a 200k target.** `/handoff` and `/flow` name the same 200k target.
+- **`/orchestrator`: lanes keep bulky outputs (device runs, full test suites, long logs) in a worker.** They send only messages
+  another session acts on, batch shared-file approvals per task, and wait on a lock or RAM in a background shell loop
+  instead of `/loop` turns.
 
 - **`night-run.sh`: adds a `--detached` flag so the pre-flight gate runs to completion.** The caller declares detachment; both gate limits
   are raised inline on that one call. An undeclared slow gate now refuses by name (`pre-flight-gate-foreground-limit`) instead of being
