@@ -355,3 +355,9 @@ Strongest-tier used: 4 of 6.
 
 ### 2026-11-16 | close | SPRINT-180 closed, 1 of 1 members done
 Retro -> the sprint file § Retro. Owner sign-off, verbatim: "File as proposed (Recommended)" (the Retro filing) · "Leave for TASK-671 (Recommended)" (the CONTEXT `dispatch-trial:` line) · "Archive + sweep (Recommended)" (the §11 retention pass). Filed: TD-317 (the commit-inline path ignores the host glossary); L-327 new; count bumps on L-293, L-255 and L-261; the CHANGELOG `[Unreleased]` line gained the commit-path caveat. No new task file; TASK-671's unblock is routed to `/triage` by the coordinator. System verify at `d6e1568e`: bun test 638 pass, 0 fail; QA-CHECK 233 pass, 0 fail. No `handoff` entries in this Log, so no reconciliation was owed.
+
+### 2026-11-16 | progress | post-close: trial row 19 tokens and the closed-tree gate
+
+Row 19 (close worker resume, writes) reported 153,420 tokens cumulative, so the resume took about 26.7k. Close cell total: 153.4k against the 114.5k baseline, 1.34×, over the 1.25× cap. Retries 0. Findings: 0 misses; the coordinator confirmed a clean tree and the commits d5eeea85, caf50a60 and b506867f.
+Opt-in gate on the closed tree (CONTEXT § Sprint model: close runs QA_FULL), b506867f: bun test 638 pass, 0 fail; QA-CHECK 225 pass, 0 fail. The count is below the 233 at d6e1568e because the checks that need an active sprint stop applying once it closes.
+Dispatch-trial summary for TASK-671 (cells over the 1.25× cap): intake 1.45×, promote 1.40×, close 1.34×. Builder check 1.06× and test runner 1.16×; neither met the 20%-below bar. The strongest-tier blind pairs met their condition on 4 of 4 samples (intake draft ×2, G2 design, review), with 4 of 6 dispatches used.
