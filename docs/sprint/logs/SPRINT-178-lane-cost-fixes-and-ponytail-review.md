@@ -3,7 +3,7 @@ sprint: 178
 slug: lane-cost-fixes-and-ponytail-review
 owner: Maintainer
 last_updated: 2026-11-16
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -78,3 +78,6 @@ builder-check · T3 · 0 contradictions · 4 questions · knowledge-index regene
 - **Fix:** `sprint(178) T3:` e5236150 sets `related: [ADR-001, graphify-daily-value]`; the epic stays cited in the body.
 - **Run 2 at e5236150:** `gate-remote: ran e5236150f33105613e0a96d2ce776ec92dbbcf35` · `bun test: 638 pass, 0 fail (rc 0)` · `QA-CHECK: 235 pass, 0 fail (rc 0)`. The Windows-local `epic-archive-differential` failure seen in T2's exercise does not reproduce off-host: a host-only parity difference, a TD candidate for close.
 - **Rollup:** run · 18 of 18 DoD ticked (T1 7/7 · T2 6/6 · T3 5/5); terminal state PLAN_EXHAUSTED. Next: `/lean-doc-generator close`.
+
+### 2026-11-16 | close | SPRINT-178 closed, 3 of 3 members done
+Retro -> the sprint file § Retro. Filed: TD-316 (Windows-host differential-parity failure); L-322, L-323, L-324 new; L-306 and L-319 bumped to count 2. No follow-up task (TASK-668 already in the backlog, blocked; the mobile-repo toolchain env script is an owner action in another repo). CHANGELOG `[Unreleased]` already held T1 and T2; T3 is not user-visible, no line added. Checks: `check-sprint-by-reference.ts --close` 8 pass, 0 fail. Handoff reconciliation: no `handoff` entry in this log and no `HANDOFF-LEDGER.md`; the probe lanes' `/handoff` docs (OS temp dir) were throwaway exercise files for T1's rotation test, not sprint handoffs, so nothing to make `spent`. Epic: EPIC-026 row completed and the ponytail Closed-when line ticked; the epic stays active (3 conditions open: RTK, graphify, record the verdicts). §11 retention and doc-freshness are proposals awaiting owner approval.

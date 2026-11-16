@@ -2006,3 +2006,8 @@ status: current
   - Evidence: SPRINT-176 Log, T2 progress entry ("token budget 12683 of 12691"); promote checklist, 12521 of 12691 at promote.
   - Impact: low. Same as TD-312: the next added line is refused or traded away.
   - Mitigation: the dedup pass TD-312 names (prose duplicating CLAUDE.md or the README becomes a pointer), measured in tokens this time; run at a promote doc-aging pass.
+- **TD-316** severity: low | status: open | created: Sprint-178 (close retro)
+  - Summary: **`evals/epic-archive-differential.test.ts` fails on this Windows host and passes off-host.** The case "check-epic-archive.ts matches check-epic-archive.sh (differential parity) > identical exit code + stdout" on fixture `epic-state/r-nonmember-attrib` fails locally at line 77:24 (`bun test` 637 pass, 1 fail), while the off-host gate is green at `99f85bb6` and `e5236150` (638 pass, 0 fail). The `.ts` and `.sh` checkers differ in output on this host only; the cause is not investigated. TD-242 is a different host difference (harness PASS count).
+  - Evidence: SPRINT-178 Log, T2 progress entry (exercise (i)) and the system-verify entry.
+  - Impact: low. A local full `bun test` on Windows reads red for a reason outside the change under test; the release gate (off-host) is unaffected.
+  - Mitigation: diff the two checkers' stdout on that fixture on this host and name the difference; fix the `.ts` or make the case host-aware.

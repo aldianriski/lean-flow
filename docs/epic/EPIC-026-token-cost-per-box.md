@@ -45,7 +45,7 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-178](../sprint/SPRINT-178-lane-cost-fixes-and-ponytail-review.md) | Lane cost fixes (TASK-666, TASK-667) with the ponytail delta review (TASK-669) | active | Ponytail slice only: TASK-669 delivers the ponytail verdict. TASK-666 and TASK-667 advance no EPIC-026 condition. |
+| [SPRINT-178](../sprint/SPRINT-178-lane-cost-fixes-and-ponytail-review.md) | Lane cost fixes (TASK-666, TASK-667) with the ponytail delta review (TASK-669) | closed · close_commit pending | Ponytail slice only: TASK-669 delivers the ponytail verdict (Drop, `docs/research/ponytail-delta-review.md`; "-45% tokens" inconclusive, nothing installed). TASK-666 and TASK-667 advance no EPIC-026 condition. |
 
 ## Decisions
 - **D1** — Vehicle, owner popup 2026-11-15: "One small epic, after Sprint B (Recommended)". Open a 'token cost per box' epic with the trials as slices. It starts only after EPIC-025 Sprint B (the workdoo SPRINT-005) closes, so Sprint B's measurement stays clean.
@@ -68,6 +68,6 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 
 ## Closed when
 - [ ] RTK has a recorded verdict (keep, drop or inconclusive) from one real lean-flow sprint run with it project-scoped, with USD per box compared against recent sprints by `scripts/session-cost.ts`. The bypass rule held: `git diff --cached` and the gate output were read uncompressed. → next slice: RTK measured trial
-- [ ] Ponytail has a recorded verdict (keep, drop or inconclusive) from a first-hand read of its SKILL.md and benchmark. Each technique is mapped to lean-flow's existing surface, and only the unmatched ones are named, as kept or dropped. Nothing is installed. → TASK-669
+- [x] Ponytail has a recorded verdict (keep, drop or inconclusive) from a first-hand read of its SKILL.md and benchmark. Each technique is mapped to lean-flow's existing surface, and only the unmatched ones are named, as kept or dropped. Nothing is installed. → closed by SPRINT-178 (TASK-669)
 - [ ] graphify has a recorded verdict (keep, drop or inconclusive) from one run on workdoo's TypeScript code during a dashboard sprint, with the measurement shown. lean-flow's own verdict is untouched. → next slice: graphify on workdoo
 - [ ] Each verdict and its measurement are in `docs/research/`, and the INDEX row names all three. Nothing ships inside lean-flow without a separate owner ruling, and a kept tool is recorded as maintainer-environment only unless that ruling says otherwise. → next slice: record the verdicts

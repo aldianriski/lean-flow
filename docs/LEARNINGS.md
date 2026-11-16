@@ -127,6 +127,33 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 ---
 
+## L-324 [tags: process] [status: active]: **A brief that states what the environment holds is a claim about the world: check it before sending, or tell the worker how to supply it.**
+SPRINT-178's promote brief said the `LF_GATE_*` settings "are already configured in the environment". They are not: the off-host gate needs them inline on the command. The promote worker could not run its baseline gate, and the coordinator ran it afterwards. Before a brief asserts env state (a variable, a login, a running service), read it from the shell the worker will use, or give the exact inline form instead of a promise.
+- seen: 2026-11-16 (SPRINT-178 promote; Log "promote" entry, baseline gate line)
+- count: 1
+- promoted: no
+- related: L-305 (path-looking env values and the gate settings) · L-310
+
+---
+
+## L-323 [tags: tooling] [status: active]: **`claude attach` and `claude agents` need a real terminal; a coordinator's shell and the `!` command have none.**
+SPRINT-178's T1 exercise ran `claude attach <id>` from the coordinator's shell and again as the owner's `!` command in the coordinator session; both printed "Attaching..." and exited. From a coordinator use `claude agents --json`; the owner attaches from a separate terminal window. Any brief or doc that tells an owner to attach names the terminal window, not the session they are in. CLI 2.1.325.
+- seen: 2026-11-16 (SPRINT-178 T1, box 1 exercise (c))
+- count: 1
+- promoted: no
+- related: L-300 (the CLI blocks a command a worker would rely on)
+
+---
+
+## L-322 [tags: tooling] [status: active]: **In `claude --bg`, a variadic flag swallows a trailing positional brief, so the session starts idle: put the brief first.**
+SPRINT-178's third probe lane launched with `--add-dir <dir>` before the brief; `--add-dir` is variadic and took the brief as another directory. The lane sat idle with no error. The fourth, with the brief first and then `--permission-mode auto --add-dir <dir>`, ran. The rule is now in `coordinator.md` § 8; check any new launch line for a variadic flag ahead of the brief. CLI 2.1.325.
+- seen: 2026-11-16 (SPRINT-178 T1, box 1 exercise (d), probe-3 vs probe-4)
+- count: 1
+- promoted: no
+- related: L-308 (text handed to a shell is code)
+
+---
+
 ## L-321 [tags: tooling] [status: active]: **A test fixture must run on every host the gate runs on, so build it from what the test controls, never from the author's OS.**
 SPRINT-177 T2's builder wrote its no-timeout fixture on Windows: it copied Git-for-Windows' `/usr/bin`, called `pwd -W` and joined PATH with `;`. The off-host gate is Linux, where it would have thrown. Codex R2 caught it before commit, and the fix made the lookup overridable instead. Run the new test once on the other host, or read it for host-only calls, before it counts as green.
 - seen: 2026-11-15 (SPRINT-177 T2, Codex R2 High)
@@ -146,8 +173,8 @@ SPRINT-177 T2 first added a test-only knob that controlled execution of the boun
 ---
 
 ## L-319 [tags: docs] [status: active]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.** SPRINT-176 T1 filed L-317 with `related: L-042`, copied from CONTEXT's Streams bullet, which still cites it. L-042 is retired (the ledger's retired-ids line), and the first system verify failed `learnings dangling refs`. Cite the durable rule's home or a live id; a citation in a live doc is not proof the id still resolves.
-- seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`)
-- count: 1
+- seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`) · 2026-11-16 (SPRINT-178 system verify, first run: `related: [EPIC-026]` in a research file, because `related:` takes corpus ids only (ADR, research, L ids), never epics; fixed in `e5236150`, one extra gate run)
+- count: 2
 - promoted: no
 - related: L-234 (a check caught it only at system verify)
 
@@ -256,8 +283,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 ---
 
 ## L-306 [tags: tooling] [status: active]: **A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s.** Three of SPRINT-170 T3's six timed rounds (arm A twice, arm B once) lost 120 s each to a command that began with plain `python`, which skewed the time comparison. Row 5 was a no-go under either reading, but the time figures carry that noise. Tell a worker the interpreter to use (`bun`, or `python -c` with a script) in its brief, and screen a timed round's transcript for a 120 s gap before reading its minutes. CLI 2.1.319.
-- seen: 2026-11-09 (SPRINT-170 T3, TASK-633; Log "T3 pairs q1-q3")
-- count: 1
+- seen: 2026-11-09 (SPRINT-170 T3, TASK-633; Log "T3 pairs q1-q3") · 2026-11-16 (SPRINT-178 promote: a worker's background `python` heredoc hung and the coordinator stopped it; same family, a python call that never returns on this host)
+- count: 2
 - promoted: no
 - related: L-300
 
