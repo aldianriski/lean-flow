@@ -80,3 +80,8 @@ Coordinator self-check findings (logged before either reviewer, not shown to the
 
 Strongest-tier used: 2 of 6.
 Coordinator note: baseline off-host gate run by the coordinator, not the worker: LF_GATE_* is not in the worker environment (L-324); the brief said so this time.
+
+### 2026-11-16 | progress | dispatch-trial: row 10 tokens, promote cell total
+
+Row 10 (promote worker, resume, writes after sign-off) reported 210,964 tokens cumulative, so the resume itself took about 15.1k. Retries 0. Findings 0: the coordinator re-ran `promote-check` on its own (`promote-check: PASS -- 4 pass, 0 fail`), and `git status` was clean after b190c6e1.
+Promote cell total: 211.0k against the 151k baseline, which is 1.40×, over the 1.25× cap. Strongest-tier used: 2 of 6.
