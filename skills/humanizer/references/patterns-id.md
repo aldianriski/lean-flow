@@ -4,6 +4,8 @@ Read this in full, in addition to `patterns-en.md`, when the text is Indonesian 
 
 Register: developer code-mixed Indonesian. Keep the English technical term where the KBBI coinage is uncommon or shifts the meaning.
 
+**Before you rewrite, look for a host glossary.** Read `.claude/CONTEXT.md`, then `CONTEXT.md`, at the project root (the working folder when there is no repo), and apply § Host glossary below. If neither file exists, carry on.
+
 ## A. Slop patterns
 
 Each pattern names the English section it shares. The English problem statements and "when not to act" rules carry over.
