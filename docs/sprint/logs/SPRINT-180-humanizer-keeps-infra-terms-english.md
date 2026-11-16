@@ -284,7 +284,8 @@ Approved design (the G2 record, verbatim; its quoted Done when is omitted here b
 
 ### 2026-11-16 | review | T1: blind pair round 1 (Fable then Codex, same frozen diff c8addd36..90081415)
 
-consequence · T1 · behaviour:low · governance:low. The skip table gives one scoped reviewer. The trial's Review cell ran the blind pair on this small diff.
+consequence · T1 · behaviour:low · governance:low
+The skip table gives one scoped reviewer. The trial's Review cell ran the blind pair on this small diff.
 - Fable · high: 1H 6M 8L. Coordinator verified: S1 (the NOTES validity rule invalidates the baseline) is real. T3 (the leftover rule never reaches the inline paths, which read only the catalogs) is real. T1 (the glossary has no same-sense check; a business entry could rewrite "konsumen") is real and a consumer risk. T2 (the unggah verb line contradicts the Keep note) is real. S2 (the commit-inline input is not retained) and S4 (the second query skips rehearsal, dry run and kunci) are real. S5 (acceptance test vs penyerahan) is real but low. S3 (catalogs edited before any baseline was on record) is partly real: the baseline export was frozen before the edit, and the record landed later in 29766c39; the sample was strengthened with the edits known, which is disclosed here. S7 (pindai: only the noun moves) is real, and is fixed by following box 3 literally.
 - Codex: 1H 1M. Both duplicate Fable (T3 rated high, S1 rated medium). Codex found nothing Fable missed.
 - Pair verdict: the cell condition holds (Fable's T1, T2, S2 and S4 are real and missed by Codex). Cost 134,027 / 105,958 = 1.26× (cap 2×). Strongest-tier used: 4 of 6.
@@ -338,3 +339,7 @@ Box evidence:
 | 17 | 2026-11-16 | test runner (after-runs, round 2) | haiku · low | 59,848 cumulative (round delta ≈4.3k); cell total 59.8k vs 51.5k = 1.16× | 1 (eval retry, not runner error) | 0 misses: each verdict line matched the coordinator's transcript read | coordinator | yes |
 
 Strongest-tier used: 4 of 6.
+
+### 2026-11-16 | progress | coordinator correction: the round-1 review entry's consequence line
+
+System-verify at 78612591 failed `review-depth-consequence-vocab` on the round-1 review entry: "governance:low." had a sentence glued after the token. The line was split in place, with the token unchanged, so it reads exactly `consequence · T1 · behaviour:low · governance:low`. This is the only edit to an earlier entry, and it changes the line's format, not its content.
