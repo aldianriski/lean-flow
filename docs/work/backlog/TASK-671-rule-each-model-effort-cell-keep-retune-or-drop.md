@@ -10,7 +10,7 @@ class: decision
 tier: P
 authority: J1
 origin: decomposer
-state: blocked
+state: ready
 depends-on: [TASK-670]
 ---
 
@@ -47,7 +47,6 @@ dispatch.md § Route by classification and § Escalation, CONTEXT § Model tiers
 
 ## Assumes
 
-- **blocked-by:** the next real sprint after TASK-670 closes, run with the trial matrix (one sprint, strongest tier at most 6 dispatches), and its record holding the per-dispatch fields.
 - Transcript sums do not reproduce the harness figures (the close worker sums to about 349k raw against 112-117k reported), so the reported figure is the unit. Effort is not in `meta.json`, so the record is the source.
 - Tokens are not USD across models. Results are read as direction, not proof (EPIC-024 D4).
 - Baselines for the repo fetch, promote and close workers have n=1 to 2, so those cells lean on the 1.25× cap more than on the 20% margin.
