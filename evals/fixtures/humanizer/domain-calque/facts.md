@@ -11,10 +11,10 @@ Facts:
 6. The queue worker runs on two old hosts until the move is complete.
 7. The rehearsal is scheduled for Wednesday with the staff who will work on Saturday.
 8. Each staff member records the work sequence and start time on a shared sheet.
-9. The code freeze starts on Thursday at 17.00.
-10. The final sync is at 22.00 on Saturday, the last task before the switch.
+9. Filling in the checklist starts on Thursday at 17.00.
+10. The full copy of the archive at 22.00 on Saturday is the last task before the switch.
 11. The core database moves to a new host with 7 TB of capacity.
-12. TLS termination remains on the existing load balancer.
+12. The deception sensors stay on the existing network.
 13. NFS is a dependency for the second wave because moving the archives waits for shared storage to be available.
 14. The person responsible for access must replace the payment service's API key before the system reopens.
 15. Database records are retained for 14 days.
@@ -32,10 +32,10 @@ Expected terms, judged per run (the first eight seeds are scored separately from
 | 2 | Worker antrean berjalan di dua host lama | Queue worker berjalan di dua host lama |
 | 3 | temuan tersebut sudah ditutup | findings tersebut sudah di-fix |
 | 4 | gladi dijadwalkan Rabu | rehearsal dijadwalkan Rabu |
-| 5 | sinkron akhir pukul 22.00 | final sync pukul 22.00 |
-| 6 | Pembekuan Kode berlaku sejak Kamis pukul 17.00 | Code freeze berlaku sejak Kamis pukul 17.00 |
+| 5 | salin penuh arsip pukul 22.00 | full copy arsip pukul 22.00 |
+| 6 | Pengisian Daftar Periksa dimulai Kamis | Pengisian checklist dimulai Kamis |
 | 7 | inti data pindah ke host baru | core database pindah ke host baru |
-| 8 | terminasi TLS di load balancer | TLS termination di load balancer |
+| 8 | sensor jebakan di jaringan yang ada | deception sensor di jaringan yang ada |
 
 Seed 2 begins a sentence; seed 6 is mid-paragraph with mixed casing. Both exercise case-insensitive cleanup. Seeds 1
 and 3 require the affixed forms `di-scan` and `di-fix`, respectively. In a glossary-override run, seed 4 instead becomes

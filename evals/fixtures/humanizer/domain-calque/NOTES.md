@@ -14,10 +14,10 @@ The eight seeds and their expected forms with no override:
 2. Sentence-initial "Worker antrean berjalan di dua host lama" → "Queue worker berjalan di dua host lama".
 3. "temuan tersebut sudah ditutup" → "findings tersebut sudah di-fix".
 4. "gladi dijadwalkan Rabu" → "rehearsal dijadwalkan Rabu".
-5. "sinkron akhir pukul 22.00" → "final sync pukul 22.00".
-6. Mid-paragraph "Pembekuan Kode berlaku sejak Kamis pukul 17.00" → "Code freeze berlaku sejak Kamis pukul 17.00".
+5. "salin penuh arsip pukul 22.00" → "full copy arsip pukul 22.00".
+6. Mid-sentence, mixed casing: "Pengisian Daftar Periksa dimulai Kamis" → "Pengisian checklist dimulai Kamis".
 7. "inti data pindah ke host baru" → "core database pindah ke host baru".
-8. "terminasi TLS di load balancer" → "TLS termination di load balancer".
+8. "sensor jebakan di jaringan yang ada" → "deception sensor di jaringan yang ada".
 
 Two kunci seeds are scored separately: "NFS menjadi kunci gelombang kedua" → "NFS menjadi dependency gelombang
 kedua", and "kunci API layanan pembayaran" → "API key layanan pembayaran". The first is a critical dependency,
