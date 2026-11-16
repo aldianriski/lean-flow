@@ -4,6 +4,7 @@ slug: humanizer-keeps-infra-terms-english
 owner: Maintainer
 last_updated: 2026-11-16
 status: active
+plan_commit: 4579e335
 update_trigger: sprint execute/close events
 ---
 
