@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-15
+last_updated: 2026-11-16
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2011,3 +2011,8 @@ status: current
   - Evidence: SPRINT-178 Log, T2 progress entry (exercise (i)) and the system-verify entry.
   - Impact: low. A local full `bun test` on Windows reads red for a reason outside the change under test; the release gate (off-host) is unaffected.
   - Mitigation: diff the two checkers' stdout on that fixture on this host and name the difference; fix the `.ts` or make the case host-aware.
+- **TD-317** severity: low | status: open | created: Sprint-180 (close retro)
+  - Summary: **The inline commit-message path never reads the host glossary, so a host override is ignored in commit messages.** `embedded.md` § Inline path sends the pass to the three catalogs and never to `CONTEXT.md`. The global calque rules still apply there ("di-scan" worked).
+  - Evidence: SPRINT-180 Log, the box-4 scope-change entry and the after-run entries. 2 of 2 commit-inline runs (exports at `2767637f` and `d28b0a6f`) read the three catalogs, never `CONTEXT.md`, and wrote "rehearsal" where the override demanded "dry run". The child and inline-fallback paths fired once the glossary step moved to the top of `patterns-id.md`.
+  - Impact: low. A host glossary override reaches documents and PR bodies but not humanized commit messages. The owner ruled "Accept gap + TD (Recommended)", with no `embedded.md` edit this sprint.
+  - Mitigation: a one-line pointer to the glossary step in `embedded.md` § Inline path, then re-run the commit-inline override case in `evals/fixtures/humanizer/domain-calque/`. A hypothesis, not a plan; re-derive before building on it.

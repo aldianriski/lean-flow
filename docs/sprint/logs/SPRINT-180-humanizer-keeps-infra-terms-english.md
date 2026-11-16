@@ -343,3 +343,15 @@ Strongest-tier used: 4 of 6.
 ### 2026-11-16 | progress | coordinator correction: the round-1 review entry's consequence line
 
 System-verify at 78612591 failed `review-depth-consequence-vocab` on the round-1 review entry: "governance:low." had a sentence glued after the token. The line was split in place, with the token unchanged, so it reads exactly `consequence · T1 · behaviour:low · governance:low`. This is the only edit to an earlier entry, and it changes the line's format, not its content.
+
+### 2026-11-16 | progress | dispatch-trial: close worker rows
+
+| # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
+|---|---|---|---|---|---|---|---|---|
+| 18 | 2026-11-16 | close worker (scan, proposal) | sonnet · medium | 126,744 (baseline 114.5k → 1.11x, under the 1.25x cap) | 0 | 0 misses so far | coordinator | yes |
+| 19 | 2026-11-16 | close worker (resume, writes after sign-off) | sonnet · medium | filled by the coordinator at report time | | | | |
+
+Strongest-tier used: 4 of 6.
+
+### 2026-11-16 | close | SPRINT-180 closed, 1 of 1 members done
+Retro -> the sprint file § Retro. Owner sign-off, verbatim: "File as proposed (Recommended)" (the Retro filing) · "Leave for TASK-671 (Recommended)" (the CONTEXT `dispatch-trial:` line) · "Archive + sweep (Recommended)" (the §11 retention pass). Filed: TD-317 (the commit-inline path ignores the host glossary); L-327 new; count bumps on L-293, L-255 and L-261; the CHANGELOG `[Unreleased]` line gained the commit-path caveat. No new task file; TASK-671's unblock is routed to `/triage` by the coordinator. System verify at `d6e1568e`: bun test 638 pass, 0 fail; QA-CHECK 233 pass, 0 fail. No `handoff` entries in this Log, so no reconciliation was owed.

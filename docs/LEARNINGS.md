@@ -133,6 +133,15 @@ A bare `python` on this Windows host opens an interactive REPL and stalls a tool
 
 ---
 
+## L-327 [tags: process] [status: active]: **An action instruction deep in a reference catalog is not acted on: put it at the top of the file every path reads.**
+SPRINT-180's host-glossary step sat at line 173 of 188 in `patterns-id.md`. After the first build it fired in 1 of 7 runs that had a glossary in the folder; the other 6 read the catalog and never looked for `CONTEXT.md`. Moved to the top of the file, it fired on the child and inline-fallback paths. The commit-inline path still did not fire (TD-317). A step a run must perform belongs where the run starts reading, and its proof is a Read call in the transcript, not the text.
+- seen: 2026-11-16 (SPRINT-180 T1: 1 of 7 before the move, child and inline-fallback after it)
+- count: 1
+- promoted: no
+- related: L-294 (a stage told to read must do the read) · L-099 (a rule where its reader does not read)
+
+---
+
 ## L-326 [tags: tooling] [status: active]: **`record-line.ts tick` runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout: tick in batches, or run the loop in the background and read the verdict line.**
 SPRINT-179 ticked TASK-670's 17 boxes one call at a time in a single loop, and the loop outran a 120 s tool timeout because each tick re-ran the downstream checkers. The ticks written before the cut stayed written, so after a timeout read the member file for which boxes landed, not the loop's status.
 - seen: 2026-11-16 (SPRINT-179 close: the T1 ticks)
@@ -413,7 +422,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ## L-293 [tags: process] [status: active]: **Who launches a headless proof is a G2 decision: a worker's nested `claude -p` can be denied by the host's classifier.** SPRINT-165 T1's design gave the proof to the builder. The classifier denied its launch as "Create Unsafe Agents", so the builder returned `blocked` with the work done and the box open, and the owner had to approve the runs in a second popup. Name the launcher and get the approval at G2, and have the builder stage the proof only.
 - seen: 2026-11-07 (SPRINT-165 T1, consumer proof)
-- count: 1
+- seen: 2026-11-16 (SPRINT-180 T1: the headless child's Skill call was denied; passing `--allowedTools` to the child was refused by the auto-mode classifier as undermining oversight. The route that needed no permission change, ruled by the owner, was naming the export's skill folder in the prompt so the child reads SKILL.md from there)
+- count: 2
 - promoted: no
 - related: L-241 · L-249 · TASK-614
 
@@ -667,7 +677,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ## L-261 [tags: edit-safety] [status: promoted]: **Prose that a guard parses is a structured field: a path-shaped token written into it is a claim the guard will check.** At SPRINT-147's system verify, two of three FAILs were the coordinator's own words. Tick evidence on TASK-533 named the bare `run-trial.ts` and a dotted `result.…` token, which the member-layers check reads as undeclared files. A scope-change entry backticked two directory names, which the scope-change check reads as paths the entry claims, though T1's `Layers:` did not hold them. Both guards were right; the author wrote file-shaped tokens where plain words were meant. L-108 is the guard's side of this (match by shape, not substring); this is the writer's side. Inside a governed artifact (tick evidence, a log entry's paths, Plan lines), write a token in backticks with a path shape only when it names a file the task touches or cites; otherwise use words.
 - seen: 2026-10-29 (SPRINT-147 system verify on `b41932a7`, three FAILs; fixed in place per L-176, then 327/0) · 2026-10-29 (SPRINT-148 close: five `consequence ·` records written as bulleted prose with `med`/`high` tokens, unreadable to `check-review-depth` and so silently green; found by reading the checker before close, corrected in place, and the reviews they had hidden were owed and run) · 2026-11-03 (SPRINT-160 close: TASK-595's tick evidence named the gate script; layers completeness read it as a file the task touched; system verify 477/2, then 479/0) · 2026-11-08 (SPRINT-169 system verify on `05c9fcbe`: the coordinator's T1 `consequence ·` line carried prose where the checker reads `behaviour:(low|material) · governance:(low|high)`; `review-depth-consequence-vocab` FAIL, QA-CHECK 495/1; fixed in place per L-176, then 496/0) · 2026-11-10 (SPRINT-170 system verify: the T1 `consequence ·` line again carried a trailing explanation; tick evidence on TASK-633 and TASK-634 sat on a continuation line, read as a Done-when edit; T6's `Cites:` named `gate-remote.ts` by a path-shaped token. Fixed in `65a32709`, `26d1bfd7`, `f00521ea`, `aa80826f`, `c4a4a7a0`, then 493/0: tick evidence goes on the box's FIRST line, a `Cites:` token is the bare file name) · 2026-11-10 (SPRINT-171 close: seven `consequence ·` lines with inline reasons, unreadable to `check-review-depth`, hid T5's owed independent review until the close gate)
-- count: 6
+- seen: 2026-11-16 (SPRINT-180 system verify on `78612591`: a sentence glued after the `governance:low` token of a `consequence ·` line failed `review-depth-consequence-vocab`; split in place in `d6e1568e`, gate then 233/0)
+- count: 7
 - **L-261 → promoted: `docs/LEARNINGS.md` § Durable rules › edit-safety** · disposition: merge — into L-257's scope-change line, widened from a scope-change body to every governed field a guard parses (tick evidence, log paths, Plan lines) (SPRINT-149 promote)
 - related: L-108 (the guard's side) · L-176 (structured fields in a narrative file) · L-251 (run every check that reads a touched file)
 
@@ -716,7 +727,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ## L-255 [tags: process] [status: active]: **A retained sample must first show the failure it is meant to catch, and facts in plain sentences do not.** SPRINT-142 T2's first sample stated its eleven facts in sentences the pass left almost untouched, and the pre-fix embedded pass kept all of them in 3 of 3 runs. Strengthened once (each fact inside dressing the pass is tempted to cut), it still lost nothing in 3 of 3. The 3-of-6 loss TD-274 recorded never reproduced, so the fix shipped as a guard and the TD was narrowed, not resolved. Run the baseline before writing the fix: a baseline that cannot fail measures nothing about the fix.
 - seen: 2026-10-25 (SPRINT-142 T2: pre-fix 0 of 3 on each sample version; owner rulings R1 and R2)
-- count: 1
+- seen: 2026-11-16 (SPRINT-180 T1 baseline round 2: run 2 fixed code freeze, final sync and TLS termination through the existing infra rule, leaving 5 of 8 unfixed against a pin of 6; the sample was strengthened with seeds the old rule cannot reach, and round 3 left 8 of 8 unfixed)
+- count: 2
 - promoted: no
 - related: L-252 (judge a model-driven pass over several runs) · L-246 (a RED that proves nothing about the old code)
 

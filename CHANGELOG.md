@@ -16,7 +16,7 @@ status: current
 
 ## [Unreleased]
 
-- **`/humanizer`: uses English terms for Indonesian infra calques, with an optional host-glossary override and a check for rejected forms left in the final text.**
+- **`/humanizer`: uses English terms for Indonesian infra calques, with an optional host-glossary override (read on the document and inline-fallback paths; commit messages ignore it, TD-317) and a check for rejected forms left in the final text.**
 
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
