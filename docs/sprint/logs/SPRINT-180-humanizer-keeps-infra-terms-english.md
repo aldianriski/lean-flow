@@ -314,3 +314,12 @@ Eval miss → the design's one bounded catalog retry: d28b0a6f puts the glossary
 | # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
 |---|---|---|---|---|---|---|---|---|
 | 16 | 2026-11-16 | test runner (after-runs, round 1) | haiku · low | 55,557 (baseline 51.5k → 1.08×) | 0 | 0 misses: all 10 verdict lines matched the coordinator's transcript read | coordinator | yes |
+
+### 2026-11-16 | scope-change | T1/TASK-672 box 4: the commit-inline path does not fire the host glossary; owner accepts the gap with a TD
+
+- What broke: box 4 says "Every path that reads the catalogs gets it ... child path, inline commit path, inline fallback, standalone use and Translate mode".
+  - After round 1 (2767637f), the commit-inline run read the three catalogs and never looked for CONTEXT.md, so it wrote "rehearsal" where the override demanded "dry run".
+  - After the one bounded catalog retry (d28b0a6f, the glossary step moved to the catalog's top), the same happened. The child and inline-fallback paths then fired: "dry run", with CONTEXT.md read.
+- Owner ruling, verbatim: "Accept gap + TD (Recommended)", answering "Box 4 ticks for the document paths, and the commit path is recorded as not firing, with the 2 runs as evidence. The global rules still apply in commits (di-scan worked). File a TD for the commit-path glossary. No embedded.md edit."
+- Impact: box 4 is ticked for the child and inline-fallback paths, which were run, and for standalone and Translate, which are judgment ticks through the same catalog read. The commit-inline path is recorded as not firing, and the box gets a note line. TD-317 (the next free id: ledger max TD-316, cross-checked by the row census; TD-961 is a string inside an archived log) will be filed at close.
+- G2 re-confirm: not needed. The design is unchanged, and the gap is recorded rather than worked around.
