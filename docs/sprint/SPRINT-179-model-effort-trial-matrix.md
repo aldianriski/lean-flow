@@ -4,6 +4,7 @@ slug: model-effort-trial-matrix
 owner: Maintainer
 last_updated: 2026-11-16
 status: active
+plan_commit: c25c88ce
 update_trigger: sprint execute/close events
 ---
 
