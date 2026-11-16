@@ -294,3 +294,9 @@ consequence · T1 · behaviour:low · governance:low. The skip table gives one s
 |---|---|---|---|---|---|---|---|---|
 | 14 | 2026-11-16 | review (T1 diff, blind pair 1 of 2) | fable · high | 134,027 | 0 | 1H 6M 8L; 4 real ones unique vs Codex | coordinator | yes |
 | 15 | 2026-11-16 | review (T1 diff, blind pair 2 of 2, comparator) | codex exec · default | 105,958 | 0 | 1H 1M, both shared with Fable | coordinator | yes |
+
+### 2026-11-16 | review | T1: builder retry and round-2 re-review CLEAR
+
+- worker · T1 retry · codex exec · gpt-6.1-sol · worktree s180-t1. The 9 fix conditions landed as 2767637f (Codex reported 99,447 tokens). The coordinator read the whole diff: all 9 are met, SKILL.md is 121 lines, the 20 rows are unchanged, and commit-message.txt is retained.
+- Re-review, Codex alone (revise-loop re-review, outside the measured pair): 0 blocking. One note: the after-run evidence is not yet recorded, and is due before the tick. 91,429 tokens. Review rounds: 2 of 2.
+- After arm: export of 2767637f at D:\Research\s180-evals\export-after. Prompts built from the export's `embedded.md` sections, per NOTES.md: child, inline fallback, commit-inline and term-of-art. The run folders sit outside any git repo, so discovery uses the working folder. The term-of-art folders hold no CONTEXT.md. 10 after-runs dispatched to a fresh test runner (haiku · low).
