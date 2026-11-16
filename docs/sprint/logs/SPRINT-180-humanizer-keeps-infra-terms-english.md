@@ -85,3 +85,15 @@ Coordinator note: baseline off-host gate run by the coordinator, not the worker:
 
 Row 10 (promote worker, resume, writes after sign-off) reported 210,964 tokens cumulative, so the resume itself took about 15.1k. Retries 0. Findings 0: the coordinator re-ran `promote-check` on its own (`promote-check: PASS -- 4 pass, 0 fail`), and `git status` was clean after b190c6e1.
 Promote cell total: 211.0k against the 151k baseline, which is 1.40×, over the 1.25× cap. Strongest-tier used: 2 of 6.
+
+### 2026-11-16 | gate | G1 passed for T1 (TASK-672), fast-path
+
+origin: decomposer, so G1 is one confirm. Owner, verbatim: "Unchanged (Recommended)". The same popup also took three G2 intent rulings, verbatim:
+- verb uji: "Compounds only (Recommended)"
+- lapis: "'lapis' only (Recommended)"
+- bare kunci: "Owner phrase only (Recommended)"
+The G2 design draft is in the coordinator's scratchpad until sign-off.
+Coordinator's own G2 check, logged before any reviewer saw the design (trial pair for the G2 design check cell):
+- (a) 15 candidate rows plus 3 compound rows gives 18 rows, against Q2's "12-15" and box 1's "about 12 to 15". Move the compounds into the one-liner.
+- (b) The design does not pin the model for the headless runs. Baseline and after must run on the same model.
+- (c) The inline-fallback wiring run is the only non-child proof. The commit-inline path is not run; it reads the same catalog, so the proof holds by construction only.
