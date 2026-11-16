@@ -241,11 +241,9 @@ SPRINT-173 T6 and T7 each passed a scoped review, then the gate failed on `run-o
 ---
 
 ## L-315 [tags: process] [status: promoted]: **A claim that nothing depends on X is a census, and a truncated query cannot back it; run the dependency grep untruncated, or say the result is partial.**
-At SPRINT-173's G2 the coordinator told the owner that no check reads `close_commit`, from a grep piped through `head -12` that cut off `scripts/lib/conformance-engine.sh`. The owner signed on that claim. T7's round-1 reviewer, briefed to grep the whole tree, found S10.FOURBUCKETS reading it, and the owner re-ruled.
-Second sighting, a claim that a surface is missing: SPRINT-174's research note said reviewer briefs asked for neither coverage nor limitations, from one grep for those two words. The brief already asked what the reviewer "declined to judge". Reading the section for the G2 design caught it. An absence claim needs a second query that varies the wording, or a read of the section.
 - seen: 2026-11-12 (SPRINT-173 G2 and T7), 2026-11-13 (SPRINT-174 G2)
 - count: 2
-- promoted: yes → `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check bullet's second line, and `docs/LEARNINGS.md` § Durable rules › cross-check · disposition: merge — the capped-output half is L-198's, already carried by L-130; this sighting adds the absence-claim case and is counted there, and this entry's text stays as the record. Matcher: none, the line is documentation; the promote review's L-promotion line is its only consumer.
+- **L-315 → promoted: `.claude/CLAUDE.md` § Behavioral Guidelines, the cross-check bullet's second line, and `docs/LEARNINGS.md` § Durable rules › cross-check** · disposition: merge — the capped-output half is L-198's, already carried by L-130; this sighting adds the absence-claim case and is counted there (§11 collapse, SPRINT-180 close). Body: git; seen SPRINT-173 G2 and T7 (a grep through `head -12` backed a no-reader claim for `close_commit`) and SPRINT-174 G2 (a one-wording grep backed a missing-surface claim).
 - related: L-198 · L-130 · EPIC-025
 
 ---
