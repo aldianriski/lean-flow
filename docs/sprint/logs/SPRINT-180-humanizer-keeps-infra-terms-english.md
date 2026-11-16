@@ -267,3 +267,17 @@ Approved design (the G2 record, verbatim; its quoted Done when is omitted here b
 > J1, HITL, risk low, tier X, size S. No ADR. No auth/input/secrets surface.
 > Cost: 13 headless runs + 1 judge + 1 Codex build; ~0.4 USD per run by `behavioral-eval-feasibility` → about 5-6 USD.
 > 
+
+### 2026-11-16 | progress | T1: fixture, baseline pin and text build
+
+- worker · T1 M1 · codex exec · gpt-6.1-sol · worktree D:\Project\lean-flow-worktrees\s180-t1. The fixture landed as 520ac6d1 (sample hash c843bd27). Codex reported 61,882 tokens. The coordinator re-counted seeds and controls (each appears once) and found no leaked expected forms.
+- worker · T1 M3 · codex exec · gpt-6.1-sol · same worktree. The text edits landed as 5a50d0b3 (Codex reported 74,035 tokens). The coordinator fix 90081415 covers 3 findings from the coordinator's own diff read: the owner's pairs for tanda tangan → sign and bersihkan → cleanup, and the glossary entry now acts through its `_Avoid_` forms. Without that, the override fixture could not fire.
+- Run model pinned to `--model sonnet` (claude-sonnet-5-5) for every run, because the child path inherits the session model (`embedded.md` § Child path). Runs execute in trusted `D:\Research\s180-evals`.
+- The first baseline round was discarded unjudged. All 3 runs returned UNAVAILABLE: the headless Skill call was denied and the catalogs were never read.
+- A retry passing `--allowedTools` to the child was denied by the auto-mode classifier as undermining oversight, and was not worked around. Owner ruling, verbatim: "Name skill path (Recommended)". With no permission change, the prompt names the export's humanizer folder as an input, so the child takes item 1's own fallback, reading SKILL.md from there. Every arm uses this route.
+- Baseline round 2 (sample c843bd27) was valid, but run 2 fixed code freeze, final sync and TLS termination through the existing infra rule. That left 5 of 8 unfixed, short of the pin. The sample was strengthened under the DoD's escape (17dc37ee, hash b2e4ef38): seeds 5, 6 and 8 became salin penuh, Daftar Periksa and sensor jebakan.
+- Baseline round 3 (sample b2e4ef38, export 3e31706d, identical to HEAD for skills and .claude-plugin before M3). All 3 runs valid (sonnet; every Read on export-base; patterns-id.md read with no offset). Mechanical grep: 8 of 8 seeds unfixed in 3 of 3, both kunci seeds unfixed, so the **pin holds**. Run 2 reworded the controls "keputusan kunci" and "lapisan". Cost $0.18, $0.18 and $0.19. The blind judge scores these finals with the after-runs.
+
+| # | Date | Role | Cell | Reported tokens | Retries | Findings | Ruled real by | Fired? |
+|---|---|---|---|---|---|---|---|---|
+| 13 | 2026-11-16 | test runner (baseline runs) | haiku · low | 58,082 cumulative over 4 rounds (round 1 51,433; round 2 53,247 denied; round 3 55,757; round 4 58,082); baseline 51.5k; first round 1.00×, total 1.13× | 3 (harness rounds, not runner errors) | 0 misses: each verdict line matched the coordinator's own transcript read; no false "ready" | coordinator | yes |
