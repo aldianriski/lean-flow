@@ -196,7 +196,7 @@ SPRINT-177 T2 first added a test-only knob that controlled execution of the boun
 
 ---
 
-## L-319 [tags: docs] [status: promoted]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.** SPRINT-176 T1 filed L-317 with `related: L-042`, copied from CONTEXT's Streams bullet, which still cites it. L-042 is retired (the ledger's retired-ids line), and the first system verify failed `learnings dangling refs`. Cite the durable rule's home or a live id; a citation in a live doc is not proof the id still resolves.
+## L-319 [tags: docs] [status: promoted]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.**
 - seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`) · 2026-11-16 (SPRINT-178 system verify, first run: `related: [EPIC-026]` in a research file, because `related:` takes corpus ids only (ADR, research, L ids), never epics; fixed in `e5236150`, one extra gate run)
 - count: 2
 - **L-319 → promoted: `skills/lean-doc-generator/templates/LEARNINGS.md.template` (the `related:` comment)** · disposition: merge — one clause added: corpus ids only, never a retired id or an epic; the dangling-ref check stays the backstop.
