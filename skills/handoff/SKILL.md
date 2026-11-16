@@ -17,7 +17,8 @@ On v1 or mixed, name it and refuse to write the status stub — point to `/lean-
 
 ## When to invoke
 
-- Context budget is running low and work is unfinished.
+- The session's context is past ~200k (or the host's `lane-context-ceiling:`) at a task boundary and work is unfinished;
+  in a lane, also send the coordinator "rotate me `<path>`" (→ `/orchestrator` `references/coordinator.md` § 8 Lane rotation).
 - A task is blocked and the next session will resume it.
 - A deliberate stop mid-task, or a planned agent-to-agent handoff.
 

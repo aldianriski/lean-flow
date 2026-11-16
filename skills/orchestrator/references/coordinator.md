@@ -16,6 +16,9 @@ section, it governs. A single-stream repo needs none of this.
 
 Start lane sessions outside the editor terminal, so closing the editor does not kill them.
 
+The coordinator proposes a brand-new lane (stream, sprint, worktree, why) in one popup. On the owner's yes it launches
+the lane with `claude --bg`. That popup yes is the authority for a new lane; gate status still follows the rule below.
+
 A lane brief carries:
 
 - **stream** and **sprint** (the lane's one active sprint);
@@ -24,6 +27,7 @@ A lane brief carries:
 - an **inventory of uncommitted state** in that worktree (or "clean");
 - **gate status**: each gate (G1, G2) either `signed by record @<sha>`, or `unsigned`, in which case the brief says
   "take your G1/G2 to the owner as a popup in your own session";
+- ceiling `<n>` (default 200k); at a task boundary write `/handoff` and send 'rotate me `<handoff path>`'.
 - the **reply requested** (what the lane sends back, and when).
 
 A brief never claims a G1 or G2 sign-off the owner did not give. A gate the owner already signed (for example an
@@ -80,3 +84,26 @@ maximum, so two lanes can file the same number. The coordinator prevents that by
 - A range change is sent as a message and logged.
 - No ledger field and no checker: booking is prose. With no booking (a single stream), derivation is exactly the
   maximum-in-use rule, unchanged.
+
+## 8. Lane rotation
+
+A lane acts only at a task boundary (a member task's commit), because a session cannot see its own context size.
+200k is the coordinator's and owner's target; the coordinator reads a lane's transcript usage or the owner's status line.
+The host overrides it with a CONTEXT line `lane-context-ceiling: <tokens>` or in the lane brief.
+The lane itself only starts a rotation at a task boundary. The coordinator, which can see the usage, may rotate a lane
+above the target mid-task once its current coherent step is done. Never stop or rotate a lane mid-step; a task never
+waits on a rotation.
+
+- Route (CLI-version-dependent; Claude Code 2.1.325): the lane writes `/handoff` and sends "rotate me `<path>`".
+  The coordinator runs `claude stop <id>` then `claude --bg "<brief + handoff path>" --name <lane> --permission-mode <the lane's mode> --add-dir <the handoff's directory>`.
+  The fresh lane runs `/prime`, reads the handoff, and reports; the coordinator logs the new id and name.
+  List/inspect with `claude agents --json` (plain `claude agents` needs a terminal) and `claude logs <id>`.
+- Rules from real input, 2026-11-16: put the brief BEFORE variadic flags such as `--add-dir`, which swallows a trailing brief and starts the session idle.
+  Give the fresh lane its predecessor's permission mode plus `--add-dir` for the handoff's directory; an `acceptEdits` lane stopped on a prompt to read the handoff.
+  The owner answers a lane's popup with `claude attach <id>` from a real terminal window, never the coordinator's shell
+  or a `!` command in it: neither has a terminal, so attach exits at once. Messages queue behind a pending popup.
+- If the route fails, the owner opens the fresh lane in a terminal with the same brief.
+- Rotating an existing lane needs no popup. The rotated brief cites the original gate records and never claims a new sign-off (§2).
+- Coordinator self-rotation is advisory, never a gate: at a checkpoint write `/handoff` and hand to a successor launched
+  with `claude --bg` (a rotation, no popup), or tell the owner one line: `/clear`, then `/prime` and the handoff path.
+- No ledger field, checker or poller: rotation is prose.

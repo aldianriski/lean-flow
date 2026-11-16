@@ -16,6 +16,8 @@ status: current
 
 ## [Unreleased]
 
+- **`/orchestrator`: the coordinator can launch a new lane with one owner popup and rotate an existing lane to a fresh session at a task boundary with `claude --bg`, against a 200k target.** `/handoff` and `/flow` name the same 200k target.
+
 ## v2.24.0 — a coordinator for multi-session work, an opt-in cross-model route, and reviews that state their limits (2026-11-15)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.

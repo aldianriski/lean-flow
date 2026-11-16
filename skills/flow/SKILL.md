@@ -38,7 +38,7 @@ members are its `## Members` paths ∪ every task file stamped `sprint: SPRINT-N
 4. **Build** — an active sprint with a member outside `done/`/`cancel/` → `/orchestrator sprint-bulk` through G1 / G2 (never an unpromoted Backlog task — step 3 promotes first). Route each task by type: new behaviour → `/tdd` (test-first, default) · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
    A `type: bug` item builds through `/diagnose`, which writes its root cause, fix and regression test into it.
 5. **Close** — every member of the active sprint in `docs/work/done/` or `cancel/` → `/lean-doc-generator close` (Retro → §10 buckets), then **`/release-patch` (PATCH) for a fixes-only sprint · MINOR by hand for a feature sprint**.
-6. **Continuity** — stopping mid-loop or context budget low → `/handoff`, so the next `/flow` resumes cleanly.
+6. **Continuity** — stopping mid-loop or context past ~200k (or the host's `lane-context-ceiling:`) at a task boundary → `/handoff`, so the next `/flow` resumes cleanly; with a coordinator, follow `orchestrator/references/coordinator.md` § 8 Lane rotation.
 
 **Pin the target with `/goal`** — set a `/goal` to the active task/sprint's DoD so the conducted run
 keeps driving across turns until it's verifiably met; clear it at close. That's the native engine
