@@ -40,3 +40,8 @@ G1 and G2 are not yet signed; `gates_signed` is omitted from the frontmatter unt
 consequence · T1 · behaviour:low · governance:low
 consequence · T2 · behaviour:low · governance:low
 consequence · T3 · behaviour:low · governance:low
+
+### 2026-11-16 | progress | baseline gate (QA_FULL, off-host) green at 99f85bb6
+- **Gate:** `bun --no-env-file scripts/gate-remote.ts` run by the coordinator, verdict lines read from its own output: `gate-remote: ran 99f85bb6c9149fdb3d8689990dd349f5013005bd` · `bun test: 638 pass, 0 fail (rc 0)` · `QA-CHECK: 233 pass, 0 fail (rc 0)`.
+- **Promote checks:** `promote-check: PASS -- 11 pass, 0 fail` on the real sprint file before the lock commit (promote worker).
+- **Next:** G1/G2 for the three members in the owner session; `gates_signed` stays absent until then.
