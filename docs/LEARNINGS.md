@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-245**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-324**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL

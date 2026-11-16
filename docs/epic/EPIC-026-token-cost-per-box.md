@@ -45,7 +45,7 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-178](../sprint/SPRINT-178-lane-cost-fixes-and-ponytail-review.md) | Lane cost fixes (TASK-666, TASK-667) with the ponytail delta review (TASK-669) | closed · `dfd668f7` | Ponytail slice only: TASK-669 delivers the ponytail verdict (Drop, `docs/research/ponytail-delta-review.md`; "-45% tokens" inconclusive, nothing installed). TASK-666 and TASK-667 advance no EPIC-026 condition. |
+| [SPRINT-178](../sprint/archive/SPRINT-178-lane-cost-fixes-and-ponytail-review.md) | Lane cost fixes (TASK-666, TASK-667) with the ponytail delta review (TASK-669) | closed · `dfd668f7` | Ponytail slice only: TASK-669 delivers the ponytail verdict (Drop, `docs/research/ponytail-delta-review.md`; "-45% tokens" inconclusive, nothing installed). TASK-666 and TASK-667 advance no EPIC-026 condition. |
 
 ## Decisions
 - **D1** — Vehicle, owner popup 2026-11-15: "One small epic, after Sprint B (Recommended)". Open a 'token cost per box' epic with the trials as slices. It starts only after EPIC-025 Sprint B (the workdoo SPRINT-005) closes, so Sprint B's measurement stays clean.
