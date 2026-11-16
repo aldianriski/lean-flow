@@ -11,6 +11,7 @@ authority: J1
 origin: decomposer
 state: ready
 depends-on: []
+sprint: SPRINT-180
 ---
 
 # TASK-672 — Indonesian infra text uses the English term where a plain Indonesian word was translated word for word
