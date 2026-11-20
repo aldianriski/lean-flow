@@ -83,3 +83,15 @@ review · T1 · self-review · behaviour:low · governance:low
 - The notes were written inline by the coordinator, not by a note worker as the design had it, because every figure was already in hand and a worker would only re-read them (cheaper; logged as the one design deviation). Self-review (consequence low/low).
 review · T2 · self-review · behaviour:low · governance:low
 ### 2026-11-20 | scope-change | T3/TASK-678 boxes 3 and 7: the only eligible release (v1.1.0, newest stable >=14 days; v1.2.0 the same) has the pipeline engine but no Claude Code PostToolUse processor, and its project rtk init writes CLAUDE.md instructions without registering hooks, so built-in Read/Grep compression cannot occur. Owner ruling, popup: Test what v1.1.0 supports. Box 3 becomes the v1.1.0 surface (posthook+terse pipeline trusted and resolved, project rtk init, PreToolUse Bash rewrite hand-wired into the snapshot's project settings, Read/Grep compression recorded untestable, rtk recall on a cut Bash output); box 7's bar drops the Read/Grep clause. Impact: T3 tests the shell rewrite and terse prose only.
+
+### 2026-11-20 | progress | T3 (TASK-678) done: RTK inconclusive; 3.21 of 8.00 USD spent; probe deleted
+- The only eligible release (full v1.1.0) and v1.2.0 have no Claude Code PostToolUse processor, and project `rtk init` registers no hooks. Owner popup "Test what v1.1.0 supports"; scope-change logged (afaaf422) before boxes 3 and 7 were reworded.
+- Setup per RTK run, project-scoped: trusted posthook+terse pipeline with the two overrides, project `rtk init`, PreToolUse Bash hook hand-wired into the snapshot's `.claude/settings.local.json`, PATH prefix on the child only. `%APPDATA%\rtk` was unchanged.
+- Capability runs: `rtk-cap` (0.0701 USD) showed the rewrite, `rtk recall` returning the cut lines, and `rtk git add .` denied. `rtk-cap2` (0.0410 USD) printed `rtk --version` and `rtk init --show` in-run, after the probe's deny list was narrowed from `rtk init:*` to its mutating forms so the read-only `--show` could run.
+- Scored ABBA: plain-3 0.2383, rtk-1 0.2682, rtk-2 0.1854, plain-4 0.2046 USD. Blind scorer (69,121 tokens): all 6/6.
+- Verdict: **inconclusive**. Mean USD 1.02× plain; the gap (+0.005) is inside RTK's own spread (0.083). Tokens 0.96×, recorded only. 4 Bash rewrites in two runs; most work went through Read/Grep, which v1.1.0 cannot reach.
+- Probe `retest-probe/` deleted after its run summaries went into the results file. Self-review (consequence low/low).
+review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-11-20 | progress | T3 Cites correction
+The box-3 rewording (scope-change afaaf422) names the workdoo snapshot's `.rtk/pipeline.toml`; check-layers-completeness read it as an undeclared lean-flow path (member-layers-incomplete). Per the checker's own guidance it is declared on T3's Cites: line, because the box cites it and the task never touches it in lean-flow. Same false-positive shape promote hit with `.claude/CLAUDE.md`.

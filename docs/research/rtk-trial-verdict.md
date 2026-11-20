@@ -13,6 +13,8 @@ related: [graphify-workdoo-test, model-effort-trial-verdict]
 
 > **Question.** With RTK compressing Bash output for one sprint, is that sprint's USD per box below the lowest, or above the highest, of the three sprints before it?
 > **Verdict (confirmed by the coordinator under the owner's band rule).** **Inconclusive on RTK OSS's effect on sprint cost.** SPRINT-181 cost 0.686 USD per box, inside the 0.474 to 2.023 band of SPRINT-178 to SPRINT-180. Global counters show estimated command-output compression, but neither sprint-specific savings nor net USD savings were established. Pipeline benefits (the README's cost claims) were not tested: they need the full edition. The bypass rule held. RTK stays maintainer-environment only; nothing ships. A pipeline test was ordered on 2026-11-20. — TASK-674, SPRINT-181; reworded after a Codex review.
+>
+> **Re-test verdict (2026-11-20, TASK-678, SPRINT-182): inconclusive; RTK stays maintainer-environment only.** The full edition v1.1.0 (the only eligible release) was set up project-scoped with the posthook + terse pipeline, and paired ABBA against its own plain runs on six questions. Correctness tied at 12/12. Mean USD was 1.02× plain, not below it, and the gap (+0.005) is far inside the spread between RTK's own two runs (0.083), so the noise rule gives inconclusive. Read/Grep compression, the core of the README's pipeline cost claim, could not be tested: neither v1.1.0 nor v1.2.0 has a Claude Code PostToolUse processor. The Bash rewrite fired 4 times across two runs, `rtk recall` worked, and a mutating command was denied. Figures: `graphify-rtk-retest-results.md` § T3.
 
 ## Why this matters
 EPIC-026 asks whether RTK is worth keeping. A wrong keep adds a hook and a binary to a workflow that already works. A wrong drop throws away a saving that may be real.
@@ -50,5 +52,5 @@ The owner chose this band rule on 2026-11-20 ("Band vs baselines (Recommended)")
 
 ## Out of scope / open questions
 - A paired run (matched tasks, RTK on and off) would improve attribution, not prove it: repetition and spread still matter, and boxes are not standard units of work. It was not run.
-- The README's cost claims sit in pipelines (compress Read/Grep, hand big reads to a cheaper model; one pipeline reports −20.2% total cost in its author's benchmark). They need the full edition and were not tested. The owner ordered a pipeline test on 2026-11-20.
+- The README's cost claims sit in pipelines (compress Read/Grep, hand big reads to a cheaper model; one pipeline reports −20.2% total cost in its author's benchmark). The 2026-11-20 re-test (TASK-678) ran the full edition v1.1.0, but no release at least 14 days old can apply posthook in Claude Code (no PostToolUse processor), so the Read/Grep part stays untested. It becomes testable only when a stable release with a Claude Code PostToolUse hook is at least 14 days old; no task owns that.
 - The 37.2% from `rtk gain` is output compression, not cost; the RTK README's own caveat (90% less output is not 90% less cost) is the prior.

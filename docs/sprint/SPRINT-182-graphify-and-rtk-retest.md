@@ -49,7 +49,7 @@ The first test installed no integration and ran no query. This runs the README's
 ### T3 — Run RTK posthook and terse against its own plain pair, rule on RTK `[size: M · risk: med · class: execution · HITL · J2]`
 Layers: `docs/research/rtk-trial-verdict.md` · `docs/research/graphify-rtk-retest-results.md` · `docs/knowledge-index.md`
 Depends-on: T2
-Cites: TASK-678, `docs/research/graphify-rtk-retest-questions.md`
+Cites: TASK-678, `docs/research/graphify-rtk-retest-questions.md`, `.rtk/pipeline.toml` (the workdoo snapshot's, cited by box 3, never a lean-flow file)
 The OSS edition has no pipeline engine, so this installs the full edition apart from it and compares RTK with its own plain runs.
 
 **Acceptance:** an RTK keep, drop or inconclusive verdict against the bar, the probe deleted, and the snapshot back at baseline.
