@@ -144,6 +144,12 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20T08:57:28.456Z | T5 B1-S4-P | run | 0.3437 | actual | 4.8097 |
 | 2026-11-20T09:00:01.870Z | T5 B1-S4-G | run | 0.2959 | actual | 5.1056 |
 | 2026-11-20T09:01:05.426Z | T5 B1-S4-R (void overturned: `cd src && cat ../supabase/…` resolves inside the export; fence fixed to follow cd) | run | 0.2853 | actual | 5.3909 |
+| 2026-11-20T09:03:11.884Z | T5 B2-S6-P | run | 0.2848 | actual | 5.6757 |
+| 2026-11-20T09:04:16.979Z | T5 B2-S6-R | run | 0.3023 | actual | 5.9780 |
+| 2026-11-20T09:06:02.182Z | T5 B2-S6-G (void overturned: the flagged `../copy` was text inside a python heredoc the permission layer denied; it ran nothing) | run | 0.2708 | actual | 6.2488 |
+| 2026-11-20T09:08:39.348Z | T5 B3-S1-G | run | 0.2244 | actual | 6.4732 |
+| 2026-11-20T09:09:55.515Z | T5 B3-S1-P | run | 0.2484 | actual | 6.7216 |
+| 2026-11-20T09:11:36.636Z | T5 B3-S1-R (void overturned: `PEPPER\|SECRET` was a grep pattern over docs/SETUP.md inside the export, not a secret-file read) | run | 0.3287 | actual | 7.0503 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
