@@ -2,9 +2,9 @@
 epic: 026
 slug: token-cost-per-box
 owner: Maintainer
-last_updated: 2026-11-16
+last_updated: 2026-11-20
 status: active
-member_sprints: [SPRINT-178]
+member_sprints: [SPRINT-178, SPRINT-181]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
 
@@ -30,7 +30,7 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 **In:**
 - **RTK trial:** a project-scoped install in lean-flow only, then one real sprint run with it, with USD per box compared against recent sprints. A bypass rule keeps `git diff --cached` and the gate output uncompressed.
 - **Ponytail delta review:** read its SKILL.md and benchmark first-hand and map each technique to what lean-flow already has. Keep only the unmatched remainder (candidates: /ponytail-review reading the touched code, /ponytail-debt shortcut comments).
-- **graphify trial on workdoo:** once, on workdoo's TypeScript code, during a dashboard sprint, measured and then ruled.
+- **graphify test on workdoo:** one small standalone test on the workdoo TypeScript snapshot against Explore, on six fixed questions, measured and then ruled.
 - **A verdict per tool**, recorded in `docs/research/` and reflected in the INDEX row.
 
 **Out (explicitly not):**
@@ -46,15 +46,17 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-178](../sprint/archive/SPRINT-178-lane-cost-fixes-and-ponytail-review.md) | Lane cost fixes (TASK-666, TASK-667) with the ponytail delta review (TASK-669) | closed · `dfd668f7` | Ponytail slice only: TASK-669 delivers the ponytail verdict (Drop, `docs/research/ponytail-delta-review.md`; "-45% tokens" inconclusive, nothing installed). TASK-666 and TASK-667 advance no EPIC-026 condition. |
+| SPRINT-181 | RTK trial, graphify test and the cell verdicts (TASK-671, TASK-673, TASK-674) | active | The RTK trial sprint: TASK-673 delivers the graphify verdict, TASK-674 the RTK verdict and the verdict record. TASK-671 (the dispatch cell rulings) advances no EPIC-026 condition. |
 
 ## Decisions
 - **D1** — Vehicle, owner popup 2026-11-15: "One small epic, after Sprint B (Recommended)". Open a 'token cost per box' epic with the trials as slices. It starts only after EPIC-025 Sprint B (the workdoo SPRINT-005) closes, so Sprint B's measurement stays clean.
 - **D2** — RTK, owner popup 2026-11-15: "Measured trial, one repo (Recommended)". After Sprint B closes, install it project-scoped in lean-flow only, never with the global `-g`. Run one real sprint with it and compare `scripts/session-cost.ts` USD per box against recent sprints. Add a bypass rule for `git diff --cached` and the gate output, so edit-safety and verdict-reading stay intact.
 - **D3** — Ponytail, owner popup 2026-11-15: "Delta review only (Recommended)". Read its SKILL.md and benchmark first-hand, and keep only the techniques lean-flow doesn't already have (candidates: /ponytail-review reading the touched code, /ponytail-debt shortcut comments). No install.
-- **D4** — graphify, owner popup 2026-11-15: "Test on workdoo only (Recommended)". Keep lean-flow's verdict (`docs/research/graphify-daily-value.md`: redundant, twice). Try it once on workdoo's TypeScript code during a dashboard sprint, measure it, then rule.
+- **D4** (amended by D8) — graphify, owner popup 2026-11-15: "Test on workdoo only (Recommended)". Keep lean-flow's verdict (`docs/research/graphify-daily-value.md`: redundant, twice). Try it once on workdoo's TypeScript code during a dashboard sprint, measure it, then rule.
 - **D5** — Measure basis: EPIC-024's, USD per box from promote to the last sprint commit across all agents, read as direction, not proof. Each verdict says which it is, and an inconclusive tool is not shipped.
 - **D6** — Approved as proposed by owner popup, 2026-11-15: "Approve, write it".
 - **D7** — Owner popup 2026-11-16, "Lane fix + ponytail now (Recommended)": the ponytail delta review (D3) runs now in SPRINT-178, as a reading that installs nothing and cannot affect EPIC-025's Sprint B. D1's timing is amended for that slice only. The RTK trial (D2) and the graphify trial (D4) still start only after EPIC-025 Sprint B (workdoo SPRINT-005) closes.
+- **D8** — Owner popups 2026-11-20. The graphify test is a standalone small test on the `D:\Research\workdoo` snapshot (TypeScript), not run during a dashboard sprint. It amends D4, the Scope graphify bullet and Closed-when line 3, and closes the open question about which workdoo sprint hosts the trial. Pass bar: keep only if graphify answers at least as many of the 6 fixed questions correctly as Explore and uses at most 1.0x Explore's tokens, graph build cost included; otherwise drop or inconclusive. If kept, it ships in lean-flow via TASK-675 in the next sprint; this popup is the separate owner ruling EPIC-026 requires. The D1 and D7 timing gate is lifted because workdoo SPRINT-005 (Sprint B) is closed. The RTK trial and this test run in SPRINT-181.
 
 ## Open questions
 - **Does RTK's output compression lower USD per box, not just output bytes?** (measurement) → the RTK trial sprint. The baseline is recent sprints from `session-cost.ts`, and the README's own caveat is the prior.
@@ -63,11 +65,10 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 - **Which RTK-compressed commands, if any, hide something edit-safety needs (staged diffs, gate verdict lines)?** (measurement) → test the bypass rule against the real gate output before the trial sprint.
 - **Which ponytail techniques are a delta over lean-flow's existing surface?** (judgement, L-017) → the delta review maps each one to the existing surface first. Only the unmatched remainder is a keeper.
 - **Is ponytail's "-45% tokens" credible for lean-flow's work?** (measurement, self-benchmarked on 39 tasks with Opus 5.5) → read its benchmark. There is no paid re-run, since D3 rules out an install.
-- **Does graphify on workdoo's TypeScript beat reading the code during a dashboard sprint?** (measurement) → one run during a workdoo dashboard sprint, measured against that sprint's own baseline.
-- **Which workdoo sprint hosts the graphify trial?** (judgement) → the owner names it at slice time, after Sprint B closes.
+- **Does graphify on workdoo's TypeScript beat reading the code with Explore alone?** (measurement) → one standalone test on the workdoo snapshot (D8), six fixed questions, both arms measured.
 
 ## Closed when
-- [ ] RTK has a recorded verdict (keep, drop or inconclusive) from one real lean-flow sprint run with it project-scoped, with USD per box compared against recent sprints by `scripts/session-cost.ts`. The bypass rule held: `git diff --cached` and the gate output were read uncompressed. → next slice: RTK measured trial
+- [ ] RTK has a recorded verdict (keep, drop or inconclusive) from one real lean-flow sprint run with it project-scoped, with USD per box compared against recent sprints by `scripts/session-cost.ts`. The bypass rule held: `git diff --cached` and the gate output were read uncompressed. → TASK-674
 - [x] Ponytail has a recorded verdict (keep, drop or inconclusive) from a first-hand read of its SKILL.md and benchmark. Each technique is mapped to lean-flow's existing surface, and only the unmatched ones are named, as kept or dropped. Nothing is installed. → closed by SPRINT-178 (TASK-669)
-- [ ] graphify has a recorded verdict (keep, drop or inconclusive) from one run on workdoo's TypeScript code during a dashboard sprint, with the measurement shown. lean-flow's own verdict is untouched. → next slice: graphify on workdoo
-- [ ] Each verdict and its measurement are in `docs/research/`, and the INDEX row names all three. Nothing ships inside lean-flow without a separate owner ruling, and a kept tool is recorded as maintainer-environment only unless that ruling says otherwise. → next slice: record the verdicts
+- [ ] graphify has a recorded verdict (keep, drop or inconclusive) from one standalone test on a workdoo TypeScript snapshot against Explore, with correct answers and tokens shown, build cost included. lean-flow's own verdict is untouched. → TASK-673
+- [ ] Each verdict and its measurement are in `docs/research/`, and the INDEX row names all three. Nothing ships inside lean-flow without a separate owner ruling, and a kept tool is recorded as maintainer-environment only unless that ruling says otherwise. → TASK-674
