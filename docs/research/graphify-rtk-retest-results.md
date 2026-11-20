@@ -116,3 +116,61 @@ rtk-2, plain-4; snapshot reset to the baseline before each, RTK re-set-up per RT
 - **Rewrites:** 4 across the two RTK runs. The agent did most of its work with the Read and Grep tools, which v1.1.0
   cannot reach.
 - Snapshot HEAD 884d897 and `git status --porcelain --ignored` equalled the baseline after every revert.
+
+## Bloodlines web re-test (SPRINT-183)
+
+Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50, T3 5.00, T4 1.50, T5 the rest.
+
+### Ledger
+
+| time | item | kind | USD | basis | cumulative |
+|---|---|---|---|---|---|
+| 2026-11-20 | T1 pool draw, leak-grep, export recipe | coordinator | 0.00 | read-only git | 0.00 |
+| 2026-11-20 | T1 builder (pool, leak grep, export recipe; 96,898 reported tokens × 3.00 USD/MTok) | dispatch | 0.2907 | estimate | 0.2907 |
+| 2026-11-20 | T1 key-aware audit, candidates 1-3 (108,232 tokens) | dispatch | 0.3247 | estimate | 0.6154 |
+| 2026-11-20 | T1 key-aware audit, candidates 4-6 (106,746 tokens) | dispatch | 0.3202 | estimate | 0.9356 |
+| 2026-11-20 | T1 key-aware audit, candidates 7-9 (89,136 tokens) | dispatch | 0.2674 | estimate | 1.2030 |
+
+### Pool (9 candidates, last 12 months, drawn 2026-11-20)
+
+| # | sha | parent | type | subject | code files | test files | top-level dirs (src/x/y) |
+|---|---|---|---|---|---|---|---|
+| 1 | 2263c84d2279 | b7c9481ef5f1 | fix | fix(auth): a password change needs a one-time code emailed to the member (TASK-201) | 7 | 7 | 5 sub-dirs under src |
+| 2 | f0f771defbf7 | dc89bff3db0c | fix | fix(member): one membership pick, and only ACTIVE counts as verified (TASK-200) | 9 | 7 | 6 sub-dirs under src |
+| 3 | 584a2926f281 | 191166625ad3 | fix | fix(auth): shared parseSafeNext closes /\evil.com open redirect in login/register/callback (SPRINT-088 T1) | 7 | 2 | 3 sub-dirs under src |
+| 4 | e76250d6f6f4 | 6c7b342b7516 | fix | fix(payments): payable = ISSUED or DRAFT; VOID locked at the DB; zero-row flips logged (SPRINT-087 T7) | 7 | 5 | 6 sub-dirs under src |
+| 5 | 4b7d89403b52 | bafc2daf1f64 | feat | feat(api): avatar, verification email and password routes for the mobile app (TASK-186) | 9 | 8 | 6 sub-dirs under src |
+| 6 | 5bd2abc3c1f7 | 340cd11b0132 | feat | feat(touring): SOS to Telegram safety groups, chapter link by one-time code (TASK-108) | 14 | 9 | 5 sub-dirs under src |
+| 7 | 85b2ac8e7368 | 4191dffb73e6 | feat | feat(auth): suspended and terminated memberships lose console, officer actions and chapter data (SPRINT-085 T1) | 15 | 7 | 8 sub-dirs under src |
+| 8 | 2161c4fadff2 | 990ac2e2e83f | feat | feat(app): members download and update the Android app from the web (TASK-194) | 5 | 5 | 5 sub-dirs under src |
+| 9 | b0cbadbfd0b9 | eebcb01ddcc5 | refactor | refactor(touring): share the sticky bar, place search and form pieces with the create wizard (TASK-148) | 5 | 0 | 1 sub-dirs under src |
+
+### Widening reserve (next 4 by recency, not in the pool)
+
+| # | sha | parent | type | subject | code files | test files | top-level dirs (src/x/y) |
+|---|---|---|---|---|---|---|---|
+| 1 | 4e2fc8bcf5bc | 990ac2e2e83f | feat | feat(touring): crew contacts read for a ride's own people (TASK-193) | 5 | 3 | 4 sub-dirs under src |
+| 2 | 364db1e19012 | a18bbfa747db | feat | feat(072-T1): evict the role cache on every privilege change | 7 | 1 | 6 sub-dirs under src |
+| 3 | 65d2b3a48b53 | dd50fd35ee64 | feat | feat(touring): HQ queue section, HQ duty card, pages and actions, reachability (SPRINT-092 T5) | 13 | 6 | 4 sub-dirs under src |
+| 4 | 9ffd0feb8820 | cf17c60d9823 | feat | feat(touring): route points and stops you can tap, with a card (TASK-178) | 15 | 5 | 3 sub-dirs under src |
+
+Counts exclude tests, lockfiles, generated files, dist/build and snapshots; secret-pattern paths are excluded from every read. Leak-grep full hit lists: scratch `t1-leakgrep.md` (not committed).
+
+### Dispositions (key-aware audit, 2026-11-20)
+
+Every export removes the planning trees (docs/work, docs/sprint, docs/epic), TECH-DEBT.md, TODO.md, docs/TODO.md,
+docs/CHANGELOG.md, docs/changelog, .claude/settings.local.json and supabase/.temp, plus the secret patterns, for all arms.
+
+| # | Disposition | Extra scrub (all arms) | Why |
+|---|---|---|---|
+| 1 | **scenario** (clean) | — | Only motivation survives (openapi-auth notes re-auth is recommended); no code, stub or doc names the emailed code. |
+| 2 | **scenario** (clean) | — | Comments describe the old oldest-membership rule (the defect), not the fix. |
+| 3 | **scenario** (clean) | — | The existing `login-redirect.ts` already checks backslashes: ordinary context in a file the change edits, equal for all arms. |
+| 4 | **scenario** (clean) | — | The parent states the opposite rule; nothing sketches DRAFT as payable. |
+| 8 | **scenario** (clean) | — | No file at the parent references the endpoint, bucket, script or page. |
+| 9 | **scenario** (keep-with-scrub) | `docs/research/touring-mobile-ux.md` | That research doc ties the sticky bar, map-first search and SessionForm to the wizard; the TASK-148 src comments describe wizard helpers, not the extraction. |
+| 5 | spare (smoke only, unscored) | — | `docs/openapi.yaml` and a src comment name `POST /me/avatar`; removing them would break the tree, so it cannot be a scored scenario. |
+| 6 | **skip** | — | src comments in the edited file name TASK-108 and the missing group adapters; the PRD states the requirement. |
+| 7 | **skip** | — | src and migration comments name the TD-011 gap and `src/proxy.ts`; not removable without editing code. |
+
+Six scenarios: #1, #2, #3, #4 (fix), #8 (feature), #9 (refactor). Reserve 4 un-audited, for T3 swaps under the same rules.
