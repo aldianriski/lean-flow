@@ -29,7 +29,7 @@ The RTK trial is measured over its own sprint, so the verdict is the sprint's la
 - [ ] That figure shown both with and without the TASK-673 dispatches, since that workload differs from recent sprints.
 - [ ] RTK verdict (keep, drop or inconclusive) recorded in `docs/research/` with its measure basis (direction, not proof), stating that the bypass rule held throughout.
 - [ ] The EPIC-026 row in `docs/epic/INDEX.md` names the RTK, graphify (TASK-673) and ponytail (Drop, TASK-669) verdicts.
-- [ ] Each verdict says maintainer-environment only; nothing ships without a separate owner ruling.
+- [ ] The RTK and ponytail verdicts say maintainer-environment only; the graphify verdict, if keep, names TASK-675 and the owner's 2026-11-20 ship ruling.
 - [ ] Negative: if the bypass rule failed even once, or the workload is confounded, RTK is recorded as inconclusive, not keep.
 
 ## Touches
