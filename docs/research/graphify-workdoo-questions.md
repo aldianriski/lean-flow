@@ -6,7 +6,7 @@ status: current
 id: graphify-workdoo-questions
 tags: [tooling]
 domain: knowledge
-related: [TASK-673]
+related: [graphify-workdoo-test, graphify-reference-run]
 ---
 
 # graphify vs Explore on a workdoo snapshot — question set and answer key
