@@ -37,7 +37,7 @@ parameters.
 
 | Role | Tier | Effort | Pair | Why kept |
 |---|---|---|---|---|
-| Intake draft check: the `/task-decomposer` task draft, after the intake worker returns it and before the owner's `approve` | `decision-escalation` | high | Blind Codex pairing on the same unmodified draft; each reviewer's findings recorded | Found real defects the Codex pass missed on 2 of 2 pairs, at 1.01x and 1.09x its cost |
+| Intake draft check: the `/task-decomposer` task draft, after the intake worker returns it and before the owner's `approve` | `decision-escalation` | high | Blind Codex pairing on the same unmodified draft; each reviewer's findings recorded | In the trial it found real defects the paired review missed, at about the paired review's cost (ADR-010 addendum) |
 
 Tiers are remappable roles from the host's model map. `decision-escalation` is the strongest tier; an undefined role
 uses the next-strongest defined role. "Codex" means the host's declared cross-model CLI, selected by `via <cli>` in
