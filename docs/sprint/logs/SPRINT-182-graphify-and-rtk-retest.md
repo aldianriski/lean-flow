@@ -63,3 +63,13 @@ G1: all three members are `origin: decomposer`; scope unchanged since the 2026-1
 - RTK gets one unscored capability run (own prompt, ledgered) for `rtk recall`, the mutating denial, in-run `rtk --version`, and whether PostToolUse compresses built-in Read/Grep; T3's scored set starts only if the remainder covers 4 × T2's highest run cost. "Correctness equals plain" is applied as not lower than plain. No eligible full release with pipelines → the RTK arm reports "not run".
 - Verdict, noise, ledger and arm-failure rules are pasted verbatim from each member's Done when into its note worker's brief.
 Run: T1 → T2 → T3 (linear, no parallel build). Shared files (results file, knowledge-index) owned by the coordinator in task order.
+
+### 2026-11-20 | progress | T1 (TASK-676) done: fixture, key check and probe; 0.82 of 8.00 USD spent
+- Builder (Sonnet, 153,486 reported tokens): wrote the 6-question fixture, the results/ledger file and the throwaway probe `retest-probe/run.ts` (self-test exercised the cap refusal, the unpriced block and the plain-void flag without launching `claude`).
+- Key check (fresh Sonnet, blind, 94,674 tokens): 6/6 against the key, no disagreement on any scored element. That is the ceiling signal, so correctness may tie and the bar may fall on tokens.
+- Fixture committed 46043cf5 before any arm.
+- Coordinator launched two smoke runs through the probe (owner-approved): `plain-smoke` 0.0450 USD, correct answer, but the model skipped the contamination line, so `plain-smoke2` asked it alone → NONE (0.0282 USD). The init event's `memory_paths` holds only workdoo's (absent) project auto-memory; skills and plugins are built-in only. The plain config is uncontaminated, so no CLAUDE_CONFIG_DIR fallback.
+- Snapshot equals the baseline after every run. Ledger: 0.8177 USD (two dispatch estimates + two actual runs).
+- Note for close: graphify-rtk-retest-questions.md is 167 lines against the §2 soft cap 130 (the fixture is evidence; dispose at the next promote).
+- Review: docs-only research files plus an uncommitted throwaway probe → self-review (consequence low/low, logged at promote).
+review · T1 · self-review · behaviour:low · governance:low
