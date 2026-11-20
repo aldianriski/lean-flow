@@ -33,7 +33,7 @@ measurement stays clean) · TASK-402, 489, 507, 523 and 668 · any new guard, ch
 ## Plan
 
 ### T1 — Rule each model × effort cell keep, retune or drop `[size: S · risk: low · class: decision · HITL · J1]`
-Layers: `skills/orchestrator/references/dispatch.md` · `.claude/CONTEXT.md` · `docs/adr/ADR-010-model-dispatch-role-tiers.md` · `docs/research/model-effort-trial-verdict.md` · `docs/knowledge-index.md` · `CHANGELOG.md`
+Layers: `skills/orchestrator/references/dispatch.md` · `.claude/CONTEXT.md` · `docs/adr/ADR-010-model-dispatch-role-tiers.md` · `docs/research/model-effort-trial-verdict.md` · `docs/knowledge-index.md` · `CHANGELOG.md` · `README.md`
 Depends-on: none
 Cites: TASK-671, TASK-670
 The trial's numbers exist only from SPRINT-180, so the verdict is its own task. Cells with fewer than two dispatches are inconclusive.

@@ -94,8 +94,8 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 | `execution` → **Sonnet** *(dispatched)* | implement · recon (`Explore`) · council advisors + review · research |
 | `mechanical-ingest` → **Haiku** *(dispatched)* | bulk extraction · validation · triage · high-volume reads |
 
-**`decision-escalation` → Fable**: manual by default on two execution failures or ADR-grade fork (opt. `/council`); **no automated ladder** (fail-point built-in allowed, never hook). Spawn-with-brief: execution gets procedure skill (runtime Skill, `general-purpose`), not paraphrase; G1/G2 + review guard quality. Routing, preflight, § Trial cells → `orchestrator/references/dispatch.md`.
-dispatch-trial: on · the next sprint promoted after SPRINT-179 · ≤6 `decision-escalation` dispatches · sprint Log per dispatch: role · cell (model+effort) · reported tokens · retries · findings · who ruled them real
+**`decision-escalation` → Fable**: manual by default on two execution failures or ADR-grade fork (opt. `/council`); **no automated ladder** (fail-point built-in allowed, never hook). Spawn-with-brief: execution gets procedure skill (runtime Skill, `general-purpose`), not paraphrase; G1/G2 + review guard quality. Routing, preflight → `orchestrator/references/dispatch.md`.
+Opted in here: intake draft check (`decision-escalation` high, blind Codex pair; cell in `dispatch.md`).
 
 ## Sprint model
 

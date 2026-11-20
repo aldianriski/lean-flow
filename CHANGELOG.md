@@ -16,6 +16,8 @@ status: current
 
 ## [Unreleased]
 
+- **`/orchestrator`: the model-and-effort trial is ruled. Only the intake draft check (strongest tier, blind Codex pair) is kept, opt-in per host; the other cells return to their defaults and the `dispatch-trial` declaration is retired (ADR-010, TASK-671).**
+
 ## v2.25.0 — Indonesian infra calques keep their English terms, with an optional host glossary (2026-11-16)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.

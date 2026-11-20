@@ -182,3 +182,19 @@ inconclusive and also reverts to manual-only.
 **Rejected:** a permanent strongest-tier default before measurement, or an automated escalation
 ladder. The trial establishes the cheaper cells' baselines and rules first; strongest-tier cells
 register comparison rules only, with no numeric baseline yet.
+
+## Addendum (2026-11-20) — trial verdict: one cell kept, the rest back to defaults
+
+**Status:** accepted · closes the 2026-11-16 trial amendment. **Source:** owner rulings 2026-11-20, SPRINT-181 G2;
+[model-effort-trial-verdict.md](../research/model-effort-trial-verdict.md) (TASK-671).
+
+The only kept cell is the intake draft check (`decision-escalation`, high, blind Codex pair). It stays opt-in per host and
+is not a consumer default. The dispatch.md cells for the intake, promote and close workers are dropped (each ran over the
+1.25x cap). The test runner and repo fetch are dropped or never fired, and the builder-check reader is inconclusive. All
+of these are back to the class-row defaults.
+
+Every strongest-tier cell that was dropped, never fired or inconclusive is back to item 3's manual-only rule: Review
+(1 pair), G2 design check (1 sample, no comparator) and Diagnose escalation (never fired). Items 4 and 5 stand unamended.
+The trial label and the `dispatch-trial` declaration are retired; the amendment above stays as the record of the trial.
+
+The kept intake draft check is a standing per-host opt-in. It supersedes the 2026-11-16 amendment's wording that the cells apply only where the host declares `dispatch-trial` and stop at the named sprint's close. The same-provider `/diagnose` strongest-tier admission in that amendment lapses with the Diagnose escalation cell. The 2026-11-13 cross-model diagnose handoff is unchanged.

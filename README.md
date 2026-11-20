@@ -233,7 +233,7 @@ gates are **inline checklists** (lean-flow ships no agent definitions of its own
 security → `/security-review`. `/council` is the one skill that orchestrates sub-agents internally.
 A repo can opt in to the [cross-model route](skills/orchestrator/references/cross-model-route.md) to have another
 provider's CLI review, build or diagnose. The route is off by default.
-A host's `dispatch-trial` declaration opts in to [per-role tier and effort cells](skills/orchestrator/references/dispatch.md#trial-cells-opt-in) for one sprint, capped at six strongest-tier dispatches; without it, dispatch keeps its existing defaults.
+A host can opt in to one [kept dispatch cell](skills/orchestrator/references/dispatch.md#kept-cell-opt-in-per-host): the intake draft check runs on the strongest tier at high effort, blind-paired with Codex. Without the opt-in, dispatch keeps its defaults.
 Every build dispatch carries a short worker contract ([`worker-brief.md`](skills/orchestrator/references/worker-brief.md)): the
 worker owns its checks, asks one question when blocked, and never ends its turn while a job it needs still runs; a blocked worker
 is resumed with `SendMessage` from the session that dispatched it, or a fresh worker gets the context when that session is gone.
