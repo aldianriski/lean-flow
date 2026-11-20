@@ -130,6 +130,8 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20 | T1 key-aware audit, candidates 1-3 (108,232 tokens) | dispatch | 0.3247 | estimate | 0.6154 |
 | 2026-11-20 | T1 key-aware audit, candidates 4-6 (106,746 tokens) | dispatch | 0.3202 | estimate | 0.9356 |
 | 2026-11-20 | T1 key-aware audit, candidates 7-9 (89,136 tokens) | dispatch | 0.2674 | estimate | 1.2030 |
+| 2026-11-20 | T2 key worker (keys, descriptions, frozen rules; 180,952 tokens) | dispatch | 0.5429 | estimate | 1.7459 |
+| 2026-11-20 | T2 blind description check (64,746 tokens) | dispatch | 0.1942 | estimate | 1.9401 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
@@ -174,3 +176,12 @@ docs/CHANGELOG.md, docs/changelog, .claude/settings.local.json and supabase/.tem
 | 7 | **skip** | — | src and migration comments name the TD-011 gap and `src/proxy.ts`; not removable without editing code. |
 
 Six scenarios: #1, #2, #3, #4 (fix), #8 (feature), #9 (refactor). Reserve 4 un-audited, for T3 swaps under the same rules.
+
+### Freeze (T2, 2026-11-20)
+
+Scenarios S1–S6 = #1, #2, #3, #4, #8, #9; SPARE = #5 (smoke only). Descriptions, keys and frozen rules are in
+`bloodlines-retest-scenarios.md`, frozen in commit **634a74fb** (blob 529a1633). Coordinator leak-grep: first run 2 hits
+(`verified` allowlisted, `label` removed from S6's description and key), second run PASS with 0 unallowed hits. Blind check
+(fresh Sonnet, descriptions + allowlist + one export per parent, never the key): every description answerable, no
+give-away, all 16 allowlist words ordinary. Block assignment (seed 4b8f3b40): PGR S4 · PRG S6 · GPR S1 · GRP S3 · RPG S5 ·
+RGP S2. Minimum detectable differences frozen: tokens 48,300, USD 0.0628; C not estimable before the pre-screen.

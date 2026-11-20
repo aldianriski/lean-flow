@@ -68,3 +68,10 @@ builder-check · T5 · 10 contradictions · 8 questions · refuse-then-ask on bu
 - Observation: every candidate's code sits under `src/`, so the "≥2 top-level directories" preference fell back to sub-directories under `src/`. `.claude/CLAUDE.md` and `.claude/CONTEXT.md` stay in the exports as ordinary repo context (the auditors found no leak in them).
 - Live repo HEAD b8fea870 and status unchanged; no export on disk. Ledger 1.2030 USD (estimates). Self-review (consequence low/low).
 review · T1 · self-review · behaviour:low · governance:low
+
+### 2026-11-20 | progress | T2 (TASK-680) done: scenarios, keys and rules frozen at 634a74fb; 1.94 of 32.00 USD spent
+- Key worker (Sonnet, 180,952 tokens) wrote S1–S6 keys, seven PM-voice descriptions and the frozen rules pasted verbatim from the approved draft (md5 11250ace…); the coordinator kept migrations and `scripts/*.mjs` in the code-file keys (a real plan includes its migration; same for every arm).
+- Coordinator leak-grep (`retest-probe/leakgrep.ts`): run 1 FAIL — `verified` (S2, the bug's own domain word → allowlisted) and `label` (S6, the new prop's name → clause removed from the description, detail dropped from key point 1); run 2 PASS, 0 unallowed hits.
+- Blind check (fresh Sonnet, 64,746 tokens; descriptions + allowlist + one export per parent, never the key): all seven answerable, no give-away, all 16 allowlist words ordinary.
+- Freeze commit 634a74fb; block assignment (seed 4b8f3b40) PGR S4 · PRG S6 · GPR S1 · GRP S3 · RPG S5 · RGP S2. `.cap-dispositions` retain row added for the 259-line scenarios file (expected, signed at promote). Note: export.ts needs Git Bash (Windows tar lacks --force-local). Self-review (consequence low/low).
+review · T2 · self-review · behaviour:low · governance:low
