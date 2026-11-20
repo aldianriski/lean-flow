@@ -1,6 +1,7 @@
 ---
 id: TASK-678
 title: "Run RTK posthook + terse x2 (ABBA with its own plain pair), score blind, and rule on RTK"
+sprint: SPRINT-182
 priority: P2
 size: M
 risk: med

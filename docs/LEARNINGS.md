@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-16
+last_updated: 2026-11-20
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -131,6 +131,10 @@ to the rules in § Project Overview, § Definition of Done and § Behavioral Gui
 
 A bare `python` on this Windows host opens an interactive REPL and stalls a tool call for 120 s (SPRINT-170 T3 lost three timed rounds to it; SPRINT-178's promote worker hung on a background `python` heredoc). Name the interpreter in a worker's brief (`bun`, or `python -c` with a script file), and screen a timed round's transcript for a 120 s gap before reading its minutes.
 
+- **host-tooling › L-326 → moved: `docs/LEARNINGS.md` § Durable rules › host-tooling** · disposition: move-to-reference — no `.claude/CLAUDE.md` or CONTEXT line (both at their caps; `record-line.ts` is lean-flow-only, so a shipped reference would leak a repo path) · learnings: L-326
+
+`record-line.ts tick` re-runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout (SPRINT-179 T1 ticked 17 boxes in one loop; SPRINT-181 T3's last tick ran past 120 s and finished green). Tick in batches, or run the loop in the background and read the verdict line. Ticks written before a cut stay written, so after a timeout read the member file for which boxes landed, not the loop's status (L-224).
+
 ---
 
 ## L-328 [tags: process] [status: active]: **A task's consequence is predicted from its Layers, never from its class: a decision task that edits a workflow contract or an implementation-binding ADR is not `governance:low`.**
@@ -151,12 +155,10 @@ SPRINT-180's host-glossary step sat at line 173 of 188 in `patterns-id.md`. Afte
 
 ---
 
-## L-326 [tags: tooling] [status: active]: **`record-line.ts tick` runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout: tick in batches, or run the loop in the background and read the verdict line.**
-SPRINT-179 ticked TASK-670's 17 boxes one call at a time in a single loop, and the loop outran a 120 s tool timeout because each tick re-ran the downstream checkers. The ticks written before the cut stayed written, so after a timeout read the member file for which boxes landed, not the loop's status.
-- seen: 2026-11-16 (SPRINT-179 close: the T1 ticks)
-- seen: 2026-11-20 (SPRINT-181 T3: the last tick on TASK-674 ran its downstream checks past 120 s and finished green)
+## L-326 [tags: tooling] [status: promoted]: **`record-line.ts tick` runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout.**
+- seen: 2026-11-16 (SPRINT-179 close: the T1 ticks) · 2026-11-20 (SPRINT-181 T3: the last tick on TASK-674 ran past 120 s and finished green)
 - count: 2
-- promoted: no
+- **L-326 → promoted: `docs/LEARNINGS.md` § Durable rules › host-tooling** · disposition: move-to-reference — host-specific, so no CLAUDE.md or CONTEXT line; the body is collapsed to this pointer.
 - related: L-224 (re-run the gate's own checker after a tick)
 
 ---

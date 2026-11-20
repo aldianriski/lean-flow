@@ -1,6 +1,7 @@
 ---
 id: TASK-676
 title: "Build the key-checked question set and the throwaway run harness for the graphify and RTK re-test"
+sprint: SPRINT-182
 priority: P2
 size: M
 risk: low

@@ -1,6 +1,7 @@
 ---
 id: TASK-677
 title: "Run plain x2 and graphify x2 (ABBA) in the workdoo snapshot, score them blind, and rule on graphify"
+sprint: SPRINT-182
 priority: P2
 size: M
 risk: med
@@ -28,7 +29,7 @@ The first test installed no integration, told its arm to read GRAPH_REPORT.md fi
 - [ ] `docs/research/graphify-workdoo-test.md` states the graphify verdict against the bar (correctness at least equal to plain, tokens at most 1.0x plain), with spread and USD reported separately.
 - [ ] If graphify passes, a new backlog task re-files the owner's earlier "Ship in lean-flow" ruling (like cancelled TASK-675) citing this evidence; if it fails or is inconclusive, no ship task is filed and the note says so.
 - [ ] Read-through of both notes: every figure traces to the results file.
-- [ ] The snapshot's HEAD and `git status --porcelain --ignored` equal the baseline, the tracked `.claude/CLAUDE.md` is restored with `git checkout`, the temporary `.graphifyignore`, the project skill, settings and graphify-out files are removed, no ~/.claude hook was added, the throwaway probe is left for TASK-678 and D:\Project\workdoo is untouched.
+- [ ] The snapshot's HEAD and `git status --porcelain --ignored` equal the baseline, workdoo's tracked project CLAUDE.md is restored with `git checkout`, the temporary `.graphifyignore`, the project skill, settings and graphify-out files are removed, no ~/.claude hook was added, the throwaway probe is left for TASK-678 and D:\Project\workdoo is untouched.
 - [ ] Negative: if the ledger reaches 8.00 USD before the 4 runs finish, the remaining runs do not start, the note records the result as inconclusive, and no verdict is extrapolated from partial data.
 - [ ] Negative: a graphify run with no hook trace (`hook-guard` nudge event) in its transcript is an arm failure, recorded as inconclusive and not counted as evidence against graphify's query-first claim; a run where the hook fired but the agent ran no query is a counted graphify run.
 - [ ] Negative: a result inside the noise (the two runs of an arm differ by more than the gap to plain) is written as inconclusive, never as pass or fail.
