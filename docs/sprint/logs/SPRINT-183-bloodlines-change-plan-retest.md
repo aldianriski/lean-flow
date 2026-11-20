@@ -75,3 +75,10 @@ review · T1 · self-review · behaviour:low · governance:low
 - Blind check (fresh Sonnet, 64,746 tokens; descriptions + allowlist + one export per parent, never the key): all seven answerable, no give-away, all 16 allowlist words ordinary.
 - Freeze commit 634a74fb; block assignment (seed 4b8f3b40) PGR S4 · PRG S6 · GPR S1 · GRP S3 · RPG S5 · RGP S2. `.cap-dispositions` retain row added for the 259-line scenarios file (expected, signed at promote). Note: export.ts needs Git Bash (Windows tar lacks --force-local). Self-review (consequence low/low).
 review · T2 · self-review · behaviour:low · governance:low
+
+### 2026-11-20 | progress | T3 (TASK-681) done: pre-screen gate PASS (plain C 0.844 / 0.821); 3.62 of 32.00 USD spent
+- Probe builder (Sonnet, 124,248 tokens): `retest-probe/run.ts` + self-test, 35/35 checks, no `claude` launched by it. The first real stream confirmed the hook/usage field names used.
+- Coordinator launched (owner-approved) pre-S2 (0.3842 USD, 543K tokens) and pre-S4 (0.3898, VOID: it attempted `git log`, which the deny list blocked; the signed G2 counts any denied-git attempt as a history read) then pre-S4-r (0.3314, 433K).
+- Blind scorer (66,126 tokens): S2 F1 0.889, K 0.80, C 0.844; S4 F1 0.842 (recall 1.0, 2 matches by equivalence, 3 unmatched extras), K 0.80, C 0.821. Gate PASS → no swap, proceed.
+- MDD recomputed and appended: tokens 89,712 / USD 0.0431 / C 0.019 (scenario-confounded). Owner-attention note: the denied-git-attempt void is stricter than TASK-681's own wording ("a git call that reached history"); agents reach for `git log` naturally, so it may void paid runs again.
+review · T3 · self-review · behaviour:low · governance:low

@@ -132,6 +132,11 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20 | T1 key-aware audit, candidates 7-9 (89,136 tokens) | dispatch | 0.2674 | estimate | 1.2030 |
 | 2026-11-20 | T2 key worker (keys, descriptions, frozen rules; 180,952 tokens) | dispatch | 0.5429 | estimate | 1.7459 |
 | 2026-11-20 | T2 blind description check (64,746 tokens) | dispatch | 0.1942 | estimate | 1.9401 |
+| 2026-11-20T08:22:34.499Z | T3 pre-S2 | run | 0.3842 | actual | 2.3243 |
+| 2026-11-20T08:24:14.134Z | T3 pre-S4 (VOID) | run | 0.3898 | actual | 2.7141 |
+| 2026-11-20T08:25:54.907Z | T3 pre-S4-r | run | 0.3314 | actual | 3.0455 |
+| 2026-11-20 | T3 probe builder (run.ts + self-test; 124,248 tokens) | dispatch | 0.3727 | estimate | 3.4182 |
+| 2026-11-20 | T3 blind pre-screen scorer (66,126 tokens) | dispatch | 0.1984 | estimate | 3.6166 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
@@ -185,3 +190,23 @@ Scenarios S1–S6 = #1, #2, #3, #4, #8, #9; SPARE = #5 (smoke only). Description
 (fresh Sonnet, descriptions + allowlist + one export per parent, never the key): every description answerable, no
 give-away, all 16 allowlist words ordinary. Block assignment (seed 4b8f3b40): PGR S4 · PRG S6 · GPR S1 · GRP S3 · RPG S5 ·
 RGP S2. Minimum detectable differences frozen: tokens 48,300, USD 0.0628; C not estimable before the pre-screen.
+
+### Pre-screen gate (T3, 2026-11-20)
+
+Two plain runs on the two scenarios with the most code files across the most directories (S2: 9 code files, S4: 8),
+each in a fresh history-free export, scored blind (labels P1/P2, tool names redacted); F1 by script from the scorer's
+mapping (docs and generated files excluded as the frozen rules say).
+
+| Run | USD | Tokens | First-turn cache (create/read) | Tools | Code: key / planned / matched | P | R | F1 | K | C |
+|---|---|---|---|---|---|---|---|---|---|---|
+| pre-S2 | 0.3842 | 543,232 | 8,287 / 11,223 | Grep 20, Read 12, Glob 3 | 9 / 9 / 8 | 0.889 | 0.889 | 0.889 | 0.80 | **0.844** |
+| pre-S4 | 0.3898 | 528,853 | 8,172 / 11,223 | Grep 11, Read 11, Glob 2, Bash 1 | VOID: attempted `git log` (denied by the deny list; void under the signed G2 rule), repeated once | | | | | |
+| pre-S4-r | 0.3314 | 433,358 | 8,180 / 11,223 | Bash 7, Read 5, Grep 3 | 8 / 11 / 8 (2 by equivalence) | 0.727 | 1.000 | 0.842 | 0.80 | **0.821** |
+
+**Gate: PASS** — plain scored below 0.9 on both screened scenarios (0.844, 0.821), so no swap and no STOP; the test
+proceeds to T4. Pre-screen runs only gate and price; they are never controls (each scenario gets a fresh plain run in T5).
+
+Minimum detectable differences recomputed (appended beside the frozen ones, never edits; two runs on DIFFERENT scenarios,
+so the spread mixes scenario and run noise and over-states run noise): tokens 89,712 (frozen 48,300); USD
+0.0431 (frozen 0.0628); C 0.019 (first estimate; frozen "not estimable before the pre-screen"). A plain run
+on this repo costs about 0.33–0.39 USD at 430–540K tokens (workdoo: 0.20–0.32 USD at 220–320K).
