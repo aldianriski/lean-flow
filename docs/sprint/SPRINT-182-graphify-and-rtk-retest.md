@@ -4,6 +4,7 @@ slug: graphify-and-rtk-retest
 owner: Maintainer
 last_updated: 2026-11-20
 status: active
+plan_commit: f6639005
 update_trigger: sprint execute/close events
 ---
 
