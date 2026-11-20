@@ -39,7 +39,7 @@ Nine candidate commits are audited over the whole parent tree and key-aware, six
 **Acceptance:** six scenarios with sha, parent, type and scrub list, an export that shows one commit and an empty baseline status, and the 32.00 USD ledger opened.
 
 ### T2 — Write blind descriptions and keys and freeze the rules `[size: M · risk: low · class: execution · HITL · J1]`
-Layers: `docs/research/bloodlines-retest-scenarios.md` · `docs/research/graphify-rtk-retest-results.md` · `docs/knowledge-index.md`
+Layers: `docs/research/bloodlines-retest-scenarios.md` · `docs/research/graphify-rtk-retest-results.md` · `docs/knowledge-index.md` · `.cap-dispositions`
 Depends-on: T1
 Cites: TASK-680, L-329
 Each scenario gets a leak-free request and an objective key, and the scoring, adoption and noise rules are committed with their hash before any run so the verdict cannot be tuned afterwards.
