@@ -82,3 +82,16 @@ Review: one scoped Sonnet reviewer (dispatch.md is a workflow contract and ADR-0
 check-doc-caps: `PASS doc-caps: token-budget ~12634 tokens <= budget 12691`, `PASS cap .claude/CONTEXT.md (150 <= 150)`, `PASS cap .claude/CLAUDE.md (79 <= 80)`. Ticks: 9 of 9 via record-line, each followed by check-sprint-by-reference 4/0 and check-layers-completeness 9/0.
 consequence · T1 · behaviour:low · governance:high
 review · T1 · scoped-reviewer · behaviour:low · governance:high
+
+### 2026-11-20 | progress | T2 (TASK-673) done: graphify drop, a correctness tie at 1.04× the tokens
+Pre-test record: `D:\Research\workdoo` HEAD 884d897; `git status --porcelain --ignored` = `?? .claude/worktrees/`, `!! .workdoo/`, `!! dist/`, `!! node_modules/`, `!! tsconfig.tsbuildinfo`; no `graphify-out`; no `~/.graphify`.
+Dispatches, all launched by the coordinator (L-293); T3 subtracts these four from the RTK window by their Agent descriptions:
+- "T2 key worker: questions" · general-purpose · sonnet · 96,941 reported tokens · 6 questions + key, committed db180683 before any arm; the coordinator checked each key answer with one Grep each, all matched.
+- "T2 arm A: Explore only" · Explore · sonnet · 41,375 reported tokens · 7 tool uses · 6 answers.
+- Build: `graphify update .` in the snapshot, with a temporary `.graphifyignore` (`.claude/`, `.workdoo/`), because `.claude/worktrees/` holds two untracked copies of the code that graphify does not skip. 0 LLM tokens ("no LLM needed"), 9 s wall, 635 files, 6,874 nodes, 13,478 edges, 381 communities; no `.claude/` node.
+- "T2 arm B: Explore + graphify" · Explore · sonnet · 42,932 reported tokens · 11 tool uses · read the first 60 lines of the 87 KB GRAPH_REPORT.md, judged it not useful, ran no graphify query, answered from grep.
+- "T2 blind scorer" · general-purpose · sonnet · 56,975 reported tokens · X = arm B, Y = arm A (mapping held by the coordinator only) · X 6/6, Y 6/6.
+Verdict: drop. B ÷ A = 42,932 ÷ 41,375 = 1.038×, over the owner's 1.0× bar, at equal correctness. Ceiling: arm A was already 6/6. Not a confound under G2's definition. RTK fired for both arms equally. Revert: `graphify-out` and `.graphifyignore` removed; HEAD and `--ignored` status match the pre-test record exactly; `~/.graphify` still absent; `D:\Project\workdoo` never touched. TASK-675 is cancelled at close by its own condition.
+Review: docs-only research notes, no shipped surface → self-review (consequence below).
+consequence · T2 · behaviour:low · governance:low
+review · T2 · self-review · behaviour:low · governance:low
