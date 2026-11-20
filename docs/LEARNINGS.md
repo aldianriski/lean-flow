@@ -135,14 +135,19 @@ A bare `python` on this Windows host opens an interactive REPL and stalls a tool
 
 `record-line.ts tick` re-runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout (SPRINT-179 T1 ticked 17 boxes in one loop; SPRINT-181 T3's last tick ran past 120 s and finished green). Tick in batches, or run the loop in the background and read the verdict line. Ticks written before a cut stay written, so after a timeout read the member file for which boxes landed, not the loop's status (L-224).
 
+### ab-ceiling
+
+- **ab-ceiling → moved: `docs/LEARNINGS.md` § Durable rules › ab-ceiling** · disposition: move-to-reference — no `.claude/CLAUDE.md` or CONTEXT line (both at their caps); flows that hit it: `/task-decomposer` intake and `/orchestrator` G2 of any A/B or trial · learnings: L-329
+
+A re-test whose key check already scores full marks cannot discriminate on correctness (SPRINT-181 graphify 6 of 6, SPRINT-182 12 of 12 per arm, 3.21 USD for two inconclusives decided on token and USD noise). So the ceiling gates the run: at G2 of any A/B, if the blind key check or a smoke arm already scores full marks, harden the questions until a plain run fails some, or declare the correctness leg void and size the run for the cost leg's noise before launching.
+
 ---
 
-## L-329 [tags: process] [status: active]: **A re-test whose key check already scores full marks cannot discriminate on correctness, so the ceiling gates the run rather than only being recorded.** SPRINT-181's graphify test tied 6 of 6 and SPRINT-182's "harder" re-test tied 12 of 12 per arm (graphify, plain, RTK, plain) after T1's blind key check had scored 6/6 before any arm ran. The ceiling was logged at T1 and both arms ran anyway, so 3.21 USD bought two inconclusives decided on token and USD noise. At G2 of any A/B, if the blind key check or a smoke arm already scores full marks, either harden the questions until a plain run fails some, or declare the correctness leg void and size the run for the cost leg's noise before launching.
+## L-329 [tags: process] [status: promoted]: **A re-test whose key check already scores full marks cannot discriminate on correctness, so the ceiling gates the run rather than only being recorded.**
 - seen: 2026-11-20 (SPRINT-181 T2 graphify 6/6 tie; SPRINT-182 T2 and T3 12/12 ties)
 - count: 2
-- promoted: no
+- **L-329 → promoted: `docs/LEARNINGS.md` § Durable rules › ab-ceiling** · disposition: move-to-reference — placed by §10's placement test (intake and G2 flows), no always-loaded line; the body is collapsed to this pointer.
 - related: L-279 · L-255
-
 ---
 
 ## L-328 [tags: process] [status: active]: **A task's consequence is predicted from its Layers, never from its class: a decision task that edits a workflow contract or an implementation-binding ADR is not `governance:low`.**
