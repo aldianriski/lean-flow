@@ -85,3 +85,10 @@ review · T3 · self-review · behaviour:low · governance:low
 
 ### 2026-11-20 | g2-amendment | void rule: a denied git attempt voids only if it ran (owner popup, "Void only if it ran (Recommended)")
 The signed G2 counted any attempt at a denied git form as a history read (pre-S4 was voided for a `git log` the deny list blocked). Owner ruling: a denied git or rtk form voids a run only when the call actually ran; a call the deny list blocked is recorded as an attempt (`denied_attempts` in the run summary). Out-of-export paths, `.git` reads, secret paths and a plain-arm graphify/rtk call still void. This matches TASK-681/683's own wording ("a git call that reached history"); no frozen Done-when box changes. The probe's fence now pairs each flagged tool_use with its tool_result (`is_error` + "has been denied" → attempt); a call with no result stays void. Self-test still ALL PASS; a replay of the real pre-S4 stream records `git log` as an attempt. pre-S4 stays void as booked (ruled before the change).
+
+### 2026-11-20 | progress | T4 (TASK-682) done: both arms built, price gate PASS; 4.47 of 32.00 USD spent
+- graphify 0.9.103 (code-only build 9,149 nodes / 67 s, `install --project`) and RTK v1.1.0 (trusted terse+posthook pipeline, project init, hand-wired PreToolUse hook) each set up on the spare, removed, and verified back to the export's commit; global hashes unchanged throughout.
+- Smokes (coordinator-launched, owner-approved): graphify 0.1824 USD (2 graphify queries, 1 nudge), RTK 0.3880 (10 rewrites; 4 Write attempts blocked — the agent tried to implement, plausibly from the rtk CLAUDE.md block), plain 0.2081.
+- RTK capability run (0.0709, unscored): version and init --show in-run, a cut + recall, a denied mutating command; the info-loss audit procedure proven (shown + recalled = raw). The probe voided it on a fence false positive (`rtk init --show` treated as mutating); fixed, self-test ALL PASS.
+- Projection 12.23 USD ≤ remaining 27.53 → T5 proceeds without asking. Self-review (consequence low/low).
+review · T4 · self-review · behaviour:low · governance:low

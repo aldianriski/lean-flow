@@ -137,6 +137,10 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20T08:25:54.907Z | T3 pre-S4-r | run | 0.3314 | actual | 3.0455 |
 | 2026-11-20 | T3 probe builder (run.ts + self-test; 124,248 tokens) | dispatch | 0.3727 | estimate | 3.4182 |
 | 2026-11-20 | T3 blind pre-screen scorer (66,126 tokens) | dispatch | 0.1984 | estimate | 3.6166 |
+| 2026-11-20T08:48:39.541Z | T4 sm-graphify | run | 0.1824 | actual | 3.7990 |
+| 2026-11-20T08:51:40.811Z | T4 sm-rtk | run | 0.3880 | actual | 4.1870 |
+| 2026-11-20T08:52:51.820Z | T4 sm-plain | run | 0.2081 | actual | 4.3951 |
+| 2026-11-20T08:53:30.010Z | T4 cap-rtk (VOID) | run | 0.0709 | actual | 4.4660 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
@@ -210,3 +214,24 @@ Minimum detectable differences recomputed (appended beside the frozen ones, neve
 so the spread mixes scenario and run noise and over-states run noise): tokens 89,712 (frozen 48,300); USD
 0.0431 (frozen 0.0628); C 0.019 (first estimate; frozen "not estimable before the pre-screen"). A plain run
 on this repo costs about 0.33–0.39 USD at 430–540K tokens (workdoo: 0.20–0.32 USD at 220–320K).
+
+### Arms and price gate (T4, 2026-11-20)
+
+All on the SPARE (#5, never scored). Global hashes (~/.claude CLAUDE.md, settings.json, the skills/graphify tree, %APPDATA%tk) were taken before and after each arm's install and removal: unchanged.
+
+- **graphify 0.9.103:** `graphify update .` code-only ("no LLM needed") with `.graphifyignore` (public/, test-results/): 9,149 nodes, 27,515 edges, 324 communities, 67 s; then `graphify install --project` (root CLAUDE.md section, skill registration in the tracked .claude/CLAUDE.md, .claude/settings.json PreToolUse hooks Bash|Grep and Read/Glob, SessionStart hook, project skill). Removal by checkout + clean: `--ignored` status empty, tree equal to the export's commit. The project CLAUDE.md edit is reverted after the arm's run (the export is deleted after it).
+- **RTK full v1.1.0** (`D:	oolstk-full.1.0`, PATH prefix on the child only): trusted `.rtk/pipeline.toml` (terse + posthook, strip-line-numbers and json-reads on; `rtk pipeline validate` ok), `rtk init --auto-patch` project mode (CLAUDE.md block + .rtk/filters.toml), PreToolUse Bash hook in the export's `.claude/settings.local.json`. Read/Grep compression untestable in v1.1.0 (no Claude Code PostToolUse processor). Removal round-trip clean.
+
+| Smoke run | USD | Tokens | First-turn cache (create/read) | Tools | Hooks / nudges / rewrites / graphify queries | Void |
+|---|---|---|---|---|---|---|
+| sm-graphify | 0.1824 | 226,130 | 8,895 / 11,223 | Bash 5, Read 7 | 12 / 1 / 0 / 2 | no |
+| sm-rtk | 0.3880 | 483,757 | 8,713 / 11,223 | Bash 11, Write 4 (all blocked: "No such tool available: Write") | 11 / 0 / 10 / 0 | no |
+| sm-plain | 0.2081 | 257,532 | 8,183 / 11,223 | Bash 7 | 0 / 0 / 0 / 0 | no |
+
+The RTK-arm agent tried to implement rather than only plan (4 blocked Write calls), plausibly prompted by the rtk instructions `rtk init` writes into the project CLAUDE.md; recorded as arm behaviour.
+
+**RTK capability run** `cap-rtk` (unscored, own prompt, 0.0709 USD): `rtk --version` → `rtk 1.1.0`; `rtk init --show` printed in-run ("Hook: not found", because v1.1.0 inspects only global settings, though the project hook fired); `ls -la src/app/api/v1/me` and `ls -la src/lib` were rewritten and compressed, the second cut; `rtk recall d981e63f113a7245` returned the 11 hidden entries; `rtk git add .` → "Permission to use Bash with command rtk git add . has been denied". **Information-loss audit procedure proven once:** the 50 shown + 11 recalled entries equal the 61 entries of the raw listing in the unmodified export (PASS). The probe voided this run because its fence treated the read-only `rtk init --show` as mutating; unscored, so no repeat; the fence now exempts `rtk init --show` (self-test re-run ALL PASS).
+
+**Price gate: PASS.** max smoke price 0.3880 × 18 × 1.25 = 8.73 + scorer 2.00 + hold-back 1.50 = 12.23 ≤ remaining 27.53 → T5 proceeds without asking. T4 lines 0.8494 USD ≤ 1.50.
+
+MDD recomputed from the smoke runs (appended; three DIFFERENT arms on one scenario, so it mixes arm effect with run noise): tokens 162,300, USD 0.1294.
