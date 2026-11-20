@@ -18,6 +18,13 @@ related: [graphify-workdoo-questions, graphify-daily-value, graphify-reference-r
 > graphify, the use its README recommends, is untested**, so this is not a verdict on graphify itself; a re-test
 > was ordered on 2026-11-20. TASK-675 (ship the wiring) is cancelled. lean-flow's own verdict
 > (`graphify-daily-value.md`, redundant) is untouched. — TASK-673, SPRINT-181; reworded after a Codex review.
+>
+> **Re-test verdict (2026-11-20, TASK-677, SPRINT-182): inconclusive.** graphify 0.9.103 installed the README way
+> (`graphify install --project`: query-first CLAUDE.md block plus Read/Glob and Bash/Grep hooks, which fired in both
+> runs) against plain, ABBA, on six harder questions. Correctness tied at 12/12 each. Tokens came to 1.22× plain, over
+> the 1.0× bar, but the two graphify runs differ by more than the gap to plain, so the noise rule makes it inconclusive,
+> never pass or fail. USD, reported beside it, was 0.89× plain, also inside the noise. No ship task is filed.
+> Figures: `graphify-rtk-retest-results.md` § T2.
 
 ## Why this matters
 The owner ruled on 2026-11-20 that graphify ships in lean-flow if it passes this test. A wrong keep would put
@@ -61,5 +68,8 @@ README directs (query-first integration, cross-file and multi-hop questions, two
 reversed) before ruling on graphify itself. No ADR is needed: nothing is adopted, and the decision is easy to reverse.
 
 ## Out of scope / open questions
-- The query-first re-test (owner ruling 2026-11-20) settles graphify's main claim. This test is n=6 with one
-  run per arm, which shows direction, not proof (EPIC-024 D4).
+- The query-first re-test (TASK-677) ran and is inconclusive: a correctness ceiling (all four runs 6/6; the blind key
+  check also scored 6/6) and run-to-run token spread larger than the arm gap. Two runs per arm cannot separate them.
+  Settling it would take more runs per arm, or questions a plain agent gets wrong; neither is owned by a task.
+- Observed behaviour, not ruled on: with the hooks firing, the agent issued one `graphify query` in 13 Bash calls
+  across both graphify runs and otherwise grepped and read as the plain arm did.

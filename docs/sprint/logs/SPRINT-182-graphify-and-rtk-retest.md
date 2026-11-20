@@ -73,3 +73,12 @@ Run: T1 → T2 → T3 (linear, no parallel build). Shared files (results file, k
 - Note for close: graphify-rtk-retest-questions.md is 167 lines against the §2 soft cap 130 (the fixture is evidence; dispose at the next promote).
 - Review: docs-only research files plus an uncommitted throwaway probe → self-review (consequence low/low, logged at promote).
 review · T1 · self-review · behaviour:low · governance:low
+
+### 2026-11-20 | progress | T2 (TASK-677) done: graphify inconclusive; 2.00 of 8.00 USD spent
+- Runs, coordinator-launched through the probe, owner-approved, ABBA, snapshot reset before each: plain-1 0.3171 USD / 296,527 tokens; graphify-1 0.2584 / 381,198; graphify-2 0.1989 / 248,932; plain-2 0.1990 / 221,618.
+- graphify 0.9.103 was installed the README way per graphify run (`graphify update .`, then `graphify install --project`). Hooks fired in both graphify runs (1 and 3 nudges). The agent ran one `graphify query` in 13 Bash calls.
+- Blind scorer (fresh Sonnet, 68,949 tokens): all four sets 6/6.
+- Verdict under the frozen rules: tie on correctness; tokens 1.22× plain, but graphify's run-to-run spread (132,266) exceeds the gap to plain (55,993), so the noise rule gives **inconclusive**. USD was 0.89× plain, also inside the noise. No ship task filed.
+- Side effect logged: `graphify install --project` refreshed the global ~/.claude/skills/graphify to 0.9.103. ~/.claude CLAUDE.md and settings.json were unchanged and no hook was added; runs load no user skills.
+- The notes were written inline by the coordinator, not by a note worker as the design had it, because every figure was already in hand and a worker would only re-read them (cheaper; logged as the one design deviation). Self-review (consequence low/low).
+review · T2 · self-review · behaviour:low · governance:low
