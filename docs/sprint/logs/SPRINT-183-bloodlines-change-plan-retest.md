@@ -107,3 +107,11 @@ review · T4 · self-review · behaviour:low · governance:low
 - Owner ruling at the futility look: "Stop RTK, finish graphify" — RTK's last 3 runs not launched; blocks 4-6 ran their frozen order minus R.
 - Runs: B4 (S3, GP) G 0.1859 / 163K, P 0.1826 / 183K · B5 (S5, PG) P 0.4407 / 492K, G 0.4683 / 483K · B6 (S2, GP) G 0.2255 / 312K, P 0.2596 / 310K. graphify: 1 nudge and 1 query per run.
 - Fence false positives overturned (annotated ledger + summary; no repeats): B5-S5-P and B5-S5-G flagged `~` inside heredoc edit attempts the permission layer refused ("needs approval", obfuscation check) → those refusals now count as "denied" too; B6-S2-P flagged `/m/`, a grep pattern read as an MSYS drive path → grep/rg pattern arguments are no longer path-checked. Self-test ALL PASS; replays clean. Ledger 8.81 of 32.00 USD.
+
+### 2026-11-20 | progress | T5 (TASK-683) done: graphify INCONCLUSIVE, RTK DROP; 9.22 of 32.00 USD spent
+- Blind scoring: one Sonnet pass over 15 plans (shuffled labels, tool names and arm-cue clauses removed), 137,348 tokens booked at 0.4120 USD (estimate). F1 by script from the mapping.
+- graphify (n = 6): tokens +1.7% (tie, threshold 38,302), C +0.026 (tie, threshold 0.051), USD −5.0% (tie). Plain mean C 0.858, so the gain leg is live. Not KEEP, not DROP → INCONCLUSIVE. A +0.1 gain would have been detectable; the observed effect is a quarter of it.
+- RTK (n = 3 after the owner's stop): tokens +16.4%, real and higher; C and USD tie. The audit of all 5 cuts finds 3 hidden lines naming a key file or symbol (losses by the frozen rule; none lowered C) → DROP.
+- No ship task filed (no tool passed). Exports and retest-probe/ deleted; global hashes unchanged; live repo unchanged. Self-review (consequence low/low).
+- Coordinator judgment to surface: 6 scored runs flagged void by the probe were kept, not repeated. Each flag was checked against the transcript and shown to be a fence false positive (nothing was read outside the export), and the reason is annotated per row.
+review · T5 · self-review · behaviour:low · governance:low

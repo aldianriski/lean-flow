@@ -6,7 +6,7 @@ status: current
 id: rtk-trial-verdict
 tags: [tooling]
 domain: knowledge
-related: [graphify-workdoo-test, model-effort-trial-verdict]
+related: [graphify-workdoo-test, model-effort-trial-verdict, graphify-rtk-retest-results]
 ---
 
 # Research — Does RTK cut USD per box on a real sprint?
@@ -54,3 +54,18 @@ The owner chose this band rule on 2026-11-20 ("Band vs baselines (Recommended)")
 - A paired run (matched tasks, RTK on and off) would improve attribution, not prove it: repetition and spread still matter, and boxes are not standard units of work. It was not run.
 - The README's cost claims sit in pipelines (compress Read/Grep, hand big reads to a cheaper model; one pipeline reports −20.2% total cost in its author's benchmark). The 2026-11-20 re-test (TASK-678) ran the full edition v1.1.0, but no release at least 14 days old can apply posthook in Claude Code (no PostToolUse processor), so the Read/Grep part stays untested. It becomes testable only when a stable release with a Claude Code PostToolUse hook is at least 14 days old; no task owns that.
 - The 37.2% from `rtk gain` is output compression, not cost; the RTK README's own caveat (90% less output is not 90% less cost) is the prior.
+
+## Big-repo re-test verdict (2026-11-20, SPRINT-183): DROP
+RTK full v1.1.0 ran on bloodlinesfamilia web as the README wires it for Claude Code: a project hook rewriting Bash, and
+a trusted terse + posthook pipeline. Read/Grep compression is untestable in v1.1.0. It planned real past changes
+against plain, paired by scenario. The owner stopped RTK at the futility look after three scenarios, so n = 3 and
+the threshold is 2·s/√3. Figures are in `graphify-rtk-retest-results.md` § Paid set.
+- **Tokens:** d̄ +51,238 (+16.4% of plain), s 39,344, threshold 45,431, effect size +1.30. Real, and higher.
+- **Correctness C:** d̄ −0.002, s 0.046, threshold 0.053. Tie.
+- **USD (guard):** d̄ +0.0131, s 0.0694, threshold 0.0801. Tie.
+- **Information-loss audit:** 5 cuts in 3 runs, none recalled by the agent. Recall plus the shown lines reproduce
+  the raw output in every cut. By the frozen rule, 3 hidden lines naming a key file or key symbol are losses. None
+  lowered C.
+
+DROP on two independent legs: tokens are real and higher, and the audit finds a loss. No ship task is filed. RTK
+stays out of the plugin and its consumers.

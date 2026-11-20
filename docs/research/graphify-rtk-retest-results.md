@@ -156,6 +156,7 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20T13:52:17.480Z | T5 B5-S5-G (void overturned: the flagged ~ was text inside heredoc edit attempts the permission layer refused; nothing ran) | run | 0.4683 | actual | 7.9991 |
 | 2026-11-20T13:55:29.137Z | T5 B6-S2-G | run | 0.2255 | actual | 8.5533 |
 | 2026-11-20T13:56:28.821Z | T5 B6-S2-P (void overturned: the flagged /m/ was a grep pattern over in-export test/e2e, read as an MSYS drive path) | run | 0.2596 | actual | 8.8129 |
+| 2026-11-20 | T5 blind scorer, 15 plans (137,348 reported tokens × 3.00 USD/MTok) | dispatch | 0.4120 | estimate | 9.2249 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
@@ -252,3 +253,81 @@ The RTK-arm agent tried to implement rather than only plan (4 blocked Write call
 **Price gate: PASS.** max smoke price 0.3880 × 18 × 1.25 = 8.73 + scorer 2.00 + hold-back 1.50 = 12.23 ≤ remaining 27.53 → T5 proceeds without asking. T4 lines 0.8494 USD ≤ 1.50.
 
 MDD recomputed from the smoke runs (appended; three DIFFERENT arms on one scenario, so it mixes arm effect with run noise): tokens 162,300, USD 0.1294.
+
+### Paid set (T5, 2026-11-20)
+
+Execution order as run: block order PGR, PRG, GPR, then GRP, RPG and RGP without R, after the owner's futility ruling. Each run used a fresh history-free export of its scenario's parent, with one export on disk at a time. The coordinator launched every run with `--max-budget-usd 1.50`. † marks a run the probe flagged void, where the coordinator overturned the flag as a fence false positive. The reason is in its ledger row and summary, and the fence was fixed and the run replayed each time. graphify showed a hook nudge in every run, so there was no arm failure. Scoring was one blind Sonnet pass over all 15 plans: labels Q01–Q15 shuffled with seed `4b8f3b40-t5`, tool names redacted, and three "run the tool's update" clauses removed as arm cues; it used 137,348 tokens. F1 is computed by script from its mapping.
+
+| # | Run | USD | Tokens | Wall s | First-turn cache (create/read) | Tools | Hooks / nudges / rewrites / graphify queries | Code key / planned / matched | F1 | Tests found | K | C |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | B1-S4-P | 0.3437 | 306,304 | 84 | 8,178 / 11,223 | Grep 3, Bash 11 | 0 / 0 / 0 / 0 | 8 / 11 / 8 (2 equiv) | 0.842 | 4/5 | 1.00 | **0.921** |
+| 2 | B1-S4-G | 0.2959 | 404,814 | 73 | 8,889 / 11,223 | Bash 9, Grep 4 | 13 / 1 / 0 / 1 | 8 / 8 / 8 (2 equiv) | 1.000 | 4/5 | 1.00 | **1.000** |
+| 3 | B1-S4-R † | 0.2853 | 390,600 | 57 | 8,706 / 11,223 | Grep 6, Glob 1, Read 9, Bash 3 | 3 / 0 / 3 / 0 | 8 / 9 / 8 (2 equiv) | 0.941 | 3/5 | 1.00 | **0.971** |
+| 4 | B2-S6-P | 0.2848 | 396,385 | 64 | 8,232 / 11,223 | Grep 1, Bash 8, Read 3, Write 1 | 0 / 0 / 0 / 0 | 7 / 7 / 5 (1 equiv) | 0.714 | 0/0 | 0.90 | **0.807** |
+| 5 | B2-S6-R | 0.3023 | 404,106 | 58 | 8,762 / 11,223 | Grep 2, Read 4, Bash 6 | 6 / 0 / 4 / 0 | 7 / 8 / 5 (1 equiv) | 0.667 | 0/0 | 0.90 | **0.783** |
+| 6 | B2-S6-G † | 0.2708 | 386,313 | 61 | 8,942 / 11,223 | Bash 10, Grep 1 | 11 / 1 / 0 / 1 | 7 / 8 / 5 (1 equiv) | 0.667 | 0/0 | 1.00 | **0.833** |
+| 7 | B3-S1-G | 0.2244 | 207,084 | 58 | 8,947 / 11,223 | Bash 4, Grep 2, Read 8 | 14 / 1 / 0 / 1 | 7 / 8 / 7 (2 equiv) | 0.933 | 3/7 | 0.80 | **0.867** |
+| 8 | B3-S1-P | 0.2484 | 236,821 | 70 | 8,237 / 11,223 | Grep 1, Bash 8 | 0 / 0 / 0 / 0 | 7 / 7 / 7 (2 equiv) | 1.000 | 3/7 | 0.90 | **0.950** |
+| 9 | B3-S1-R † | 0.3287 | 298,517 | 93 | 8,765 / 11,223 | Grep 1, Bash 5, Read 10 | 5 / 0 / 5 / 0 | 7 / 8 / 7 (2 equiv) | 0.933 | 3/7 | 0.90 | **0.917** |
+| 10 | B4-S3-G | 0.1859 | 163,214 | 60 | 8,888 / 11,223 | Bash 4, Grep 1, Write 2, Edit 11 | 5 / 1 / 0 / 1 | 7 / 9 / 7 (1 equiv) | 0.875 | 0/2 | 0.90 | **0.888** |
+| 11 | B4-S3-P | 0.1826 | 183,138 | 53 | 8,179 / 11,223 | Grep 5, Read 3, Bash 3 | 0 / 0 / 0 / 0 | 7 / 9 / 7 (1 equiv) | 0.875 | 0/2 | 0.90 | **0.888** |
+| 12 | B5-S5-P † | 0.4407 | 492,152 | 131 | 8,299 / 11,223 | Bash 10, Grep 1, Write 3 | 0 / 0 / 0 / 0 | 8 / 10 / 8 (5 equiv) | 0.889 | 1/5 | 0.70 | **0.794** |
+| 13 | B5-S5-G † | 0.4683 | 483,156 | 163 | 9,008 / 11,223 | Bash 13, Grep 2, Write 6 | 15 / 1 / 0 / 1 | 8 / 10 / 8 (5 equiv) | 0.889 | 1/5 | 0.80 | **0.844** |
+| 14 | B6-S2-G | 0.2255 | 312,283 | 56 | 9,004 / 11,223 | Bash 9, Grep 1 | 10 / 1 / 0 / 1 | 9 / 8 / 8 (0 equiv) | 0.941 | 4/7 | 0.80 | **0.871** |
+| 15 | B6-S2-P † | 0.2596 | 310,144 | 49 | 8,294 / 11,223 | Grep 2, Bash 7, Read 3 | 0 / 0 / 0 / 0 | 9 / 7 / 7 (0 equiv) | 0.875 | 5/7 | 0.70 | **0.788** |
+
+Every arm, plain included, tried to edit files despite the plan-only prompt: Write, `cat >` heredocs and python edits. The permission layer refused all of them.
+
+**graphify vs plain** (n = 6 paired scenarios; threshold 2·s/√6):
+
+| Scenario | d C | d tokens | d USD |
+|---|---|---|---|
+| S4 | +0.079 | +98,510 | -0.0477 |
+| S6 | +0.026 | -10,072 | -0.0140 |
+| S1 | -0.083 | -29,737 | -0.0240 |
+| S3 | +0.000 | -19,924 | +0.0033 |
+| S5 | +0.050 | -8,996 | +0.0276 |
+| S2 | +0.083 | +2,139 | -0.0341 |
+
+| Metric | plain mean | d̄ | s | 2·s/√n | effect size d̄/s | d̄ vs plain mean | leg |
+|---|---|---|---|---|---|---|---|
+| C | 0.858 | +0.026 | 0.062 | 0.051 | +0.42 | +3.0% | tie |
+| tokens | 320,824 | +5,320 | 46,910 | 38,302 | +0.11 | +1.7% | tie |
+| USD | 0.2933 | -0.0148 | 0.0271 | 0.0221 | -0.55 | -5.0% | tie |
+
+**RTK vs plain (owner stopped RTK after block 3)** (n = 3 paired scenarios; threshold 2·s/√3):
+
+| Scenario | d C | d tokens | d USD |
+|---|---|---|---|
+| S4 | +0.050 | +84,296 | -0.0583 |
+| S6 | -0.024 | +7,721 | +0.0175 |
+| S1 | -0.033 | +61,696 | +0.0803 |
+
+| Metric | plain mean | d̄ | s | 2·s/√n | effect size d̄/s | d̄ vs plain mean | leg |
+|---|---|---|---|---|---|---|---|
+| C | 0.893 | -0.002 | 0.046 | 0.053 | -0.05 | -0.3% | tie |
+| tokens | 313,170 | +51,238 | 39,344 | 45,431 | +1.30 | +16.4% | real, higher |
+| USD | 0.2923 | +0.0131 | 0.0694 | 0.0801 | +0.19 | +4.5% | tie |
+
+**Minimum detectable difference, recomputed from the paid set.** This is the 2-SE threshold the verdicts used:
+
+| Arm | C | Tokens | USD |
+|---|---|---|---|
+| graphify | 0.051 | 38,302 | 0.0221 |
+| RTK (n = 3) | 0.053 | 45,431 | 0.0801 |
+
+The frozen pre-run token figure (48,300) was smaller than the paired spread this repo shows.
+
+**Ceiling rule:** plain's mean C over graphify's six scenarios is 0.858, below 0.9, so the correctness-gain leg is live, not void.
+
+**RTK information-loss audit (every cut in every RTK run).** There were 5 cuts, and the agent recalled none of them. For each cut, `rtk recall <id>` returned the hidden lines, and the agent's original command was re-run in an unmodified export of that parent. In all 5, the shown and recalled lines together cover every file token of the raw output (0 missing). Hidden lines were then checked against the key's files and symbols:
+
+| Run | Cut | Hidden | Raw tokens missing | Hidden lines bearing on the key |
+|---|---|---|---|---|
+| B1-S4-R | 747efb38 (`ls supabase/migrations`, test dirs) | 105 | 0 | **1 loss:** `20261004020000_payments_only_server_succeeds.sql`, a key file. The agent had already read it directly earlier in the run, and its plan covers it by equivalence. `…_add_payment_data_to_payments.sql` matched only the generic word `payments`; judged no bearing |
+| B1-S4-R | eb15861a (test dirs) | 2 | 0 | none |
+| B2-S6-R | 474cbeab (touring component dirs) | 3 | 0 | none |
+| B3-S1-R | c3c604eb (`ls docs .claude supabase …`) | 203 | 0 | **1 loss:** `20260330000000_email_queue.sql`, which defines the key symbol `email_queue`. Six more matched only `page` or `email`; judged no bearing |
+| B3-S1-R | 0ba3dc21 (rate-limit grep) | 154 | 0 | **1 loss:** the same `email_queue` migration line. Six generic matches judged no bearing |
+
+The frozen rule counts "any dropped line bearing on a key file, symbol or key point" as a loss, "whether or not C fell". By that rule the audit finds 3 losses. None of them lowered C: B1-S4-R scored 0.971 and B3-S1-R 0.917.

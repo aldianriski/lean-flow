@@ -6,7 +6,7 @@ status: current
 id: graphify-workdoo-test
 tags: [tooling]
 domain: knowledge
-related: [graphify-workdoo-questions, graphify-daily-value, graphify-reference-run]
+related: [graphify-workdoo-questions, graphify-daily-value, graphify-reference-run, graphify-rtk-retest-results]
 ---
 
 # Research — Does a graphify graph help an AI know a TypeScript repo better, at no extra cost?
@@ -73,3 +73,17 @@ reversed) before ruling on graphify itself. No ADR is needed: nothing is adopted
   Settling it would take more runs per arm, or questions a plain agent gets wrong; neither is owned by a task.
 - Observed behaviour, not ruled on: with the hooks firing, the agent issued one `graphify query` in 13 Bash calls
   across both graphify runs and otherwise grepped and read as the plain arm did.
+
+## Big-repo re-test verdict (2026-11-20, SPRINT-183): INCONCLUSIVE
+graphify 0.9.103 ran the README way on bloodlinesfamilia web: a code-only graph, `install --project` hooks, a nudge in
+every run. It planned six real past changes against plain, paired by scenario. Figures are in
+`graphify-rtk-retest-results.md` § Paid set; a metric is real only when |d̄| > 2·s/√6.
+- **Tokens:** d̄ +5,320 (+1.7% of plain), s 46,910, threshold 38,302, effect size +0.11. Tie.
+- **Correctness C:** d̄ +0.026, s 0.062, threshold 0.051, effect size +0.42. Tie. Plain's mean C is 0.858, so the
+  ceiling rule does not void this leg.
+- **USD (guard):** d̄ −0.0148, s 0.0271, threshold 0.0221, effect size −0.55. Tie.
+
+Not KEEP: there is no real token cut, the C gain is neither real nor near +0.1, and mean tokens are 1.017× plain,
+above the 1.0× limit. Not DROP: C is not clearly lower and tokens are not clearly higher. The C threshold (0.051) is
+half the owner's +0.1 bar, so a gain that large would have shown as real; the observed +0.026 is a quarter of the bar.
+No ship task is filed. The recommendation above stands: do not ship.
