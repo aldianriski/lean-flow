@@ -149,7 +149,13 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20T09:06:02.182Z | T5 B2-S6-G (void overturned: the flagged `../copy` was text inside a python heredoc the permission layer denied; it ran nothing) | run | 0.2708 | actual | 6.2488 |
 | 2026-11-20T09:08:39.348Z | T5 B3-S1-G | run | 0.2244 | actual | 6.4732 |
 | 2026-11-20T09:09:55.515Z | T5 B3-S1-P | run | 0.2484 | actual | 6.7216 |
-| 2026-11-20T09:11:36.636Z | T5 B3-S1-R (void overturned: `PEPPER\|SECRET` was a grep pattern over docs/SETUP.md inside the export, not a secret-file read) | run | 0.3287 | actual | 7.0503 |
+| 2026-11-20T09:11:36.636Z | T5 B3-S1-R (void overturned: a grep pattern for PEPPER or SECRET over in-export docs/SETUP.md, not a secret-file read) | run | 0.3287 | actual | 7.0503 |
+| 2026-11-20T13:44:58.891Z | T5 B4-S3-G | run | 0.1859 | actual | 6.9075 |
+| 2026-11-20T13:45:59.262Z | T5 B4-S3-P | run | 0.1826 | actual | 7.0901 |
+| 2026-11-20T13:48:19.550Z | T5 B5-S5-P (void overturned: the flagged ~ was text inside heredoc edit attempts the permission layer refused; nothing ran) | run | 0.4407 | actual | 7.5308 |
+| 2026-11-20T13:52:17.480Z | T5 B5-S5-G (void overturned: the flagged ~ was text inside heredoc edit attempts the permission layer refused; nothing ran) | run | 0.4683 | actual | 7.9991 |
+| 2026-11-20T13:55:29.137Z | T5 B6-S2-G | run | 0.2255 | actual | 8.5533 |
+| 2026-11-20T13:56:28.821Z | T5 B6-S2-P (void overturned: the flagged /m/ was a grep pattern over in-export test/e2e, read as an MSYS drive path) | run | 0.2596 | actual | 8.8129 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
