@@ -92,3 +92,8 @@ The signed G2 counted any attempt at a denied git form as a history read (pre-S4
 - RTK capability run (0.0709, unscored): version and init --show in-run, a cut + recall, a denied mutating command; the info-loss audit procedure proven (shown + recalled = raw). The probe voided it on a fence false positive (`rtk init --show` treated as mutating); fixed, self-test ALL PASS.
 - Projection 12.23 USD ≤ remaining 27.53 → T5 proceeds without asking. Self-review (consequence low/low).
 review · T4 · self-review · behaviour:low · governance:low
+
+### 2026-11-20 | progress | T5 block 1 (S4) and two probe fixes
+- Runs: B1-S4-P plain 0.3437 USD / 306K tokens; B1-S4-G graphify 0.2959 / 405K (1 nudge, 1 graphify query); B1-S4-R RTK 0.2853 / 391K (3 rewrites).
+- Probe fix 1 (no spend): the first graphify launch was refused with "another export exists: B1-S4-G" — its own export; the one-export check compared Windows paths case-sensitively (T4's lowercase labels passed). Now a normalized comparison; the leftover export was deleted; nothing launched or booked.
+- Probe fix 2: B1-S4-R was flagged VOID for "`..` escapes export: ../supabase/…" — the command was `cd src && … cat ../supabase/migrations/…`, which resolves inside the export. A factual misclassification under the void rule (the run read nothing outside its export), not a rule change, so the coordinator overturned it (ledger row and summary annotated) instead of buying a biased repeat. The fence now follows `cd` within a command; self-test ALL PASS; a replay of the run no longer raises the `..` reason.

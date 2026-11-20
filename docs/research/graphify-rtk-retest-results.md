@@ -141,6 +141,9 @@ Cap 32.00 USD, hold-back 1.50 (spendable 30.50). Per-task caps: T1 2.50, T2 2.50
 | 2026-11-20T08:51:40.811Z | T4 sm-rtk | run | 0.3880 | actual | 4.1870 |
 | 2026-11-20T08:52:51.820Z | T4 sm-plain | run | 0.2081 | actual | 4.3951 |
 | 2026-11-20T08:53:30.010Z | T4 cap-rtk (VOID) | run | 0.0709 | actual | 4.4660 |
+| 2026-11-20T08:57:28.456Z | T5 B1-S4-P | run | 0.3437 | actual | 4.8097 |
+| 2026-11-20T09:00:01.870Z | T5 B1-S4-G | run | 0.2959 | actual | 5.1056 |
+| 2026-11-20T09:01:05.426Z | T5 B1-S4-R (void overturned: `cd src && cat ../supabase/…` resolves inside the export; fence fixed to follow cd) | run | 0.2853 | actual | 5.3909 |
 
 ### Pool (9 candidates, last 12 months, drawn 2026-11-20)
 
@@ -217,10 +220,12 @@ on this repo costs about 0.33–0.39 USD at 430–540K tokens (workdoo: 0.20–0
 
 ### Arms and price gate (T4, 2026-11-20)
 
-All on the SPARE (#5, never scored). Global hashes (~/.claude CLAUDE.md, settings.json, the skills/graphify tree, %APPDATA%tk) were taken before and after each arm's install and removal: unchanged.
+All on the SPARE (#5, never scored). Global hashes (~/.claude CLAUDE.md, settings.json, the skills/graphify tree, %APPDATA%
+tk) were taken before and after each arm's install and removal: unchanged.
 
 - **graphify 0.9.103:** `graphify update .` code-only ("no LLM needed") with `.graphifyignore` (public/, test-results/): 9,149 nodes, 27,515 edges, 324 communities, 67 s; then `graphify install --project` (root CLAUDE.md section, skill registration in the tracked .claude/CLAUDE.md, .claude/settings.json PreToolUse hooks Bash|Grep and Read/Glob, SessionStart hook, project skill). Removal by checkout + clean: `--ignored` status empty, tree equal to the export's commit. The project CLAUDE.md edit is reverted after the arm's run (the export is deleted after it).
-- **RTK full v1.1.0** (`D:	oolstk-full.1.0`, PATH prefix on the child only): trusted `.rtk/pipeline.toml` (terse + posthook, strip-line-numbers and json-reads on; `rtk pipeline validate` ok), `rtk init --auto-patch` project mode (CLAUDE.md block + .rtk/filters.toml), PreToolUse Bash hook in the export's `.claude/settings.local.json`. Read/Grep compression untestable in v1.1.0 (no Claude Code PostToolUse processor). Removal round-trip clean.
+- **RTK full v1.1.0** (`D:	ools
+tk-full.1.0`, PATH prefix on the child only): trusted `.rtk/pipeline.toml` (terse + posthook, strip-line-numbers and json-reads on; `rtk pipeline validate` ok), `rtk init --auto-patch` project mode (CLAUDE.md block + .rtk/filters.toml), PreToolUse Bash hook in the export's `.claude/settings.local.json`. Read/Grep compression untestable in v1.1.0 (no Claude Code PostToolUse processor). Removal round-trip clean.
 
 | Smoke run | USD | Tokens | First-turn cache (create/read) | Tools | Hooks / nudges / rewrites / graphify queries | Void |
 |---|---|---|---|---|---|---|
