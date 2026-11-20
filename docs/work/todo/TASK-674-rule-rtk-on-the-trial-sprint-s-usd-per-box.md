@@ -1,6 +1,7 @@
 ---
 id: TASK-674
 title: "Rule RTK on the trial sprint's USD per box, then record all three verdicts"
+sprint: SPRINT-181
 type: feature
 epic: EPIC-026
 priority: P2

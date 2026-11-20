@@ -1,6 +1,7 @@
 ---
 id: TASK-671
 title: "Rule each model × effort cell keep, retune or drop on the trial sprint's numbers"
+sprint: SPRINT-181
 type: feature
 priority: P2
 size: S
