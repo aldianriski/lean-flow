@@ -4,7 +4,7 @@ slug: rtk-trial-graphify-test-and-cell-verdicts
 epic: EPIC-026
 owner: Maintainer
 last_updated: 2026-11-20
-status: active
+status: closed
 plan_commit: 22b9d5ec
 gates_signed: G1,G2 @ 664e979a
 update_trigger: sprint execute/close events
@@ -80,5 +80,36 @@ It runs last so its measure window (promote up to the commit before its own work
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `docs/epic/EPIC-026-token-cost-per-box.md` | COORD | D8 amendment and the SPRINT-181 member row (WHY: the owner moved the graphify test to a standalone run) | Low | coverage re-read |
+| `skills/orchestrator/references/dispatch.md`, `.claude/CONTEXT.md`, `docs/adr/ADR-010-model-dispatch-role-tiers.md`, `README.md`, `CHANGELOG.md` | T1 | One cell kept (intake draft check, opt-in per host); the trial wording and the other cells retired (WHY: the SPRINT-180 numbers ruled them) | Low | scoped review, check-doc-caps |
+| `docs/research/model-effort-trial-verdict.md` | T1 | Verdict note for the cell rulings | Low | read-through |
+| `docs/research/graphify-workdoo-questions.md`, `docs/research/graphify-workdoo-test.md` | T2 | Six fixed questions with the key, and the graphify drop verdict (WHY: 6 of 6 tie at 1.038x tokens) | Low | blind score, workdoo reverted |
+| `docs/research/rtk-trial-verdict.md`, `docs/epic/INDEX.md` | T3 | RTK inconclusive, and the EPIC-026 row naming all three verdicts (WHY: 0.686 USD per box sits inside the 0.474 to 2.023 band) | Low | session-cost window probe |
+| `docs/knowledge-index.md`, `docs/work/` task moves | COORD | Regenerated index and status moves (WHY: derived view and folder status) | Low | gen-index |
 
 ## Retro
+**Retrieval check** — yes, a miss. L-319 (`related:` takes corpus ids only) is already promoted into the template, yet the graphify questions note carried `related: [TASK-673]`. The corpus dangling-ref check caught it at system verify (first run, fixed in 212f0c52). L-326 and L-045 were also hit again.
+
+**Cost** — 3 members (S, M, S), coordinator plus Sonnet workers, no Codex builder. The RTK window is 10.29 USD over 15 boxes, 0.686 USD per box (0.638 without the four T2 dispatches); baselines SPRINT-178 0.659, SPRINT-179 0.474, SPRINT-180 2.023. Reported worker tokens sum to 446,475: T1 112,303; T2 key worker 96,941, arm A 41,375, arm B 42,932, scorer 56,975; T3 95,949. The graphify build cost 0 LLM tokens (a 9 s code-only update). The coordinator's own tokens are not recorded, so no per-sprint total is stated.
+
+**Worked**
+- The dispatch cells were ruled from the SPRINT-180 Log, one worker counted as one dispatch at its cumulative cost.
+- The graphify key was fixed and checked before either arm ran, the scorer was blind, and workdoo was reverted exactly (HEAD, `--ignored` status and `~/.graphify` matched the pre-test record).
+- T3's box wording was fixed by a scope-change entry and an owner popup before any work.
+
+**Friction**
+- Promote predicted `governance:low` for T1, but T1 changed a workflow contract and an implementation-binding ADR, so review logged `governance:high`.
+- The first system-verify run piped the gate through `| tail`, so exit 0 was tail's; the VPS result files showed qa.rc 1.
+- A research note's `related:` held a task id and reddened the corpus check.
+- RTK v1.1.0's project-scoped `rtk init` installs no hook, so the hook was hand-wired into gitignored settings.local.json. RTK also truncated `ls`, `head`, `tail`, `sed` and `wc` output, so census queries went through Glob and Grep.
+- The last `record-line tick` on TASK-674 ran its downstream checks past 120 s and finished green.
+- graphify does not skip an untracked `.claude/worktrees/`, which needed a temporary `.graphifyignore` (workdoo-side, no lean-flow row).
+- A local Windows bare gate showed a `run-spec-reader-fixtures.sh s13-rows-intact` FAIL with spec/ untouched; it passes off-host.
+
+**Pattern candidate**
+- L-328 new (predict a task's consequence from its Layers, not its class). Count bumps: L-045, L-326 (now 2) and L-319 (now 3).
+
+**Routed**
+- Shipped: the T1 CHANGELOG `[Unreleased]` line is already present; the RTK and graphify verdicts ship nothing. Tech debt: TD-318. Follow-ups: no new task file. TASK-675 is cancelled (graphify drop). EPIC-026 closes and is archived.
+- Verdicts: one dispatch cell kept (intake draft check, opt-in per host), the rest default; graphify drop (6 of 6 tie, 1.038x tokens); RTK inconclusive (0.686 USD per box inside the 0.474 to 2.023 band), maintainer-environment only; ponytail Drop from SPRINT-178.
+- RTK hook: the owner ruled it removed after close (the coordinator removes it from the gitignored `.claude/settings.local.json`; the binary stays in `D:\tools\rtk`).
+- Release: a feature sprint, so a MINOR by hand with SPRINT-180's `[Unreleased]` line, owner-run later; nothing is bumped or pushed here.

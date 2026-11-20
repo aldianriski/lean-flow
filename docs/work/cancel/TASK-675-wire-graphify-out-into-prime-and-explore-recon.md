@@ -43,3 +43,6 @@ The prime SKILL.md and the Explore recon brief lines in task-decomposer, orchest
 ## Tracker
 
 Owner popups 2026-11-20 Q4 and "Next sprint, if kept"; owner approve 2026-11-20.
+
+## Cancelled
+2026-11-20, SPRINT-181 close: TASK-673 ruled graphify drop (6 of 6 correct, a tie with Explore, at 1.038x its tokens against the 1.0x bar), so the graphify wiring is not taken up.

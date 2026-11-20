@@ -2016,3 +2016,8 @@ status: current
   - Evidence: SPRINT-180 Log, the box-4 scope-change entry and the after-run entries. 2 of 2 commit-inline runs (exports at `2767637f` and `d28b0a6f`) read the three catalogs, never `CONTEXT.md`, and wrote "rehearsal" where the override demanded "dry run". The child and inline-fallback paths fired once the glossary step moved to the top of `patterns-id.md`.
   - Impact: low. A host glossary override reaches documents and PR bodies but not humanized commit messages. The owner ruled "Accept gap + TD (Recommended)", with no `embedded.md` edit this sprint.
   - Mitigation: a one-line pointer to the glossary step in `embedded.md` § Inline path, then re-run the commit-inline override case in `evals/fixtures/humanizer/domain-calque/`. A hypothesis, not a plan; re-derive before building on it.
+- **TD-318** severity: low | status: open | created: Sprint-181 (close retro)
+  - Summary: **`evals/run-spec-reader-fixtures.sh` case `s13-rows-intact` fails on this Windows host and passes off-host.** A local bare gate printed "FAIL eval harness run-spec-reader-fixtures.sh … s13-rows-intact" while spec/ was untouched this sprint. The cause is not investigated. TD-316 is a different harness with the same kind of host difference.
+  - Evidence: SPRINT-181 system-verify notes (local Windows bare gate against the off-host green at 212f0c52).
+  - Impact: low. A local gate run reads red for a reason outside the change under test; the off-host release gate is unaffected.
+  - Mitigation: run the case on this host, name the difference, then fix the harness or make the case host-aware. A hypothesis; re-derive before building on it.

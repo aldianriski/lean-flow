@@ -133,6 +133,15 @@ A bare `python` on this Windows host opens an interactive REPL and stalls a tool
 
 ---
 
+## L-328 [tags: process] [status: active]: **A task's consequence is predicted from its Layers, never from its class: a decision task that edits a workflow contract or an implementation-binding ADR is not `governance:low`.**
+SPRINT-181 promote predicted `governance:low` for T1 because it was a `class: decision` task. Its Layers held `skills/orchestrator/references/dispatch.md` and ADR-010, so review logged `governance:high` and ran a scoped reviewer. Read the Layers when predicting, and expect the prediction to rise when a shipped reference or an ADR is among them.
+- seen: 2026-11-20 (SPRINT-181 T1)
+- count: 1
+- promoted: no
+- related: L-268 (a review record written before the depth is decided)
+
+---
+
 ## L-327 [tags: process] [status: active]: **An action instruction deep in a reference catalog is not acted on: put it at the top of the file every path reads.**
 SPRINT-180's host-glossary step sat at line 173 of 188 in `patterns-id.md`. After the first build it fired in 1 of 7 runs that had a glossary in the folder; the other 6 read the catalog and never looked for `CONTEXT.md`. Moved to the top of the file, it fired on the child and inline-fallback paths. The commit-inline path still did not fire (TD-317). A step a run must perform belongs where the run starts reading, and its proof is a Read call in the transcript, not the text.
 - seen: 2026-11-16 (SPRINT-180 T1: 1 of 7 before the move, child and inline-fallback after it)
@@ -145,7 +154,8 @@ SPRINT-180's host-glossary step sat at line 173 of 188 in `patterns-id.md`. Afte
 ## L-326 [tags: tooling] [status: active]: **`record-line.ts tick` runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout: tick in batches, or run the loop in the background and read the verdict line.**
 SPRINT-179 ticked TASK-670's 17 boxes one call at a time in a single loop, and the loop outran a 120 s tool timeout because each tick re-ran the downstream checkers. The ticks written before the cut stayed written, so after a timeout read the member file for which boxes landed, not the loop's status.
 - seen: 2026-11-16 (SPRINT-179 close: the T1 ticks)
-- count: 1
+- seen: 2026-11-20 (SPRINT-181 T3: the last tick on TASK-674 ran its downstream checks past 120 s and finished green)
+- count: 2
 - promoted: no
 - related: L-224 (re-run the gate's own checker after a tick)
 
@@ -206,8 +216,8 @@ SPRINT-177 T2 first added a test-only knob that controlled execution of the boun
 ---
 
 ## L-319 [tags: docs] [status: promoted]: **A live doc can cite a retired id, so resolve every `related:` id against the ledger before writing it.**
-- seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`) · 2026-11-16 (SPRINT-178 system verify, first run: `related: [EPIC-026]` in a research file, because `related:` takes corpus ids only (ADR, research, L ids), never epics; fixed in `e5236150`, one extra gate run)
-- count: 2
+- seen: 2026-11-15 (SPRINT-176 system verify, first run; fixed in `994d643e`) · 2026-11-16 (SPRINT-178 system verify, first run: `related: [EPIC-026]` in a research file, because `related:` takes corpus ids only (ADR, research, L ids), never epics; fixed in `e5236150`, one extra gate run) · 2026-11-20 (SPRINT-181 system verify, first run: `related: [TASK-673]` in `graphify-workdoo-questions.md`, a task id; fixed in `212f0c52`)
+- count: 3
 - **L-319 → promoted: `skills/lean-doc-generator/templates/LEARNINGS.md.template` (the `related:` comment)** · disposition: merge — one clause added: corpus ids only, never a retired id or an epic; the dangling-ref check stays the backstop.
 - related: L-234 (a check caught it only at system verify)
 
@@ -2100,7 +2110,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - seen: 2026-10-11 (SPRINT-122 close: a gate log was read before its run finished and printed a stale verdict; the final `QA-CHECK` line, read after rc existed, said 288/0)
 - seen: 2026-10-12 (SPRINT-124 T2: Codex R2 claimed a fixture's octal escapes print plain ASCII; the pasted diff had lost its backslashes, and the VPS seed run had already shown the case reddens)
 - seen: 2026-11-13 (SPRINT-174 close: a `git add` naming a path that no longer existed failed as a whole and staged nothing, so `936eb3e7` carried only the task file under a subject naming T1's re-ask wording; found from `git status` afterwards, fixed forward in `1c6a3798`)
-- count: +9 (SPRINT-121 T4 consolidation of family B: 6 entries folded; base count is narrated above; SPRINT-122 close +1; SPRINT-124 close +1; SPRINT-174 close +1)
+- seen: 2026-11-20 (SPRINT-181 system verify, first run: the gate command was piped through `| tail`, so exit 0 was tail's; the VPS result files showed qa.rc 1)
+- count: +10 (SPRINT-121 T4 consolidation of family B: 6 entries folded; base count is narrated above; SPRINT-122 close +1; SPRINT-124 close +1; SPRINT-174 close +1; SPRINT-181 close +1)
 
 ## L-044 [tags: tooling] [status: promoted]: leave a worktree directory before removing it, and retry from a fresh shell — the Windows handle-lock caveat.
 - **L-044 → promoted: dispatch.md § Merge-back queue** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-025 + Sprint-026.

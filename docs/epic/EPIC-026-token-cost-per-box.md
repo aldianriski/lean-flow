@@ -3,7 +3,7 @@ epic: 026
 slug: token-cost-per-box
 owner: Maintainer
 last_updated: 2026-11-20
-status: active
+status: closed
 member_sprints: [SPRINT-178, SPRINT-181]
 update_trigger: a member sprint closes, a trial ends, or a decision lands that changes the outcome
 ---
@@ -46,7 +46,7 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-178](../sprint/archive/SPRINT-178-lane-cost-fixes-and-ponytail-review.md) | Lane cost fixes (TASK-666, TASK-667) with the ponytail delta review (TASK-669) | closed · `dfd668f7` | Ponytail slice only: TASK-669 delivers the ponytail verdict (Drop, `docs/research/ponytail-delta-review.md`; "-45% tokens" inconclusive, nothing installed). TASK-666 and TASK-667 advance no EPIC-026 condition. |
-| SPRINT-181 | RTK trial, graphify test and the cell verdicts (TASK-671, TASK-673, TASK-674) | active | The RTK trial sprint: TASK-673 delivers the graphify verdict, TASK-674 the RTK verdict and the verdict record. TASK-671 (the dispatch cell rulings) advances no EPIC-026 condition. |
+| [SPRINT-181](../sprint/archive/SPRINT-181-rtk-trial-graphify-test-and-cell-verdicts.md) | RTK trial, graphify test and the cell verdicts (TASK-671, TASK-673, TASK-674) | closed · `SHA` | TASK-673 delivers the graphify verdict (Drop), TASK-674 the RTK verdict (inconclusive) and the three-verdict record, both maintainer-environment only. TASK-671 (the dispatch cell rulings) advances no EPIC-026 condition. |
 
 ## Decisions
 - **D1** — Vehicle, owner popup 2026-11-15: "One small epic, after Sprint B (Recommended)". Open a 'token cost per box' epic with the trials as slices. It starts only after EPIC-025 Sprint B (the workdoo SPRINT-005) closes, so Sprint B's measurement stays clean.
@@ -68,7 +68,7 @@ lean-flow ships no hooks (ADR-044 allows them under the ADR-001 curation bar). R
 - **Does graphify on workdoo's TypeScript beat reading the code with Explore alone?** (measurement) → one standalone test on the workdoo snapshot (D8), six fixed questions, both arms measured.
 
 ## Closed when
-- [ ] RTK has a recorded verdict (keep, drop or inconclusive) from one real lean-flow sprint run with it project-scoped, with USD per box compared against recent sprints by `scripts/session-cost.ts`. The bypass rule held: `git diff --cached` and the gate output were read uncompressed. → TASK-674
+- [x] RTK has a recorded verdict (keep, drop or inconclusive) from one real lean-flow sprint run with it project-scoped, with USD per box compared against recent sprints by `scripts/session-cost.ts`. The bypass rule held: `git diff --cached` and the gate output were read uncompressed. → closed by SPRINT-181 (TASK-674)
 - [x] Ponytail has a recorded verdict (keep, drop or inconclusive) from a first-hand read of its SKILL.md and benchmark. Each technique is mapped to lean-flow's existing surface, and only the unmatched ones are named, as kept or dropped. Nothing is installed. → closed by SPRINT-178 (TASK-669)
-- [ ] graphify has a recorded verdict (keep, drop or inconclusive) from one standalone test on a workdoo TypeScript snapshot against Explore, with correct answers and tokens shown, build cost included. lean-flow's own verdict is untouched. → TASK-673
-- [ ] Each verdict and its measurement are in `docs/research/`, and the INDEX row names all three. Nothing ships inside lean-flow without a separate owner ruling, and a kept tool is recorded as maintainer-environment only unless that ruling says otherwise. → TASK-674
+- [x] graphify has a recorded verdict (keep, drop or inconclusive) from one standalone test on a workdoo TypeScript snapshot against Explore, with correct answers and tokens shown, build cost included. lean-flow's own verdict is untouched. → closed by SPRINT-181 (TASK-673)
+- [x] Each verdict and its measurement are in `docs/research/`, and the INDEX row names all three. Nothing ships inside lean-flow without a separate owner ruling, and a kept tool is recorded as maintainer-environment only unless that ruling says otherwise. → closed by SPRINT-181 (TASK-674)

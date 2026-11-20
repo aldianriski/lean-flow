@@ -3,7 +3,7 @@ sprint: 181
 slug: rtk-trial-graphify-test-and-cell-verdicts
 owner: Maintainer
 last_updated: 2026-11-20
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -104,3 +104,6 @@ Edits: new docs/research/rtk-trial-verdict.md (coordinator confirmed the verdict
 RTK hook stays installed project-scoped until the owner rules otherwise (it is a maintainer-environment tool; removal = delete the hook block from .claude/settings.local.json).
 consequence · T3 · behaviour:low · governance:low
 review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-11-20 | close | Retro written, buckets routed, SPRINT-181 closed
+Retro is in the sprint file; no second narrative here. Owner popup, verbatim: "Approve all (Recommended)" (close and retention) and "Remove it (Recommended)" (the RTK hook is removed after close; the coordinator edits the gitignored `.claude/settings.local.json`, the binary stays in `D:	oolstk`). Routed: TD-318; L-328 new, sightings on L-045, L-326 and L-319; no follow-up task; TASK-675 cancelled; EPIC-026 closed. Handoff sweep: no `handoff` entry in this Log, none to reconcile.
