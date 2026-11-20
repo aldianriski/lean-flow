@@ -3,7 +3,7 @@ sprint: 182
 slug: graphify-and-rtk-retest
 owner: Maintainer
 last_updated: 2026-11-20
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -95,3 +95,6 @@ review · T3 · self-review · behaviour:low · governance:low
 
 ### 2026-11-20 | progress | T3 Cites correction
 The box-3 rewording (scope-change afaaf422) names the workdoo snapshot's `.rtk/pipeline.toml`; check-layers-completeness read it as an undeclared lean-flow path (member-layers-incomplete). Per the checker's own guidance it is declared on T3's Cites: line, because the box cites it and the task never touches it in lean-flow. Same false-positive shape promote hit with `.claude/CLAUDE.md`.
+
+### 2026-11-20 | close | Retro written, buckets routed, SPRINT-182 closed
+Retro is in the sprint file; no second narrative here. Owner popups, verbatim: "File active, place at promote (Recommended)" (L-329), "None (Recommended)" (no follow-up task), "File as drafted (Recommended)" (TD-319), "Approve close" (close, archive and the questions-fixture retain row). The handoff sweep found no `handoff` entry in this log and the ledger's one path is `spent`, so nothing was reconciled.

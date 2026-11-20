@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-16
+last_updated: 2026-11-20
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -2021,3 +2021,8 @@ status: current
   - Evidence: SPRINT-181 system-verify notes (local Windows bare gate against the off-host green at 212f0c52).
   - Impact: low. A local gate run reads red for a reason outside the change under test; the off-host release gate is unaffected.
   - Mitigation: run the case on this host, name the difference, then fix the harness or make the case host-aware. A hypothesis; re-derive before building on it.
+- **TD-319** severity: low | status: open | created: Sprint-182 (close retro)
+  - Summary: **`check-layers-completeness` reads a path in a Done-when box that names another repo's file as a lean-flow file, so a cross-repo test task can silence the member-layers-incomplete FAIL only by declaring the foreign path on `Cites:`.** The Cites line then claims an input lean-flow does not have.
+  - Evidence: SPRINT-182 promote (workdoo's `.claude/CLAUDE.md` in TASK-677's cleanup box, reworded before the lock) and SPRINT-182 T3 (box 3 names the workdoo snapshot's `.rtk/pipeline.toml`; the tick reddened the check, fixed by the Cites line in c9a755ef). Two sightings in one sprint, both on workdoo paths.
+  - Impact: low. The check fails loud and a workaround exists; the cost is a red tick that a quiet chain can bury (L-045).
+  - Mitigation: let a Done-when path marked as belonging to another repo be exempt, or accept a named foreign-root prefix. A hypothesis, not a plan; re-derive before building on it. A defect fix of an existing checker, unfrozen under ADR-053.

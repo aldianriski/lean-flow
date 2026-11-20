@@ -25,7 +25,7 @@ Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-326**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-329**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -137,6 +137,14 @@ A bare `python` on this Windows host opens an interactive REPL and stalls a tool
 
 ---
 
+## L-329 [tags: process] [status: active]: **A re-test whose key check already scores full marks cannot discriminate on correctness, so the ceiling gates the run rather than only being recorded.** SPRINT-181's graphify test tied 6 of 6 and SPRINT-182's "harder" re-test tied 12 of 12 per arm (graphify, plain, RTK, plain) after T1's blind key check had scored 6/6 before any arm ran. The ceiling was logged at T1 and both arms ran anyway, so 3.21 USD bought two inconclusives decided on token and USD noise. At G2 of any A/B, if the blind key check or a smoke arm already scores full marks, either harden the questions until a plain run fails some, or declare the correctness leg void and size the run for the cost leg's noise before launching.
+- seen: 2026-11-20 (SPRINT-181 T2 graphify 6/6 tie; SPRINT-182 T2 and T3 12/12 ties)
+- count: 2
+- promoted: no
+- related: L-279 · L-255
+
+---
+
 ## L-328 [tags: process] [status: active]: **A task's consequence is predicted from its Layers, never from its class: a decision task that edits a workflow contract or an implementation-binding ADR is not `governance:low`.**
 SPRINT-181 promote predicted `governance:low` for T1 because it was a `class: decision` task. Its Layers held `skills/orchestrator/references/dispatch.md` and ADR-010, so review logged `governance:high` and ran a scoped reviewer. Read the Layers when predicting, and expect the prediction to rise when a shipped reference or an ADR is among them.
 - seen: 2026-11-20 (SPRINT-181 T1)
@@ -156,8 +164,8 @@ SPRINT-180's host-glossary step sat at line 173 of 188 in `patterns-id.md`. Afte
 ---
 
 ## L-326 [tags: tooling] [status: promoted]: **`record-line.ts tick` runs the gate's checkers on every call, so ticking many boxes in one loop can overrun the 120 s tool timeout.**
-- seen: 2026-11-16 (SPRINT-179 close: the T1 ticks) · 2026-11-20 (SPRINT-181 T3: the last tick on TASK-674 ran past 120 s and finished green)
-- count: 2
+- seen: 2026-11-16 (SPRINT-179 close: the T1 ticks) · 2026-11-20 (SPRINT-181 T3: the last tick on TASK-674 ran past 120 s and finished green) · 2026-11-20 (SPRINT-182 T2: TASK-677's last tick backgrounded past 120 s and finished green)
+- count: 3
 - **L-326 → promoted: `docs/LEARNINGS.md` § Durable rules › host-tooling** · disposition: move-to-reference — host-specific, so no CLAUDE.md or CONTEXT line; the body is collapsed to this pointer.
 - related: L-224 (re-run the gate's own checker after a tick)
 
@@ -977,7 +985,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - seen: 2026-10-24 (SPRINT-137 system verify: the 10-23 T3 scope-change entry named `check-layers-completeness.ts`, outside T3's
   `Cites:`; the entry was never re-run through `--scope-change`, so the leg FAILed only at close, a day later)
 - seen: 2026-11-08 (SPRINT-167 promote: the worker froze the Plan without running `check-layers-completeness`; T2's `Cites:` lacked four files its Done-when names, and the first merge-check FAILed on it; fixed by a scope-change)
-- count: 10 (6 recorded in TASK-438's Why; SPRINT-127 close +1; SPRINT-128 close +1; SPRINT-137 close +1; SPRINT-167 close +1)
+- seen: 2026-11-20 (SPRINT-182 T3: a tick reddened the layers check over a Done-when path of another repo, and only the checker's own re-run showed it; fixed in c9a755ef)
+- count: 11 (6 recorded in TASK-438's Why; SPRINT-127 close +1; SPRINT-128 close +1; SPRINT-137 close +1; SPRINT-167 close +1; SPRINT-182 close +1)
 
 ## L-223 [tags: process] [status: promoted]: **Slimming an always-loaded rule to a pointer moves its history safely, but each imperative it carries has to stay always-loaded, because the reader that needs it is the one that never opens the pointer.** SPRINT-112 T2 moved five CLAUDE.md rules verbatim into LEARNINGS (byte-verified) and kept one-liners. Codex then found, over three rounds, actions the one-liners had dropped: verify the seed landed, parse with ±1 line and the assertion count, a sibling control, a checked-hash restore, `git add -p` then `git diff --cached`, re-reading the structure, scoping an env workaround, the cache read-before-edit rule, the Tier X/P bars and seeding the rejected design. Each was restored as a terse clause, and the always-loaded set still dropped ~16081 → ~13419 tokens. **Durable form: before slimming a rule, list its imperatives (what an agent must DO at the moment of action) and check each one against the kept text. History, sightings and examples may move; actions may not.**
 - seen: 2026-10-03 (SPRINT-112 T2, Codex rounds 1–3 on `.claude/CLAUDE.md`)
@@ -2112,8 +2121,9 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - seen: 2026-10-11 (SPRINT-122 close: a gate log was read before its run finished and printed a stale verdict; the final `QA-CHECK` line, read after rc existed, said 288/0)
 - seen: 2026-10-12 (SPRINT-124 T2: Codex R2 claimed a fixture's octal escapes print plain ASCII; the pasted diff had lost its backslashes, and the VPS seed run had already shown the case reddens)
 - seen: 2026-11-13 (SPRINT-174 close: a `git add` naming a path that no longer existed failed as a whole and staged nothing, so `936eb3e7` carried only the task file under a subject naming T1's re-ask wording; found from `git status` afterwards, fixed forward in `1c6a3798`)
+- seen: 2026-11-20 (SPRINT-182 T3: a tick chain's output went to /dev/null, so a reddened layers check was hidden, the `&&` chain stopped and commit 46295349 carried one tick)
 - seen: 2026-11-20 (SPRINT-181 system verify, first run: the gate command was piped through `| tail`, so exit 0 was tail's; the VPS result files showed qa.rc 1)
-- count: +10 (SPRINT-121 T4 consolidation of family B: 6 entries folded; base count is narrated above; SPRINT-122 close +1; SPRINT-124 close +1; SPRINT-174 close +1; SPRINT-181 close +1)
+- count: +11 (SPRINT-121 T4 consolidation of family B: 6 entries folded; base count is narrated above; SPRINT-122 close +1; SPRINT-124 close +1; SPRINT-174 close +1; SPRINT-181 close +1; SPRINT-182 close +1)
 
 ## L-044 [tags: tooling] [status: promoted]: leave a worktree directory before removing it, and retry from a fresh shell — the Windows handle-lock caveat.
 - **L-044 → promoted: dispatch.md § Merge-back queue** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-025 + Sprint-026.

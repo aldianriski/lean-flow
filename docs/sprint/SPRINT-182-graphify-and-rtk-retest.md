@@ -3,7 +3,7 @@ sprint: 182
 slug: graphify-and-rtk-retest
 owner: Maintainer
 last_updated: 2026-11-20
-status: active
+status: closed
 plan_commit: f6639005
 gates_signed: G1,G2 @ 3ce17ee0
 update_trigger: sprint execute/close events
@@ -76,7 +76,39 @@ The OSS edition has no pipeline engine, so this installs the full edition apart 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| `docs/work/` task moves, `docs/LEARNINGS.md`, `docs/knowledge-index.md` | COORD | Status moves, and L-326 promoted to the host-tooling rule (WHY: count reached 2 at SPRINT-181 close) | Low | gen-index, check-doc-caps |
+| `docs/research/graphify-rtk-retest-questions.md`, `docs/research/graphify-rtk-retest-results.md` | T1 | Key-checked question set and the run ledger (WHY: fixed before any arm ran) | Low | key check, smoke run |
+| `docs/research/graphify-workdoo-test.md` | T2 | Re-test verdict for graphify (WHY: tie 12/12, tokens 1.22× inside the noise) | Low | blind score, snapshot reverted |
+| `docs/research/rtk-trial-verdict.md` | T3 | Re-test verdict for RTK (WHY: tie 12/12, USD 1.02× inside the noise) | Low | blind score, snapshot reverted |
+| `docs/work/` task moves, `docs/LEARNINGS.md`, `docs/knowledge-index.md`, `TECH-DEBT.md`, `.cap-dispositions` | COORD | Status moves, and L-326 promoted to the host-tooling rule (WHY: count reached 2 at SPRINT-181 close) | Low | gen-index, check-doc-caps |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check** — Partly yes. L-279 (check a predeclared threshold against what the comparator already scores) existed, and T1's key check scored 6/6 before any arm ran, which is exactly that measurement. It was logged as a ceiling signal and the arms ran anyway (L-329). L-326, L-045 and L-224 were also hit again.
+
+**Cost** — 3 members (M, M, M), coordinator plus Sonnet workers, no Codex builder. The ledger spent 3.21 of 8.00 USD, about 0.097 USD per box over 33 boxes. The runs cost about 2.5 USD; dispatch figures are labelled estimates. Reported worker tokens sum to 386,230: T1 builder 153,486 and key check 94,674, T2 scorer 68,949, T3 scorer 69,121. SPRINT-181 ran at 0.686 USD per box, but that was session cost, so the two figures are not like for like.
+
+**Worked**
+- The key was fixed and checked by a second blind pass before any arm ran, and every scorer was blind with tool names redacted.
+- The snapshot returned to its baseline (HEAD and `--ignored` status) after every run, and the ledger cap refused nothing.
+- Each owner popup (stream-json, drop the skills flag, "Test what v1.1.0 supports") was logged as a scope-change entry before the box wording moved.
+- The kept intake-draft-check cell fired once on the TASK-676..678 draft (Fable high plus a Codex blind pair). Fable found 4 real issues Codex missed, including the High on posthook Read rules; Codex rated two shared ones higher. That is cell evidence, and no trial bookkeeping is needed.
+
+**Friction**
+- Both tools tied on correctness. The key check and every arm scored full marks in both re-tests, so the "harder" questions still did not discriminate, and the verdicts fell on token and USD noise: graphify 1.22× tokens and 0.89× USD, RTK 1.02× USD, both inconclusive.
+- graphify followed the README and its hooks fired, but the agent ran one `graphify query` in 13 Bash calls.
+- RTK v1.1.0 and v1.2.0 have no Claude Code PostToolUse processor, so the Read/Grep compression the README sells was untestable. The owner ruled "Test what v1.1.0 supports", and T3 tested the Bash rewrite and terse prose only.
+- A tick chain failed silently. TASK-678 box 2's tick reddened `check-layers-completeness` (member-layers-incomplete: the box named workdoo's `.rtk/pipeline.toml`), but the chain's output was redirected to /dev/null. The `&&` chain stopped, a later `git add` over a missing done/ path aborted, and commit 46295349 carried one tick. It was fixed by declaring the path on T3's Cites line (c9a755ef).
+- The layers checker reads another repo's cited path as a lean-flow file. Promote hit it with workdoo's `.claude/CLAUDE.md`, T3 with `.rtk/pipeline.toml`.
+- TASK-677's last `record-line tick` ran past 120 s (backgrounded, finished green): L-326's third sighting, after the rule was promoted at this sprint's promote.
+- `graphify install --project` also refreshed the global `~/.claude/skills/graphify`, and RTK v1.1.0's project `rtk init` registers no hooks (`rtk init --show` reads only global settings). Both are already in `graphify-rtk-retest-results.md`.
+- `docs/research/graphify-rtk-retest-questions.md` is 167 lines against the §2 soft cap of 130.
+
+**Pattern candidate**
+- L-329 new: a re-test whose key check already scores full marks cannot discriminate on correctness, so the ceiling should gate the run. Count 2 (SPRINT-181 graphify 6/6, SPRINT-182 12/12), `promoted: no`; placed at the next promote.
+- Count bumps: L-326 (now 3), L-045 (+1), L-224 (+1).
+
+**Routed**
+- Shipped: none. Tech debt: TD-319. Follow-ups: none (owner ruling "None (Recommended)"). Learnings: L-329 new; L-326, L-045 and L-224 bumped.
+- Verdicts: graphify inconclusive, no ship task. RTK inconclusive, maintainer-environment only.
+- §2 cap: a `retain` row in `.cap-dispositions` for the questions fixture, whose commit hash the results file records.
+- Release: none, nothing shipped.
