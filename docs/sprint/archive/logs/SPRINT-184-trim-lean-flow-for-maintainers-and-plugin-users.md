@@ -166,3 +166,4 @@ The gate-dependent boxes are ticked on it: TASK-685 box 3, TASK-691 box 4, TASK-
 
 ### 2026-11-21 | close | Retro written, buckets routed, SPRINT-184 closed
 Retro is in the sprint file; no second narrative here. Owner word: "close". Pre-close: `check-sprint-by-reference --close` 22 pass, 0 fail (nine members in done/, TASK-692 in cancel/, every Done-when unchanged since 45b2e2cc); system-verify green at 899ec6e4 (bun test 643 pass, 0 fail; QA-CHECK 245 pass, 0 fail). Filed: TD-315, TD-317, TD-318 and TD-319 resolved by their tasks; TD-320 new (cancelled-member handling in the sprint checks); L-237, L-238 and L-293 sightings. No follow-up task; CHANGELOG `[Unreleased]` already carries the sprint's consumer lines (T10). The handoff sweep found no `handoff` entry in this log, so nothing was reconciled.
+Owner popup at archive, verbatim: "Approve archive (Recommended)" (archive, INDEX line, close_commit 9a2e957d).
