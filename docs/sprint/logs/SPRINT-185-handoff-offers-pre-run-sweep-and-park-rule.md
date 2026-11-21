@@ -87,3 +87,11 @@ T2 shipped-diff Codex review round 1 `VERDICT: CLEAR`, no findings. Box 9 ticked
 T4 (TASK-696): Codex built it in worktree `s185-t4` off e43827df (`ready`; orchestrator-store 42/0, store-readers 21/0, run-mode fixtures green; SKILL.md 140 lines). Scoped Sonnet reviewer `VERDICT: CLEAR`. Its lows: the conformance engine (S9) accepts an interim `gates_signed: G1 @ <sha>` and never reads it as G2, but `lean-doc-generator/SKILL.md` and `SPRINT.md.template` still say omit until both gates are signed; `**blocked-by:**` Assumes lines are not named in Sweep step 2 (step 5 still catches them). Landed with blob-hash equality on all 4 files, commit 709d01ec; boxes 1-3 ticked; 4-6 wait for the proof and the shipped-diff Codex review.
 run · 22 of 36 DoD ticked (T3 6/6 · T1 6/8 · T2 7/9 · T4 3/6 · T5 0/7)
 review · T4 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-11-21 | handoff | SPRINT-185 batch G2 and the build, fresh session (resumed)
+handoff-status: consumed
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-g2.md
+
+### 2026-11-21 | handoff | SPRINT-185 T4 shipped-diff review, T5 build, proofs, system-verify and close
+handoff-status: live
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-build.md
