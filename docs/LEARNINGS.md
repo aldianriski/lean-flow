@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-20
+last_updated: 2026-11-21
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -140,6 +140,15 @@ A bare `python` on this Windows host opens an interactive REPL and stalls a tool
 - **ab-ceiling → moved: `docs/LEARNINGS.md` § Durable rules › ab-ceiling** · disposition: move-to-reference — no `.claude/CLAUDE.md` or CONTEXT line (both at their caps); flows that hit it: `/task-decomposer` intake and `/orchestrator` G2 of any A/B or trial · learnings: L-329
 
 A re-test whose key check already scores full marks cannot discriminate on correctness (SPRINT-181 graphify 6 of 6, SPRINT-182 12 of 12 per arm, 3.21 USD for two inconclusives decided on token and USD noise). So the ceiling gates the run: at G2 of any A/B, if the blind key check or a smoke arm already scores full marks, harden the questions until a plain run fails some, or declare the correctness leg void and size the run for the cost leg's noise before launching.
+
+---
+
+## L-330 [tags: process] [status: active]: **A probe that voids a paid run by parsing its shell commands misfires on each new command shape, so check every void flag against the transcript before throwing the run away.**
+SPRINT-183 T4 and T5 hit seven misfires in one fence: `rtk init --show` read as mutating, a case-sensitive path compare that refused the run's own export, a `..` that resolved inside the export after a `cd`, a path inside a heredoc the permission layer denied, the grep regex `PEPPER\|SECRET`, `~` inside refused heredocs, and the grep pattern `/m/` read as an MSYS drive path. Each was shown false from the transcript (the call never ran, or read only inside the export), the run was kept with an annotated ledger row, and the fence was fixed and replayed before the next launch. Most came from edit attempts: agents in every arm tried Write or heredoc edits under a plan-only prompt, and only the deny list stopped them. Decide a void from what ran (the tool_result) and what it read; a parsed command that never ran is an attempt, not a read.
+- seen: 2026-11-20 (SPRINT-183 T4 capability run, T5 blocks 1, 2, 3, 5 and 6)
+- count: 1
+- promoted: no
+- related: L-217 (a hand-rolled parser never converges) · L-045 (a self-report is evidence about the reporter)
 
 ---
 
@@ -1821,6 +1830,7 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - related: TD-022 (the checker that exists because of this) · L-074 (two docs by one author at one moment are one source) · L-071 (omission looks identical to absence)
 
 - **Fourth sighting, SPRINT-075 — four more corrections, and one of a new kind.** T1 declared `scripts/qa-check.sh` at execution, T2 declared `conformance.sh`, T5 declared the epic file and the generated index, T3 declared four files including the engine it was only supposed to touch "if the run exposes a defect" (it did). All expected, all logged. The new kind is **T4's**: its `Layers:` said *"the engine"*, which reads correctly to a human and matches nothing — `check-layers-observed.sh` compares **paths**, so a layer named in prose is an undeclared layer, and the gate reported the file as changed-but-never-declared. The correction is not "declare more", it is **declare in the form the checker reads**: a `Layers:` entry is a path, and a description of a file is a comment about a path, not a declaration of one. seen Sprint-055 · Sprint-042 · Sprint-074 · Sprint-075, count 4.
+- **Sighting, SPRINT-183 T2.** Promote's doc-aging line predicted T2's `.cap-dispositions` retain row, yet T2's `Layers:` did not name the file; the system-verify gate's layers-observed check caught it at close, corrected by a `scope-change` entry first (3a45c801). A file the promote checklist already expects belongs on the Layers line it writes.
 ---
 
 ## L-099 [tags: process] [status: promoted]: **A rule written where its checker does not read it is not a rule — it is a comment that looks like one.** SPRINT-055 existed because five separate rules had been written and were not running: DOCS_Guide §11's epic-archive row had never once executed (EPIC-001 sat closed and fully ticked in `docs/epic/` for five sprints while every gate reported green), `close`'s compaction sweep pointed at a research archive target §11 never defined, §2 described a BUG report's content but not its file, G1 fast-pathed "decomposer-approved" tasks with no field recording whether any task had met the grill, and README's template count was guarded on two surfaces but not the third it had drifted on. The sprint then **demonstrated the rule on itself before the first task started**: its own § Decisions D1 said "strictly sequential T1→T7", the pre-dispatch preflight reads `Depends-on:`, and the preflight HALTed on two shared files with no edge — the ownership decision had been signed at G2 and written where nothing reads it. The discriminator is mechanical and worth applying at authoring time: name the reader. If the answer is "a human who happens to look", the rule is documentation, and documentation is fine — but it will not fire, and calling it a gate is the error. Where a rule is meant to bind, it goes in the field the checker parses, and the prose becomes the explanation rather than the mechanism.

@@ -2,8 +2,8 @@
 sprint: 183
 slug: bloodlines-change-plan-retest
 owner: Maintainer
-last_updated: 2026-11-20
-status: active
+last_updated: 2026-11-21
+status: closed
 plan_commit: 4b8f3b40
 gates_signed: G1,G2 @ 11afc10f
 update_trigger: sprint execute/close events
@@ -93,18 +93,37 @@ Paired scenario blocks give six independent comparisons per tool. The ship decis
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/bloodlines-retest-scenarios.md` | T1, T2 | Six audited bloodlines commits with blind descriptions, keys and the frozen rules (WHY: fixed at 634a74fb before any arm ran) | Low | leak grep, blind check |
+| `docs/research/graphify-rtk-retest-results.md` | T1–T5 | Run ledger, pre-screen and price gates, per-run table, paired tables, RTK audit (WHY: the evidence both verdicts rest on) | Low | blind score, F1 by script |
+| `docs/research/graphify-workdoo-test.md` | T5 | Big-repo verdict for graphify: INCONCLUSIVE (WHY: tokens +1.7%, C +0.026, both ties) | Low | paired 2SE rule |
+| `docs/research/rtk-trial-verdict.md` | T5 | Big-repo verdict for RTK: DROP (WHY: tokens +16.4%, real and higher; 3 audit losses) | Low | paired 2SE rule, info-loss audit |
+| `docs/work/` task moves, `docs/knowledge-index.md`, `.cap-dispositions`, `docs/LEARNINGS.md` | COORD | Status moves, two retain rows (scenarios file at T2, results file at close), L-330 and an L-100 sighting | Low | gen-index, check-doc-caps |
 
 ## Retro
 
-**Retrieval check** —
+**Retrieval check** — Yes. L-329's ceiling rule (promoted at this sprint's promote) gated the run as written: T3's plain pre-screen scored C 0.844 and 0.821, under the ceiling, so the arms ran and the correctness leg was live (plain mean 0.858). L-045 was applied to the probe's own void flags, each checked against its transcript before a run was thrown away (L-330). TD-319 was sidestepped at promote by declaring `.rtk/pipeline.toml` on T4's Cites line. L-100 fired once more (T2's undeclared `.cap-dispositions`, caught by the gate).
 
-**Cost** —
+**Cost** — 5 members (all M), coordinator plus Sonnet workers, no Codex builder. The ledger spent 9.2249 of 32.00 USD (about 0.181 USD per box over 51 boxes): 15 paid runs, 3 smokes, a capability run, two pre-screen runs and one void, plus dispatch estimates. Reported worker tokens sum to 974,432: T1 builder 96,898 and auditors 304,114, T2 key 180,952 and blind check 64,746, T3 probe builder 124,248 and pre-screen scorer 66,126, T5 scorer 137,348. The G2 builder checks' tokens were not recorded.
 
 **Worked**
--
+- Real commits from a big repo, scored against their own diffs, gave a live correctness leg for the first time in three re-tests (plain 0.858, a +0.1 gain detectable at 2SE 0.051).
+- Paired blocks with a seeded order, a single blind scoring pass with shuffled labels and arm cues removed, and F1 computed by script from the scorer's mapping.
+- The futility look after block 3 stopped RTK early by owner ruling and saved three runs.
+- Every arm installed and removed cleanly; global `~/.claude` and RTK hashes were unchanged and the live bloodlines repo stayed at b8fea870.
 
 **Friction**
--
+- The probe's fence produced seven false positives (L-330). Six scored runs were flagged void and kept as overturned after transcript checks; the frozen rule said "void and repeat once", so this is a coordinator judgment surfaced to the owner (repeating them would cost about 2 USD).
+- Agents in every arm attempted edits (Write, python heredocs) under a plan-only prompt; the deny list held every time. The RTK smoke tried four Writes, plausibly prompted by RTK's own CLAUDE.md block.
+- The first system-verify run was red on T2's undeclared `.cap-dispositions` (L-100 sighting), fixed by a scope-change entry and 3a45c801.
+- `export.ts` needs Git Bash (Windows tar lacks `--force-local`), and heredoc backslash loss hit the helper scripts again (the known host trap; written via chr(92) and the Write tool).
+- `graphify-rtk-retest-results.md` grew to 333 lines against the §2 soft cap of 130.
 
 **Pattern candidate**
--
+- L-330 new: void a paid run from what ran and what it read, never from a parse of a command that never ran. Count 1, `promoted: no`.
+- Sighting: L-100 (promoted; recorded on its entry).
+
+**Routed**
+- Shipped: none (research docs only), so no CHANGELOG entry. Tech debt: none new. Follow-ups: none (no tool passed, so no ship task). Learnings: L-330 new; L-100 sighting.
+- Verdicts: graphify INCONCLUSIVE on the big repo (third non-pass after SPRINT-181 Drop and SPRINT-182 inconclusive). RTK DROP.
+- §2 cap: a `retain` row in `.cap-dispositions` for `graphify-rtk-retest-results.md`.
+- Release: none from this sprint; v2.26.0 is already cut (4ab339d6) and unpushed with the rest of main.

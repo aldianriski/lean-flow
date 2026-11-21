@@ -116,3 +116,6 @@ review · T4 · self-review · behaviour:low · governance:low
 - Coordinator judgment to surface: 6 scored runs flagged void by the probe were kept, not repeated. Each flag was checked against the transcript and shown to be a fence false positive (nothing was read outside the export), and the reason is annotated per row.
 review · T5 · self-review · behaviour:low · governance:low
 ### 2026-11-20 | scope-change | T2/TASK-680 Layers: add .cap-dispositions — T2 wrote its retain row for the 259-line frozen scenarios file (a §2 soft-cap disposition); the gate's layers-observed check found it undeclared (L-100 correction, no behaviour change)
+
+### 2026-11-21 | close | Retro written, buckets routed, SPRINT-183 closed
+Retro is in the sprint file; no second narrative here. Owner word: "close". Pre-close: `check-sprint-by-reference --close` 12 pass, 0 fail (all five members in done/, every Done-when unchanged since 4b8f3b4); system-verify green at 3a45c801 (bun test 638 pass, 0 fail; QA-CHECK 240 pass, 0 fail). Filed: L-330 (new), an L-100 sighting, a `retain` row for `graphify-rtk-retest-results.md` (333 lines). No TD, no follow-up task, no CHANGELOG entry. The handoff sweep found no `handoff` entry in this log, so nothing was reconciled.
