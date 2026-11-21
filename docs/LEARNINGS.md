@@ -141,6 +141,12 @@ A bare `python` on this Windows host opens an interactive REPL and stalls a tool
 
 A re-test whose key check already scores full marks cannot discriminate on correctness (SPRINT-181 graphify 6 of 6, SPRINT-182 12 of 12 per arm, 3.21 USD for two inconclusives decided on token and USD noise). So the ceiling gates the run: at G2 of any A/B, if the blind key check or a smoke arm already scores full marks, harden the questions until a plain run fails some, or declare the correctness leg void and size the run for the cost leg's noise before launching.
 
+### headless-proof-launcher
+
+- **headless-proof-launcher → moved: `docs/LEARNINGS.md` § Durable rules › headless-proof-launcher** · disposition: move-to-reference — no `.claude/CLAUDE.md` or CONTEXT line (both at their caps); flow that hits it: `/orchestrator` G2 of any task whose DoD has a headless consumer proof · learnings: L-293
+
+A worker's nested `claude -p` can be refused by the host's classifier (SPRINT-165 T1: "Create Unsafe Agents", the box left open), and a child's default permissions can block its `Skill` call (SPRINT-180 T1, SPRINT-184 T8). The builder stages the proof only. At G2 name who launches it and how the child gets its tools, and take the owner's approval for each launch. Both are decisions, because no one route holds across hosts: SPRINT-180's classifier refused `--allowedTools` on the child and the owner ruled instead that the prompt name the export's skill folder; SPRINT-184's coordinator ran `--allowedTools Skill Read Glob Grep` with each launch owner-approved in manual mode. A before-run whose `Skill` call was blocked is void, since the model then works by hand (SPRINT-184: the first four before-runs); read the transcript for the call before trusting the run.
+
 ---
 
 ## L-330 [tags: process] [status: active]: **A probe that voids a paid run by parsing its shell commands misfires on each new command shape, so check every void flag against the transcript before throwing the run away.**
@@ -451,12 +457,10 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ---
 
-## L-293 [tags: process] [status: active]: **Who launches a headless proof is a G2 decision: a worker's nested `claude -p` can be denied by the host's classifier.** SPRINT-165 T1's design gave the proof to the builder. The classifier denied its launch as "Create Unsafe Agents", so the builder returned `blocked` with the work done and the box open, and the owner had to approve the runs in a second popup. Name the launcher and get the approval at G2, and have the builder stage the proof only.
-- seen: 2026-11-07 (SPRINT-165 T1, consumer proof)
-- seen: 2026-11-16 (SPRINT-180 T1: the headless child's Skill call was denied; passing `--allowedTools` to the child was refused by the auto-mode classifier as undermining oversight. The route that needed no permission change, ruled by the owner, was naming the export's skill folder in the prompt so the child reads SKILL.md from there)
-- seen: 2026-11-21 (SPRINT-184 T8: the coordinator launched the proofs, and the first four before-runs were void because the headless permission default blocked `Skill`, so the model worked by hand; rerun with `--allowedTools Skill Read Glob Grep` on both arms, each launch owner-approved in manual mode)
+## L-293 [tags: process] [status: promoted]: **Who launches a headless proof is a G2 decision: a worker's nested `claude -p` can be denied by the host's classifier.**
+- seen: 2026-11-07 (SPRINT-165 T1) · 2026-11-16 (SPRINT-180 T1) · 2026-11-21 (SPRINT-184 T8)
 - count: 3
-- promoted: no
+- **L-293 → promoted: `docs/LEARNINGS.md` § Durable rules › headless-proof-launcher** · disposition: move-to-reference — placed by §10's placement test (G2 of any task with a headless consumer proof, in `/orchestrator`), no always-loaded line (CLAUDE.md and CONTEXT both at their caps); the body is collapsed to this pointer.
 - related: L-241 · L-249 · TASK-614
 
 ---
@@ -760,7 +764,7 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - seen: 2026-10-25 (SPRINT-142 T2: pre-fix 0 of 3 on each sample version; owner rulings R1 and R2)
 - seen: 2026-11-16 (SPRINT-180 T1 baseline round 2: run 2 fixed code freeze, final sync and TLS termination through the existing infra rule, leaving 5 of 8 unfixed against a pin of 6; the sample was strengthened with seeds the old rule cannot reach, and round 3 left 8 of 8 unfixed)
 - count: 2
-- promoted: no
+- promoted: no — **retained** (SPRINT-185 promote) · disposition: retain — covered by L-246, L-007 and CLAUDE.md's must-FAIL rule, and no sighting since SPRINT-180; re-open the promotion on a third sighting.
 - related: L-252 (judge a model-driven pass over several runs) · L-246 (a RED that proves nothing about the old code)
 
 ---
