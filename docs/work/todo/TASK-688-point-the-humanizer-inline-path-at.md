@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: []
 ---
 # TASK-688 — Point the humanizer inline path at the host glossary (TD-317)

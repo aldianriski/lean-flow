@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: [TASK-688, TASK-689, TASK-690, TASK-691, TASK-692]
 ---
 # TASK-693 — Trim the lean-doc-generator SKILL.md body with no behaviour change and write the release notes

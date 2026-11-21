@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: [TASK-686]
 ---
 # TASK-687 — Compress low, minor and trivial TECH-DEBT rows to Summary, Mitigation and an evidence pointer

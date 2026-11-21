@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: [TASK-690]
 ---
 # TASK-691 — Trim the task-decomposer, triage and prime SKILL.md bodies with no behaviour change

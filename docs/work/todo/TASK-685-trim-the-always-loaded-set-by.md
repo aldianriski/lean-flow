@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: [TASK-684]
 ---
 # TASK-685 — Trim the always-loaded set by at least 15% of its tokens and ratchet the token budget

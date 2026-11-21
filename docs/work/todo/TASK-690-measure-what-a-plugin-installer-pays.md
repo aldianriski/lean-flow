@@ -10,6 +10,7 @@ tier: P
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: []
 ---
 # TASK-690 — Measure what a plugin installer pays per session and per skill call, and trim over-long skill descriptions

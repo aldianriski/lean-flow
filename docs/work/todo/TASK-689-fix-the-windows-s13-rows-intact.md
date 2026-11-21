@@ -10,6 +10,7 @@ tier: G
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: []
 ---
 # TASK-689 — Fix the Windows s13-rows-intact failure and the foreign-path false positive in check-layers-completeness (TD-318, TD-319)

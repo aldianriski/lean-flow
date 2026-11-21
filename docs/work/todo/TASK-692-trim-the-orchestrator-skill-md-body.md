@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: [TASK-691]
 ---
 # TASK-692 — Trim the orchestrator SKILL.md body with no behaviour change

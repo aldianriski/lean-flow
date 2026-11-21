@@ -10,6 +10,7 @@ tier: P
 authority: J2
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: []
 ---
 # TASK-686 — Close or merge stale TECH-DEBT rows with the owner's per-row approval

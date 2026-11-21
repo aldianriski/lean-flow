@@ -10,6 +10,7 @@ tier: X
 authority: J1
 origin: decomposer
 state: ready
+sprint: SPRINT-184
 depends-on: []
 ---
 # TASK-684 — Collapse promoted LEARNINGS entries to pointer form and report the measured line delta
