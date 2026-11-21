@@ -119,3 +119,4 @@ review · T5 · self-review · behaviour:low · governance:low
 
 ### 2026-11-21 | close | Retro written, buckets routed, SPRINT-183 closed
 Retro is in the sprint file; no second narrative here. Owner word: "close". Pre-close: `check-sprint-by-reference --close` 12 pass, 0 fail (all five members in done/, every Done-when unchanged since 4b8f3b4); system-verify green at 3a45c801 (bun test 638 pass, 0 fail; QA-CHECK 240 pass, 0 fail). Filed: L-330 (new), an L-100 sighting, a `retain` row for `graphify-rtk-retest-results.md` (333 lines). No TD, no follow-up task, no CHANGELOG entry. The handoff sweep found no `handoff` entry in this log, so nothing was reconciled.
+Owner popups at archive, verbatim: "Approve archive (Recommended)" (archive, INDEX line, close_commit 078967f9) and "Keep them (Recommended)" (the 6 overturned-void runs stand; the verdicts are unchanged).
