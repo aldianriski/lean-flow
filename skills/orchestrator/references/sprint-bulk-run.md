@@ -35,8 +35,8 @@ Loaded by `orchestrator/SKILL.md` steps 1–2 before execution of the active spr
    Known exclusions settle at G1; one discovered at G2 must leave before G2 signs, and the ownership map is updated
    over the retained members. If the owner declines, G2 stays unsigned and no run starts.
 6. **Sign only after the sweep closes.** No retained member may carry an open assumption or unresolved foreseeable
-   intent question. Record `gates_signed: G1 @ <sha>` in sprint frontmatter only after G1 approval, then
-   `gates_signed: G1,G2 @ <sha>` only after G2 approval (`@ <YYYY-MM-DD>` without git). Re-read the retained members'
+   intent question. Record `gates_signed: G1,G2 @ <sha>` in sprint frontmatter only after both approvals (`@ <YYYY-MM-DD>`
+   without git); until then omit the field, since its absence means not signed (`/lean-doc-generator` promote). Re-read the retained members'
    `## Assumes`: `night-run.md` Part 1's zero-open-assumes check still applies at launch; a settled marker or a plain
    informational bullet is not open. A declared J2 still blocks overnight launch under Part 1 item 3, even with its
    questions answered. Unforeseeable questions arising after G2 belong to runtime handling, not this sweep.
