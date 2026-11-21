@@ -30,7 +30,7 @@ The `depends-on: [TASK-695]` is a shared-file sequence only (`orchestrator/SKILL
 - [x] A member still blocked after the sweep → the owner approves scoping it out with its dependents via the existing scope-change path before signing; never left silently in the frozen Plan. A declared J2 still blocks overnight launch. ✓ § Sweep step 5: a still-blocked member leaves with its transitive dependents only by owner ruling, via dispatch.md backlog-return steps 1-3; decline leaves G2 unsigned; step 6: a declared J2 still blocks overnight launch (scoped reviewer CLEAR)
 - [ ] Consumer proof in D:\Research\workdoo (pre-run file-hash manifest compared after revert): a sprint with a scope-blocking assumption (settled at batch G1), an open assumes, a dependent question pair and one unresolvable member → all asked before the first dispatch, the pair in two rounds, the member scoped out by owner ruling; no question asked after dispatch starts for anything the sweep could see.
 - [ ] Negative: batch sign-off never waves an open assumes through; a scoped-out member never runs; workdoo matches baseline.
-- [ ] `orchestrator/SKILL.md` step 2 changes by pointer only and stays ≤ 140; Codex review of the shipped diff clean within 2 rounds; the report returns proposed README/CHANGELOG/CONTEXT lines.
+- [x] `orchestrator/SKILL.md` step 2 changes by pointer only and stays ≤ 140; Codex review of the shipped diff clean within 2 rounds; the report returns proposed README/CHANGELOG/CONTEXT lines. ✓ SKILL.md steps 1-2 are pointers, 140 lines; shipped-diff Codex review (gpt-6-astra, read-only) r1 `VERDICT: CLEAR` with one low (interim `G1 @` write) fixed in b688abc1, r2 `VERDICT: CLEAR` no findings; README/CHANGELOG/CONTEXT lines in the build report
 
 ## Touches
 
