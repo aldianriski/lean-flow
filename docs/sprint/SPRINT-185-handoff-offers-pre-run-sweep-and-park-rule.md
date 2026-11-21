@@ -4,7 +4,7 @@ slug: handoff-offers-pre-run-sweep-and-park-rule
 owner: Maintainer
 last_updated: 2026-11-21
 status: active
-plan_commit: <sha, set after plan locked>
+plan_commit: 9478dec4
 update_trigger: sprint execute/close events
 ---
 
