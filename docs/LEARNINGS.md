@@ -454,7 +454,8 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 ## L-293 [tags: process] [status: active]: **Who launches a headless proof is a G2 decision: a worker's nested `claude -p` can be denied by the host's classifier.** SPRINT-165 T1's design gave the proof to the builder. The classifier denied its launch as "Create Unsafe Agents", so the builder returned `blocked` with the work done and the box open, and the owner had to approve the runs in a second popup. Name the launcher and get the approval at G2, and have the builder stage the proof only.
 - seen: 2026-11-07 (SPRINT-165 T1, consumer proof)
 - seen: 2026-11-16 (SPRINT-180 T1: the headless child's Skill call was denied; passing `--allowedTools` to the child was refused by the auto-mode classifier as undermining oversight. The route that needed no permission change, ruled by the owner, was naming the export's skill folder in the prompt so the child reads SKILL.md from there)
-- count: 2
+- seen: 2026-11-21 (SPRINT-184 T8: the coordinator launched the proofs, and the first four before-runs were void because the headless permission default blocked `Skill`, so the model worked by hand; rerun with `--allowedTools Skill Read Glob Grep` on both arms, each launch owner-approved in manual mode)
+- count: 3
 - promoted: no
 - related: L-241 · L-249 · TASK-614
 
@@ -887,12 +888,14 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 
 ## L-238 [tags: edit-safety] [status: promoted]: **A coordinator's commit subject is the attribution record, so a coordinator-owned write goes under `sprint(N):`, never under a task's `Tn:`.** SPRINT-131's system verify FAILed on two legs (`layers observed` · `dod-delta`) with no content defect. Four of the coordinator's own subjects could not be attributed: a combined `sprint(131) T3 + T4:` that no attribution arm reads, two `git revert --no-edit` subjects (`Revert "…"`) with no sprint at all, and a write to the coordinator-owned research doc under `sprint(131) T2:`, which T2's `Layers:` do not declare. The owner ruled fix-and-rerun, which cost a `filter-branch` message rewrite of 10 commits (trees byte-identical) and a second QA_FULL run. One task per subject; a write to a D1-owned shared file is `sprint(N):`; a revert gets a `sprint(N) Tn:` subject (`git revert --no-commit`, then commit).
 - **L-238 → promoted: `.claude/CONTEXT.md` § Sprint model, the commit-subject attribution bullet** · disposition: merge — a coordinator write (a status move the task's `Layers:` do not declare, a Log or sprint-file edit, a shared file) commits as bare `sprint(NNN):`, never under a task's `Tn:`. Count 2: SPRINT-131 close (298/2) and SPRINT-133 close (292/1). Body: git.
+- **Sighting, SPRINT-184.** The coordinator landed T5 and T7 in one commit, `sprint(184) T5 T7:`, and the mid-sprint gate FAILed `layers observed` on it. Three local, unpushed commits were rebuilt to split it (0e937945, 2b7bc4d7), tree unchanged against the backup branch.
 
 ---
 
 ## L-237 [tags: process] [status: promoted]: **A G2 design that paraphrases a frozen Done-when can loosen it, and the builder follows the paraphrase.** SPRINT-130 T1: the Done-when said the declared command must be the segment's TRAILING argument list; the coordinator's G2 text said "ending the segment or followed by a space", the owner signed it, and the builder implemented the looser reading — an interior run counted as invoking the gate. Only the review, briefed with the Done-when as its Spec comparand, caught it. The frozen text governs; a design paraphrase of a criterion is a second copy that can drift from it in the same hour.
 - seen: 2026-10-19 (SPRINT-130 T1, Codex Spec F1; fixed in the one retry) · 2026-10-25 (SPRINT-139 T5: the G2 design read the Indonesian catalog only for Indonesian text, the frozen Done when said both catalogs, the builder followed the design, and only the exercise caught it) · 2026-11-15 (SPRINT-177 T1: the coordinator's G2 settlement exempted a new path from the frozen "only paths that exist"; Codex R1 caught it before commit)
-- count: 3
+- seen: 2026-11-21 (SPRINT-184 T4: the G2 keep-rule for history bullets was narrower than frozen box 2, the builder followed the rule and dropped 5 lines carrying `route` or `blocked`; the coordinator's census against the box caught it and the one retry restored them)
+- count: 4
 - **L-237 → promoted: `skills/orchestrator/references/builder-check.md` § Two rules for the design itself** · disposition: move-to-reference — a design quotes a frozen Done-when verbatim where it relies on it.
 - related: L-122 (the comparand-briefed reviewer catches what the builder carried) · L-088 (do not reinterpret a frozen DoD)
 

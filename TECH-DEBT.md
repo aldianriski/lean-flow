@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-20
+last_updated: 2026-11-21
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -1838,7 +1838,8 @@ status: current
   - Summary: **`review-scoping.md` has no rule for a prose-only change on two points.** Which search hits count as "pinning tests" when harnesses only mention the file name, and what the Spec comparand is when no mechanical rung exists.
   - Mitigation: add one line per point to the scoping ladder; no new check is needed.
   - Evidence: Sprint-174
-- **TD-315** severity: low | status: open | created: Sprint-176 (close retro)
+- **TD-315** severity: low | status: resolved → TASK-685 | closed: Sprint-184 | created: Sprint-176 (close retro)
+  - Closed: Sprint-184 T2 cut the always-loaded set to 10,700 tokens and ratcheted the budget to 11,021 (321 headroom, 69c10681). TD-312 stays open: CONTEXT.md is still 150 of 150 lines.
   - Summary: **The always-loaded token budget has 8 tokens of headroom (12683 of 12691).** SPRINT-176 T2 spent the rest of about 170 tokens on two pointer clauses; the next addition to CONTEXT, CLAUDE.md or an always-read SKILL.md fails `check-doc-caps.ts`, or is squeezed in by deleting something unreviewed. TD-312 covers CONTEXT's 150-line cap and TD-313 the 140-line SKILL.md cap; neither covers the token budget.
   - Mitigation: the dedup pass TD-312 names (prose duplicating CLAUDE.md or the README becomes a pointer), measured in tokens this time; run at a promote doc-aging pass.
   - Evidence: Sprint-176
@@ -1846,15 +1847,22 @@ status: current
   - Summary: **`evals/epic-archive-differential.test.ts` fails on this Windows host and passes off-host.** The case "check-epic-archive.ts matches check-epic-archive.sh (differential parity) > identical exit code + stdout" on fixture `epic-state/r-nonmember-attrib` fails locally at line 77:24 (`bun test` 637 pass, 1 fail), while the off-host gate is green at `99f85bb6` and `e5236150` (638 pass, 0 fail). The `.ts` and `.sh` checkers differ in output on this host only; the cause is not investigated. TD-242 is a different host difference (harness PASS count).
   - Mitigation: diff the two checkers' stdout on that fixture on this host and name the difference; fix the `.ts` or make the case host-aware.
   - Evidence: Sprint-178
-- **TD-317** severity: low | status: open | created: Sprint-180 (close retro)
+- **TD-317** severity: low | status: resolved → TASK-688 | closed: Sprint-184 | created: Sprint-180 (close retro)
+  - Closed: Sprint-184 T5 put the host-glossary pointer first in `embedded.md` § Inline path; the domain-calque commit case wrote the host term on a live-checkout run (0e937945).
   - Summary: **The inline commit-message path never reads the host glossary, so a host override is ignored in commit messages.** `embedded.md` § Inline path sends the pass to the three catalogs and never to `CONTEXT.md`. The global calque rules still apply there ("di-scan" worked).
   - Mitigation: a one-line pointer to the glossary step in `embedded.md` § Inline path, then re-run the commit-inline override case in `evals/fixtures/humanizer/domain-calque/`. A hypothesis, not a plan; re-derive before building on it.
   - Evidence: Sprint-180 · 2767637f · d28b0a6f
-- **TD-318** severity: low | status: open | created: Sprint-181 (close retro)
+- **TD-318** severity: low | status: resolved → TASK-689 | closed: Sprint-184 | created: Sprint-181 (close retro)
+  - Closed: Sprint-184 T6. Cause: under `LC_ALL=C` the case grep's `.` matched one byte of the 3-byte em-dash; an exact-byte match fixes it, and `s13-rows-broken` is the retained must-FAIL (3cc64db0).
   - Summary: **`evals/run-spec-reader-fixtures.sh` case `s13-rows-intact` fails on this Windows host and passes off-host.** A local bare gate printed "FAIL eval harness run-spec-reader-fixtures.sh … s13-rows-intact" while spec/ was untouched this sprint. The cause is not investigated. TD-316 is a different harness with the same kind of host difference.
   - Mitigation: run the case on this host, name the difference, then fix the harness or make the case host-aware. A hypothesis; re-derive before building on it.
   - Evidence: Sprint-181 · 212f0c52
-- **TD-319** severity: low | status: open | created: Sprint-182 (close retro)
+- **TD-319** severity: low | status: resolved → TASK-689 | closed: Sprint-184 | created: Sprint-182 (close retro)
+  - Closed: Sprint-184 T6 exempts a `repo:path` token; the `member-foreign-path` fixtures keep the missing-path FAIL beside a marked path (3cc64db0).
   - Summary: **`check-layers-completeness` reads a path in a Done-when box that names another repo's file as a lean-flow file, so a cross-repo test task can silence the member-layers-incomplete FAIL only by declaring the foreign path on `Cites:`.** The Cites line then claims an input lean-flow does not have.
   - Mitigation: let a Done-when path marked as belonging to another repo be exempt, or accept a named foreign-root prefix. A hypothesis, not a plan; re-derive before building on it. A defect fix of an existing checker, unfrozen under ADR-053.
   - Evidence: Sprint-182 · c9a755ef
+- **TD-320** severity: low | status: open | created: Sprint-184 (close retro)
+  - Summary: **The sprint checks disagree on a member cancelled before any build.** `check-review-depth.sh` asks a review line of every Plan task with no exemption for a `cancel/` member, so SPRINT-184 recorded `review · T9 · not-built` to satisfy it. `check-layers-observed.ts` flags the cancelled task's never-created evidence folder as a token that matches nothing, while `check-layers-completeness.ts` still reads the frozen Done-when naming files in it; the only route that passed both moved them to `Cites:`.
+  - Mitigation: have both checks skip, or read alike, a member in `cancel/` with no commit attributed to its task. A hypothesis, not a plan; re-derive before building on it. A defect fix of existing checkers, unfrozen under ADR-053.
+  - Evidence: Sprint-184 · 3aacd3eb

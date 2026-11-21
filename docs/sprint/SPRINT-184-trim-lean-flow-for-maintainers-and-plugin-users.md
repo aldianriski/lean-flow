@@ -3,7 +3,7 @@ sprint: 184
 slug: trim-lean-flow-for-maintainers-and-plugin-users
 owner: Maintainer
 last_updated: 2026-11-21
-status: active
+status: closed
 plan_commit: 45b2e2cc
 gates_signed: G1,G2 @ 6108661c
 update_trigger: sprint execute/close events
@@ -139,7 +139,40 @@ It runs last so the single README and CHANGELOG entry covers every consumer-visi
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/LEARNINGS.md` | T1, COORD | 78 promoted entries collapsed to pointer form, 13 marked `(no disposition at promotion)`, L-106's dead pointer fixed (WHY: §11's own compaction, 2,269 → 2,184 lines); close adds the L-237, L-238 and L-293 sightings | Low | learnings-metadata fixtures, `--ledger`, id census 309/309 |
+| `.claude/CONTEXT.md`, `scripts/lib/token-budget.txt`, `docs/work/evidence/TASK-685/inventory.md` | T2 | 16 lines shortened in place, budget ratcheted 12,691 → 11,021 (WHY: always-loaded set 12,634 → 10,700 tokens, −15.3%, nothing moved under Safety wins) | Med | check-doc-caps token leg, pointer census, gate |
+| `TECH-DEBT.md` | T3, T4, COORD | TD-288/291/293 closed by per-row approval; 107 low/minor/trivial rows compressed, the 13 medium rows byte-identical (WHY: 2,031 → 1,860 lines); close resolves TD-315/317/318/319 and files TD-320 | Med | field census (420 lines), md5 of the medium blocks |
+| `skills/humanizer/references/embedded.md`, `docs/work/evidence/TASK-688/spend.md` | T5 | Host-glossary pointer first in § Inline path (WHY: TD-317, commit messages ignored a host override) | Low | 2 live-checkout runs, 0.3190 USD |
+| `evals/run-spec-reader-fixtures.sh`, `scripts/lib/check-layers-completeness.ts`, `evals/layers-completeness.test.ts`, `evals/fixtures/layers-completeness/` | T6 | Exact-byte em-dash match with the `s13-rows-broken` must-FAIL; `repo:path` tokens exempt (WHY: TD-318 host locale, TD-319 foreign path) | Med | 61 tests, C-locale fixture run, gate |
+| `skills/council/SKILL.md`, `skills/lean-doc-generator/SKILL.md`, `docs/work/evidence/TASK-690/` | T7 | Installer-cost census with five body targets; descriptions 944 → 777 B and 541 → 415 B, every trigger kept (WHY: the per-session cost every installer pays) | Low | trigger inventory, routing runs, 0.4725 USD |
+| `skills/task-decomposer/SKILL.md`, `skills/triage/SKILL.md`, `skills/triage/references/out-of-scope.md`, `skills/prime/SKILL.md`, `docs/work/evidence/TASK-691/` | T8 | Bodies 35,370 → 32,969 B: duplicate task-file shape removed, triage's rejection procedure moved with pointers at steps 1 and 7 (WHY: the per-call cost) | Med | inventories, 14 before/after runs, 1.4220 USD |
+| `skills/lean-doc-generator/SKILL.md`, `README.md`, `CHANGELOG.md`, `docs/work/evidence/TASK-693/` | T10 | Body 18,428 → 17,678 B, three in-place trims; `[Unreleased]` and README lines for TASK-688/690/691/693 (WHY: the per-call cost, and one release entry for the sprint) | Med | inventory, promote before/after, 0.4499 USD |
+| `docs/work/` moves, sprint file and Log | COORD | Status moves, ticks, scope-changes, the T5/T7 commit split (WHY: coordinator bookkeeping) | Low | check-sprint-by-reference `--close`, gate |
 
 ## Retro
 
-Written at close.
+**Retrieval check** — Yes. Safety wins (owner, G2) kept every-call text in the bodies, and T7's census showed what that leaves to cut: 1.5% to 9.4% per body. That figure is why T9 was cancelled before any build. L-100 and L-240 drove five Layers corrections, each logged before its edit. L-237 fired once and was caught by the coordinator's census (T4). L-238 fired once and was caught by the gate (the T5/T7 commit).
+
+**Cost** — 10 members (all M). Nine were built, eight by Codex, with T3 by a Sonnet worker. Six were reviewed by Claude Sonnet; T1, T3 and T4 got a coordinator self-review. Three needed one bounded retry each (T2, T4 and T8). Reported builder tokens: 1,185,059 (T1 139,715 · T2 143,708 · T3 116,537 · T4 155,898 · T5 68,871 · T6 131,669 · T7 144,511 · T8 147,668 · T10 136,482). Reviewer tokens: 389,735. Real-input spend was 2.6634 of 15.00 USD (T5 0.3190 · T7 0.4725 · T8 1.4220 · T10 0.4499); T9's 4.00 share was unused. DoD: 36 of 36 boxes on the nine done members; T9's five boxes were cancelled unrun. Builder-check tokens were not recorded.
+
+**Worked**
+- The always-loaded set fell 15.3% with no rule moved out of it. The budget ratchet is a value edit, so the next addition has 321 tokens of room instead of 8.
+- Codex builds in worktrees, Claude reviews and coordinator landing with blob-hash checks: every landed blob equalled its worktree's.
+- An independent coordinator census against the frozen box, not the design's rule, caught T4's five dropped lines before landing.
+- Running the census before the body trims let the owner cancel the gate-engine trim on evidence rather than risk it for 385 B.
+
+**Friction**
+- The first four T8 before-runs were void: headless `claude -p` blocks `Skill` unless `--allowedTools` names it (L-293 sighting, about 0.40 USD).
+- A combined `sprint(184) T5 T7:` subject reddened the mid-sprint gate. Three local commits were rebuilt to split it; the tree is identical to `s184-backup-c80a3860` (L-238 sighting).
+- A cancelled, unbuilt member put two checks at odds: `review-depth` wanted a review and the two layers checks disagreed on its evidence folder (TD-320).
+- The ADR routing prompt did not route on either arm, so T7 proved lean-doc-generator's description on the promote trigger instead. One T8 before/after pair looked like a regression until two reruns showed it was noise.
+
+**Pattern candidate**
+- No new entry. Sightings: L-237 (T4, count 4), L-238 (T5/T7 commit), L-293 (headless Skill block, count 3; owner placed it at SPRINT-185's promote).
+
+**Routed**
+- Shipped: CHANGELOG `[Unreleased]` lines for TASK-688, 690, 691 and 693 (written by T10). TASK-689 is maintainer-only and gets no consumer line. No `type: bug` member.
+- Tech debt: TD-315 resolved → TASK-685, TD-317 resolved → TASK-688, TD-318 and TD-319 resolved → TASK-689. TD-320 is new (cancelled-member handling in the sprint checks). TD-312 stays open: CONTEXT.md is still 150 of 150 lines.
+- Follow-ups: none filed.
+- Learnings: the three sightings above.
+- Release: feature sprint (shipped skills changed), so MINOR v2.27.0, cut by hand by the owner. Nothing is pushed.
