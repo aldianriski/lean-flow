@@ -107,3 +107,10 @@ review · T1 · self-review · behaviour:low · governance:low
 - Checks on main after landing (blobs equal the worktree's): `bun test evals/layers-completeness.test.ts` 61 pass, 0 fail; `LC_ALL=C sh evals/run-spec-reader-fixtures.sh` s13-rows-intact PASS, s13-rows-broken PASS (exit 1, named finding), all green; `promote-check` on SPRINT-184 31 pass, 0 fail (G2 note 5: the checker guarding this Plan changed).
 - Review: Claude (Sonnet, 61,363 tokens), scoped to the diff: CLEAR, 0 High, 0 Medium; Low: any 2+ character label is exempt (the code comment says so; the check trusts the author's label).
 review · T6 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-11-21 | progress | T5 (TASK-688) and T7 (TASK-690) built, reviewed and merged; their real-input runs follow
+- T5: Codex (gpt-6-astra) in worktree s184-t5, 68,871 tokens. One pointer line added first in `embedded.md` § Inline path, naming `references/patterns-id.md` § Host glossary (optional) and saying an absent glossary means the pass continues. Claude review (Sonnet, 59,142 tokens): CLEAR; Lows: the line does not repeat the Indonesian-only gate (the target does), CHANGELOG is T10's.
+- T7: Codex (gpt-6-astra) in worktree s184-t7, 144,511 tokens. `census.md` (16 skills: description, body, reference and template tokens; five body targets, copied to the Tracker). council description 944 → 777 B with all 14 triggers and the Do-NOT clause verbatim (owner "Accept ~780"); lean-doc-generator 541 → 415 B, only the "Bundles its own templates…" sentence dropped. Claude review (Sonnet, 62,786 tokens): CLEAR; recomputed four skills' figures and both trigger inventories; manifest lockstep PASS.
+- Census finding for T8–T10: the provable body targets are small (1.5% to 9.4% per body, about 3.5 KB in all), because "Safety wins" keeps every-call text in the body.
+review · T5 · scoped-reviewer · behaviour:material · governance:high
+review · T7 · scoped-reviewer · behaviour:material · governance:high

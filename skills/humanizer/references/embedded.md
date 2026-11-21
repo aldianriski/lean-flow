@@ -22,6 +22,8 @@ Documents and PR bodies take this path; a commit message takes § Inline path. T
 
 ## Inline path (commit messages)
 
+**Host glossary first:** before the pass, read the host's context file (`.claude/CONTEXT.md`, else `CONTEXT.md`) for a `## Domain Glossary` section and apply it as `references/patterns-id.md` § Host glossary (optional) says; with no file or section there is nothing to apply and the pass continues.
+
 A commit message is short and usually written in the repo's own voice, so the caller runs the pass itself instead of dispatching a child. The first time it humanizes a commit message in a session, it reads `references/patterns-en.md`, `references/patterns-lf.md` and `references/patterns-id.md` in full (first line to last, no offset or limit). Later commit messages in that session reuse that read. After a compaction or context summary the catalogs are no longer in context, so it reads them again. A worktree builder is a session of its own and reads them once there. Each pass keeps Child path item 4 (the fact list before, the check after, the repair, none of it in the output), the format, the voice sample and § Never touched. It prints no status line; the fallback's line is for a runtime that could not start a child.
 
 ## Inline fallback
