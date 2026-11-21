@@ -91,7 +91,7 @@ The census sets the trim targets for the three body-trim tasks, and descriptions
 **Acceptance:** the census table and per-body targets exist, trimmed descriptions keep every trigger and Do-not-use clause, and each routes on a real-input run within 1.50 USD.
 
 ### T8 — Trim the task-decomposer, triage and prime bodies `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/` · `skills/triage/SKILL.md` · `skills/prime/SKILL.md` · `skills/triage/references/` · `skills/prime/references/` · `docs/work/evidence/TASK-691/`
+Layers: `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/` · `skills/triage/SKILL.md` · `skills/prime/SKILL.md` · `skills/triage/references/` · `docs/work/evidence/TASK-691/`
 Depends-on: T7
 Cites: TASK-691, L-327, L-316
 The lower-blast set proves the method: a line-by-line inventory, moves with a pointer at the branch point, and a real-input run per moved route.

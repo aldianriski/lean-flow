@@ -86,18 +86,7 @@ normally. Full artifact + loop → `${CLAUDE_SKILL_DIR}/references/fog-map.md`.
 
 ## Task file shape
 
-One task = one file, `docs/work/backlog/TASK-NNN-<slug>.md` (full template → `references/task-file.md`):
-
-```
----
-id · title · epic · priority · size · risk · autonomy (HITL|AFK) · tier · authority
-class:      decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
-origin:     decomposer   (always — these entries met the grill above; that is what earns G1's fast-path)
-state:      ready | needs-info | blocked               (readiness — a field, never a folder)
-depends-on: [TASK-NNN, …] or []
----
-## Done when (observable outcome) · ## Touches · ## Assumes (key assumptions · open questions) · ## Tracker
-```
+One task = one file, `docs/work/backlog/TASK-NNN-<slug>.md` (full template → `references/task-file.md`).
 
 No `status:` field — the folder is the status. Set the initial `state:` (`ready` if the done-when is
 concrete, else `needs-info` with its open questions under `## Assumes`) and an initial `priority:`

@@ -44,7 +44,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 
 ## Flow
 
-1. **Scan `.out-of-scope/` first** — if a backlog task resembles a prior rejection, surface it and ask before keeping it.
+1. **Scan `.out-of-scope/` first** — read `${CLAUDE_SKILL_DIR}/references/out-of-scope.md` before scanning; if a backlog task resembles a prior rejection, surface it and ask before keeping it.
 2. **Load** — after the layout check above (v1/mixed stops here): read every `docs/work/backlog/TASK-*.md` — frontmatter + `## Done when` + `## Assumes` (+ root `TECH-DEBT.md`). Read other folders only to resolve a `depends-on:` id or an active epic's `→ TASK-…` coverage mark; never groom them.
    **Also read every `status: active` epic** (`docs/epic/EPIC-*.md`, not `archive/`; none → skip) — read-only, to run
    the coverage check (STANDARD § 2, *Epic coverage*): each open `- [ ]` § Closed-when item must **end** with
@@ -64,7 +64,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
 6. **State** — set `state:` `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions as `- **open:**` lines under `## Assumes`; for `blocked` name the blocker in `depends-on:` (a task) or a `- **blocked-by:**` line (anything else).
    A bug does not move to `ready` without that cited `Negative:` box (step 3); until it has one it is `needs-info` with that `open:` line. A bug already `ready` is not demoted for lacking one.
-7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then move the task file `backlog/ → cancel/` — `git mv` in the git case, a plain move with no git (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
+7. **Route rejects** — read `${CLAUDE_SKILL_DIR}/references/out-of-scope.md` first; for work that will not be done, write an `.out-of-scope/` entry, then move the task file `backlog/ → cancel/` — `git mv` in the git case, a plain move with no git (§ Applying). A merged duplicate goes the same way, with a `## Amended <date>` line naming the survivor.
 8. **Output** — the groomed backlog in derived order + a **ready-to-promote shortlist** (that order, `ready` only) + **uncovered epic conditions and roadmap rows**, one line each:
    `EPIC-NNN · "<condition, ~60 chars>" · uncovered (unmarked | stale: TASK-NNN done/cancelled | missing: TASK-NNN)`; a row: `roadmap · P2a · "<outcome, ~60 chars>" · uncovered (… | stale: EPIC-NNN not active)`.
    Close a gap by proposing a task (`/task-decomposer --epic`) or a `→ next slice:` mark — triage never edits the epic or roadmap.
@@ -92,25 +92,6 @@ A `depends-on` cycle is a finding — report its ids; never break it silently.
 - **Cancel** — `git mv docs/work/backlog/<file> docs/work/cancel/` in its **own commit** (no git: a plain
   move); any content edit (the `## Amended` note) lands in a separate commit before it (with no git: it is made before the move). A status change
   never shares a commit with a content edit. Its commit messages pass through `/humanizer` embedded mode, format `plain`, unless the entire message is a fixed template (→ the humanizer skill's `references/embedded.md` § Commit messages and PR bodies).
-
-## `.out-of-scope/` knowledge base
-
-Rejected enhancements are remembered, not forgotten — so they are not re-litigated next quarter.
-Create lazily (only on the first rejection). **One file per *concept*, not per task** — repeat
-requests for the same thing accumulate under one file's `prior-requests` list.
-
-```
-.out-of-scope/<concept-slug>.md
-# <Concept name>
-- date: YYYY-MM-DD
-- decision: out of scope
-- reason: <durable why — project scope/philosophy · technical constraint · strategic choice>
-- revisit-if: <the condition that would change the answer, or "—">
-- prior-requests: TASK-012, TASK-031, …
-```
-
-- **Durable reason, not a deferral** — "we're too busy right now" is a deferral, not a rejection; don't file it. The reason must still hold next year.
-- **Match by concept, not keyword** — "night theme" matches `dark-mode.md`. On a match, surface it: *"resembles `.out-of-scope/<x>.md`, rejected because … — still true?"* → **confirm** (append to `prior-requests`, move the task to `cancel/` — `git mv`, or a plain move with no git) · **reconsider** (delete the file, task proceeds) · **disagree** (related but distinct, task proceeds).
 
 ## Hard rules
 

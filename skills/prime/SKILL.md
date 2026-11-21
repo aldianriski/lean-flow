@@ -33,11 +33,7 @@ locations second. Adapt the globs to the host project's layout.
 | 6 | `docs/architecture/overview.md`, `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Presence + narrow `## Stack` heading search only; defer the module map |
 | 7 | active `docs/epic/EPIC-*.md` (not `archive/`) § Closed when · `docs/product/roadmap.md` (or `docs/roadmap.md`) Delivery-sequence rows | Coverage count (below) |
 
-**README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +
-CONTEXT.md (2) + ARCHITECTURE.md (6). Stat its presence for the health line, but **read its full
-content only when CLAUDE.md *or* CONTEXT.md is MISSING** (then it is the best available overview).
-Why: when both instruction/context files exist, this health report needs no additional overview;
-stages read the facts they need themselves, even when invoked without `/prime`.
+**README fallback.** Report its presence; read it in full only when CLAUDE.md or CONTEXT.md is missing. Stages load their own facts even without `/prime`.
 
 **Resolution** (v2 store): backlog = `docs/work/backlog/`. Active sprint = each `docs/sprint/SPRINT-NNN-<slug>.md`
 with `status: active` (a multi-stream repo has one per stream) — read only its frontmatter + `## Members`. Open bugs = `type: bug` items outside `done/`·`cancel/`, oldest = lowest id.
@@ -52,19 +48,14 @@ is **covered** when its mark names `next slice:`, an open task (outside `done/` 
 **uncovered**. Count both; `proposed` epics and `planned`/`done` rows exempt. Procedure → `lean-doc-generator/references/epic-coverage.md`.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed. When its **Uncertain writes** item names one, the `Handoff:` row adds `· uncertain write: <target> → reconcile first` (the row is emitted for this even when no repo-side `handoff` entry exists) and `Next:` leads with reading that target back before any retry (a timeout is not a failure); `none` adds nothing.
 
-**Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log and root
-`HANDOFF-LEDGER.md` may each carry a `handoff` entry: a handoff is the sprint's own when the session's focus
-names a member task of that sprint; any other is a side handoff, in the ledger. Report the LATEST such entry's
-`handoff-status:` from each — `live` (not yet resumed), `consumed` (resumed, still open), or none outstanding.
-Never write it (`/handoff`'s and `/lean-doc-generator close`'s job, not this one's) — priming only surfaces what
-a reader would otherwise have to open the temp file, or have been in the session, to know.
+**Handoff status (read-only).** Read the LATEST `handoff` entry in each active sprint Execution Log and
+root `HANDOFF-LEDGER.md`. A handoff belongs to a sprint when the session focus names its member;
+other handoffs go in the ledger. Report each latest `handoff-status:`: `live` (not resumed),
+`consumed` (resumed, open), or none outstanding. Never write it; `/handoff` and `/lean-doc-generator close` own transitions.
 
 ## Skill freshness — a report, not a gate
 
-A live session keeps whatever installed copy of a plugin it started with, so a skill edited but not
-reinstalled keeps running its **old** procedure — no error, and a diff that reads as if the change was
-simply ignored. The fact is never hidden: every skill invocation prints its own base directory, and
-that path carries the installed version (`…/<plugin>/<version>/skills/prime`). It just goes unread.
+A live session retains its starting plugin copy. The invocation's base directory (`…/<plugin>/<version>/skills/prime`) exposes its installed version.
 
 Compare that version against the host repo's plugin manifest (`.claude-plugin/plugin.json`, first
 match; a project that vendors its own plugin may place it elsewhere — adapt the glob):
