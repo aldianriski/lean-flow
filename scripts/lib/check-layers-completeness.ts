@@ -247,6 +247,7 @@ export interface RunResult {
 }
 
 const FILE_TOKEN_RE = /`[A-Za-z0-9_./-]+\.[A-Za-z]+`/g;
+const FOREIGN_FILE_TOKEN_RE = /`[A-Za-z][A-Za-z0-9_-]+:[A-Za-z0-9_./-]+\.[A-Za-z]+`/g;
 const BARE_TOKEN_RE = /[A-Za-z0-9_./-]+\.[A-Za-z]+/g;
 const TID_RE = /\bT[0-9]+\b/g;
 
@@ -261,6 +262,10 @@ const TID_RE = /\bT[0-9]+\b/g;
 // is NOT taught this (decision D1: it stays the Plan-path oracle); the differential names the exclusion.
 // `## Touches` stays prose and is not parsed. An id the resolver cannot resolve to exactly one well-placed
 // file is a named FAIL here too (member-missing / member-ambiguous / member-misplaced, TD-188), not a silent drop.
+// TD-319: besides Cites:, a Done-when token may declare another repo's file as `repo:path.ext`.
+// Repo names match [A-Za-z][A-Za-z0-9_-]+ (two or more characters; a drive letter is not a repo).
+// This trusts the author's repo label; mislabelling a local file exempts it too. Unmarked paths
+// still need Layers/Cites. Other colon forms retain FILE_TOKEN_RE's existing behaviour.
 interface BlockDecl {
   tidFull: string;
   citedTasks: Set<string>;
@@ -286,7 +291,8 @@ export function evaluateMemberLayers(
       continue;
     }
     const doneWhen = section(readMember(m), "Done when") ?? "";
-    const implied = [...new Set((doneWhen.match(FILE_TOKEN_RE) ?? []).map((t) => t.slice(1, -1)))];
+    const localDoneWhen = doneWhen.replace(FOREIGN_FILE_TOKEN_RE, "");
+    const implied = [...new Set((localDoneWhen.match(FILE_TOKEN_RE) ?? []).map((t) => t.slice(1, -1)))];
     for (const b of governing) {
       const layers = new Set(b.layersToks);
       const cites = new Set(b.citesToks);
@@ -313,7 +319,7 @@ export function evaluateMemberLayers(
       if (miss !== "") {
         anyFail = true;
         lines.push(
-          `FAIL  member-layers-incomplete: ${sp} ${b.tidFull} member ${m.path} (${m.id}) Done when implies${miss}, absent from that block's Layers: -- if the prose only cites it rather than touching it, declare it on that block's Cites: line`,
+          `FAIL  member-layers-incomplete: ${sp} ${b.tidFull} member ${m.path} (${m.id}) Done when implies${miss}, absent from that block's Layers: -- if the prose only cites it rather than touching it, declare it on that block's Cites: line; or, if it names another repo's file, write it \`repo:path\``,
         );
       } else {
         lines.push(`PASS  member-layers-complete: ${sp} ${b.tidFull} member ${m.path} (${m.id}) Done when files all declared`);

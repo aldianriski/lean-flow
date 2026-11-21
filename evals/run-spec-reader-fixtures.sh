@@ -34,15 +34,30 @@ run_case_anywhere "reconciles-with-section-14" 0 "reconciled" -- \
 # conformance-engine.sh consumes this reader instead of carrying its own copy of the parse (it took
 # over §13 from the deleted check-attestation.sh at SPRINT-078 T1). If §13's rows ever stop matching,
 # the engine's whole §13 rule set changes silently.
-out=$(sh "$reader" "$spec" --section 13 2>&1); rc=$?
-n13=$(printf '%s\n' "$out" | grep -c '^S13\.')
-if [ "$rc" -eq 0 ] && [ "$n13" -eq 7 ] &&
-   printf '%s\n' "$out" | grep -q '^S13\.TRAILERS Attested mechanical$' &&
-   printf '%s\n' "$out" | grep -q '^S13\.NOINFER . implementation-directed$'; then
-  echo "PASS fixture(s13-rows-intact): 7 rows, levels and marks as the spec states them"
-else
-  echo "FAIL fixture(s13-rows-intact): exit $rc, $n13 rows -- output:"; printf '%s\n' "$out"; fail=1
+check_s13() (
+  out=$(sh "$reader" "$1" --section 13 2>&1); rc=$?
+  n13=$(printf '%s\n' "$out" | grep -c '^S13\.')
+  # TD-318: the UTF-8 em-dash is three bytes; grep's dot matches only one byte in the C locale.
+  if [ "$rc" -eq 0 ] && [ "$n13" -eq 7 ] &&
+     printf '%s\n' "$out" | grep -q '^S13\.TRAILERS Attested mechanical$' &&
+     printf '%s\n' "$out" | grep -q "^S13\.NOINFER $(printf '\342\200\224') implementation-directed$"; then
+    echo "PASS fixture(s13-rows-intact): 7 rows, levels and marks as the spec states them"
+  else
+    echo "FAIL fixture(s13-rows-intact): exit $rc, $n13 rows -- expected S13.TRAILERS Attested mechanical and S13.NOINFER $(printf '\342\200\224') implementation-directed -- output:"
+    printf '%s\n' "$out"
+    return 1
+  fi
+)
+check_s13 "$spec" || fail=1
+
+# Keep seven parseable rows but break NOINFER's mark: this must fail the SAME assertion, even when
+# a one-character wildcard would accept the bad mark. cmp proves the seed changed the real spec.
+awk -v dash="$(printf '\342\200\224')" '/^[|] *`S13[.]NOINFER` *[|]/ {sub(dash, "x")} {print}' "$spec" > "$work/spec-broken-s13.md"
+if cmp -s "$spec" "$work/spec-broken-s13.md" || ! grep -q '^[|] *`S13[.]NOINFER` *[|] x [|]' "$work/spec-broken-s13.md"; then
+  echo "FAIL harness: S13.NOINFER seed did not change the spec"; fail=1
 fi
+run_case_firstline "s13-rows-broken" 1 "FAIL fixture(s13-rows-intact): exit 0, 7 rows -- expected S13.TRAILERS Attested mechanical and S13.NOINFER" -- \
+  check_s13 "$work/spec-broken-s13.md"
 
 # --- case 3 (PASS control): a section §14 says has NO rules exits 0 and says nothing ---------------
 # §8 is a projection and introduces no rules; §14 records that as 0. Reporting a finding here would be

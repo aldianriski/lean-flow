@@ -15,11 +15,11 @@
 // distinct argument set (in a `beforeAll`) and every `test()` asserts against that ONE captured
 // {exitCode, output} -- never a second invocation of the same input.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, statSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import { runLayersCompleteness } from "../scripts/lib/check-layers-completeness.ts";
-import { anomalyFinding, memberAnomalyFinding, parsePlan, resolveMembersChecked } from "../scripts/lib/sprint-members.ts";
+import { anomalyFinding, memberAnomalyFinding, parsePlan, resolveMembersChecked, section } from "../scripts/lib/sprint-members.ts";
 import { ANOMALY_CASES, EXPECTED, buildAnomalyTree, type AnomalyCase } from "./fixtures/member-anomalies/tree.ts";
 import {
   buildArchiveSelectionPair,
@@ -28,6 +28,81 @@ import {
 } from "./fixtures/layers-completeness/synthetic.ts";
 
 const FIXTURES = posix.join(import.meta.dir, "fixtures/layers-completeness");
+
+// TD-319: the marker is opt-in and token-local. Real sentences are retained beside their unmarked
+// controls; TASK-677's pre-reword cleanup is explicitly labelled a reconstruction from TD-319.
+describe("member-foreign-path (retained must-FAIL controls + real SPRINT-182 shapes)", () => {
+  const mixed = posix.join(FIXTURES, "member-foreign-path/docs/sprint/SPRINT-926-fx.md");
+  const realRoot = posix.join(FIXTURES, "member-foreign-real-shape");
+  const real = posix.join(realRoot, "docs/sprint/SPRINT-927-fx.md");
+  const remedy = "absent from that block's Layers: -- if the prose only cites it rather than touching it, declare it on that block's Cites: line; or, if it names another repo's file, write it `repo:path`";
+  let r: Captured;
+  let clean: Captured;
+  let unmarked: Captured;
+  let tmp: string;
+  let twin: string;
+  const done = (p: string) => section(readFileSync(p, "utf8"), "Done when")!.trim();
+  beforeAll(() => {
+    r = capture([mixed]);
+    clean = capture([real]);
+    tmp = mkdtempSync(posix.join(tmpdir().replace(/\\/g, "/"), "lc-foreign-"));
+    cpSync(realRoot, tmp, { recursive: true });
+    const member = posix.join(tmp, "docs/work/todo/TASK-966-rtk.md");
+    writeFileSync(member, readFileSync(member, "utf8").replace("`workdoo:.rtk/pipeline.toml`", "`.rtk/pipeline.toml`"));
+    twin = posix.join(tmp, "docs/sprint/SPRINT-927-fx.md");
+    unmarked = capture([twin]);
+  });
+  afterAll(() => rmSync(tmp, { recursive: true, force: true }));
+
+  test("marked RTK and reconstructed cleanup paths PASS without foreign Cites entries", () => {
+    for (const [id, name] of [[961, "marked-rtk"], [964, "marked-cleanup"]]) {
+      expect(r.output).toContain(`PASS  member-layers-complete: ${mixed} ### T1 member docs/work/todo/TASK-${id}-${name}.md (TASK-${id}) Done when files all declared`);
+    }
+    expect(parsePlan(readFileSync(mixed, "utf8")).blocks.find(b => b.tid === "T1")!.cites.tokens).toEqual([
+      "TASK-961", "TASK-962", "TASK-963", "TASK-964", "TASK-965",
+    ]);
+  });
+
+  test("unmarked originals and the lean-flow omission FAIL with named findings and the marker remedy", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output.split("\n").filter(l => l.startsWith("FAIL"))).toEqual([
+      `FAIL  member-layers-incomplete: ${mixed} ### T1 member docs/work/todo/TASK-962-unmarked-rtk.md (TASK-962) Done when implies .rtk/pipeline.toml, ${remedy}`,
+      `FAIL  member-layers-incomplete: ${mixed} ### T1 member docs/work/todo/TASK-963-local-omission.md (TASK-963) Done when implies lean.md, ${remedy}`,
+      `FAIL  member-layers-incomplete: ${mixed} ### T1 member docs/work/todo/TASK-965-unmarked-cleanup.md (TASK-965) Done when implies .claude/CLAUDE.md, ${remedy}`,
+    ]);
+  });
+
+  test("real SPRINT-182 T2/T3 shapes PASS with no foreign path on Cites", () => {
+    expect(clean.exitCode).toBe(0);
+    for (const [id, name, tid] of [[966, "rtk", "T3"], [967, "cleanup", "T2"]]) {
+      expect(clean.output).toContain(`PASS  member-layers-complete: ${real} ### ${tid} member docs/work/todo/TASK-${id}-${name}.md (TASK-${id}) Done when files all declared`);
+    }
+    expect(parsePlan(readFileSync(real, "utf8")).blocks.flatMap(b => b.cites.tokens)).toEqual([
+      "docs/research/graphify-rtk-retest-questions.md", "docs/research/graphify-rtk-retest-questions.md",
+    ]);
+  });
+
+  test("removing only the marker from the real-shape copy FAILs; the cleanup sibling stays green", () => {
+    expect(unmarked.exitCode).toBe(1);
+    expect(unmarked.output.split("\n").filter(l => l.startsWith("FAIL"))).toEqual([
+      `FAIL  member-layers-incomplete: ${twin} ### T3 member docs/work/todo/TASK-966-rtk.md (TASK-966) Done when implies .rtk/pipeline.toml, ${remedy}`,
+    ]);
+    expect(unmarked.output).toContain(`PASS  member-layers-complete: ${twin} ### T2 member docs/work/todo/TASK-967-cleanup.md (TASK-967) Done when files all declared`);
+  });
+
+  test("retained real sentences match the done files verbatim except the marker", () => {
+    const repo = posix.join(import.meta.dir, "..");
+    const rtk = done(posix.join(repo, "docs/work/done/TASK-678-run-rtk-posthook-terse-against-plain-score-blind-and-rule-on-rtk.md"))
+      .split("\n").find(l => l.startsWith("- [x] The v1.1.0 surface"))!;
+    const cleanup = done(posix.join(repo, "docs/work/done/TASK-677-run-plain-and-graphify-abba-score-blind-and-rule-on-graphify.md"))
+      .split("\n").find(l => l.startsWith("- [x] The snapshot's HEAD"))!;
+    const mixedMembers = posix.join(FIXTURES, "member-foreign-path/docs/work/todo");
+    expect(done(posix.join(mixedMembers, "TASK-962-unmarked-rtk.md"))).toBe(rtk);
+    expect(done(posix.join(mixedMembers, "TASK-961-marked-rtk.md"))).toBe(rtk.replace("`.rtk/pipeline.toml`", "`workdoo:.rtk/pipeline.toml`"));
+    expect(done(posix.join(realRoot, "docs/work/todo/TASK-966-rtk.md"))).toBe(done(posix.join(mixedMembers, "TASK-961-marked-rtk.md")));
+    expect(done(posix.join(realRoot, "docs/work/todo/TASK-967-cleanup.md"))).toBe(cleanup);
+  });
+});
 
 interface Captured {
   exitCode: number;

@@ -100,3 +100,10 @@ review · T3 · self-review · behaviour:low · governance:low
 - Census: 309 ids in and out; 233 promoted / 75 active / 1 superseded unchanged; 232 promotion pointers, all resolve after the L-106 fix. L-144 byte-identical (hash fc7d499d…). 13 no-disposition entries collapsed with `(no disposition at promotion)` per the G2 scope-change.
 - Checks (coordinator, worktree): `run-learnings-metadata-fixtures.ts` 5 pass, 0 fail; `--ledger` PASS; builder also ran conformance `PASS S11.LEARNINGS`, `gen-index --check` PASS, `check-doc-caps` exit 0. Blob on main equals the worktree's. Coordinator self-review (consequence low/low).
 review · T1 · self-review · behaviour:low · governance:low
+
+### 2026-11-21 | progress | T6 (TASK-689) done: s13 passes under the C locale, foreign `repo:path` tokens exempt, both must-FAIL controls retained
+- Builder: Codex (gpt-6-astra) in worktree s184-t6, 131,669 tokens. Cause (Tracker): the s13 grep's `.` matched one byte of a 3-byte em-dash under `LC_ALL=C`; fixed with an exact-byte match. TD-319: `check-layers-completeness` strips `repo:path` tokens before the file-token scan, with a remedy hint in the finding.
+- Fixtures: `member-foreign-path/` (marked RTK and cleanup pass; unmarked RTK and cleanup FAIL; a missing `lean.md` FAILs beside a marked path) and `member-foreign-real-shape/` (TASK-678's real box with the marker and TASK-677's current box pass; a test asserts they match the done files except the marker); `s13-rows-broken` seeds the NOINFER mark and must FAIL.
+- Checks on main after landing (blobs equal the worktree's): `bun test evals/layers-completeness.test.ts` 61 pass, 0 fail; `LC_ALL=C sh evals/run-spec-reader-fixtures.sh` s13-rows-intact PASS, s13-rows-broken PASS (exit 1, named finding), all green; `promote-check` on SPRINT-184 31 pass, 0 fail (G2 note 5: the checker guarding this Plan changed).
+- Review: Claude (Sonnet, 61,363 tokens), scoped to the diff: CLEAR, 0 High, 0 Medium; Low: any 2+ character label is exempt (the code comment says so; the check trusts the author's label).
+review · T6 · scoped-reviewer · behaviour:material · governance:high
