@@ -69,3 +69,13 @@ consequence · T2 · behaviour:material · governance:high
 consequence · T4 · behaviour:material · governance:high
 consequence · T5 · behaviour:material · governance:high
 consequence · T3 · behaviour:low · governance:low
+
+### 2026-11-21 | progress | W1 landed: T3 (TASK-697) done; T1 (TASK-694) and T2 (TASK-695) built, reviewed and merged, proofs and shipped-diff Codex reviews pending
+Dispatch preflight on 1ccc8bd4, run as its own call: `PREFLIGHT: CLEAR` (waves T1=0 T2=0 T3=0 T4=1 T5=2; every shared file owned by a Depends-on chain).
+T3 (TASK-697), inline on the session model: `docs/research/loop-audit-2026-11.md` (77 of 130 lines, `check-doc-caps` PASS) ranks 8 weak points from three Explore recon passes plus coordinator reads at 9478dec4. First is the coordinator writing guarded fields that the gate catches only late (first gate pass red in 4 of 6 sprints). Codex review (`gpt-6-astra`, read-only) round 1 `VERDICT: CLEAR` with 7 medium/low corrections, all applied; no round 2. `gen-index.sh --check` PASS. Commit 914408bf, all 6 boxes ticked.
+T1 (TASK-694): Codex built it in worktree `s185-t1` off 1ccc8bd4 (`ready`; leg-13 pins 4/4; layout fixtures 41/0; SKILL.md 138 lines). Scoped Sonnet reviewer `VERDICT: CLEAR`, two low notes; the proofs must exercise the popup's built-in free-text path. Landed with blob-hash equality on all 3 files, commit 8e441077; boxes 1-5 ticked; 6-8 wait for proofs and the shipped-diff Codex review.
+T2 (TASK-695): Codex built it in worktree `s185-t2` off 1ccc8bd4 (`ready`; orchestrator-store 42/0, store-readers 21/0, dispatch-preflight and worktree-base fixtures green, both executed fences equal to HEAD). Scoped Sonnet reviewer `VERDICT: CLEAR`, five low notes: `orchestrator/SKILL.md` has no spare line for T4/T5; prime now never recommends overnight from frontmatter alone (a CHANGELOG line). Landed with blob-hash equality on all 9 files, fixtures re-run on main 42/0 and 21/0, commit bee6fbcc; boxes 1-6 ticked; 7-9 wait for proofs and the shipped-diff Codex review.
+Coordinator slip: one `cd` into the T1 worktree briefly made it the session's working directory (L-219 shape). No isolated dispatch ran while it lasted, and every later command ran from an absolute path on main.
+review · T3 · self-review · behaviour:low · governance:low
+review · T1 · scoped-reviewer · behaviour:material · governance:high
+review · T2 · scoped-reviewer · behaviour:material · governance:high
