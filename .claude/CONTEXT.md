@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-16
+last_updated: 2026-11-21
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
@@ -20,8 +20,8 @@ Every skill works standalone; the loop is just the order they reward most togeth
 |---|---|---|
 | `/flow` | **conductor** | opt-in — drives the whole loop, calling stage-skills in sequence; enforces gates + governance, never auto-approves |
 | `/prime` | entry | ordered context load + health check (read-only) — incl. a `Skills:` freshness row: installed base-dir version vs repo manifest (report, never a block) |
-| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (multi-sprint) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh); both write the repo profile — bundles templates; **creates** every core doc, `/task-decomposer` consumes them |
-| `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
+| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (multi-sprint) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh; on a repo with docs it hands over to migrate in-session); both write the repo profile and offer reviewed suggestions for open profile prompts — bundles templates; **creates** every core doc, `/task-decomposer` consumes them |
+| `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk`; each hand-off returns `promote`, `stop` or a named mode, and the caller runs the next stage once (`orchestrator/references/mode-choice.md`) |
 | `/task-decomposer` | feed | intent / ticket / PRD / epic-slice → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake). **Consumes docs, never creates them** |
 | `/triage` | groom | re-prioritise + state the backlog (`docs/work/backlog/`); flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
 | `/prototype` | explore | throwaway code to answer one design question; capture → ADR/PRD, delete |
@@ -79,11 +79,11 @@ A HITL step is **parked**: record → continue disjoint AFK → clean halt via `
 |---|---|---|
 | `quick` | G1 | single small low-risk task |
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
-| `sprint-bulk` | G1+G2 once | auto-loop the active sprint's member tasks |
+| `sprint-bulk` | G1+G2 once | auto-loop the active sprint's member tasks; a pre-run sweep asks every foreseeable question at batch G1/G2, before the first dispatch (`sprint-bulk-run.md` § Sweep) |
 
 **`overnight`** is the **canonical** name for the unattended headless run; its aliases (`night-run` · `unattended` · `sprint-bulk unattended`) still resolve, and an unrecognised mode string is refused, never defaulted → `orchestrator/SKILL.md` § Mode dispatch · `orchestrator/references/night-run.md` Part 0.
 
-**Continuation contract** — a run does not pause between tasks the owner already approved, and ends at exactly one of five terminal states, named in the rollup by the launcher: `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` → `orchestrator/references/night-run.md` Part 0b.
+**Continuation contract** — a run does not pause between tasks the owner already approved, and ends at exactly one of five terminal states, named in the rollup by the launcher: `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` → `orchestrator/references/night-run.md` Part 0b. After G2, attended and overnight runs follow one rule: park the blocked unit, continue disjoint approved work, ask at the end (attended: one frontier round; overnight: the `/handoff` slot plus a Log digest `/prime` recovers); user and budget stops, hard failures and pre-execution gates still halt at once → `sprint-bulk-run.md` § Runtime.
 
 ## Model tiers (dispatch discipline · ADR-010)
 Route by **nature, not size — ambiguity & consequence up, volume & repetition down**. lean-flow controls only the models it **dispatches** (Agent-tool `model:`); the session model is advisory. **Role-based + remappable** — undefined role → next-strongest defined.

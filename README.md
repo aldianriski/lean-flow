@@ -262,12 +262,14 @@ change touches, searched by path, file name and exported names, and reports them
 Coding standards can carry an optional `## Standards adopted` section: `init` and `migrate` ask once which named standards your repo adopts, with `none` as the default.
 Review applies each entry's checks and exceptions, naming the failed check and its location.
 A standard named without checks is shown back with one more ask. If none come, it is written as `checks: not decided yet`, and review says it has nothing to check.
+Run `init` on a repo that already has docs and it can hand over to `migrate` in the same session, reusing what it scanned. Where a profile prompt is still open and its options leave room, both offer a suggestion that an independent reviewer checked first; one you accept is cited as `(owner, init; suggested)` or `(owner, migrate; suggested)`, and one you don't is never written.
 
 **Plan-mode approvals** — `quick`/`mvp` record the owner's G1/G2 approval on the task file (`gates_signed:` + `## Approved design`). You MAY set Claude Code's `plansDirectory` setting to a repo folder so plan mode's own plan file is kept; the task's record then cites that file. lean-flow never edits a settings file.
 
 **Modes** (`/orchestrator <mode>`) — three: `quick` (single small low-risk task, G1 only) · `mvp`
 (feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the active sprint's member tasks, G1+G2 once) —
 full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
+After `/task-decomposer` writes tasks it offers to promote them, and after `promote` you are offered a recommended mode; `/flow` carries each choice once, and *Stop here* ends the chain. `sprint-bulk` asks every question it can foresee (open assumptions, builder-check questions, owner decisions) in rounds at batch G1/G2, before the first dispatch; a member that stays blocked leaves the sprint only by your ruling. Once the run starts, attended and overnight follow one rule: a new blocker parks the work it touches, disjoint work carries on, and the questions are asked together at the end.
 
 **Unattended runs (`overnight`)** — a promoted sprint can be executed headless while you sleep:
 `claude -p "/orchestrator overnight" --permission-mode dontAsk --allowedTools "<scoped list>"`,

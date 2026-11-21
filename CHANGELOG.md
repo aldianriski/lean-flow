@@ -16,6 +16,12 @@ status: current
 
 ## [Unreleased]
 
+- **`/lean-doc-generator`: `init` on a repo with docs hands over to `migrate` in the same session, and both offer independently reviewed suggestions for open profile prompts; an accepted one is cited, a rejected one is never written (TASK-694).**
+- **`/task-decomposer`, `/lean-doc-generator promote`, `/orchestrator` and `/flow`: each hand-off offers the next step (promote, then a recommended mode) and the caller runs it once; `quick` and `mvp` follow a promoted member's lifecycle. `/prime` now names an overnight run only when every open member is AFK at J0/J1 with no open assumptions, so one AFK member no longer qualifies (TASK-695).**
+- **`/orchestrator sprint-bulk`: a pre-run sweep asks every foreseeable question at batch G1/G2 before the first dispatch; a member still blocked leaves only by the owner's ruling (TASK-696).**
+- **`/orchestrator`, `/flow`, `/prime` and `/handoff`: after G2, attended and overnight runs park a blocker, continue disjoint work and ask at the end; units advance on their own readiness instead of a wave barrier, and `/prime` surfaces the open questions from the handoff or the Execution Log (TASK-698).**
+- **`docs/research/loop-audit-2026-11.md`: a ranked audit of the lane and loop workflow (TASK-697).**
+
 ## v2.27.0 — shorter skill descriptions and bodies, same behaviour (2026-11-21)
 
 **MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.
