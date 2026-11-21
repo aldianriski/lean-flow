@@ -95,3 +95,11 @@ handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-g2.md
 ### 2026-11-21 | handoff | SPRINT-185 T4 shipped-diff review, T5 build, proofs, system-verify and close
 handoff-status: live
 handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-build.md
+
+### 2026-11-21 | progress | T4 shipped-diff review cleared; T5 (TASK-698) built, reviewed and landed
+Resumed from the live handoff above in a fresh session (`/prime` → `/orchestrator sprint-bulk`).
+T4 shipped-diff Codex review (`gpt-6-astra`, read-only): round 1 `VERDICT: CLEAR`, one low Spec finding. Step 6 of `sprint-bulk-run.md` wrote an interim `gates_signed: G1 @ <sha>`, while lean-doc-generator's promote row says to omit the field until both gates are signed. The coordinator fixed it inside T4's Layers as the one bounded retry (b688abc1). Round 2, scoped to that fix, `VERDICT: CLEAR` with no findings. The `**blocked-by:**` low was judged not a separate violation. Box 6 ticked (87ec4dc8).
+T5 (TASK-698): Codex built it in worktree `s185-t5` off b688abc1, re-verified at spawn (`ready`; orchestrator-store 42/0, store-readers 21/0, dispatch-preflight, worktree-base and run-mode fixtures green; both executed dispatch fences byte-identical; `git diff --stat scripts/` empty; SKILL.md 140 lines). Scoped Sonnet reviewer `VERDICT: CLEAR`, two lows needing no action. Landed with blob-hash equality on all 8 files, fixtures re-run on main (the five above plus work-store 21/0 and layout 41/0), commit 6be7fafd; boxes 1-4 ticked; 5-7 wait for the proofs and the shipped-diff Codex review.
+Coordinator slip: one `cd` into the T5 worktree again made it the session's working directory (L-219 shape, second sighting this sprint). Nothing was dispatched from it, and the next command returned to main.
+run · 27 of 36 DoD ticked (T3 6/6 · T1 6/8 · T2 7/9 · T4 4/6 · T5 4/7)
+review · T5 · scoped-reviewer · behaviour:material · governance:high
