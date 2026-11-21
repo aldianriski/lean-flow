@@ -155,3 +155,11 @@ review · T8 · scoped-reviewer · behaviour:material · governance:high
 - Runs (`docs/work/evidence/TASK-693/spend.md`): promote before/after, 0.4499 of 4.50 USD; same stop at the L size check, nothing written, no sign-off fabricated. The before arm used the worker route and the after arm ran inline; the worker-route line is unchanged, so noise.
 - Local checks: layout-fixtures 41/0, v1-to-v2 fixtures 101/0, store-writer 29/0, doc caps PASS (138 ≤ 140 lines), count-claims, qa-check leg 13 cues, skill-freshness, manifest lockstep. Box 5's gate half waits for the full gate.
 review · T10 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-11-21 | progress | system-verify green on 899ec6e4: every member resolved (9 done, 1 cancelled)
+```
+gate-remote: ran 899ec6e4c1198095ac233534f72a4183ecfea9e0
+bun test: 643 pass, 0 fail (rc 0)
+qa-check: QA-CHECK: 245 pass, 0 fail (rc 0)
+```
+The gate-dependent boxes are ticked on it: TASK-685 box 3, TASK-691 box 4, TASK-693 box 5. Real-input spend: T5 0.3190, T7 0.4725, T8 1.4220, T10 0.4499 = 2.6634 of 15.00 USD (T9's 4.00 share unused).
