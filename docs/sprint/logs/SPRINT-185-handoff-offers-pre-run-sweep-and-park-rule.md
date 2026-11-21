@@ -49,3 +49,7 @@ G1 and G2 are not yet signed; `gates_signed` is omitted from the frontmatter unt
 ### 2026-11-21 | gate | batch G1 signed (fast-path), T1–T5
 Owner popup, verbatim: "Scope unchanged — sign G1 (Recommended)" to "Batch G1 (fast-path, all five origin: decomposer): is the scope of TASK-694..698 unchanged since your approve? Since then only G2 notes were folded in (L-293 cited, 15 USD proof cap, T5 review cap 2, sprint-by-reference.md added to T5 Layers)."
 G1 passes for T1–T5 at 24299773. G2 is not signed; `gates_signed` stays omitted until batch G2 is signed. Owner ruled batch G2 and the build run in a fresh session ("Fresh session (Recommended)"), resumed via `/handoff` → `/prime` → `/orchestrator sprint-bulk`.
+
+### 2026-11-21 | handoff | SPRINT-185 batch G2 and the build, fresh session
+handoff-status: live
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-g2.md
