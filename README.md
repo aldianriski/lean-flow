@@ -201,8 +201,12 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |
 | **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
 | **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → a calibrated `verdict-<slug>.md` (pre-mortem · confidence+dissent · optional gated fact-verify) → feed an ADR (uses sub-agents) |
-| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) plus an Indonesian catalog (slop patterns, a term policy that keeps English where the KBBI coinage is uncommon; Indonesian infra calques use English terms, with optional overrides in a host `CONTEXT.md` § Domain Glossary) and a lean-flow overlay of six more patterns; on request it audits first (numbered findings, only the picked ones change) or translates EN↔ID; it reports before → after counts of dashes, bold labels and curly quotes; other skills call it in a child context for docs, CHANGELOG entries, handoffs and PR bodies, and inline for commit messages |
+| **write** | `/humanizer` | rewrite AI-sounding prose (pasted text or a named file) so it reads human, without changing what it says; English catalog of 26 patterns vendored from blader/humanizer (MIT) plus an Indonesian catalog (slop patterns, a term policy that keeps English where the KBBI coinage is uncommon; Indonesian infra calques use English terms, with optional overrides in a host `CONTEXT.md` § Domain Glossary) and a lean-flow overlay of six more patterns; on request it audits first (numbered findings, only the picked ones change) or translates EN↔ID; it reports before → after counts of dashes, bold labels and curly quotes; other skills call it in a child context for docs, CHANGELOG entries, handoffs and PR bodies, and inline for commit messages; the inline commit-message path now reads the optional host glossary too |
 | | `/diagram` | draw architecture, workflow, sequence, data flow, state or ERD as Mermaid plus an evidence table that ties every box and arrow to a source line, marked called, configured, proposed or unknown; read-only git only; standalone |
+
+The `/council` and `/lean-doc-generator` descriptions are shorter, with all triggers kept.
+`/task-decomposer`, `/triage`, `/prime` and `/lean-doc-generator` also load shorter bodies with
+unchanged behaviour; `/triage` keeps its rejection procedure in its own `references/out-of-scope.md`.
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
 promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates · modes →
@@ -571,7 +575,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-11-20 · status: current · v2.26.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-11-21 · status: current · v2.26.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

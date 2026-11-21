@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-11-20
+last_updated: 2026-11-21
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -15,6 +15,11 @@ status: current
 ---
 
 ## [Unreleased]
+
+- **`/humanizer`: the inline commit-message path now reads the optional host glossary for Indonesian infra terms too; an absent glossary leaves the catalog defaults in use (TASK-688).**
+- **`/council` and `/lean-doc-generator`: shorter descriptions, with every trigger kept (TASK-690).**
+- **`/task-decomposer`, `/triage` and `/prime`: shorter skill bodies with unchanged behaviour; `/triage` now keeps its rejection procedure in its own `references/out-of-scope.md` (TASK-691).**
+- **`/lean-doc-generator`: shorter skill body with unchanged behaviour; promote and close approval stops, retention rules and template requirements stay in place (TASK-693).**
 
 ## v2.26.0 — the dispatch trial is ruled: one opt-in cell kept, the rest back to defaults (2026-11-20)
 

@@ -148,3 +148,10 @@ review · T2 · scoped-reviewer · behaviour:low · governance:high
 - Runs (`docs/work/evidence/TASK-691/spend.md`): 14 runs, 1.4220 of 3.50 USD. The first four before-runs were void: the headless permission default blocked `Skill`, so the model worked by hand; rerun with `--allowedTools Skill Read Glob Grep` on both arms. A fresh comparer found R2–R4 the same; R1's first after-run skipped the context read, two reruns read it, and the trim did not touch that instruction, so it is noise.
 - Checks on main: layout-fixtures 41/0, work-store-fixtures 21/0 (builder and coordinator), doc caps PASS. Box 4's qa-check half waits for the full gate.
 review · T8 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-11-21 | progress | T10 (TASK-693) built, reviewed, merged and proven: lean-doc-generator body 18,428 → 17,678 bytes; release lines in CHANGELOG [Unreleased] and README
+- Builder: Codex (gpt-6-astra) in worktree s184-t10, 136,482 tokens. Three in-place trims (promote row rationale, doc-aging incident clause, epic-staleness anecdote); no procedure moved; inventory quotes all 105 original nonblank lines. CHANGELOG `[Unreleased]` and README carry TASK-688, 690, 691 and 693; no TASK-692 line (cancelled), no maintainer-only lines (v2.26.0's style lists consumer changes), no version bump.
+- Review: Claude (Sonnet, 62,869 tokens): CLEAR, 0 High, 0 Medium; Lows: the L-099 consequence dropped from the promote row (rule kept), 2 B of headroom, one wordy README sentence.
+- Runs (`docs/work/evidence/TASK-693/spend.md`): promote before/after, 0.4499 of 4.50 USD; same stop at the L size check, nothing written, no sign-off fabricated. The before arm used the worker route and the after arm ran inline; the worker-route line is unchanged, so noise.
+- Local checks: layout-fixtures 41/0, v1-to-v2 fixtures 101/0, store-writer 29/0, doc caps PASS (138 ≤ 140 lines), count-claims, qa-check leg 13 cues, skill-freshness, manifest lockstep. Box 5's gate half waits for the full gate.
+review · T10 · scoped-reviewer · behaviour:material · governance:high
