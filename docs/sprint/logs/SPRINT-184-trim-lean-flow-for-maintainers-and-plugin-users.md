@@ -114,3 +114,8 @@ review · T6 · scoped-reviewer · behaviour:material · governance:high
 - Census finding for T8–T10: the provable body targets are small (1.5% to 9.4% per body, about 3.5 KB in all), because "Safety wins" keeps every-call text in the body.
 review · T5 · scoped-reviewer · behaviour:material · governance:high
 review · T7 · scoped-reviewer · behaviour:material · governance:high
+
+### 2026-11-21 | progress | T4 (TASK-687) done: 107 low/minor/trivial rows compressed, TECH-DEBT 2,031 → 1,860 lines (−171)
+- Builder: Codex (gpt-6-astra) in worktree s184-t4, 155,898 tokens, plus one bounded retry. The coordinator's census found 5 lines containing a frozen box-2 keyword (`route`, `blocked`) removed from history bullets: the G2 condition rule was narrower than box 2, and the box wins. The retry restored them byte-identically; nothing else changed.
+- Coordinator census (independent of the builder's): over the original, all 420 lines that are a row header, or carry Summary, Mitigation, Fix direction, `Re-file fresh if`, `route`, `blocked` or `unblock`, are present after; 123 ids; the 13 medium rows are byte-identical (md5 of their blocks equal); closed TD-288/291/293 and the header/aging prose untouched. Rows whose condition line was kept from Impact/Evidence: TD-074, TD-280, TD-304, TD-313 (builder census). Builder checks: `check-doc-caps` exit 0; conformance verdicts for TECH-DEBT identical before/after (41 informational S10.TDAGING, S11.TDDELETE PASS). Coordinator self-review (consequence low/low).
+review · T4 · self-review · behaviour:low · governance:low

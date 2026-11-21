@@ -406,10 +406,8 @@ status: current
     a trial's own dir after its row is appended, but the judges' dirs are left for `sweepStale`, which only runs when a driver
     starts; with `owner.json` naming a live driver they are kept for the whole run. At two workers 94 piled up during A4b (about
     5 MB each).
-  - Evidence: `D:/ab-work` listing during the A4b run (2026-11-02, about 11:45 UTC); each dir holds `owner.json`, `cfg`, `home`,
-    `outside`, `trial`.
-  - Impact: low (disk only; D: had 64 GB free). Grows with workers and arm length.
   - Mitigation (hypothesis, re-derive first): clean each judge's isolation when the judge returns, as the trial's own is cleaned.
+  - Evidence: Sprint-158
 - **TD-283** severity: medium | status: open | created: Sprint-152 (close retro, S0 report)
   - Summary: **`analyze.ts` prints R-b's verdicts but no section 4 verdict (holds, inconclusive or regressed) and no per-symptom
     regression line.** The pre-registration leaves the +0.10 and -0.05 thresholds to the reader, so the report shows the rates and
@@ -424,27 +422,28 @@ status: current
   - Summary: **Reading the LAST `QA-CHECK:` line (TD-268's fix) can trust a nested line when the run's own verdict never prints.**
     A qa-check run that exits rc 0 after nested fixture output printed `QA-CHECK: 5 pass, 0 fail`, but dies before its own verdict
     line, is read as passing by `judgeOutput()` and `gate-remote.ts`. Before the fix, the first line had the mirror-image hole.
-  - Evidence: the reviewer traced it by reading; no such run is on record (census zero). It needs rc 0 and a missing final verdict together.
-  - Impact: trivial today, since a run that dies mid-flight usually exits non-zero.
   - Mitigation (hypothesis, re-derive first): have qa-check print an end-of-run marker and require the verdict to be the last
     `QA-CHECK:` line before it. A defect fix of an existing tool, unfrozen under ADR-053.
+  - Evidence: Sprint-148
 
 - **TD-280** severity: low | status: open | created: Sprint-147 (close retro, measured)
   - Summary: **The member-layers check matches a bare filename against `Layers:` by basename but against `Cites:` only as the exact token, so the fix its own FAIL message recommends fails.** A Done-when naming the bare `lean-flow-3-foundation.md`, with `Cites:` carrying `docs/research/lean-flow-3-foundation.md`, stays a `member-layers-incomplete` FAIL whose text says "declare it on that block's Cites: line".
-  - Evidence: the SPRINT-147 promote-check FAILed until T2's `Cites:` carried the bare token; `evaluateMemberLayers` in `scripts/lib/check-layers-completeness.ts` applies its basename branch to `Layers:` paths only.
-  - Impact: low. The check fails loud and a workaround exists, but the message sends the reader to a fix that does not work.
   - Mitigation (hypothesis, re-derive first): apply the same single-basename rule to `Cites:` tokens, keeping the ambiguity case. A defect fix of an existing checker, unfrozen under ADR-053.
+  - Evidence: Sprint-147
+  - Evidence: the SPRINT-147 promote-check FAILed until T2's `Cites:` carried the bare token; `evaluateMemberLayers` in `scripts/lib/check-layers-completeness.ts` applies its basename branch to `Layers:` paths only.
 
 - **TD-277** severity: low | status: open | created: Sprint-143 (T3 Codex R1, out of scope)
   - Summary: **`product-requirements.md.template`'s header comment names lean-flow's `ADR-012`.** The comment is copied into
     every adopter's `docs/product/requirements.md`, where `ADR-012` points at nothing.
   - Fix direction: reword the comment without the lean-flow id, and check the other templates for the same leak.
+  - Evidence: Sprint-143
 
 - **TD-276** severity: low | status: open | created: Sprint-143 (T3 Codex R1, out of scope)
   - Summary: **`init.md` step 2 scaffolds base-tier files before step 3's popup decides a headless park.** The headless rule
     says base-tier scaffolding waits with the tier choice, but the numbered order writes first. T3 kept its own new
     section out of the conflict (written only from step 3's answers); the older order is unchanged.
   - Fix direction: prepare the scaffold in step 2 and write it after step 3's popup or headless decision.
+  - Evidence: Sprint-143
 
 - **TD-275** severity: low | status: open | created: Sprint-141 (close retro, T2 G2 ruling R1)
   - Summary: **Nothing checks SECURITY.md's grant table against each skill's `allowed-tools:`.** SPRINT-141 T2 found two row
@@ -453,6 +452,7 @@ status: current
     and on a security page that misfiling understates what a skill can run. Owner ruling R1 kept the rows a read-through.
   - Fix direction (not a ruling): a leg that classifies each `allowed-tools:` line (unscoped `Bash` · scoped `Bash(...)` · no
     shell) and compares it with the table row naming that skill. Admit it under ADR-053 only if the table drifts again.
+  - Evidence: Sprint-141
 
 - **TD-274** severity: medium | status: open | created: Sprint-140 (T3 exercise, owner ruling at the T3 retry popup)
   - **Narrowed (SPRINT-142 T2, TASK-511, `cae91606` + `cc398202`; owner ruling R2):** not reproduced. On a retained sample
@@ -479,6 +479,7 @@ status: current
     estimated from header and length) and 7 verbatim copies of a "Shared archive predicate" comment that will drift.
   - Fix direction: replace the 7 copies with one line pointing at `archive-path.sh`, then trim the confirmed padded headers to the
     constraint they carry. Comments only, never code; the scripts are maintainer-side (Other G at most).
+  - Evidence: Sprint-140
 
 - **TD-272** severity: low | status: open | created: Sprint-139 (T7 scope-change; worked around in T7 `Cites:`)
   - Summary: **`check-sprint-by-reference.ts --scope-change` misses a multi-segment path suffix.** `declares()` matches a bare
@@ -487,6 +488,7 @@ status: current
     `skills/orchestrator/references/dispatch.md`. SPRINT-139 added the short token to T7's `Cites:` to clear the leg.
   - Fix direction: match a multi-segment token as a path suffix of a declared path, on a `/` boundary, with a fixture where the
     suffix passes and a non-suffix still fails. Maintainer-only check (Other G).
+  - Evidence: Sprint-139
 
 - **TD-271** severity: low | status: open | created: Sprint-138 (T3 consumer reading on workdoo)
   - Summary: **`dispatch.md` § System verify's rung 1 does not rank `test` · `check` · `verify`.** It says "a `test` / `check` /
@@ -496,6 +498,7 @@ status: current
     carries the ambiguity for every consumer.
   - Fix direction: rank rung 1 explicitly (a repo-wide gate script over a unit-only one), with a discovery fixture holding both.
     Consumer-facing skill work.
+  - Evidence: Sprint-138
 
 - **TD-270** severity: low | status: open | created: Sprint-138 (T3 cost measurement, PowerShell PATH)
   - Summary: **Some gate checkers fail misleadingly when Git's POSIX tools are not on PATH.** Run with bun from a PowerShell PATH
@@ -503,6 +506,7 @@ status: current
     crashed Bun. Neither said a tool was missing. With Git's tools on PATH for the call, all five merge-check legs passed. The gate
     itself runs under `sh`, so it is unaffected; a direct checker call or `merge-check` from PowerShell is not.
   - Fix direction: each checker that shells out to a POSIX tool checks for it first and FAILs naming the missing tool. Other G.
+  - Evidence: Sprint-138
 
 - **TD-269** severity: trivial | status: open | created: Sprint-138 (T3 scoped review round 2, review-cap routed)
   - Summary: **`evals/merge-check.test.ts`'s wiring check has two blind spots.** (1) It matches each leg's invocation inside its
@@ -510,6 +514,7 @@ status: current
     --strict`) goes unnoticed. (2) If a gate block loses its column-0 `fi`, the block reader runs past the real block; the
     `toBeGreaterThan` guards do not catch it.
   - Fix direction: assert the invocation as a whole trimmed line (allowing the trailing `2>&1`); fail when a block has no closing `fi`.
+  - Evidence: Sprint-138
 
 - **TD-267** severity: low | status: open | created: Sprint-137 (T1 tick, layers-completeness leg)
   - Summary: **`check-layers-completeness.ts` reads a task id inside a hyphenated token as a task reference.** Its Depends-on
@@ -517,11 +522,12 @@ status: current
     `pre-T1` in SPRINT-137 T3's Acceptance read as "references T1, absent from Depends-on" and FAILed the gate leg. Worked
     around by rewording the Acceptance (scope-change, owner ruling 2026-10-23). Census at SPRINT-137: that one sighting; the
     other live Plan prose carries no `<word>-T<digits>` token.
+  - Fix direction: require a non-word, non-hyphen character (or line start) before `T<digits>` at both sites, with a must-FAIL
+    fixture holding `pre-T1` beside a real `T1` reference that still FAILs. Other G.
+  - Evidence: Sprint-137
   - **Widened (SPRINT-137 system verify, 2026-10-24):** a second site, `check-sprint-by-reference.ts`'s `--scope-change` leg,
     selects an entry's tasks with `\bT<n>(?![0-9])` over its heading, so the 2026-10-23 T3 entry (heading quotes `pre-T1`)
     was attributed `T1+T3`. Harmless there (the union only widened what it checked), but the same unbounded match.
-  - Fix direction: require a non-word, non-hyphen character (or line start) before `T<digits>` at both sites, with a must-FAIL
-    fixture holding `pre-T1` beside a real `T1` reference that still FAILs. Other G.
 
 - **TD-266** severity: low | status: open | created: Sprint-136 (T3 review, census-routed)
   - Summary: **verify-reaches' `.ts` support has two known looseness shapes.** (1) The `.ts` comment strip is line-start only,
@@ -531,6 +537,7 @@ status: current
     limit, extended). Census at SPRINT-136: 0 live `Verify:` clauses name a `.ts` method, so neither shape is reachable today.
   - Fix direction: strip trailing `//` and track `/* */` block state for `.ts`; treat only the token after `bun`, or the first
     script token, as the method. Other G.
+  - Evidence: Sprint-136
 
 - **TD-265** severity: low | status: open | created: Sprint-135 (T3 review, census-routed)
   - Summary: **`fragmentCorroborated()` has three untested edges and one size limit.** (1) `git ls-files -z` runs under the
@@ -540,6 +547,7 @@ status: current
     the deciding condition: the `docs/` control is blocked by its on-disk existence alone.
   - Fix direction: one `git ls-files -z -- <p>` per fragment (a pathspec keeps the output small), normalise `./`, and add a
     fixture whose directory is tracked but absent on disk. Other G.
+  - Evidence: Sprint-135
 
 - **TD-264** severity: low | status: open | created: Sprint-135 (T2 review, census-routed)
   - Summary: **`review-depth-consequence-vocab` reads only bare record lines.** A bullet-prefixed `- consequence · T1 · …`
@@ -549,6 +557,7 @@ status: current
     or two bad lines in one log.
   - Fix direction: accept an optional `^[-*] ` prefix in both loops, or state in review-scoping.md that only a bare line is a
     record; add `gsub(/\r/, "", line)`; add the missing fixtures. Other G.
+  - Evidence: Sprint-135
 
 - **TD-261** severity: low | status: open | created: Sprint-132 (close; final gate, `epic-state`)
   - Summary: **ADR-030 and the epic-state checker disagree about where member-sprint rows live.** ADR-030 puts the rows in
@@ -557,11 +566,13 @@ status: current
     inline (owner ruling) and the log removed.
   - Fix direction: teach the checker to read the log when the epic points to one, or amend ADR-030 to keep the rows inline.
     Decide before an epic nears its 200-line cap, which is the case ADR-030 was written for.
+  - Evidence: Sprint-132
 - **TD-260** severity: low | status: open | created: Sprint-131 (close; found by the T2 inline replay)
   - Summary: **The whole-suite rule is still stated twice.** SPRINT-129's owner ruling put the per-slice whole-suite rule in one
     place (`/tdd`), and `test-standard.md` now points to it. But `skills/orchestrator/references/review-scoping.md:241` (§ QA
     suggestion) still restates it: "ALL existing tests still pass (zero regressions) before it ticks done".
   - Fix direction: replace the clause with a pointer to `/tdd` § Workflow, as `test-standard.md` does.
+  - Evidence: Sprint-131
 - **TD-259** severity: low | status: open | created: Sprint-131 (close; found by the T2 inline replay)
   - Summary: **The TD-154 gate guard accepts a quoted excluded head.** `invokes()` in `test/gate-discovery/discover.ts` strips
     quoted spans to a ` Q ` placeholder before the head check, so `"echo" sh scripts/qa-check.sh`, `'echo' …` and `e"ch"o …`
@@ -569,53 +580,61 @@ status: current
     negative, reachable only by a deliberately odd manifest.
   - Fix direction: the inline arm's fix is a ready reference (replay commit `290f70bf`, a no-space sentinel; reject a quoted or
     backslashed head), with a retained must-FAIL per head form and a seeded proof.
+  - Evidence: Sprint-131
 - **TD-258** severity: low | status: open | created: Sprint-128 (close; T3 · T5 proof gaps)
   - Summary: **Three hardened branches carry no discriminating proof.** `_att_fmv_stdin` (§13b) strips CR but has no CRLF fixture;
     `_own_scan` and `_own_governed_off` are covered by CRLF twins but were never seeded; the CLI half of TASK-445's empty-store fix
     (`isV2`) has no seed that reddens, because `requireMembers` re-checks the directory itself.
   - Fix direction: one CRLF twin for the attestation reader and one seed per unseeded branch, at the next sprint touching them.
+  - Evidence: Sprint-128
 - **TD-257** severity: low | status: open | created: Sprint-128 (close; T1 residuals of TD-178 · TD-248)
   - Summary: **Two declaration/attribution leftovers.** The completeness checker's Plan-prose "implies" leg still compares a bare
     filename literally (TD-178 fixed the member leg only), and `check-layers-observed` still ignores N in the trailing
     `(SPRINT-N Tn)` subject form (TD-248 fixed the `sprint(NNN) Tn:` forms only).
   - Fix direction: apply the exactly-one basename rule to the prose leg, and the own-sprint test to the parenthetical form.
+  - Evidence: Sprint-128
 - **TD-256** severity: low | status: open | created: Sprint-128 (close; T4 builder finding)
   - Summary: **The reaper with no `bun`, on a v1 sprint, reports zero counts with no line.** The bun-unavailable message fires only
     for a sprint with `## Members`, so a v1 sprint (unsupported since 2.0) gets silent zeros. Census: no v1 sprint exists in a v2 tree.
   - Fix direction: name the missing bun whatever the sprint's shape; re-open on the first sighting.
+  - Evidence: Sprint-128
 - **TD-255** severity: low | status: open | created: Sprint-128 (close; T1/T2 parser residuals, census 0 of 505 blocks)
   - Summary: **`parsePlan` shapes no real Plan contains.** A block with two `Cites:` lines takes the leading run of their
     concatenation, which is neither the old CLI's union nor dod-delta's first line; a backtick span split across a line break no
     longer joins; a combined `### T1+T2` heading keys as T1. Each is 0 of 505 real task blocks (two-route census at SPRINT-128).
   - Fix direction: on the first real sighting, define the rule in the parser and pin it with a fixture; until then a TD, not a round.
+  - Evidence: Sprint-128
 - **TD-254** severity: low | status: open | created: Sprint-127 (close; owner ruling at intake)
   - Summary: **No conformance rule reads the git-less freeze.** Without git, the frozen text is the promote entry's snapshot
     (ADR-054), and `S9.PLANFROZEN` / `S9.SCOPECHANGE` only report "history unavailable". The freeze holds only if the procedure is
     followed, and an edited past log entry passes unseen.
   - Fix direction: an engine rule that diffs each member's `## Done when` against its promote-entry block, built when the first
     git-less adopter needs a tool rather than a reader to hold the freeze.
+  - Evidence: Sprint-127
 - **TD-253** severity: low | status: open | created: Sprint-127 (close, T5 finding F1)
   - Summary: **An adopter who already has a hand-rolled delivery table ends up with two copies of it.** workdoo's roadmap was rendered
     from its persistence plan's table, which stays as it was, so the sequence now lives in two files. The template says nothing about
     adopting from an existing table, and `migrate` has no mapping for one (out of scope at SPRINT-126).
   - Fix direction: the template (or `migrate`) states that the roadmap becomes the sequence's single home and the source table
     becomes a pointer, with the source owner's approval.
+  - Evidence: Sprint-127
 - **TD-252** severity: trivial | status: open | created: Sprint-125 (close, wave B Codex B6)
   - Summary: **`.claude/CONTEXT.md:104` (the sprint-model bullet) is one line over 400 chars.** It was already over before SPRINT-125;
     T3 lengthened it ("created at promote …"). It sits under its prose-density baseline (16 dense lines), so the gate stays green and
     nothing flags the growth.
   - Fix direction: split it at the next CONTEXT.md dedup pass (L-008 · TD-006), never by squeezing.
+  - Evidence: Sprint-125
 - **TD-251** severity: low | status: open | created: Sprint-125 (T7, Codex R1-T4)
   - Summary: **`S11.TDDELETE` takes the FIRST sprint id in a resolved row's status field as its resolve sprint.** A status like
     `resolved → TASK-404 (filed Sprint-880, resolved SPRINT-899)` would be aged from 880 and could FAIL early.
-  - Census (SPRINT-125 close): 0 of 112 distinct historical resolved rows carry two sprint ids in the status field. Routed here under
-    the bounded-review stop rule (census-zero shape → TD), not into a second builder round.
   - Fix direction (not a ruling): prefer the sprint after a `resolved` / `→` token, or the last id; re-open on the first real sighting.
+  - Evidence: Sprint-125
 - **TD-250** severity: minor | status: open | created: Sprint-124 (close, T2's fixture builder)
   - Summary: **`evals/run-sprint-family-fixtures.sh`'s header still says it was "enumerated from the 68 assertions below", and its
     per-section tally sums to 68.** The cases kept growing after that header was written, and TASK-404 alone added 10 assertions. The
     header claims to be derived from the assertions, so a stale count is a false statement about the file it heads.
   - Fix direction: re-derive the tally from the assertions, or drop the count and keep the per-section list.
+  - Evidence: Sprint-124
 - **TD-249** severity: low | status: open | created: Sprint-124 (T2 review, Codex R1 T1/T4 + R2 R1)
   - Summary: **TASK-404's batched engine passes can still differ from the per-file code they replaced, on three input shapes no real
     corpus holds.** (1) `S10.TDAGING` does its age arithmetic in awk floats, so a sprint number above 2^53 rounds and an age can read one
@@ -623,11 +642,9 @@ status: current
     both parents differ from the merged directory but one is TREESAME for a single file, history simplification picks a different add
     or revision date. (3) Even with `core.quotepath=off`, git still quotes a path holding a double quote, a backslash or a control
     character, so the literal lookup in `S4.APPEND` (and the S11 map) misses it, where the old pathspec passed it intact.
-  - Census (SPRINT-124 T2): 0 for each. The max sprint number is 124. 0 merges touch `docs/sprint/archive/`, and the one merge touching
-    `docs/adr/` gives byte-identical output. 0 tracked paths under `docs/` hold those characters, and Windows forbids a double quote in a
-    filename. Routed here under the review stop rule (cap 2 reached, census-zero shape → TD), not into a third builder round.
   - Fix direction (not a ruling): `-z` output for (3) needs NUL handling that POSIX awk does not promise (ADR-043 keeps mawk in scope).
     Re-open on the first real sighting.
+  - Evidence: Sprint-124
 - **TD-247** severity: low | status: open | created: Sprint-122 (T1 review, Codex C3 + C6)
   - Summary: **A USER_STOP is not bound to the run that produced it.** The `<log>.stop` marker the wrapper leaves carries only a
     signal name, so a standalone `night-run.sh --reap` over an old log can read a stale marker (the wrapper clears it only at its own
@@ -636,17 +653,14 @@ status: current
   - Mitigation (owner-chosen 2026-10-11, Option A of TASK-425): the wrapper writes `<signal> <wr_start>` into `<log>.stop`, and
     reap() reads USER_STOP only when the id equals its own `rp_started`. This closes C3. C6 (the guard accepts an unbacked USER_STOP)
     stays open; it has no occurrences so far. Option B (bind in the rollup, guard-checked) was rejected: it changes the frozen Part 4 contract.
-  - **C3 resolved → TASK-426** (SPRINT-124 T1, `7470f1a0`): the marker is `<signal> <started>`, and a foreign or missing id is ignored
-    and named in `warnings ·`. Retained must-FAIL fixtures: `stale-marker-foreign-id-is-not-user-stop` and
-    `stale-marker-without-id-is-not-user-stop`. **C6 stays open.** Census 2026-10-11: 0 line-start `terminal · USER_STOP` in
-    `docs/sprint/` (control: the same query reaches 10 real terminals, 6 PLAN_EXHAUSTED and 4 AUTHORITY_BOUNDARY). The row stays
-    `open` for C6.
+  - Evidence: Sprint-122 · SPRINT-124 · 7470f1a0
 
 - **TD-246** severity: low | status: open | created: Sprint-121 (dispatch)
   - Summary: **Agent worktrees accumulate: 14 under `.claude/worktrees/` at SPRINT-121 close, several `locked`.** dispatch.md says
     `git worktree list` should show none before a dispatch (stale-branch reuse on an agent-id collision, harness issue #51596). Nothing
     removes them, and a locked one may belong to a live session, so the coordinator cannot safely sweep them unasked.
   - Mitigation (hypothesis): a close-time step that lists merged, unlocked agent worktrees and proposes their removal (propose→approve).
+  - Evidence: Sprint-121 · SPRINT-129 · SPRINT-138 · SPRINT-168
   - **Sighting (SPRINT-129 close, 2026-10-19):** 12 older agent worktrees present at dispatch (first written as 13, a miscount; 12 remain after cleanup, two routes agree) (the base guard reads each one:
     stale by 24–992 commits or divergent). The mitigation was applied by hand: this sprint's 4 builder worktrees and its integration
     worktree were proposed for removal at close and removed on owner approval; the 12 older ones were left for review.
@@ -656,45 +670,51 @@ status: current
     holds. Their branches were deleted with `-D` on that proof. Also removed: the 6 empty orphan directories. Kept: 1 locked and 9
     dirty (two with one commit not in main). 10 remain registered; 2 stray files (`qa-t4.out`, `red.txt`) are left for the owner.
     Still open: nothing removes worktrees as they accumulate, which is the debt itself.
-  - **Sighting (SPRINT-168 T3, TASK-624, 2026-11-08):** the pile was back to 9 registered worktrees (WIP from sprints 107 to 135), 1 empty folder and the 2 stray files. All 12 removed on owner rulings, patches saved first, 48 branches kept; `git worktree list` now shows 0 `.claude/worktrees/` entries. The creating mechanism is unchanged, so the row stays open.
 
 - **TD-245** severity: minor | status: open | created: Sprint-121 (T6, ADR-052)
   - Summary: **Epic ids now span two repositories and nothing derives the next one across both.** EPIC-016 to 020 live in workdoo
     (ADR-052), and lean-flow continues its own sequence. `/lean-doc-generator epic` derives the maximum from this repository only, so the
     next id can collide with a workdoo epic, and nothing rejects a duplicate EPIC id (L-143 shape).
   - Mitigation (hypothesis): name the sibling repository in the epic INDEX and make id derivation read both; or reserve a range per repo.
+  - Evidence: Sprint-121
 
 - **TD-242** severity: minor | status: open | created: Sprint-120 (T5 build)
   - Summary: **The conformance-engine harness counts differently by host: 97 PASS on Windows, 98 on Linux, at the same commit (`bcb283f7`).** Both are
     all green, so no verdict is wrong, but one case is skipped or merged on one host, and nobody has said which.
   - Mitigation (hypothesis): diff the two hosts' PASS lines at one commit and name the case; make the skip explicit if it is host-gated.
+  - Evidence: Sprint-120
 
 - **TD-241** severity: low | status: open | created: Sprint-120 (T5 review)
   - Summary: **The engine harness reads the pre-change engine through `git show eef67ee8:…`.** In a shallow clone or a release tarball the object
     is missing, so that case FAILs loudly and the harness goes permanently red there. It is loud, not silent, so it is debt and not a defect.
   - Mitigation (hypothesis): keep the old engine as a fixture file, or emit a labelled SKIP when the object is unavailable.
+  - Evidence: Sprint-120
 
 - **TD-240** severity: low | status: open | created: Sprint-120 (T5 reviews)
   - Summary: **The §11 citation scan has three silent narrowings.** Files a sparse checkout leaves off disk are skipped, so their citations are lost;
     untracked `.md` citations are ignored inside a git repo; and `cat` can fuse a file with no trailing newline to the next file's first line.
     Each one can only make the prune propose MORE, which a human then approves. There are 0 occurrences in this repo.
   - Mitigation (hypothesis): count the files read against the files listed, and note any shortfall, as the fail-safe already does for a failed stage.
+  - Evidence: Sprint-120
 
 - **TD-239** severity: low | status: open | created: Sprint-120 (T6 build)
   - Summary: **Gate leg 14-a runs the whole by-reference checker with `--scope-change`, so a freeze FAIL on an active sprint reddens it too.** That
     duplicates the engine's S9 freeze leg under a scope-change label. Accepted for now; one root cause shows up twice.
   - Mitigation (hypothesis): give the checker a mode that emits only the scope-change finding, or have leg 14-a filter its own finding id.
+  - Evidence: Sprint-120
 
 - **TD-238** severity: low | status: open | created: Sprint-120 (T6 review)
   - Summary: **The scope-change check splits backticked spans on whitespace and silently drops a token with trailing punctuation** (`,` `;` `)` `#`).
     About 1 real span in the logs has that shape, and it is a bare name. A widened path written that way is not checked.
   - Mitigation (hypothesis): strip trailing punctuation before matching the token shape.
+  - Evidence: Sprint-120
 
 - **TD-237** severity: low | status: open | created: Sprint-120 (T4/T5 reviews)
   - Summary: **The engine's line-based path lists mishandle exotic names.** `git ls-files` still quotes a path containing `"`, `\` or a control
     character even with `core.quotePath=false`, and a newline in a directory or file name splits one path into two. Under `.claude/worktrees/`
     this can leak a worktree path past the filter; in the §11 scan it loses a citation. There are 0 occurrences here and no plausible adopter path.
   - Mitigation (hypothesis): move the walks to `-z` / NUL-separated lists end to end, once a NUL-aware POSIX filter is chosen.
+  - Evidence: Sprint-120
 
 - **TD-236** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
   - Summary: **The tracked `.claude/settings.json` allowlist trails the engine it permits.** It names the `.sh` oracles
@@ -702,12 +722,14 @@ status: current
     directory-prefix rules (`Bash(sh evals/:*)`, `Bash(sh scripts/:*)`), a form night-run.md Part 1 measured as non-functional.
     SPRINT-119's run needed three exact-file `bun scripts/lib/check-*.ts` rules added in a gitignored local file to work at all.
   - Mitigation (hypothesis): replace the `.sh` checker rules with their `.ts` forms, and the directory-prefix rules with exact-file ones.
+  - Evidence: Sprint-118
 
 - **TD-235** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
   - Summary: **With more than one sprint active, sprint-bulk step 0 and `/handoff` step 1 both say "ask", and neither has a rule that a
     named target resolves it.** A headless run has no ask channel, so with SPRINT-118 and SPRINT-119 both active the run worked only
     because the trigger text named its sprint and said the other was not its own. That is a convention nothing checks.
   - Mitigation (hypothesis): state in both steps that a sprint path named by the trigger (or `--sprint`) resolves the choice.
+  - Evidence: Sprint-118
 
 - **TD-234** severity: low | status: open | created: Sprint-118 (T2 pre-run review)
   - Summary: **A budget or wall-clock stop is reaped as `HARD_FAILURE`, while SPRINT-119 D2 and the envelope said `BUDGET_STOP`.**
@@ -716,16 +738,16 @@ status: current
     distinguishes.
   - Mitigation (hypothesis): have the reaper map exit 124 and the harness's budget-exceeded result to `BUDGET_STOP`, or reword the
     template's stop-condition guidance.
+  - Evidence: Sprint-118
 
 - **TD-231** severity: low | status: open | created: Sprint-118 (T1 build)
   - Summary: **`check-authority.ts`'s `terminal ·` unattended signal has never matched real reaper output.** `reap()` writes its
     rollup, `terminal ·` line included, inside a ``` fence (`scripts/night-run.sh` `reap()` printf block). The checker strips fenced
     lines before matching `TERMINAL_RE`, so on a real reaped log the signal is always absent. The T1 builder reproduced it with a real
     `--reap` into a log with an executed J2 task: `PASS authority-j2-honoured … no terminal · line anywhere`.
-  - Why it is low now: SPRINT-118 T1's `fired ·` line, written by the launcher at fire time, is the primary signal and is read correctly.
-    The dead backstop matters only for logs written before the ledger existed. Owner ruled "file, don't fix" at T1 (2026-10-07).
   - Mitigation (hypothesis): read a fenced `terminal ·` line inside a `### … | run-complete |` entry, the same carve-out
     `check-sprint-by-reference.ts --close` uses, or retire the signal once no pre-ledger log is in scope.
+  - Evidence: Sprint-118
 
 
 - **TD-228** severity: low | status: open | created: Sprint-116 (close, T1 Codex R1)
@@ -734,20 +756,21 @@ status: current
     same file. The deleted TS test documented this as an owner-ruled divergence; after ADR-051 nothing live does, and
     `run-adr-family-fixtures.sh` asserts only ONEFILE's finding on the retained `empty-slug` fixture.
   - Mitigation (hypothesis): make `_adr_canonical` use ONEFILE's stricter glob, so the other three see no canonical ADR there.
+  - Evidence: Sprint-116
 
 - **TD-227** severity: low | status: open | created: Sprint-116 (close, T3)
   - Summary: **Leg 10b (archive-predicate singularity) has no retained must-FAIL fixture.** The leg is inline in `scripts/qa-check.sh`;
     SPRINT-116 T3 proved it by extracting its lines and re-seeding a raw `*/archive/*` site once, a proof that is not retained. A grep of
     `evals/` for `archive-predicate` returns 0.
   - Mitigation (hypothesis): extract the leg into `scripts/lib/` (TypeScript) taking a root, with a seeded-site fixture and a clean control.
+  - Evidence: Sprint-116
 
 - **TD-226** severity: low | status: open | created: Sprint-115 (close retro, T4)
   - Summary: **`dod-delta`'s EXEMPT line is visible in the checker's own output but not in the gate summary.** `check-dod-delta.ts` prints
     `PASS  dod-delta: EXEMPT <sha> … ruled by <ruling>` for a commit declared in `.dod-delta-exempt`, but `scripts/qa-check.sh` folds the
     leg's PASS lines into a count and surfaces only FAIL lines, so an exemption, the thing TASK-354 exists to make visible, does not appear in
     the verdict a reader actually reads. Latent today: `.dod-delta-exempt` declares no rows.
-  - done-when: a declared exemption appears in the gate's own output (a named INFO/NOTE line, or the leg's summary naming the exempted sha),
-    with a fixture where one declared row shows up in a `qa-check.sh` run and an empty file shows nothing.
+  - Evidence: Sprint-115
 
 - **TD-223** severity: low | status: open | created: Sprint-114 (post-push scratch-profile install)
   - Summary: **The plugin's longest tracked path leaves a thin margin under Windows' 260-char MAX_PATH.** The longest is 141 chars
@@ -755,22 +778,19 @@ status: current
     config dir. The default base (`%USERPROFILE%\.claude\plugins\cache\lean-flow\lean-flow\<ver>\`, 66 chars here) reaches ~207, so a
     long username, a custom `CLAUDE_CONFIG_DIR`, or a longer task slug can break a Windows consumer's install with no `core.longpaths`. Nothing
     caps a task-file slug's length, and the store makes long filenames the norm.
-  - done-when: a checked ceiling on tracked path length (or slug length), with headroom stated against MAX_PATH, plus a must-FAIL fixture;
-    or a documented `core.longpaths` prerequisite in the README install section.
+  - Evidence: Sprint-114
 
 - **TD-221** severity: low | status: open | created: Sprint-114 (close retro, T6 acceptance)
   - Summary: **`scripts/lib/check-dod-delta.ts` leaks `fatal:` git stderr on a `git mv` store-transition commit.** The verdicts are still
     correct (`dod-delta … 0 unattributed ticks` at the release gate), but the noise lands in the gate log next to real output, where a reader
     has to judge it harmless every time. That is the "warning read as furniture" shape (L-138).
-  - done-when: the git call that fails on a rename-only commit has its stderr captured and either handled or suppressed with a reason, and
-    a `git mv` commit in the checked range produces no `fatal:` line.
+  - Evidence: Sprint-114
 
 - **TD-219** severity: low | status: open | created: Sprint-114 (close retro, T1 RC cut)
   - Summary: **`scripts/lib/check-manifest-lockstep.sh` cannot read a prerelease version.** `ver_of` matches `X.Y.Z` only (l.26), so
     `2.0.0-rc.1` is read as `2.0.0`. The lockstep check would pass four manifests whose prerelease suffixes disagree, and it cannot report what
     the RC actually carries.
-  - done-when: `ver_of` captures the full SemVer string, including prerelease and build, and a must-FAIL fixture with mismatched suffixes
-    (`-rc.1` vs `-rc.2`) reddens.
+  - Evidence: Sprint-114
 
 - **TD-218** severity: low | status: open | created: Sprint-114 (T3 Codex round 2, census-zero → TD per owner rule)
   - Summary: **The layout harness's store census (`evals/run-layout-fixtures.ts`, `frontmatterId`/`census`) misreads three input shapes.**
@@ -778,21 +798,22 @@ status: current
     the task's id: a false green, confirmed (`TASK-777` returned). (2) A symlinked store `*.md` is skipped (`isFile()` rejects the link), so a
     duplicate behind a link is invisible; not run on this host (symlink creation needs a privilege). (3) A UTF-8 BOM before `---`, or a trailing
     `# comment` after `id:`, gives `NOID`: a false FAIL, confirmed (both `null`).
-  - **Census 2026-10-03: 0 of 73** real store files (lean-flow `docs/work/` 52 · migrated workdoo copy 10 · `v2b` 11) carry any of the
-    three shapes; each detector was seed-proven to fire (1/1/1). Census-zero → TD, not a fix loop (owner rule).
   - Mitigation (hypothesis): match the closing `---` at a line start including the immediate-close case, strip a leading BOM, allow a trailing
     YAML comment, and follow symlinks via `statSync` — each with a must-FAIL fixture under the maintainer-only bar.
+  - Evidence: Sprint-114
 
 - **TD-216** severity: low | status: open | created: Sprint-113 (T1 seeded break B)
   - Summary: **`qa-check.sh` has no listed-but-missing check for `eval_harnesses_excluded`.** A name in the excluded list whose file no
     longer exists passes silently; the completeness leg checks only disk → list, and "script not found" covers only the always-on and opt-in
     lists. Census 2026-10-03: the excluded list is empty after TASK-398, so the gap is moot today (census-zero → TD, owner rule).
   - Mitigation (hypothesis): one loop over the excluded names asserting each file exists, with a must-FAIL fixture (ADR-050 maintainer-only bar).
+  - Evidence: Sprint-113
 - **TD-213** severity: low | status: open | created: Sprint-111 (T4 Codex round 2)
   - Summary: **The engine's retired-row marker regex has only been run under gawk.** `_s2_rows` matches a literal em dash
     (`—`) inside a single-quoted awk program. mawk (Debian's default awk) and busybox awk are absent on the dev host, so
     adopter portability is unverified. A mismatch fails safe: the retired row becomes live again and is placed, never dropped.
   - Mitigation (hypothesis): run `run-s2-placement-fixtures.sh` under mawk and busybox in CI or a container once one exists.
+  - Evidence: Sprint-111
 
 - **TD-210** severity: low | status: open | created: Sprint-111 (T5 follow-up, Codex r2)
   - Summary: **The work-store harness's two membership selectors diverge on two shapes neither fixture varies.** (a) Member
@@ -800,36 +821,43 @@ status: current
     bare-id member is valid. (b) A compares `status:` literally, while B strips quotes, so `status: "active"` splits them.
     Census 2026-10-02: 0 quoted sprint statuses; all 18 Members entries across 4 by-reference sprints are plain paths.
   - Mitigation (hypothesis): settle the member syntax in prime § Resolution, then align both selectors with a fixture per shape.
+  - Evidence: Sprint-111
 
 - **TD-208** severity: low | status: open | created: Sprint-110 (T3 outside review)
   - Summary: **S9.VERIFYCLAUSE checks a partial member read-back only at zero.** It FAILs when no ticked line could be read back
     while the CLI counts more than zero. A 3-counted, 2-read case leaves the third unexamined. Census 2026-09-30: 0.
   - Mitigation (hypothesis): FAIL whenever the read-back count differs from the CLI's ticked count.
+  - Evidence: Sprint-110
 
 - **TD-207** severity: low | status: open | created: Sprint-110 (T3 outside review)
   - Summary: **The engine's task-file exemption accepts any folder name as a status.** `docs/work/*/TASK-*.md` exempts
     `docs/work/anything/TASK-1.md` from the ownership-header check. Census 2026-09-30: 0 non-status folders.
   - Mitigation (hypothesis): enumerate the six status folders (backlog · todo · in_progress · review · done · cancel), as ADR-045 names them.
+  - Evidence: Sprint-110
 - **TD-202** severity: low | status: open | created: Sprint-110 (T4 outside review)
   - Summary: **Two shell call sites read the CLI's `kind` output and ignore its exit status.** `night-run.sh` (~:231) and qa-check leg 2g
     run `[ "$(bun … kind … 2>/dev/null)" = "v2" ]`, so any CLI failure falls to the v1 arm, which counts 0 Plan boxes. The `counts` calls
     do read their exit status and fail closed. Census 2026-09-30: 0 (both sites pass only real sprint files).
   - Mitigation (hypothesis): capture `kind`'s exit status and fail with a named finding on anything but 0 (L-120).
+  - Evidence: Sprint-110
 
 - **TD-200** severity: low | status: open | created: Sprint-110 (T4 outside review)
   - Summary: **A member whose `## Done when` has no boxes counts as delivered.** `counts` gives `dod 0 0`, `units 1 1`. Census 2026-09-30:
     0 of 29 task files. CRLF files parse correctly.
   - Mitigation (hypothesis): a member with zero boxes is a named finding, as TASK-360's schema already requires a Done-when box.
+  - Evidence: Sprint-110
 - **TD-197** severity: low | status: open | created: Sprint-110 (T2 outside review)
   - Summary: **A backtick-wrapped `Task:` trailer value escapes member attribution.** A `Task:` value of TASK-901 wrapped in backticks, on a `sprint(N):`
     (COORD) subject falls through to the bookkeeping exemption, and an out-of-layers file PASSes. Census 2026-09-29: 0 such trailers.
   - Mitigation (hypothesis): strip backticks and quotes from the trailer value before the lookup, the way the TS frontmatter readers normalise. A fixture (L-186).
+  - Evidence: Sprint-110
 
 - **TD-196** severity: low | status: open | created: Sprint-110 (T2 outside review)
   - Summary: **Two `Task:` trailers on one commit PASS silently.** `gitLogTrailerTask` joins them into `TASK-901TASK-902`, which
     matches no member, so a `sprint(N):` subject reads as COORD and is exempt. Census 2026-09-29: 0 multi-trailer commits, and 0
     `Task: TASK-NNN` trailers at all (23 `Task:` trailers in 1514 commits, all single and all `T1`–`T6`).
   - Mitigation (hypothesis): read one trailer per line and check each; a two-trailer must-FAIL fixture.
+  - Evidence: Sprint-110
 
 - **TD-195** severity: low | status: open | created: Sprint-109 (close)
   - Summary: **The dispatch preflight reads brace shorthand in `Layers:` as a bare directory.** `scripts/lib/check-doc-caps.{sh,ts}`
@@ -838,12 +866,14 @@ status: current
     0 brace forms left in live `Layers:` lines (written out at SPRINT-109).
   - Mitigation (hypothesis): expand `{a,b}` before building the overlap map, or FAIL `layers-brace-shorthand` by name so the
     author knows to write the paths out. A fixture for each arm (L-186).
+  - Evidence: Sprint-109
 
 - **TD-193** severity: low | status: open | created: Sprint-109 (T4 outside review)
   - Summary: **A `*Verify:*` clause that wraps onto a second line vanishes without a trace.** `extractClause` needs the
     closing `*` on the same line, so the line passes the `*Verify:` filter, extracts `null`, and adds nothing to checked,
     judgment or findings: no NOTE at all. Census 2026-09-28: 15+ wrapped clauses, all in `docs/sprint/archive/` (exempt); 0 reachable.
   - Mitigation (hypothesis): join continuation lines up to the closing `*`, or FAIL `verify-clause-unterminated`. A fixture (L-186).
+  - Evidence: Sprint-109
 
 - **TD-192** severity: low | status: open | created: Sprint-109 (T4 outside review)
   - Summary: **dod-delta never correlates a member tick in a commit that does not touch the sprint doc.** With no
@@ -852,6 +882,7 @@ status: current
     Census 2026-09-28: 0 real tick commits without the sprint doc (all tick commits in `1834c83..` touch it; transitions are 0/0 renames).
   - Mitigation (hypothesis): resolve `Cites:` from the sprint doc at that commit via `git show <sha>:<path>`, not from the diff,
     and print a NOTE, not a PASS, when nothing is compared (the TD-042 rule).
+  - Evidence: Sprint-109
 
 - **TD-184** severity: low | status: open | created: Sprint-107 (outside review)
   - Summary: **re-indenting a Done-when box is not a freeze edit.** `- [ ]` → `  - [ ]` changes the
@@ -859,12 +890,14 @@ status: current
     leading indentation.
   - Mitigation (hypothesis): either list indentation as ignored in the reference or compare it. Tier **G**
     either way: needs a retained fixture.
+  - Evidence: Sprint-107
 
 - **TD-183** severity: low | status: open | created: Sprint-107 (outside review)
   - Summary: **a slugless `TASK-NNN.md` member is never selected, and nothing says so.** The reference puts
     that filename outside the contract, but an edit to one yields a clean `3 pass, 0 fail` with no signal
     that a stamped file was skipped (L-186's shape: the set, not the branch).
   - Mitigation (hypothesis): report a stamped file whose name the resolver rejects as a named finding.
+  - Evidence: Sprint-107
 
 - **TD-182** severity: low | status: open | created: Sprint-107 (outside review)
   - Summary: **one `scope-change` entry excuses every later edit to a planned member.** An edit plus
@@ -872,6 +905,7 @@ status: current
     since plan_commit", while added members need "a newer entry", so the two cases are treated differently.
   - Mitigation (hypothesis): a spec ruling first. Should an entry excuse only edits committed before it?
     Then a Tier **G** change with a must-FAIL fixture.
+  - Evidence: Sprint-107
 
 - **TD-181** severity: low | status: open | created: Sprint-107
   - Summary: **`layers observed` accepts a qualifier after the task id in one subject shape and rejects
@@ -882,6 +916,7 @@ status: current
   - Mitigation (hypothesis): give rule 4 the same letter-led, no-embedded-`T<digit>` qualifier that
     rule 2 already carries. Tier **G**, so it needs the retained must-FAIL fixture, and `(SPRINT-NNN
     T1 T2)` must still fall through as ambiguous.
+  - Evidence: Sprint-107
   - **Re-file fresh if** subjects move wholly onto the `Task:` trailer.
 
 - **TD-180** severity: low | status: open | created: Sprint-107
@@ -893,6 +928,7 @@ status: current
     is L-067's environment-boundary shape.
   - Mitigation: match with `.*` (or the literal dash) instead of `.`. It is one line, and Tier G
     discipline applies to the fixture itself.
+  - Evidence: Sprint-107
   - **Re-file fresh if** the gate starts pinning a UTF-8 locale for every harness.
 - **TD-171** severity: medium | status: open | created: Sprint-103
   - Summary: **`evals/run-conformance-engine-fixtures.sh`'s fixture construction is portable and
@@ -960,13 +996,10 @@ status: current
     SPRINT-092/093"* — and SPRINT-101 T4 ticked precisely that box, the ruling having been taken at the
     SPRINT-096 promote. There is now no open box, so the sentence is **false in the present tense** and
     **true as a statement about the close**.
-  - Impact: small and self-inflicted, but it is exactly the class SPRINT-101 T3 built a guard for — a
-    claimed DoD figure disagreeing with the actual tick state — arriving in the same sprint from an
-    unrelated task. Left unfixed deliberately: editing an archived close figure is a governance call,
-    not a mechanical follow-on from T4's scope, and the two readings point opposite ways.
   - Fix direction (**not a ruling**): either annotate the close line to say the 23rd was ticked later,
     or rule that a close figure is a historical statement and needs no maintenance. Pick one and say so
     in STANDARD, because the guard cannot tell them apart.
+  - Evidence: Sprint-101
 - **TD-159** severity: minor | status: open | created: Sprint-100
   - Summary: **Worktree-isolated review is mandated by three rules and its mechanics are written down
     nowhere**, so each coordinator rediscovers them. Three distinct gaps, all hit this sprint:
@@ -976,16 +1009,9 @@ status: current
     `git worktree unlock`, documented in no skill; (c) **a builder told not to commit leaves its branch
     tip identical to `main`**, so handing a reviewer `git checkout <branch> -- <path>` silently yields
     the pre-change baseline.
-  - Evidence: (a) and (b) recorded at the wave-1 entry of
-    `docs/sprint/logs/SPRINT-100-findings-that-mean-what-they-say.md`; (c) hit at T5 and caught **by a
-    different agent** — the Tier P prose reviewer reported `git show HEAD:<path>` and
-    `git show <branch>:<path>` identical and `git log --all -S` matching zero commits, while the
-    adversarial reviewer was already running against the wrong file.
-  - Impact: (c) is the dangerous one and is **silent by construction** — every downstream proof
-    (reddened case, sibling control, verified restore) runs correctly against the baseline and reports
-    green. A review that examined the wrong artifact is indistinguishable from a real pass.
   - Mitigation already in force, not a fix: dispatched reviewers are now given a **content assertion**
     their artifact must satisfy (L-200). The documentation gap is what this row tracks.
+  - Evidence: Sprint-100
 
 - **TD-158** severity: minor | status: open | created: Sprint-100
   - Summary: **`check-verify-reaches.sh` has two clause-extraction defects that drop real references
@@ -994,12 +1020,7 @@ status: current
     fall back to the whole raw line, leaking surrounding prose into the "clause". (b) Trailing
     punctuation glued to a method token fails the anchored `^…\.sh$` test, so the token silently drops
     out of the method set.
-  - Evidence: both found while settling T1's contested archive count — `run-adr-family-fixtures.sh,`
-    at `SPRINT-076:102` never becomes a finding at all because of (b). Recorded in full at the T1
-    entry of `docs/sprint/logs/SPRINT-100-findings-that-mean-what-they-say.md`.
-  - Impact: **L-186's population blindness one level down** — a real reference the guard never examines
-    and never reports skipping. The guard's branches are sound; the member set they run over is short,
-    with no signal that anything was skipped.
+  - Evidence: Sprint-100 · SPRINT-076
   - Family: **TD-139** is the same punctuation defect at a different site (`dep_ids` in the dispatch
     preflight). If either is fixed, fix both — one strip rule, two call sites.
 
@@ -1009,12 +1030,7 @@ status: current
     parsed from §2 …` yields `path=no`; `spec-table-unreadable: §11's S11.TDDELETE row states no …`
     yields `path=§11's`. The lines parse, so a consumer counts them as **reached** — the population
     reconciles while being semantically wrong.
-  - Evidence: lines **1530 · 1817 · 1855 · 2420 · 2461 · 2475 · 2961 · 2971**, found by T5's
-    worktree-isolated adversarial reviewer and reproduced by feeding each site's literal message
-    through the shipped sweep (`matched=[core-file-missing: no]`).
-  - Impact: **fails noisy, not silent** — a prose token is neither a file the target has nor a §2
-    canonical path, so the actionability check reports it unactionable and the case goes red with a
-    confusing name. That is why this is minor: the failure is visible, just mislabelled.
+  - Evidence: Sprint-100
   - **Deliberately not fixed at T5, on the record.** A path-vs-prose heuristic inside a guard whose
     entire purpose is not to lie would risk false positives worse than the mislabelling it removes.
     The cheaper cure if this is ever taken up is at the **emitter**: give a finding with no path
@@ -1098,26 +1114,15 @@ status: current
     decision recorded where its reader cannot reach it is not a decision).
 
 - **TD-147** severity: minor | status: open | created: Sprint-097
-  - Tracker: none — surfaced by the SPRINT-097 T5 outside review (round 1 MINOR-2, restated round 2 as a contributing cause of its CRITICAL-1). Filed rather than fixed: the CRITICAL-1 repair closed the harm, and using the annotation is a new capability, not a fix.
   - Summary: **`member_sprints:` state annotations are parsed and then thrown away.**
     `_member_entries` strips `(closed)` / `(active)` with `gsub(/\([^)]*\)/, "", entry)` and nothing
     else in `check-epic-archive.sh` reads them.
-  - Location: `scripts/lib/check-epic-archive.sh`, the `gsub` inside `_member_entries`.
-  - Evidence: `[workdoo SPRINT-960 (active)]` and `[workdoo SPRINT-960 (closed)]` are
-    indistinguishable to the checker — both yield `workdoo 960`.
-  - Why it matters: for a FOREIGN member that annotation is the **only** in-repo statement of its
-    state, and it is exactly the disconfirming evidence the archival legs lack. An archived epic
-    whose own field says `(active)` is a finding the checker currently cannot make. Not a defect
-    today — the round-3 narrowing means such an epic is reported as unverified rather than as
-    verified-closed — but the fact is sitting in the field the parser already reads.
+  - Evidence: Sprint-097 · SPRINT-960
 - **TD-139** severity: minor | status: open | created: Sprint-095
   - Summary: **Trailing punctuation glued to closing markup defeats the anchored strip in
     `dep_ids`, silently dropping the id.** `**T1**;` keeps a non-strippable tail, fails the exact-id
     test, and ends the list. Confirmed on BOTH call sites by round-5 review.
-  - **Fails in the SAFE direction** — a false HALT, not a false PASS — which is why it is minor and
-    not a blocker under this guard's own priority. Only `,` is handled today, via the separator gsub.
-  - Not in the corpus: no real `Depends-on:` line wraps a leading id in markup at all (250 lines
-    swept). Latent risk, not a live bug.
+  - Evidence: Sprint-095
   - **Re-file fresh if** a real Plan writes a markup-wrapped id, or the strip is revisited.
 
 - **TD-140** severity: minor | status: open | created: Sprint-095
@@ -1126,9 +1131,7 @@ status: current
     `o > 0` and `c > o` takes the annotation branch, is clamped to depth 0, and passes silently —
     the very shape that rule's own comment claims to catch. Repro: `(x)) T2` yields `T2,` with no
     flag.
-  - Impact bounded, and verified so by round-5 review: the clamp always resets to exactly 0, so no
-    phantom state survives and no real id is dropped or invented. It suppresses the *signal* for
-    malformed brackets, nothing more.
+  - Evidence: Sprint-095
   - **Re-file fresh if** the depth accounting is revisited, or a malformed bracket is found to
     corrupt a verdict rather than only its diagnostic.
 
@@ -1250,52 +1253,25 @@ status: current
 - **TD-136** severity: minor | status: open | created: Sprint-094
   - Summary: **`evals/fixtures/compat/rule-ids-v0.10.0.txt` — ADR-034's frozen semantic-compatibility
     surface — has zero executable readers.** Nothing regenerates it, diffs it, or fails on it.
-  - Evidence (SPRINT-094, two agreeing queries, worktrees excluded): a repo-wide search for `rule-ids`
-    and a second for `fixtures/compat` both return references only from
-    `docs/adr/ADR-034-semantic-compatibility-contract.md` and the archived `SPRINT-083` sprint file and
-    log — documentation, never a check. The ADR states the regeneration command in prose; no script,
-    harness, gate leg or test invokes it.
-  - Impact: the artifact ADR-034 designed to detect a silent rule-surface change cannot detect one. It
-    is a snapshot nobody compares against, so a reclassification — the case §15 calls MAJOR, and calls
-    the one that looks safe and is not — would pass unnoticed by the very fixture retained to catch it.
-  - **Why this row exists, and it is this sprint's own theme landing on the sprint:** this is exactly
-    `L-172`'s class, a shipped capability with zero non-test callers, which is what T3 was built to
-    detect mechanically. T3's detector reads the **TypeScript** module graph, so a retained
-    Shell/fixture artifact falls outside its scope by construction. The property T3 makes mechanical
-    for TS is still asked of nobody for the rest of the repo.
-  - Found while verifying that SPRINT-094's `spec/` 0.10.0 to 0.11.0 bump would not redden a check. It
-    did not — and the reason it could not is this row.
+  - Evidence: Sprint-094 · SPRINT-083
   - **Re-file fresh if** T3's detector is extended past the TS module graph, or a compat harness leg is
     added — the fix belongs with either.
 
 - **TD-116** severity: minor | status: open | created: Sprint-091
   - Summary: **Every F12 finding sub-line prints its own name twice** -- `- secret-committed:
     secret-committed: .env carries...` -- for all four §12 rules.
-  - Found by the SPRINT-091 T9 adversarial reviewer while diffing reason strings rather than
-    verdict words alone. Confirmed **pre-existing**: it reproduces through the flagless run too and
-    is untouched by T9's diff. T9 is what newly exposes it on the `--section` path.
-  - Cosmetic -- verdicts and exit codes are unaffected. Worth fixing because DoD-level parity
-    verification in this epic compares **reason text**, not just the verdict word, so a doubled
-    prefix is noise inside the very signal later differentials read.
+  - Evidence: Sprint-091
 
 - **TD-108** severity: minor | status: open | created: Sprint-088
   - Summary: **`night-run.sh`'s mode-signal pre-flight is an unanchored substring scan over the whole
     command line, so a NEGATED mention satisfies it.** A prompt containing *"please do NOT run this
     unattended"* passes the gate exactly as a genuine declaration does, and the finding text claims a
     property (*"the command carries a trigger word"*) that is true while the intent is the opposite.
-  - Evidence: `scripts/night-run.sh` — `case "$allargs$run_mode" in *unattended*|*overnight*|*night-run*)`.
-    Verified against the literal case logic by an independent reviewer during SPRINT-088's Tier G
-    review. Pre-existing in shape (the check was `*unattended*` before T3); T3 widened the alternation
-    to keep the `overnight` rename additive and inherited the weakness rather than introducing it.
-  - **Why it is `minor` and not `high`.** This leg is explicitly documented as *"the mechanically-
-    checkable subset only"*, with the judgement items handled by human pre-flight (Part 1), and the
-    explicit `--mode` path added at T3 **is** exact: it resolves through
-    `scripts/lib/resolve-run-mode.sh`, which refuses an unrecognised string rather than defaulting.
-    So a caller who declares the mode properly is already outside this defect.
   - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): make `--mode` the
     load-bearing signal and demote the prompt scan to a fallback that only *warns*. **Do not attempt
     negation-aware substring matching** — that is a natural-language problem wearing a shell-glob
     costume, and every rule added to it will have its own counterexample.
+  - Evidence: Sprint-088
   - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
     stops being load-bearing.
 
@@ -1303,28 +1279,16 @@ status: current
   - Summary: **ADR-030's epic-log split has never been executed.** Contribution rows are supposed to
     live in `docs/epic/logs/EPIC-NNN-<slug>.md`, created lazily at the first member sprint's close;
     that directory does not exist and both member rows sit in `EPIC-014`'s own table.
-  - Evidence: `docs/epic/logs/` absent at SPRINT-085's close, which is EPIC-014's second member close.
-    ADR-030 § the split — *"created lazily at the first member sprint's close"*.
-  - Impact: none yet, and that is why it is `trivial` — the epic is at **134 of 200** lines, so the cap
-    pressure ADR-030 exists to relieve has not arrived. It becomes real as members accumulate.
   - Mitigation (hypothesis): perform the split deliberately at a promote, moving both existing rows
     together, rather than as a side effect of a close. Ruled this way at SPRINT-085's close on owner
     approval rather than drifted into.
+  - Evidence: Sprint-085
   - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
 
 - **TD-088** severity: minor | status: open | created: Sprint-084
   - Summary: **SPRINT-082's execution-architecture freeze is unreachable by the consumer that must obey
     it.** Its commit claimed it was "written where admission reads it"; it is not.
-  - Evidence: Sprint-084 T2's review checked every plausible consumer at the pinned ref and found no
-    reference to the freeze or its gated register in `skills/lean-doc-generator/SKILL.md` § Epic,
-    `EPIC.md.template`, `skills/orchestrator/SKILL.md` G1/G2, `.claude/CONTEXT.md`'s epic definition, or
-    `scripts/qa-check.sh`. The only path is a human incidentally reading a descriptive pointer at
-    `docs/epic/INDEX.md:17`.
-  - Impact: **L-151 exactly**, in the sprint that promoted its neighbours. An agent running
-    `/lean-doc-generator epic` precisely as instructed ships an epic violating the freeze with nothing in
-    the loop ever opening the file the freeze lives in. EPIC-015 engaged the freeze one commit later —
-    evidence it can be found by the author who just wrote it, not that the mechanism reaches an
-    independent later session.
+  - Evidence: Sprint-084
   - **Re-file fresh if** the freeze is lifted before this is wired: the reachability defect outlives the
     particular freeze.
 
@@ -1474,13 +1438,6 @@ status: current
     `spec/STANDARD.md` row reads *"a rule is added, amended or reclassified — bump per
     `spec/CHANGELOG.md`"*. SPRINT-081 T2 added a rule to §6 and the standard stayed stamped
     `version: 0.8.0` through a **fully green gate**; it was caught by reading §2, not by tooling.
-  - Evidence: `sh scripts/qa-check.sh` printed `161 pass, 0 fail` on a tree whose spec carried a new
-    §6 rule and an unchanged version. Bumped to `0.9.0` by hand at T2, with the changelog entry
-    written at the same time.
-  - Impact: low but consumer-facing in a specific way — an adopter pins a spec version and re-reads it
-    when the number moves. A rule added without a bump is a change they have no signal for, and
-    `--spec <path>` makes vendoring an old copy a supported workflow, so the version is load-bearing
-    rather than decorative.
   - Mitigation (hypothesis, not a plan — the filer's): an `S2` assertion comparing the spec's
     `version:` against the newest `## <version>` block in `spec/CHANGELOG.md` would catch a **missing
     changelog entry** for a declared version, and a version present in neither. **It would not catch
@@ -1488,9 +1445,7 @@ status: current
     the diff, and §2's trigger is a judgement. Naming what the check *cannot* do is the honest half:
     the mechanical half is real and worth having, and calling it enforcement of §2's trigger would be
     the overstatement this ledger exists to avoid.
-  - Sibling: **TD-078** (a template that ships a doc which cannot pass its own standard). Both are the
-    reference implementation disagreeing with the standard it publishes, in opposite directions — one
-    ships a defect, this one ships an unstated change.
+  - Evidence: Sprint-081
 
 - **TD-076** severity: minor | status: open | created: Sprint-080
   - Summary: **Controls across the existing check families report only silence, so a control that is
@@ -1498,19 +1453,11 @@ status: current
     shipped two vacuous controls and caught both only because a sibling must-FAIL went red; §12's
     four rules were then written to print their own denominator (*"N shape-match(es) examined and
     cleared on content"*), and the older families were not retrofitted.
-  - Evidence: `S11.BACKLOG`'s § Backlog scoping could not be exercised by its control at all — every
-    candidate line already sat inside the scoped section, so deleting the scope changed no verdict,
-    and the seeded break stayed green. `S11.WHENITRUNS`'s must-FAIL *and* its control both read a
-    `close_commit` written past the frontmatter `_fm_real` parses: both were reading nothing, in
-    opposite directions, in the same run.
-  - Impact: every `assert_absent`-style control in `run-sprint-family-fixtures.sh`,
-    `run-conformance-engine-fixtures.sh` and the standalone harnesses is currently trusted on its
-    silence. The failure is **green**, so nothing in a diff or a report shows it — L-058's shape one
-    level in, arriving at the control rather than at the check.
   - Mitigation *(hypothesis, not a plan)*: give each rule's PASS line a denominator, as §12's four
     now do, and have `assert_absent` optionally require it to be non-zero. Cheaper alternative: a
     one-off audit that seeds a break per control and lists the ones that stay green — which is the
     measurement L-155 argues every promoted rule needs anyway.
+  - Evidence: Sprint-080
   - **Revisit-if** a third vacuous control is found, or when L-155/L-156 reach `count: 2` at a
     promote review.
 
@@ -1520,20 +1467,12 @@ status: current
     gate are quieter than the rules they guard.** Split off TD-073, which is resolved: this is the
     half of it that survived the cost fix, and TD-073's own *Re-file fresh if* clause named this row
     in advance — *"only the opt-in parking remains, and it is a different row."*
-  - Evidence: TD-016's rule is *cheap-and-git-free always-on, git-repo-building opt-in*, and it is
-    applied per FILE, so one git-using case in a family parks the whole file. The git-free cases here
-    are the caps, the log directory, the verify clause, and the §10 promotion/aging reads — plus the
-    four §11 ledger-retention cases added at SPRINT-080 T1, which read `TECH-DEBT.md`, `TODO.md` and
-    `docs/LEARNINGS.md` from the tree and touch no history at all.
-  - Impact: `S9.VERIFYCLAUSE` is the worked example and it is not hypothetical. It shipped with a
-    defect that fired on **every** unticked Plan (SPRINT-080 T0), and its guards sat behind an opt-in
-    flag while the rule itself ran on every gate. The defect surfaced from a manual baseline run at
-    G2, not from the suite that existed to catch it.
   - Mitigation *(hypothesis, not a plan)*: the obvious move is a git-free sibling file, and it was
     refused at SPRINT-079 T4/T5 on the grounds that one family belongs in one file. That reason still
     holds and the refusal may still be right. **What changed is the price:** at 3m20s for 38 cases the
     whole harness may now simply be cheap enough to run always-on, which would dissolve the split
     rather than resolve it. Measure before choosing.
+  - Evidence: Sprint-080
   - **Revisit-if** the harness is proposed for the always-on set, or a second family-with-history is
     added and inherits the same parking.
 
@@ -1544,41 +1483,33 @@ status: current
     bucket that HAD content was routed*. That needs the Retro parsed to know which buckets had content,
     so the shipped check reports which homes the close commit touched and fails only when it touched
     none.
-  - Evidence: the rule fires on a close that routed nothing at all and stays silent on a close that
-    routed to one home — both proven by retained fixtures (`s10-retro-bucket-unrouted` and its
-    control). A close that routed Shipped but silently dropped three filed learnings passes today.
+  - Mitigation *(hypothesis, not a plan — re-derive before building on it, L-091)*: the Retro's four
+    bucket headings are fixed by the SPRINT template, so "this bucket has content" may be readable
+    without natural-language parsing. If so the check strengthens from *reached none* to *reached
+    every home whose bucket is non-empty*, with the empty-bucket case still silent.
+  - Evidence: Sprint-079
   - Impact: low, and deliberately chosen over the alternative. Demanding all four would fail a
     correct close — a sprint that incurred no debt files no `TD-NNN` — which is the false-positive
     class §2's create-lazily rows raise, and a false positive here is a false negative about the
     contract. The weak check is right until the Retro is parseable; it is filed because *weak by
     ruling* and *weak by oversight* read identically in six months.
-  - Mitigation *(hypothesis, not a plan — re-derive before building on it, L-091)*: the Retro's four
-    bucket headings are fixed by the SPRINT template, so "this bucket has content" may be readable
-    without natural-language parsing. If so the check strengthens from *reached none* to *reached
-    every home whose bucket is non-empty*, with the empty-bucket case still silent.
   - **Re-file fresh if** the Retro's bucket structure changes shape, which would make the parse either
     trivial or impossible and settle this either way.
+  - Evidence: the rule fires on a close that routed nothing at all and stays silent on a close that
+    routed to one home — both proven by retained fixtures (`s10-retro-bucket-unrouted` and its
+    control). A close that routed Shipped but silently dropped three filed learnings passes today.
 
 - **TD-067** severity: minor | status: open | created: Sprint-076
   - Summary: **`S9.GATESWELLFORMED` accepts any `G<digits>` token while its own message promises
     "want G1 / G2".** The test is `case "$gates" in *[!G0-9,]*)`, which rejects characters *outside*
     `[G0-9,]` and therefore passes `G7`, `G99` and `G0`. A sprint file carrying
     `gates_signed: G7 @ <sha>` is reported as **signed**.
-  - Evidence: found by SPRINT-076 T1's fixture audit while writing the missing must-FAIL case for the
-    `unrecognised gate token` branch — the first fixture used `G1,G7`, expecting rejection, and the
-    check passed it. `docs/research/fixture-coverage-audit.md` § NOT guarded.
-  - Impact: low in practice, and precisely the shape that makes it worth a row. Nothing generates a
-    `G7`, so no live sprint is mis-reported today; but the gate exists to catch a *hand-edited or
-    machine-mangled* value, which is exactly where an out-of-range gate number would appear, and the
-    finding text tells a reader the check is stricter than it is. **The retained fixture now guards the
-    branch that exists** (`X2`, genuinely rejected), so tightening the test will not silently pass.
   - Mitigation (hypothesis, not a plan): match the token list against the gates the standard actually
     defines rather than a character class — and re-point the fixture at `G7` once it does, since that
     is the case a reader expects the finding to be about. **Do it as its own change**: it alters what a
     conformant report says about an existing adopter's file, which is a behaviour change and not
     fixture work. Deliberately not folded into T1, whose declared Layers is the audit record.
-  - Sibling: **TD-064** (real doc gaps in this repo). Unrelated cause; both are "the reference
-    implementation disagrees with the standard it publishes".
+  - Evidence: Sprint-076
 
 - **TD-068** severity: minor | status: open | created: Sprint-076
   - Summary: **an off-vocabulary tag drops a doc out of the generated knowledge index, silently.**
@@ -1587,24 +1518,13 @@ status: current
     `DOMAINS="skills doc-standard governance knowledge sprint-model"`). A doc whose frontmatter carries
     anything else is parsed, entered into the internal entries table, and then **rendered nowhere** —
     no warning, no exit code, nothing in the diff.
-  - Evidence: SPRINT-076 T1 wrote `docs/research/fixture-coverage-audit.md` with
-    `tags: [conformance, testing, governance]` · `domain: quality` — all plausible, none in the
-    vocabulary. `qa-check.sh` flagged `knowledge index STALE`, regenerating produced a **one-line diff
-    (`last_updated`)**, and the doc appeared in no section. Retagging `[tooling, process]` / `governance`
-    made it appear three times.
-  - Impact: low per occurrence, and the shape is what earns the row: **the staleness check cannot see
-    it.** That check compares the file against a fresh regeneration, and a doc missing from *both* is
-    consistent — so the gate is green precisely when the index is wrong. ADR-009 makes this index the
-    retrieval path for ADRs, research and learnings; a doc that is absent from it is findable only by
-    someone who already knows the path, which is the failure the index exists to prevent.
   - Mitigation (hypothesis, not a plan — the filer's, written at close): have `gen-index.sh` **warn on
     an unrecognised tag or domain** and exit non-zero, so an author learns at write-time rather than
     never; and publish the vocabulary where a frontmatter author will look — §7's glossary in
     `.claude/CONTEXT.md` is the natural home, since it is already the place canonical terms are fixed.
     Both halves matter: warning alone tells you *something* is wrong, publishing alone still lets a
     typo through.
-  - Sibling: **TD-067** (the gate-token check being looser than its message). Unrelated cause; both are
-    "a tool's report and its behaviour disagree, and the disagreement is silent".
+  - Evidence: Sprint-076
 
 - **TD-072** severity: trivial | status: open | created: Sprint-078
   - Summary: **The §3 ownership footer is now read two ways, and only one of them is spec-derived.**
@@ -1613,69 +1533,25 @@ status: current
     `assert_S3_AGENTS` still matches a **hard-coded** pattern,
     `^<sub>.*[Dd]oc owner:.*status:.*</sub>` — the same footer, a different and frozen idea of its
     shape.
-  - Evidence: both live in `scripts/lib/conformance-engine.sh`. A second, smaller instance of the same
-    family: `_att_fmv_stdin` (T1) and `_s9_gates_fmv` are the same frontmatter parse over different
-    sources — a git blob versus a file path — and the near-duplicate was written deliberately rather
-    than refactored, because T1's ruling (D2) made that task a *move* and a shared reader would have
-    been a *change*.
-  - Impact: trivial today — the two footer readers agree on the current §3 wording. The exposure is
-    that they cannot disagree *loudly*: re-word §3 and `S2.R-README` follows while `S3.AGENTS`
-    silently keeps checking the old shape, which is a spec/checker divergence of exactly the kind
-    `S3.README`'s scope-out was arranged to prevent.
   - Mitigation (hypothesis, not a plan): give both rules one spec-derived footer reader; fold the two
     frontmatter parses into one that takes its source as an argument. Both are small and neither
     belongs on a coverage task.
+  - Evidence: Sprint-078
 
 - **TD-070** severity: minor | status: open | created: Sprint-077 | updated: Sprint-079
-  - **SPRINT-079 T4 added the SIXTH parser** — `_s2_cap_for` in the engine, reading §2's Cap cell
-    so the sprint file's 400 is not hard-coded in a checker (L-097). Adding it rather than writing
-    the figure was the lesser cost, and it is recorded rather than slipped in: this row's case for a
-    shared `read-spec-files.sh` is now stronger by exactly one caller.
   - Summary: **§2's file tables have FIVE independent parsers (three at filing, five since SPRINT-078), each hard-coding the same column
     offset, and nothing states the contract they share.** `scripts/lib/conformance-engine.sh`
     (`_s2_rows`, `cre = (pfx=="docs/") ? c[6] : c[5]`), `scripts/lib/check-doc-caps.sh`
     (`cap = (pfx=="docs/") ? c[5] : c[4]`) and `evals/run-s2-placement-fixtures.sh`
     (`cre = (pfx=="docs/") ? c[6] : c[5]`) each re-derive §2's rows from scratch. The offset exists
     only because the `docs/` tree carries a `Tier` column the root and `.claude/` tables do not.
-  - Evidence: surfaced at SPRINT-077 **G1 recon**, not by a check — the count was verified two ways
-    (`grep -ln '§2' scripts/`, then reading each parser). The engine's own comment has named the
-    problem since SPRINT-076 T3 (*"this is the SECOND §2 table parser in the repo … extracting a
-    shared `read-spec-files.sh` beside `read-spec-rules.sh` is the right shape"*) and deferred it as
-    out of that task's Layers. It is now three, and the third is a **fixture harness that re-derives
-    the required set exactly as the engine does** — so it would break identically rather than catch
-    the break, with only `n_req >= 5` between it and a silent wipeout the `docs/` rows alone satisfy.
-  - Impact: **the failure mode is a silent false negative in a gate, and SPRINT-077 came within one
-    design choice of it.** T1's obvious implementation — giving the root/`.claude/` tables the `Tier`
-    column — shifts every column by one. `check-doc-caps.sh` would then read `lean loop` as the Cap
-    cell, find no integer, and **drop every root and `.claude/` row from cap checking while reporting
-    PASS** (L-058). The shipped design avoided this by needing no column at all, which is luck about
-    this change, not a property of the next one. Any future §2 column edit re-arms it.
   - Mitigation (hypothesis, not a plan — the filer's): extract `scripts/lib/read-spec-files.sh`
     beside the existing `read-spec-rules.sh`, emitting `always|path|legacy|cap` per row, and have all
     three call it. The precedent is already set and working: `read-spec-rules.sh` did exactly this
     for §14's rule tables. The harness is the interesting case — it re-derives *deliberately*, to
     prove the engine is not hard-coding, so it should keep an independent derivation but gain a case
     asserting the two agree on the full row set rather than on `n_req >= 5`.
-  - Sibling: **TD-057** is the same *shape* one level over (`Layers:` feeding three checkers that
-    match it three different ways, contract unstated) but a different subject; curing either moves
-    neither. **TD-048** likewise. Related: **L-146**, the fixture that decayed to vacuous in this
-    same family.
-  - **Grew to FIVE at SPRINT-078 (T2).** The tier family needed §2's Tier column, which no existing
-    parser emitted, so it added `_s2_tier_rows` to `scripts/lib/conformance-engine.sh` — a *fourth*
-    parser, in the same file as the first — and `base_tier_set` to
-    `evals/run-conformance-engine-fixtures.sh`, a *fifth*. Both re-derive the same rows with the same
-    hard-coded `c[6]`-vs-`c[5]` offset this row describes.
-  - The fifth one **immediately proved the row's point**, and cheaply: `base_tier_set` expanded §6's
-    `deployment/{deployment,rollback}-guide` with a `sed` that split on the comma alone, yielding
-    `deployment/deployment` and `rollback-guide`. That silently un-subtracted a substrate-conditional
-    row and put it back in the owed set. It surfaced only because the harness's answer disagreed with
-    the engine's `skipped not owed` line — two independent derivations of one table, caught by the
-    disagreement rather than by review (L-108). A shared reader would have had one expansion to get
-    right, and the fixture's independence — which is genuinely worth keeping, per the mitigation above
-    — should be independence of the *assertion*, not of the parse.
-  - Severity held at `minor` rather than escalated: nothing here is wrong today, and the extraction
-    still wants its own task rather than a rider on a coverage sprint. But the count is now five and
-    the growth is not slowing — each new rule family that needs a §2 column adds one.
+  - Evidence: Sprint-077 · SPRINT-079 · SPRINT-076 · SPRINT-078
 
 - **TD-061** severity: medium | status: open | created: Sprint-072
   - Summary: **`check-doc-caps.sh` expands §2's `research/<slug>.md` into a non-recursive glob, so any
@@ -1713,12 +1589,6 @@ status: current
     the spec as an adopter with no `skills/` access (SPRINT-071 T3). The same exposure applies to every
     `§N` reference in the file, of which there are many, and to references *into* `spec/` from
     `skills/` — 25 name-citations (`STANDARD §N`) whose targets nothing verifies either.
-  - Impact: bounded but badly placed. The spec is the artifact an adopter *pins*, so a dangling
-    reference is shipped to every consumer and is exactly the kind of defect that erodes trust in a
-    standard faster than a missing feature would — it reads as evidence the document was not checked.
-    The gap is also self-concealing: a reference reads fluently from the source side, so review does
-    not catch it, and the corpus is self-describing enough that grepping for `§9` finds the *pointer*
-    and reports success (L-108's shape again).
   - Mitigation (**not yet derived**, L-091): the obvious move is "a checker that resolves every `§N`
     against the section headings present in the file", which is probably most of it and is not
     obviously the whole thing. Price at least: whether the check covers **references into `spec/` from
@@ -1727,7 +1597,7 @@ status: current
     the referenced subject*, which is the failure that actually occurred and is far harder to assert ·
     and whether this belongs in `qa-check.sh` or is subsumed by EPIC-004's engine, since a conformance
     tool reading the spec has to resolve its cross-references anyway.
-  - Tracker: SPRINT-071 T3 · **L-129** · ADR-023 (`spec/` is the SSOT an adopter pins) · vehicle absent
+  - Evidence: Sprint-071
   - **Re-reviewed 2026-08-16 (SPRINT-074 promote, 3 sprints open) — held, but the exposure has grown by
     a whole class and the row is re-scoped rather than merely re-parked.** Ledger search first (L-127):
     nothing new checks `§N` resolution, and no vehicle exists. **What changed is the surface.**
@@ -1749,13 +1619,6 @@ status: current
     always-on set — correctly, by `qa-check.sh`'s declared rule that cheap-and-git-free stays
     always-on while git-repo-building stays opt-in (SPRINT-043 T1 / TD-016). Costed, not assumed:
     ~1.5s for 3 repos + 2 worktrees on this host.
-  - Impact: the rule is right in general and expensive here specifically. The leg this guard covers —
-    a dispatched worktree silently branching from `origin/main` — went **six sprints** undetected and
-    cost SPRINT-069 a merge conflict, a task forced inline, and union-verification on every merge. A
-    guard for a defect with that history sitting behind a flag is the shape L-058 warns about one
-    level up: not a silent false negative in the check, but a check nobody runs. Bounded by the fact
-    that the guard itself is always-on in `dispatch.md` for a coordinator who follows the protocol;
-    it is the *regression* cover that is flagged off.
   - Mitigation (**not yet derived**, L-091): do not reach for "just move it to always-on" — that
     trades a known 1.5s against a rule two sprints old, and the rule exists because throwaway-repo
     harnesses were measurably the slow ones. The question to price first is whether the guard can be
@@ -1763,16 +1626,7 @@ status: current
     control need no history and could be split always-on, leaving only `stale` and `divergent` behind
     the flag. That would put the cheap majority of the coverage on every run. Whether a split harness
     is worth two files is the real trade-off, and it is undecided.
-  - Tracker: SPRINT-070 T2 · `evals/run-worktree-base-fixtures.sh` header · TD-054 (the defect) ·
-    TD-016 (the cost boundary the rule encodes)
-  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints open) — first aging re-review; held,
-    trigger unchanged.** Ledger search before any decision (L-127): `qa-check.sh`'s
-    `eval_harnesses_optin` list, the harness header, and TD-016 all agree the opt-in placement is the
-    **declared rule** rather than an oversight, and nothing since SPRINT-070 has re-priced that rule.
-    The row's own open question — whether cases 1–3 plus the PASS control split into a git-free
-    always-on leg — is still undecided and still unvehicled. SPRINT-073 is spec-annotation work and
-    touches no harness, so it is not a vehicle either. Search recorded so the next reviewer does not
-    repeat it.
+  - Evidence: Sprint-070 · SPRINT-069 · SPRINT-073
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -1850,13 +1704,6 @@ status: current
     now runs to a dozen items, several of them multi-paragraph. It has no cap: DOCS_Guide §2 does not
     cover `skills/**/references/`, and ADR-006 explicitly leaves reference files uncounted so that
     depth can live outside a `SKILL.md`.
-  - Impact: none mechanical — the exemption is deliberate and correct. The concern is that the
-    pre-flight checklist is now the doc's centre of gravity and is read *under time pressure, the
-    evening before a run*, which is the worst possible reading condition for a twelve-item list where
-    four items are load-bearing and the rest are context. SPRINT-057 added two items and lengthened
-    two more without removing anything. Recorded now because the trend is only visible across
-    sprints, and because the failure mode is a skipped item rather than a broken one — invisible to
-    every check in the repo.
   - Mitigation (**not yet derived**, L-091): the obvious move is a split, as `night-run-checks.md`
     already did once. **Re-derive before doing it**: that split is precisely what let the probe
     mechanism sit deferred and unfiled for four sprints (SPRINT-057 T1), so splitting again without a
@@ -1864,6 +1711,7 @@ status: current
     order the checklist so the four total-loss items come first and say so, leaving the rest as
     context that can be skimmed. Do not act on the line count alone — measure which items a real
     pre-flight actually skips.
+  - Evidence: Sprint-057
   - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 4 sprints open) — held, trigger unchanged.** The
     trigger is a measurement of *which pre-flight items get skipped*, and no night run has been
     launched since SPRINT-057 — SPRINT-060's run mode was ruled interactive at G2 (L-111), so the
@@ -1881,7 +1729,6 @@ status: current
     firing. Still no night run since SPRINT-057, so the read-under-pressure condition remains
     unmeasured. **Unblock condition:** unchanged — and the next actual night-run pre-flight should
     note which items it skims, which is one line of observation for free.
-
   - **Re-reviewed 2026-08-16 (SPRINT-070 promote, 3 sprints since last) — held, trigger unfired and
     unfireable so far.** The trigger is a measurement of *which pre-flight items a real run skips*, and
     no unattended run has been launched since SPRINT-057 — SPRINT-069 was attended end to end, its
@@ -1923,37 +1770,31 @@ status: current
   - Summary: **`gate-remote.ts`'s local bundle step was denied in the default temp directory, cause unknown.** Two consecutive runs failed
     with `cannot create … lf-gate-<sha>-<pid>.bundle: Permission denied`, after two earlier runs that day had passed. The same `git bundle
     create` by hand in that directory worked, and the wrapper passed with `TMP`, `TEMP` and `TMPDIR` set to a scratch directory for one run.
-  - Evidence: SPRINT-163 log, close entry; `scripts/gate-remote.ts` (`tmpdir()`).
-  - Impact: trivial; it reported a transport failure and no verdict, which is the safe reading.
   - Mitigation: scope the temp directory to the one invocation when it recurs; look for the cause only on a repeat.
+  - Evidence: Sprint-163
 - **TD-297** severity: trivial | status: open | created: Sprint-164 (close; T3 proof)
   - Summary: **The bug template has no `## Assumes` heading, though `/triage` and the template's own `Negative:` line name it.** Agents add the
     section when a bug stays `needs-info`, so the `open:` line still lands where the skill says.
-  - Evidence: SPRINT-164 log, T3 fix entry; `skills/lean-doc-generator/templates/BUG.md.template`; `skills/triage/SKILL.md` steps 3 and 6.
-  - Impact: trivial; every T3 run wrote the section correctly, and a bug with no open question does not need one.
+  - Evidence: Sprint-164
 
 - **TD-296** severity: low | status: open | created: Sprint-164 (T1 after-run)
   - Summary: **`migrate`'s report labels do not cover two cases.** A topic left unasked because the owner kept its file untouched fits no label,
     and the run's report said so. A Standards answer mixing a standard with checks and one without has no named label either.
-  - Evidence: SPRINT-164 log, T1 entries; `skills/lean-doc-generator/references/migration-map.md` (Report).
-  - Impact: the report falls back on prose for these two cases; nothing is written wrong.
   - Mitigation: name both labels when a real migrate hits one; no run planned.
+  - Evidence: Sprint-164
 - **TD-299** severity: low | status: open | created: Sprint-165 (promote)
   - Summary: **Promote's §11 scan of closed task files is done by hand, and one reported nothing due while files were overdue.** SPRINT-164's promote said "nothing due"; SPRINT-165's found 26 due, 25 of them old enough at SPRINT-164. A citation that lapsed in between could explain some; that was not checked.
-  - Evidence: SPRINT-165 Log, promote entry; `d0a9752a` deleted the 26, two selectors agreeing on 25.
-  - Impact: low; a stale file costs little, and nothing wrong reaches an adopter.
   - Mitigation: derive the list at each promote, by the live-citation rule in STANDARD §11, as the SPRINT-165 scan did. A checker needs an ADR-053 reason; one sighting is not one.
-  - **Sighting (SPRINT-169 close, 2026-11-08):** the promote doc-aging line named TD deletion only. A two-selector census at close (sprint 166 or earlier, no live citation outside history, and a tree grep that agreed) found 10 due task files: TASK-604, 605, 606 (SPRINT-163), 610, 611, 612 (164), 615 (165), 618, 619, 620 (166). Deleted at close on the owner's approval.
+  - Evidence: Sprint-165 · d0a9752a · SPRINT-169 · SPRINT-163
 - **TD-300** severity: low | status: open | created: Sprint-165 (T1 review)
   - Summary: **`/handoff` step 2's resume path has no run.** Codex round 1 found a resumed side stub could stay `live`, and `750963c0` fixed the text. The proof ran on `8d099eda`, before the fix, and covered first handoffs only.
-  - Evidence: SPRINT-165 Log, T1 entry.
-  - Impact: low; the worst case is a `live` ledger row that promote's handoff line then shows.
   - Mitigation: run it the next time a real side handoff is resumed; no run planned.
+  - Evidence: Sprint-165
 - **TD-304** severity: low | status: open | created: Sprint-170 (close)
   - Summary: **The row 7 watcher's `--exclude` accepts only the `agent-` prefixed worker id.** Given a bare id it excluded nothing, the coordinator relaunched it, and that retry cost 0.033 USD of the 0.120 USD overhead that failed S23's 0.10 limit. The script lives on `trial/epic-024-row7` (f5cf1963) and the row is a no-go, so nothing on `main` carries it.
-  - Evidence: SPRINT-170 Log, "T5 runs; row 7 verdict no-go on overhead"; TASK-635 § Results.
-  - Impact: low; only matters if row 7 is retried. Overhead was the only failed bar, so this is part of the cost, not the cause.
   - Mitigation: if row 7 is retried, accept the bare id or print the accepted form on a miss. Re-derive from the transcripts first; one run is one sighting.
+  - Evidence: Sprint-170
+  - Impact: low; only matters if row 7 is retried. Overhead was the only failed bar, so this is part of the cost, not the cause.
 - **TD-305** severity: medium | status: open | created: Sprint-170 (close)
   - Summary: **Cross-process resume of a worker is unreliable on Claude Code 2.1.319, and its cause is not found.** A forked session fails with "No transcript found for agent ID"; a plain `--resume` worked in a probe and opened a new session in real pairs, although the worker's transcript sat in the build session's `subagents/` folder. Restoring the original folder did not help.
   - Evidence: SPRINT-170 Log, "T3 M0 probes" and "arm A moves in-process"; TASK-633 § Results; L-302.
@@ -1961,14 +1802,12 @@ status: current
   - Mitigation: hypothesis only: the worker lookup keys on something that a new process or session id changes. Re-check on the next CLI version before any new resume trial (TASK-645), and keep the rule "resume in-process, else hand a fresh worker the context" (TASK-639) until then.
 - **TD-306** severity: low | status: open | created: Sprint-170 (close)
   - Summary: **In-session subagents leave no transcript, so their cost cannot be measured and SPRINT-170 carries an estimate.** The G2 workers (builder checks, recon) are booked at about 3.5 USD of the 31.4 USD; the rest of the figure is measured from `total_cost_usd` and `session-cost.ts`. Codex runs are recorded as tokens, outside the cap.
-  - Evidence: SPRINT-170 Log, settlement S0 and the running tallies; Codex's recap review found a 0.7 USD slip in the tally, since corrected.
-  - Impact: low; about 11 percent of the sprint's spend is an estimate, so a cost bar that close to it would not be trustworthy.
   - Mitigation: run G2 workers as headless sessions with a session id when their cost matters, or book a per-worker figure from the parent's usage. Not needed until a bar sits within that margin.
+  - Evidence: Sprint-170
 - **TD-307** severity: low | status: open | created: Sprint-171 (close gate)
   - Summary: **A commit whose subject names no task cannot be attributed after the fact, so `layers observed` fails it for good.** SPRINT-171's `7407e49c` (`fix(trials): …`, the T6-era `agent-cost.ts` fix) belongs to T1, which owns `scripts/trials/`. `attribute()` reads only the commit's own subject and `Task:` trailer, so the only cure is a history rewrite that churns every later SHA the Log and the kit's records cite.
-  - Evidence: SPRINT-171 Log, close-gate entries; system-verify at `da6c4dbd`; owner popup "Rule it a known FAIL + TD (Recommended)".
-  - Impact: low. One known FAIL at SPRINT-171's close under a recorded owner ruling. The same shape voided both completed merger runs in T6 (builder commits no task owns).
   - Mitigation: harness and kit fixes made during a task go under the task that owns the path (`sprint(N) Tn:`). An attribution-override record that the checker reads (a Log line naming sha → Tn) would cure it without a rewrite. That is new governance machinery, admitted only with a second sighting.
+  - Evidence: Sprint-171 · da6c4dbd
 - **TD-308** severity: medium | status: open | created: Sprint-171 (T5 review)
   - Summary: **The trial replication protocol (D17) leaves five rules open that a designer could use to let noise buy a verdict.** (1) "Void" has no test fixed before metrics are read, and the replacement cap is per run in D16 but per arm in T6's ruling. (2) There is no general stop once 3 valid runs per arm becomes unreachable (ruled for T6 only). (3) Whether time is raw or gap-adjusted is not frozen up front. (4) It is unclear whether D17's 3 per arm overrides D4's n = 1 per seed. (5) "Hard bar" at n = 1 is undefined, though the signed design uses the phrase.
   - Evidence: SPRINT-171 Log, T5 review entry (scoped Sonnet reviewer, one bounded retry fixed the dropped "in both runs" screen-out condition, the margin scope and the rounding); owner popup "Carry as one TD row (Recommended)".
@@ -1976,56 +1815,46 @@ status: current
   - Mitigation: settle all five at the next trial's G2, before any spend, and amend `docs/research/trial-replication-protocol.md` and D17 with the rulings.
 - **TD-309** severity: low | status: open | created: Sprint-171 (close)
   - Summary: **The trial harness carries four review gaps from T1, and two timeouts seen in T6.** Most `merge-oracle` sub-checks have no must-FAIL fixture; the stream checker's built-in FAIL paths and operators are untested; the in-tree `.scratch` stays; three `test/trials/` tests time out at bun's 5000 ms default on a memory-starved host (29/0 at `--timeout 60000`). The T6 kit's post-run snapshot timed out (`ETIMEDOUT`) after every merger run.
-  - Evidence: SPRINT-171 Log, T1 entry (review 0 High, 2 Med, 5 Low; retry cap reached) and the T6 resume and K2R entries.
-  - Impact: low. The harness is maintainer-only. A sub-check without a must-FAIL fixture can pass while broken, and a timeout reads as a failure.
   - Mitigation: add must-FAIL fixtures per oracle sub-check and per stream-checker operator; set an explicit timeout on the slow `test/trials/` cases; give the snapshot step the same timeout as the audit.
+  - Evidence: Sprint-171
 - **TD-310** severity: low | status: open | created: Sprint-173 (close)
   - Summary: **Cutting `run-workflow-command-fixtures.ts` (H51) removed the live-case floors for `evals/gate-remote.test.ts` (38) and `evals/merge-check.test.ts` (22).** The gate's `bun test` stage needs only one live test across the whole suite, so either file can vanish or lose cases unseen.
-  - Evidence: SPRINT-173 Log, T5 entry (scoped review Medium, owner-approved cut).
-  - Impact: low. Both files guard maintainer tools; a vanished suite reads as green.
   - Mitigation: none proposed; a per-file floor in `scripts/gate-remote.ts` would be new governance machinery under ADR-053, so it waits for a measured miss.
+  - Evidence: Sprint-173
 - **TD-311** severity: low | status: open | created: Sprint-173 (close)
   - Summary: **Prose density (no line over 400 characters) is a manual check since G0268 left the gate and merge-check.** In SPRINT-173 three Execution Log lines over 400 landed unnoticed, and both shipped SKILL.md files sit at their 140-line cap, which invites squeezing.
-  - Evidence: SPRINT-173 Log lines 100, 131 and 140; T6 and T7 first passes each pushed a SKILL.md line past 400.
-  - Impact: low. Wording only; no verdict depends on it.
   - Mitigation: count lines over 400 at EPIC-025's measuring sprint (Sprint B); restore a leg only if the count grows.
+  - Evidence: Sprint-173
 - **TD-312** severity: low | status: open | created: Sprint-174 (close retro)
   - Summary: **`.claude/CONTEXT.md` sits at its 150-line hard cap with no headroom.** SPRINT-174's two cross-model lines only fit because a blank line under "Built-in leverage" was removed.
-  - Evidence: commit `da8ab049`; `wc -l .claude/CONTEXT.md` prints 150.
-  - Impact: low. The next line a sprint must add to the SSOT fails the cap check, or is squeezed in by deleting something unreviewed.
   - Mitigation: the periodic dedup pass CLAUDE.md already names (prose that duplicates CLAUDE.md or the README becomes a pointer), run at a promote doc-aging pass.
+  - Evidence: Sprint-174 · da8ab049
 - **TD-313** severity: low | status: open | created: Sprint-174 (close retro)
   - Summary: **The G2 design gate in `skills/orchestrator/SKILL.md` names no cross-model route.** A cold reader reaches it only through `review-scoping.md` § Draft reviews. SKILL.md is at its 140-line cap, so the pointer was left out.
-  - Evidence: SPRINT-174 Log, progress entry (the proof-run agent's report).
-  - Impact: low. A host with the opt-in on can run a G2 design review without the route unless it reads the reference first.
   - Mitigation: a one-clause pointer at the G2 step once SKILL.md has room, or by trading it for a line already there.
+  - Evidence: Sprint-174
+  - Impact: low. A host with the opt-in on can run a G2 design review without the route unless it reads the reference first.
 - **TD-314** severity: low | status: open | created: Sprint-174 (close retro)
   - Summary: **`review-scoping.md` has no rule for a prose-only change on two points.** Which search hits count as "pinning tests" when harnesses only mention the file name, and what the Spec comparand is when no mechanical rung exists.
-  - Evidence: SPRINT-174 Log, progress entry (the proof-run agents hit both).
-  - Impact: low. Each reviewer decides both points alone, so two reviews of one change can differ.
   - Mitigation: add one line per point to the scoping ladder; no new check is needed.
+  - Evidence: Sprint-174
 - **TD-315** severity: low | status: open | created: Sprint-176 (close retro)
   - Summary: **The always-loaded token budget has 8 tokens of headroom (12683 of 12691).** SPRINT-176 T2 spent the rest of about 170 tokens on two pointer clauses; the next addition to CONTEXT, CLAUDE.md or an always-read SKILL.md fails `check-doc-caps.ts`, or is squeezed in by deleting something unreviewed. TD-312 covers CONTEXT's 150-line cap and TD-313 the 140-line SKILL.md cap; neither covers the token budget.
-  - Evidence: SPRINT-176 Log, T2 progress entry ("token budget 12683 of 12691"); promote checklist, 12521 of 12691 at promote.
-  - Impact: low. Same as TD-312: the next added line is refused or traded away.
   - Mitigation: the dedup pass TD-312 names (prose duplicating CLAUDE.md or the README becomes a pointer), measured in tokens this time; run at a promote doc-aging pass.
+  - Evidence: Sprint-176
 - **TD-316** severity: low | status: open | created: Sprint-178 (close retro)
   - Summary: **`evals/epic-archive-differential.test.ts` fails on this Windows host and passes off-host.** The case "check-epic-archive.ts matches check-epic-archive.sh (differential parity) > identical exit code + stdout" on fixture `epic-state/r-nonmember-attrib` fails locally at line 77:24 (`bun test` 637 pass, 1 fail), while the off-host gate is green at `99f85bb6` and `e5236150` (638 pass, 0 fail). The `.ts` and `.sh` checkers differ in output on this host only; the cause is not investigated. TD-242 is a different host difference (harness PASS count).
-  - Evidence: SPRINT-178 Log, T2 progress entry (exercise (i)) and the system-verify entry.
-  - Impact: low. A local full `bun test` on Windows reads red for a reason outside the change under test; the release gate (off-host) is unaffected.
   - Mitigation: diff the two checkers' stdout on that fixture on this host and name the difference; fix the `.ts` or make the case host-aware.
+  - Evidence: Sprint-178
 - **TD-317** severity: low | status: open | created: Sprint-180 (close retro)
   - Summary: **The inline commit-message path never reads the host glossary, so a host override is ignored in commit messages.** `embedded.md` § Inline path sends the pass to the three catalogs and never to `CONTEXT.md`. The global calque rules still apply there ("di-scan" worked).
-  - Evidence: SPRINT-180 Log, the box-4 scope-change entry and the after-run entries. 2 of 2 commit-inline runs (exports at `2767637f` and `d28b0a6f`) read the three catalogs, never `CONTEXT.md`, and wrote "rehearsal" where the override demanded "dry run". The child and inline-fallback paths fired once the glossary step moved to the top of `patterns-id.md`.
-  - Impact: low. A host glossary override reaches documents and PR bodies but not humanized commit messages. The owner ruled "Accept gap + TD (Recommended)", with no `embedded.md` edit this sprint.
   - Mitigation: a one-line pointer to the glossary step in `embedded.md` § Inline path, then re-run the commit-inline override case in `evals/fixtures/humanizer/domain-calque/`. A hypothesis, not a plan; re-derive before building on it.
+  - Evidence: Sprint-180 · 2767637f · d28b0a6f
 - **TD-318** severity: low | status: open | created: Sprint-181 (close retro)
   - Summary: **`evals/run-spec-reader-fixtures.sh` case `s13-rows-intact` fails on this Windows host and passes off-host.** A local bare gate printed "FAIL eval harness run-spec-reader-fixtures.sh … s13-rows-intact" while spec/ was untouched this sprint. The cause is not investigated. TD-316 is a different harness with the same kind of host difference.
-  - Evidence: SPRINT-181 system-verify notes (local Windows bare gate against the off-host green at 212f0c52).
-  - Impact: low. A local gate run reads red for a reason outside the change under test; the off-host release gate is unaffected.
   - Mitigation: run the case on this host, name the difference, then fix the harness or make the case host-aware. A hypothesis; re-derive before building on it.
+  - Evidence: Sprint-181 · 212f0c52
 - **TD-319** severity: low | status: open | created: Sprint-182 (close retro)
   - Summary: **`check-layers-completeness` reads a path in a Done-when box that names another repo's file as a lean-flow file, so a cross-repo test task can silence the member-layers-incomplete FAIL only by declaring the foreign path on `Cites:`.** The Cites line then claims an input lean-flow does not have.
-  - Evidence: SPRINT-182 promote (workdoo's `.claude/CLAUDE.md` in TASK-677's cleanup box, reworded before the lock) and SPRINT-182 T3 (box 3 names the workdoo snapshot's `.rtk/pipeline.toml`; the tick reddened the check, fixed by the Cites line in c9a755ef). Two sightings in one sprint, both on workdoo paths.
-  - Impact: low. The check fails loud and a workaround exists; the cost is a red tick that a quiet chain can bury (L-045).
   - Mitigation: let a Done-when path marked as belonging to another repo be exempt, or accept a named foreign-root prefix. A hypothesis, not a plan; re-derive before building on it. A defect fix of an existing checker, unfrozen under ADR-053.
+  - Evidence: Sprint-182 · c9a755ef
