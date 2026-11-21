@@ -30,7 +30,7 @@ Two owner notes on `/lean-doc-generator`. (1) When init finds existing docs and 
 - [x] Headless init/migrate park with no suggestions and no writes; the park record keeps the existing-docs and migrate-offer lines. ✓ init.md: headless drafts no suggestions and runs no reviewer; the park record keeps the existing-docs and migrate-offer lines; leg 13 strings present in both files (builder grep 4/4, reviewer re-checked)
 - [ ] Consumer proof in D:\Research\workdoo with a pre-run file-hash manifest compared after revert: (a) init on a repo with docs → migrate chosen → migrate's plan, no init writes, no second command; (b) an init round shows a reviewed suggestion on First milestone or Standards plus a business/conventions prompt; (c) a migrate round shows a reviewed suggestion on Standards plus a business/conventions prompt; accept writes the cite; a reviewer drop is visibly absent.
 - [ ] Negative: migrate choice leaves no init-written files and touches nothing outside migrate's approved plan; a dropped/unaccepted suggestion is never written; workdoo matches baseline.
-- [ ] `lean-doc-generator/SKILL.md` ≤ 140 lines; Codex review of the shipped diff clean within 2 rounds; the report returns proposed README/CHANGELOG lines (coordinator writes them once).
+- [x] `lean-doc-generator/SKILL.md` ≤ 140 lines; Codex review of the shipped diff clean within 2 rounds; the report returns proposed README/CHANGELOG lines (coordinator writes them once). ✓ lean-doc-generator/SKILL.md 138 lines; Codex gpt-6-astra shipped-diff review: round 1 NOT CLEAR (template cite list) → fix 8541976a → round 2 VERDICT: CLEAR; builder report returned README/CHANGELOG/CONTEXT lines
 
 ## Touches
 
