@@ -18,7 +18,7 @@ what they meant. A reader who cannot ask the author has only the text.
    records; facts are never the owner's job. You settle a **contradiction** before sign-off. Either fix the design, or,
    when the Done-when itself is wrong, log a `scope-change` and get a recorded owner ruling: this is the SKILL.md red flag
    *quietly reinterpreting a DoD*, met before the build instead of after it. Only **intent** questions reach the owner,
-   inside the G2 popup.
+   inside the G2 popup; in sprint-bulk, feed them into `sprint-bulk-run.md` § Sweep's frontier rounds before sign-off.
 4. **Record one line per task.** Sprint-bulk puts it in the Execution Log; mvp, which has no log, puts it in the task's
    `## Approved design` paragraph:
    `builder-check · Tn · <c> contradictions · <q> questions · <how settled>`.

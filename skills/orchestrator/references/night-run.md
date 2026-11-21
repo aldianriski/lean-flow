@@ -208,7 +208,7 @@ interactive sub-agents, not the run):
 | 1 | `<X>` is raw intent / a PRD / a ticket / **a slice of an open epic** | `/task-decomposer` (`--prd <path>` · `--epic <id\|name>` — decompose only the slice named, never the whole epic) → a `TASK-NNN` file in `docs/work/backlog/` | human `approve` |
 | 2 | the files in `docs/work/backlog/` are ungroomed, or none is `state: ready` | `/triage` | human sign-off |
 | 3 | no active sprint holds the work — no top-level `docs/sprint/SPRINT-*.md` with `status: active` has the task as a member (`## Members` ∪ `sprint:` stamp, `dispatch.md` § Members by reference) | `/lean-doc-generator promote` | governance checklist sign-off |
-| 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |
+| 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2 (incl. the sweep), interactively | human G1 + G2 |
 | 4b | G1/G2 are signed but no **approval envelope** is recorded | write `approval_envelope:` into the sprint frontmatter | human approval of all ten dimensions |
 | 4c | the host's gate is red and **this Plan's purpose is repairing it** | write `gate_exceptions:` into the sprint frontmatter, naming only the check(s) the Plan repairs | owner ruling naming those specific checks — never a blanket grant |
 | 5 | all of the above are green | Part 1 pre-flight → Part 2 trigger | — |
