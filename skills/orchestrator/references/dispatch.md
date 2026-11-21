@@ -153,8 +153,8 @@ the member file its `Cites:` names (§ Members by reference, rule 4), and the pr
    two were assumed to be the same thing for six sprints (TD-054). The worktree's own base is checked
    after spawn by the **worktree-base guard** in § Worktree dispatch protocol; a CLEAR here is not a
    statement about any worktree.
-4. **Wave computation** — topological rank over the `Depends-on` DAG; rank 0 dispatches in parallel,
-   higher ranks wait behind a barrier.
+4. **Wave computation** — topological rank over the `Depends-on` DAG, not a runtime barrier;
+   each unit advances by its own prerequisites and ownership per `sprint-bulk-run.md` § Runtime.
 
 Any FAIL halts the wave and reports its own named finding — a bare "FAIL" doesn't tell a morning
 rollup which check tripped (L-058: a gate needs a must-FAIL fixture per check, proven on this one).
@@ -500,9 +500,9 @@ Decide from the **G2 overlap-ownership map** — the same map that assigns share
   runs after its predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) —
   promoted rule.
 
-Group the Plan into **parallel batches separated by sequential barriers**: fan out each batch of independent
-tasks in one message, await it, then the next. Worktree isolation for a parallel batch is **first-class —
-the protocol below**; `/batch` (one worktree sub-agent per unit → PR each; `/workflows` watches) remains the
+Dispatch **ready units**, per `sprint-bulk-run.md` § Runtime: their own `Depends-on:` predecessors have
+merged and shared-file ownership predecessors have committed; a parked wave-mate is no barrier. Fan out
+ready disjoint units together, using **the worktree protocol below**; `/batch` (one worktree sub-agent per unit → PR each; `/workflows` watches) remains the
 escalation for very large fan-out where scripted determinism matters.
 
 **Cost term** — fan-out cost scales with **branch-count × substrate-size, not call-count**: every branch
@@ -556,7 +556,7 @@ Claude-only v1 — external CLI agents are out of scope until a real consumer si
 pre-decided shape (BYO opt-in + AGENTS.md brief carrier) is parked, not built.
 
 Guardrail: stale-branch reuse on agent-id collision is an open harness issue (#51596). Before
-dispatch, `git worktree list` should show no leftover agent worktrees — clean any first.
+dispatch, inspect `git worktree list`: preserve held parks and live workers; clean only abandoned agent worktrees.
 
 **Never move the session into a worktree, and never load the host while a task is timing** (L-219). Inspect a dispatched worktree
 with `git -C <path>` and absolute paths: a `cd` can make the harness adopt that worktree as the session's checkout, and the next
@@ -573,10 +573,10 @@ step left unrun, in the host's format. The coordinator checks the report quotes 
 too. Neither installation nor the gate leg may overlap any task's wall-clock measurement on the same host. A task that measures
 wall-clock defers the leg to the post-merge check and says so in its report; reviewers follow the same rule.
 
-**Declared-base rule** (ADR-013 · L-055): every worktree/agent branches from the current wave's
-declared base commit — stated up front, then verified against live HEAD at spawn, never assumed.
-Mismatch halts dispatch for the wave. Re-run the check at every wave boundary, not just once at the
-start — HEAD moves as waves land, so a base verified for wave 1 is stale by wave 2.
+**Declared-base rule** (ADR-013 · L-055): every worktree/agent branches from its unit's
+declared base commit — stated up front, then verified against live HEAD at each spawn, never assumed.
+Mismatch halts that dispatch. Re-declare and re-verify for each newly ready unit, not just at wave
+boundaries — HEAD moves as individual units land, even while another unit in their wave is parked.
 
 ### The stale base is a pin, and the pin is documented default behaviour
 
@@ -673,7 +673,7 @@ which makes it the *most* likely to be swept before you can check it.
 
 ## Merge-back queue (coordinator-only)
 
-Once a wave completes, merge on a **separate integration worktree** — never switch the main tree,
+As each unit is ready under `sprint-bulk-run.md` § Runtime, merge on a **separate integration worktree** — never switch the main tree,
 which may hold the coordinator's own WIP. Merge sequentially in **G2-ownership order**, one
 `--no-ff` commit per task (clean per-task revert via `git revert -m 1`).
 
@@ -693,16 +693,17 @@ System verify then runs on the **final** integrated tree, never on a trial merge
 the last fix (L-218 ×2: a `typecheck` red sat on `main` through a sprint because each merge re-ran only its own harness).
 
 Conflicts: **expected** (overlap map named this file) → re-dispatch that agent to rebase onto the
-new tip. **Surprise** (map missed it) → halt that task only, kick back to G2 — the map was
-incomplete. Resolution is coordinator-owned, never a blind sub-agent. First-blocker-halt is
-per-task; a whole wave halts only on a transitive dependency.
+new tip. **Surprise** (map missed it) → park the affected work per `sprint-bulk-run.md` § Runtime;
+the map was incomplete, so its G2 ruling joins the exit frontier while approved disjoint work continues.
+Resolution is coordinator-owned, never a blind sub-agent. Hold parked worktrees outside the merge queue;
+when a park clears, re-dispatch the same worker to rebase onto the current tip before continuing.
 
 **Resolving a hunk: recover both intents first.** Read the commit messages (and the task blocks) behind
 each side before choosing — a conflict is two authors who each had a reason, and the diff shows neither.
 Preserve both intents where they compose; where they genuinely cannot, keep the one matching the merge's
 stated goal and note the trade-off in the merge commit. **Never invent new behaviour** to bridge them,
-and **always resolve rather than `--abort`** — abandoning the merge strands the wave that was the whole
-point of the fan-out. SPRINT-041's corrupted merge is why this is written down.
+and resolve within the approved intents; if that needs an owner ruling, hold the affected merge per
+`sprint-bulk-run.md` § Runtime. SPRINT-041's corrupted merge is why this is written down.
 
 **Task-file transitions are coordinator-owned, with a duplicate-id check at every merge-back.** A
 dispatched agent never `git mv`s a task file or ticks a box; it reports, and the coordinator applies
@@ -721,8 +722,9 @@ store then says two things about one task (ADR-045 D6). Resolve it on the coordi
 side. Keep the folder the coordinator's own transition record names, and give a colliding new file a
 freshly derived id.
 
-A broken or incomplete worktree never merges — return the task to backlog with an unblock
-condition, salvage any doc/research artifacts, drop the code. **Returning it is a file move by the
+A broken or incomplete worktree never merges. A runtime park keeps its partial work and sprint membership
+per `sprint-bulk-run.md` § Runtime. Backlog return applies only to hard failures or owner-approved scope-outs:
+name the unblock condition, salvage any doc/research artifacts, drop the failed code. **Returning it is a file move by the
 coordinator**, so the sprint's freeze and close checks stay green (ADR-047 § scoped out):
 1. append an Execution Log entry headed `### <date> | scope-change | …` that names the TASK id and
    its unblock condition (a prose mention under another event does not count);
@@ -732,7 +734,7 @@ coordinator**, so the sprint's freeze and close checks stay green (ADR-047 § sc
 A task still stamped or listed after the move is still a member, so it blocks close from `backlog/`.
 Clearing the stamp and the line without the Log entry is an unlogged `MEMBER-DROPPED`.
 
-Cleanup (coordinator-only): leave the worktree directory **before** removing it — Windows holds a
+Cleanup (coordinator-only, held parked worktrees excluded): leave the worktree directory **before** removing it — Windows holds a
 handle-lock on any worktree a shell has `cd`'d into, so removal from inside it fails
 Permission-denied mid-way (admin entry gone, directory left) (L-044). Retry `git worktree remove`
 from a fresh shell, `rm` any stray directory, `git worktree prune`, verify with `git worktree list`.

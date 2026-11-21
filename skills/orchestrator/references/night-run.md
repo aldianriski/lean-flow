@@ -120,11 +120,12 @@ content the *run itself* produces qualifies: a Retro not yet written cannot be a
 That is precisely why the charter is **execute-only** — a night run executes a promoted Plan; it does
 not decide what the Plan should be, and it does not dispose of what the Plan produced.
 
-**Park protocol.** On reaching a ⛔ step:
+**Park protocol.** Post-G2 sprint execution uses `sprint-bulk-run.md` § Runtime in both modes; the
+steps below apply that rule to this unattended authority contract. Pre-execution gates halt execution.
 
 1. **Don't ask** (there is no channel) and — the harder half — **don't decide**.
-2. **Write the park record** — one rollup line (Part 4) in the sprint Execution Log naming the blocker and unblock condition. Attended blockers use this same record once before waiting. No sprint file to
-   write into (e.g. parked at `promote`) → the record goes in the `/handoff` doc instead.
+2. **Write the park record** per § Runtime: a temporary-park sentence in the existing `progress` entry;
+   canonical Part 4 task lines only for parks still open at exit. No sprint Log (e.g. at `promote`) → `/handoff` instead.
 3. **Continue disjoint AFK work** — anything with no shared file and no `depends-on` against the
    parked unit, per the G2 overlap map. Same-owner, shared-file, or dependent work parks *with* it.
 4. **Re-check open parks as each later task takes ownership.** A park does not always outlive the
@@ -136,10 +137,10 @@ not decide what the Plan should be, and it does not dispose of what the Plan pro
    none revisited it, and the field is still written and never read. So at each task boundary, walk the
    open parks: if a park's unblock condition names a task that has since completed, it is actionable
    now — do it. If it is still not actionable at exit, it gets a rollup line (Part 4) rather than
-   silence. **Unattended runs only** — an interactive run halts at the first blocker with a human
-   present to resolve the park, which is the whole difference.
-5. **Clean halt** when no AFK work remains — finish through `/handoff` so the morning `/prime` reads
-   it in. Never idle-spin waiting for an input that cannot arrive.
+   silence. This task-boundary re-check applies in **both modes**, per § Runtime; it never supplies an owner answer.
+5. **Exit frontier** when no approved runnable work remains — § Runtime owns the record and delivery:
+   attended asks its round; unattended writes the Log digest and `/handoff` questions for `/prime`.
+   Never idle-spin waiting for an input that cannot arrive.
 6. **Never work around the park** — rewriting, splitting, or narrowing a task so it dodges the gate is
    itself scope-changing, and therefore HITL. Park it as-is.
 
@@ -163,7 +164,7 @@ declared — the failure that reads as success, because a turn that simply ends 
 | Terminal state | Meaning | Morning action |
 |---|---|---|
 | `PLAN_EXHAUSTED` | every task reached a resolved state — the only *clean* ending | close, or re-fire for what parked |
-| `AUTHORITY_BOUNDARY` | work remains, but all of it is J2 or blocked behind a park | take the named human step; the rest already completed around it |
+| `AUTHORITY_BOUNDARY` | work remains, but all of it is parked at exit (J2 or blocked behind a park) | take the named human step; the rest already completed around it |
 | `HARD_FAILURE` | a step failed in a way the run cannot proceed past (a red gate, a broken tree), or a member's open DoD box that no Plan `Tn` cites — the Plan cannot reach it (replaces only a would-be `PLAN_EXHAUSTED`) | read the named finding; fix before re-firing |
 | `BUDGET_STOP` | a declared budget ceiling was reached with Plan remaining | raise the ceiling or re-fire; the Plan is unchanged |
 | `USER_STOP` | a human signalled the launcher's wrapper (the `fired detached: pid=` process) | resume at will |
@@ -455,8 +456,8 @@ All items must pass or the night-run does not fire:
       terminal step — the merge-back denial behind source 2 above is the second, which is why that
       pair is called out as the pre-flight's load-bearing half rather than left as one anecdote.
       **Belt, not replacement.** The fallback stays: a denied or unavailable `/handoff` still halts
-      cleanly by appending its rollup line (Part 4) to the sprint Execution Log, which the morning
-      `/prime` reads. Never let an allowlisted `/handoff` become the run's only exit.
+      cleanly with the already-appended `open questions at exit` digest (§ Runtime) and exit park lines
+      (Part 4) in the sprint Execution Log, which `/prime` reads. Never let `/handoff` become the only exit.
 - [ ] `bypassPermissions` is off the table — never the fallback for a lazy allowlist. The safety
       default stays OFF; flipping it is an owner decision, not a night-run convenience.
 - [ ] **The run's own expected cost is stated** — as its own line, and explicitly *not* the cost of
@@ -626,12 +627,12 @@ Scheduling variants — the machine must stay on for either:
 - **Windows Task Scheduler**: `schtasks /Create /TN "night-run" /TR "claude -p \"/orchestrator sprint-bulk unattended\" --permission-mode dontAsk --allowedTools \"<built list>\"" /SC DAILY /ST 01:00`
 
 Checkpointing is inherited free from `sprint-bulk` steps 4–5 — no new mechanism: per-task commit +
-Execution Log append is the checkpoint; first-blocker-halt parks the blocked task with its unblock
-condition and lets disjoint work continue per the G2 parallel map.
+Execution Log append is the checkpoint; `sprint-bulk-run.md` § Runtime owns parking, continuing
+approved disjoint work, task-boundary re-checks and the exit frontier in both modes.
 
 **Base verification carries into the run.** If the run fans work out to parallel workers (worktrees
-or sub-agents), each one branches from the wave's declared base commit, verified against live HEAD
-at spawn, re-checked at every later wave boundary — a mismatch halts that wave, not the whole run.
+or sub-agents), each one branches from its unit's declared base commit, verified against live HEAD
+at every unit's spawn, including within a wave — a mismatch halts that dispatch (`dispatch.md` § Declared-base rule).
 This binds unattended runs the same as interactive ones, for the same reason the rest of Part 0
 exists: nobody is watching to catch a silent divergence before it reaches a commit.
 
@@ -763,16 +764,23 @@ around it). `denied-tool` = `dontAsk` refused a call outside the pre-flight allo
 allowlist, re-run). `stalled` = the watchdog fired (next: resume via `/prime` + the handoff path).
 `done` tasks need no per-task line — the header count already carries them.
 
+**Park lines are exit-only**, per `sprint-bulk-run.md` § Runtime: temporary parks stay in progress prose,
+and only a task still parked at exit gets `Tn · parked-hitl|blocked · <unblock>` (one state). Neither
+temporary-park prose nor the `open questions at exit` entry starts a line with `Tn · `; a park that
+clears must not leave canonical evidence that would make the unchanged reaper report an open park.
+
 Distinguish `parked-hitl` from `denied-tool` in the morning: a park is the contract working as
 designed and needs a decision; a denial is an under-scoped allowlist and needs a config fix. And
 distinguish both from `unattempted`: those two were *reached*, this one never was.
 
-**A revise-loop retry (ADR-022) adds one line per firing** beneath its task's state line —
+**A revise-loop retry (ADR-022) adds one progress line per firing**, retained in the exit rollup —
 `Tn · retry · <axis>: <finding> → fixed | still-open | rejected (<evidence>) | deferred (<impact> → TASK/TD)`
 — emitted whether or not the retry succeeded. A `still-open`, `rejected` or `deferred` outcome parks the
 task (`parked-hitl`, the finding named): unattended, closing a finding without a fix is a judgement, and a
 `rejected` names its evidence inside the parenthesis (`test` · `check` · `fixture` · `owner-ruling`). The states
-above are unchanged — the retry line is supplementary, never a new task state.
+above are unchanged — the retry line is supplementary, never a new task state. Record the retry when it
+fires; the matching `parked-hitl` line is written only at exit under § Runtime, including for a retry
+still open. The reaper checks the whole run window at exit, so this satisfies escalation without an early park line.
 
 **The ceiling is enforced mechanically over whatever retry lines the run wrote — and what it does
 NOT do is verify that every retry was logged.** Unlike `unattempted`, a retry has no absence-based

@@ -46,12 +46,15 @@ sprint → fall back to the backlog.
 **Coverage (read-only count):** an open `- [ ]` § Closed-when item of a `status: active` epic, and a roadmap row with `Status: active`,
 is **covered** when its mark names `next slice:`, an open task (outside `done/` · `cancel/`), or (rows) an active `EPIC-NNN`; else
 **uncovered**. Count both; `proposed` epics and `planned`/`done` rows exempt. Procedure → `lean-doc-generator/references/epic-coverage.md`.
-**Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed. When its **Uncertain writes** item names one, the `Handoff:` row adds `· uncertain write: <target> → reconcile first` (the row is emitted for this even when no repo-side `handoff` entry exists) and `Next:` leads with reading that target back before any retry (a timeout is not a failure); `none` adds nothing.
+**Resuming from a `/handoff`?** Resolve a live stub's `handoff-path` and read that temp doc (or the supplied path when no stub exists). When its **Uncertain writes** item names one, the `Handoff:` row adds `· uncertain write: <target> → reconcile first` (even with no repo-side entry) and `Next:` leads with reading that target back before any retry or question handling (a timeout is not a failure); `none` adds nothing.
 
 **Handoff status (read-only).** Read the LATEST `handoff` entry in each active sprint Execution Log and
 root `HANDOFF-LEDGER.md`. A handoff belongs to a sprint when the session focus names its member;
 other handoffs go in the ledger. Report each latest `handoff-status:`: `live` (not resumed),
 `consumed` (resumed, open), or none outstanding. Never write it; `/handoff` and `/lean-doc-generator close` own transitions.
+
+**Questions before mode advice.** From the latest run's readable live handoff, surface its **Blockers / open questions** ready frontier as a `Questions:` digest leading `Next:` after any uncertain-write reconciliation. If that run has no handoff (absent, denied or unreadable), use its newest `### <date> | progress | open questions at exit` Log entry; never substitute an older run's live stub.
+A later `… | questions answered` entry or a newer `open questions at exit` retires the older digest, including a stale handoff's copy; no other entry does, including that run's handoff stub, progress or rollup. Prefer the newer digest if one supersedes the handoff. Read only these entries for this recovery; show question + recommendation, never ask or write answers. The resuming session records answers per `orchestrator/references/sprint-bulk-run.md` § Runtime; an empty (`none`) frontier adds no Questions digest.
 
 ## Skill freshness — a report, not a gate
 
@@ -76,9 +79,9 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
 1. Check each slot in order; track found/missing. Read slot 2 in full. Never full-read the architecture map for priming; use Grep for the slot-6 `^## Stack\b` heading check.
 2. From the active task list, count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check).
 3. Compare the base-dir version against the plugin manifest — or, with no version segment, the live-checkout row (above).
-4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
+4. Read the LATEST `handoff` entry (§ Handoff status), resolve its live path and recover questions (§ Questions before mode advice) — report only, never write.
 5. Emit the health report (below) — health check ONLY, no inline file summaries. Its first line — the banner itself — carries the **verdict** (ready · stale · blocked, why in one clause) and the next step, so the reader has both before reading a row.
-6. Emit one `Next:` line:
+6. Emit one `Next:` line: uncertain-write reconciliation first, then any `Questions:` digest (§ above), then the advice below:
    - open members in an **active sprint** → name the mode `orchestrator/references/mode-choice.md` recommends from prime's allowed entry facts (member frontmatter + open-DoD counts). Advice only: name unknown facts for intake confirmation; priming never asks or launches. Other open work → `/orchestrator` intake.
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom

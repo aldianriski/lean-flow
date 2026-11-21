@@ -1,6 +1,6 @@
-# Sprint-bulk — pre-run sweep
+# Sprint-bulk — sweep and runtime
 
-Loaded by `orchestrator/SKILL.md` steps 1–2 before execution of the active sprint.
+Loaded by `orchestrator/SKILL.md` steps 1–2 before execution and step 5 during the active sprint.
 
 ## Sweep
 
@@ -40,3 +40,56 @@ Loaded by `orchestrator/SKILL.md` steps 1–2 before execution of the active spr
    `## Assumes`: `night-run.md` Part 1's zero-open-assumes check still applies at launch; a settled marker or a plain
    informational bullet is not open. A declared J2 still blocks overnight launch under Part 1 item 3, even with its
    questions answered. Unforeseeable questions arising after G2 belong to runtime handling, not this sweep.
+
+## Runtime
+
+One **park, continue, ask at the end** rule governs post-G2 sprint execution, attended and overnight.
+Pre-execution gates, explicit user stops (including human `block`), budget stops and hard failures halt at once;
+never turn one into a park to keep executing. Overnight retains `night-run.md` Part 0's authority limits.
+
+1. **Park the affected work.** A new blocker, including a worker's `blocked` question, holds that unit and
+   anything sharing its ownership, files or dependencies (including transitive dependents), using the G2 map.
+   Keep partial work in the sprint and its worktree outside the merge queue; do not return it to backlog.
+   Never self-answer, work around, reshape or narrow a park. Workers return their question, recommendation
+   and unblock condition; the coordinator owns the record and the final ask.
+2. **Record a temporary park in the existing `progress` entry**, as one sentence naming the unit, blocker,
+   unblock condition and held work. Start with prose, e.g. `Parked T1 pending …`; neither this sentence nor
+   any line in an `open questions at exit` entry may start with `Tn · ` (the reaper's task-line shape).
+   A review's BLOCKED/CRITICAL finding first follows `review-scoping.md` § The revise loop: one bounded
+   retry where permitted (overnight only ADR-022's mechanical carve-out). Still open after that retry,
+   or a retry not authorized → park for the owner, never a second retry or a silent resolution.
+3. **Continue approved disjoint work by readiness, not whole-wave completion.** A unit can advance when
+   its own `Depends-on:` predecessors have merged and its shared-file ownership predecessors have committed.
+   A parked wave-mate alone cannot hold it. Merge each ready unit in ownership order (`dispatch.md`
+   § Merge-back queue); declare and verify the live base at each spawn (§ Declared-base rule).
+4. **Re-check every open park at each task boundary, in both modes.** If its recorded unblock condition is
+   now satisfied by completed work, resume it within the approved scope; needing an owner answer is not
+   satisfied by a recommendation. Re-dispatch the same held worker to rebase onto the current tip before
+   continuing (§ Merge-back queue's expected-conflict rule). If it cannot resume, use `dispatch.md`'s
+   worker-resume fallback with its report and the resolved condition. A retry-still-open park needs the
+   owner and remains parked through the unattended exit.
+5. **Deliver the ready question frontier at exit**, after approved in-flight work finishes and no runnable work remains. Batch questions
+   whose prerequisites are settled, with one recommended answer and the affected unit/unblock condition each;
+   dependent questions wait for their prerequisite answers in later rounds. Always append the ready frontier
+   to the Execution Log as `### <date> | progress | open questions at exit` (write `none` if empty), before
+   attempting `/handoff`. This digest survives a denied handoff or a temp file that later disappears.
+   - **Attended:** ask that frontier in one AskUserQuestion round (up to four questions per popup); send
+     answers via `SendMessage` to the same held workers. Record the owner's answers under
+     `### <date> | questions answered`, then re-check parks and resume authorized work. Ask dependents only
+     once their prerequisites settle. Denial, missing channel or no answer leaves the work parked.
+   - **Overnight:** never ask; put the same ready frontier in `/handoff`'s **Blockers / open questions** slot
+     and halt cleanly. If `/handoff` fails or is denied, keep the Log digest and report the failure once;
+     do not retry it through another tool route.
+   In either mode, immediate halts preserve any pending frontier on the exit path when possible,
+   without delaying the stop, opening a popup or dispatching more work.
+6. **Finalize parks only at the actual exit.** Only a unit still parked then gets the canonical
+   `Tn · parked-hitl|blocked · <unblock>` line (choose one state) for `night-run.md` Part 4. A cleared park
+   gets no such line; a retry-still-open park gets `parked-hitl` here too. The reaper checks the whole run
+   window at exit, so that line satisfies its retry-escalation check. The launcher still owns the terminal
+   state and rollup (ADR-016); this rule changes its evidence timing, not its writer or format.
+
+**Resuming questions.** Record owner answers in a `questions answered` entry in the resuming session too.
+Only that later entry or a newer `open questions at exit` entry retires a digest; a handoff stub, progress,
+or rollup never does. If answers leave questions open, append the remaining ready frontier as a new digest
+after the answers so `/prime` can recover it. Prime surfaces questions read-only, ahead of mode advice,
+after reconciling any uncertain writes; it does not ask or record answers itself.
