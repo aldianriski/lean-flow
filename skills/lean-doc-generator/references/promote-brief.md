@@ -20,6 +20,7 @@ The draft includes proposed members/order, size/dependency checks, stream/epic d
 The coordinator shows the checklist and draft, resolves remaining questions, and obtains explicit owner sign-off on the checklist; it never signs for the owner.
 Only a SendMessage resume carrying that sign-off verbatim and the checklist/draft it covers authorizes worker writes. Earlier approvals cover only their stated scope.
 Then complete the approved promote under the existing procedure: required writes, moves, stamps, signed checklist in the Log and plan freeze/commit; preserve the no-git path. Report the resulting files and evidence.
+Return the completed promotion as `ready` without running § Promote by reference step 5; the coordinator runs that offer per `orchestrator/references/mode-choice.md`, returning `<mode>` / `stop` to flow/orchestrator when called from there, otherwise invoking the selected mode once. Workers never raise the offer or start execution.
 G1/G2 remain separate human sign-offs in the coordinator's session; record gates_signed only after their actual sign-off is relayed verbatim, never infer it from governance approval.
 If new evidence changes what was signed, return `blocked` for the coordinator to resolve it before affected writes. Never turn a proposed repair into a completed checklist item.
 Report changes, checks/results, evidence and anything remaining. Unattended or no Agent/resumption uses the original inline flow; unattended promote parks at the scan and records the park as the skill requires.

@@ -22,10 +22,10 @@ Before recon/design, read only the affected area's section of `docs/architecture
 | `overnight` | G1+G2 pre-signed | **canonical name** for the unattended headless run of a promoted Plan — `sprint-bulk` under the Part 0 authority contract and the Part 0b continuation contract. **Aliases, all still accepted:** `night-run` · `unattended` · `sprint-bulk unattended` |
 
 **Intake routing — a mode keyword selects the mode, it never bypasses these routing checks.** Run them on every invocation, named mode or not:
-- No tracked task → run `/task-decomposer` first, then return here.
+- No tracked task → run `/task-decomposer` first, then consume its hand-off per `references/mode-choice.md`: `stop` ends; `promote` invokes promote once and returns its result here; `<mode>` proceeds as named.
 - Intent too **foggy to slice** (decisions unknown — no acceptance criteria writable yet) → `/task-decomposer` **fog-mode** (`--fog`): map the decisions before forcing tasks.
-- Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
-- Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: surface the choice as a popup — `/lean-doc-generator promote` it into a sprint, or proceed as an explicit `quick` one-off (never slide decompose → build unrecorded).
+- Task is in an **active sprint** → no mode named: popup per `references/mode-choice.md`, recommended first; a named mode (including one picked at a hand-off) skips it. Named or chosen quick/mvp follows its § Promoted member before dispatch. Headless/unattended mode-less intake → `Next:` only, runs nothing.
+- Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: attended per `references/mode-choice.md` → popup `/lean-doc-generator promote` into a sprint, or explicit `quick` one-off; headless/unattended → `Next:` only, runs nothing (never slide decompose → build unrecorded).
 - Asked to **start a night run** on anything that isn't already a promoted Plan → you are the *interactive launcher*, not the run: do feed → promote → pre-flight here, gates and all, and fire the trigger only once pre-flight is green. Never spawn first (→ `${CLAUDE_SKILL_DIR}/references/night-run.md` Part 1a).
 - **Layout v1/mixed** → `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content). Refuse this skill's queue operation and point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree.
 

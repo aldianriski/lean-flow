@@ -79,12 +79,7 @@ session's call. One row covers every skill (one version-scoped root). Out of sco
 4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
 5. Emit the health report (below) — health check ONLY, no inline file summaries. Its first line — the banner itself — carries the **verdict** (ready · stale · blocked, why in one clause) and the next step, so the reader has both before reading a row.
 6. Emit one `Next:` line:
-   - open tasks exist → `/orchestrator` to continue — and when those tasks sit in an **active
-     sprint** with ≥1 open member `autonomy: AFK` at authority `J0`/`J1`, name `/orchestrator
-     sprint-bulk unattended` too (a night run executing the promoted Plan). An all-HITL/J2 sprint gets
-     `/orchestrator` alone: an unattended run would park every J2 task and end at AUTHORITY_BOUNDARY
-     having done nothing. **Naming it is the whole job:** priming never launches anything; the mode is
-     declared at the trigger, and the run is gated by its own pre-flight (`orchestrator/references/night-run.md`)
+   - open members in an **active sprint** → name the mode `orchestrator/references/mode-choice.md` recommends from prime's allowed entry facts (member frontmatter + open-DoD counts). Advice only: name unknown facts for intake confirmation; priming never asks or launches. Other open work → `/orchestrator` intake.
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - uncovered epic conditions or roadmap rows > 0 → also name `/triage` (it lists them)
@@ -106,7 +101,7 @@ Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open · bugs: 1 open (oldest TASK-NNN)
 Coverage: 2 uncovered (EPIC-015 ×1 · roadmap P2a) → /triage
 Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
-Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run — only if an open AFK J0/J1 member exists)
+Next:     /orchestrator sprint-bulk — 3 open members; attended advice pending intake's readiness check (mode-choice.md)
 ```
 
 The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reachable (neither an active
@@ -121,7 +116,7 @@ base dir; otherwise report it, including `n/a`, so its absence is never mistaken
 ## Red flags
 
 ❌ **Reading files outside the declared slots** (beyond a referenced handoff, the plugin manifest the
-   freshness row compares against, and the Execution Log / `HANDOFF-LEDGER.md` the Handoff row reads, and the active epics' § Closed when / the roadmap the Coverage row reads)
+   freshness row compares against, `orchestrator/references/mode-choice.md` for advice, and the Execution Log / `HANDOFF-LEDGER.md` the Handoff row reads, and the active epics' § Closed when / the roadmap the Coverage row reads)
    — adds noise; not this skill's job.
 ❌ **Aborting on a missing file** — everything is optional; `[MISSING]` is the correct response.
 ❌ **Treating presence as loaded context** — emit the health check only; each downstream stage reads its own required sources, including when invoked without `/prime`.

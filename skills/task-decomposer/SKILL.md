@@ -71,7 +71,8 @@ Before the grill or PRD synthesis, the worker (inline on fallback) reads `.claud
    A draft that needs this box and names no scenario is not written on that `approve`: show each drafted box as the exact `- [ ] Negative: …` line it will be written as, write nothing, and wait for a fresh `approve`, then write those lines unchanged; the earlier one never covered a box added after it.
    A draft someone reviews before `approve` runs that review under `orchestrator/references/review-scoping.md` § Draft reviews (at most two rounds).
 7. **Write** — after the layout check above (v1/mixed stops here) and only after the human types `approve`, write **one file per task** to `docs/work/backlog/TASK-NNN-<slug>.md`, blockers first.
-   Id = max in use across all six status folders + 1; shape + id rule → `${CLAUDE_SKILL_DIR}/references/task-file.md`. Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
+   Id = max in use across all six status folders + 1; shape + id rule → `${CLAUDE_SKILL_DIR}/references/task-file.md`. Touch no other file during decomposition. After writing, use `orchestrator/references/mode-choice.md` for attended detection, provisional mode advice and hand-off ownership: N = the `state: ready` tasks just written; N = 0 → no offer, return `stop` with `Next: /triage`.
+   Attended → popup **Promote these N tasks now (recommended)** (form a sprint from the ready output) / **Stop here** (keep the backlog only), returning `promote` / `stop`. Standalone, promote invokes `/lean-doc-generator promote`; under flow/orchestrator, return the result so that caller invokes it once. Stop ends the chain with `Next:` only; unattended/headless gives `Next:` only and runs nothing. Delegated intake leaves this offer to its coordinator after `ready`.
 
 ## Fog-map mode (foggy work too big to plan up front)
 

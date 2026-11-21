@@ -21,6 +21,7 @@ The coordinator reviews and presents the draft, obtains the owner's typed `appro
 Only that resume authorizes task-file writes; follow Step 7 and the hard rules: derive ids, write new backlog files only, never overwrite or write a sprint, roadmap or core doc.
 If a new decision changes the approved draft, return `blocked` for the coordinator to resolve it; never extend an approval yourself. G1/G2 sign-off remains with the coordinator and owner.
 Report files changed, checks/results, evidence and anything remaining; do not move task status or tick acceptance boxes for a future build.
+After this resumed worker reports `ready`, the coordinator runs Step 7's offer per `orchestrator/references/mode-choice.md` and returns `promote` / `stop` to its caller (including flow's Feed→Plan guard); the worker never offers or launches promote. N = 0 or no attended ask channel → return `stop` with `Next:` only.
 
 - `ready`: the task is complete and relevant checks passed; name checks and results.
 - `blocked`: partial or needs input; name what remains and what unblocks it.

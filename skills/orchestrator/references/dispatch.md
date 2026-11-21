@@ -128,6 +128,8 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    is `done/` or `cancel/`. Any member in `todo/`, `in_progress/` or `review/` blocks close, and the
    freeze check is `/lean-doc-generator`'s sprint-by-reference procedure.
 
+8. **One promoted member in quick/mvp** — first follow `mode-choice.md` § Promoted member for selection, frozen dependencies and ownership order; then reuse this lifecycle and the sprint Execution Log, stopping after that member.
+
 ## Pre-dispatch preflight (cycle · ownership · base-ref · waves)
 
 Runs before any wave-shape decision below — the Parallel-vs-sequential call is only as good as the

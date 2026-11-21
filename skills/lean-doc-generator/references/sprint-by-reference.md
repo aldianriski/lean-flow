@@ -46,6 +46,8 @@ docs' content**. It is a derived view, never hand-edited (lean-flow itself:
    (one block per member, headed by its TASK id) and set `plan_commit: none (no git)`; sign the batch gates
    as `gates_signed: G1,G2 @ <YYYY-MM-DD>`. § Without git.
 
+5. **Offer execution after promotion succeeds** — use `orchestrator/references/mode-choice.md` for the entry facts, recommendation and attended probe. Attended → mode popup, recommended first with reasons and **Stop here** last; return `<mode>` / `stop`. An explicitly named mode skips this chooser. Standalone invokes `/orchestrator <mode>` once; under flow/orchestrator, return to that caller to invoke it. Stop keeps the sprint promoted and ends the chain, nothing run. Unattended/headless → one `Next:` recommendation only, no execution. On the delegated path the worker returns `ready` after step 4; its coordinator owns step 5.
+
 ## What `plan locked` pins — the freeze
 
 `plan_commit` **is** the frozen snapshot. No hash or copy is stored beside it: git already holds every
