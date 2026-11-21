@@ -1,0 +1,36 @@
+---
+id: TASK-693
+title: "Trim the lean-doc-generator SKILL.md body with no behaviour change and write the release notes"
+priority: P2
+size: M
+risk: med
+autonomy: HITL
+class: execution
+tier: X
+authority: J1
+origin: decomposer
+state: ready
+depends-on: [TASK-688, TASK-689, TASK-690, TASK-691, TASK-692]
+---
+# TASK-693 — Trim the lean-doc-generator SKILL.md body with no behaviour change and write the release notes
+
+## Why
+lean-doc-generator is 18.9k characters, with promote, close and init procedures. It runs last so the release notes cover every consumer-visible change from 688, 690, 691 and 692. It is the single owner of the README and CHANGELOG lines.
+
+## Done when
+- [ ] The lean-doc-generator body is at or under its TASK-690 census target, `wc -c` before and after recorded.
+- [ ] A retained inventory (`docs/work/evidence/TASK-693/lean-doc-generator.md`) accounts for EVERY behavioural line in the body before the trim, as a complete line-by-line list (not selected classes), each kept, moved (with its branch-point pointer) or deleted (reason: duplicate of a named surviving line); anything that fires on every call stays in the body.
+- [ ] The skill is exercised on real input via `claude -p --plugin-dir D:/Project/lean-flow` (transcript shows the repo base dir): each of promote, close, init, migrate, epic and prd whose text was moved or deleted, on a throwaway directory or in a scratch worktree, nothing committed to main; the same stops and outputs as before are shown for each, including each moved reference being read. Spend is recorded against this task's 4.50 USD share in `docs/work/evidence/TASK-693/spend.md`.
+- [ ] README and the root CHANGELOG carry the user-visible lines for TASK-688 (humanizer glossary pointer), TASK-690 (description trims), TASK-691, TASK-692 and this task (body trims); no version bump (the owner releases v2.27.0 by hand).
+- [ ] The inventory and the runs are reviewed by a different model family than the builder (worktree-isolated), at most 2 rounds; the existing gates stay green.
+- [ ] Negative: no promote or close approval stop, retention rule or "never write a core doc before approve" line is removed or weakened in the body, and a CHANGELOG line that names a leaked repo-specific path fails the review.
+
+## Touches
+`skills/lean-doc-generator/SKILL.md` (+ its `references/`), README, CHANGELOG. Shared files, so `git add -p` and read the staged diff. Not CONTEXT.md.
+
+## Assumes
+- Run budget: this task's fixed share is 4.50 USD of the 15.00 USD total; a run over the share is refused and the owner asked; unspent share is not borrowed without the owner.
+- The last task: it cannot start before the other five finish.
+
+## Tracker
+Owner intake 2026-11-21, area 5; answer Q4 and the split ruling (the release lines are owned here).
