@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-11-21
 status: active
 plan_commit: 45b2e2cc
+gates_signed: G1,G2 @ 6108661c
 update_trigger: sprint execute/close events
 ---
 
@@ -34,7 +35,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Collapse promoted LEARNINGS entries to pointer form `[size: M · risk: low · class: mechanical-ingest · AFK · J1]`
-Layers: `docs/LEARNINGS.md` · `docs/knowledge-index.md`
+Layers: `docs/LEARNINGS.md`
 Depends-on: none
 Cites: TASK-684, `evals/run-learnings-metadata-fixtures.ts`
 85 promoted entries keep bodies over the 6-line collapsed form (the promote-time re-count agrees; it finds 248 lines over it, not the 418 in the task's Why). Collapsing is §11's own action; the id set and every pointer target must survive.
@@ -42,7 +43,7 @@ Cites: TASK-684, `evals/run-learnings-metadata-fixtures.ts`
 **Acceptance:** the measured line delta is reported, 309 ids in and out, and a deliberately uncollapsed entry stays byte-identical.
 
 ### T2 — Trim the always-loaded set by 15% and ratchet the token budget `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `scripts/lib/token-budget.txt` · `docs/work/evidence/TASK-685/inventory.md` · `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `docs/architecture/overview.md`
+Layers: `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `scripts/lib/token-budget.txt` · `docs/work/evidence/TASK-685/inventory.md` · `docs/LEARNINGS.md`
 Depends-on: T1
 Cites: TASK-685, L-008, TD-006
 Duplicated prose becomes pointers; a universal action stays loaded, only branch-specific text moves to a home its flow already reads. The inventory is the proof nothing was lost.
@@ -74,7 +75,7 @@ The inline path never reaches the host glossary, so an override is ignored in co
 **Acceptance:** the domain-calque commit case outputs the host term on a live-checkout run, spend within 1.50 USD, and no host glossary still completes.
 
 ### T6 — Fix the Windows s13 case and the foreign-path false positive (TD-318, TD-319) `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `evals/run-spec-reader-fixtures.sh` · `scripts/lib/check-layers-completeness.ts` · `evals/fixtures/layers-completeness/`
+Layers: `evals/run-spec-reader-fixtures.sh` · `scripts/lib/check-layers-completeness.ts` · `evals/fixtures/layers-completeness/` · `evals/layers-completeness.test.ts`
 Depends-on: none
 Cites: TASK-689, TD-318, TD-319
 A local gate reads red on s13 while off-host is green, and a Done-when path naming another repo's file reads as a lean-flow file. Defect fixes on maintainer-only tooling, other G, no new `.sh` and no new leg.
