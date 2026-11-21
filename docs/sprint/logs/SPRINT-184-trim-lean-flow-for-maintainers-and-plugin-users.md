@@ -94,3 +94,9 @@ builder-check · T10 · 3 contradictions · 3 questions · settled: raw pre-trim
 
 - Applied: three headers set to `status: resolved → accepted (no task) | closed: Sprint-184` plus one `Closed:` bullet each with its reasoning and re-file condition. Checks: only `TECH-DEBT.md` changed; changed header ids = {288, 291, 293}; 123 rows, TD-319 still highest; `check-doc-caps.ts` exit 0; conformance engine `PASS S11.TDDELETE`, informational `S10.TDAGING` count 44 → 41, none naming the closed rows. No duplicates met, so no merges. Coordinator self-review of the diff (consequence low/low).
 review · T3 · self-review · behaviour:low · governance:low
+
+### 2026-11-21 | progress | T1 (TASK-684) done: 78 promoted entries collapsed, LEARNINGS 2,269 → 2,184 lines
+- Builder: Codex (gpt-6-astra) in worktree s184-t1, 139,715 tokens; it returned `blocked` on one finding: L-106's pointer names `DOCS_Guide.md`, which no longer exists (renamed to `spec/STANDARD.md`). Owner popup, verbatim: "Fix the target (Recommended)"; the coordinator changed only that file name (§2 Growth rule exists at `spec/STANDARD.md:196`).
+- Census: 309 ids in and out; 233 promoted / 75 active / 1 superseded unchanged; 232 promotion pointers, all resolve after the L-106 fix. L-144 byte-identical (hash fc7d499d…). 13 no-disposition entries collapsed with `(no disposition at promotion)` per the G2 scope-change.
+- Checks (coordinator, worktree): `run-learnings-metadata-fixtures.ts` 5 pass, 0 fail; `--ledger` PASS; builder also ran conformance `PASS S11.LEARNINGS`, `gen-index --check` PASS, `check-doc-caps` exit 0. Blob on main equals the worktree's. Coordinator self-review (consequence low/low).
+review · T1 · self-review · behaviour:low · governance:low
