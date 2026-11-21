@@ -134,3 +134,9 @@ review · T4 · self-review · behaviour:low · governance:low
 - T7 box 4 legs are not among the 8 FAILs: leg 3 frontmatter, skill-freshness and manifest lockstep pass on c80a3860.
 review · T9 · not-built · behaviour:material · governance:high
 - Follow-up to the T9 prune: `check-layers-completeness` still reads T9's frozen Done-when, which names `docs/work/evidence/TASK-692/orchestrator.md` and `spend.md`; both now sit on T9's `Cites:` line (cited, never touched), which satisfies it while the Layers token stays pruned.
+
+### 2026-11-21 | progress | T2 (TASK-685) built, reviewed and merged: always-loaded set 12,634 → 10,700 tokens (−15.3%), budget ratcheted to 11,021
+- Builder: Codex (gpt-6-astra) in worktree s184-t2, 143,708 tokens, plus one bounded retry. 16 CONTEXT.md lines shortened in place; no rule moved (CLAUDE.md and LEARNINGS unchanged); the five L-105-family paragraphs keep their titles and rules, and the one dedup (line 66) is carried by CLAUDE.md's cross-check bullet. `token-budget.txt`: 12691 → 11021 = ceil(10,700 × 1.03), ratio 2.991 unchanged, reason names TASK-685.
+- Review: Claude (Sonnet, 77,577 tokens), scoped to the diff: CLEAR, 0 High; one Medium accepted: line 68 had lost its two concrete destinations (gate sign-off → sprint frontmatter; close-Retro follow-up → backlog). The retry restored them as one clause (10,663 → 10,700 tokens, still ≤ 10,738).
+- Checks on main (blobs equal the worktree's): `check-doc-caps` PASS token-budget ~10700 ≤ 11021, CLAUDE.md 79/80, CONTEXT.md 150/150; `check-count-claims` PASS; pointer census (reviewer + builder): every `CONTEXT.md §` target in the repo, 232 promoted and 14 moved LEARNINGS pointers resolve. Box 3's qa-check half waits for the next full gate.
+review · T2 · scoped-reviewer · behaviour:low · governance:high

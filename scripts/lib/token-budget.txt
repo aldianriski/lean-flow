@@ -25,4 +25,4 @@
 # no recalibration -- the ratio stays the 2026-09-28 pooled 2.991; only the budget moves, to the check's OWN
 # estimate of the compacted set at that ratio (ceil(37957 / 2.991) = 12691), zero headroom (ADR-048: ratchet
 # at adoption). Round 2 of docs/research/logs/token-calibration.md records the before/after figures.
-12691 2.991 2026-10-25+bc0cac72 ratchet after TASK-506 compaction; ratio unchanged from the 2026-09-28 headless differential via claude-opus-5-5 (claude -p, no ANTHROPIC_API_KEY) -- see docs/research/logs/token-calibration.md
+11021 2.991 2026-11-21+ceea1714 ratchet after TASK-685 trim of the always-loaded set (measured 10700 tokens + 3% headroom); ratio unchanged from the 2026-09-28 headless differential via claude-opus-5-5 (claude -p, no ANTHROPIC_API_KEY) -- see docs/research/logs/token-calibration.md
