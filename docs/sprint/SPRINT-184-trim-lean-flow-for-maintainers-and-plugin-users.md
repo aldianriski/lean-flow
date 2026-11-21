@@ -4,7 +4,7 @@ slug: trim-lean-flow-for-maintainers-and-plugin-users
 owner: Maintainer
 last_updated: 2026-11-21
 status: active
-plan_commit: <sha, set after plan locked>
+plan_commit: 45b2e2cc
 update_trigger: sprint execute/close events
 ---
 
