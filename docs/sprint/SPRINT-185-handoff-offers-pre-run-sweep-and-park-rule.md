@@ -31,7 +31,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Hand init over into migrate and draft reviewed suggestions `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/migration-map.md`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/references/migration-map.md` · `skills/lean-doc-generator/templates/product-requirements.md.template` · `skills/lean-doc-generator/templates/development-coding-standards.md.template`
 Depends-on: none
 Cites: TASK-694 · `lean-doc-generator/SKILL.md` · L-293
 Init writes nothing and stops when migrate is chosen, and both skills offer the owner no starting point when evidence is absent. The sole writer of the lean-doc-generator skill body in this sprint.

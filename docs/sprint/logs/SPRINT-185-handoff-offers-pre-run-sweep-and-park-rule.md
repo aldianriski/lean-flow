@@ -79,3 +79,4 @@ Coordinator slip: one `cd` into the T1 worktree briefly made it the session's wo
 review · T3 · self-review · behaviour:low · governance:low
 review · T1 · scoped-reviewer · behaviour:material · governance:high
 review · T2 · scoped-reviewer · behaviour:material · governance:high
+### 2026-11-21 | scope-change | T1/TASK-694 Layers: add skills/lean-doc-generator/templates/product-requirements.md.template and skills/lean-doc-generator/templates/development-coding-standards.md.template — the shipped-diff Codex review (round 1, medium) found the templates' source lists exclude the new (owner, init; suggested) cite, and SKILL.md says the template wins on divergence, so box 4 could not hold for a quality row; bounded retry by the coordinator, no Done-when change
