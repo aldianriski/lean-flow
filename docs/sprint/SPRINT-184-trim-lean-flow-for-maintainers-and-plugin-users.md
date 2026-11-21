@@ -99,9 +99,9 @@ The lower-blast set proves the method: a line-by-line inventory, moves with a po
 **Acceptance:** each body is at or under its census target, every behavioural line is accounted for, and a different-family review plus real-input runs pass within 3.50 USD.
 
 ### T9 — Trim the orchestrator body `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/` · `docs/work/evidence/TASK-692/`
+Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/`
 Depends-on: T8
-Cites: TASK-692, L-327, L-316
+Cites: TASK-692, L-327, L-316, `docs/work/evidence/TASK-692/orchestrator.md`, `docs/work/evidence/TASK-692/spend.md`
 The gate engine of the loop, so it follows T8. No G1, G2, approve stop or never-push line may be removed or weakened.
 
 **Acceptance:** the body is at or under its target with a full inventory, every moved gate is exercised on real input, and the cross-family review closes within 4.00 USD and two rounds.

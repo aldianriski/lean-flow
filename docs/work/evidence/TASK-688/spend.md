@@ -1,6 +1,6 @@
 # TASK-688 real-input runs (SPRINT-184 T5)
 
-Share: 1.50 USD. Spent: 0.3190 USD (2 runs). Model `claude-sonnet-5-5`; each run's `system/init` lists the plugin `lean-flow` at path `D:\Project\lean-flow` (inline, 2.26.0), the live checkout after merge-back (f09ce0b6).
+Share: 1.50 USD. Spent: 0.3190 USD (2 runs). Model `claude-sonnet-5-5`; each run's `system/init` lists the plugin `lean-flow` at path `D:\Project\lean-flow` (inline, 2.26.0), the live checkout after merge-back (0e937945).
 Prompt: `embedded.md` § Inline path, § Child path item 4, § Never touched and § Commit messages and PR bodies, verbatim from the live file, then format `plain` and `evals/fixtures/humanizer/domain-calque/commit-message.txt` (Indonesian) as text and voice sample. Flags: `claude -p --setting-sources local --plugin-dir D:/Project/lean-flow --add-dir D:/Project/lean-flow --output-format stream-json --verbose --model sonnet --max-budget-usd 0.40`, each from its own scratch folder outside the repo.
 
 | Run | Folder context | Cost USD | Tool calls on the host context | Result |

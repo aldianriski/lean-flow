@@ -1,6 +1,6 @@
 # TASK-690 routing runs (SPRINT-184 T7)
 
-Share: 1.50 USD. Spent: 0.4725 USD (10 runs). Model `claude-sonnet-5-5`. After-arm runs: each `system/init` lists the plugin `lean-flow` at path `D:\Project\lean-flow` (inline, 2.26.0), the live checkout after merge-back (f09ce0b6). Pre-trim comparison runs use `git archive af7508b1 skills .claude-plugin` (the descriptions before T7). Flags: `claude -p --plugin-dir <arm> --setting-sources project,local --strict-mcp-config --output-format stream-json --verbose --model sonnet --max-turns 2 --max-budget-usd 0.30`, each from its own scratch folder outside the repo.
+Share: 1.50 USD. Spent: 0.4725 USD (10 runs). Model `claude-sonnet-5-5`. After-arm runs: each `system/init` lists the plugin `lean-flow` at path `D:\Project\lean-flow` (inline, 2.26.0), the live checkout after merge-back (2b7bc4d7). Pre-trim comparison runs use `git archive af7508b1 skills .claude-plugin` (the descriptions before T7). Flags: `claude -p --plugin-dir <arm> --setting-sources project,local --strict-mcp-config --output-format stream-json --verbose --model sonnet --max-turns 2 --max-budget-usd 0.30`, each from its own scratch folder outside the repo.
 
 | Run | Arm | Prompt | Cost USD | First tool call | Verdict |
 |---|---|---|---:|---|---|
