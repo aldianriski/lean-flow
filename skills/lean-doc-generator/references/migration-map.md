@@ -57,7 +57,8 @@ don't hand-reconcile, and you're not lost in your own existing code.
 Adds the site-specific profile. It reuses init's procedure by pointer
 (`${CLAUDE_SKILL_DIR}/references/init.md`) — do not restate it: **step 1** scan (Stack · Conventions in
 use) · **1b** business evidence · **1c** question sets · the **step-3** business and conventions rounds + Standards question ·
-the **step-5** citation rule. Migrate's deltas only:
+the **step-5** citation rule. On entry from init 1d, reuse its already-gathered step 1/1b/1c inputs,
+without re-scanning them; migrate's own Detect → Plan → approval still runs. Migrate's deltas only:
 
 - **Targets** — `## Stack` (`docs/architecture/overview.md`), `## Conventions in use` and optional `## Standards adopted`
   (`docs/development/coding-standards.md`), and Business goal · Main flows · Invariants · Quality attributes ·
@@ -69,7 +70,7 @@ the **step-5** citation rule. Migrate's deltas only:
   existing text. **Absent** — create it from its template; coding-standards only when the repo has code (init's
   row).
 - **Standards adopted** — keep an existing section verbatim and do not ask again, even if checks are undecided.
-  Otherwise reuse init's Standards question; answers cite `(owner, migrate)`, and a standard still without checks
+  Otherwise reuse init's Standards question and the citation rule below; a standard still without checks
   reads `checks: not decided yet (owner, migrate)`, with the citation on `checks` itself.
 - **Heading match** ignores case and a trailing ` [CUSTOMIZE]`. Except for Standards adopted, a target section whose body is only template
   placeholders or a `Not decided yet (owner, …)` line is present-but-unfilled: the pass may fill it, asking that
@@ -80,11 +81,15 @@ the **step-5** citation rule. Migrate's deltas only:
   `settled (<path> § <heading>)`. Partial profile → add only
   the missing targets; all targets present → deltas only (§ Re-run).
 - **Cite, don't copy** — a fact already in an existing doc is cited `(from <path> § <heading>)`. Answers given
-  here cite `(owner, migrate)` or `(owner, migrate; drafted from <path> § <heading>)`.
+  here cite `(owner, migrate)` for an edited or described answer, `(owner, migrate; suggested)` for an
+  accepted suggestion, or `(owner, migrate; drafted from <path> § <heading>)` for an accepted evidence option.
+  `checks:` stay owner-only and cite `(owner, migrate)`, never `suggested`.
 - **Own home** — an existing section elsewhere that overlaps (e.g. a stack list in `CONTEXT.md`) stays
   untouched; propose a **consolidate** plan item, not applied in this pass.
 - **Rounds** — the business and conventions rounds run after the plan is approved (no tier popup); ask only
   what nothing settles. Headless is unchanged: park with the plan; nothing is written.
+- **Suggestions** — reuse init step 3's **Suggested option**, including its reviewer, slot and headless rules,
+  for open business topics, conventions questions and Standards where it fires; First milestone stays init-only.
 - **Report** — every profile topic (Stack, Conventions and optional Standards adopted included), labelled with exactly one of
   `settled (<source>)` · `asked (answered)` · `asked (not decided yet)` · `skipped (none)` for standards declined, in those words.
   Standards adopted whose every named standard lacks checks is `asked (not decided yet)`.
