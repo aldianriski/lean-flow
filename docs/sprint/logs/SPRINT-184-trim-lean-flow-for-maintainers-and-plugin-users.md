@@ -75,3 +75,22 @@ builder-check · T10 · 3 contradictions · 3 questions · settled: raw pre-trim
 ### 2026-11-21 | scope-change | T1/TASK-684 T2/TASK-685 Layers: prune docs/knowledge-index.md from T1 and T2 and docs/architecture/overview.md from T2 — both confirmed untouched at G2 (the index is generated from L-NNN headings only and gen-index --check passes; overview.md is at its cap and is not a home under Safety wins); L-240, no Done-when change
 ### 2026-11-21 | scope-change | T6/TASK-689 Layers: add evals/layers-completeness.test.ts — the runner of the retained must-FAIL fixtures the task's box 2 needs (L-100); no Done-when change
 ### 2026-11-21 | scope-change | T1/TASK-684 box 1 reading: 13 promoted entries (L-010, 043, 049, 060, 087, 097, 100, 108, 120, 129, 135, 151, 172) carry a pointer but no disposition; owner ruled "Collapse them (Recommended)": each keeps its pointer line verbatim and records 'no disposition at promotion' instead of an invented one; box text unchanged
+
+### 2026-11-21 | progress | T3 (TASK-686) done: 3 stale rows closed by owner per-row approval, 7 kept, no merges
+- Builder (Sonnet, read-only phase 1, 109,169 tokens; phase 2 applied, 116,537 cumulative) checked all ten candidates by fact. Per-row table, with the owner's approval recorded (AskUserQuestion multi-select, verbatim: "TD-288 (Recommended),TD-291 (Recommended),TD-293 (Recommended)"):
+
+| Row | Sev | Disposition | Owner | Reason | Re-file fresh if |
+|---|---|---|---|---|---|
+| TD-288 | low | close | approved | hypothetical sprint-filename defect, zero population (STANDARD §2) | a sprint file is named outside `SPRINT-NNN-<slug>.md` |
+| TD-291 | low | close | approved | watch fires only on A/B release arms; A/B system deleted (53c91a3e) | an A/B or arm-style measurement is rebuilt, or two or more tasks' residual failures concentrate in backend layers |
+| TD-293 | low | close | approved | cites `evals/ab` classifier/operator files, deleted; TASK-607 shipped without an arm | an A/B or operated-migrate arm harness is rebuilt |
+| TD-070 | minor | keep | — | duplicated §2 parsers still live (conformance-engine, check-doc-caps, s2-placement fixtures) | — |
+| TD-090 | medium | keep | — | Windows gate cost still measured live (Round 26, 2026-11-14) | — |
+| TD-061 | medium | keep | — | subfolder cap gap reproduced today on a scratch root (ADR-057 only narrows it) | — |
+| TD-158 | minor | keep | — | cited `.sh` retired, defect (b) survives in the `.ts` port | — |
+| TD-159 | minor | keep | — | 2 of 3 documentation gaps remain | — |
+| TD-207 | low | keep | — | any-folder glob still in conformance-engine | — |
+| TD-228 | low | keep | — | `_adr_canonical` slug divergence still there | — |
+
+- Applied: three headers set to `status: resolved → accepted (no task) | closed: Sprint-184` plus one `Closed:` bullet each with its reasoning and re-file condition. Checks: only `TECH-DEBT.md` changed; changed header ids = {288, 291, 293}; 123 rows, TD-319 still highest; `check-doc-caps.ts` exit 0; conformance engine `PASS S11.TDDELETE`, informational `S10.TDAGING` count 44 → 41, none naming the closed rows. No duplicates met, so no merges. Coordinator self-review of the diff (consequence low/low).
+review · T3 · self-review · behaviour:low · governance:low

@@ -391,7 +391,8 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-288** severity: low | status: open | created: Sprint-159 (T3 outside review, round 2)
+- **TD-288** severity: low | status: resolved → accepted (no task) | closed: Sprint-184 | created: Sprint-159 (T3 outside review, round 2)
+  - Closed: Sprint-184, owner-approved. The row's own Evidence says no live case exists; every sprint file here is `SPRINT-NNN-<slug>.md` (STANDARD §2). Re-file fresh if a sprint file is ever named outside that standard.
   - Summary: **The sprint checker follows a copy whose source path carries no `SPRINT-<n>` number.** TASK-596's fix stops at a
     copy from another sprint by comparing the `SPRINT-<n>` in the paths; a copy from an unnumbered path (e.g. `2026-09-01.md`)
     is followed, so that file's earlier records could leak into the new sprint's history (a false `PLAN-COMMIT-LATE`).
@@ -1898,7 +1899,8 @@ status: current
     SPRINT-073 (spec annotation, all HITL, no night run) is the wrong sprint for it. Recorded
     explicitly so the next reviewer starts from *"unblocked but unscheduled"* rather than re-deriving
     a block that has already lifted.
-- **TD-291** severity: low | status: open | created: Sprint-162 (promote; EPIC-023 D20)
+- **TD-291** severity: low | status: resolved → accepted (no task) | closed: Sprint-184 | created: Sprint-162 (promote; EPIC-023 D20)
+  - Closed: Sprint-184, owner-approved. The watch's trigger is the A/B release arm (D19); the A/B system was deleted (53c91a3e), so it cannot fire. Re-file fresh if an A/B or arm-style measurement is rebuilt, or two or more tasks' residual failures concentrate in backend layers.
   - Summary: **Backend role watch: duplicated server logic keeps recurring in A/B runs, and no reviewer looks for it.** EPIC-023
     D20 deferred every role agent; backend is the one it marked **watched**. The trigger fires when the residual failures of two
     or more tasks concentrate in backend layers on the shipped plugin.
@@ -1909,7 +1911,8 @@ status: current
   - Mitigation: re-check the trigger at each release arm (D19). If it fires, propose an epic for a backend reviewer, admitted
     under ADR-053 and measured by one arm against the shipped stack.
 
-- **TD-293** severity: low | status: open | created: Sprint-163 (close; T2 surprise)
+- **TD-293** severity: low | status: resolved → accepted (no task) | closed: Sprint-184 | created: Sprint-163 (close; T2 surprise)
+  - Closed: Sprint-184, owner-approved. The harness it names (`evals/ab/lib/classifier.ts`, `operator.ts`) was deleted with the A/B system, and TASK-607 shipped without an arm. Re-file fresh if an A/B or operated-migrate arm harness is rebuilt.
   - Summary: **The operated migrate route stopped before the Standards question.** On a real-repo copy, an operated migrate halted at its
     first plan popup: four bundled questions the classifier has no answer for, with Bash and PowerShell reported blocked. The operator
     can answer the Standards question and its plan item (S81), but that run never got there.
