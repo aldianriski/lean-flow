@@ -68,7 +68,10 @@ never turn one into a park to keep executing. Overnight retains `night-run.md` P
    continuing (§ Merge-back queue's expected-conflict rule). If it cannot resume, use `dispatch.md`'s
    worker-resume fallback with its report and the resolved condition. A retry-still-open park needs the
    owner and remains parked through the unattended exit.
-5. **Deliver the ready question frontier at exit**, after approved in-flight work finishes and no runnable work remains. Batch questions
+5. **Deliver the ready question frontier at exit**, after approved in-flight work finishes and no runnable work remains. Exit pass, in order:
+   the digest below; step 6's canonical line for each unit still parked, in its own `progress` entry (overnight: before
+   `/handoff`; attended: after the round, for parks its answers left open); then `/handoff`. Omitting that line makes
+   the reaper read a parked unit as `unattempted`. Batch questions
    whose prerequisites are settled, with one recommended answer and the affected unit/unblock condition each;
    dependent questions wait for their prerequisite answers in later rounds. Always append the ready frontier
    to the Execution Log as `### <date> | progress | open questions at exit` (write `none` if empty), before
@@ -78,11 +81,12 @@ never turn one into a park to keep executing. Overnight retains `night-run.md` P
      `### <date> | questions answered`, then re-check parks and resume authorized work. Ask dependents only
      once their prerequisites settle. Denial, missing channel or no answer leaves the work parked.
    - **Overnight:** never ask; put the same ready frontier in `/handoff`'s **Blockers / open questions** slot
-     and halt cleanly. If `/handoff` fails or is denied, keep the Log digest and report the failure once;
-     do not retry it through another tool route.
+     and halt cleanly. If `/handoff` fails or is denied, keep the Log digest and report the failure once in a new
+     Log entry; never delete or rewrite lines already appended (the Log is append-only), and do not retry it
+     through another tool route.
    In either mode, immediate halts preserve any pending frontier on the exit path when possible,
    without delaying the stop, opening a popup or dispatching more work.
-6. **Finalize parks only at the actual exit.** Only a unit still parked then gets the canonical
+6. **Finalize parks only at the actual exit** (step 5's exit pass). Only a unit still parked then gets the canonical
    `Tn · parked-hitl|blocked · <unblock>` line (choose one state) for `night-run.md` Part 4. A cleared park
    gets no such line; a retry-still-open park gets `parked-hitl` here too. The reaper checks the whole run
    window at exit, so that line satisfies its retry-escalation check. The launcher still owns the terminal
