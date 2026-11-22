@@ -149,6 +149,15 @@ A worker's nested `claude -p` can be refused by the host's classifier (SPRINT-16
 
 ---
 
+## L-331 [tags: process] [status: active]: **A rule a run must follow at its own exit is not proven by one passing run: in SPRINT-185 the same exit order held in two overnight runs and failed in a third.**
+T5's proof ran three overnight exits on one rule. Two wrote the canonical `T1 · parked-hitl` line; the third parked T1 correctly, wrote the digest, and left the line out, so the unchanged reaper derived a false BUDGET_STOP. The rule stated the steps but not their order at exit. Fixed by stating one ordered exit pass (6c98f393), then re-run.
+- seen: 2026-11-22 (SPRINT-185 T5 proof leg d)
+- count: 1
+- promoted: no
+- related: L-007 (exercised on real input) · L-045 (a self-report is evidence about the reporter)
+
+---
+
 ## L-330 [tags: process] [status: active]: **A probe that voids a paid run by parsing its shell commands misfires on each new command shape, so check every void flag against the transcript before throwing the run away.**
 SPRINT-183 T4 and T5 hit seven misfires in one fence: `rtk init --show` read as mutating, a case-sensitive path compare that refused the run's own export, a `..` that resolved inside the export after a `cd`, a path inside a heredoc the permission layer denied, the grep regex `PEPPER\|SECRET`, `~` inside refused heredocs, and the grep pattern `/m/` read as an MSYS drive path. Each was shown false from the transcript (the call never ran, or read only inside the export), the run was kept with an annotated ledger row, and the fence was fixed and replayed before the next launch. Most came from edit attempts: agents in every arm tried Write or heredoc edits under a plan-only prompt, and only the deny list stopped them. Decide a void from what ran (the tool_result) and what it read; a parsed command that never ran is an attempt, not a read.
 - seen: 2026-11-20 (SPRINT-183 T4 capability run, T5 blocks 1, 2, 3, 5 and 6)
@@ -1027,12 +1036,15 @@ SPRINT-172 made the error both ways. T3's first draft judged 9 must-FAIL fixture
 - seen: 2026-10-10 (SPRINT-121 T4 fold of L-171: SPRINT-087)
 - seen: 2026-10-10 (SPRINT-121 close: the coordinator ran workdoo verify on the host while T3 was timing the engine; first baseline discarded)
 - seen: 2026-10-18 (SPRINT-127 T3: a bare `cd` into the worktree for the coordinator's independent re-seed; the seed was restored first, then the session `cd`'d back and T4 ran without a worktree)
-- count: 6
+- count: 9
 - **L-219 → promoted: skills/orchestrator/references/dispatch.md § Worktree dispatch protocol** · disposition: move-to-reference — family G (×5): inspect a worktree with `git -C`, never `cd`; run nothing host-heavy while a timing task measures (SPRINT-122 promote, owner).
 - related: L-055 (declared base) · L-216 (a background job owns the tree it rewrites) · L-067 (a result across an environment boundary) · TD-054
 - seen: 2026-10-24 (SPRINT-138, a **failure**: the coordinator ran `cd <worktree> && …` to probe T1's command, and the harness adopted
   the worktree as the session's checkout. Noticed from the environment notice; moved back before any dispatch; later probes used a subshell
   or `--cwd`.)
+- seen: 2026-11-21 (SPRINT-185 W1, coordinator: a `cd` into worktree `s185-t1` moved the session there for a turn; no isolated dispatch ran)
+- seen: 2026-11-21 (SPRINT-185 T5 landing, coordinator: a `cd` into worktree `s185-t5`; moved back with `cd /d/Project/lean-flow` before any dispatch)
+- seen: 2026-11-22 (SPRINT-185 T5 proof leg a, consumer session in workdoo: a `cd` into its integration worktree moved the session there; no dispatch ran, and it caused the L-044 Windows lock on removal)
 
 ---
 

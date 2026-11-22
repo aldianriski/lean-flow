@@ -117,3 +117,15 @@ T2 (TASK-695): (b) Stop here at the decomposer's offer ended /flow with Next onl
 T5 (TASK-698), owner rulings: fold the seven staged legs into four runs plus /prime checks; G1, G2 and the approval envelope signed for the synthetic proof sprint at 2.5 USD per run. (a) attended: blocked T1 worker, T2 merged first, one exit popup, the answer went back by SendMessage to the same worker, PLAN_EXHAUSTED. (b) the hold cleared at the boundary re-check, reaper PLAN_EXHAUSTED. (c)+(f) T1 parked, T2 merged, T3 ran on the new base, reaper AUTHORITY_BOUNDARY. (d) failed at first: the run left out the canonical park line, so the unchanged reaper derived a false BUDGET_STOP, and the run deleted its own appended stub lines. Owner ruling: fix the exit order. 6c98f393 makes the exit pass ordered (digest, then the canonical line in its own entry, then /handoff) and keeps the Log append-only; Codex round 2 CLEAR. The re-run passed, and a fresh /prime led with the question from the live stub. (e) a real handoff denial (dontAsk Write to the temp dir) got no alternate-route retry, and /prime recovered the question from the Log digest. (e2) with the temp doc deleted, /prime used the Log digest.
 Known limit: headless /handoff can write only when the child's TEMP and --add-dir use the long path (the 8.3 short name was denied twice), which is a TD candidate for the exit-path allowlist. Spend: 5.00 of the 15 USD cap. The workdoo session's `cd` into an integration worktree is a third L-219 sighting.
 run · 36 of 36 DoD ticked (T3 6/6 · T1 8/8 · T4 6/6 · T2 9/9 · T5 7/7)
+
+### 2026-11-22 | handoff | reconciled at close -- the G2 handoff's work is all in this Log (batch G2 signed, W1 and W2 landed)
+handoff-status: spent
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-g2.md
+
+### 2026-11-22 | handoff | reconciled at close -- the build handoff's items went to the Retro, TD-322 and L-219
+handoff-status: spent
+handoff-path: C:\Users\HYPEAM~1\AppData\Local\Temp\handoff-sprint-185-build.md
+Routed: the L-219 sighting → `docs/LEARNINGS.md` L-219 (count 9, with this sprint's two later sightings); the RESEARCH.md.template cap figure → TD-322; the T3 audit ranking → the Retro's Follow-ups line. Ruled, no action: the T4 reviewer's low note that Sweep step 2 does not name `**blocked-by:**` Assumes lines, since step 5 still catches a member left blocked. Worktree cleanup (TD-246) is in the retention pass.
+
+### 2026-11-22 | close | Retro written, buckets routed, SPRINT-185 closed
+System-verify on 8c3711e8 (off-host, `QA_FULL=1`): `QA-CHECK: 241 pass, 0 fail`, `bun test` 643 pass, 0 fail. `check-sprint-by-reference.ts --close`: 12 pass, 0 fail. Retro in the sprint file; TD-322 to 325 and L-331 filed.

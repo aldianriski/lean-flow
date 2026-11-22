@@ -2,8 +2,8 @@
 sprint: 185
 slug: handoff-offers-pre-run-sweep-and-park-rule
 owner: Maintainer
-last_updated: 2026-11-21
-status: active
+last_updated: 2026-11-22
+status: closed
 plan_commit: 9478dec4
 gates_signed: G1,G2 @ c812fcfb
 update_trigger: sprint execute/close events
@@ -83,3 +83,45 @@ Attended runs halt at the first blocker while overnight parks, which is two proc
 ## Assumptions
 
 - **A1** — No ADR governs init's "never generates candidate answers". *Confirm: re-derive at G2 (L-220).*
+
+## Execution Log
+
+Append-only, in [`logs/SPRINT-185-handoff-offers-pre-run-sweep-and-park-rule.md`](logs/SPRINT-185-handoff-offers-pre-run-sweep-and-park-rule.md).
+
+## Files Changed
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| `skills/lean-doc-generator/SKILL.md`, `references/init.md`, `references/migration-map.md`, `templates/product-requirements.md.template`, `templates/development-coding-standards.md.template` | T1 | Init on a repo with docs hands over to migrate in the same session; open profile prompts get independently reviewed suggestions, cited when accepted (WHY: init stopped where migrate should start) | Med | consumer proof legs a, b, c (trimmed); Codex r2 CLEAR |
+| `skills/orchestrator/references/mode-choice.md` (new), `skills/task-decomposer/SKILL.md`, `references/intake-brief.md`, `skills/lean-doc-generator/references/sprint-by-reference.md`, `references/promote-brief.md`, `skills/orchestrator/SKILL.md`, `references/dispatch.md`, `skills/prime/SKILL.md`, `skills/flow/SKILL.md` | T2 | One offer per hand-off: promote or stop, then a recommended mode; the caller runs it once (WHY: a decomposed backlog ended without offering promote) | Med | consumer proof legs a to f; Codex r1 CLEAR |
+| `docs/research/loop-audit-2026-11.md` (new), `docs/knowledge-index.md` | T3 | Ranked audit of the lane and loop workflow (WHY: the owner picks the next sprint from evidence) | Low | Codex draft review r1 CLEAR |
+| `skills/orchestrator/references/sprint-bulk-run.md` (new, § Sweep), `references/builder-check.md`, `references/night-run.md`, `skills/orchestrator/SKILL.md` | T4 | Pre-run sweep asks every foreseeable question at batch G1/G2 before the first dispatch (WHY: sprint-bulk asked mid-run what it could ask once) | Med | consumer proof legs 1, 2; Codex r2 CLEAR |
+| `sprint-bulk-run.md` (§ Runtime), `night-run.md`, `dispatch.md`, `skills/orchestrator/SKILL.md`, `skills/flow/SKILL.md`, `skills/prime/SKILL.md`, `skills/handoff/SKILL.md`, `sprint-by-reference.md` | T5 | One park, continue, ask-at-end rule for attended and overnight runs; units advance on their own readiness; `/prime` surfaces the exit questions; 6c98f393 orders the exit pass after a proof run omitted the canonical park line (WHY: two park rules disagreed) | Med | consumer proof legs a to f, e2, unchanged launcher and reaper; night-run-rollup 46/0; Codex r1 and r2 CLEAR |
+| `README.md`, `CHANGELOG.md`, `.claude/CONTEXT.md` | COORD | `[Unreleased]` lines and roster-neutral wording for TASK-694 to 698 (WHY: D3, coordinator-owned) | Low | gate |
+| `docs/work/` moves, sprint file and Log; `TECH-DEBT.md`, `docs/LEARNINGS.md` | COORD | Ticks, status moves, proof records; close files TD-322 to 325, L-331 and three L-219 sightings | Low | check-sprint-by-reference `--close` 12/0, layers-observed PASS, gate |
+
+## Retro
+
+**Retrieval check** — Yes, one miss. L-219's durable rule (`git -C`, never `cd`) is in `dispatch.md` and still fired three times this sprint: twice in this coordinator, once in the consumer session. Each was caught before a dispatch, so the cost was nothing beyond the slip itself. L-293 held: every headless proof launch named its tool route first, and no run was voided by a blocked `Skill` call.
+
+**Cost** — 5 members (T5 size M, the rest S or M); coordinator plus Codex builders (T1, T2, T4, T5) and Claude inline for T3. Reviews: scoped Sonnet reviewers per build, Codex on each shipped diff (T1 and T4 needed round 2; T5 needed a second round for the exit-order fix). Consumer-proof spend: 5.00 of 15.00 USD (T2 leg f 0.30; T5 runs b 0.89, c+d+f 1.37, d 0.88, d re-run 0.87; three `/prime` checks 0.69), all other legs interactive. DoD: 36 of 36. Builder and reviewer token counts were not recorded this session.
+
+**Worked**
+- The consumer proofs found a real defect the reviews missed. Two of three overnight exits wrote the canonical park line; one left it out, and the unchanged reaper derived a false BUDGET_STOP. The fix shipped inside the sprint, checked by Codex replaying the reaper's rules over the failed Log.
+- Folding legs by shared seed (T1 trimmed, T5 seven legs into four runs plus `/prime` checks) kept spend at a third of the cap with every frozen leg still exercised.
+- Throwaway proof branches in workdoo, reverted by checkout plus a manifest compare, were safer than moving the work store aside, which once lost a held copy before it was compared.
+
+**Friction**
+- Headless `/handoff` could not write its temp doc until the long temp path was used (TD-323); two proof runs reached the exit path blind.
+- workdoo has no `## Stack`, so the first `/flow` session detoured through migrate and exposed two migrate defects (TD-324, TD-325).
+- The owner had to relay `/clear` and "go" for each interactive leg, because a cleared session loses the run request.
+
+**Pattern candidate**
+- L-331 (new, count 1): a rule a run must follow at its exit is not proven by one passing run; the same exit order held twice and failed once.
+
+**Routed**
+- Shipped: CHANGELOG `[Unreleased]` carries one line per member (TASK-694 to 698). No `type: bug` member.
+- Tech debt: TD-322 (research template cap figure), TD-323 (headless handoff temp path), TD-324 (single-option migrate popup), TD-325 (migrate backup popup hides its commands).
+- Follow-ups: none filed. The T3 audit's ranking (`docs/research/loop-audit-2026-11.md`) is the input for picking the next sprint: #3 (one builder brief), then #7 (close-time worktree sweep, TD-246).
+- Learnings: L-331 filed; L-219 count 6 to 9.
+- Release: feature sprint (shipped skills changed), so MINOR by hand. Nothing is pushed.

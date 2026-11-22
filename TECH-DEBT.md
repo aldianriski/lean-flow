@@ -1870,3 +1870,19 @@ status: current
   - Summary: **The intake draft check for TASK-694..698 ran as an improvised Codex debate, not the shipped cross-model route.** The coordinator wrote its own `AGREE / DISAGREE` brief with no altitude line, no `--model`, no read/not-read statements, ran it in the background, and went to round 3 on the owner's "discuss until each other agree". Rounds 2 and 3 again found issues in the coordinator's own fixes (8 → 6 → 4 findings, about 318k Codex tokens for 3 rounds), the pattern the two-round stop rule exists to stop. The owner flagged it ("why still amateur with this", citing claudex-loop).
   - Mitigation: the route is reachable only in two hops (decomposer step 6 → `review-scoping.md` § Draft reviews → `cross-model-route.md`), and no line says what to do when the owner asks for more rounds than the cap. Candidate: name `cross-model-route.md` § The review brief directly at the intake draft check, and state that "until agree" means agreement inside the stop rule, with the conflict surfaced to the owner. A hypothesis, not a plan; re-derive before building on it. Skill prose, unfrozen under ADR-053. TASK-697's audit may mark this "covered by".
   - Evidence: this session's scratchpad briefs and verdicts (debate-r1..r3); `docs/research/claudex-loop-delta.md`; `skills/orchestrator/references/cross-model-route.md` § Rounds and record
+- **TD-322** severity: trivial | status: open | created: Sprint-185 (close retro)
+  - Summary: **`RESEARCH.md.template`'s footer says "≤120 soft" while STANDARD §2 sets the research cap at 130.** Found by TASK-697's audit (out of its scope).
+  - Mitigation: point the footer at STANDARD §2 instead of restating the figure. A template line fix, unfrozen under ADR-053.
+  - Evidence: Sprint-185 · `docs/research/loop-audit-2026-11.md`
+- **TD-323** severity: low | status: open | created: Sprint-185 (close retro)
+  - Summary: **A headless overnight run on this Windows host could not write its `/handoff` temp doc.** Under `--permission-mode dontAsk`, Write to `C:\Users\HYPEAM~1\AppData\Local\Temp\…` was denied twice, once even with `--add-dir` on that short-name path. It landed only when the child's TEMP/TMP and `--add-dir` used the long path (`C:\Users\HYPE AMD\…`). The Log digest kept the questions, as designed, but no handoff doc or live stub was written.
+  - Mitigation: `night-run.md` Part 1's exit-path allowlist item could name the resolved long temp path (or a `Write(...)` rule for it) and say that an 8.3 short name does not match. A hypothesis, not a plan; re-derive before building on it.
+  - Evidence: Sprint-185 · T5 proof runs c+d+f and d (8c3711e8)
+- **TD-324** severity: low | status: open | created: Sprint-185 (close retro)
+  - Summary: **`/lean-doc-generator migrate` built a profile question with a single option.** The `checks:` question for an adopted standard offered only "Not decided yet", so the popup was rejected before the owner saw it, and the session wrote `checks: not decided yet (owner, migrate)` with no owner pick.
+  - Mitigation: when a question would have one option, state that path as a note instead of a popup, or give it a real second option (name a check). A hypothesis, not a plan. Skill prose, unfrozen under ADR-053.
+  - Evidence: Sprint-185 · T2 proof session 1 in workdoo
+- **TD-325** severity: low | status: open | created: Sprint-185 (close retro)
+  - Summary: **`migrate`'s backup check asked the owner to make the tree clean without showing the git commands.** The owner answered in free text ("where the syntax give me"), then rejected the re-check popup ("where ? i dont see"), and the session had to print the commands as plain text.
+  - Mitigation: put the exact commands in the message before the popup, or in its question. A hypothesis, not a plan. Skill prose, unfrozen under ADR-053.
+  - Evidence: Sprint-185 · T2 proof session 1 in workdoo
