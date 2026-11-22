@@ -16,6 +16,12 @@ status: current
 
 ## [Unreleased]
 
+## v2.28.0 — hand-off offers, a pre-run sweep and one park rule (2026-11-22)
+
+**MINOR** — no new skill; the roster stays at 16, and the standard is spec 0.21.0. Restart the session after installing.
+Released on a Codex review of the shipped diff since v2.27.0 (R1 CLEAR, no findings) and the off-host gate. SPRINT-185
+(TASK-694 to TASK-698) carries the evidence; every behaviour was proven in a consumer repo, and one defect found there was fixed before release.
+
 - **`/lean-doc-generator`: `init` on a repo with docs hands over to `migrate` in the same session, and both offer independently reviewed suggestions for open profile prompts; an accepted one is cited, a rejected one is never written (TASK-694).**
 - **`/task-decomposer`, `/lean-doc-generator promote`, `/orchestrator` and `/flow`: each hand-off offers the next step (promote, then a recommended mode) and the caller runs it once; `quick` and `mvp` follow a promoted member's lifecycle. `/prime` now names an overnight run only when every open member is AFK at J0/J1 with no open assumptions, so one AFK member no longer qualifies (TASK-695).**
 - **`/orchestrator sprint-bulk`: a pre-run sweep asks every foreseeable question at batch G1/G2 before the first dispatch; a member still blocked leaves only by the owner's ruling (TASK-696).**
